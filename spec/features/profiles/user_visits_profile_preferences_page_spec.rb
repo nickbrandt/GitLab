@@ -17,7 +17,7 @@ RSpec.describe 'User visits the profile preferences page', :js do
     expect(page).to have_active_navigation('Preferences')
   end
 
-  describe 'User changes their syntax highlighting theme', :js do
+  describe 'User changes their syntax highlighting theme' do
     it 'creates a flash message' do
       choose 'user_color_scheme_id_5'
 
@@ -36,7 +36,7 @@ RSpec.describe 'User visits the profile preferences page', :js do
     end
   end
 
-  describe 'User changes their default dashboard', :js do
+  describe 'User changes their default dashboard' do
     it 'creates a flash message' do
       select2('stars', from: '#user_dashboard')
       click_button 'Save changes'
@@ -64,9 +64,10 @@ RSpec.describe 'User visits the profile preferences page', :js do
     end
   end
 
-  describe 'User changes their language', :js do
-    it 'creates a flash message', quarantine: 'https://gitlab.com/gitlab-org/gitlab/-/issues/31404' do
-      select2('en', from: '#user_preferred_language')
+  describe 'User changes their language' do
+    it 'creates a flash message' do
+      wait_for_requests
+      select 'English', from: 'user_preferred_language'
       click_button 'Save changes'
 
       wait_for_requests
@@ -76,7 +77,7 @@ RSpec.describe 'User visits the profile preferences page', :js do
 
     it 'updates their preference' do
       wait_for_requests
-      select2('pt_BR', from: '#user_preferred_language')
+      select 'Portuguese (Brazil) - português (Brasil)', from: 'user_preferred_language'
       click_button 'Save changes'
 
       wait_for_requests

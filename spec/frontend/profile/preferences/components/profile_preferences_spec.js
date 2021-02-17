@@ -52,10 +52,6 @@ describe('ProfilePreferences component', () => {
     );
   }
 
-  function findFlashError() {
-    return document.querySelector('.flash-container .flash-text');
-  }
-
   function findLocalizationAnchor() {
     return wrapper.find('#localization');
   }
@@ -130,6 +126,10 @@ describe('ProfilePreferences component', () => {
     div.classList.add('container-fluid');
     document.body.appendChild(div);
     document.body.classList.add('content-wrapper');
+  }
+
+  function findFlashError() {
+    return document.querySelector('.flash-container .flash-text');
   }
 
   beforeEach(() => {
