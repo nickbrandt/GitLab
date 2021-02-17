@@ -60,6 +60,10 @@ RSpec.describe Issues::ExportCsvService do
       expect(csv.headers).to include('Title', 'Description')
     end
 
+    it 'returns two issues' do
+      expect(csv.count).to eq(2)
+    end
+
     specify 'iid' do
       expect(csv[0]['Issue ID']).to eq issue.iid.to_s
     end
@@ -163,12 +167,24 @@ RSpec.describe Issues::ExportCsvService do
       end
     end
 
-    context 'performance' do
+    context 'with label links' do
+      let(:labeled_issues) { create_list(:labeled_issue, 2, project: project, author: user, labels: [feature_label, idea_label]) }
+
       it 'does not run a query for each label link' do
         control_count = ActiveRecord::QueryRecorder.new { csv }.count
-        create_list(:labeled_issue, 2, project: project, author: user, labels: [feature_label, idea_label])
+
+        labeled_issues
 
         expect { csv }.not_to exceed_query_limit(control_count)
+        expect(csv.count).to eq(4)
+      end
+
+      it 'returns the labels in sorted order' do
+        labeled_issues
+
+        labeled_rows = csv.select { |entry| labeled_issues.map(&:iid).include?(entry['Issue ID'].to_i) }
+        expect(labeled_rows.count).to eq(2)
+        expect(labeled_rows.map { |entry| entry['Labels'] }).to all( eq("Feature,Idea") )
       end
     end
   end
