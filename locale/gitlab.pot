@@ -653,6 +653,12 @@ msgstr ""
 msgid "%{name_with_link} has run out of Shared Runner Pipeline minutes so no new jobs or pipelines in its projects will run."
 msgstr ""
 
+msgid "%{name} %{status}"
+msgstr ""
+
+msgid "%{name} (Busy)"
+msgstr ""
+
 msgid "%{name} contained %{resultsString}"
 msgstr ""
 
@@ -736,9 +742,6 @@ msgid "%{reportType} detected %{totalStart}%{total}%{totalEnd} potential %{vulnM
 msgstr ""
 
 msgid "%{reportType} detected %{totalStart}no%{totalEnd} vulnerabilities."
-msgstr ""
-
-msgid "%{requirementCount} requirements have been selected for export. These will be sent to %{email} as an attachment once finished."
 msgstr ""
 
 msgid "%{retryButtonStart}Try again%{retryButtonEnd} or %{newFileButtonStart}attach a new file%{newFileButtonEnd}."
@@ -1120,6 +1123,11 @@ msgstr[1] ""
 
 msgid "1 deploy key"
 msgid_plural "%d deploy keys"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "1 follower"
+msgid_plural "%{count} followers"
 msgstr[0] ""
 msgstr[1] ""
 
@@ -2547,6 +2555,9 @@ msgstr ""
 msgid "Advanced Settings"
 msgstr ""
 
+msgid "Advanced export options"
+msgstr ""
+
 msgid "Advanced permissions, Large File Storage and Two-Factor authentication settings."
 msgstr ""
 
@@ -3284,6 +3295,9 @@ msgstr ""
 msgid "An error occurred while fetching markdown preview"
 msgstr ""
 
+msgid "An error occurred while fetching participants."
+msgstr ""
+
 msgid "An error occurred while fetching pending comments"
 msgstr ""
 
@@ -3452,7 +3466,7 @@ msgstr ""
 msgid "An error occurred while retrieving projects."
 msgstr ""
 
-msgid "An error occurred while saving assignees"
+msgid "An error occurred while searching users."
 msgstr ""
 
 msgid "An error occurred while subscribing to notifications."
@@ -5068,6 +5082,9 @@ msgid "Business"
 msgstr ""
 
 msgid "Business metrics (Custom)"
+msgstr ""
+
+msgid "Busy"
 msgstr ""
 
 msgid "Buy License"
@@ -9430,6 +9447,9 @@ msgstr ""
 msgid "Date range cannot exceed %{maxDateRange} days."
 msgstr ""
 
+msgid "Date range is greater than %{quarter_days} days"
+msgstr ""
+
 msgid "Day of month"
 msgstr ""
 
@@ -12120,6 +12140,9 @@ msgstr ""
 msgid "Export"
 msgstr ""
 
+msgid "Export %{requirementsCount} requirements?"
+msgstr ""
+
 msgid "Export as CSV"
 msgstr ""
 
@@ -12313,9 +12336,6 @@ msgid "Failed to load errors from Sentry."
 msgstr ""
 
 msgid "Failed to load group activity metrics. Please try again."
-msgstr ""
-
-msgid "Failed to load groups & users."
 msgstr ""
 
 msgid "Failed to load groups, users and deploy keys."
@@ -12969,6 +12989,12 @@ msgid "FogBugz import"
 msgstr ""
 
 msgid "Folder/%{name}"
+msgstr ""
+
+msgid "Follow"
+msgstr ""
+
+msgid "Followed users"
 msgstr ""
 
 msgid "Font Color"
@@ -14031,6 +14057,9 @@ msgid "Group SAML must be enabled to test"
 msgstr ""
 
 msgid "Group URL"
+msgstr ""
+
+msgid "Group Wikis"
 msgstr ""
 
 msgid "Group avatar"
@@ -17434,6 +17463,30 @@ msgstr ""
 msgid "Learn more."
 msgstr ""
 
+msgid "LearnGitLab|Add code owners"
+msgstr ""
+
+msgid "LearnGitLab|Create a repository"
+msgstr ""
+
+msgid "LearnGitLab|Enable require merge approvals"
+msgstr ""
+
+msgid "LearnGitLab|Invite your colleagues"
+msgstr ""
+
+msgid "LearnGitLab|Run a Security scan using CI/CD"
+msgstr ""
+
+msgid "LearnGitLab|Set-up CI/CD"
+msgstr ""
+
+msgid "LearnGitLab|Start a free trial of GitLab Gold"
+msgstr ""
+
+msgid "LearnGitLab|Submit a merge request (MR)"
+msgstr ""
+
 msgid "Leave"
 msgstr ""
 
@@ -18481,6 +18534,9 @@ msgid "Merge request %{mr_link} was reviewed by %{mr_author}"
 msgstr ""
 
 msgid "Merge request (MR) approvals"
+msgstr ""
+
+msgid "Merge request approval settings have been updated."
 msgstr ""
 
 msgid "Merge request approvals"
@@ -20865,10 +20921,10 @@ msgstr ""
 msgid "Open errors"
 msgstr ""
 
-msgid "Open in Xcode"
+msgid "Open in file view"
 msgstr ""
 
-msgid "Open in file view"
+msgid "Open in your IDE"
 msgstr ""
 
 msgid "Open issues"
@@ -21379,6 +21435,15 @@ msgid "Parameter"
 msgstr ""
 
 msgid "Parameter \"job_id\" cannot exceed length of %{job_id_max_size}"
+msgstr ""
+
+msgid "Parameter `from` must be specified"
+msgstr ""
+
+msgid "Parameter `interval` must be one of (\"%{valid_intervals}\")"
+msgstr ""
+
+msgid "Parameter `to` is before the `from` date"
 msgstr ""
 
 msgid "Parent"
@@ -22155,6 +22220,9 @@ msgstr ""
 msgid "Please select at least one filter to see results"
 msgstr ""
 
+msgid "Please select what should be included in each exported requirement."
+msgstr ""
+
 msgid "Please set a new password before proceeding."
 msgstr ""
 
@@ -22224,19 +22292,37 @@ msgstr ""
 msgid "Preferences|Choose what content you want to see on your homepage."
 msgstr ""
 
+msgid "Preferences|Customize integrations with third party services."
+msgstr ""
+
 msgid "Preferences|Customize the appearance of the application header and navigation sidebar."
 msgstr ""
 
 msgid "Preferences|Display time in 24-hour format"
 msgstr ""
 
+msgid "Preferences|Enable Gitpod integration"
+msgstr ""
+
+msgid "Preferences|Enable integrated code intelligence on code views"
+msgstr ""
+
+msgid "Preferences|Failed to save preferences."
+msgstr ""
+
 msgid "Preferences|For example: 30 mins ago."
+msgstr ""
+
+msgid "Preferences|Gitpod"
 msgstr ""
 
 msgid "Preferences|Homepage content"
 msgstr ""
 
 msgid "Preferences|Instead of all the files changed, show only one file at a time. To switch between files, use the file browser."
+msgstr ""
+
+msgid "Preferences|Integrations"
 msgstr ""
 
 msgid "Preferences|Layout width"
@@ -22258,6 +22344,9 @@ msgid "Preferences|Show one file at a time on merge request's Changes tab"
 msgstr ""
 
 msgid "Preferences|Show whitespace changes in diffs"
+msgstr ""
+
+msgid "Preferences|Sourcegraph"
 msgstr ""
 
 msgid "Preferences|Syntax highlighting theme"
@@ -22368,6 +22457,9 @@ msgstr ""
 msgid "Private"
 msgstr ""
 
+msgid "Private - Guest users are not allowed to view detailed release information like title and source code."
+msgstr ""
+
 msgid "Private - Project access must be granted explicitly to each user. If this project is part of a group, access will be granted to members of the group."
 msgstr ""
 
@@ -22450,24 +22542,6 @@ msgid "Profile"
 msgstr ""
 
 msgid "Profile Settings"
-msgstr ""
-
-msgid "ProfilePreferences|Customize integrations with third party services."
-msgstr ""
-
-msgid "ProfilePreferences|Enable Gitpod integration"
-msgstr ""
-
-msgid "ProfilePreferences|Enable integrated code intelligence on code views"
-msgstr ""
-
-msgid "ProfilePreferences|Gitpod"
-msgstr ""
-
-msgid "ProfilePreferences|Integrations"
-msgstr ""
-
-msgid "ProfilePreferences|Sourcegraph"
 msgstr ""
 
 msgid "ProfileSession|on"
@@ -25965,7 +26039,7 @@ msgstr ""
 msgid "Secret Detection"
 msgstr ""
 
-msgid "Secret Token"
+msgid "Secret token"
 msgstr ""
 
 msgid "Security"
@@ -26137,6 +26211,9 @@ msgid "SecurityReports|Download Report"
 msgstr ""
 
 msgid "SecurityReports|Download results"
+msgstr ""
+
+msgid "SecurityReports|Download scanned resources"
 msgstr ""
 
 msgid "SecurityReports|Either you don't have permission to view this dashboard or the dashboard has not been setup. Please check your permission settings with your administrator or check your dashboard configurations to proceed."
@@ -28380,67 +28457,67 @@ msgstr ""
 msgid "Suggested solutions help link"
 msgstr ""
 
-msgid "SuggestedColors|Bright green"
+msgid "SuggestedColors|Aztec Gold"
 msgstr ""
 
-msgid "SuggestedColors|Dark grayish cyan"
+msgid "SuggestedColors|Blue"
 msgstr ""
 
-msgid "SuggestedColors|Dark moderate blue"
+msgid "SuggestedColors|Blue-gray"
 msgstr ""
 
-msgid "SuggestedColors|Dark moderate orange"
+msgid "SuggestedColors|Carrot orange"
 msgstr ""
 
-msgid "SuggestedColors|Dark moderate pink"
+msgid "SuggestedColors|Champagne"
 msgstr ""
 
-msgid "SuggestedColors|Dark moderate violet"
+msgid "SuggestedColors|Charcoal grey"
 msgstr ""
 
-msgid "SuggestedColors|Feijoa"
+msgid "SuggestedColors|Crimson"
 msgstr ""
 
-msgid "SuggestedColors|Lime green"
+msgid "SuggestedColors|Dark coral"
 msgstr ""
 
-msgid "SuggestedColors|Moderate blue"
+msgid "SuggestedColors|Dark green"
 msgstr ""
 
-msgid "SuggestedColors|Pure red"
+msgid "SuggestedColors|Dark sea green"
 msgstr ""
 
-msgid "SuggestedColors|Slightly desaturated blue"
+msgid "SuggestedColors|Dark violet"
 msgstr ""
 
-msgid "SuggestedColors|Slightly desaturated green"
+msgid "SuggestedColors|Deep violet"
 msgstr ""
 
-msgid "SuggestedColors|Soft orange"
+msgid "SuggestedColors|Gray"
 msgstr ""
 
-msgid "SuggestedColors|Soft red"
+msgid "SuggestedColors|Green screen"
 msgstr ""
 
-msgid "SuggestedColors|Strong pink"
+msgid "SuggestedColors|Green-cyan"
 msgstr ""
 
-msgid "SuggestedColors|Strong red"
+msgid "SuggestedColors|Lavendar"
 msgstr ""
 
-msgid "SuggestedColors|Strong yellow"
+msgid "SuggestedColors|Magenta-pink"
 msgstr ""
 
-msgid "SuggestedColors|UA blue"
+msgid "SuggestedColors|Medium sea green"
 msgstr ""
 
-msgid "SuggestedColors|Very dark desaturated blue"
+msgid "SuggestedColors|Red"
 msgstr ""
 
-msgid "SuggestedColors|Very dark lime green"
+msgid "SuggestedColors|Rose red"
 msgstr ""
 
-msgid "SuggestedColors|Very pale orange"
+msgid "SuggestedColors|Titanium yellow"
 msgstr ""
 
 msgid "Suggestion is not applicable as the suggestion was not found."
@@ -28542,7 +28619,7 @@ msgstr ""
 msgid "System hook was successfully updated."
 msgstr ""
 
-msgid "System hook will be triggered on set of events like creating project or adding ssh key. But you can also enable extra triggers like Push events."
+msgid "System hooks are triggered on sets of events like creating a project or adding an SSH key. You can also enable extra triggers, such as push events."
 msgstr ""
 
 msgid "System metrics (Custom)"
@@ -29770,6 +29847,9 @@ msgstr ""
 msgid "These variables are inherited from the parent group."
 msgstr ""
 
+msgid "These will be sent to %{email} in an attachment once finished."
+msgstr ""
+
 msgid "Third Party Advisory Link"
 msgstr ""
 
@@ -29810,18 +29890,6 @@ msgid "This Project is currently archived and read-only. Please unarchive the pr
 msgstr ""
 
 msgid "This URL is already used for another link; duplicate URLs are not allowed"
-msgstr ""
-
-msgid "This URL will be triggered for each branch updated to the repository"
-msgstr ""
-
-msgid "This URL will be triggered when a merge request is created/updated/merged"
-msgstr ""
-
-msgid "This URL will be triggered when a new tag is pushed to the repository"
-msgstr ""
-
-msgid "This URL will be triggered when repository is updated"
 msgstr ""
 
 msgid "This action can lead to data loss. To prevent accidental actions we ask you to confirm your intention."
@@ -31249,6 +31317,21 @@ msgstr ""
 msgid "URL is required"
 msgstr ""
 
+msgid "URL is triggered for each branch updated to the repository"
+msgstr ""
+
+msgid "URL is triggered when a merge request is created, updated, or merged"
+msgstr ""
+
+msgid "URL is triggered when a new tag is pushed to the repository"
+msgstr ""
+
+msgid "URL is triggered when repository is updated"
+msgstr ""
+
+msgid "URL must be percent-encoded if neccessary."
+msgstr ""
+
 msgid "URL must start with %{codeStart}http://%{codeEnd}, %{codeStart}https://%{codeEnd}, or %{codeStart}ftp://%{codeEnd}"
 msgstr ""
 
@@ -31379,6 +31462,9 @@ msgid "Undo ignore"
 msgstr ""
 
 msgid "Unexpected error"
+msgstr ""
+
+msgid "Unfollow"
 msgstr ""
 
 msgid "Unfortunately, your email message to GitLab could not be processed."
@@ -31867,7 +31953,7 @@ msgstr ""
 msgid "Use template"
 msgstr ""
 
-msgid "Use this token to validate received payloads"
+msgid "Use this token to validate received payloads."
 msgstr ""
 
 msgid "Use webhook"
@@ -32038,6 +32124,12 @@ msgstr ""
 msgid "UserProfile|Explore public groups to find projects to contribute to."
 msgstr ""
 
+msgid "UserProfile|Followers"
+msgstr ""
+
+msgid "UserProfile|Following"
+msgstr ""
+
 msgid "UserProfile|Groups"
 msgstr ""
 
@@ -32080,6 +32172,9 @@ msgstr ""
 msgid "UserProfile|Subscribe"
 msgstr ""
 
+msgid "UserProfile|This user doesn't have any followers."
+msgstr ""
+
 msgid "UserProfile|This user doesn't have any personal projects"
 msgstr ""
 
@@ -32095,6 +32190,9 @@ msgstr ""
 msgid "UserProfile|This user is blocked"
 msgstr ""
 
+msgid "UserProfile|This user isn't following other users."
+msgstr ""
+
 msgid "UserProfile|Unconfirmed user"
 msgstr ""
 
@@ -32104,7 +32202,13 @@ msgstr ""
 msgid "UserProfile|View user in admin area"
 msgstr ""
 
+msgid "UserProfile|You are not following other users."
+msgstr ""
+
 msgid "UserProfile|You can create a group for several dependent projects."
+msgstr ""
+
+msgid "UserProfile|You do not have any followers."
 msgstr ""
 
 msgid "UserProfile|You haven't created any personal projects."
@@ -32177,6 +32281,9 @@ msgid "UsersSelect|Unassigned"
 msgstr ""
 
 msgid "Using %{code_start}::%{code_end} denotes a %{link_start}scoped label set%{link_end}"
+msgstr ""
+
+msgid "Using additional formats requires starting the companion containers. Make sure that all %{kroki_images} are running."
 msgstr ""
 
 msgid "Using required encryption strategy when encrypted field is missing!"
@@ -32457,6 +32564,9 @@ msgid "VisibilityLevel|Unknown"
 msgstr ""
 
 msgid "Visit settings page"
+msgstr ""
+
+msgid "Visual Studio Code"
 msgstr ""
 
 msgid "VisualReviewApp|%{stepStart}Step 1%{stepEnd}. Copy the following script:"
@@ -32849,10 +32959,10 @@ msgstr ""
 msgid "Webhooks|Comments"
 msgstr ""
 
-msgid "Webhooks|Confidential Comments"
+msgid "Webhooks|Confidential comments"
 msgstr ""
 
-msgid "Webhooks|Confidential Issues events"
+msgid "Webhooks|Confidential issues events"
 msgstr ""
 
 msgid "Webhooks|Deployment events"
@@ -32861,7 +32971,7 @@ msgstr ""
 msgid "Webhooks|Enable SSL verification"
 msgstr ""
 
-msgid "Webhooks|Feature Flag events"
+msgid "Webhooks|Feature flag events"
 msgstr ""
 
 msgid "Webhooks|Issues events"
@@ -32888,7 +32998,7 @@ msgstr ""
 msgid "Webhooks|SSL verification"
 msgstr ""
 
-msgid "Webhooks|Secret Token"
+msgid "Webhooks|Secret token"
 msgstr ""
 
 msgid "Webhooks|Subgroup events"
@@ -32897,61 +33007,64 @@ msgstr ""
 msgid "Webhooks|Tag push events"
 msgstr ""
 
-msgid "Webhooks|This URL is triggered when a deployment starts, finishes, fails, or is canceled"
-msgstr ""
-
-msgid "Webhooks|This URL is triggered when a feature flag is turned on or off"
-msgstr ""
-
-msgid "Webhooks|This URL is triggered when a release is created/updated"
-msgstr ""
-
-msgid "Webhooks|This URL will be triggered by a push to the repository"
-msgstr ""
-
-msgid "Webhooks|This URL will be triggered when a confidential issue is created/updated/merged"
-msgstr ""
-
-msgid "Webhooks|This URL will be triggered when a group member is created/updated/removed"
-msgstr ""
-
-msgid "Webhooks|This URL will be triggered when a merge request is created/updated/merged"
-msgstr ""
-
-msgid "Webhooks|This URL will be triggered when a new tag is pushed to the repository"
-msgstr ""
-
-msgid "Webhooks|This URL will be triggered when a subgroup is created/removed"
-msgstr ""
-
-msgid "Webhooks|This URL will be triggered when a wiki page is created/updated"
-msgstr ""
-
-msgid "Webhooks|This URL will be triggered when an issue is created/updated/merged"
-msgstr ""
-
-msgid "Webhooks|This URL will be triggered when someone adds a comment"
-msgstr ""
-
-msgid "Webhooks|This URL will be triggered when someone adds a comment on a confidential issue"
-msgstr ""
-
-msgid "Webhooks|This URL will be triggered when the job status changes"
-msgstr ""
-
-msgid "Webhooks|This URL will be triggered when the pipeline status changes"
-msgstr ""
-
 msgid "Webhooks|Trigger"
 msgstr ""
 
 msgid "Webhooks|URL"
 msgstr ""
 
-msgid "Webhooks|Use this token to validate received payloads. It will be sent with the request in the X-Gitlab-Token HTTP header."
+msgid "Webhooks|URL is triggered by a push to the repository"
 msgstr ""
 
-msgid "Webhooks|Wiki Page events"
+msgid "Webhooks|URL is triggered when a confidential issue is created, updated, or merged"
+msgstr ""
+
+msgid "Webhooks|URL is triggered when a deployment starts, finishes, fails, or is canceled"
+msgstr ""
+
+msgid "Webhooks|URL is triggered when a feature flag is turned on or off"
+msgstr ""
+
+msgid "Webhooks|URL is triggered when a group member is created, updated, or removed"
+msgstr ""
+
+msgid "Webhooks|URL is triggered when a merge request is created, updated, or merged"
+msgstr ""
+
+msgid "Webhooks|URL is triggered when a new tag is pushed to the repository"
+msgstr ""
+
+msgid "Webhooks|URL is triggered when a release is created or updated"
+msgstr ""
+
+msgid "Webhooks|URL is triggered when a subgroup is created or removed"
+msgstr ""
+
+msgid "Webhooks|URL is triggered when a wiki page is created or updated"
+msgstr ""
+
+msgid "Webhooks|URL is triggered when an issue is created, updated, or merged"
+msgstr ""
+
+msgid "Webhooks|URL is triggered when someone adds a comment"
+msgstr ""
+
+msgid "Webhooks|URL is triggered when someone adds a comment on a confidential issue"
+msgstr ""
+
+msgid "Webhooks|URL is triggered when the job status changes"
+msgstr ""
+
+msgid "Webhooks|URL is triggered when the pipeline status changes"
+msgstr ""
+
+msgid "Webhooks|URL must be percent-encoded if neccessary."
+msgstr ""
+
+msgid "Webhooks|Use this token to validate received payloads. It is sent with the request in the X-Gitlab-Token HTTP header."
+msgstr ""
+
+msgid "Webhooks|Wiki page events"
 msgstr ""
 
 msgid "Wednesday"
@@ -33292,6 +33405,9 @@ msgstr ""
 msgid "Wrong extern UID provided. Make sure Auth0 is configured correctly."
 msgstr ""
 
+msgid "Xcode"
+msgstr ""
+
 msgid "YYYY-MM-DD"
 msgstr ""
 
@@ -33569,6 +33685,9 @@ msgid "You do not have an active license"
 msgstr ""
 
 msgid "You do not have any subscriptions yet"
+msgstr ""
+
+msgid "You do not have permission to access deployment frequencies"
 msgstr ""
 
 msgid "You do not have permission to leave this %{namespaceType}."
@@ -34670,6 +34789,9 @@ msgstr[0] ""
 msgstr[1] ""
 
 msgid "finding is not found or is already attached to a vulnerability"
+msgstr ""
+
+msgid "following"
 msgstr ""
 
 msgid "for %{link_to_merge_request} with %{link_to_merge_request_source_branch}"

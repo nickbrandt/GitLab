@@ -1,5 +1,5 @@
-import httpStatus from '~/lib/utils/http_status';
 import Api from '~/api';
+import httpStatus from '~/lib/utils/http_status';
 import { PIPELINE_CONFIGURATION_PATH_FORMAT } from './constants';
 
 export const initialiseFormData = () => ({

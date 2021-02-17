@@ -2,8 +2,8 @@
 import { GlFormGroup, GlFormInput, GlFormRadioGroup, GlModal, GlAlert, GlIcon } from '@gitlab/ui';
 import { convertToGraphQLId, TYPE_GROUP } from '~/graphql_shared/utils';
 import * as Sentry from '~/sentry/wrapper';
-import createDevopsAdoptionSegmentMutation from '../graphql/mutations/create_devops_adoption_segment.mutation.graphql';
 import { DEVOPS_ADOPTION_STRINGS, DEVOPS_ADOPTION_SEGMENT_MODAL_ID } from '../constants';
+import createDevopsAdoptionSegmentMutation from '../graphql/mutations/create_devops_adoption_segment.mutation.graphql';
 import { addSegmentToCache } from '../utils/cache_updates';
 
 export default {

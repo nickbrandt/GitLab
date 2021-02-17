@@ -132,11 +132,12 @@ RSpec.describe Issue, :elastic do
     expect(issue.__elasticsearch__.as_indexed_json).to eq(expected_hash)
   end
 
-  it 'handles a project missing project_feature', :aggregate_failures do
+  it 'handles a project missing project_feature' do
     issue = create :issue, project: project
     allow(issue.project).to receive(:project_feature).and_return(nil)
 
-    expect { issue.__elasticsearch__.as_indexed_json }.not_to raise_error
+    expect(Gitlab::ErrorTracking).to receive(:track_exception)
+
     expect(issue.__elasticsearch__.as_indexed_json['issues_access_level']).to eq(ProjectFeature::PRIVATE)
   end
 

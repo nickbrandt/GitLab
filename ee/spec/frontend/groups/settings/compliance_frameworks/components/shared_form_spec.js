@@ -2,12 +2,11 @@ import { GlForm, GlSprintf } from '@gitlab/ui';
 import { shallowMount } from '@vue/test-utils';
 
 import SharedForm from 'ee/groups/settings/compliance_frameworks/components/shared_form.vue';
+import * as Utils from 'ee/groups/settings/compliance_frameworks/utils';
 import waitForPromises from 'helpers/wait_for_promises';
 import ColorPicker from '~/vue_shared/components/color_picker/color_picker.vue';
-import * as Utils from 'ee/groups/settings/compliance_frameworks/utils';
-import { GlFormGroup, GlFormInput } from '../stubs';
-
 import { frameworkFoundResponse, suggestedLabelColors } from '../mock_data';
+import { GlFormGroup, GlFormInput } from '../stubs';
 
 describe('SharedForm', () => {
   let wrapper;

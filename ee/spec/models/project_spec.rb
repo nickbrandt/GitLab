@@ -897,9 +897,11 @@ RSpec.describe Project do
 
     it 'only loads licensed availability once' do
       expect(project).to receive(:load_licensed_feature_available)
-                             .once.and_call_original
+        .once.and_call_original
 
-      2.times { project.feature_available?(:push_rules) }
+      with_license_feature_cache do
+        2.times { project.feature_available?(:push_rules) }
+      end
     end
 
     context 'when feature symbol is not included on Namespace features code' do
@@ -2663,8 +2665,8 @@ RSpec.describe Project do
       let!(:issue) { create(:issue, project: project) }
 
       context 'when updating the visibility_level' do
-        it 'triggers ElasticAssociationIndexerWorker to update issues and notes' do
-          expect(ElasticAssociationIndexerWorker).to receive(:perform_async).with('Project', project.id, %w[issues notes])
+        it 'triggers ElasticAssociationIndexerWorker to update issues' do
+          expect(ElasticAssociationIndexerWorker).to receive(:perform_async).with('Project', project.id, ['issues'])
 
           project.update!(visibility_level: Gitlab::VisibilityLevel::PRIVATE)
         end

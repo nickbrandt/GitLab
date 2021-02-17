@@ -18,7 +18,7 @@ If you follow our guidance to automate user provisioning using [SCIM](scim_setup
 User synchronization of SAML SSO groups is supported through [SCIM](scim_setup.md). SCIM supports adding and removing users from the GitLab group.
 For example, if you remove a user from the SCIM app, SCIM removes that same user from the GitLab group.
 
-SAML SSO is not supported at the subgroup level.
+SAML SSO is only configurable at the top-level group.
 
 ## Configuring your Identity Provider
 
@@ -295,6 +295,10 @@ Users can unlink SAML for a group from their profile page. This can be helpful i
 WARNING:
 Unlinking an account removes all roles assigned to that user in the group.
 If a user re-links their account, roles need to be reassigned.
+
+Groups require at least one owner. If your account is the only owner in the
+group, you are not allowed to unlink the account. In that case, set up another user as a
+group owner, and then you can unlink the account.
 
 For example, to unlink the `MyOrg` account:
 
