@@ -2,12 +2,12 @@
 
 require 'spec_helper'
 
-RSpec.describe EE::BulkImports::Groups::Pipelines::EpicAwardEmojiPipeline do
+RSpec.describe EE::BulkImports::Groups::Pipelines::EpicEventsPipeline do
   let_it_be(:cursor) { 'cursor' }
   let_it_be(:user) { create(:user) }
   let_it_be(:group) { create(:group) }
   let_it_be(:epic) { create(:epic, group: group) }
-  let_it_be(:tracker) { "epic_#{epic.iid}_award_emoji" }
+  let_it_be(:tracker) { "epic_#{epic.iid}_events" }
   let_it_be(:bulk_import) { create(:bulk_import, user: user) }
   let_it_be(:entity) do
     create(
@@ -38,7 +38,7 @@ RSpec.describe EE::BulkImports::Groups::Pipelines::EpicAwardEmojiPipeline do
   end
 
   describe '#run' do
-    it 'imports epic award emoji' do
+    it 'imports epic events and resource state events' do
       data = extractor_data(has_next_page: false, cursor: cursor)
 
       allow_next_instance_of(BulkImports::Common::Extractors::GraphqlExtractor) do |extractor|
@@ -47,8 +47,49 @@ RSpec.describe EE::BulkImports::Groups::Pipelines::EpicAwardEmojiPipeline do
           .and_return(data)
       end
 
-      expect { subject.run }.to change(::AwardEmoji, :count).by(1)
-      expect(epic.award_emoji.first.name).to eq('thumbsup')
+      subject.run
+      expect(epic.events.first.action).to eq('closed')
+      expect(epic.resource_state_events.first.state).to eq('closed')
+    end
+  end
+
+  describe '#transform' do
+    it 'downcases action & adds group_id' do
+      data = { 'action' => 'CLOSED' }
+      result = subject.transform(context, data)
+
+      expect(result['group_id']).to eq(group.id)
+      expect(result['action']).to eq(data['action'].downcase)
+    end
+
+    context 'when action is not listed as permitted' do
+      it 'returns' do
+        data = { 'action' => 'created' }
+
+        expect(subject.transform(nil, data)).to eq(nil)
+      end
+    end
+  end
+
+  describe '#load' do
+    context 'when exception occurs during resource state event creation' do
+      it 'reverts created event' do
+        allow(subject).to receive(:create_resource_state_event!).and_raise(StandardError)
+
+        data = { 'action' => 'reopened', 'author_id' => user.id }
+
+        expect { subject.load(context, data) }.to raise_error(StandardError)
+        expect(epic.events.count).to eq(0)
+        expect(epic.resource_state_events.count).to eq(0)
+      end
+    end
+
+    context 'when epic could not be found' do
+      it 'does not create new event' do
+        context.extra[:epic_iid] = 'not_iid'
+
+        expect { subject.load(context, nil) }.to not_change { Event.count }.and not_change { ResourceStateEvent.count }
+      end
     end
   end
 
@@ -104,7 +145,7 @@ RSpec.describe EE::BulkImports::Groups::Pipelines::EpicAwardEmojiPipeline do
         .to eq(
           klass: BulkImports::Common::Extractors::GraphqlExtractor,
           options: {
-            query: EE::BulkImports::Groups::Graphql::GetEpicAwardEmojiQuery
+            query: EE::BulkImports::Groups::Graphql::GetEpicEventsQuery
           }
         )
     end
@@ -113,17 +154,22 @@ RSpec.describe EE::BulkImports::Groups::Pipelines::EpicAwardEmojiPipeline do
       expect(described_class.transformers)
         .to contain_exactly(
           { klass: BulkImports::Common::Transformers::ProhibitedAttributesTransformer, options: nil },
-          { klass: BulkImports::Common::Transformers::UserReferenceTransformer, options: nil }
+          { klass: BulkImports::Common::Transformers::UserReferenceTransformer, options: { reference: 'author' } }
         )
-    end
-
-    it 'has loaders' do
-      expect(described_class.get_loader).to eq(klass: EE::BulkImports::Groups::Loaders::EpicAwardEmojiLoader, options: nil)
     end
   end
 
   def extractor_data(has_next_page:, cursor: nil)
-    data = [{ 'name' => 'thumbsup' }]
+    data = [
+      {
+        'action' => 'CLOSED',
+        'created_at' => '2021-02-15T15:08:57Z',
+        'updated_at' => '2021-02-15T16:08:57Z',
+        'author' => {
+          'public_email' => user.email
+        }
+      }
+    ]
 
     page_info = {
       'end_cursor' => cursor,
