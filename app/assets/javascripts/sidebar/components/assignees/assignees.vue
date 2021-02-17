@@ -51,7 +51,7 @@ export default {
   <div>
     <collapsed-assignee-list :users="sortedAssigness" :issuable-type="issuableType" />
 
-    <div class="value hide-collapsed">
+    <div data-testid="expanded-assignee" class="value hide-collapsed">
       <template v-if="hasNoUsers">
         <span class="assign-yourself no-value qa-assign-yourself">
           {{ __('None') }}
