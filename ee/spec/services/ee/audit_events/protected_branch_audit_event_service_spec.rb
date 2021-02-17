@@ -2,13 +2,14 @@
 
 require 'spec_helper'
 
-RSpec.describe EE::AuditEvents::ProtectedBranchAuditEventService do
+RSpec.describe EE::AuditEvents::ProtectedBranchAuditEventService, :request_store do
   let(:merge_level) { 'Maintainers' }
   let(:push_level) { 'No one' }
   let_it_be(:author) { create(:user, :with_sign_ins) }
   let_it_be(:entity) { create(:project, creator: author) }
   let_it_be(:protected_branch) { create(:protected_branch, :no_one_can_push, project: entity) }
   let(:logger) { instance_spy(Gitlab::AuditJsonLogger) }
+  let(:ip_address) { '192.168.15.18' }
 
   describe '#security_event' do
     shared_examples 'loggable' do |action|
@@ -17,6 +18,7 @@ RSpec.describe EE::AuditEvents::ProtectedBranchAuditEventService do
 
         before do
           stub_licensed_features(admin_audit_log: true)
+          allow(Gitlab::RequestContext.instance).to receive(:client_ip).and_return(ip_address)
         end
 
         it 'creates an event', :aggregate_failures do
@@ -33,13 +35,13 @@ RSpec.describe EE::AuditEvents::ProtectedBranchAuditEventService do
             target_details: protected_branch.name,
             push_access_levels: [push_level],
             merge_access_levels: [merge_level],
-            ip_address: '127.0.0.1'
+            ip_address: ip_address
           )
 
           expect(security_event.author_id).to eq(author.id)
           expect(security_event.entity_id).to eq(entity.id)
           expect(security_event.entity_type).to eq('Project')
-          expect(security_event.ip_address).to eq('127.0.0.1')
+          expect(security_event.ip_address).to eq(ip_address)
         end
 
         it 'logs to a file with the provided details' do
@@ -59,7 +61,7 @@ RSpec.describe EE::AuditEvents::ProtectedBranchAuditEventService do
             target_id: protected_branch.id,
             target_type: 'ProtectedBranch',
             action => 'protected_branch',
-            ip_address: '127.0.0.1'
+            ip_address: ip_address
           )
         end
       end
