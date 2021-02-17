@@ -22,5 +22,9 @@ FactoryBot.define do
       last_synced_at { 1.day.ago }
       retry_count { 0 }
     end
+
+    trait :with_package_file_id do
+      sequence(:package_file_id)
+    end
   end
 end
