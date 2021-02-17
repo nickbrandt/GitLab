@@ -6,6 +6,7 @@ class Profiles::PreferencesController < Profiles::ApplicationController
   feature_category :users
 
   def show
+    push_frontend_feature_flag(:user_time_settings, default_enabled: :yaml)
   end
 
   def update

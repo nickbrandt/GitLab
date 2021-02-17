@@ -11,7 +11,7 @@ RSpec.describe 'User edit preferences profile', :js do
   end
 
   it 'allows the user to toggle their time format preference' do
-    field = page.find("name[user[time_format_in_24h]]")
+    field = page.find_field('user[time_format_in_24h]')
 
     expect(field).not_to be_checked
 
@@ -21,7 +21,7 @@ RSpec.describe 'User edit preferences profile', :js do
   end
 
   it 'allows the user to toggle their time display preference' do
-    field = page.find("name[user[time_display_relative]]")
+    field = page.find_field('user[time_display_relative]')
 
     expect(field).to be_checked
 

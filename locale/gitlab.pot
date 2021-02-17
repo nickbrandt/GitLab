@@ -9619,6 +9619,9 @@ msgstr ""
 msgid "Customize icon"
 msgstr ""
 
+msgid "Customize language and region related settings."
+msgstr ""
+
 msgid "Customize name"
 msgstr ""
 
@@ -13787,6 +13790,9 @@ msgid "Finished at"
 msgstr ""
 
 msgid "First Seen"
+msgstr ""
+
+msgid "First day of the week"
 msgstr ""
 
 msgid "First name"
@@ -18392,6 +18398,9 @@ msgid "Labels|Promote Label"
 msgstr ""
 
 msgid "Labels|Promoting %{labelTitle} will make it available for all projects inside %{groupName}. Existing project labels with the same title will be merged. If a group label with the same title exists, it will also be merged. This action cannot be reversed."
+msgstr ""
+
+msgid "Language"
 msgstr ""
 
 msgid "Large File Storage"
@@ -23744,9 +23753,6 @@ msgstr ""
 msgid "Preferences|Customize integrations with third party services."
 msgstr ""
 
-msgid "Preferences|Customize language and region related settings."
-msgstr ""
-
 msgid "Preferences|Customize the appearance of the application header and navigation sidebar."
 msgstr ""
 
@@ -23760,9 +23766,6 @@ msgid "Preferences|Enable integrated code intelligence on code views"
 msgstr ""
 
 msgid "Preferences|Failed to save preferences."
-msgstr ""
-
-msgid "Preferences|First day of the week"
 msgstr ""
 
 msgid "Preferences|For example: 30 mins ago."
@@ -23780,16 +23783,7 @@ msgstr ""
 msgid "Preferences|Integrations"
 msgstr ""
 
-msgid "Preferences|Language"
-msgstr ""
-
 msgid "Preferences|Layout width"
-msgstr ""
-
-msgid "Preferences|Learn more"
-msgstr ""
-
-msgid "Preferences|Localization"
 msgstr ""
 
 msgid "Preferences|Must be a number between %{min} and %{max}"
