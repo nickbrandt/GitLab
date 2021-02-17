@@ -88,7 +88,7 @@ class IssuableFinder
     end
 
     def valid_params
-      @valid_params ||= scalar_params + [array_params.merge(not: {})]
+      @valid_params ||= scalar_params + [array_params.merge(or: {}, not: {})]
     end
   end
 
@@ -377,6 +377,7 @@ class IssuableFinder
     Issuables::AuthorFilter.new(
       items,
       params: original_params,
+      or_filters_enabled: or_filters_enabled?,
       not_filters_enabled: not_filters_enabled?
     ).filter
   end
@@ -496,6 +497,12 @@ class IssuableFinder
 
   def by_non_archived(items)
     params[:non_archived].present? ? items.non_archived : items
+  end
+
+  def or_filters_enabled?
+    strong_memoize(:or_filters_enabled) do
+      Feature.enabled?(:or_issuable_queries, feature_flag_scope, default_enabled: :yaml)
+    end
   end
 
   def not_filters_enabled?
