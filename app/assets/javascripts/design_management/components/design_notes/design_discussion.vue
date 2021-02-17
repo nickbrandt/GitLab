@@ -257,7 +257,7 @@ export default {
         <reply-placeholder
           v-if="!isFormVisible"
           class="qa-discussion-reply"
-          :placeholder-text="__('Reply...')"
+          :placeholder-text="__('Reply…')"
           @focus="showForm"
         />
         <apollo-mutation

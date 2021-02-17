@@ -15,7 +15,8 @@ export default {
     rows="1"
     class="reply-placeholder-text-field js-vue-discussion-reply"
     :placeholder="placeholderText"
-    :title="s__('MergeRequests|Add a reply')"
+    :title="__('Reply to comment')"
+    :aria-label="__('Reply to comment')"
     @focus="$emit('focus')"
   ></textarea>
 </template>

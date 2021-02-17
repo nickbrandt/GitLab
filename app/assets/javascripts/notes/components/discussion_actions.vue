@@ -50,7 +50,7 @@ export default {
   <div class="discussion-with-resolve-btn clearfix">
     <reply-placeholder
       data-qa-selector="discussion_reply_tab"
-      :placeholder-text="s__('MergeRequests|Reply...')"
+      :placeholder-text="__('Reply…')"
       @focus="$emit('showReplyForm')"
     />
 
