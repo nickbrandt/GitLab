@@ -3912,6 +3912,9 @@ msgstr ""
 msgid "Are you sure you want to discard this comment?"
 msgstr ""
 
+msgid "Are you sure you want to discard your changes?"
+msgstr ""
+
 msgid "Are you sure you want to erase this build?"
 msgstr ""
 
