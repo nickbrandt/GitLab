@@ -12,6 +12,7 @@ export default {
 
 <template>
   <textarea
+    ref="textarea"
     rows="1"
     class="reply-placeholder-text-field js-vue-discussion-reply"
     :placeholder="placeholderText"

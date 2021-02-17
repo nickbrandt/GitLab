@@ -6,7 +6,7 @@ const placeholderText = 'Test Button Text';
 describe('ReplyPlaceholder', () => {
   let wrapper;
 
-  const findTextarea = () => wrapper.find('.js-vue-discussion-reply');
+  const findTextarea = () => wrapper.find({ ref: 'textarea' });
 
   beforeEach(() => {
     wrapper = shallowMount(ReplyPlaceholder, {
