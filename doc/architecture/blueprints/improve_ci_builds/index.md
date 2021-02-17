@@ -108,8 +108,10 @@ our partitioning strategy for it.
 
 There are multiple ways to partition `ci_builds` table, but because the
 importance and relevance of a pipeline data decays with time, we might want to
-use a pipeline creation date as a partitioning key. Choosing the viable
-strategy for partitioning this table is in the scope of this blueprint.
+use a pipeline creation date as a partitioning key. Depending on the
+partitioning strategy we choose, we will need to change pipelines data access
+patterns in our product, what can be a significant effort. We want to minimize
+the risk of doing that by moving towards partitioning in an iterative way.
 
 ## Iterations
 
