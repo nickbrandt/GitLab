@@ -7,20 +7,22 @@ module Types
       graphql_name 'OncallRotationActivePeriodType'
       description 'Active period time range for on-call rotation'
 
-      field :from, GraphQL::STRING_TYPE,
-                null: true,
-                description: 'The start of the rotation interval.'
+      field :start_time, GraphQL::STRING_TYPE,
+            null: true,
+            description: 'The start of the rotation active period.'
 
-      field :to, GraphQL::STRING_TYPE,
-                null: true,
-                description: 'The end of the rotation interval.'
+      field :end_time, GraphQL::STRING_TYPE,
+            null: true,
+            description: 'The end of the rotation active period.'
+
+      alias_method :active_period, :object
 
       def from
-        object.start_time&.strftime('%H:%M')
+        active_period.start_time&.strftime('%H:%M')
       end
 
       def to
-        object.end_time&.strftime('%H:%M')
+        active_period.end_time&.strftime('%H:%M')
       end
     end
     # rubocop: enable Graphql/AuthorizeTypes

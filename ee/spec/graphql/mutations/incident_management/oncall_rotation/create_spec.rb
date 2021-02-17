@@ -85,8 +85,8 @@ RSpec.describe Mutations::IncidentManagement::OncallRotation::Create do
       context 'with active period times given' do
         before do
           args[:active_period] = {
-            from: '08:00',
-            to: '17:00'
+            start_time: '08:00',
+            end_time: '17:00'
           }
         end
 

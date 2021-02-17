@@ -75,8 +75,8 @@ module Mutations
           rotation_length_unit = args[:rotation_length][:unit]
           starts_at = parse_datetime(schedule, args[:starts_at])
           ends_at = parse_datetime(schedule, args[:ends_at]) if args[:ends_at]
-          active_period_start = args.dig(:active_period, :from)
-          active_period_end = args.dig(:active_period, :to)
+          active_period_start = args.dig(:active_period, :start_time)
+          active_period_end = args.dig(:active_period, :end_time)
 
           args.slice(:name).merge(
             length: rotation_length,

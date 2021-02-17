@@ -2810,8 +2810,8 @@ Active period time range for on-call rotation.
 
 | Field | Type | Description |
 | ----- | ---- | ----------- |
-| `from` | String | The start of the rotation interval. |
-| `to` | String | The end of the rotation interval. |
+| `endTime` | String | The end of the rotation active period. |
+| `startTime` | String | The start of the rotation active period. |
 
 ### OncallRotationCreatePayload
 
