@@ -1,0 +1,5 @@
+---
+title: Limit number of refs shown in Run Pipeline page
+merge_request: 54435
+author:
+type: fixed
