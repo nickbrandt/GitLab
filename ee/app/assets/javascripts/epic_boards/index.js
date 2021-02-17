@@ -97,7 +97,6 @@ export default () => {
             ? parseInt($boardApp.dataset.boardWeight, 10)
             : null,
         },
-        isEpicBoard: true,
       });
     },
     mounted() {
