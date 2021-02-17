@@ -1,11 +1,12 @@
 <script>
-import { GlButton, GlDropdown, GlIcon } from '@gitlab/ui';
+import { GlButton, GlDropdown, GlDropdownItem, GlIcon } from '@gitlab/ui';
 
 export default {
   name: 'GeoNodeActions',
   components: {
     GlButton,
     GlDropdown,
+    GlDropdownItem,
     GlIcon,
   },
   props: {
@@ -20,6 +21,11 @@ export default {
       showActions: false,
     };
   },
+  computed: {
+    dropdownRemoveClass() {
+      return this.primary ? 'gl-text-gray-400' : 'gl-text-red-500';
+    },
+  },
 };
 </script>
 
@@ -28,20 +34,17 @@ export default {
     <gl-dropdown
       class="gl-lg-display-none"
       toggle-class="gl-shadow-none! gl-bg-transparent! gl-p-3!"
-      menu-class="gl-min-w-full! gl-w-auto! gl-px-5! gl-py-3!"
       right
     >
       <template #button-content>
         <gl-icon name="ellipsis_h" />
       </template>
-      <div class="gl-display-flex gl-flex-direction-column gl-align-items-flex-end">
-        <gl-button class="gl-mb-3">{{ __('Edit') }}</gl-button>
-        <gl-button variant="danger" category="secondary" :disabled="primary">{{
-          __('Remove')
-        }}</gl-button>
-      </div>
+      <gl-dropdown-item>{{ __('Edit') }}</gl-dropdown-item>
+      <gl-dropdown-item :disabled="primary"
+        ><span :class="dropdownRemoveClass">{{ __('Remove') }}</span></gl-dropdown-item
+      >
     </gl-dropdown>
-    <div class="gl-display-none gl-lg-display-block">
+    <div class="gl-display-none gl-lg-display-flex">
       <gl-button class="gl-mr-3">{{ __('Edit') }}</gl-button>
       <gl-button variant="danger" category="secondary" :disabled="primary">{{
         __('Remove')

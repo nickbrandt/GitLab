@@ -90,7 +90,7 @@ export default {
         </div>
         <div v-if="detailsPath" class="mt-3">
           <gl-link class="gl-font-sm" :href="detailsPath" target="_blank">{{
-            __('More information')
+            __('Learn more')
           }}</gl-link>
         </div>
       </section>

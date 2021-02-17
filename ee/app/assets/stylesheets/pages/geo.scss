@@ -30,11 +30,11 @@
 }
 
 .geo-node-header-grid-columns {
-  grid-template-columns: 1fr 1fr auto;
+  grid-template-columns: 1fr auto;
   grid-gap: 1rem;
 
-  @include media-breakpoint-up(lg) {
-    grid-template-columns: 1fr 2fr 1fr;
+  @include media-breakpoint-up(md) {
+    grid-template-columns: 3fr 1fr
   }
 }
 
@@ -47,8 +47,12 @@
 }
 
 .geo-node-replication-details-grid-columns {
-  grid-template-columns: 1fr 1fr 2fr 2fr;
+  grid-template-columns: 1fr 1fr;
   grid-gap: 1rem;
+
+  @include media-breakpoint-up(md) {
+    grid-template-columns: 1fr 1fr 2fr 2fr;
+  }
 }
 
 .geo-node-core-details-grid-columns {
@@ -79,4 +83,14 @@
   @include media-breakpoint-up(md) {
     margin-right: $gl-spacing-scale-5;
   }
+}
+
+.gl-md-w-auto{
+  @include media-breakpoint-up(md) {
+    width: auto !important;
+  }
+}
+
+.gl-flex-fill-2 {
+  flex: 2;
 }

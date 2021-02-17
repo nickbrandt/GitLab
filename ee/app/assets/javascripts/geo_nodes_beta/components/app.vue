@@ -29,13 +29,13 @@ export default {
   <section>
     <h3>{{ __('Geo sites') }}</h3>
     <div
-      class="gl-display-flex gl-align-items-center gl-border-b-1 gl-border-b-solid gl-border-b-gray-100 gl-pb-4"
+      class="gl-display-flex gl-flex-direction-column gl-md-flex-direction-row gl-md-align-items-center gl-border-b-1 gl-border-b-solid gl-border-b-gray-100 gl-pb-5"
     >
-      <p class="gl-mb-0">
+      <p class="gl-mb-0 gl-mr-5">
         <gl-sprintf
           :message="
             s__(
-              'Geo|With GitLab Geo, you can install a special read-only and replicated instance anywhere. %{linkStart}More Information%{linkEnd}',
+              'Geo|With GitLab Geo, you can install a special read-only and replicated instance anywhere. %{linkStart}Learn more%{linkEnd}',
             )
           "
         >
@@ -46,9 +46,13 @@ export default {
           </template>
         </gl-sprintf>
       </p>
-      <gl-button class="gl-ml-auto" variant="confirm" href="#" target="_blank">{{
-        __('Add site')
-      }}</gl-button>
+      <gl-button
+        class="gl-ml-auto gl-mr-5 gl-w-full gl-md-w-auto gl-mt-5 gl-md-mt-0"
+        variant="confirm"
+        href="#"
+        target="_blank"
+        >{{ __('Add site') }}</gl-button
+      >
     </div>
     <geo-nodes v-for="node in nodes" :key="node.id" :node="node" />
   </section>

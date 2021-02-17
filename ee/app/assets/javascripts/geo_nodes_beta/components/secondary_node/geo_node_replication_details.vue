@@ -1,8 +1,8 @@
 <script>
 import { GlIcon, GlPopover, GlLink } from '@gitlab/ui';
 import { mapGetters } from 'vuex';
-import { HELP_INFO_URL } from '../constants';
-import GeoNodeProgressBar from './geo_node_progress_bar.vue';
+import GeoNodeProgressBar from 'ee/geo_nodes_beta/components/shared/geo_node_progress_bar.vue';
+import { HELP_INFO_URL } from 'ee/geo_nodes_beta/constants';
 
 export default {
   name: 'GeoNodeReplicationDetails',
@@ -71,16 +71,23 @@ export default {
         <p>
           {{ __('Lorem ipsum dolor sit amet, consectetur adipiscing elit.') }}
         </p>
-        <gl-link href="#" target="_blank">{{ __('More information') }}</gl-link>
+        <gl-link href="#" target="_blank">{{ __('Learn more') }}</gl-link>
       </gl-popover>
     </div>
     <div
       class="gl-display-grid geo-node-replication-details-grid-columns gl-bg-gray-10 gl-p-5 gl-border-b-1 gl-border-b-solid gl-border-b-gray-100"
     >
-      <span class="gl-font-weight-bold">{{ __('Data type') }}</span>
+      <span class="gl-font-weight-bold gl-display-none gl-md-display-block">{{
+        __('Data type')
+      }}</span>
       <span class="gl-font-weight-bold">{{ __('Component') }}</span>
-      <span class="gl-font-weight-bold">{{ __('Synchronization status') }}</span>
-      <div class="gl-display-flex gl-align-items-center">
+      <span class="gl-font-weight-bold gl-display-block gl-md-display-none!">{{
+        __('Status')
+      }}</span>
+      <span class="gl-font-weight-bold gl-display-none gl-md-display-block">{{
+        __('Synchronization status')
+      }}</span>
+      <div class="gl-display-none gl-md-display-flex gl-align-items-center">
         <span class="gl-font-weight-bold">{{ __('Verification status') }}</span>
         <gl-icon
           ref="verificationStatus"
@@ -96,9 +103,7 @@ export default {
           <p>
             {{ __('Replicated data is verified with the secondary node(s) using checksums') }}
           </p>
-          <gl-link :href="$options.HELP_INFO_URL" target="_blank">{{
-            __('More information')
-          }}</gl-link>
+          <gl-link :href="$options.HELP_INFO_URL" target="_blank">{{ __('Learn more') }}</gl-link>
         </gl-popover>
       </div>
     </div>
@@ -107,9 +112,9 @@ export default {
       :key="item.component"
       class="gl-display-grid geo-node-replication-details-grid-columns gl-p-5 gl-border-b-1 gl-border-b-solid gl-border-b-gray-100"
     >
-      <span class="gl-mr-5">{{ item.dataTypeTitle }}</span>
+      <span class="gl-mr-5 gl-display-none gl-md-display-block">{{ item.dataTypeTitle }}</span>
       <span class="gl-mr-5">{{ item.component }}</span>
-      <div class="gl-mr-5">
+      <div class="gl-mr-5 gl-display-none gl-md-display-block">
         <geo-node-progress-bar
           v-if="item.syncValues"
           :title="`${item.component} synced`"
@@ -117,13 +122,33 @@ export default {
         />
         <span v-else class="gl-text-gray-400 gl-font-sm">{{ __('N/A') }}</span>
       </div>
-      <div>
+      <div class="gl-display-none gl-md-display-block">
         <geo-node-progress-bar
           v-if="item.verificationValues"
           :title="`${item.component} synced`"
           :values="item.verificationValues"
         />
         <span v-else class="gl-text-gray-400 gl-font-sm">{{ __('N/A') }}</span>
+      </div>
+      <div class="gl-display-block gl-md-display-none!">
+        <div class="gl-mb-5 gl-display-flex gl-flex-direction-column">
+          <span class="gl-font-sm gl-mb-3">{{ __('Synchronization status') }}</span>
+          <geo-node-progress-bar
+            v-if="item.syncValues"
+            :title="`${item.component} synced`"
+            :values="item.syncValues"
+          />
+          <span v-else class="gl-text-gray-400 gl-font-sm">{{ __('N/A') }}</span>
+        </div>
+        <div class="gl-display-flex gl-flex-direction-column">
+          <span class="gl-font-sm gl-mb-3">{{ __('Verification status') }}</span>
+          <geo-node-progress-bar
+            v-if="item.verificationValues"
+            :title="`${item.component} synced`"
+            :values="item.verificationValues"
+          />
+          <span v-else class="gl-text-gray-400 gl-font-sm">{{ __('N/A') }}</span>
+        </div>
       </div>
     </div>
   </div>

@@ -1,17 +1,17 @@
 <script>
-import GeoNodeCoreDetails from './geo_node_core_details.vue';
-import GeoNodePrimaryOtherInfo from './geo_node_primary_other_info.vue';
-import GeoNodeReplicationDetails from './geo_node_replication_details.vue';
-import GeoNodeReplicationSummary from './geo_node_replication_summary.vue';
-import GeoNodeSecondaryOtherInfo from './geo_node_secondary_other_info.vue';
-import GeoNodeVerificationInfo from './geo_node_verification_info.vue';
+import GeoNodePrimaryOtherInfo from './primary_node/geo_node_primary_other_info.vue';
+import GeoNodeVerificationInfo from './primary_node/geo_node_verification_info.vue';
+import GeoNodeReplicationDetails from './secondary_node/geo_node_replication_details.vue';
+import GeoNodeReplicationSummary from './secondary_node/geo_node_replication_summary.vue';
+import GeoNodeSecondaryOtherInfo from './secondary_node/geo_node_secondary_other_info.vue';
+import GeoNodeCoreDetails from './shared/geo_node_core_details.vue';
 
 export default {
   name: 'GeoNodeDetails',
   components: {
     GeoNodeCoreDetails,
-    GeoNodeVerificationInfo,
     GeoNodePrimaryOtherInfo,
+    GeoNodeVerificationInfo,
     GeoNodeReplicationSummary,
     GeoNodeSecondaryOtherInfo,
     GeoNodeReplicationDetails,

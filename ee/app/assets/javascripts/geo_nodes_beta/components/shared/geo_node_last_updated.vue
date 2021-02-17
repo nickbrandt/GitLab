@@ -1,12 +1,12 @@
 <script>
 import { GlPopover, GlLink, GlIcon } from '@gitlab/ui';
-import { sprintf, s__ } from '~/locale';
-import timeAgoMixin from '~/vue_shared/mixins/timeago';
 import {
   HELP_NODE_HEALTH_URL,
   GEO_TROUBLESHOOTING_URL,
   STATUS_DELAY_THRESHOLD_MS,
-} from '../constants';
+} from 'ee/geo_nodes_beta/constants';
+import { sprintf, s__ } from '~/locale';
+import timeAgoMixin from '~/vue_shared/mixins/timeago';
 
 export default {
   name: 'GeoNodeLastUpdated',

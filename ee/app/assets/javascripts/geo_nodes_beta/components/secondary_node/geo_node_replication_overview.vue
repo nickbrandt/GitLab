@@ -1,8 +1,8 @@
 <script>
 import { mapGetters } from 'vuex';
+import { REPOSITORY, BLOB } from 'ee/geo_nodes_beta/constants';
 import { roundDownFloat } from '~/lib/utils/common_utils';
 import { __ } from '~/locale';
-import { REPOSITORY, BLOB } from '../constants';
 
 export default {
   name: 'GeoNodeReplicationOverview',
@@ -71,9 +71,9 @@ export default {
 <template>
   <div>
     <div class="gl-display-flex gl-align-items-center gl-mb-3">
-      <span class="gl-flex-fill-1 gl-font-sm">{{ __('Data type') }}</span>
-      <span class="gl-flex-fill-1 gl-font-sm">{{ __('Synchronization') }}</span>
-      <span class="gl-flex-fill-1 gl-font-sm">{{ __('Verification') }}</span>
+      <span class="gl-flex-fill-1">{{ __('Data type') }}</span>
+      <span class="gl-flex-fill-1">{{ __('Synchronization') }}</span>
+      <span class="gl-flex-fill-1">{{ __('Verification') }}</span>
     </div>
     <div
       v-for="type in replicationOverview"

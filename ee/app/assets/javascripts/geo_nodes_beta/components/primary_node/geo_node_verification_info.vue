@@ -1,9 +1,9 @@
 <script>
 import { GlCard, GlIcon, GlPopover, GlLink } from '@gitlab/ui';
 import { mapGetters } from 'vuex';
+import { HELP_INFO_URL } from 'ee/geo_nodes_beta/constants';
 import { sprintf, __ } from '~/locale';
-import { HELP_INFO_URL } from '../constants';
-import GeoNodeProgressBar from './geo_node_progress_bar.vue';
+import GeoNodeProgressBar from '../shared/geo_node_progress_bar.vue';
 
 export default {
   name: 'GeoNodeVerificationInfo',
@@ -49,9 +49,7 @@ export default {
         <p>
           {{ __('Replicated data is verified with the secondary node(s) using checksums') }}
         </p>
-        <gl-link :href="$options.HELP_INFO_URL" target="_blank">{{
-          __('More information')
-        }}</gl-link>
+        <gl-link :href="$options.HELP_INFO_URL" target="_blank">{{ __('Learn more') }}</gl-link>
       </gl-popover>
     </template>
     <div v-for="bar in verificationInfoBars" :key="bar.title" class="gl-mb-5">

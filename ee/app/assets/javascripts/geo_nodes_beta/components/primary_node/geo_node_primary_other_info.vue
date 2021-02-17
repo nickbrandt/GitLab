@@ -3,7 +3,7 @@ import { GlCard } from '@gitlab/ui';
 import { mapGetters } from 'vuex';
 import { numberToHumanSize } from '~/lib/utils/number_utils';
 import { __ } from '~/locale';
-import GeoNodeProgressBar from './geo_node_progress_bar.vue';
+import GeoNodeProgressBar from '../shared/geo_node_progress_bar.vue';
 
 export default {
   name: 'GeoNodePrimaryOtherInfo',

@@ -1,6 +1,6 @@
 <script>
 import { GlIcon, GlPopover, GlLink } from '@gitlab/ui';
-import { REPLICATION_STATUS_UI, REPLICATION_PAUSE_URL } from '../constants';
+import { REPLICATION_STATUS_UI, REPLICATION_PAUSE_URL } from 'ee/geo_nodes_beta/constants';
 
 export default {
   name: 'GeoNodeReplicationStatus',
@@ -41,7 +41,7 @@ export default {
         {{ __('Geo nodes are paused using a command run on the node') }}
       </p>
       <gl-link :href="$options.REPLICATION_PAUSE_URL" target="_blank">{{
-        __('More information')
+        __('Learn more')
       }}</gl-link>
     </gl-popover>
   </div>
