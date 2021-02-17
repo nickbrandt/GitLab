@@ -19,14 +19,14 @@
           .check-all-holder.d-none.d-sm-block.hidden
             = check_box_tag "check-all-issues", nil, false, class: "check-all-issues left"
         .issues-other-filters.filtered-search-wrapper.d-flex.flex-column.flex-md-row
-          .filtered-search-box
+          .filtered-search-box.btn-group
             - if type != :boards_modal && type != :boards
               - text = tag.span(sprite_icon('history'), class: "d-md-none") + tag.span(_('Recent searches'), class: "d-none d-md-inline")
               = dropdown_tag(text,
-                options: { wrapper_class: "filtered-search-history-dropdown-wrapper",
-                toggle_class: "btn filtered-search-history-dropdown-toggle-button",
+                options: { wrapper_class: "gl-new-dropdown dropdown btn-group filtered-search-history-dropdown-wrapper",
+                toggle_class: "gl-button btn dropdown-toggle btn-default btn-md gl-dropdown-toggle filtered-search-history-dropdown-toggle-button",
                 dropdown_class: "filtered-search-history-dropdown",
-                content_class: "filtered-search-history-dropdown-content" }) do
+                content_class: "gl-new-dropdown-inner filtered-search-history-dropdown-content" }) do
                 .js-filtered-search-history-dropdown{ data: { full_path: search_history_storage_prefix } }
             .filtered-search-box-input-container.droplab-dropdown
               .scroll-container
