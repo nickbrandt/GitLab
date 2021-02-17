@@ -9,10 +9,10 @@ import {
   updateStoreAfterRotationAdd,
   updateStoreAfterRotationEdit,
 } from 'ee/oncall_schedules/utils/cache_updates';
-import { isNameFieldValid } from 'ee/oncall_schedules/utils/common_utils';
+import { isNameFieldValid, getParticipantsForSave } from 'ee/oncall_schedules/utils/common_utils';
 import createFlash, { FLASH_TYPES } from '~/flash';
 import usersSearchQuery from '~/graphql_shared/queries/users_search.query.graphql';
-import { format24HourTimeStringFromInt } from '~/lib/utils/datetime_utility';
+import { format24HourTimeStringFromInt, formatDate } from '~/lib/utils/datetime_utility';
 import { s__, __ } from '~/locale';
 import AddEditRotationForm from './add_edit_rotation_form.vue';
 
@@ -114,24 +114,26 @@ export default {
       };
     },
     rotationVariables() {
+      const {
+        name,
+        rotationLength,
+        participants,
+        startsAt: { date, time },
+      } = this.form;
+
       return {
         projectPath: this.projectPath,
         scheduleIid: this.schedule.iid,
-        name: this.form.name,
+        name,
         startsAt: {
-          ...this.form.startsAt,
-          time: format24HourTimeStringFromInt(this.form.startsAt.time),
+          date: formatDate(date, 'yyyy-mm-dd'),
+          time: format24HourTimeStringFromInt(time),
         },
         rotationLength: {
-          ...this.form.rotationLength,
-          length: parseInt(this.form.rotationLength.length, 10),
+          ...rotationLength,
+          length: parseInt(rotationLength.length, 10),
         },
-        participants: this.form.participants.map(({ username }) => ({
-          username,
-          // eslint-disable-next-line @gitlab/require-i18n-strings
-          colorWeight: 'WEIGHT_500',
-          colorPalette: 'BLUE',
-        })),
+        participants: getParticipantsForSave(participants),
       };
     },
     isFormValid() {
