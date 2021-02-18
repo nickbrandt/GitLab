@@ -119,7 +119,7 @@ module IncidentManagement
         # the number of shifts we expect to be included in the
         # shift_cycle. 1.week is the same as 7.days.
         expected_shift_count = rotation.shifts_per_cycle
-        (0..expected_shift_count - 1).map do |shift_count|
+        (0...expected_shift_count).map do |shift_count|
           # we know the start/end time of the active period,
           # so the date is dependent on the cycle start time
           # and how many days have elapsed in the cycle.
@@ -144,7 +144,7 @@ module IncidentManagement
 
     # Removes shifts which are out of bounds from the given starts_at and ends_at timestamps.
     def remove_out_of_bounds_shifts(shifts, shift_cycle_starts_at, starts_at, ends_at)
-      shifts.reject! { |shift| shift.ends_at < starts_at } if shift_cycle_starts_at < starts_at
+      shifts.reject! { |shift| shift.ends_at <= starts_at } if shift_cycle_starts_at <= starts_at
       shifts.reject! { |shift| shift.starts_at > ends_at } if (shift_cycle_starts_at + shift_cycle_duration) > ends_at
 
       shifts

@@ -17,11 +17,11 @@ module Types
 
       alias_method :active_period, :object
 
-      def from
+      def start_time
         active_period.start_time&.strftime('%H:%M')
       end
 
-      def to
+      def end_time
         active_period.end_time&.strftime('%H:%M')
       end
     end

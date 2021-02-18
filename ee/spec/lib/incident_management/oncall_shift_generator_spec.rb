@@ -72,6 +72,15 @@ RSpec.describe IncidentManagement::OncallShiftGenerator do
        [[:participant, '2020-12-08 00:00:00 UTC', '2020-12-13 00:00:00 UTC'],
         [:participant, '2020-12-13 00:00:00 UTC', '2020-12-18 00:00:00 UTC'],
         [:participant, '2020-12-18 00:00:00 UTC', '2020-12-23 00:00:00 UTC']]
+
+      context 'when timestamp is at the end of a shift' do
+        let(:starts_at) { rotation_start_time + shift_length }
+
+        it_behaves_like 'unsaved shifts',
+          'the second and third shift',
+          [[:participant, '2020-12-13 00:00:00 UTC', '2020-12-18 00:00:00 UTC'],
+           [:participant, '2020-12-18 00:00:00 UTC', '2020-12-23 00:00:00 UTC']]
+      end
     end
 
     context 'with many participants' do

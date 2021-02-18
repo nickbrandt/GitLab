@@ -43,6 +43,7 @@ module Mutations
                  description: 'The usernames of users participating in the on-call rotation.'
 
         MAXIMUM_PARTICIPANTS = 100
+        TIME_FORMAT = /^(0\d|1\d|2[0-3]):[0-5]\d$/.freeze
 
         def resolve(iid:, project_path:, participants:, **args)
           project = Project.find_by_full_path(project_path)
@@ -75,8 +76,8 @@ module Mutations
           rotation_length_unit = args[:rotation_length][:unit]
           starts_at = parse_datetime(schedule, args[:starts_at])
           ends_at = parse_datetime(schedule, args[:ends_at]) if args[:ends_at]
-          active_period_start = args.dig(:active_period, :start_time)
-          active_period_end = args.dig(:active_period, :end_time)
+
+          active_period_start, active_period_end = active_period_times(args)
 
           args.slice(:name).merge(
             length: rotation_length,
@@ -107,6 +108,27 @@ module Mutations
           user_array.map.with_index { |param, i| param.to_h.merge(user: matched_users[i]) }
         end
 
+        def active_period_times(args)
+          active_period_args = args.dig(:active_period)
+
+          return [nil, nil] if active_period_args.blank?
+
+          start_time = active_period_args[:start_time]
+          end_time = active_period_args[:end_time]
+
+          raise invalid_time_error unless TIME_FORMAT.match?(start_time)
+          raise invalid_time_error unless TIME_FORMAT.match?(end_time)
+
+          parsed_from = Time.parse(start_time)
+          parsed_to = Time.parse(end_time)
+
+          if parsed_to < parsed_from
+            raise ::Gitlab::Graphql::Errors::ArgumentError, "'start_time' time must be before 'end_time' time"
+          end
+
+          [start_time, end_time]
+        end
+
         def raise_project_not_found
           raise Gitlab::Graphql::Errors::ArgumentError, 'The project could not be found'
         end
@@ -125,6 +147,10 @@ module Mutations
 
         def raise_user_not_found
           raise Gitlab::Graphql::Errors::ArgumentError, "A provided username couldn't be matched to a user"
+        end
+
+        def invalid_time_error
+          ::Gitlab::Graphql::Errors::ArgumentError.new 'Time given is invalid'
         end
       end
     end

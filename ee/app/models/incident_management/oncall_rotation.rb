@@ -68,6 +68,8 @@ module IncidentManagement
       length.public_send(length_unit) # rubocop:disable GitlabSecurity/PublicSend
     end
 
+    # If there is an active period, and the rotation unit is weeks, we multiple the
+    # count of shifts per cycle by 7, as there are 7 days in a week.
     def shifts_per_cycle
       return 1 unless has_shift_active_period?
 

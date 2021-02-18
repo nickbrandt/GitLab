@@ -83,10 +83,13 @@ RSpec.describe Mutations::IncidentManagement::OncallRotation::Create do
       end
 
       context 'with active period times given' do
+        let(:start_time) { '08:00' }
+        let(:end_time) { '17:00' }
+
         before do
           args[:active_period] = {
-            start_time: '08:00',
-            end_time: '17:00'
+            start_time: start_time,
+            end_time: end_time
           }
         end
 
@@ -114,6 +117,23 @@ RSpec.describe Mutations::IncidentManagement::OncallRotation::Create do
               oncall_rotation: nil,
               errors: [/Restricted shift times are not available for hourly shifts/]
             )
+          end
+        end
+
+        context 'end time is before start time' do
+          let(:start_time) { '17:00' }
+          let(:end_time) { '08:00' }
+
+          it 'raises an error' do
+            expect { resolve }.to raise_error(Gitlab::Graphql::Errors::ArgumentError, "'start_time' time must be before 'end_time' time")
+          end
+        end
+
+        context 'invalid time given' do
+          let(:start_time) {  'an invalid time' }
+
+          it 'raises an error' do
+            expect { resolve }.to raise_error(Gitlab::Graphql::Errors::ArgumentError, 'Time given is invalid')
           end
         end
       end
