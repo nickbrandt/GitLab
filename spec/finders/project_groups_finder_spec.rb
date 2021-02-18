@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe ProjectGroupsFinder do
+RSpec.describe GroupsFinder do
   include AdminModeHelper
 
   describe '#execute' do
@@ -24,7 +24,7 @@ RSpec.describe ProjectGroupsFinder do
 
     let(:params) { {} }
     let(:current_user) { user }
-    let(:finder) { described_class.new(project: project, current_user: current_user, params: params) }
+    let(:finder) { described_class.new(current_user, params.merge(project: project)) }
 
     subject { finder.execute }
 
@@ -94,12 +94,6 @@ RSpec.describe ProjectGroupsFinder do
           it { is_expected.to eq([]) }
         end
       end
-    end
-
-    describe 'Missing project' do
-      let(:project) { nil }
-
-      it { is_expected.to eq([]) }
     end
   end
 end

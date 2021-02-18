@@ -42,8 +42,16 @@ class GroupsFinder < UnionFinder
 
   attr_reader :current_user, :params
 
+  def project
+    params[:project]
+  end
+
   def authorized?
-    true
+    if project
+      Ability.allowed?(current_user, :read_project, project)
+    else
+      true
+    end
   end
 
   def apply_filters_on(item)
@@ -54,17 +62,37 @@ class GroupsFinder < UnionFinder
     item
   end
 
+  # rubocop: disable CodeReuse/ActiveRecord
+  # rubocop: disable Metrics/CyclomaticComplexity
+  # rubocop: disable Metrics/PerceivedComplexity
   def all_groups
     return [owned_groups] if params[:owned]
     return [groups_with_min_access_level] if min_access_level?
     return [Group.all] if current_user&.can_read_all_resources? && all_available?
 
     groups = []
-    groups << Gitlab::ObjectHierarchy.new(groups_for_ancestors, groups_for_descendants).all_objects if current_user
-    groups << Group.unscoped.public_to_user(current_user) if include_public_groups?
+    groups << Gitlab::ObjectHierarchy.new(groups_for_ancestors, groups_for_descendants).all_objects if current_user && !project
+    groups << project.group.self_and_ancestors if project&.group
+
+    if params[:with_shared]
+      shared_groups = project.invited_groups
+
+      if params[:shared_min_access_level]
+        shared_groups = shared_groups.where(
+          'project_group_links.group_access >= ?', params[:shared_min_access_level]
+        )
+      end
+
+      groups << shared_groups
+    end
+
+    groups << Group.unscoped.public_to_user(current_user) if include_public_groups? && !project
     groups << Group.none if groups.empty?
     groups
   end
+  # rubocop: enable Metrics/CyclomaticComplexity
+  # rubocop: enable Metrics/PerceivedComplexity
+  # rubocop: enable CodeReuse/ActiveRecord
 
   def groups_for_ancestors
     current_user.authorized_groups
