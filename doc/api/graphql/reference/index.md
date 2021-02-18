@@ -5472,9 +5472,9 @@ Size of UI component in SAST configuration page.
 
 | Value | Description |
 | ----- | ----------- |
-| `LARGE` |  |
-| `MEDIUM` |  |
-| `SMALL` |  |
+| `LARGE` | The size of UI component in SAST configuration page is large. |
+| `MEDIUM` | The size of UI component in SAST configuration page is medium. |
+| `SMALL` | The size of UI component in SAST configuration page is small. |
 
 ### SecurityReportTypeEnum
 

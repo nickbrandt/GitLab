@@ -23865,8 +23865,19 @@ type SastCiConfigurationOptionsEntityEdge {
 Size of UI component in SAST configuration page
 """
 enum SastUiComponentSize {
+  """
+  The size of UI component in SAST configuration page is large.
+  """
   LARGE
+
+  """
+  The size of UI component in SAST configuration page is medium.
+  """
   MEDIUM
+
+  """
+  The size of UI component in SAST configuration page is small.
+  """
   SMALL
 }
 

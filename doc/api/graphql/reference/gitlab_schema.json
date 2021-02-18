@@ -68702,19 +68702,19 @@
           "enumValues": [
             {
               "name": "SMALL",
-              "description": null,
+              "description": "The size of UI component in SAST configuration page is small.",
               "isDeprecated": false,
               "deprecationReason": null
             },
             {
               "name": "MEDIUM",
-              "description": null,
+              "description": "The size of UI component in SAST configuration page is medium.",
               "isDeprecated": false,
               "deprecationReason": null
             },
             {
               "name": "LARGE",
-              "description": null,
+              "description": "The size of UI component in SAST configuration page is large.",
               "isDeprecated": false,
               "deprecationReason": null
             }
