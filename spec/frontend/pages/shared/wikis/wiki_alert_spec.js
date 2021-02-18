@@ -1,14 +1,17 @@
 import { GlAlert, GlLink, GlSprintf } from '@gitlab/ui';
 import { shallowMount } from '@vue/test-utils';
 import WikiAlert from '~/pages/shared/wikis/components/wiki_alert.vue';
-import { ERRORS } from '~/pages/shared/wikis/constants';
 
 describe('WikiAlert', () => {
   let wrapper;
+  const ERROR = 'There is already a page with the same title in that path.';
+  const ERROR_WITH_LINK =
+    'Someone edited the page the same time you did. Please check out %{wikiLinkStart}the page%{wikiLinkEnd} and make sure your changes will not unintentionally remove theirs.';
+  const PATH = '/test';
 
   function createWrapper(propsData = {}, stubs = {}) {
     wrapper = shallowMount(WikiAlert, {
-      propsData,
+      propsData: { wikiPagePath: PATH, ...propsData },
       stubs,
     });
   }
@@ -24,32 +27,15 @@ describe('WikiAlert', () => {
 
   describe('Wiki Alert', () => {
     it('does show an alert when there is an error', () => {
-      createWrapper({ error: ERRORS.PAGE_RENAME.ERROR });
+      createWrapper({ error: ERROR });
       expect(findGlAlert().exists()).toBe(true);
-    });
-
-    it('does show the page change message text', () => {
-      createWrapper({ error: ERRORS.PAGE_CHANGE.ERROR });
       expect(findGlSprintf().exists()).toBe(true);
-      const text = findGlSprintf();
-      expect(text.attributes('message')).toBe(ERRORS.PAGE_CHANGE.MESSAGE);
-    });
-
-    it('does show the page rename message text', () => {
-      createWrapper({ error: ERRORS.PAGE_RENAME.ERROR });
-      expect(findGlSprintf().attributes('message')).toBe(ERRORS.PAGE_RENAME.MESSAGE);
-    });
-
-    it('does show the error message', () => {
-      const error = 'test message';
-      createWrapper({ error });
-      expect(findGlSprintf().attributes('message')).toBe(error);
+      expect(findGlSprintf().attributes('message')).toBe(ERROR);
     });
 
     it('does show the link to the help path', () => {
-      const wikiPagePath = '/help';
-      createWrapper({ error: ERRORS.PAGE_CHANGE.ERROR, wikiPagePath }, { GlAlert, GlSprintf });
-      expect(findGlLink().attributes('href')).toBe(wikiPagePath);
+      createWrapper({ error: ERROR_WITH_LINK }, { GlAlert, GlSprintf });
+      expect(findGlLink().attributes('href')).toBe(PATH);
     });
   });
 });
