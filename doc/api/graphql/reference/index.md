@@ -103,7 +103,7 @@ Fields related to Instance Security Dashboard.
 
 ### InstanceStatisticsMeasurements
 
-Get statistics on the instance.
+Get statistics on the instance. Deprecated in 13.10: This field was renamed. Use the `usageTrendsMeasurements` field instead..
 
 | Name | Description | Type |
 | ----- | ---- | ----------- |
@@ -216,11 +216,25 @@ Find Snippets visible to the current user.
 | `before` | Returns the elements in the list that come before the specified cursor. | String |
 | `explore` | Explore personal snippets. | Boolean |
 | `first` | Returns the first _n_ elements from the list. | Int |
-| `ids` | Array of global snippet ids, e.g., "gid://gitlab/ProjectSnippet/1". | SnippetID! => Array |
+| `ids` | Array of global snippet ids, e.g., `gid://gitlab/ProjectSnippet/1`. | SnippetID! => Array |
 | `last` | Returns the last _n_ elements from the list. | Int |
 | `projectId` | The ID of a project. | ProjectID |
 | `type` | The type of snippet. | TypeEnum |
 | `visibility` | The visibility of the snippet. | VisibilityScopesEnum |
+
+### UsageTrendsMeasurements
+
+Get statistics on the instance.
+
+| Name | Description | Type |
+| ----- | ---- | ----------- |
+| `after` | Returns the elements in the list that come after the specified cursor. | String |
+| `before` | Returns the elements in the list that come before the specified cursor. | String |
+| `first` | Returns the first _n_ elements from the list. | Int |
+| `identifier` | The type of measurement/statistics to retrieve. | MeasurementIdentifier! |
+| `last` | Returns the last _n_ elements from the list. | Int |
+| `recordedAfter` | Measurement recorded after this date. | Time |
+| `recordedBefore` | Measurement recorded before this date. | Time |
 
 ### User
 
