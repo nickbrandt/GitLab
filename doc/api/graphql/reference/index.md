@@ -4335,9 +4335,9 @@ Represents the vulnerability details base.
 
 | Field | Type | Description |
 | ----- | ---- | ----------- |
-| `description` | String! | Description of the field. |
+| `description` | String | Description of the field. |
 | `fieldName` | String | Name of the field. |
-| `name` | String! | Name of the field. |
+| `name` | String | Name of the field. |
 
 ### VulnerabilityDetailBoolean
 
@@ -4345,9 +4345,9 @@ Represents the vulnerability details boolean value.
 
 | Field | Type | Description |
 | ----- | ---- | ----------- |
-| `description` | String! | Description of the field. |
+| `description` | String | Description of the field. |
 | `fieldName` | String | Name of the field. |
-| `name` | String! | Name of the field. |
+| `name` | String | Name of the field. |
 | `value` | Boolean! | Value of the field. |
 
 ### VulnerabilityDetailCode
@@ -4356,10 +4356,10 @@ Represents the vulnerability details code field.
 
 | Field | Type | Description |
 | ----- | ---- | ----------- |
-| `description` | String! | Description of the field. |
+| `description` | String | Description of the field. |
 | `fieldName` | String | Name of the field. |
 | `lang` | String | Language of the code. |
-| `name` | String! | Name of the field. |
+| `name` | String | Name of the field. |
 | `value` | String! | Source code. |
 
 ### VulnerabilityDetailCommit
@@ -4368,9 +4368,9 @@ Represents the vulnerability details commit field.
 
 | Field | Type | Description |
 | ----- | ---- | ----------- |
-| `description` | String! | Description of the field. |
+| `description` | String | Description of the field. |
 | `fieldName` | String | Name of the field. |
-| `name` | String! | Name of the field. |
+| `name` | String | Name of the field. |
 | `value` | String! | The commit SHA value. |
 
 ### VulnerabilityDetailDiff
@@ -4381,9 +4381,9 @@ Represents the vulnerability details diff field.
 | ----- | ---- | ----------- |
 | `after` | String! | Value of the field after the change. |
 | `before` | String! | Value of the field before the change. |
-| `description` | String! | Description of the field. |
+| `description` | String | Description of the field. |
 | `fieldName` | String | Name of the field. |
-| `name` | String! | Name of the field. |
+| `name` | String | Name of the field. |
 
 ### VulnerabilityDetailFileLocation
 
@@ -4391,12 +4391,12 @@ Represents the vulnerability details location within a file in the project.
 
 | Field | Type | Description |
 | ----- | ---- | ----------- |
-| `description` | String! | Description of the field. |
+| `description` | String | Description of the field. |
 | `fieldName` | String | Name of the field. |
 | `fileName` | String! | File name. |
 | `lineEnd` | Int! | End line number of the file location. |
 | `lineStart` | Int! | Start line number of the file location. |
-| `name` | String! | Name of the field. |
+| `name` | String | Name of the field. |
 
 ### VulnerabilityDetailInt
 
@@ -4404,9 +4404,9 @@ Represents the vulnerability details integer value.
 
 | Field | Type | Description |
 | ----- | ---- | ----------- |
-| `description` | String! | Description of the field. |
+| `description` | String | Description of the field. |
 | `fieldName` | String | Name of the field. |
-| `name` | String! | Name of the field. |
+| `name` | String | Name of the field. |
 | `value` | Int! | Value of the field. |
 
 ### VulnerabilityDetailList
@@ -4415,10 +4415,10 @@ Represents the vulnerability details list value.
 
 | Field | Type | Description |
 | ----- | ---- | ----------- |
-| `description` | String! | Description of the field. |
+| `description` | String | Description of the field. |
 | `fieldName` | String | Name of the field. |
 | `items` | VulnerabilityDetail! => Array | List of details. |
-| `name` | String! | Name of the field. |
+| `name` | String | Name of the field. |
 
 ### VulnerabilityDetailMarkdown
 
@@ -4426,9 +4426,9 @@ Represents the vulnerability details Markdown field.
 
 | Field | Type | Description |
 | ----- | ---- | ----------- |
-| `description` | String! | Description of the field. |
+| `description` | String | Description of the field. |
 | `fieldName` | String | Name of the field. |
-| `name` | String! | Name of the field. |
+| `name` | String | Name of the field. |
 | `value` | String! | Value of the Markdown field. |
 
 ### VulnerabilityDetailModuleLocation
@@ -4437,10 +4437,10 @@ Represents the vulnerability details location within a file in the project.
 
 | Field | Type | Description |
 | ----- | ---- | ----------- |
-| `description` | String! | Description of the field. |
+| `description` | String | Description of the field. |
 | `fieldName` | String | Name of the field. |
 | `moduleName` | String! | Module name. |
-| `name` | String! | Name of the field. |
+| `name` | String | Name of the field. |
 | `offset` | Int! | Offset of the module location. |
 
 ### VulnerabilityDetailTable
@@ -4449,10 +4449,10 @@ Represents the vulnerability details table value.
 
 | Field | Type | Description |
 | ----- | ---- | ----------- |
-| `description` | String! | Description of the field. |
+| `description` | String | Description of the field. |
 | `fieldName` | String | Name of the field. |
 | `headers` | VulnerabilityDetail! => Array | Table headers. |
-| `name` | String! | Name of the field. |
+| `name` | String | Name of the field. |
 | `rows` | VulnerabilityDetail! => Array | Table rows. |
 
 ### VulnerabilityDetailText
@@ -4461,9 +4461,9 @@ Represents the vulnerability details text field.
 
 | Field | Type | Description |
 | ----- | ---- | ----------- |
-| `description` | String! | Description of the field. |
+| `description` | String | Description of the field. |
 | `fieldName` | String | Name of the field. |
-| `name` | String! | Name of the field. |
+| `name` | String | Name of the field. |
 | `value` | String! | Value of the text field. |
 
 ### VulnerabilityDetailUrl
@@ -4472,10 +4472,10 @@ Represents the vulnerability details URL field.
 
 | Field | Type | Description |
 | ----- | ---- | ----------- |
-| `description` | String! | Description of the field. |
+| `description` | String | Description of the field. |
 | `fieldName` | String | Name of the field. |
 | `href` | String! | Href of the URL. |
-| `name` | String! | Name of the field. |
+| `name` | String | Name of the field. |
 | `text` | String | Text of the URL. |
 
 ### VulnerabilityDismissPayload

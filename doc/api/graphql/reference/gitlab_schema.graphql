@@ -28462,7 +28462,7 @@ type VulnerabilityDetailBase {
   """
   Description of the field.
   """
-  description: String!
+  description: String
 
   """
   Name of the field.
@@ -28472,7 +28472,7 @@ type VulnerabilityDetailBase {
   """
   Name of the field.
   """
-  name: String!
+  name: String
 }
 
 """
@@ -28482,7 +28482,7 @@ type VulnerabilityDetailBoolean {
   """
   Description of the field.
   """
-  description: String!
+  description: String
 
   """
   Name of the field.
@@ -28492,7 +28492,7 @@ type VulnerabilityDetailBoolean {
   """
   Name of the field.
   """
-  name: String!
+  name: String
 
   """
   Value of the field.
@@ -28507,7 +28507,7 @@ type VulnerabilityDetailCode {
   """
   Description of the field.
   """
-  description: String!
+  description: String
 
   """
   Name of the field.
@@ -28522,7 +28522,7 @@ type VulnerabilityDetailCode {
   """
   Name of the field.
   """
-  name: String!
+  name: String
 
   """
   Source code.
@@ -28537,7 +28537,7 @@ type VulnerabilityDetailCommit {
   """
   Description of the field.
   """
-  description: String!
+  description: String
 
   """
   Name of the field.
@@ -28547,7 +28547,7 @@ type VulnerabilityDetailCommit {
   """
   Name of the field.
   """
-  name: String!
+  name: String
 
   """
   The commit SHA value.
@@ -28572,7 +28572,7 @@ type VulnerabilityDetailDiff {
   """
   Description of the field.
   """
-  description: String!
+  description: String
 
   """
   Name of the field.
@@ -28582,7 +28582,7 @@ type VulnerabilityDetailDiff {
   """
   Name of the field.
   """
-  name: String!
+  name: String
 }
 
 """
@@ -28592,7 +28592,7 @@ type VulnerabilityDetailFileLocation {
   """
   Description of the field.
   """
-  description: String!
+  description: String
 
   """
   Name of the field.
@@ -28617,7 +28617,7 @@ type VulnerabilityDetailFileLocation {
   """
   Name of the field.
   """
-  name: String!
+  name: String
 }
 
 """
@@ -28627,7 +28627,7 @@ type VulnerabilityDetailInt {
   """
   Description of the field.
   """
-  description: String!
+  description: String
 
   """
   Name of the field.
@@ -28637,7 +28637,7 @@ type VulnerabilityDetailInt {
   """
   Name of the field.
   """
-  name: String!
+  name: String
 
   """
   Value of the field.
@@ -28652,7 +28652,7 @@ type VulnerabilityDetailList {
   """
   Description of the field.
   """
-  description: String!
+  description: String
 
   """
   Name of the field.
@@ -28667,7 +28667,7 @@ type VulnerabilityDetailList {
   """
   Name of the field.
   """
-  name: String!
+  name: String
 }
 
 """
@@ -28677,7 +28677,7 @@ type VulnerabilityDetailMarkdown {
   """
   Description of the field.
   """
-  description: String!
+  description: String
 
   """
   Name of the field.
@@ -28687,7 +28687,7 @@ type VulnerabilityDetailMarkdown {
   """
   Name of the field.
   """
-  name: String!
+  name: String
 
   """
   Value of the Markdown field.
@@ -28702,7 +28702,7 @@ type VulnerabilityDetailModuleLocation {
   """
   Description of the field.
   """
-  description: String!
+  description: String
 
   """
   Name of the field.
@@ -28717,7 +28717,7 @@ type VulnerabilityDetailModuleLocation {
   """
   Name of the field.
   """
-  name: String!
+  name: String
 
   """
   Offset of the module location.
@@ -28732,7 +28732,7 @@ type VulnerabilityDetailTable {
   """
   Description of the field.
   """
-  description: String!
+  description: String
 
   """
   Name of the field.
@@ -28747,7 +28747,7 @@ type VulnerabilityDetailTable {
   """
   Name of the field.
   """
-  name: String!
+  name: String
 
   """
   Table rows.
@@ -28762,7 +28762,7 @@ type VulnerabilityDetailText {
   """
   Description of the field.
   """
-  description: String!
+  description: String
 
   """
   Name of the field.
@@ -28772,7 +28772,7 @@ type VulnerabilityDetailText {
   """
   Name of the field.
   """
-  name: String!
+  name: String
 
   """
   Value of the text field.
@@ -28787,7 +28787,7 @@ type VulnerabilityDetailUrl {
   """
   Description of the field.
   """
-  description: String!
+  description: String
 
   """
   Name of the field.
@@ -28802,7 +28802,7 @@ type VulnerabilityDetailUrl {
   """
   Name of the field.
   """
-  name: String!
+  name: String
 
   """
   Text of the URL.
