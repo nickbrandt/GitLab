@@ -21992,6 +21992,9 @@ msgstr ""
 msgid "Pipeline|Canceled"
 msgstr ""
 
+msgid "Pipeline|Checking pipeline status"
+msgstr ""
+
 msgid "Pipeline|Checking pipeline status."
 msgstr ""
 
@@ -22041,6 +22044,9 @@ msgid "Pipeline|Pending"
 msgstr ""
 
 msgid "Pipeline|Pipeline"
+msgstr ""
+
+msgid "Pipeline|Pipeline %{idStart}#%{idEnd} %{statusStart}%{statusEnd} for %{commitStart}%{commitEnd}"
 msgstr ""
 
 msgid "Pipeline|Pipelines"
@@ -22098,6 +22104,9 @@ msgid "Pipeline|Value"
 msgstr ""
 
 msgid "Pipeline|Variables"
+msgstr ""
+
+msgid "Pipeline|We are currently unable to fetch pipeline data"
 msgstr ""
 
 msgid "Pipeline|You’re about to stop pipeline %{pipelineId}."
