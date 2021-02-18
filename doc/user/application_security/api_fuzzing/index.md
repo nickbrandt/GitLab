@@ -64,6 +64,12 @@ Examples of both configurations can be found here:
 - [Example HTTP Archive (HAR) project](https://gitlab.com/gitlab-org/security-products/demos/api-fuzzing-example/-/tree/har)
 - [Example Postman Collection project](https://gitlab.com/gitlab-org/security-products/demos/api-fuzzing/postman-api-fuzzing-example)
 
+WARNING:
+GitLab 14.0 will require that you place API fuzzing configuration files (for example,
+`gitlab-api-fuzzing-config.yml`) in your repository's `.gitlab` directory instead of your
+repository's root. You can continue using your existing configuration files as they are, but
+starting in GitLab 14.0, GitLab will not check your repository's root for configuration files.
+
 ### OpenAPI Specification
 
 The [OpenAPI Specification](https://www.openapis.org/) (formerly the Swagger Specification) is an
