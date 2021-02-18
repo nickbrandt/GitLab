@@ -1,9 +1,9 @@
 import { GlDrawer } from '@gitlab/ui';
 import { shallowMount } from '@vue/test-utils';
 import BoardContentSidebar from 'ee_component/boards/components/board_content_sidebar.vue';
+import BoardSidebarIterationSelect from 'ee_component/boards/components/sidebar/board_sidebar_iteration_select.vue';
 import { stubComponent } from 'helpers/stub_component';
 import waitForPromises from 'helpers/wait_for_promises';
-import BoardAssigneeDropdown from '~/boards/components/board_assignee_dropdown.vue';
 import BoardSidebarDueDate from '~/boards/components/sidebar/board_sidebar_due_date.vue';
 import BoardSidebarIssueTitle from '~/boards/components/sidebar/board_sidebar_issue_title.vue';
 import BoardSidebarLabelsSelect from '~/boards/components/sidebar/board_sidebar_labels_select.vue';
@@ -44,7 +44,8 @@ describe('ee/BoardContentSidebar', () => {
   beforeEach(() => {
     store = createStore();
     store.state.sidebarType = ISSUABLE;
-    store.state.issues = { 1: { title: 'One', referencePath: 'path', assignees: [] } };
+    store.state.issues = { 1: { title: 'One', referencePath: 'path#2', assignees: [], iid: '2' } };
+    store.state.activeIssue = { title: 'One', referencePath: 'path#2', assignees: [], iid: '2' };
     store.state.activeId = '1';
 
     createComponent();
@@ -61,10 +62,6 @@ describe('ee/BoardContentSidebar', () => {
 
   it('applies an open attribute', () => {
     expect(wrapper.find(GlDrawer).props('open')).toBe(true);
-  });
-
-  it('renders BoardAssigneeDropdown', () => {
-    expect(wrapper.find(BoardAssigneeDropdown).exists()).toBe(true);
   });
 
   it('renders BoardSidebarLabelsSelect', () => {
@@ -85,6 +82,10 @@ describe('ee/BoardContentSidebar', () => {
 
   it('renders BoardSidebarMilestoneSelect', () => {
     expect(wrapper.find(BoardSidebarMilestoneSelect).exists()).toBe(true);
+  });
+
+  it('renders BoardSidebarIterationSelect', () => {
+    expect(wrapper.find(BoardSidebarIterationSelect).exists()).toBe(true);
   });
 
   describe('when we emit close', () => {

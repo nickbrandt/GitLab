@@ -641,8 +641,8 @@ request to add a new user to a project through API will not be possible.
 > - [Moved](https://gitlab.com/gitlab-org/gitlab/-/issues/215410) to [GitLab Premium](https://about.gitlab.com/pricing/) in 13.1.
 
 NOTE:
-IP Access Restrictions are currently not functioning as expected on GitLab.com. Some users
-may experience blocked Git operations or have difficulties accessing projects. Please
+IP Access Restrictions are currently not functioning as expected on GitLab.com. If enabled,
+users cannot perform Git operations through SSH, or access projects via the UI. Please
 review the [following bug report](https://gitlab.com/gitlab-org/gitlab/-/issues/271673) for
 more information.
 
@@ -787,7 +787,7 @@ To enable delayed deletion of projects:
 1. Click **Save changes**.
 
 NOTE:
-The group setting for delayed deletion is not inherited by sub-groups and has to be individually defined for each group.
+The group setting for delayed deletion is not inherited by subgroups and has to be individually defined for each group.
 
 #### Prevent project forking outside group **(PREMIUM)**
 
@@ -870,3 +870,13 @@ questions that you know someone might ask.
 Each scenario can be a third-level heading, e.g. `### Getting error message X`.
 If you have none to add when creating a doc, leave this section in place
 but commented out to help encourage others to add to it in the future. -->
+
+## DORA4 analytics overview **(ULTIMATE ONLY)**
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/291747) in GitLab [Ultimate](https://about.gitlab.com/pricing/) 13.9 as a [Beta feature](https://about.gitlab.com/handbook/product/gitlab-the-product/#beta).
+
+Group details include the following analytics:
+
+- Deployment Frequency
+
+For more information, see [DORA4 Project Analytics API](../../api/dora4_group_analytics.md).

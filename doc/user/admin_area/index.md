@@ -33,7 +33,7 @@ The Admin Area is made up of the following sections:
 | **{cloud-gear}** Kubernetes                    | Create and manage instance-level [Kubernetes clusters](../instance/clusters/index.md).                                                                                                                                                                                                   |
 | **{push-rules}** Push rules **(STARTER ONLY)** | Configure pre-defined Git [push rules](../../push_rules/push_rules.md) for projects. Also, configure [merge requests approvers rules](merge_requests_approvals.md). **(PREMIUM SELF)**                                                                                                   |
 | **{location-dot}** Geo **(PREMIUM SELF)**      | Configure and maintain [Geo nodes](geo_nodes.md).                                                                                                                                                                                                                                        |
-| **{key}** Deploy keys                          | Create instance-wide [SSH deploy keys](../../ssh/README.md#deploy-keys).                                                                                                                                                                                                                 |
+| **{key}** Deploy keys                          | Create instance-wide [SSH deploy keys](../project/deploy_keys/index.md).                                                                                                                                                                                                                 |
 | **{lock}** Credentials **(ULTIMATE SELF)**     | View [credentials](credentials_inventory.md) that can be used to access your instance.                                                                                                                                                                                                   |
 | **{template}** Service Templates               | Create [service templates](../project/integrations/services_templates.md) for projects.                                                                                                                                                                                                  |
 | **{labels}** Labels                            | Create and maintain [labels](labels.md) for your GitLab instance.                                                                                                                                                                                                                        |
@@ -150,7 +150,7 @@ An administrator can "impersonate" any other user, including other administrator
 This allows the administrator to "see what the user sees," and take actions on behalf of the user.
 You can impersonate a user in the following ways:
 
-- Through the UI, by selecting **Admin Area > Overview > Users > [Select a user] > Impersonate**.
+- Through the UI, by selecting **Admin Area > Overview > Users > Select a user > Impersonate**.
 - With the API, using [impersonation tokens](../../api/README.md#impersonation-tokens).
 
 All impersonation activities are [captured with audit events](../../administration/audit_events.md#impersonation-data).

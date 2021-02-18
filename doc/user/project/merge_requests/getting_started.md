@@ -132,7 +132,7 @@ To request it, open the **Reviewers** drop-down box to search for the user you w
 
 #### Approval Rule information for Reviewers **(PREMIUM)**
 
-> - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/233736) in GitLab 13.8. For this version only, GitLab administrators can opt to [enable it](#enable-or-disable-approval-rule-information).
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/233736) in GitLab 13.8.
 > - [Feature flag removed](https://gitlab.com/gitlab-org/gitlab/-/issues/293742) in GitLab 13.9.
 
 When editing the **Reviewers** field in a new or existing merge request, GitLab
@@ -194,6 +194,33 @@ is set for deletion, the merge request widget displays the
 
 ![Delete source branch status](img/remove_source_branch_status.png)
 
+### Branch retargeting on merge **(FREE SELF)**
+
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/320902) in GitLab 13.9.
+> - It's [deployed behind a feature flag](../../feature_flags.md), disabled by default.
+> - It's disabled on GitLab.com.
+> - It's not recommended for production use.
+> - To use it in GitLab self-managed instances, ask a GitLab administrator to [enable it](#enable-or-disable-branch-retargeting-on-merge).
+
+In specific circumstances, GitLab can retarget the destination branch of
+open merge request, if the destination branch merges while the merge request is
+open. Merge requests are often chained in this manner, with one merge request
+depending on another:
+
+- **Merge request 1**: merge `feature-alpha` into `master`.
+- **Merge request 2**: merge `feature-beta` into `feature-alpha`.
+
+These merge requests are usually handled in one of these ways:
+
+- Merge request 1 is merged into `master` first. Merge request 2 is then
+  retargeted to `master`.
+- Merge request 2 is merged into `feature-alpha`. The updated merge request 1, which
+  now contains the contents of `feature-alpha` and `feature-beta`, is merged into `master`.
+
+GitLab retargets up to four merge requests when their target branch is merged into
+`master`, so you don't need to perform this operation manually. Merge requests from
+forks are not retargeted.
+
 ## Recommendations and best practices for Merge Requests
 
 - When working locally in your branch, add multiple commits and only push when
@@ -204,11 +231,9 @@ is set for deletion, the merge request widget displays the
   reviews are faster and your changes are less prone to errors.
 - Do not use capital letters nor special chars in branch names.
 
-## Enable or disable Approval Rule information **(PREMIUM SELF)**
+### Enable or disable branch retargeting on merge **(FREE SELF)**
 
-> - [Feature flag removed](https://gitlab.com/gitlab-org/gitlab/-/issues/293742) in GitLab 13.9.
-
-Merge Request Reviewers is under development and ready for production use.
+Automatically retargeting merge requests is under development but ready for production use.
 It is deployed behind a feature flag that is **enabled by default**.
 [GitLab administrators with access to the GitLab Rails console](../../../administration/feature_flags.md)
 can opt to disable it.
@@ -216,17 +241,11 @@ can opt to disable it.
 To enable it:
 
 ```ruby
-# For the instance
-Feature.enable(:reviewer_approval_rules)
-# For a single project
-Feature.enable(:reviewer_approval_rules, Project.find(<project id>))
+Feature.enable(:retarget_merge_requests)
 ```
 
 To disable it:
 
 ```ruby
-# For the instance
-Feature.disable(:reviewer_approval_rules)
-# For a single project
-Feature.disable(:reviewer_approval_rules, Project.find(<project id>))
+Feature.disable(:retarget_merge_requests)
 ```

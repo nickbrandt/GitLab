@@ -1,13 +1,9 @@
 import { pick } from 'lodash';
-
 import boardListsQuery from 'ee_else_ce/boards/graphql/board_lists.query.graphql';
 import { BoardType, ListType, inactiveId, flashAnimationDuration } from '~/boards/constants';
-import createFlash from '~/flash';
 import { getIdFromGraphQLId } from '~/graphql_shared/utils';
 import createGqClient, { fetchPolicies } from '~/lib/graphql';
 import { convertObjectPropsToCamelCase, urlParamsToObject } from '~/lib/utils/common_utils';
-import { __ } from '~/locale';
-import updateAssigneesMutation from '~/vue_shared/components/sidebar/queries/updateAssignees.mutation.graphql';
 import {
   formatBoardLists,
   formatListIssues,
@@ -83,7 +79,11 @@ export default {
     }
   },
 
-  fetchLists: ({ commit, state, dispatch }) => {
+  fetchLists: ({ dispatch }) => {
+    dispatch('fetchIssueLists');
+  },
+
+  fetchIssueLists: ({ commit, state, dispatch }) => {
     const { boardType, filterParams, fullPath, boardId } = state;
 
     const variables = {
@@ -257,8 +257,8 @@ export default {
       });
   },
 
-  fetchIssuesForList: ({ state, commit }, { listId, fetchNext = false }) => {
-    commit(types.REQUEST_ISSUES_FOR_LIST, { listId, fetchNext });
+  fetchItemsForList: ({ state, commit }, { listId, fetchNext = false }) => {
+    commit(types.REQUEST_ITEMS_FOR_LIST, { listId, fetchNext });
 
     const { fullPath, boardId, boardType, filterParams } = state;
 
@@ -285,9 +285,9 @@ export default {
         const { lists } = data[boardType]?.board;
         const listIssues = formatListIssues(lists);
         const listPageInfo = formatListsPageInfo(lists);
-        commit(types.RECEIVE_ISSUES_FOR_LIST_SUCCESS, { listIssues, listPageInfo, listId });
+        commit(types.RECEIVE_ITEMS_FOR_LIST_SUCCESS, { listIssues, listPageInfo, listId });
       })
-      .catch(() => commit(types.RECEIVE_ISSUES_FOR_LIST_FAILURE, listId));
+      .catch(() => commit(types.RECEIVE_ITEMS_FOR_LIST_FAILURE, listId));
   },
 
   resetIssues: ({ commit }) => {
@@ -333,34 +333,11 @@ export default {
   },
 
   setAssignees: ({ commit, getters }, assigneeUsernames) => {
-    commit(types.SET_ASSIGNEE_LOADING, true);
-
-    return gqlClient
-      .mutate({
-        mutation: updateAssigneesMutation,
-        variables: {
-          iid: getters.activeIssue.iid,
-          projectPath: getters.activeIssue.referencePath.split('#')[0],
-          assigneeUsernames,
-        },
-      })
-      .then(({ data }) => {
-        const { nodes } = data.issueSetAssignees?.issue?.assignees || [];
-
-        commit('UPDATE_ISSUE_BY_ID', {
-          issueId: getters.activeIssue.id,
-          prop: 'assignees',
-          value: nodes,
-        });
-
-        return nodes;
-      })
-      .catch(() => {
-        createFlash({ message: __('An error occurred while updating assignees.') });
-      })
-      .finally(() => {
-        commit(types.SET_ASSIGNEE_LOADING, false);
-      });
+    commit('UPDATE_ISSUE_BY_ID', {
+      issueId: getters.activeIssue.id,
+      prop: 'assignees',
+      value: assigneeUsernames,
+    });
   },
 
   setActiveIssueMilestone: async ({ commit, getters }, input) => {

@@ -373,6 +373,7 @@ nullable
 Nurtch
 nyc
 OAuth
+Octokit
 offboarded
 offboarding
 offboards
@@ -421,6 +422,7 @@ prepend
 prepended
 prepending
 prepends
+prepopulated
 Prettifier
 Pritaly
 Priyanka
@@ -488,6 +490,10 @@ resync
 resynced
 resyncing
 resyncs
+retarget
+retargeted
+retargeting
+retargets
 reusability
 reverified
 reverifies
@@ -519,6 +525,7 @@ scatterplot
 scatterplots
 Schemastore
 scrollable
+Semgrep
 Sendmail
 Sentry
 serializer
@@ -561,6 +568,8 @@ subfolder
 subfolders
 subgraph
 subgraphs
+subgroup
+subgroups
 subkey
 subkeys
 sublicense
@@ -659,6 +668,9 @@ unencoded
 unencoder
 unencodes
 unencrypted
+unfollow
+unfollowed
+unfollows
 Unicorn
 unindexed
 unlink
@@ -697,6 +709,7 @@ unreplicated
 unresolve
 unresolved
 unresolving
+unreviewed
 unsanitized
 unschedule
 unscoped
@@ -766,3 +779,4 @@ Yubico
 Zeitwerk
 Zendesk
 zsh
+Zstandard

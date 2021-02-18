@@ -153,7 +153,7 @@ Job grouping is evaluated with an improved regular expression to group jobs by n
 The new implementation removes one or more `: [...]`, `X Y`, `X/Y`, or `X\Y` sequences
 from the **end** of job names only.
 
-Matching substrings occuring at the beginning or in the middle of build names are
+Matching substrings occurring at the beginning or in the middle of build names are
 no longer removed.
 
 ## Specifying variables when running manual jobs
@@ -167,7 +167,7 @@ additional variables. To access this page, click on the **name** of the manual j
 the pipeline view, *not* the play (**{play}**) button.
 
 This is useful when you want to alter the execution of a job that uses
-[custom environment variables](../variables/README.md#custom-cicd-variables).
+[custom CI/CD variables](../variables/README.md#custom-cicd-variables).
 Add a variable name (key) and value here to override the value defined in
 [the UI or `.gitlab-ci.yml`](../variables/README.md#custom-cicd-variables),
 for a single run of the manual job.
