@@ -16849,6 +16849,9 @@ msgstr ""
 msgid "Jira service not configured."
 msgstr ""
 
+msgid "Jira user"
+msgstr ""
+
 msgid "Jira users have been imported from the configured Jira instance. They can be mapped by selecting a GitLab user from the dropdown in the \"GitLab username\" column. When the form appears, the dropdown defaults to the user conducting the import."
 msgstr ""
 
@@ -20119,6 +20122,9 @@ msgid "No activities found"
 msgstr ""
 
 msgid "No application_settings found"
+msgstr ""
+
+msgid "No assignee"
 msgstr ""
 
 msgid "No authentication methods configured."
