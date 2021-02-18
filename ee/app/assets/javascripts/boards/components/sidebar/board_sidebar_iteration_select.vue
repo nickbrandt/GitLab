@@ -9,6 +9,7 @@ import {
   GlLoadingIcon,
   GlTooltipDirective,
 } from '@gitlab/ui';
+import * as Sentry from '@sentry/browser';
 import { mapGetters } from 'vuex';
 import {
   iterationSelectTextMap,
@@ -22,7 +23,6 @@ import currentIterationQuery from 'ee/sidebar/queries/issue_iteration.query.grap
 import setIssueIterationMutation from 'ee/sidebar/queries/set_iteration_on_issue.mutation.graphql';
 import BoardEditableItem from '~/boards/components/sidebar/board_editable_item.vue';
 import createFlash from '~/flash';
-import * as Sentry from '~/sentry/wrapper';
 
 const debounceValue = 250;
 

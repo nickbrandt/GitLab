@@ -1,4 +1,5 @@
 import { GlDropdown, GlDropdownItem, GlDropdownText, GlLink, GlSearchBoxByType } from '@gitlab/ui';
+import * as Sentry from '@sentry/browser';
 
 import { createLocalVue, shallowMount } from '@vue/test-utils';
 import VueApollo from 'vue-apollo';
@@ -15,7 +16,6 @@ import waitForPromises from 'helpers/wait_for_promises';
 import BoardEditableItem from '~/boards/components/sidebar/board_editable_item.vue';
 import getters from '~/boards/stores/getters';
 import createFlash from '~/flash';
-import * as Sentry from '~/sentry/wrapper';
 
 import {
   mockIssue2 as mockIssue,
