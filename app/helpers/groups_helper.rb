@@ -181,7 +181,7 @@ module GroupsHelper
   def parent_group_options(current_group)
     exclude_groups = current_group.self_and_descendants.pluck_primary_key
     exclude_groups << current_group.parent_id if current_group.parent_id
-    groups = GroupsFinder.new(current_user, min_access_level: Gitlab::Access::OWNER, exclude_group_ids: exclude_groups).execute.sort_by(&:human_name).map do |group|
+    groups = GroupsFinder.new(current_user, min_access_level: Gitlab::Access::OWNER, skip_groups: exclude_groups).execute.sort_by(&:human_name).map do |group|
       { id: group.id, text: group.human_name }
     end
 

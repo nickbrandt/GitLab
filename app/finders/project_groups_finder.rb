@@ -12,27 +12,15 @@
 #     shared_min_access_level: integer (optional)
 #     skip_groups: array of integers (optional)
 #
-class ProjectGroupsFinder < UnionFinder
+class ProjectGroupsFinder < GroupsFinder
   def initialize(project:, current_user: nil, params: {})
     @project = project
-    @current_user = current_user
-    @params = params
-  end
-
-  def execute
-    return Group.none unless authorized?
-
-    items = all_groups.map do |item|
-      item = exclude_group_ids(item)
-      item
-    end
-
-    find_union(items, Group).with_route.order_id_desc
+    super(current_user, params)
   end
 
   private
 
-  attr_reader :project, :current_user, :params
+  attr_reader :project
 
   def authorized?
     Ability.allowed?(current_user, :read_project, project)
@@ -60,9 +48,9 @@ class ProjectGroupsFinder < UnionFinder
   end
   # rubocop: enable CodeReuse/ActiveRecord
 
-  def exclude_group_ids(groups)
-    return groups unless params[:skip_groups]
+  def apply_filters_on(item)
+    item = exclude_group_ids(item)
 
-    groups.id_not_in(params[:skip_groups])
+    item
   end
 end

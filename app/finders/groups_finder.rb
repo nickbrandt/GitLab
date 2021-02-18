@@ -11,7 +11,7 @@
 #     parent: Group
 #     all_available: boolean (defaults to true)
 #     min_access_level: integer
-#     exclude_group_ids: array of integers
+#     skip_groups: array of integers
 #     include_parent_descendants: boolean (defaults to false) - includes descendant groups when
 #                                 filtering by parent. The parent param must be present.
 #
@@ -29,12 +29,10 @@ class GroupsFinder < UnionFinder
   end
 
   def execute
-    items = all_groups.map do |item|
-      item = by_parent(item)
-      item = by_custom_attributes(item)
-      item = exclude_group_ids(item)
+    return Group.none unless authorized?
 
-      item
+    items = all_groups.map do |item|
+      apply_filters_on(item)
     end
 
     find_union(items, Group).with_route.order_id_desc
@@ -43,6 +41,18 @@ class GroupsFinder < UnionFinder
   private
 
   attr_reader :current_user, :params
+
+  def authorized?
+    true
+  end
+
+  def apply_filters_on(item)
+    item = by_parent(item)
+    item = by_custom_attributes(item)
+    item = exclude_group_ids(item)
+
+    item
+  end
 
   def all_groups
     return [owned_groups] if params[:owned]
@@ -77,9 +87,9 @@ class GroupsFinder < UnionFinder
   # rubocop: enable CodeReuse/ActiveRecord
 
   def exclude_group_ids(groups)
-    return groups unless params[:exclude_group_ids]
+    return groups unless params[:skip_groups]
 
-    groups.id_not_in(params[:exclude_group_ids])
+    groups.id_not_in(params[:skip_groups])
   end
 
   # rubocop: disable CodeReuse/ActiveRecord
