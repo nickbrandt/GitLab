@@ -53,4 +53,29 @@ RSpec.describe 'get list of epics for an epic  board list' do
       let(:first_param) { 2 }
     end
   end
+
+  describe 'field values' do
+    def query(params = {})
+      graphql_query_for(:group, { full_path: group.full_path },
+                        <<~BOARDS
+        epicBoard(id: "#{board.to_global_id}") {
+          lists(id: "#{list.to_global_id}") {
+            nodes {
+              #{all_graphql_fields_for('epic_list'.classify)}
+            }
+          }
+        }
+      BOARDS
+      )
+    end
+
+    it 'returns the correct values for collapsed' do
+      board.epic_lists.first.update_preferences_for(current_user, collapsed: true)
+
+      post_graphql(query, current_user: current_user)
+      pp graphql_dig_at(graphql_data, 'group', 'epicBoard', 'lists', 'nodes', 0)
+
+      expect(graphql_dig_at(graphql_data, 'group', 'epicBoard', 'lists', 'nodes', 0, 'collapsed')).to eq list.collapsed?(current_user)
+    end
+  end
 end
