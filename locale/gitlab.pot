@@ -13234,6 +13234,9 @@ msgstr ""
 msgid "Geo nodes are paused using a command run on the node"
 msgstr ""
 
+msgid "Geo sites"
+msgstr ""
+
 msgid "GeoNodeStatusEvent|%{timeAgoStr} (%{pendingEvents} events)"
 msgstr ""
 
@@ -13610,6 +13613,9 @@ msgid "Get started!"
 msgstr ""
 
 msgid "Getting started with releases"
+msgstr ""
+
+msgid "Git"
 msgstr ""
 
 msgid "Git LFS is not enabled on this GitLab server, contact your admin."
@@ -29791,6 +29797,9 @@ msgid "There was an error fetching projects"
 msgstr ""
 
 msgid "There was an error fetching the %{replicableType}"
+msgstr ""
+
+msgid "There was an error fetching the Geo Nodes"
 msgstr ""
 
 msgid "There was an error fetching the Geo Settings"
