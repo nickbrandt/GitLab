@@ -49,32 +49,55 @@ RSpec.describe 'Query.project(fullPath).pipeline(iid).securityReportFinding' do
     )
   end
 
-  before do
-    stub_licensed_features(sast: true, dast: true)
-    project.add_developer(user)
-  end
-
   subject { GitlabSchema.execute(query, context: { current_user: user }).as_json }
 
   let(:security_report_findings) { subject.dig('data', 'project', 'pipeline', 'securityReportFindings', 'nodes') }
 
-  it 'returns all the vulnerability findings' do
-    expect(security_report_findings.length).to eq(53)
+  context 'when `sast` and `dast` features are enabled' do
+    before do
+      stub_licensed_features(sast: true, dast: true)
+    end
+
+    context 'when user is memeber of the project' do
+      before do
+        project.add_developer(user)
+      end
+
+      it 'returns all the vulnerability findings' do
+        expect(security_report_findings.length).to eq(53)
+      end
+
+      it 'returns all the queried fields', :aggregate_failures do
+        security_report_finding = security_report_findings.first
+
+        expect(security_report_finding.dig('project', 'fullPath')).to eq(project.full_path)
+        expect(security_report_finding.dig('project', 'visibility')).to eq(project.visibility)
+        expect(security_report_finding['identifiers'].length).to eq(3)
+        expect(security_report_finding['confidence']).not_to be_nil
+        expect(security_report_finding['severity']).not_to be_nil
+        expect(security_report_finding['reportType']).not_to be_nil
+        expect(security_report_finding['name']).not_to be_nil
+        expect(security_report_finding['projectFingerprint']).not_to be_nil
+        expect(security_report_finding['uuid']).not_to be_nil
+        expect(security_report_finding['solution']).not_to be_nil
+        expect(security_report_finding['description']).not_to be_nil
+      end
+    end
+
+    context 'when user is not memeber of the project' do
+      it 'returns no vulnerability findings' do
+        expect(security_report_findings).to be_nil
+      end
+    end
   end
 
-  it 'returns all the queried fields' do
-    security_report_finding = security_report_findings.first
+  context 'when `sast` and `dast` both features are disabled' do
+    before do
+      stub_licensed_features(sast: false, dast: false)
+    end
 
-    expect(security_report_finding.dig('project', 'fullPath')).to eq(project.full_path)
-    expect(security_report_finding.dig('project', 'visibility')).to eq(project.visibility)
-    expect(security_report_finding['identifiers'].length).to eq(3)
-    expect(security_report_finding['confidence']).not_to be_nil
-    expect(security_report_finding['severity']).not_to be_nil
-    expect(security_report_finding['reportType']).not_to be_nil
-    expect(security_report_finding['name']).not_to be_nil
-    expect(security_report_finding['projectFingerprint']).not_to be_nil
-    expect(security_report_finding['uuid']).not_to be_nil
-    expect(security_report_finding['solution']).not_to be_nil
-    expect(security_report_finding['description']).not_to be_nil
+    it 'returns no vulnerability findings' do
+      expect(security_report_findings).to be_nil
+    end
   end
 end

@@ -5,7 +5,7 @@ module Types
   class PipelineSecurityReportFindingType < BaseObject
     graphql_name 'PipelineSecurityReportFinding'
 
-    description 'Represents vulnerability finding of a security report on the pipeline'
+    description 'Represents vulnerability finding of a security report on the pipeline.'
 
     field :report_type, VulnerabilityReportTypeEnum, null: true,
           description: 'Type of the security report that found the vulnerability finding.'
