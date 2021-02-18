@@ -25,7 +25,7 @@
 
     .jira-connect-app-body
       - unless new_jira_connect_ui?
-        %form#add-subscription-form.jira-connect-subscription-form.gl-mb-5{ action: jira_connect_subscriptions_path }
+        %form#add-subscription-form.subscription-form.gl-mb-5{ action: jira_connect_subscriptions_path }
           .ak-field-group
             %label= _('GitLab namespace')
 
@@ -39,7 +39,7 @@
           %thead
             %tr
               %th= _('Namespace')
-              %th= s_('Integrations|Added')
+              %th= _('Added')
               %th
           %tbody
             - @subscriptions.each do |subscription|
