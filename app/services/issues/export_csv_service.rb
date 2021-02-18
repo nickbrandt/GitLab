@@ -8,7 +8,7 @@ module Issues
     def initialize(issuables_relation, project)
       super
 
-      @labels = @issuables.labels_hash
+      @labels = @issuables.labels_hash.transform_values { |labels| labels.sort.join(',').presence }
     end
 
     def email(user)
@@ -47,7 +47,7 @@ module Issues
     end
 
     def issue_labels(issue)
-      @labels[issue.id].sort.join(',').presence
+      @labels[issue.id]
     end
 
     # rubocop: disable CodeReuse/ActiveRecord
