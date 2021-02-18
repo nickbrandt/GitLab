@@ -23,7 +23,9 @@ RSpec.describe 'getting Alert Management HTTP Integrations' do
   end
 
   let_it_be(:project) { create(:project, :repository) }
-  let_it_be(:current_user) { create(:user) }
+  let_it_be(:maintainer) { create(:user) }
+  let_it_be(:developer) { create(:user) }
+  let_it_be(:guest) { create(:user) }
   let_it_be(:prometheus_service) { create(:prometheus_service, project: project) }
   let_it_be(:project_alerting_setting) { create(:project_alerting_setting, project: project) }
   let_it_be(:inactive_http_integration) { create(:alert_management_http_integration, :inactive, project: project) }
@@ -58,11 +60,16 @@ RSpec.describe 'getting Alert Management HTTP Integrations' do
     stub_feature_flags(multiple_http_integrations_custom_mapping: project)
   end
 
+  before_all do
+    project.add_developer(developer)
+    project.add_maintainer(maintainer)
+  end
+
   context 'with integrations' do
     let(:integrations) { graphql_data.dig('project', 'alertManagementHttpIntegrations', 'nodes') }
 
     context 'without project permissions' do
-      let(:user) { create(:user) }
+      let(:current_user) { guest }
 
       before do
         post_graphql(query, current_user: current_user)
@@ -73,9 +80,22 @@ RSpec.describe 'getting Alert Management HTTP Integrations' do
       specify { expect(integrations).to be_nil }
     end
 
-    context 'with project permissions' do
+    context 'with developer permissions' do
+      let(:current_user) { developer }
+
       before do
-        project.add_maintainer(current_user)
+        post_graphql(query, current_user: current_user)
+      end
+
+      it_behaves_like 'a working graphql query'
+
+      specify { expect(integrations).to eq([]) }
+    end
+
+    context 'with maintainer permissions' do
+      let(:current_user) { maintainer }
+
+      before do
         post_graphql(query, current_user: current_user)
       end
 
