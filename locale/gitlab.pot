@@ -21674,6 +21674,9 @@ msgstr ""
 msgid "PerformanceBar|SQL queries"
 msgstr ""
 
+msgid "PerformanceBar|Stats"
+msgstr ""
+
 msgid "PerformanceBar|trace"
 msgstr ""
 
