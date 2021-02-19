@@ -12,7 +12,7 @@ RSpec.describe Gitlab::HookData::ProjectMemberBuilder do
     let(:event_name) { data[:event_name] }
     let(:attributes) do
       [
-        :event_name, :created_at, :updated_at, :expires_at, :project_name, :project_path, :project_path_with_namespace, :project_id, :user_username, :user_name, :user_email, :user_id, :access_level, :project_visibility
+        :event_name, :created_at, :updated_at, :project_name, :project_path, :project_path_with_namespace, :project_id, :user_username, :user_name, :user_email, :user_id, :access_level, :project_visibility
       ]
     end
 
