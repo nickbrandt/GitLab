@@ -4212,12 +4212,6 @@ msgstr[1] ""
 msgid "Attaching the file failed."
 msgstr ""
 
-msgid "Attachment"
-msgstr ""
-
-msgid "Attachments"
-msgstr ""
-
 msgid "Audit Events"
 msgstr ""
 
