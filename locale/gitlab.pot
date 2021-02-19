@@ -20742,6 +20742,9 @@ msgstr ""
 msgid "OnCallSchedules|Create on-call schedules  in GitLab"
 msgstr ""
 
+msgid "OnCallSchedules|Currently no rotation."
+msgstr ""
+
 msgid "OnCallSchedules|Delete rotation"
 msgstr ""
 

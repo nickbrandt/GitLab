@@ -8,7 +8,6 @@ import {
   GlTooltipDirective,
 } from '@gitlab/ui';
 import { capitalize } from 'lodash';
-import { fetchPolicies } from '~/lib/graphql';
 import {
   formatDate,
   nWeeksBefore,
@@ -68,7 +67,6 @@ export default {
   },
   apollo: {
     rotations: {
-      fetchPolicy: fetchPolicies.CACHE_AND_NETWORK,
       query: getShiftsForRotations,
       variables() {
         const startsAt = this.timeframeStartDate;
@@ -123,7 +121,7 @@ export default {
           return '';
       }
     },
-    isLoading() {
+    loading() {
       return this.$apollo.queries.rotations.loading;
     },
   },
@@ -158,6 +156,9 @@ export default {
         default:
           break;
       }
+    },
+    fetchRotationShifts() {
+      this.$apollo.queries.rotations.refetch();
     },
   },
 };
@@ -215,13 +216,13 @@ export default {
           <gl-button
             data-testid="previous-timeframe-btn"
             icon="chevron-left"
-            :disabled="isLoading"
+            :disabled="loading"
             @click="updateToViewPreviousTimeframe"
           />
           <gl-button
             data-testid="next-timeframe-btn"
             icon="chevron-right"
-            :disabled="isLoading"
+            :disabled="loading"
             @click="updateToViewNextTimeframe"
           />
         </gl-button-group>
@@ -248,6 +249,7 @@ export default {
             :rotations="rotations"
             :timeframe="timeframe"
             :schedule-iid="schedule.iid"
+            :loading="loading"
           />
         </div>
       </gl-card>
@@ -258,7 +260,11 @@ export default {
       :modal-id="$options.editScheduleModalId"
       is-edit-mode
     />
-    <add-edit-rotation-modal :schedule="schedule" :modal-id="$options.addRotationModalId" />
+    <add-edit-rotation-modal
+      :schedule="schedule"
+      :modal-id="$options.addRotationModalId"
+      @fetchRotationShifts="fetchRotationShifts"
+    />
     <add-edit-rotation-modal
       :schedule="schedule"
       :modal-id="$options.editRotationModalId"
