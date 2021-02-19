@@ -334,3 +334,6 @@ spec:
     - name: https_proxy
       value: "PUT_YOUR_HTTPS_PROXY_HERE"
 ```
+
+<!-- DO NOT ADD TROUBLESHOOTING INFO HERE -->
+<!-- Troubleshooting information has moved to troubleshooting.md -->
