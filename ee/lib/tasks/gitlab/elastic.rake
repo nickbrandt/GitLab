@@ -149,6 +149,20 @@ namespace :gitlab do
       end
     end
 
+    desc "GitLab | Elasticsearch | List pending migrations"
+    task list_pending_migrations: :environment do
+      pending_migrations = ::Elastic::DataMigrationService.pending_migrations
+
+      if pending_migrations.any?
+        puts 'Pending migrations:'
+        pending_migrations.each do |migration|
+          puts migration.name
+        end
+      else
+        puts 'There are no pending migrations.'
+      end
+    end
+
     def project_id_batches(&blk)
       relation = Project.all
 
