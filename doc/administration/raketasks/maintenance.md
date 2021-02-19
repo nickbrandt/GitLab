@@ -203,6 +203,51 @@ You will lose any data stored in authorized_keys file.
 Do you want to continue (yes/no)? yes
 ```
 
+## Clear issue and merge request description template names cache
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/54706) in GitLab 13.10
+
+If for some reason the issue or merge request description template names in the dropdown
+do not reflect the actual description template names in the repository, you may want to
+consider clearing the Redis cache that stores the template names information. To do so, you
+need to run:
+
+### Clear cache for all issue and merge request template names
+
+In cases where you want to refresh issue and merge request templates for all projects in your installation:
+
+**Omnibus Installation**
+
+```shell
+sudo gitlab-rake cache:clear:description_templates
+```
+
+**Source Installation**
+
+```shell
+cd /home/git/gitlab
+sudo -u git -H bundle exec rake cache:clear:description_templates RAILS_ENV=production
+```
+
+### Clear cache for issue and merge request template names in specific projects
+
+In cases where you want to refresh issue and merge request templates for specific projects
+
+Provide a comma separate list of ids as `project_ids` parameter to the Rake task.
+
+**Omnibus Installation**
+
+```shell
+sudo gitlab-rake cache:clear:description_templates project_ids=10,25,35
+```
+
+**Source Installation**
+
+```shell
+cd /home/git/gitlab
+sudo -u git -H bundle exec rake cache:clear:description_templates project_ids=10,25,35 RAILS_ENV=production
+```
+
 ## Clear Redis cache
 
 If for some reason the dashboard displays the wrong information, you might want to
