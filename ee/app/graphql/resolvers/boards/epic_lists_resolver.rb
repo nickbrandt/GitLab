@@ -29,6 +29,11 @@ module Resolvers
 
       private
 
+      def load_preferences?(lookahead)
+        lookahead&.selection(:edges)&.selection(:node)&.selects?(:collapsed) ||
+            lookahead&.selection(:nodes)&.selects?(:collapsed)
+      end
+
       def authorize!
         Ability.allowed?(context[:current_user], :read_epic_board_list, epic_board.group) || raise_resource_not_available_error!
       end

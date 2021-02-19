@@ -10,7 +10,7 @@ RSpec.shared_examples 'list_preferences_for user' do |list_factory, list_id, pre
       it 'returns not persisted preferences' do
         preferences = subject.preferences_for(nil)
 
-        expect(preferences.persisted?).to eq(false)
+        expect(preferences).not_to be_persisted
         expect(preferences.send(list_id)).to eq(subject.id)
         expect(preferences.user_id).to be_nil
       end
@@ -33,7 +33,7 @@ RSpec.shared_examples 'list_preferences_for user' do |list_factory, list_id, pre
       it 'returns not persisted preferences' do
         preferences = subject.preferences_for(user)
 
-        expect(preferences.persisted?).to eq(false)
+        expect(preferences).not_to be_persisted
         expect(preferences.user_id).to eq(user.id)
         expect(preferences.send(list_id)).to eq(subject.id)
       end
