@@ -168,6 +168,7 @@ class License < ApplicationRecord
     secret_detection
     security_dashboard
     security_on_demand_scans
+    security_orchestration_policies
     status_page
     subepics
     threat_monitoring

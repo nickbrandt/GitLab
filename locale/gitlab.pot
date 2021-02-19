@@ -26437,6 +26437,9 @@ msgstr ""
 msgid "SecurityReports|[No reason]"
 msgstr ""
 
+msgid "Security|Policies"
+msgstr ""
+
 msgid "See GitLab's %{password_policy_guidelines}"
 msgstr ""
 
