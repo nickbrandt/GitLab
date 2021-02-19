@@ -262,14 +262,14 @@ describe('Bulk import resolvers', () => {
         expect(intermediateResults[0].status).toBe(STATUSES.SCHEDULING);
       });
 
-      it('sets group status to STARTED when request completes', async () => {
+      it('sets import status to CREATED when request completes', async () => {
         axiosMockAdapter.onPost(FAKE_ENDPOINTS.createBulkImport).reply(httpStatus.OK, { id: 1 });
         await client.mutate({
           mutation: importGroupMutation,
           variables: { sourceGroupId: GROUP_ID },
         });
 
-        expect(results[0].status).toBe(STATUSES.STARTED);
+        expect(results[0].status).toBe(STATUSES.CREATED);
       });
 
       it('resets status to NONE if request fails', async () => {

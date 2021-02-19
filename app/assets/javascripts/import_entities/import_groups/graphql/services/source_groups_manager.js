@@ -93,8 +93,8 @@ export class SourceGroupsManager {
   }, DEBOUNCE_INTERVAL);
 
   startImport({ group, importId }) {
+    this.setImportStatus(group, STATUSES.CREATED);
     this.saveImportState(importId, group);
-    this.setImportStatus(group, STATUSES.STARTED);
   }
 
   setImportStatus(group, status) {
