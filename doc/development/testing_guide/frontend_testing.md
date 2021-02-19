@@ -539,20 +539,7 @@ When looking at this initially you'd suspect that the component is setup before 
 
 This is however not entirely true as the `destroy` method does not remove everything which has been mutated on the `wrapper` object. For functional components, destroy only removes the rendered DOM elements from the document.
 
-In order to ensure that a clean wrapper object and DOM are being used in each test, the breakdown of the component should rather be performed as follows:
-
-```javascript
-  afterEach(() => {
-    wrapper.destroy();
-    wrapper = null;
-  });
-```
-
-<!-- vale gitlab.Spelling = NO -->
-
-See also the [Vue Test Utils documentation on `destroy`](https://vue-test-utils.vuejs.org/api/wrapper/#destroy).
-
-<!-- vale gitlab.Spelling = YES -->
+When your test tries to access the destroyed `wrapper` object you will receive the corresponding error `[vue-test-utils]: Operations on destroyed component are discouraged`.
 
 ### Jest best practices
 
