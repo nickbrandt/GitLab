@@ -143,9 +143,9 @@ pending_job_classes.each { |job_class| Gitlab::BackgroundMigration.steal(job_cla
 This section is only applicable if you have enabled the [Elasticsearch
 integration](../integration/elasticsearch.md).
 
-Certain major releases may require [Elasticsearch
+Certain major releases might require [Elasticsearch
 migrations](../integration/elasticsearch.md#background-migrations) to be
-finished. The pending migrations can be found by running the following command:
+finished. You can find pending migrations by running the following command:
 
 **For Omnibus installations**
 
