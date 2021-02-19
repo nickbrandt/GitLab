@@ -191,15 +191,15 @@ RSpec.describe ApplicationExperiment, :experiment do
   end
 
   context "when caching" do
-    let(:cache) { Gitlab::Experiment::Configuration._default_cache } # as defined in the initializer
+    let(:cache) { Gitlab::Experiment::Configuration.cache }
 
     before do
+      allow(Gitlab::Experiment::Configuration).to receive(:cache).and_call_original
+
       cache.clear(key: subject.name)
 
       subject.use { } # setup the control
       subject.try { } # setup the candidate
-
-      allow(Gitlab::Experiment::Configuration).to receive(:cache).and_return(cache)
     end
 
     it "caches the variant determined by the variant resolver" do
