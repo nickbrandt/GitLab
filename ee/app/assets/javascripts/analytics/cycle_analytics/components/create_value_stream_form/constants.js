@@ -37,6 +37,9 @@ export const i18n = {
   ISSUE_STAGE_END: s__('CreateValueStreamForm|Issue stage end'),
   PLAN_STAGE_START: s__('CreateValueStreamForm|Plan stage start'),
   CODE_STAGE_START: s__('CreateValueStreamForm|Code stage start'),
+  DEFAULT_STAGE_FEATURES: s__(
+    'CreateValueStreamForm|Default stages can only be hidden or re-ordered',
+  ),
 };
 
 export const ERRORS = {
