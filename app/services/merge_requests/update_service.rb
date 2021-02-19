@@ -60,13 +60,6 @@ module MergeRequests
 
       track_title_and_desc_edits(merge_request, changed_fields)
 
-      if merge_request.previous_changes.include?('target_branch') ||
-          merge_request.previous_changes.include?('source_branch')
-        merge_request.mark_as_unchecked
-      end
-
-      handle_milestone_change(merge_request)
-
       added_labels = merge_request.labels - old_labels
       if added_labels.present?
         notification_service.async.relabeled_merge_request(
@@ -84,6 +77,15 @@ module MergeRequests
           added_mentions,
           current_user
         )
+      end
+
+      # Since #mark_as_unchecked triggers an update action through the MR's
+      #   state machine, we want to push this as far down in the process so we
+      #   avoid resetting #ActiveModel::Dirty
+      #
+      if merge_request.previous_changes.include?('target_branch') ||
+          merge_request.previous_changes.include?('source_branch')
+        merge_request.mark_as_unchecked
       end
     end
     # rubocop:enable Metrics/AbcSize
