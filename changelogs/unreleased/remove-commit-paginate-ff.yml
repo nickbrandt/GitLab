@@ -1,5 +1,5 @@
 ---
-title: Remove paginate_commit_view feature flag
+title: Add pagination of file diffs when viewing a large commit
 merge_request: 54236
 author:
-type: changed
+type: added
