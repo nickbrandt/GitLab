@@ -146,6 +146,25 @@ RSpec.describe IncidentManagement::OncallShiftGenerator do
              [:participant2, '2020-12-20 08:00:00 UTC', '2020-12-20 17:00:00 UTC'],
              [:participant2, '2020-12-21 08:00:00 UTC', '2020-12-21 17:00:00 UTC']]
         end
+
+        context 'rotation start time is in middle of active period' do
+          before do
+            rotation.update!(starts_at: rotation_start_time.change(hour: 10))
+          end
+
+          it_behaves_like 'unsaved shifts',
+            '5 shifts for each participant split by each day',
+            [[:participant1, '2020-12-08 10:00:00 UTC', '2020-12-08 17:00:00 UTC'],
+             [:participant1, '2020-12-09 08:00:00 UTC', '2020-12-09 17:00:00 UTC'],
+             [:participant1, '2020-12-10 08:00:00 UTC', '2020-12-10 17:00:00 UTC'],
+             [:participant1, '2020-12-11 08:00:00 UTC', '2020-12-11 17:00:00 UTC'],
+             [:participant1, '2020-12-12 08:00:00 UTC', '2020-12-12 17:00:00 UTC'],
+             [:participant2, '2020-12-13 08:00:00 UTC', '2020-12-13 17:00:00 UTC'],
+             [:participant2, '2020-12-14 08:00:00 UTC', '2020-12-14 17:00:00 UTC'],
+             [:participant2, '2020-12-15 08:00:00 UTC', '2020-12-15 17:00:00 UTC'],
+             [:participant2, '2020-12-16 08:00:00 UTC', '2020-12-16 17:00:00 UTC'],
+             [:participant2, '2020-12-17 08:00:00 UTC', '2020-12-17 17:00:00 UTC']]
+        end
       end
 
       context 'when end time is earlier than start time' do

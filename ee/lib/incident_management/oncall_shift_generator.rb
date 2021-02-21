@@ -132,7 +132,7 @@ module IncidentManagement
 
           starts_at, ends_at = rotation.active_period.for_date(shift_cycle_starts_at + shift_count.days)
 
-          shift_for(participant, starts_at, limit_end_time(ends_at))
+          shift_for(participant, [rotation.starts_at, starts_at].max, limit_end_time(ends_at))
         end
       else
         # This is the normal shift start/end times

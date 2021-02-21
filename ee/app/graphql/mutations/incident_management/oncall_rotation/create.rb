@@ -122,6 +122,8 @@ module Mutations
           parsed_from = Time.parse(start_time)
           parsed_to = Time.parse(end_time)
 
+          # Overnight shift times will be supported via
+          # https://gitlab.com/gitlab-org/gitlab/-/issues/322079
           if parsed_to < parsed_from
             raise ::Gitlab::Graphql::Errors::ArgumentError, "'start_time' time must be before 'end_time' time"
           end
