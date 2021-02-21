@@ -20,7 +20,6 @@ RSpec.describe Gitlab::HookData::ProjectMemberBuilder do
       shared_examples_for 'includes the required attributes' do
         it 'includes the required attributes' do
           expect(data).to include(*attributes)
-
           expect(data[:project_name]).to eq(project.name)
           expect(data[:project_path]).to eq(project.path)
           expect(data[:project_path_with_namespace]).to eq(project.full_path)
