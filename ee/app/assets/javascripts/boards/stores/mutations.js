@@ -3,6 +3,7 @@ import Vue from 'vue';
 import { moveIssueListHelper } from '~/boards/boards_util';
 import mutationsCE, { addIssueToList, removeIssueFromList } from '~/boards/stores/mutations';
 import { s__ } from '~/locale';
+import { ErrorMessages } from '../constants';
 import * as mutationTypes from './mutation_types';
 
 const notImplemented = () => {
@@ -83,15 +84,7 @@ export default {
   },
 
   [mutationTypes.RECEIVE_ITEMS_FOR_LIST_FAILURE]: (state, listId) => {
-    if (state.isEpicBoard) {
-      state.error = s__(
-        'Boards|An error occurred while fetching the board epics. Please reload the page.',
-      );
-    } else {
-      state.error = s__(
-        'Boards|An error occurred while fetching the board issues. Please reload the page.',
-      );
-    }
+    state.error = state.isEpicBoard ? ErrorMessages.fetchEpicsError : ErrorMessages.fetchIssueError;
     Vue.set(state.listsFlags, listId, { isLoading: false, isLoadingMore: false });
   },
 
