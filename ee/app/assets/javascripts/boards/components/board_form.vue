@@ -14,17 +14,13 @@ export default {
       return createEpicBoardMutation;
     },
     mutationVariables() {
-      let variables = this.baseMutationVariables;
-
       // TODO: Epic board scope will be added in a future iteration: https://gitlab.com/gitlab-org/gitlab/-/issues/231389
-      if (this.scopedIssueBoardFeatureEnabled && !this.isEpicBoard) {
-        variables = {
-          ...variables,
-          ...this.boardScopeMutationVariables,
-        };
-      }
-
-      return variables;
+      return {
+        ...this.baseMutationVariables,
+        ...(this.scopedIssueBoardFeatureEnabled && !this.isEpicBoard
+          ? this.boardScopeMutationVariables
+          : {}),
+      };
     },
   },
   methods: {

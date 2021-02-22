@@ -44,8 +44,9 @@ const defaultProps = {
 describe('BoardForm', () => {
   let wrapper;
   let mutate;
+  let location;
 
-  const findModal = () => wrapper.find(GlModal);
+  const findModal = () => wrapper.findComponent(GlModal);
   const findModalActionPrimary = () => findModal().props('actionPrimary');
   const findFormWrapper = () => wrapper.find('[data-testid="board-form-wrapper"]');
   const findDeleteConfirmation = () => wrapper.find('[data-testid="delete-confirmation-message"]');
@@ -61,15 +62,10 @@ describe('BoardForm', () => {
 
   const store = createStore();
 
-  const createComponent = (props, data) => {
+  const createComponent = (props) => {
     wrapper = shallowMount(BoardForm, {
       localVue,
       propsData: { ...defaultProps, ...props },
-      data() {
-        return {
-          ...data,
-        };
-      },
       provide: {
         rootPath: 'root',
       },
@@ -83,7 +79,8 @@ describe('BoardForm', () => {
     });
   };
 
-  beforeEach(() => {
+  beforeAll(() => {
+    location = window.location;
     delete window.location;
   });
 
@@ -91,6 +88,7 @@ describe('BoardForm', () => {
     wrapper.destroy();
     wrapper = null;
     mutate = null;
+    window.location = location;
   });
 
   describe('when creating a new epic board', () => {

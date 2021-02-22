@@ -199,16 +199,10 @@ export default {
       /* eslint-enable @gitlab/require-i18n-strings */
     },
     mutationVariables() {
-      let variables = this.baseMutationVariables;
-
-      if (this.scopedIssueBoardFeatureEnabled) {
-        variables = {
-          ...variables,
-          ...this.boardScopeMutationVariables,
-        };
-      }
-
-      return variables;
+      return {
+        ...this.baseMutationVariables,
+        ...(this.scopedIssueBoardFeatureEnabled ? this.boardScopeMutationVariables : {}),
+      };
     },
   },
   mounted() {
@@ -264,7 +258,7 @@ export default {
         try {
           const url = await this.createOrUpdateBoard();
           visitUrl(url);
-        } catch (e) {
+        } catch {
           Flash(this.$options.i18n.saveErrorMessage);
         } finally {
           this.isLoading = false;
