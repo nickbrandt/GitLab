@@ -30,8 +30,6 @@ describe('UsersChart', () => {
 
     return shallowMount(UsersChart, {
       props: {
-        startDate: new Date(2020, 9, 26),
-        endDate: new Date(2020, 10, 1),
         totalDataPoints: mockCountsData2.length,
       },
       localVue,

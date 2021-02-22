@@ -24,16 +24,8 @@ export default {
 <template>
   <div>
     <usage-counts />
-    <users-chart
-      :start-date="$options.START_DATE"
-      :end-date="$options.TODAY"
-      :total-data-points="$options.TOTAL_DAYS_TO_SHOW"
-    />
-    <projects-and-groups-chart
-      :start-date="$options.START_DATE"
-      :end-date="$options.TODAY"
-      :total-data-points="$options.TOTAL_DAYS_TO_SHOW"
-    />
+    <users-chart :total-data-points="$options.TOTAL_DAYS_TO_SHOW" />
+    <projects-and-groups-chart :total-data-points="$options.TOTAL_DAYS_TO_SHOW" />
     <usage-trends-count-chart
       v-for="chartOptions in $options.configs"
       :key="chartOptions.chartTitle"

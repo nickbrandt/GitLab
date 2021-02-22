@@ -25,14 +25,6 @@ export default {
   name: 'ProjectsAndGroupsChart',
   components: { GlAlert, GlLineChart, ChartSkeletonLoader },
   props: {
-    startDate: {
-      type: Date,
-      required: true,
-    },
-    endDate: {
-      type: Date,
-      required: true,
-    },
     totalDataPoints: {
       type: Number,
       required: true,
