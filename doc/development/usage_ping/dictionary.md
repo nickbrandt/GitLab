@@ -7312,8 +7312,8 @@ Projects with a GitHub service pipeline enabled
 | --- | --- |
 | `key_path` | **`counts.projects_reporting_ci_cd_back_to_github`** |
 | `product_section` | ops |
-| `product_stage` |  |
-| `product_group` | `group::verify` |
+| `product_stage` | verify |
+| `product_group` | `group::continuous_integration` |
 | `product_category` | `continuous_integration` |
 | `value_type` | number |
 | `status` | data_available |
@@ -7321,7 +7321,6 @@ Projects with a GitHub service pipeline enabled
 | `data_source` | Database |
 | `distribution` | ee |
 | `tier` | premium, ultimate |
-| `skip_validation` | true |
 
 ## `counts.projects_slack_active`
 
@@ -19463,7 +19462,7 @@ Calculated unique users to perform Basic or Advanced searches by week
 
 ## `redis_hll_counters.search.search_total_unique_counts_monthly`
 
-Calculated unique users to perform Basic or Advanced searches by month
+Total unique users for i_search_total, i_search_advanced, i_search_paid for recent 28 days. This metric is redundant because advanced will be a subset of paid and paid will be a subset of total. i_search_total is more appropriate if you just want the total
 
 | field | value |
 | --- | --- |
