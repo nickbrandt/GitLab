@@ -190,8 +190,7 @@ RSpec.describe Import::BulkImportsController do
         let(:bulk_import_params) do
           [{ "source_type" => "group_entity",
             "source_full_path" => "full_path",
-            "destination_name" =>
-            "destination_name",
+            "destination_name" => "destination_name",
             "destination_namespace" => "root" }]
         end
 
