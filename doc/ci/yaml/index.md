@@ -4230,7 +4230,7 @@ variables.
 
 #### `secrets:vault` **(PREMIUM)**
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/28321) in GitLab 13.4.
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/28321) in GitLab 13.4 and GitLab Runner 13.4.
 
 Use `vault` to specify secrets provided by [Hashicorp's Vault](https://www.vaultproject.io/).
 
@@ -4268,6 +4268,31 @@ job:
         path: production/db
         field: password
 ```
+
+#### `secrets:file` **(PREMIUM)**
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/250695) in GitLab 14.1 and GitLab Runner 14.1.
+
+By default, the secret is passed to the job context as a variable of type
+[`file`](../variables/index.md#cicd-variable-types). The value of the
+secret is stored in a file and the variable `DATABASE_PASSWORD` contains a path to the file.
+
+However, some software does not work with file variables and might require the secret value to be stored
+directly in the environment variable. For that case, define a `file` setting:
+
+```yaml
+job:
+  secrets:
+    DATABASE_PASSWORD:
+      vault: production/db/password@ops
+      file: false
+```
+
+When you set `file: false`, no files are created for that variable. It contains the secret
+itself instead.
+
+The `file` is a setting of the secret, so it belongs directly under the variable
+name level and not in the `vault` section.
 
 ### `pages`
 
