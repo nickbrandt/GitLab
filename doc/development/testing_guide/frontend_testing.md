@@ -539,8 +539,6 @@ When looking at this initially you'd suspect that the component is setup before 
 
 This is however not entirely true as the `destroy` method does not remove everything which has been mutated on the `wrapper` object. For functional components, destroy only removes the rendered DOM elements from the document.
 
-When your test tries to access the destroyed `wrapper` object you will receive the corresponding error `[vue-test-utils]: Operations on destroyed component are discouraged`.
-
 ### Jest best practices
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/34209) in GitLab 13.2.
