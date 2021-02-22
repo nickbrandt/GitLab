@@ -113,23 +113,19 @@ RSpec.describe Gitlab::Database::BulkUpdate do
   include_examples 'basic functionality'
 
   context 'when prepared statements are configured differently to the normal test environment' do
-    # rubocop: disable RSpec/LeakyConstantDeclaration
-    # This cop is disabled because you cannot call establish_connection on
-    # an anonymous class.
-    class ActiveRecordBasePreparedStatementsInverted < ActiveRecord::Base
-      def self.abstract_class?
-        true # So it gets its own connection
+    before do
+      klass = Class.new(ActiveRecord::Base) do
+        def self.abstract_class?
+          true # So it gets its own connection
+        end
       end
-    end
-    # rubocop: enable RSpec/LeakyConstantDeclaration
 
-    before_all do
+      stub_const('ActiveRecordBasePreparedStatementsInverted', klass)
+
       c = ActiveRecord::Base.connection.instance_variable_get(:@config)
       inverted = c.merge(prepared_statements: !ActiveRecord::Base.connection.prepared_statements)
       ActiveRecordBasePreparedStatementsInverted.establish_connection(inverted)
-    end
 
-    before do
       allow(ActiveRecord::Base).to receive(:connection_specification_name)
         .and_return(ActiveRecordBasePreparedStatementsInverted.connection_specification_name)
     end
