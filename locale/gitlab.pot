@@ -5063,6 +5063,9 @@ msgstr ""
 msgid "Bulk update"
 msgstr ""
 
+msgid "BulkImport|Existing groups"
+msgstr ""
+
 msgid "BulkImport|From source group"
 msgstr ""
 
@@ -5070,6 +5073,9 @@ msgid "BulkImport|Import groups from GitLab"
 msgstr ""
 
 msgid "BulkImport|Importing the group failed"
+msgstr ""
+
+msgid "BulkImport|No parent"
 msgstr ""
 
 msgid "BulkImport|Showing %{start}-%{end} of %{total} from %{link}"
