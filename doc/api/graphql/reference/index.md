@@ -525,7 +525,7 @@ Represents a list for an issue board.
 | Field | Type | Description |
 | ----- | ---- | ----------- |
 | `assignee` | User | Assignee in the list. |
-| `collapsed` | Boolean | Indicates if list is collapsed for this user. |
+| `collapsed` | Boolean | Indicates if the list is collapsed for this user. |
 | `id` | ID! | ID (global ID) of the list. |
 | `issues` | IssueConnection | Board issues. |
 | `issuesCount` | Int | Count of issues in the list. |

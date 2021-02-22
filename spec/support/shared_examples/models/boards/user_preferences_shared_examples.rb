@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-RSpec.shared_examples 'list_preferences_for user' do |list_factory, list_id, preference_klass|
+RSpec.shared_examples 'list_preferences_for user' do |list_factory, list_id_attribute|
   subject { create(list_factory) } # rubocop:disable Rails/SaveBang
 
-  let(:user) { create(:user) }
+  let_it_be(:user) { create(:user) }
 
   describe '#preferences_for' do
     context 'when user is nil' do
@@ -11,7 +11,7 @@ RSpec.shared_examples 'list_preferences_for user' do |list_factory, list_id, pre
         preferences = subject.preferences_for(nil)
 
         expect(preferences).not_to be_persisted
-        expect(preferences.send(list_id)).to eq(subject.id)
+        expect(preferences[list_id_attribute]).to eq(subject.id)
         expect(preferences.user_id).to be_nil
       end
     end
@@ -35,7 +35,7 @@ RSpec.shared_examples 'list_preferences_for user' do |list_factory, list_id, pre
 
         expect(preferences).not_to be_persisted
         expect(preferences.user_id).to eq(user.id)
-        expect(preferences.send(list_id)).to eq(subject.id)
+        expect(preferences.public_send(list_id_attribute)).to eq(subject.id)
       end
     end
   end
@@ -44,7 +44,7 @@ RSpec.shared_examples 'list_preferences_for user' do |list_factory, list_id, pre
     context 'when user is present' do
       context 'when there are no preferences for user' do
         it 'creates new user preferences' do
-          expect { subject.update_preferences_for(user, collapsed: true) }.to change { preference_klass.count }.by(1)
+          expect { subject.update_preferences_for(user, collapsed: true) }.to change { subject.preferences.count }.by(1)
           expect(subject.preferences_for(user).collapsed).to eq(true)
         end
       end
@@ -53,14 +53,14 @@ RSpec.shared_examples 'list_preferences_for user' do |list_factory, list_id, pre
         it 'updates user preferences' do
           subject.update_preferences_for(user, collapsed: false)
 
-          expect { subject.update_preferences_for(user, collapsed: true) }.not_to change { preference_klass.count }
+          expect { subject.update_preferences_for(user, collapsed: true) }.not_to change { subject.preferences.count }
           expect(subject.preferences_for(user).collapsed).to eq(true)
         end
       end
 
       context 'when user is nil' do
         it 'does not create user preferences' do
-          expect { subject.update_preferences_for(nil, collapsed: true) }.not_to change { preference_klass.count }
+          expect { subject.update_preferences_for(nil, collapsed: true) }.not_to change { subject.preferences.count }
         end
       end
     end

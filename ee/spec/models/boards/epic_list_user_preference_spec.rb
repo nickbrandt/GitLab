@@ -13,6 +13,8 @@ RSpec.describe Boards::EpicListUserPreference do
   describe 'relationships' do
     it { is_expected.to belong_to(:epic_list) }
     it { is_expected.to belong_to(:user) }
+    it { is_expected.to validate_presence_of(:epic_list) }
+    it { is_expected.to validate_presence_of(:user) }
 
     it do
       is_expected.to validate_uniqueness_of(:user_id).scoped_to(:epic_list_id)

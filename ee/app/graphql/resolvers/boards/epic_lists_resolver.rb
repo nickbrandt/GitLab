@@ -22,6 +22,11 @@ module Resolvers
         # point there is not reason to introduce a ListService
         # https://gitlab.com/gitlab-org/gitlab/-/issues/294043
         lists = epic_board.epic_lists
+
+        if load_preferences?(lookahead)
+          ::Boards::EpicList.preload_preferences_for_user(lists, current_user)
+        end
+
         lists = lists.where(id: id.model_id) if id # rubocop: disable CodeReuse/ActiveRecord
 
         offset_pagination(apply_lookahead(lists))

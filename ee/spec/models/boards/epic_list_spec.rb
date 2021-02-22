@@ -4,7 +4,7 @@ require 'spec_helper'
 
 RSpec.describe Boards::EpicList do
   it_behaves_like 'boards listable model', :epic_list
-  it_behaves_like 'list_preferences_for user', :epic_list, :epic_list_id, ::Boards::EpicListUserPreference
+  it_behaves_like 'list_preferences_for user', :epic_list, :epic_list_id
 
   describe 'associations' do
     subject { build(:epic_list) }

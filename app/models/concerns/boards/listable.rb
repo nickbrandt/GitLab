@@ -13,6 +13,14 @@ module Boards
       scope :ordered, -> { order(:list_type, :position) }
       scope :destroyable, -> { where(list_type: list_types.slice(*destroyable_types).values) }
       scope :movable, -> { where(list_type: list_types.slice(*movable_types).values) }
+
+      class << self
+        def preload_preferences_for_user(lists, user)
+          return unless user
+
+          lists.each { |list| list.preferences_for(user) }
+        end
+      end
     end
 
     class_methods do

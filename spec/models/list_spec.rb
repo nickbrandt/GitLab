@@ -5,7 +5,7 @@ require 'spec_helper'
 RSpec.describe List do
   it_behaves_like 'having unique enum values'
   it_behaves_like 'boards listable model', :list
-  it_behaves_like 'list_preferences_for user', :list, :list_id, ListUserPreference
+  it_behaves_like 'list_preferences_for user', :list, :list_id
 
   describe 'relationships' do
     it { is_expected.to belong_to(:board) }

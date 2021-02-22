@@ -18,14 +18,6 @@ class List < ApplicationRecord
 
   alias_method :preferences, :list_user_preferences
 
-  class << self
-    def preload_preferences_for_user(lists, user)
-      return unless user
-
-      lists.each { |list| list.preferences_for(user) }
-    end
-  end
-
   def preferences_for(user)
     return preferences.build unless user
 
