@@ -5162,6 +5162,9 @@ msgstr ""
 msgid "By default GitLab sends emails in HTML and plain text formats so mail clients can choose what format to use. Disable this option if you only want to send emails in plain text format."
 msgstr ""
 
+msgid "By default, GitLab sends emails to help guide users through the onboarding process."
+msgstr ""
+
 msgid "By default, all projects and groups will use the global notifications setting."
 msgstr ""
 
@@ -11196,6 +11199,9 @@ msgid "Enable group runners"
 msgstr ""
 
 msgid "Enable header and footer in emails"
+msgstr ""
+
+msgid "Enable in-product marketing emails"
 msgstr ""
 
 msgid "Enable integration"
