@@ -6,6 +6,31 @@ const noDataMessage = s__('UsageTrends|No data available.');
 export default [
   {
     loadChartError: sprintf(
+      s__(
+        'UsageTrends|Could not load the projects and groups chart. Please refresh the page to try again.',
+      ),
+    ),
+    noDataMessage,
+    chartTitle: s__('UsageTrends|Total projects & groups'),
+    yAxisTitle: s__('UsageTrends|Total projects & groups'),
+    xAxisTitle: s__('UsageTrends|Month'),
+    queries: [
+      {
+        query,
+        title: s__('UsageTrends|Total projects'),
+        identifier: 'PROJECTS',
+        loadError: sprintf(s__('UsageTrends|There was an error fetching the projects')),
+      },
+      {
+        query,
+        title: s__('UsageTrends|Total groups'),
+        identifier: 'GROUPS',
+        loadError: sprintf(s__('UsageTrends|There was an error fetching the groups')),
+      },
+    ],
+  },
+  {
+    loadChartError: sprintf(
       s__('UsageTrends|Could not load the pipelines chart. Please refresh the page to try again.'),
     ),
     noDataMessage,

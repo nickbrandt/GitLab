@@ -32088,10 +32088,16 @@ msgstr ""
 msgid "UsageTrends|There was an error fetching the failed pipelines"
 msgstr ""
 
+msgid "UsageTrends|There was an error fetching the groups"
+msgstr ""
+
 msgid "UsageTrends|There was an error fetching the issues"
 msgstr ""
 
 msgid "UsageTrends|There was an error fetching the merge requests"
+msgstr ""
+
+msgid "UsageTrends|There was an error fetching the projects"
 msgstr ""
 
 msgid "UsageTrends|There was an error fetching the skipped pipelines"
@@ -32101,12 +32107,6 @@ msgid "UsageTrends|There was an error fetching the successful pipelines"
 msgstr ""
 
 msgid "UsageTrends|There was an error fetching the total pipelines"
-msgstr ""
-
-msgid "UsageTrends|There was an error while loading the groups"
-msgstr ""
-
-msgid "UsageTrends|There was an error while loading the projects"
 msgstr ""
 
 msgid "UsageTrends|Total groups"
