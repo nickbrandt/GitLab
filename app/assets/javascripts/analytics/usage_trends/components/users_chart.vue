@@ -24,6 +24,10 @@ export default {
       type: Date,
       required: true,
     },
+    totalDataPoints: {
+      type: Number,
+      required: true,
+    },
   },
   data() {
     return {
@@ -39,10 +43,14 @@ export default {
         console.log('variables', {
           startDate: toIsoDate(this.startDate),
           endDate: toIsoDate(this.endDate),
+          first: this.totalDataPoints,
+          after: null,
         });
         return {
           startDate: toIsoDate(this.startDate),
           endDate: toIsoDate(this.endDate),
+          first: this.totalDataPoints,
+          after: null,
         };
       },
       update(data) {
@@ -104,6 +112,7 @@ export default {
             variables: {
               startDate: toIsoDate(this.startDate),
               endDate: toIsoDate(this.endDate),
+              after: this.pageInfo.endCursor,
             },
             updateQuery: (previousResult, { fetchMoreResult }) => {
               return produce(fetchMoreResult, (newUsers) => {

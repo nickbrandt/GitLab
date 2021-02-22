@@ -1,9 +1,11 @@
 #import "~/graphql_shared/fragments/pageInfo.fragment.graphql"
 #import "../fragments/count.fragment.graphql"
 
-query getUsersCount($first: Int, $startDate: String, $endDate: String) {
+query getUsersCount($first: String, $after: String, $startDate: Time, $endDate: Time) {
   users: usageTrendsMeasurements(
     identifier: USERS
+    first: $first
+    after: $after
     recordedAfter: $startDate
     recordedBefore: $endDate
   ) {
