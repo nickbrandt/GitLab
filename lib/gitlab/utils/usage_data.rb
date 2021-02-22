@@ -86,6 +86,14 @@ module Gitlab
         FALLBACK
       end
 
+      def add(*args)
+        return -1 if args.any?(&:negative?)
+
+        args.sum
+      rescue StandardError
+        FALLBACK
+      end
+
       def alt_usage_data(value = nil, fallback: FALLBACK, &block)
         if block_given?
           yield
