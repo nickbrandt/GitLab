@@ -1973,6 +1973,7 @@ Represents an epic board list.
 | ----- | ---- | ----------- |
 | `collapsed` | Boolean | Indicates if this list is collapsed for this user. |
 | `epics` | EpicConnection | List epics. |
+| `epicsCount` | Int | Count of epics in the list. |
 | `id` | BoardsEpicListID! | Global ID of the board list. |
 | `label` | Label | Label of the list. |
 | `listType` | String! | Type of the list. |
