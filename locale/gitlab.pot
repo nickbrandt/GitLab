@@ -12581,6 +12581,9 @@ msgstr ""
 msgid "Feature flag is not enabled on the environment's project."
 msgstr ""
 
+msgid "Feature flag status"
+msgstr ""
+
 msgid "Feature flag was not removed."
 msgstr ""
 
