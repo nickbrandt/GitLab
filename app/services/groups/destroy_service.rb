@@ -24,7 +24,7 @@ module Groups
 
       group.children.each do |group|
         # This needs to be synchronous since the namespace gets destroyed below
-        DestroyService.new(group, current_user).execute
+        DestroyService.new(group, current_user, params).execute
       end
 
       group.chat_team&.remove_mattermost_team(current_user)
@@ -43,7 +43,10 @@ module Groups
       if user_ids_for_project_authorizations_refresh.present?
         UserProjectAccessChangedService
           .new(user_ids_for_project_authorizations_refresh)
-          .execute(blocking: true)
+          .execute(
+            blocking: perform_blocking_project_authorizations_refresh?,
+            priority: project_authorizations_refresh_priority
+          )
       end
 
       group
@@ -51,6 +54,18 @@ module Groups
     # rubocop: enable CodeReuse/ActiveRecord
 
     private
+
+    def project_authorizations_refresh_priority
+      params[:project_authorizations_refresh_priority] ||
+        UserProjectAccessChangedService::HIGH_PRIORITY
+    end
+
+    def perform_blocking_project_authorizations_refresh?
+      Gitlab::Utils.to_boolean(
+        params[:perform_blocking_project_authorizations_refresh],
+        default: true
+      )
+    end
 
     def any_other_groups_are_shared_with_this_group?
       group.shared_group_links.any?

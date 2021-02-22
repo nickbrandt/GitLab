@@ -16,6 +16,13 @@ class GroupDestroyWorker # rubocop:disable Scalability/IdempotentWorker
 
     user = User.find(user_id)
 
-    Groups::DestroyService.new(group, user).execute
+    Groups::DestroyService.new(
+      group,
+      user,
+      {
+        project_authorizations_refresh_priority: UserProjectAccessChangedService::LOW_PRIORITY,
+        perform_blocking_project_authorizations_refresh: false
+      }
+    ).execute
   end
 end
