@@ -58,7 +58,7 @@ module MergeRequests
       handle_milestone_change(merge_request)
       handle_draft_status_change(merge_request, changed_fields)
 
-      track_title_and_desc_edits(merge_request, changed_fields)
+      track_title_and_desc_edits(changed_fields)
 
       added_labels = merge_request.labels - old_labels
       if added_labels.present?
@@ -111,7 +111,7 @@ module MergeRequests
 
     attr_reader :target_branch_was_deleted
 
-    def track_title_and_desc_edits(merge_request, changed_fields)
+    def track_title_and_desc_edits(changed_fields)
       tracked_fields = %w(title description)
 
       return unless changed_fields.any? { |field| tracked_fields.include?(field) }
