@@ -4,6 +4,8 @@ import { formatDate } from '~/lib/utils/datetime_utility';
 
 const { isoDate } = masks;
 
+export const toIsoDate = (date) => formatDate(date, isoDate);
+
 /**
  * Takes an array of items and returns one item per month with the average of the `count`s from that month
  * @param  {Array} items
@@ -20,7 +22,7 @@ export function getAverageByMonth(items = [], options = {}) {
   const itemsMap = items.reduce((memo, item) => {
     const { count, recordedAt } = item;
     const date = new Date(recordedAt);
-    const month = formatDate(new Date(date.getFullYear(), date.getMonth(), 1), isoDate);
+    const month = toIsoDate(new Date(date.getFullYear(), date.getMonth(), 1));
     if (memo[month]) {
       const { sum, recordCount } = memo[month];
       return { ...memo, [month]: { sum: sum + count, recordCount: recordCount + 1 } };

@@ -8,7 +8,7 @@ import { formatDateAsMonth } from '~/lib/utils/datetime_utility';
 import { __ } from '~/locale';
 import ChartSkeletonLoader from '~/vue_shared/components/resizable_chart/skeleton_loader.vue';
 import usersQuery from '../graphql/queries/users.query.graphql';
-import { getAverageByMonth } from '../utils';
+import { toIsoDate, getAverageByMonth } from '../utils';
 
 const sortByDate = (data) => sortBy(data, (item) => new Date(item[0]).getTime());
 
@@ -24,10 +24,6 @@ export default {
       type: Date,
       required: true,
     },
-    totalDataPoints: {
-      type: Number,
-      required: true,
-    },
   },
   data() {
     return {
@@ -40,15 +36,21 @@ export default {
     users: {
       query: usersQuery,
       variables() {
+        console.log('variables', {
+          startDate: toIsoDate(this.startDate),
+          endDate: toIsoDate(this.endDate),
+        });
         return {
-          first: this.totalDataPoints,
-          after: null,
+          startDate: toIsoDate(this.startDate),
+          endDate: toIsoDate(this.endDate),
         };
       },
       update(data) {
         return data.users?.nodes || [];
       },
       result({ data }) {
+        console.log('result::data', data);
+
         const {
           users: { pageInfo },
         } = data;
@@ -71,12 +73,7 @@ export default {
       return this.$apollo.queries.users.loading || this.pageInfo?.hasNextPage;
     },
     chartUserData() {
-      const averaged = getAverageByMonth(
-        this.users.length > this.totalDataPoints
-          ? this.users.slice(0, this.totalDataPoints)
-          : this.users,
-        { shouldRound: true },
-      );
+      const averaged = getAverageByMonth(this.users, { shouldRound: true });
       return sortByDate(averaged);
     },
     options() {
@@ -104,7 +101,10 @@ export default {
       if (this.pageInfo?.hasNextPage) {
         this.$apollo.queries.users
           .fetchMore({
-            variables: { first: this.totalDataPoints, after: this.pageInfo.endCursor },
+            variables: {
+              startDate: toIsoDate(this.startDate),
+              endDate: toIsoDate(this.endDate),
+            },
             updateQuery: (previousResult, { fetchMoreResult }) => {
               return produce(fetchMoreResult, (newUsers) => {
                 // eslint-disable-next-line no-param-reassign
