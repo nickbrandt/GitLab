@@ -36,7 +36,8 @@ module QA
         it_behaves_like 'audit event', ["Added project"]
       end
 
-      context "Add user access as guest", testcase: 'https://gitlab.com/gitlab-org/quality/testcases/-/issues/729' do
+      # TODO: Remove :requires_admin meta when the `Runtime::Feature.enable` method call is removed
+      context "Add user access as guest", :requires_admin, testcase: 'https://gitlab.com/gitlab-org/quality/testcases/-/issues/729' do
         before do
           Runtime::Feature.enable(:invite_members_group_modal)
           project.visit!
