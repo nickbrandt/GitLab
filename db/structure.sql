@@ -9747,23 +9747,6 @@ CREATE SEQUENCE background_migration_jobs_id_seq
 
 ALTER SEQUENCE background_migration_jobs_id_seq OWNED BY background_migration_jobs.id;
 
-CREATE TABLE backup_labels (
-    id integer NOT NULL,
-    title character varying,
-    color character varying,
-    project_id integer,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone,
-    template boolean DEFAULT false,
-    description character varying,
-    description_html text,
-    type character varying,
-    group_id integer,
-    cached_markdown_version integer,
-    restore_action integer,
-    new_title character varying
-);
-
 CREATE TABLE badges (
     id integer NOT NULL,
     link_url character varying NOT NULL,
@@ -19824,9 +19807,6 @@ ALTER TABLE ONLY aws_roles
 ALTER TABLE ONLY background_migration_jobs
     ADD CONSTRAINT background_migration_jobs_pkey PRIMARY KEY (id);
 
-ALTER TABLE ONLY backup_labels
-    ADD CONSTRAINT backup_labels_pkey PRIMARY KEY (id);
-
 ALTER TABLE ONLY badges
     ADD CONSTRAINT badges_pkey PRIMARY KEY (id);
 
@@ -21277,18 +21257,6 @@ CREATE UNIQUE INDEX any_approver_merge_request_rule_type_unique_index ON approva
 CREATE UNIQUE INDEX any_approver_project_rule_type_unique_index ON approval_project_rules USING btree (project_id) WHERE (rule_type = 3);
 
 CREATE INDEX approval_mr_rule_index_merge_request_id ON approval_merge_request_rules USING btree (merge_request_id);
-
-CREATE UNIQUE INDEX backup_labels_group_id_project_id_title_idx ON backup_labels USING btree (group_id, project_id, title);
-
-CREATE INDEX backup_labels_group_id_title_idx ON backup_labels USING btree (group_id, title) WHERE (project_id = NULL::integer);
-
-CREATE INDEX backup_labels_project_id_idx ON backup_labels USING btree (project_id);
-
-CREATE INDEX backup_labels_template_idx ON backup_labels USING btree (template) WHERE template;
-
-CREATE INDEX backup_labels_title_idx ON backup_labels USING btree (title);
-
-CREATE INDEX backup_labels_type_project_id_idx ON backup_labels USING btree (type, project_id);
 
 CREATE UNIQUE INDEX bulk_import_trackers_uniq_relation_by_entity ON bulk_import_trackers USING btree (bulk_import_entity_id, relation);
 
@@ -24470,9 +24438,6 @@ ALTER TABLE ONLY vulnerabilities
 ALTER TABLE ONLY labels
     ADD CONSTRAINT fk_7de4989a69 FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE;
 
-ALTER TABLE ONLY backup_labels
-    ADD CONSTRAINT fk_7de4989a69 FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE;
-
 ALTER TABLE ONLY merge_requests
     ADD CONSTRAINT fk_7e85395a64 FOREIGN KEY (sprint_id) REFERENCES sprints(id) ON DELETE CASCADE;
 
@@ -25986,9 +25951,6 @@ ALTER TABLE ONLY serverless_domain_cluster
     ADD CONSTRAINT fk_rails_c09009dee1 FOREIGN KEY (pages_domain_id) REFERENCES pages_domains(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY labels
-    ADD CONSTRAINT fk_rails_c1ac5161d8 FOREIGN KEY (group_id) REFERENCES namespaces(id) ON DELETE CASCADE;
-
-ALTER TABLE ONLY backup_labels
     ADD CONSTRAINT fk_rails_c1ac5161d8 FOREIGN KEY (group_id) REFERENCES namespaces(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY project_feature_usages
