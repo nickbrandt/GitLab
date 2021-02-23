@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class ScheduleSetDefaultIterationCadences < ActiveRecord::Migration[6.0]
+class RescheduleSetDefaultIterationCadences < ActiveRecord::Migration[6.0]
   include Gitlab::Database::MigrationHelpers
 
   DOWNTIME = false
@@ -17,7 +17,11 @@ class ScheduleSetDefaultIterationCadences < ActiveRecord::Migration[6.0]
   disable_ddl_transaction!
 
   def up
-    # Do nothing, rescheduling migration: 20210219102900_reschedule_set_default_iteration_cadences.rb
+    Iteration.select(:group_id).distinct.each_batch(of: BATCH_SIZE, column: :group_id) do |batch, index|
+      group_ids = batch.pluck(:group_id)
+
+      migrate_in(index * DELAY_INTERVAL, MIGRATION_CLASS, group_ids)
+    end
   end
 
   def down
