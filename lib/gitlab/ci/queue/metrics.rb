@@ -7,9 +7,31 @@ module Gitlab
         extend Gitlab::Utils::StrongMemoize
 
         QUEUE_DURATION_SECONDS_BUCKETS = [1, 3, 10, 30, 60, 300, 900, 1800, 3600].freeze
+        QUEUE_DEPTH_SIZE_TOTAL_BUCKETS = [1, 5, 10, 50, 100, 500, 1000, 2000, 5000].freeze
+        QUEUE_ITERATION_DURATION_SECONDS_BUCKETS = [0.1, 0.3, 0.5, 1, 5, 10, 30, 60, 180, 300].freeze
+
         METRICS_SHARD_TAG_PREFIX = 'metrics_shard::'
         DEFAULT_METRICS_SHARD = 'default'
         JOBS_RUNNING_FOR_PROJECT_MAX_BUCKET = 5.freeze
+
+        OPERATION_COUNTERS = [
+          :build_can_pick,
+          :build_not_pick,
+          :build_conflict_lock,
+          :build_conflict_exception,
+          :build_conflict_transition,
+          :queue_attempt,
+          :queue_conflict,
+          :queue_iteration,
+          :runner_checks_failed,
+          :runner_checks_success
+        ].freeze
+
+        QUEUE_DEPTH_HISTOGRAMS = [
+          :depth,
+          :effective,
+          :ineffective
+        ].freeze
 
         attr_reader :runner
 
@@ -47,6 +69,33 @@ module Gitlab
         end
         # rubocop: enable CodeReuse/ActiveRecord
 
+        def increment_queue_operation(operation)
+          unless OPERATION_COUNTERS.include?(operation)
+            raise ArgumentError, "unknown queue operation: #{operation}" unless Rails.env.production?
+          end
+
+          self.class.queue_operations_total.increment(operation: operation)
+        end
+
+        def observe_queue_depth(queue, size)
+          unless QUEUE_DEPTH_HISTOGRAMS.include?(queue)
+            raise ArgumentError, "unknown queue depth label: #{queue}" unless Rails.env.production?
+          end
+
+          self.class.queue_depth_size_total.observe({ queue: queue }, size.to_f)
+        end
+
+        def observe_queue_time
+          start_time = ::Gitlab::Metrics::System.monotonic_time
+
+          result = yield
+
+          seconds = ::Gitlab::Metrics::System.monotonic_time - start_time
+          self.class.queue_iteration_duration_seconds.observe({}, seconds.to_f)
+
+          result
+        end
+
         def self.failed_attempt_counter
           strong_memoize(:failed_attempt_counter) do
             name = :job_register_attempts_failed_total
@@ -71,6 +120,37 @@ module Gitlab
             comment = 'Request handling execution time'
             labels = {}
             buckets = QUEUE_DURATION_SECONDS_BUCKETS
+
+            Gitlab::Metrics.histogram(name, comment, labels, buckets)
+          end
+        end
+
+        def self.queue_operations_total
+          strong_memoize(:queue_operations_total) do
+            name = :gitlab_ci_queue_operations_total
+            comment = 'Counts all the operations that are happening inside a queue'
+
+            Gitlab::Metrics.counter(name, comment)
+          end
+        end
+
+        def self.queue_depth_size_total
+          strong_memoize(:queue_depth_size_total) do
+            name = :gitlab_ci_queue_depth_size_total
+            comment = 'Size of a CI/CD builds queue'
+            labels = {}
+            buckets = QUEUE_DEPTH_SIZE_TOTAL_BUCKETS
+
+            Gitlab::Metrics.histogram(name, comment, labels, buckets)
+          end
+        end
+
+        def self.queue_iteration_duration_seconds
+          strong_memoize(:queue_iteration_duration_seconds) do
+            name = :gitlab_ci_queue_iteration_duration_seconds
+            comment = 'Time it takes to find a build in CI/CD queue'
+            labels = {}
+            buckets = QUEUE_ITERATION_DURATION_SECONDS_BUCKETS
 
             Gitlab::Metrics.histogram(name, comment, labels, buckets)
           end
