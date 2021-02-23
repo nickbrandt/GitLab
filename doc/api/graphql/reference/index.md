@@ -5018,9 +5018,9 @@ Types of blob viewers.
 
 | Value | Description |
 | ----- | ----------- |
-| `auxiliary` |  |
-| `rich` |  |
-| `simple` |  |
+| `auxiliary` | Auxiliary blob viewers type. |
+| `rich` | Rich blob viewers type. |
+| `simple` | Simple blob viewers type. |
 
 ### CiConfigStatus
 
