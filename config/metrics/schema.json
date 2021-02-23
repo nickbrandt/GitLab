@@ -61,6 +61,12 @@
     },
     "skip_validation": {
       "type": "boolean"
+    },
+    "deprecated": {
+      "type": "boolean"
+    },
+    "not_used": {
+      "type": "boolean"
     }
   }
 }
