@@ -63,6 +63,9 @@ export default {
         '\n',
       );
     },
+    mdCollapsibleSection(){
+      return ['<details><summary>Click to expand</summary>', `{text}`, '</details>'].join('\n');
+    },
     isMac() {
       // Accessing properties using ?. to allow tests to use
       // this component without setting up window.gl.client.
@@ -227,8 +230,9 @@ export default {
         </div>
         <div class="d-inline-block ml-md-2 ml-0">
           <toolbar-button
+            :tag="mdCollapsibleSection"
             :prepend="true"
-            tag="<details><summary>Click to expand!</summary></details>"
+            tag-select="Click to expand"
             :button-title="__('Add a collapsible section')"
             icon="chevron-right"
           />
