@@ -19889,8 +19889,14 @@ ALTER TABLE ONLY chat_teams
 ALTER TABLE vulnerability_scanners
     ADD CONSTRAINT check_37608c9db5 CHECK ((char_length(vendor) <= 255)) NOT VALID;
 
+ALTER TABLE sprints
+    ADD CONSTRAINT check_ccd8a1eae0 CHECK ((start_date IS NOT NULL)) NOT VALID;
+
 ALTER TABLE group_import_states
     ADD CONSTRAINT check_cda75c7c3f CHECK ((user_id IS NOT NULL)) NOT VALID;
+
+ALTER TABLE sprints
+    ADD CONSTRAINT check_df3816aed7 CHECK ((due_date IS NOT NULL)) NOT VALID;
 
 ALTER TABLE ONLY ci_build_needs
     ADD CONSTRAINT ci_build_needs_pkey PRIMARY KEY (id);
@@ -20400,7 +20406,7 @@ ALTER TABLE ONLY issues_self_managed_prometheus_alert_events
     ADD CONSTRAINT issues_self_managed_prometheus_alert_events_pkey PRIMARY KEY (issue_id, self_managed_prometheus_alert_event_id);
 
 ALTER TABLE ONLY sprints
-    ADD CONSTRAINT iteration_start_and_due_daterange_group_id_constraint EXCLUDE USING gist (group_id WITH =, daterange(start_date, due_date, '[]'::text) WITH &&) WHERE ((group_id IS NOT NULL));
+    ADD CONSTRAINT iteration_start_and_due_date_iterations_cadence_id_constraint EXCLUDE USING gist (iterations_cadence_id WITH =, daterange(start_date, due_date, '[]'::text) WITH &&) WHERE ((group_id IS NOT NULL));
 
 ALTER TABLE ONLY sprints
     ADD CONSTRAINT iteration_start_and_due_daterange_project_id_constraint EXCLUDE USING gist (project_id WITH =, daterange(start_date, due_date, '[]'::text) WITH &&) WHERE ((project_id IS NOT NULL));
