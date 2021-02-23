@@ -41,6 +41,8 @@ Each metric is defined in a separate YAML file consisting of a number of fields:
 | `milestone`         | no       | The milestone when the metric is introduced. |
 | `milestone_removed` | no       | The milestone when the metric is removed. |
 | `introduced_by_url` | no       | The URL to the Merge Request that introduced the metric. |
+| `deprecated`        | no       | `boolean`: the metric is deprecated and should not be used. |
+| `not_used`          | no       | `boolean`: the metric is not used in any dashboard. |
 
 ### Example metric definition
 
@@ -68,6 +70,8 @@ tier:
 - free
 - premium
 - ultimate
+deprecated: false
+not_used: true
 ```
 
 ## Create a new metric definition
