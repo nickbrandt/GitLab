@@ -61,16 +61,7 @@ module MergeRequests
       track_title_and_desc_edits(changed_fields)
 
       notify_if_labels_added(merge_request, old_labels)
-
-      added_mentions = merge_request.mentioned_users(current_user) - old_mentioned_users
-
-      if added_mentions.present?
-        notification_service.async.new_mentions_in_merge_request(
-          merge_request,
-          added_mentions,
-          current_user
-        )
-      end
+      notify_if_mentions_added(merge_request, old_mentioned_users)
 
       # Since #mark_as_unchecked triggers an update action through the MR's
       #   state machine, we want to push this as far down in the process so we
@@ -125,6 +116,18 @@ module MergeRequests
       notification_service.async.relabeled_merge_request(
         merge_request,
         added_labels,
+        current_user
+      )
+    end
+
+    def notify_if_mentions_added(merge_request, old_mentioned_users)
+      added_mentions = merge_request.mentioned_users(current_user) - old_mentioned_users
+
+      return unless added_mentions.present?
+
+      notification_service.async.new_mentions_in_merge_request(
+        merge_request,
+        added_mentions,
         current_user
       )
     end
