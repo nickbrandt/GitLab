@@ -3227,7 +3227,7 @@ Represents vulnerability finding of a security report on the pipeline.
 | `dastScannerProfiles` | DastScannerProfileConnection | The DAST scanner profiles associated with the project. |
 | `dastSiteProfile` | DastSiteProfile | DAST Site Profile associated with the project. |
 | `dastSiteProfiles` | DastSiteProfileConnection | DAST Site Profiles associated with the project. |
-| `dastSiteValidations` | DastSiteValidationConnection | DAST Site Validations associated with the project. Always returns no nodes if `security_on_demand_scans_site_validation` is disabled. |
+| `dastSiteValidations` | DastSiteValidationConnection | DAST Site Validations associated with the project. |
 | `description` | String | Short description of the project. |
 | `descriptionHtml` | String | The GitLab Flavored Markdown rendering of `description` |
 | `environment` | Environment | A single environment of the project. |
