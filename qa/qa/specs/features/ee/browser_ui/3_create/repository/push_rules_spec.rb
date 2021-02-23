@@ -6,6 +6,8 @@ module QA
       # TODO: Remove :requires_admin meta when the `Runtime::Feature.enable` method call is removed
       describe 'using non signed commits', :requires_admin do
         before(:context) do
+          Runtime::Feature.enable(:invite_members_group_modal)
+
           prepare
 
           @file_name_limitation = 'denied_file'
@@ -213,8 +215,6 @@ module QA
         @project = Resource::Project.fabricate_via_api! do |project|
           project.name = 'push_rules'
         end
-
-        Runtime::Feature.enable(:invite_members_group_modal, project: @project)
 
         Resource::Repository::ProjectPush.fabricate! do |push|
           push.project = @project
