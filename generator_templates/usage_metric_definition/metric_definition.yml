@@ -19,3 +19,5 @@ distribution:
 # - free
 # - premium
 # - ultimate
+deprecated: false
+not_used:
