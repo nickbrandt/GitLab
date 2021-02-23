@@ -25,14 +25,14 @@ describe('WikiAlert', () => {
   const findGlSprintf = () => wrapper.findComponent(GlSprintf);
 
   describe('Wiki Alert', () => {
-    it('does show an alert when there is an error', () => {
+    it('shows an alert when there is an error', () => {
       createWrapper({ error: ERROR });
       expect(findGlAlert().exists()).toBe(true);
       expect(findGlSprintf().exists()).toBe(true);
       expect(findGlSprintf().attributes('message')).toBe(ERROR);
     });
 
-    it('does show the link to the help path', () => {
+    it('shows a the link to the help path', () => {
       createWrapper({ error: ERROR_WITH_LINK }, { GlAlert, GlSprintf });
       expect(findGlLink().attributes('href')).toBe(PATH);
     });
