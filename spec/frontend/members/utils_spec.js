@@ -60,27 +60,19 @@ describe('Members Utils', () => {
     });
 
     describe('when `canManageMembers` argument is `false`', () => {
-      describe('when member is not the current user', () => {
-        it('sets `show` to `false` for 2FA badge', () => {
+      describe.each`
+        description                  | memberIsCurrentUser | expectedBadgeToBeShown
+        ${'is not the current user'} | ${false}            | ${false}
+        ${'is the current user'}     | ${true}             | ${true}
+      `('when member is $description', ({ memberIsCurrentUser, expectedBadgeToBeShown }) => {
+        it(`sets 'show' to '${expectedBadgeToBeShown}' for 2FA badge`, () => {
           const badges = generateBadges({
             member: member2faEnabled,
-            isCurrentUser: false,
+            isCurrentUser: memberIsCurrentUser,
             canManageMembers: false,
           });
 
-          expect(badges.find((badge) => badge.text === '2FA').show).toBe(false);
-        });
-      });
-
-      describe('when member is the current user', () => {
-        it('sets `show` to `false` for 2fA badge', () => {
-          const badges = generateBadges({
-            member: member2faEnabled,
-            isCurrentUser: true,
-            canManageMembers: false,
-          });
-
-          expect(badges.find((badge) => badge.text === '2FA').show).toBe(true);
+          expect(badges.find((badge) => badge.text === '2FA').show).toBe(expectedBadgeToBeShown);
         });
       });
     });
