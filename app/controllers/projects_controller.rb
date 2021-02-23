@@ -98,7 +98,6 @@ class ProjectsController < Projects::ApplicationController
       @project.reset
       render 'edit'
     end
-
   end
 
   # rubocop: disable CodeReuse/ActiveRecord
