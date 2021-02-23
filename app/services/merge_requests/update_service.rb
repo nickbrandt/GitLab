@@ -33,9 +33,7 @@ module MergeRequests
       old_reviewers = old_associations.fetch(:reviewers, [])
       changed_fields = merge_request.previous_changes.keys
 
-      if has_changes?(merge_request, old_labels: old_labels, old_assignees: old_assignees, old_reviewers: old_reviewers)
-        todo_service.resolve_todos_for_target(merge_request, current_user)
-      end
+      resolve_todos(merge_request, old_labels, old_assignees, old_reviewers)
 
       if merge_request.previous_changes.include?('title') ||
           merge_request.previous_changes.include?('description')
@@ -119,6 +117,12 @@ module MergeRequests
         added_mentions,
         current_user
       )
+    end
+
+    def resolve_todos(merge_request, old_labels, old_assignees, old_reviewers)
+      return unless has_changes?(merge_request, old_labels: old_labels, old_assignees: old_assignees, old_reviewers: old_reviewers)
+
+      todo_service.resolve_todos_for_target(merge_request, current_user)
     end
 
     def handle_target_branch_change(merge_request)
