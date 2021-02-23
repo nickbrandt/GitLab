@@ -140,6 +140,9 @@ export default {
     formTouched() {
       return !isEqual(serializeFormObject(this.form.fields), this.initialFormValues);
     },
+    isPolicyProfile() {
+      return true;
+    },
   },
   async mounted() {
     if (this.isEdit) {
@@ -244,6 +247,17 @@ export default {
       {{ i18n.title }}
     </h2>
 
+    <gl-alert v-if="isPolicyProfile" variant="info" class="gl-mb-5" :dismissible="false">
+      {{
+        sprintf(
+          s__(
+            'DastProfiles|This site profile is currently being used by a policy. To make edits you must it from the active policy.',
+          ),
+          { profileName: form.fields.profileName.value },
+        )
+      }}
+    </gl-alert>
+
     <gl-alert
       v-if="hasAlert"
       variant="danger"
@@ -258,6 +272,7 @@ export default {
     </gl-alert>
 
     <gl-form-group
+      :disabled="isPolicyProfile"
       :label="s__('DastProfiles|Profile name')"
       :invalid-feedback="form.fields.profileName.feedback"
     >
@@ -276,6 +291,7 @@ export default {
     <hr class="gl-border-gray-100" />
 
     <gl-form-group
+      :disabled="isPolicyProfile"
       data-testid="target-url-input-group"
       :invalid-feedback="form.fields.targetUrl.feedback"
       :label="s__('DastProfiles|Target URL')"
@@ -294,6 +310,7 @@ export default {
 
     <div v-if="glFeatures.securityDastSiteProfilesAdditionalFields" class="row">
       <gl-form-group
+        :disabled="isPolicyProfile"
         :label="s__('DastProfiles|Excluded URLs (Optional)')"
         :invalid-feedback="form.fields.excludedUrls.feedback"
         class="col-md-6"
@@ -318,7 +335,11 @@ export default {
         }}</gl-form-text>
       </gl-form-group>
 
-      <gl-form-group :invalid-feedback="form.fields.requestHeaders.feedback" class="col-md-6">
+      <gl-form-group
+        :disabled="isPolicyProfile"
+        :invalid-feedback="form.fields.requestHeaders.feedback"
+        class="col-md-6"
+      >
         <template #label>
           {{ i18n.requestHeaders.label }}
           <tooltip-icon :title="i18n.requestHeaders.tooltip" />
@@ -343,12 +364,14 @@ export default {
     <dast-site-auth-section
       v-if="glFeatures.securityDastSiteProfilesAdditionalFields"
       v-model="authSection"
+      :is-policy-profile="isPolicyProfile"
       :show-validation="form.showValidation"
     />
 
     <hr class="gl-border-gray-100" />
 
     <gl-button
+      :disabled="isPolicyProfile"
       type="submit"
       variant="success"
       class="js-no-auto-disable"

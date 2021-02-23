@@ -14,6 +14,11 @@ export default {
     validation: validation(),
   },
   props: {
+    isPolicyProfile: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
     value: {
       type: Object,
       required: false,
@@ -77,7 +82,7 @@ export default {
 
 <template>
   <section>
-    <gl-form-group :label="s__('DastProfiles|Authentication')">
+    <gl-form-group :disabled="isPolicyProfile" :label="s__('DastProfiles|Authentication')">
       <gl-form-checkbox v-model="form.fields.enabled.value" data-testid="auth-enable-checkbox">{{
         s__('DastProfiles|Enable Authentication')
       }}</gl-form-checkbox>
@@ -85,6 +90,7 @@ export default {
     <div v-if="form.fields.enabled.value" data-testid="auth-form">
       <div class="row">
         <gl-form-group
+          :disabled="isPolicyProfile"
           :label="s__('DastProfiles|Authentication URL')"
           :invalid-feedback="form.fields.url.feedback"
           class="col-md-6"
@@ -101,6 +107,7 @@ export default {
       </div>
       <div class="row">
         <gl-form-group
+          :disabled="isPolicyProfile"
           :label="s__('DastProfiles|Username')"
           :invalid-feedback="form.fields.username.feedback"
           class="col-md-6"
@@ -116,6 +123,7 @@ export default {
           />
         </gl-form-group>
         <gl-form-group
+          :disabled="isPolicyProfile"
           :label="s__('DastProfiles|Password')"
           :invalid-feedback="form.fields.password.feedback"
           class="col-md-6"
@@ -134,6 +142,7 @@ export default {
       </div>
       <div class="row">
         <gl-form-group
+          :disabled="isPolicyProfile"
           :label="s__('DastProfiles|Username form field')"
           :invalid-feedback="form.fields.usernameField.feedback"
           class="col-md-6"
@@ -148,6 +157,7 @@ export default {
           />
         </gl-form-group>
         <gl-form-group
+          :disabled="isPolicyProfile"
           :label="s__('DastProfiles|Password form field')"
           :invalid-feedback="form.fields.passwordField.feedback"
           class="col-md-6"
