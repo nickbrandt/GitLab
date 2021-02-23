@@ -4889,12 +4889,12 @@ Access level to a resource.
 
 | Value | Description |
 | ----- | ----------- |
-| `DEVELOPER` |  |
-| `GUEST` |  |
-| `MAINTAINER` |  |
-| `NO_ACCESS` |  |
-| `OWNER` |  |
-| `REPORTER` |  |
+| `DEVELOPER` | Developer access (includes maintainers) |
+| `GUEST` | Guest access to public environments |
+| `MAINTAINER` | Maintainer access |
+| `NO_ACCESS` | No access (usually indicates sign-in is necessary) |
+| `OWNER` | Code owner access (administrator access) |
+| `REPORTER` | Reporter access to public environments |
 
 ### AlertManagementAlertSort
 
