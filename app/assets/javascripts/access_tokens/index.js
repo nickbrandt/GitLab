@@ -1,6 +1,6 @@
 import Vue from 'vue';
+
 import ExpiresAtField from './components/expires_at_field.vue';
-import ProjectsField from './components/projects_field.vue';
 
 const getInputAttrs = (el) => {
   const input = el.querySelector('input');
@@ -42,14 +42,20 @@ export const initProjectsField = () => {
 
   const inputAttrs = getInputAttrs(el);
 
-  return new Vue({
-    el,
-    render(h) {
-      return h(ProjectsField, {
-        props: {
-          inputAttrs,
-        },
-      });
-    },
-  });
+  if (window.gon.features.personalAccessTokensScopedToProjects) {
+    const ProjectsField = () => import('./components/projects_field.vue');
+
+    return new Vue({
+      el,
+      render(h) {
+        return h(ProjectsField, {
+          props: {
+            inputAttrs,
+          },
+        });
+      },
+    });
+  }
+
+  return null;
 };

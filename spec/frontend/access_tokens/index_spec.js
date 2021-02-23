@@ -1,12 +1,19 @@
 import { createWrapper } from '@vue/test-utils';
 
+import waitForPromises from 'helpers/wait_for_promises';
+
 import { initExpiresAtField, initProjectsField } from '~/access_tokens';
 import ExpiresAtField from '~/access_tokens/components/expires_at_field.vue';
 import ProjectsField from '~/access_tokens/components/projects_field.vue';
 
 describe('access tokens', () => {
+  beforeEach(() => {
+    window.gon = { features: { personalAccessTokensScopedToProjects: true } };
+  });
+
   afterEach(() => {
     document.body.innerHTML = '';
+    window.gon = {};
   });
 
   describe.each`
@@ -29,8 +36,12 @@ describe('access tokens', () => {
         document.body.appendChild(mountEl);
       });
 
-      it(`mounts component and sets \`inputAttrs\` prop`, () => {
+      it(`mounts component and sets \`inputAttrs\` prop`, async () => {
         const wrapper = createWrapper(initFunction());
+
+        // Wait for dynamic imports to resolve
+        await waitForPromises();
+
         const component = wrapper.findComponent(expectedComponent);
 
         expect(component.exists()).toBe(true);
