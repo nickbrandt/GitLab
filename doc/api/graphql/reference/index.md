@@ -5773,8 +5773,8 @@ State of a test report.
 
 | Value | Description |
 | ----- | ----------- |
-| `done` |  |
-| `pending` |  |
+| `done` | The state of the todo is done. |
+| `pending` | The state of the todo is pending. |
 
 ### TodoTargetEnum
 
