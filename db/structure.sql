@@ -22458,10 +22458,11 @@ CREATE UNIQUE INDEX index_inc_mgmnt_oncall_rotations_on_oncall_schedule_id_and_i
 
 CREATE UNIQUE INDEX index_inc_mgmnt_oncall_rotations_on_oncall_schedule_id_and_name ON incident_management_oncall_rotations USING btree (oncall_schedule_id, name);
 
+CREATE INDEX index_incident_management_oncall_participants_is_removed ON incident_management_oncall_participants USING btree (is_removed);
+
 CREATE INDEX index_incident_management_oncall_schedules_on_project_id ON incident_management_oncall_schedules USING btree (project_id);
 
 CREATE INDEX index_incident_management_oncall_shifts_on_participant_id ON incident_management_oncall_shifts USING btree (participant_id);
-CREATE INDEX index_incident_management_oncall_participants_is_removed ON incident_management_oncall_participants USING btree (is_removed);
 
 CREATE UNIQUE INDEX index_index_statuses_on_project_id ON index_statuses USING btree (project_id);
 
