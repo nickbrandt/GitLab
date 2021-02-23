@@ -60,14 +60,7 @@ module MergeRequests
 
       track_title_and_desc_edits(changed_fields)
 
-      added_labels = merge_request.labels - old_labels
-      if added_labels.present?
-        notification_service.async.relabeled_merge_request(
-          merge_request,
-          added_labels,
-          current_user
-        )
-      end
+      notify_if_labels_added(merge_request, old_labels)
 
       added_mentions = merge_request.mentioned_users(current_user) - old_mentioned_users
 
@@ -122,6 +115,18 @@ module MergeRequests
         merge_request_activity_counter
           .public_send("track_#{action}_edit_action".to_sym, user: current_user) # rubocop:disable GitlabSecurity/PublicSend
       end
+    end
+
+    def notify_if_labels_added(merge_request, old_labels)
+      added_labels = merge_request.labels - old_labels
+
+      return unless added_labels.present?
+
+      notification_service.async.relabeled_merge_request(
+        merge_request,
+        added_labels,
+        current_user
+      )
     end
 
     def handle_draft_status_change(merge_request, changed_fields)
