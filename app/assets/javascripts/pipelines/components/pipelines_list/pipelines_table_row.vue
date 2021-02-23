@@ -7,8 +7,8 @@ import { PIPELINES_TABLE } from '../../constants';
 import eventHub from '../../event_hub';
 import PipelineTriggerer from './pipeline_triggerer.vue';
 import PipelineUrl from './pipeline_url.vue';
-import PipelinesActionsComponent from './pipelines_actions.vue';
 import PipelinesArtifactsComponent from './pipelines_artifacts.vue';
+import PipelinesManualActionsComponent from './pipelines_manual_actions.vue';
 import PipelineStage from './stage.vue';
 import PipelinesTimeago from './time_ago.vue';
 
@@ -22,7 +22,7 @@ export default {
     GlModalDirective,
   },
   components: {
-    PipelinesActionsComponent,
+    PipelinesManualActionsComponent,
     PipelinesArtifactsComponent,
     CommitComponent,
     PipelineStage,
@@ -240,7 +240,7 @@ export default {
       class="table-section section-20 table-button-footer pipeline-actions"
     >
       <div class="btn-group table-action-buttons">
-        <pipelines-actions-component v-if="actions.length > 0" :actions="actions" />
+        <pipelines-manual-actions-component v-if="actions.length > 0" :actions="actions" />
 
         <pipelines-artifacts-component
           v-if="pipeline.details.artifacts.length"
