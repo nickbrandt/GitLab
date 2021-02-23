@@ -5,8 +5,7 @@ import WikiAlert from '~/pages/shared/wikis/components/wiki_alert.vue';
 describe('WikiAlert', () => {
   let wrapper;
   const ERROR = 'There is already a page with the same title in that path.';
-  const ERROR_WITH_LINK =
-    'Someone edited the page the same time you did. Please check out %{wikiLinkStart}the page%{wikiLinkEnd} and make sure your changes will not unintentionally remove theirs.';
+  const ERROR_WITH_LINK = 'Before text %{wikiLinkStart}the page%{wikiLinkEnd} after text.';
   const PATH = '/test';
 
   function createWrapper(propsData = {}, stubs = {}) {
