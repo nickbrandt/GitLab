@@ -43,9 +43,7 @@ RSpec.describe Gitlab::ErrorTracking::LogFormatter do
   end
 
   it 'appends error-related log fields' do
-    payload = {}
-
-    described_class.format!(payload, exception, context_payload)
+    payload = described_class.new.generate_log(exception, context_payload)
 
     expect(payload).to eql(
       'exception.class' => 'StandardError',

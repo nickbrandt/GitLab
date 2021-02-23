@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require 'rspec-parameterized'
 
 RSpec.describe Gitlab::ErrorTracking::Processor::ContextPayloadProcessor do
   subject(:processor) { described_class.new }
