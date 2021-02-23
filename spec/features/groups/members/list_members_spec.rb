@@ -49,6 +49,7 @@ RSpec.describe 'Groups > Members > List members', :js do
   end
 
   describe 'when user has 2FA enabled' do
+    let_it_be(:admin) { create(:admin) }
     let_it_be(:user_with_2fa) { create(:user, :two_factor_via_otp) }
 
     before do
@@ -57,6 +58,15 @@ RSpec.describe 'Groups > Members > List members', :js do
 
     it 'shows 2FA badge to user with "Owner" access level' do
       group.add_owner(user1)
+
+      visit group_group_members_path(group)
+
+      expect(find_member_row(user_with_2fa)).to have_content('2FA')
+    end
+
+    it 'shows 2FA badge to admins' do
+      sign_in(admin)
+      gitlab_enable_admin_mode_sign_in(admin)
 
       visit group_group_members_path(group)
 
