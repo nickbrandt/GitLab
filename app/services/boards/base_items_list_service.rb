@@ -13,11 +13,11 @@ module Boards
 
     # rubocop: disable CodeReuse/ActiveRecord
     def metadata
-      issues = item_model.arel_table
+      issuables = item_model.arel_table
       keys = metadata_fields.keys
       # TODO: eliminate need for SQL literal fragment
       columns = Arel.sql(metadata_fields.values_at(*keys).join(', '))
-      results = item_model.where(id: items.select(issues[:id])).pluck(columns)
+      results = item_model.where(id: items.select(issuables[:id])).pluck(columns)
 
       Hash[keys.zip(results.flatten)]
     end
