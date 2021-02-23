@@ -43,16 +43,7 @@ module MergeRequests
         todo_service.update_merge_request(merge_request, current_user, old_mentioned_users)
       end
 
-      if merge_request.previous_changes.include?('target_branch')
-        create_branch_change_note(merge_request,
-                                  'target',
-                                  target_branch_was_deleted ? 'delete' : 'update',
-                                  merge_request.previous_changes['target_branch'].first,
-                                  merge_request.target_branch)
-
-        abort_auto_merge(merge_request, 'target branch was changed')
-      end
-
+      handle_target_branch_change(merge_request)
       handle_assignees_change(merge_request, old_assignees) if merge_request.assignees != old_assignees
       handle_reviewers_change(merge_request, old_reviewers) if merge_request.reviewers != old_reviewers
       handle_milestone_change(merge_request)
@@ -130,6 +121,20 @@ module MergeRequests
         added_mentions,
         current_user
       )
+    end
+
+    def handle_target_branch_change(merge_request)
+      return unless merge_request.previous_changes.include?('target_branch')
+
+      create_branch_change_note(
+        merge_request,
+        'target',
+        target_branch_was_deleted ? 'delete' : 'update',
+        merge_request.previous_changes['target_branch'].first,
+        merge_request.target_branch
+      )
+
+      abort_auto_merge(merge_request, 'target branch was changed')
     end
 
     def handle_draft_status_change(merge_request, changed_fields)
