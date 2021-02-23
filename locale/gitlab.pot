@@ -30657,6 +30657,9 @@ msgstr ""
 msgid "ThreatMonitoring|Environment"
 msgstr ""
 
+msgid "ThreatMonitoring|Events"
+msgstr ""
+
 msgid "ThreatMonitoring|Hide dismissed alerts"
 msgstr ""
 
