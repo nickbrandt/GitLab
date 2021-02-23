@@ -119,6 +119,9 @@ module Mutations
           raise invalid_time_error unless TIME_FORMAT.match?(start_time)
           raise invalid_time_error unless TIME_FORMAT.match?(end_time)
 
+          # We parse the times into dates to compare.
+          # Time.parse parses a timestamp into a Time with todays date
+          # Time.parse("22:11") => 2021-02-23 22:11:00 +0000
           parsed_from = Time.parse(start_time)
           parsed_to = Time.parse(end_time)
 
