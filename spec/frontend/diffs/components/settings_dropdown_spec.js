@@ -1,12 +1,10 @@
 import { mount } from '@vue/test-utils';
-import Vue from 'vue';
-import Vuex from 'vuex';
+
+import { extendedWrapper } from 'helpers/vue_test_utils_helper';
 
 import SettingsDropdown from '~/diffs/components/settings_dropdown.vue';
 import { PARALLEL_DIFF_VIEW_TYPE, INLINE_DIFF_VIEW_TYPE } from '~/diffs/constants';
 import eventHub from '~/diffs/event_hub';
-
-import { extendedWrapper } from '../../__helpers__/vue_test_utils_helper';
 
 import createDiffsStore from '../create_diffs_store';
 
@@ -14,8 +12,6 @@ describe('Diff settings dropdown component', () => {
   let wrapper;
   let vm;
   let store;
-
-  Vue.use(Vuex);
 
   function createComponent(extendStore = () => {}) {
     store = createDiffsStore();
