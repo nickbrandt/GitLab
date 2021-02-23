@@ -25,7 +25,6 @@ module MergeRequests
       update_task_event(merge_request) || update(merge_request)
     end
 
-    # rubocop:disable Metrics/AbcSize
     def handle_changes(merge_request, options)
       old_associations = options.fetch(:old_associations, {})
       old_labels = old_associations.fetch(:labels, [])
@@ -63,7 +62,6 @@ module MergeRequests
         merge_request.mark_as_unchecked
       end
     end
-    # rubocop:enable Metrics/AbcSize
 
     def handle_task_changes(merge_request)
       todo_service.resolve_todos_for_target(merge_request, current_user)
