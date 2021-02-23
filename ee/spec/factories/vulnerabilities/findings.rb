@@ -48,7 +48,12 @@ FactoryBot.define do
     location_fingerprint { SecureRandom.hex(20) }
     report_type { :sast }
     uuid do
-      Gitlab::UUID.v5("#{report_type}-#{primary_identifier.fingerprint}-#{location_fingerprint}-#{project_id}")
+      Security::VulnerabilityUUID.generate(
+        report_type: report_type,
+        primary_identifier_fingerprint: primary_identifier.fingerprint,
+        location_fingerprint: location_fingerprint,
+        project_id: project_id
+      )
     end
     severity { :high }
     confidence { :medium }

@@ -131,11 +131,14 @@ RSpec.describe Security::StoreReportService, '#execute' do
 
     let!(:vulnerability) { create(:vulnerability, findings: [finding], project: project) }
 
-    let(:uuid_v5_components) do
-      "#{finding.report_type}-#{finding.primary_identifier.fingerprint}-#{finding.location_fingerprint}-#{finding.project_id}"
+    let(:desired_uuid) do
+      Security::VulnerabilityUUID.generate(
+        report_type: finding.report_type,
+        primary_identifier_fingerprint: finding.primary_identifier.fingerprint,
+        location_fingerprint: finding.location_fingerprint,
+        project_id: finding.project_id
+      )
     end
-
-    let(:desired_uuid) { Gitlab::UUID.v5(uuid_v5_components) }
 
     let!(:finding_with_uuidv5) do
       create(:vulnerabilities_finding,
