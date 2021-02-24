@@ -40,11 +40,17 @@ RSpec.describe 'Multiple value streams', :js do
     wait_for_requests
   end
 
-  def add_custom_stage_to_form(index = 6)
+  def add_custom_stage_to_form
     page.find_button(s_('CreateValueStreamForm|Add another stage')).click
-    fill_in "custom-stage-name-#{index}", with: "Cool custom stage - name #{index}"
-    select_dropdown_option_by_value "custom-stage-start-event-#{index}", :merge_request_created
-    select_dropdown_option_by_value "custom-stage-end-event-#{index}", :merge_request_merged
+
+    index = page.all('[data-testid="value-stream-stage-fields"]').length
+    last_stage = page.all('[data-testid="value-stream-stage-fields"]').last
+
+    within last_stage do
+      find('[name*="custom-stage-name-"]').fill_in with: "Cool custom stage - name #{index}"
+      select_dropdown_option_by_value "custom-stage-start-event-", :merge_request_created
+      select_dropdown_option_by_value "custom-stage-end-event-", :merge_request_merged
+    end
   end
 
   def create_value_stream
@@ -120,7 +126,7 @@ RSpec.describe 'Multiple value streams', :js do
     end
 
     it 'can add a custom stage' do
-      add_custom_stage_to_form(7)
+      add_custom_stage_to_form
 
       page.find_button(_('Save Value Stream')).click
       wait_for_requests
