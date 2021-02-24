@@ -63,8 +63,8 @@ RSpec.describe 'GitLab Markdown', :aggregate_failures do
       end
 
       aggregate_failures 'parses fenced code blocks' do
-        expect(doc).to have_selector('pre.code.highlight.js-syntax-highlight.c')
-        expect(doc).to have_selector('pre.code.highlight.js-syntax-highlight.python')
+        expect(doc).to have_selector('pre.code.highlight.js-syntax-highlight.language-c')
+        expect(doc).to have_selector('pre.code.highlight.js-syntax-highlight.language-python')
       end
 
       aggregate_failures 'parses mermaid code block' do
