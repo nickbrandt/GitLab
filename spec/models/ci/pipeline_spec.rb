@@ -144,7 +144,8 @@ RSpec.describe Ci::Pipeline, :mailer, factory_default: :keep do
     subject { described_class.for_sha(sha) }
 
     let(:sha) { 'abc' }
-    let!(:pipeline) { create(:ci_pipeline, sha: 'abc') }
+
+    let_it_be(:pipeline) { create(:ci_pipeline, sha: 'abc') }
 
     it 'returns the pipeline' do
       is_expected.to contain_exactly(pipeline)
@@ -172,7 +173,8 @@ RSpec.describe Ci::Pipeline, :mailer, factory_default: :keep do
     subject { described_class.for_source_sha(source_sha) }
 
     let(:source_sha) { 'abc' }
-    let!(:pipeline) { create(:ci_pipeline, source_sha: 'abc') }
+
+    let_it_be(:pipeline) { create(:ci_pipeline, source_sha: 'abc') }
 
     it 'returns the pipeline' do
       is_expected.to contain_exactly(pipeline)
@@ -230,7 +232,8 @@ RSpec.describe Ci::Pipeline, :mailer, factory_default: :keep do
     subject { described_class.for_branch(branch) }
 
     let(:branch) { 'master' }
-    let!(:pipeline) { create(:ci_pipeline, ref: 'master') }
+
+    let_it_be(:pipeline) { create(:ci_pipeline, ref: 'master') }
 
     it 'returns the pipeline' do
       is_expected.to contain_exactly(pipeline)
@@ -249,11 +252,11 @@ RSpec.describe Ci::Pipeline, :mailer, factory_default: :keep do
   describe '.ci_sources' do
     subject { described_class.ci_sources }
 
-    let!(:push_pipeline)   { build(:ci_pipeline, source: :push) }
-    let!(:web_pipeline)    { build(:ci_pipeline, source: :web) }
-    let!(:api_pipeline)    { build(:ci_pipeline, source: :api) }
-    let!(:webide_pipeline) { build(:ci_pipeline, source: :webide) }
-    let!(:child_pipeline)  { build(:ci_pipeline, source: :parent_pipeline) }
+    let(:push_pipeline)   { build(:ci_pipeline, source: :push) }
+    let(:web_pipeline)    { build(:ci_pipeline, source: :web) }
+    let(:api_pipeline)    { build(:ci_pipeline, source: :api) }
+    let(:webide_pipeline) { build(:ci_pipeline, source: :webide) }
+    let(:child_pipeline)  { build(:ci_pipeline, source: :parent_pipeline) }
     let(:pipelines) { [push_pipeline, web_pipeline, api_pipeline, webide_pipeline, child_pipeline] }
 
     it 'contains pipelines having CI only sources' do
