@@ -55,16 +55,16 @@ update-qa-cache:
     - install_gitlab_gem
     - ./scripts/trigger-build omnibus
 
-package-and-qa:
-  extends:
-    - .package-and-qa-base
-    - .qa:rules:package-and-qa
-  # This job often times out, so temporarily use private runners and a long timeout: https://gitlab.com/gitlab-org/gitlab/-/issues/238563
-  tags:
-    - prm
-  timeout: 4h
-  needs:
-    - job: build-qa-image
-      artifacts: false
-    - job: build-assets-image
-      artifacts: false
+# package-and-qa:
+#   extends:
+#     - .package-and-qa-base
+#     - .qa:rules:package-and-qa
+#   # This job often times out, so temporarily use private runners and a long timeout: https://gitlab.com/gitlab-org/gitlab/-/issues/238563
+#   tags:
+#     - prm
+#   timeout: 4h
+#   needs:
+#     - job: build-qa-image
+#       artifacts: false
+#     - job: build-assets-image
+#       artifacts: false

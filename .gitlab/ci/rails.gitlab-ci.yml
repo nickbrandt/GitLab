@@ -535,54 +535,54 @@ rspec:feature-flags:
 
 ##################################################
 # EE: default refs (MRs, master, schedules) jobs #
-rspec migration pg11-as-if-foss:
-  extends:
-    - .rspec-base-pg11-as-if-foss
-    - .rspec-base-migration
-    - .rails:rules:as-if-foss-migration
-    - .rspec-migration-parallel
+# rspec migration pg11-as-if-foss:
+#   extends:
+#     - .rspec-base-pg11-as-if-foss
+#     - .rspec-base-migration
+#     - .rails:rules:as-if-foss-migration
+#     - .rspec-migration-parallel
 
-rspec migration pg11-as-if-foss minimal:
-  extends:
-    - rspec migration pg11-as-if-foss
-    - .minimal-rspec-tests
-    - .rails:rules:as-if-foss-migration:minimal
+# rspec migration pg11-as-if-foss minimal:
+#   extends:
+#     - rspec migration pg11-as-if-foss
+#     - .minimal-rspec-tests
+#     - .rails:rules:as-if-foss-migration:minimal
 
-rspec unit pg11-as-if-foss:
-  extends:
-    - .rspec-base-pg11-as-if-foss
-    - .rails:rules:as-if-foss-unit
-    - .rspec-unit-parallel
+# rspec unit pg11-as-if-foss:
+#   extends:
+#     - .rspec-base-pg11-as-if-foss
+#     - .rails:rules:as-if-foss-unit
+#     - .rspec-unit-parallel
 
-rspec unit pg11-as-if-foss minimal:
-  extends:
-    - rspec unit pg11-as-if-foss
-    - .minimal-rspec-tests
-    - .rails:rules:as-if-foss-unit:minimal
+# rspec unit pg11-as-if-foss minimal:
+#   extends:
+#     - rspec unit pg11-as-if-foss
+#     - .minimal-rspec-tests
+#     - .rails:rules:as-if-foss-unit:minimal
 
-rspec integration pg11-as-if-foss:
-  extends:
-    - .rspec-base-pg11-as-if-foss
-    - .rails:rules:as-if-foss-integration
-    - .rspec-integration-parallel
+# rspec integration pg11-as-if-foss:
+#   extends:
+#     - .rspec-base-pg11-as-if-foss
+#     - .rails:rules:as-if-foss-integration
+#     - .rspec-integration-parallel
 
-rspec integration pg11-as-if-foss minimal:
-  extends:
-    - rspec integration pg11-as-if-foss
-    - .minimal-rspec-tests
-    - .rails:rules:as-if-foss-integration:minimal
+# rspec integration pg11-as-if-foss minimal:
+#   extends:
+#     - rspec integration pg11-as-if-foss
+#     - .minimal-rspec-tests
+#     - .rails:rules:as-if-foss-integration:minimal
 
-rspec system pg11-as-if-foss:
-  extends:
-    - .rspec-base-pg11-as-if-foss
-    - .rails:rules:as-if-foss-system
-    - .rspec-system-parallel
+# rspec system pg11-as-if-foss:
+#   extends:
+#     - .rspec-base-pg11-as-if-foss
+#     - .rails:rules:as-if-foss-system
+#     - .rspec-system-parallel
 
-rspec system pg11-as-if-foss minimal:
-  extends:
-    - rspec system pg11-as-if-foss
-    - .minimal-rspec-tests
-    - .rails:rules:as-if-foss-system:minimal
+# rspec system pg11-as-if-foss minimal:
+#   extends:
+#     - rspec system pg11-as-if-foss
+#     - .minimal-rspec-tests
+#     - .rails:rules:as-if-foss-system:minimal
 
 rspec-ee migration pg11:
   extends:
