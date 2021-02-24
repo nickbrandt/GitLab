@@ -63,7 +63,7 @@ export default {
 
     <div class="hide-collapsed">
       <div class="title">{{ $options.i18n.dueDateTitle }}</div>
-      <div class="value">
+      <div class="value" data-testid="due-date-value">
         <strong v-if="dueDate">{{ formattedDueDate }}</strong>
         <span v-else class="no-value">{{ $options.i18n.none }}</span>
       </div>
