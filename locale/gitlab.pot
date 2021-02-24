@@ -13813,9 +13813,6 @@ msgstr ""
 msgid "GitLab metadata URL"
 msgstr ""
 
-msgid "GitLab namespace"
-msgstr ""
-
 msgid "GitLab project export"
 msgstr ""
 
@@ -16160,9 +16157,6 @@ msgid "Integrations|Includes commit title and branch"
 msgstr ""
 
 msgid "Integrations|Issues created in Jira are shown here once you have created the issues in project setup in Jira."
-msgstr ""
-
-msgid "Integrations|Link namespace to Jira"
 msgstr ""
 
 msgid "Integrations|Link namespaces"
