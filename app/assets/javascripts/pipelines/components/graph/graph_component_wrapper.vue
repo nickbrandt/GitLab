@@ -23,6 +23,9 @@ export default {
     pipelineProjectPath: {
       default: '',
     },
+    graphqlResourceEtag: {
+      default: '',
+    },
   },
   data() {
     return {
@@ -45,7 +48,7 @@ export default {
           },
           headers: {
             'X-GITLAB-GRAPHQL-FEATURE-CORRELATION': 'verify/ci/pipeline-graph',
-            'X-GITLAB-GRAPHQL-RESOURCE-ETAG': `pipelines/id/${this.pipelineIid}`,
+            'X-GITLAB-GRAPHQL-RESOURCE-ETAG': this.graphqlResourceEtag,
             'X-REQUESTED_WITH': 'XMLHttpRequest',
           },
         };

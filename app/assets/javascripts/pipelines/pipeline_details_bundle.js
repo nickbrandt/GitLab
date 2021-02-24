@@ -99,6 +99,7 @@ export default async function initPipelineDetailsBundle() {
         pipelineProjectPath,
         pipelineIid,
         metricsPath,
+        graphqlResourceEtag,
       );
     } catch {
       Flash(__('An error occurred while loading the pipeline.'));
