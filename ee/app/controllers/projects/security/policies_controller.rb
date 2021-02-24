@@ -15,9 +15,8 @@ module Projects
         render_404 unless Feature.enabled?(:security_orchestration_policies_configuration, project) && can?(current_user, :security_orchestration_policies, project)
       end
 
-      # arams {"utf8"=>"✓", "authenticity_token"=>"LYYIbIqd2gBMMP2Wjy+Q2JhhXZ4TFps0BW3t+cslPOadSoK7e13efQ9VFtyZxMzyJXYWtmD66mWrjbg/P3JDQQ==", "orchestration"=>{"management_project_id"=>"21"}, "controller"=>"projects/security/policies", "action"=>"assign", "namespace_id"=>"root", "project_id"=>"alpine"}
-      # Project 23
       def assign
+        # TODO: Assign project once #321531 is complete
       end
     end
   end
