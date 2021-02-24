@@ -669,7 +669,7 @@ Represents a list for an issue board.
 | Field | Type | Description |
 | ----- | ---- | ----------- |
 | `assignee` | User | Assignee in the list. |
-| `collapsed` | Boolean | Indicates if list is collapsed for this user. |
+| `collapsed` | Boolean | Indicates if the list is collapsed for this user. |
 | `id` | ID! | ID (global ID) of the list. |
 | `issues` | IssueConnection | Board issues. |
 | `issuesCount` | Int | Count of issues in the list. |
@@ -1971,6 +1971,7 @@ Represents an epic board list.
 
 | Field | Type | Description |
 | ----- | ---- | ----------- |
+| `collapsed` | Boolean | Indicates if this list is collapsed for this user. |
 | `epics` | EpicConnection | List epics. |
 | `id` | BoardsEpicListID! | Global ID of the board list. |
 | `label` | Label | Label of the list. |
