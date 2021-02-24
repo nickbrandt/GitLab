@@ -20,6 +20,11 @@ export default {
     GlLoadingIcon,
   },
   props: {
+    nestedSummary: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
     summary: {
       type: String,
       required: false,
@@ -28,11 +33,6 @@ export default {
     statusIcon: {
       type: String,
       required: true,
-    },
-    statusIconSize: {
-      type: Number,
-      required: false,
-      default: 24,
     },
     popoverOptions: {
       type: Object,
@@ -48,18 +48,31 @@ export default {
       };
     },
     rowClasses() {
-      return {
-        'gl-bg-gray-10': this.statusIcon === ICON_WARNING,
-      };
+      if (!this.nestedSummary) {
+        return ['report-block-list-issue', 'report-block-list-issue-parent'];
+      }
+      return [
+        'gl-display-flex',
+        'gl-pl-7',
+        'gl-py-3',
+        'gl-pr-3',
+        'gl-border-t-solid',
+        'gl-border-t-gray-100',
+        'gl-border-t-1',
+        { 'gl-bg-gray-10': this.statusIcon === ICON_WARNING },
+      ];
+    },
+    statusIconSize() {
+      if (!this.nestedSummary) {
+        return 24;
+      }
+      return 16;
     },
   },
 };
 </script>
 <template>
-  <div
-    class="report-block-list-issue report-block-list-issue-parent align-items-center"
-    :class="rowClasses"
-  >
+  <div class="gl-align-items-center" :class="rowClasses">
     <div class="gl-mr-3">
       <gl-loading-icon
         v-if="statusIcon === 'loading'"

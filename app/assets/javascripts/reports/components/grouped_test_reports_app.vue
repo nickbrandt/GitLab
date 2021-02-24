@@ -154,8 +154,7 @@ export default {
           <summary-row
             :key="`summary-row-${i}`"
             :status-icon="getReportIcon(report)"
-            :status-icon-size="16"
-            class="gl-pl-7! gl-py-3!"
+            nested-summary
           >
             <template #summary>
               <div class="gl-display-inline-flex gl-flex-direction-column">
