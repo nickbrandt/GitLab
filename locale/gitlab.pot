@@ -7736,6 +7736,9 @@ msgstr ""
 msgid "Configure Gitaly timeouts."
 msgstr ""
 
+msgid "Configure Integrations"
+msgstr ""
+
 msgid "Configure Let's Encrypt"
 msgstr ""
 
