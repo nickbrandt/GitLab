@@ -65,12 +65,12 @@ RSpec.describe ElasticsearchIndexedNamespace do
 
         ids = namespaces.map(&:id)
 
-        described_class.index_first_n_namespaces_of_plan('gold', 1)
+        described_class.index_first_n_namespaces_of_plan('ultimate', 1)
 
         expect(get_indexed_namespaces).to eq([ids[0]])
         expect_queue_to_contain(ids[0], "index")
 
-        described_class.index_first_n_namespaces_of_plan('gold', 2)
+        described_class.index_first_n_namespaces_of_plan('ultimate', 2)
 
         expect(get_indexed_namespaces).to eq([ids[0], ids[2]])
         expect_queue_to_contain(ids[2], "index")
@@ -84,7 +84,7 @@ RSpec.describe ElasticsearchIndexedNamespace do
 
     describe '.unindex_last_n_namespaces_of_plan' do
       before do
-        described_class.index_first_n_namespaces_of_plan('gold', 2)
+        described_class.index_first_n_namespaces_of_plan('ultimate', 2)
         described_class.index_first_n_namespaces_of_plan('silver', 1)
       end
 
@@ -95,7 +95,7 @@ RSpec.describe ElasticsearchIndexedNamespace do
 
         expect(get_indexed_namespaces).to contain_exactly(ids[0], ids[2], ids[1])
 
-        described_class.unindex_last_n_namespaces_of_plan('gold', 1)
+        described_class.unindex_last_n_namespaces_of_plan('ultimate', 1)
 
         expect(get_indexed_namespaces).to contain_exactly(ids[0], ids[1])
         expect_queue_to_contain(ids[2], "delete")
@@ -105,7 +105,7 @@ RSpec.describe ElasticsearchIndexedNamespace do
         expect(get_indexed_namespaces).to contain_exactly(ids[0])
         expect_queue_to_contain(ids[1], "delete")
 
-        described_class.unindex_last_n_namespaces_of_plan('gold', 1)
+        described_class.unindex_last_n_namespaces_of_plan('ultimate', 1)
 
         expect(get_indexed_namespaces).to be_empty
         expect_queue_to_contain(ids[0], "delete")

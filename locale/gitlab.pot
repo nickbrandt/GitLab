@@ -10620,7 +10620,7 @@ msgstr ""
 msgid "Discover|Security capabilities, integrated into your development lifecycle"
 msgstr ""
 
-msgid "Discover|See the other features of the %{linkStart}gold plan%{linkEnd}"
+msgid "Discover|See the other features of the %{linkStart}ultimate plan%{linkEnd}"
 msgstr ""
 
 msgid "Discover|Start a free trial"
@@ -15632,7 +15632,7 @@ msgstr ""
 msgid "InProductMarketing|Start a GitLab Gold trial today in less than one minute, no credit card required."
 msgstr ""
 
-msgid "InProductMarketing|Start a free trial of GitLab Gold – no CC required"
+msgid "InProductMarketing|Start a free trial of GitLab Ultimate – no CC required"
 msgstr ""
 
 msgid "InProductMarketing|Start a trial"
@@ -21089,7 +21089,7 @@ msgstr ""
 msgid "Only project members will be imported. Group members will be skipped."
 msgstr ""
 
-msgid "Only projects created under a Gold license are available in Security Dashboards."
+msgid "Only projects created under a Ultimate license are available in Security Dashboards."
 msgstr ""
 
 msgid "Only verified users with an email address in any of these domains can be added to the group."

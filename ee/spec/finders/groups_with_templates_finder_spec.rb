@@ -22,7 +22,7 @@ RSpec.describe GroupsWithTemplatesFinder do
     create(:project, namespace: subgroup_1)
     create(:project, namespace: subgroup_2)
     create(:project, namespace: subgroup_3)
-    create(:gitlab_subscription, :gold, namespace: group_1)
+    create(:gitlab_subscription, :ultimate, namespace: group_1)
     create(:gitlab_subscription, :silver, namespace: group_2)
   end
 
@@ -36,7 +36,7 @@ RSpec.describe GroupsWithTemplatesFinder do
         allow(Gitlab::CurrentSettings).to receive(:should_check_namespace_plan?) { true }
       end
 
-      it 'returns groups on gold/silver plan' do
+      it 'returns groups on ultimate/silver plan' do
         expect(described_class.new.execute).to contain_exactly(group_1, group_2)
       end
 
@@ -46,7 +46,7 @@ RSpec.describe GroupsWithTemplatesFinder do
           create(:project, namespace: subgroup_5)
         end
 
-        it 'returns groups on gold/silver plan' do
+        it 'returns groups on ultimate/silver plan' do
           expect(described_class.new.execute).to contain_exactly(group_1, group_2, subgroup_4)
         end
       end

@@ -422,14 +422,14 @@ RSpec.describe BillingPlansHelper do
   describe '#subscription_plan_info' do
     it 'returns the current plan' do
       other_plan = Hashie::Mash.new(code: 'bronze')
-      current_plan = Hashie::Mash.new(code: 'gold')
+      current_plan = Hashie::Mash.new(code: 'ultimate')
 
-      expect(helper.subscription_plan_info([other_plan, current_plan], 'gold')).to eq(current_plan)
+      expect(helper.subscription_plan_info([other_plan, current_plan], 'ultimate')).to eq(current_plan)
     end
 
     it 'returns nil if no plan matches the code' do
       plan_a = Hashie::Mash.new(code: 'bronze')
-      plan_b = Hashie::Mash.new(code: 'gold')
+      plan_b = Hashie::Mash.new(code: 'ultimate')
 
       expect(helper.subscription_plan_info([plan_a, plan_b], 'default')).to be_nil
     end

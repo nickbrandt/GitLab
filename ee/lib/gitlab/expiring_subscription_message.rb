@@ -102,7 +102,7 @@ module Gitlab
 
     def expiring_features_message
       case plan_name
-      when 'Gold'
+      when 'Gold', 'Ultimate'
         _('After that, you will not be able to use merge approvals or epics as well as many security features.')
       when 'Silver'
         _('After that, you will not be able to use merge approvals or epics as well as many other features.')

@@ -8,7 +8,7 @@ RSpec.describe API::Namespaces do
 
   let_it_be(:group1, reload: true) { create(:group, name: 'test.test-group.2') }
   let_it_be(:group2) { create(:group, :nested) }
-  let_it_be(:gold_plan) { create(:gold_plan) }
+  let_it_be(:ultimate_plan) { create(:ultimate_plan) }
 
   describe "GET /namespaces" do
     context "when authenticated as admin" do
@@ -272,7 +272,7 @@ RSpec.describe API::Namespaces do
         {
           start_date: '2019-06-01',
           end_date: '2020-06-01',
-          plan_code: 'gold',
+          plan_code: 'ultimate',
           seats: 20,
           max_seats_used: 10,
           auto_renew: true,
