@@ -60,7 +60,11 @@ module Types
           description: 'Visibility of the project.'
 
     field :container_registry_enabled, GraphQL::BOOLEAN_TYPE, null: true,
-          description: 'Indicates if the project stores Docker container images in a container registry.'
+          description: 'Indicates if container registry is enabled for the current user.'
+    define_method :container_registry_enabled do
+      object.feature_available?(:container_registry, context[:current_user])
+    end
+
     field :shared_runners_enabled, GraphQL::BOOLEAN_TYPE, null: true,
           description: 'Indicates if shared runners are enabled for the project.'
     field :lfs_enabled, GraphQL::BOOLEAN_TYPE, null: true,
