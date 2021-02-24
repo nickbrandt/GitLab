@@ -585,7 +585,7 @@ module API
         use :pagination
       end
       get ':id/groups', feature_category: :source_code_management do
-        groups = ProjectGroupsFinder.new(project: user_project, current_user: current_user, params: declared_params(include_missing: false)).execute
+        groups = GroupAscendantsFinder.new(group: user_project.group, current_user: current_user, params: declared_params(project_id: user_project.id, include_missing: false)).execute
         groups = groups.search(params[:search]) if params[:search].present?
 
         present_groups groups
