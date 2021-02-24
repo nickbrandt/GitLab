@@ -2,10 +2,10 @@
 
 require 'spec_helper'
 
-RSpec.describe Gitlab::EtagCaching::Router do
+RSpec.describe Gitlab::EtagCaching::Router::Restful do
   it 'matches epic notes endpoint' do
     result = described_class.match(
-      '/groups/my-group/and-subgroup/-/epics/1/notes'
+      double(path_info: '/groups/my-group/and-subgroup/-/epics/1/notes')
     )
 
     expect(result).to be_present
@@ -14,7 +14,7 @@ RSpec.describe Gitlab::EtagCaching::Router do
 
   it 'does not match invalid epic notes endpoint' do
     result = described_class.match(
-      '/groups/my-group/-/and-subgroup/-/epics/1/notes'
+      double(path_info: '/groups/my-group/-/and-subgroup/-/epics/1/notes')
     )
 
     expect(result).to be_blank
@@ -23,8 +23,18 @@ RSpec.describe Gitlab::EtagCaching::Router do
   it 'has a valid feature category for every route', :aggregate_failures do
     feature_categories = YAML.load_file(Rails.root.join('config', 'feature_categories.yml')).to_set
 
-    described_class::EE_ROUTES.each do |route|
+    described_class.ee_routes.each do |route|
       expect(feature_categories).to include(route.feature_category), "#{route.name} has a category of #{route.feature_category}, which is not valid"
+    end
+  end
+
+  describe '.cache_key' do
+    it 'returns a cache key' do
+      request = double(path: '/path/to/resource')
+
+      described_class.ee_routes.each do |route|
+        expect(route.cache_key(request)).to eq '/path/to/resource'
+      end
     end
   end
 end
