@@ -66,13 +66,10 @@ export default {
         css-class="report-block-list-loading-icon"
         size="md"
       />
-      <ci-icon v-else :status="iconStatus" :size="statusIconSize" />
+      <ci-icon v-else :status="iconStatus" :size="statusIconSize" data-testid="summary-row-icon" />
     </div>
     <div class="report-block-list-issue-description">
-      <div
-        class="report-block-list-issue-description-text"
-        data-testid="test-summary-row-description"
-      >
+      <div class="report-block-list-issue-description-text" data-testid="summary-row-description">
         <slot name="summary">{{ summary }}</slot
         ><span v-if="popoverOptions" class="text-nowrap"
           >&nbsp;<popover v-if="popoverOptions" :options="popoverOptions" class="align-top" />
