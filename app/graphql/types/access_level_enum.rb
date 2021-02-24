@@ -5,12 +5,12 @@ module Types
     graphql_name 'AccessLevelEnum'
     description 'Access level to a resource'
 
-    value 'NO_ACCESS', description: 'No access', value: Gitlab::Access::NO_ACCESS
-    value 'MINIMAL_ACCESS', description: 'Minimal access', value: Gitlab::Access::MINIMAL_ACCESS
-    value 'GUEST', description: 'Guest access', value: Gitlab::Access::GUEST
-    value 'REPORTER', description: 'Reporter access', value: Gitlab::Access::REPORTER
-    value 'DEVELOPER', description: 'Developer access', value: Gitlab::Access::DEVELOPER
-    value 'MAINTAINER', description: 'Maintainer access', value: Gitlab::Access::MAINTAINER
-    value 'OWNER', description: 'Owner access', value: Gitlab::Access::OWNER
+    value 'NO_ACCESS', value: Gitlab::Access::NO_ACCESS, description: 'No access'
+    value 'MINIMAL_ACCESS', value: Gitlab::Access::MINIMAL_ACCESS, description: 'Minimal access'
+    value 'GUEST', value: Gitlab::Access::GUEST, description: 'Guest access'
+    value 'REPORTER', value: Gitlab::Access::REPORTER, description: 'Reporter access'
+    value 'DEVELOPER', value: Gitlab::Access::DEVELOPER, description: 'Developer access'
+    value 'MAINTAINER', value: Gitlab::Access::MAINTAINER, description: 'Maintainer access'
+    value 'OWNER', value: Gitlab::Access::OWNER, description: 'Owner access'
   end
 end
