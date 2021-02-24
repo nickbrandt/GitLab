@@ -48,7 +48,7 @@ export default {
             'X-GITLAB-GRAPHQL-RESOURCE-ETAG': `pipelines/id/${this.pipelineIid}`,
             'X-REQUESTED_WITH': 'XMLHttpRequest',
           },
-        }
+        };
       },
       query: getPipelineDetails,
       pollInterval: 10000,
@@ -61,8 +61,7 @@ export default {
       update(data) {
         return unwrapPipelineData(this.pipelineProjectPath, data);
       },
-      error(err) {
-        console.log(err);
+      error() {
         this.reportFailure(LOAD_FAILURE);
       },
     },
