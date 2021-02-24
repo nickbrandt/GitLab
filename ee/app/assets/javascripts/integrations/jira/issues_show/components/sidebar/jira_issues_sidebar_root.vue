@@ -1,11 +1,13 @@
 <script>
 import LabelsSelect from '~/vue_shared/components/sidebar/labels_select_vue/labels_select_root.vue';
 import Assignee from './assignee.vue';
+import IssueReference from './issue_reference.vue';
 
 export default {
   name: 'JiraIssuesSidebar',
   components: {
     Assignee,
+    IssueReference,
     LabelsSelect,
   },
   props: {
@@ -23,6 +25,9 @@ export default {
       // Jira issues have at most 1 assignee
       return (this.issue?.assignees || [])[0];
     },
+    reference() {
+      return this.issue?.references?.relative;
+    },
   },
 };
 </script>
@@ -38,5 +43,6 @@ export default {
     >
       {{ __('None') }}
     </labels-select>
+    <issue-reference v-if="reference" :reference="reference" />
   </div>
 </template>
