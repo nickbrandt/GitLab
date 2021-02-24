@@ -6,6 +6,7 @@ RSpec.describe Gitlab::ErrorTracking::LogFormatter do
   let(:exception) { StandardError.new('boom') }
   let(:context_payload) do
     {
+      server: 'local-hostname-of-the-server',
       user: {
         ip_address: '127.0.0.1',
         username: 'root'
