@@ -72,8 +72,6 @@ module Gitlab
         # rubocop: enable CodeReuse/ActiveRecord
 
         def increment_queue_operation(operation)
-          return unless Feature.enabled?(:gitlab_ci_builds_queuing_metrics, default_enabled: false)
-
           if !Rails.env.production? && !OPERATION_COUNTERS.include?(operation)
             raise ArgumentError, "unknown queue operation: #{operation}"
           end
