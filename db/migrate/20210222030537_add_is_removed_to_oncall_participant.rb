@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class AddRemovedAtToOncallParticipant < ActiveRecord::Migration[6.0]
+class AddIsRemovedToOncallParticipant < ActiveRecord::Migration[6.0]
   include Gitlab::Database::MigrationHelpers
 
   DOWNTIME = false

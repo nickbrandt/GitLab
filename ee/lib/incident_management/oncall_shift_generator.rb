@@ -175,7 +175,7 @@ module IncidentManagement
 
     def participants
       strong_memoize(:participants) do
-        rotation.participants.not_removed
+        rotation.active_participants
       end
     end
 

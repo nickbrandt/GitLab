@@ -40,7 +40,7 @@ RSpec.describe IncidentManagement::OncallParticipant do
   end
 
   describe 'scopes' do
-    let_it_be(:removed) { create(:incident_management_oncall_participant, :removed, rotation: rotation) }
+    let_it_be(:removed_participant) { create(:incident_management_oncall_participant, :removed, rotation: rotation) }
 
     describe '.not_removed' do
       subject { described_class.not_removed }
@@ -51,18 +51,14 @@ RSpec.describe IncidentManagement::OncallParticipant do
     describe '.removed' do
       subject { described_class.removed }
 
-      it { is_expected.to contain_exactly(removed) }
+      it { is_expected.to contain_exactly(removed_participant) }
     end
   end
 
   describe '#mark_as_removed' do
-    around do |example|
-      freeze_time { example.run }
-    end
-
     subject { participant.mark_as_removed }
 
-    it 'updates is_removed to the current time' do
+    it 'updates is_removed to true' do
       expect { subject }.to change { participant.reload.is_removed }.to(true)
     end
   end
