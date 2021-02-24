@@ -98,7 +98,7 @@ module API
       end
       # rubocop: disable CodeReuse/ActiveRecord
       get feature_category: :users do
-        authenticated_as_admin! if params[:external].present? || (params[:extern_uid].present? && params[:provider].present?)
+        authenticated_as_admin! if params[:extern_uid].present? && params[:provider].present?
 
         unless current_user&.admin?
           params.except!(:created_after, :created_before, :order_by, :sort, :two_factor, :without_projects)

@@ -51,6 +51,12 @@ RSpec.describe UsersFinder do
         expect(users).to contain_exactly(user, normal_user, external_user, omniauth_user, admin_user)
       end
 
+      it 'filters by external users' do
+        users = described_class.new(user, external: true).execute
+
+        expect(users).to contain_exactly(external_user)
+      end
+
       it 'filters by non external users' do
         users = described_class.new(user, non_external: true).execute
 
