@@ -1,5 +1,11 @@
 # Changelog for gitlab-workhorse
 
+## v8.59.1
+
+### Security
+- Use URL.EscapePath() in upstream router
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/
+
 ## v8.59.0
 
 ### Fixed
