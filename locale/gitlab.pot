@@ -32268,7 +32268,7 @@ msgstr ""
 msgid "Use Service Desk to connect with your users (e.g. to offer customer support) through email right inside GitLab"
 msgstr ""
 
-msgid "Use an one time password authenticator on your mobile device or computer to enable two-factor authentication (2FA)."
+msgid "Use a one-time password authenticator on your mobile device or computer to enable two-factor authentication (2FA)."
 msgstr ""
 
 msgid "Use cURL"
