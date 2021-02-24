@@ -439,6 +439,12 @@ RSpec.describe ProjectPolicy do
           context 'with admin disabled' do
             it { is_expected.to be_disallowed(:read_project) }
           end
+
+          context 'with auditor' do
+            let(:current_user) { create(:user, :auditor) }
+
+            it { is_expected.to be_allowed(:read_project) }
+          end
         end
       end
 

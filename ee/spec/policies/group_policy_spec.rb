@@ -567,6 +567,12 @@ RSpec.describe GroupPolicy do
 
           it { is_expected.to be_allowed(:read_group) }
         end
+
+        context 'as auditor' do
+          let(:current_user) { create(:user, :auditor) }
+
+          it { is_expected.to be_allowed(:read_group) }
+        end
       end
     end
   end

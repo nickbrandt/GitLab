@@ -283,7 +283,7 @@ module EE
         prevent :read_group
       end
 
-      rule { ip_enforcement_prevents_access & ~owner }.policy do
+      rule { ip_enforcement_prevents_access & ~owner & ~auditor }.policy do
         prevent :read_group
       end
 
