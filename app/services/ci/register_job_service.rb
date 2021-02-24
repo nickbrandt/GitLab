@@ -14,6 +14,8 @@ module Ci
     end
 
     def execute(params = {})
+      @metrics.increment_queue_operation(:queue_attempt)
+
       @metrics.observe_queue_time do
         process_queue(params)
       end
@@ -23,8 +25,6 @@ module Ci
 
     # rubocop: disable CodeReuse/ActiveRecord
     def process_queue(params)
-      @metrics.increment_queue_operation(:queue_attempt)
-
       builds =
         if runner.instance_type?
           builds_for_shared_runner
@@ -47,13 +47,13 @@ module Ci
         builds = builds.queued_before(params[:job_age].seconds.ago)
       end
 
-      @metrics.observe_queue_depth(:depth, builds.to_a.size)
+      @metrics.observe_queue_depth(:initialized, -> { builds.to_a.size })
 
       valid = true
       depth = 0
 
-      builds.each_with_index do |build, index|
-        depth = index
+      builds.each do |build|
+        depth += 1
         @metrics.increment_queue_operation(:queue_iteration)
 
         result = process_build(build, params)
@@ -61,7 +61,7 @@ module Ci
 
         if result.valid?
           @metrics.register_success(result.build)
-          @metrics.observe_queue_depth(:effective, depth)
+          @metrics.observe_queue_depth(:effective, -> { depth })
 
           return result # rubocop:disable Cop/AvoidReturnFromBlocks
         else
@@ -72,7 +72,7 @@ module Ci
       end
 
       @metrics.increment_queue_operation(:queue_conflict) unless valid
-      @metrics.observe_queue_depth(:ineffective, depth) unless valid
+      @metrics.observe_queue_depth(:ineffective, -> { depth }) unless valid
       @metrics.register_failure
 
       Result.new(nil, nil, valid)
@@ -138,11 +138,11 @@ module Ci
       failure_reason, _ = pre_assign_runner_checks.find { |_, check| check.call(build, params) }
 
       if failure_reason
-        @metrics.increment_queue_operation(:runner_checks_failed)
+        @metrics.increment_queue_operation(:runner_pre_assign_checks_failed)
 
         build.drop!(failure_reason)
       else
-        @metrics.increment_queue_operation(:runner_checks_success)
+        @metrics.increment_queue_operation(:runner_pre_assign_checks_success)
 
         build.run!
       end

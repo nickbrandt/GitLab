@@ -23,15 +23,15 @@ module Gitlab
           :queue_attempt,
           :queue_conflict,
           :queue_iteration,
-          :runner_checks_failed,
-          :runner_checks_success
-        ].freeze
+          :runner_pre_assign_checks_failed,
+          :runner_pre_assign_checks_success
+        ].to_set.freeze
 
         QUEUE_DEPTH_HISTOGRAMS = [
-          :depth,
+          :initialized,
           :effective,
           :ineffective
-        ].freeze
+        ].to_set.freeze
 
         attr_reader :runner
 
@@ -70,25 +70,31 @@ module Gitlab
         # rubocop: enable CodeReuse/ActiveRecord
 
         def increment_queue_operation(operation)
-          unless OPERATION_COUNTERS.include?(operation)
-            raise ArgumentError, "unknown queue operation: #{operation}" unless Rails.env.production?
+          return unless Feature.enabled?(:gitlab_ci_builds_queuing_metrics, default_enabled: false)
+
+          if !Rails.env.production? && !OPERATION_COUNTERS.include?(operation)
+            raise ArgumentError, "unknown queue operation: #{operation}"
           end
 
           self.class.queue_operations_total.increment(operation: operation)
         end
 
-        def observe_queue_depth(queue, size)
-          unless QUEUE_DEPTH_HISTOGRAMS.include?(queue)
-            raise ArgumentError, "unknown queue depth label: #{queue}" unless Rails.env.production?
+        def observe_queue_depth(queue, size_proc)
+          return unless Feature.enabled?(:gitlab_ci_builds_queuing_metrics, default_enabled: false)
+
+          if !Rails.env.production? && !QUEUE_DEPTH_HISTOGRAMS.include?(queue)
+            raise ArgumentError, "unknown queue depth label: #{queue}"
           end
 
-          self.class.queue_depth_size_total.observe({ queue: queue }, size.to_f)
+          self.class.queue_depth_size_total.observe({ queue: queue }, size_proc.call.to_f)
         end
 
         def observe_queue_time
           start_time = ::Gitlab::Metrics::System.monotonic_time
 
           result = yield
+
+          return result unless Feature.enabled?(:gitlab_ci_builds_queuing_metrics, default_enabled: false)
 
           seconds = ::Gitlab::Metrics::System.monotonic_time - start_time
           self.class.queue_iteration_duration_seconds.observe({}, seconds.to_f)
