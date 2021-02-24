@@ -53,7 +53,7 @@ export default {
       isLoading: false,
       isLoadingStage: false,
       isEmptyStage: false,
-      hasError: false,
+      hasError: true,
       startDate: 30,
       isOverviewDialogDismissed: Cookies.get(OVERVIEW_DIALOG_COOKIE),
     };
@@ -77,22 +77,9 @@ export default {
       this.store.setErrorState(true);
       return new Flash(__('There was an error while fetching value stream analytics data.'));
     },
-    initDropdown() {
-      const $dropdown = $('.js-ca-dropdown');
-      const $label = $dropdown.find('.dropdown-label');
-
-      // eslint-disable-next-line @gitlab/no-global-event-off
-      $dropdown
-        .find('li a')
-        .off('click')
-        .on('click', (e) => {
-          e.preventDefault();
-          const $target = $(e.currentTarget);
-          this.startDate = $target.data('value');
-
-          $label.text($target.text().trim());
-          this.fetchCycleAnalyticsData({ startDate: this.startDate });
-        });
+    handleDateSelect(startDate) {
+      this.startDate = startDate;
+      this.fetchCycleAnalyticsData({ startDate: this.startDate });
     },
     fetchCycleAnalyticsData(options) {
       const fetchOptions = options || { startDate: this.startDate };
@@ -104,7 +91,6 @@ export default {
         .then((response) => {
           this.store.setCycleAnalyticsData(response);
           this.selectDefaultStage();
-          this.initDropdown();
           this.isLoading = false;
         })
         .catch(() => {
@@ -153,7 +139,6 @@ export default {
 };
 </script>
 <template>
-  <!-- TODO: add error message if hasError = true -->
   <div class="cycle-analytics">
     <gl-loading-icon v-if="isLoading" size="lg" />
     <div v-else class="wrapper">
@@ -168,19 +153,25 @@ export default {
             <div class="js-ca-dropdown dropdown inline">
               <button class="dropdown-menu-toggle" data-toggle="dropdown" type="button">
                 <span class="dropdown-label">
-                  {{ n__('Last %d day', 'Last %d days', 30) }}
+                  {{ n__('Last %d day', 'Last %d days', startDate) }}
                   <gl-icon name="chevron-down" class="dropdown-menu-toggle-icon gl-top-3" />
                 </span>
               </button>
               <ul class="dropdown-menu dropdown-menu-right">
                 <li>
-                  <a href="#" data-value="7">{{ n__('Last %d day', 'Last %d days', 7) }}</a>
+                  <a href="#" @click.prevent="handleDateSelect(7)">{{
+                    n__('Last %d day', 'Last %d days', 7)
+                  }}</a>
                 </li>
                 <li>
-                  <a href="#" data-value="30">{{ n__('Last %d day', 'Last %d days', 30) }}</a>
+                  <a href="#" @click.prevent="handleDateSelect(30)">{{
+                    n__('Last %d day', 'Last %d days', 30)
+                  }}</a>
                 </li>
                 <li>
-                  <a href="#" data-value="90">{{ n__('Last %d day', 'Last %d days', 90) }}</a>
+                  <a href="#" @click.prevent="handleDateSelect(90)">{{
+                    n__('Last %d day', 'Last %d days', 90)
+                  }}</a>
                 </li>
               </ul>
             </div>
@@ -282,7 +273,7 @@ export default {
                     class="js-empty-state"
                     :description="currentStage.emptyStageText"
                     :svg-path="noDataSvgPath"
-                    :title="__('We don't have enough data to show this stage.')"
+                    :title="__('We don\'t have enough data to show this stage.')"
                   />
                 </template>
                 <template v-if="state.events.length && !isLoadingStage && !isEmptyStage">

@@ -12,12 +12,12 @@ const createCycleAnalyticsService = (requestPath) =>
   });
 
 export default () => {
-  const cycleAnalyticsEl = document.querySelector('#cycle-analytics');
-  const { noAccessSvgPath, noDataSvgPath } = cycleAnalyticsEl.dataset;
+  const el = document.querySelector('#js-cycle-analytics');
+  const { noAccessSvgPath, noDataSvgPath } = el.dataset;
 
   // eslint-disable-next-line no-new
   new Vue({
-    el: '#cycle-analytics',
+    el,
     name: 'CycleAnalytics',
     render: (createElement) =>
       createElement(CycleAnalytics, {
@@ -25,7 +25,7 @@ export default () => {
           noDataSvgPath,
           noAccessSvgPath,
           store: CycleAnalyticsStore,
-          service: createCycleAnalyticsService(cycleAnalyticsEl.dataset.requestPath),
+          service: createCycleAnalyticsService(el.dataset.requestPath),
         },
       }),
   });
