@@ -91,27 +91,35 @@ RSpec.describe AddPermissionsDataToNotesDocuments, :elastic, :sidekiq_inline do
   describe '#completed?' do
     using RSpec::Parameterized::TableSyntax
 
+    let_it_be(:project) { create(:project, :repository) }
     subject { migration.completed? }
 
     where(:note_type) do
       %i{
-        note_on_issue
-        note_on_project_snippet
-        note_on_merge_request
-        note_on_commit
-        diff_note_on_merge_request
         diff_note_on_commit
-        legacy_diff_note_on_merge_request
-        legacy_diff_note_on_commit
-        discussion_note_on_merge_request
-        discussion_note_on_issue
-        discussion_note_on_project_snippet
+        diff_note_on_design
+        diff_note_on_merge_request
         discussion_note_on_commit
+        discussion_note_on_issue
+        discussion_note_on_merge_request
+        discussion_note_on_personal_snippet
+        discussion_note_on_project_snippet
+        discussion_note_on_vulnerability
+        legacy_diff_note_on_commit
+        legacy_diff_note_on_merge_request
+        note_on_alert
+        note_on_commit
+        note_on_design
+        note_on_epic
+        note_on_issue
+        note_on_merge_request
+        note_on_personal_snippet
+        note_on_project_snippet
+        note_on_vulnerability
       }
     end
 
     with_them do
-      let_it_be(:project) { create(:project, :repository) }
       let!(:note) { create(note_type, project: project) } # rubocop:disable Rails/SaveBang
 
       before do
