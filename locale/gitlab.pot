@@ -2069,6 +2069,9 @@ msgstr ""
 msgid "AdminArea|Features"
 msgstr ""
 
+msgid "AdminArea|Groups"
+msgstr ""
+
 msgid "AdminArea|Guest"
 msgstr ""
 
