@@ -311,9 +311,9 @@ Supported attributes:
 | `message` | string   | no | The commit message to produce when committing the changes, defaults to `Add changelog for version X` where X is the value of the `version` argument. |
 
 If the `from` attribute is unspecified, GitLab uses the Git tag of the last
-version that came before the version specified in the `version` attribute. For
-this to work, your project must create Git tags for versions using one of the
-following formats:
+stable version that came before the version specified in the `version`
+attribute. For this to work, your project must create Git tags for versions
+using one of the following formats:
 
 - `vX.Y.Z`
 - `X.Y.Z`
@@ -322,12 +322,14 @@ Where `X.Y.Z` is a version that follows [semantic
 versioning](https://semver.org/). For example, consider a project with the
 following tags:
 
+- v1.0.0-pre1
 - v1.0.0
 - v1.1.0
 - v2.0.0
 
 If the `version` attribute is `2.1.0`, GitLab uses tag v2.0.0. And when the
-version is `1.1.1`, or `1.2.0`, GitLab uses tag v1.1.0.
+version is `1.1.1`, or `1.2.0`, GitLab uses tag v1.1.0. The tag `v1.0.0-pre1` is
+never used, because it's a pre-release tag, and pre-release tags are ignored.
 
 If `from` is unspecified and no tag to use is found, the API produces an error.
 To solve such an error, you must explicitly specify a value for the `from`
