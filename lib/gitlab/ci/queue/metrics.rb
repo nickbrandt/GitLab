@@ -7,7 +7,8 @@ module Gitlab
         extend Gitlab::Utils::StrongMemoize
 
         QUEUE_DURATION_SECONDS_BUCKETS = [1, 3, 10, 30, 60, 300, 900, 1800, 3600].freeze
-        QUEUE_DEPTH_SIZE_TOTAL_BUCKETS = [1, 5, 10, 50, 100, 500, 1000, 2000, 5000].freeze
+        QUEUE_DEPTH_TOTAL_BUCKETS = [1, 2, 3, 5, 8, 16, 32, 50, 100, 250, 500, 1000, 2000, 5000].freeze
+        QUEUE_SIZE_TOTAL_BUCKETS = [1, 5, 10, 50, 100, 500, 1000, 2000, 5000].freeze
         QUEUE_ITERATION_DURATION_SECONDS_BUCKETS = [0.1, 0.3, 0.5, 1, 5, 10, 30, 60, 180, 300].freeze
 
         METRICS_SHARD_TAG_PREFIX = 'metrics_shard::'
@@ -23,14 +24,15 @@ module Gitlab
           :queue_attempt,
           :queue_conflict,
           :queue_iteration,
+          :queue_replication_lag,
           :runner_pre_assign_checks_failed,
           :runner_pre_assign_checks_success
         ].to_set.freeze
 
         QUEUE_DEPTH_HISTOGRAMS = [
-          :initialized,
-          :effective,
-          :ineffective
+          :found,
+          :not_found,
+          :conflict
         ].to_set.freeze
 
         attr_reader :runner
@@ -79,14 +81,20 @@ module Gitlab
           self.class.queue_operations_total.increment(operation: operation)
         end
 
-        def observe_queue_depth(queue, size_proc)
+        def observe_queue_depth(queue, size)
           return unless Feature.enabled?(:gitlab_ci_builds_queuing_metrics, default_enabled: false)
 
           if !Rails.env.production? && !QUEUE_DEPTH_HISTOGRAMS.include?(queue)
             raise ArgumentError, "unknown queue depth label: #{queue}"
           end
 
-          self.class.queue_depth_size_total.observe({ queue: queue }, size_proc.call.to_f)
+          self.class.queue_depth_total.observe({ queue: queue }, size.to_f)
+        end
+
+        def observe_queue_size(size_proc)
+          return unless Feature.enabled?(:gitlab_ci_builds_queuing_metrics, default_enabled: false)
+
+          self.class.queue_size_total.observe({}, size_proc.call.to_f)
         end
 
         def observe_queue_time
@@ -140,12 +148,23 @@ module Gitlab
           end
         end
 
-        def self.queue_depth_size_total
-          strong_memoize(:queue_depth_size_total) do
-            name = :gitlab_ci_queue_depth_size_total
-            comment = 'Size of a CI/CD builds queue'
+        def self.queue_depth_total
+          strong_memoize(:queue_depth_total) do
+            name = :gitlab_ci_queue_depth_total
+            comment = 'Size of a CI/CD builds queue in relation to the operation result'
             labels = {}
-            buckets = QUEUE_DEPTH_SIZE_TOTAL_BUCKETS
+            buckets = QUEUE_DEPTH_TOTAL_BUCKETS
+
+            Gitlab::Metrics.histogram(name, comment, labels, buckets)
+          end
+        end
+
+        def self.queue_size_total
+          strong_memoize(:queue_size_total) do
+            name = :gitlab_ci_queue_size_total
+            comment = 'Size of initialized CI/CD builds queue'
+            labels = {}
+            buckets = QUEUE_SIZE_TOTAL_BUCKETS
 
             Gitlab::Metrics.histogram(name, comment, labels, buckets)
           end

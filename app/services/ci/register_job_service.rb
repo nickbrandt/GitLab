@@ -4,7 +4,7 @@ module Ci
   # This class responsible for assigning
   # proper pending build to runner on runner API request
   class RegisterJobService
-    attr_reader :runner
+    attr_reader :runner, :metrics
 
     Result = Struct.new(:build, :build_json, :valid?)
 
@@ -47,7 +47,7 @@ module Ci
         builds = builds.queued_before(params[:job_age].seconds.ago)
       end
 
-      @metrics.observe_queue_depth(:initialized, -> { builds.to_a.size })
+      @metrics.observe_queue_size(-> { builds.to_a.size })
 
       valid = true
       depth = 0
@@ -61,7 +61,7 @@ module Ci
 
         if result.valid?
           @metrics.register_success(result.build)
-          @metrics.observe_queue_depth(:effective, -> { depth })
+          @metrics.observe_queue_depth(:found, depth)
 
           return result # rubocop:disable Cop/AvoidReturnFromBlocks
         else
@@ -72,7 +72,8 @@ module Ci
       end
 
       @metrics.increment_queue_operation(:queue_conflict) unless valid
-      @metrics.observe_queue_depth(:ineffective, -> { depth }) unless valid
+      @metrics.observe_queue_depth(:conflict, depth) unless valid
+      @metrics.observe_queue_depth(:not_found, depth) if valid
       @metrics.register_failure
 
       Result.new(nil, nil, valid)
