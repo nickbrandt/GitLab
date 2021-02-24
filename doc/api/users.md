@@ -53,6 +53,9 @@ For example:
 GET /users?username=jack_smith
 ```
 
+NOTE:
+Username search is case insensitive.
+
 In addition, you can filter users based on the states `blocked` and `active`.
 It does not support `active=false` or `blocked=false`. The list of billable users
 is the total number of users minus the blocked users.
@@ -63,6 +66,13 @@ GET /users?active=true
 
 ```plaintext
 GET /users?blocked=true
+```
+
+In addition, you can search for external users only with `external=true`.
+It does not support `external=false`.
+
+```plaintext
+GET /users?external=true
 ```
 
 GitLab supports bot users such as the [alert bot](../operations/incident_management/integrations.md)
@@ -80,8 +90,11 @@ However, this action does not exclude [project bot users](../user/project/settin
 GET /users?exclude_internal=true
 ```
 
-NOTE:
-Username search is case insensitive.
+In addition, to exclude external users from the users' list, you can use the parameter `exclude_external=true`.
+
+```plaintext
+GET /users?exclude_external=true
+```
 
 ### For admins
 
@@ -222,10 +235,6 @@ For example:
 ```plaintext
 GET /users?extern_uid=1234567&provider=github
 ```
-
-Instance administrators can search for users who are external with: `/users?external=true`
-
-You cannot search for external users if you are not an instance administrator. 
 
 You can search users by creation date time range with:
 
