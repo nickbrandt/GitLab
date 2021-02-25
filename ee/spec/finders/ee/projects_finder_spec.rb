@@ -15,7 +15,7 @@ RSpec.describe ProjectsFinder do
 
       let_it_be(:ultimate_project) { create_project(:ultimate_plan) }
       let_it_be(:ultimate_project2) { create_project(:ultimate_plan) }
-      let_it_be(:silver_project) { create_project(:silver_plan) }
+      let_it_be(:premium_project) { create_project(:premium_plan) }
       let_it_be(:no_plan_project) { create_project(nil) }
 
       context 'with ultimate plan' do
@@ -25,9 +25,9 @@ RSpec.describe ProjectsFinder do
       end
 
       context 'with multiple plans' do
-        let(:plans) { %w[ultimate silver] }
+        let(:plans) { %w[ultimate premium] }
 
-        it { is_expected.to contain_exactly(ultimate_project, ultimate_project2, silver_project) }
+        it { is_expected.to contain_exactly(ultimate_project, ultimate_project2, premium_project) }
       end
 
       context 'with other plans' do
@@ -39,13 +39,13 @@ RSpec.describe ProjectsFinder do
       context 'without plans' do
         let(:plans) { nil }
 
-        it { is_expected.to contain_exactly(ultimate_project, ultimate_project2, silver_project, no_plan_project) }
+        it { is_expected.to contain_exactly(ultimate_project, ultimate_project2, premium_project, no_plan_project) }
       end
 
       context 'with empty plans' do
         let(:plans) { [] }
 
-        it { is_expected.to contain_exactly(ultimate_project, ultimate_project2, silver_project, no_plan_project) }
+        it { is_expected.to contain_exactly(ultimate_project, ultimate_project2, premium_project, no_plan_project) }
       end
 
       context 'filter by aimed for deletion' do

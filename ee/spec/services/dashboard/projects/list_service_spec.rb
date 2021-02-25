@@ -94,11 +94,11 @@ RSpec.describe Dashboard::Projects::ListService do
 
       where(:check_namespace_plan, :plan, :available) do
         true  | :gold     | true
-        true  | :silver   | true
+        true  | :premium  | true
         true  | :ultimate | true
         true  | nil       | false
         false | :gold     | true
-        false | :silver   | true
+        false | :premium  | true
         false | :ultimate | true
         false | nil       | true
       end
