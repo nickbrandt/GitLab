@@ -9359,24 +9359,24 @@ CREATE TABLE application_settings (
     elasticsearch_indexed_file_size_limit_kb integer DEFAULT 1024 NOT NULL,
     enforce_namespace_storage_limit boolean DEFAULT false NOT NULL,
     container_registry_delete_tags_service_timeout integer DEFAULT 250 NOT NULL,
-    elasticsearch_client_request_timeout integer DEFAULT 0 NOT NULL,
     gitpod_enabled boolean DEFAULT false NOT NULL,
     gitpod_url text DEFAULT 'https://gitpod.io/'::text,
+    elasticsearch_client_request_timeout integer DEFAULT 0 NOT NULL,
     abuse_notification_email character varying,
     require_admin_approval_after_user_signup boolean DEFAULT true NOT NULL,
     help_page_documentation_base_url text,
     automatic_purchased_storage_allocation boolean DEFAULT false NOT NULL,
+    container_registry_expiration_policies_worker_capacity integer DEFAULT 0 NOT NULL,
     encrypted_ci_jwt_signing_key text,
     encrypted_ci_jwt_signing_key_iv text,
-    container_registry_expiration_policies_worker_capacity integer DEFAULT 0 NOT NULL,
-    elasticsearch_analyzers_smartcn_enabled boolean DEFAULT false NOT NULL,
-    elasticsearch_analyzers_smartcn_search boolean DEFAULT false NOT NULL,
-    elasticsearch_analyzers_kuromoji_enabled boolean DEFAULT false NOT NULL,
-    elasticsearch_analyzers_kuromoji_search boolean DEFAULT false NOT NULL,
     secret_detection_token_revocation_enabled boolean DEFAULT false NOT NULL,
     secret_detection_token_revocation_url text,
     encrypted_secret_detection_token_revocation_token text,
     encrypted_secret_detection_token_revocation_token_iv text,
+    elasticsearch_analyzers_smartcn_enabled boolean DEFAULT false NOT NULL,
+    elasticsearch_analyzers_smartcn_search boolean DEFAULT false NOT NULL,
+    elasticsearch_analyzers_kuromoji_enabled boolean DEFAULT false NOT NULL,
+    elasticsearch_analyzers_kuromoji_search boolean DEFAULT false NOT NULL,
     new_user_signups_cap integer,
     domain_denylist_enabled boolean DEFAULT false,
     domain_denylist text,
@@ -9399,6 +9399,7 @@ CREATE TABLE application_settings (
     notes_create_limit integer DEFAULT 300 NOT NULL,
     notes_create_limit_allowlist text[] DEFAULT '{}'::text[] NOT NULL,
     kroki_formats jsonb DEFAULT '{}'::jsonb NOT NULL,
+    in_product_marketing_emails_enabled boolean DEFAULT true NOT NULL,
     CONSTRAINT app_settings_container_reg_cleanup_tags_max_list_size_positive CHECK ((container_registry_cleanup_tags_service_max_list_size >= 0)),
     CONSTRAINT app_settings_registry_exp_policies_worker_capacity_positive CHECK ((container_registry_expiration_policies_worker_capacity >= 0)),
     CONSTRAINT check_17d9558205 CHECK ((char_length(kroki_url) <= 1024)),
@@ -9746,23 +9747,6 @@ CREATE SEQUENCE background_migration_jobs_id_seq
 
 ALTER SEQUENCE background_migration_jobs_id_seq OWNED BY background_migration_jobs.id;
 
-CREATE TABLE backup_labels (
-    id integer NOT NULL,
-    title character varying,
-    color character varying,
-    project_id integer,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone,
-    template boolean DEFAULT false,
-    description character varying,
-    description_html text,
-    type character varying,
-    group_id integer,
-    cached_markdown_version integer,
-    restore_action integer,
-    new_title character varying
-);
-
 CREATE TABLE badges (
     id integer NOT NULL,
     link_url character varying NOT NULL,
@@ -9934,6 +9918,24 @@ CREATE SEQUENCE boards_epic_boards_id_seq
     CACHE 1;
 
 ALTER SEQUENCE boards_epic_boards_id_seq OWNED BY boards_epic_boards.id;
+
+CREATE TABLE boards_epic_list_user_preferences (
+    id bigint NOT NULL,
+    user_id bigint NOT NULL,
+    epic_list_id bigint NOT NULL,
+    created_at timestamp with time zone NOT NULL,
+    updated_at timestamp with time zone NOT NULL,
+    collapsed boolean DEFAULT false NOT NULL
+);
+
+CREATE SEQUENCE boards_epic_list_user_preferences_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE boards_epic_list_user_preferences_id_seq OWNED BY boards_epic_list_user_preferences.id;
 
 CREATE TABLE boards_epic_lists (
     id bigint NOT NULL,
@@ -11026,6 +11028,8 @@ CREATE TABLE cluster_agent_tokens (
     agent_id bigint NOT NULL,
     token_encrypted text NOT NULL,
     created_by_user_id bigint,
+    description text,
+    CONSTRAINT check_4e4ec5070a CHECK ((char_length(description) <= 1024)),
     CONSTRAINT check_c60daed227 CHECK ((char_length(token_encrypted) <= 255))
 );
 
@@ -11607,6 +11611,7 @@ CREATE TABLE custom_emoji (
     name text NOT NULL,
     file text NOT NULL,
     external boolean DEFAULT true NOT NULL,
+    creator_id bigint NOT NULL,
     CONSTRAINT check_8c586dd507 CHECK ((char_length(name) <= 36)),
     CONSTRAINT check_dd5d60f1fb CHECK ((char_length(file) <= 255))
 );
@@ -11629,7 +11634,9 @@ CREATE TABLE dast_profiles (
     updated_at timestamp with time zone NOT NULL,
     name text NOT NULL,
     description text NOT NULL,
+    branch_name text,
     CONSTRAINT check_5fcf73bf61 CHECK ((char_length(name) <= 255)),
+    CONSTRAINT check_6c9d775949 CHECK ((char_length(branch_name) <= 255)),
     CONSTRAINT check_c34e505c24 CHECK ((char_length(description) <= 255))
 );
 
@@ -13212,6 +13219,9 @@ CREATE TABLE incident_management_oncall_rotations (
     length_unit smallint NOT NULL,
     starts_at timestamp with time zone NOT NULL,
     name text NOT NULL,
+    ends_at timestamp with time zone,
+    active_period_start time without time zone,
+    active_period_end time without time zone,
     CONSTRAINT check_5209fb5d02 CHECK ((char_length(name) <= 200))
 );
 
@@ -14363,6 +14373,7 @@ CREATE TABLE namespace_settings (
     allow_mfa_for_subgroups boolean DEFAULT true NOT NULL,
     default_branch_name text,
     repository_read_only boolean DEFAULT false NOT NULL,
+    delayed_project_removal boolean DEFAULT false NOT NULL,
     CONSTRAINT check_0ba93c78c7 CHECK ((char_length(default_branch_name) <= 255))
 );
 
@@ -14370,7 +14381,9 @@ CREATE TABLE namespace_statistics (
     id integer NOT NULL,
     namespace_id integer NOT NULL,
     shared_runners_seconds integer DEFAULT 0 NOT NULL,
-    shared_runners_seconds_last_reset timestamp without time zone
+    shared_runners_seconds_last_reset timestamp without time zone,
+    storage_size bigint DEFAULT 0 NOT NULL,
+    wiki_size bigint DEFAULT 0 NOT NULL
 );
 
 CREATE SEQUENCE namespace_statistics_id_seq
@@ -14530,7 +14543,8 @@ CREATE TABLE notification_settings (
     fixed_pipeline boolean,
     new_release boolean,
     moved_project boolean DEFAULT true NOT NULL,
-    change_reviewer_merge_request boolean
+    change_reviewer_merge_request boolean,
+    merge_when_pipeline_succeeds boolean DEFAULT false NOT NULL
 );
 
 CREATE SEQUENCE notification_settings_id_seq
@@ -15552,8 +15566,8 @@ CREATE TABLE plan_limits (
     ci_max_artifact_size_api_fuzzing integer DEFAULT 0 NOT NULL,
     ci_pipeline_deployments integer DEFAULT 500 NOT NULL,
     pull_mirror_interval_seconds integer DEFAULT 300 NOT NULL,
-    rubygems_max_file_size bigint DEFAULT '3221225472'::bigint NOT NULL,
-    daily_invites integer DEFAULT 0 NOT NULL
+    daily_invites integer DEFAULT 0 NOT NULL,
+    rubygems_max_file_size bigint DEFAULT '3221225472'::bigint NOT NULL
 );
 
 CREATE SEQUENCE plan_limits_id_seq
@@ -17587,7 +17601,7 @@ CREATE TABLE terraform_states (
     locked_at timestamp with time zone,
     locked_by_user_id bigint,
     uuid character varying(32) NOT NULL,
-    name character varying(255),
+    name character varying(255) NOT NULL,
     versioning_enabled boolean DEFAULT true NOT NULL
 );
 
@@ -18527,8 +18541,8 @@ CREATE TABLE web_hooks (
     encrypted_url character varying,
     encrypted_url_iv character varying,
     deployment_events boolean DEFAULT false NOT NULL,
-    feature_flag_events boolean DEFAULT false NOT NULL,
     releases_events boolean DEFAULT false NOT NULL,
+    feature_flag_events boolean DEFAULT false NOT NULL,
     member_events boolean DEFAULT false NOT NULL,
     subgroup_events boolean DEFAULT false NOT NULL
 );
@@ -18760,6 +18774,8 @@ ALTER TABLE ONLY boards_epic_board_labels ALTER COLUMN id SET DEFAULT nextval('b
 ALTER TABLE ONLY boards_epic_board_positions ALTER COLUMN id SET DEFAULT nextval('boards_epic_board_positions_id_seq'::regclass);
 
 ALTER TABLE ONLY boards_epic_boards ALTER COLUMN id SET DEFAULT nextval('boards_epic_boards_id_seq'::regclass);
+
+ALTER TABLE ONLY boards_epic_list_user_preferences ALTER COLUMN id SET DEFAULT nextval('boards_epic_list_user_preferences_id_seq'::regclass);
 
 ALTER TABLE ONLY boards_epic_lists ALTER COLUMN id SET DEFAULT nextval('boards_epic_lists_id_seq'::regclass);
 
@@ -19813,9 +19829,6 @@ ALTER TABLE ONLY aws_roles
 ALTER TABLE ONLY background_migration_jobs
     ADD CONSTRAINT background_migration_jobs_pkey PRIMARY KEY (id);
 
-ALTER TABLE ONLY backup_labels
-    ADD CONSTRAINT backup_labels_pkey PRIMARY KEY (id);
-
 ALTER TABLE ONLY badges
     ADD CONSTRAINT badges_pkey PRIMARY KEY (id);
 
@@ -19842,6 +19855,9 @@ ALTER TABLE ONLY boards_epic_board_positions
 
 ALTER TABLE ONLY boards_epic_boards
     ADD CONSTRAINT boards_epic_boards_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY boards_epic_list_user_preferences
+    ADD CONSTRAINT boards_epic_list_user_preferences_pkey PRIMARY KEY (id);
 
 ALTER TABLE ONLY boards_epic_lists
     ADD CONSTRAINT boards_epic_lists_pkey PRIMARY KEY (id);
@@ -19879,8 +19895,14 @@ ALTER TABLE ONLY chat_teams
 ALTER TABLE vulnerability_scanners
     ADD CONSTRAINT check_37608c9db5 CHECK ((char_length(vendor) <= 255)) NOT VALID;
 
+ALTER TABLE sprints
+    ADD CONSTRAINT check_ccd8a1eae0 CHECK ((start_date IS NOT NULL)) NOT VALID;
+
 ALTER TABLE group_import_states
     ADD CONSTRAINT check_cda75c7c3f CHECK ((user_id IS NOT NULL)) NOT VALID;
+
+ALTER TABLE sprints
+    ADD CONSTRAINT check_df3816aed7 CHECK ((due_date IS NOT NULL)) NOT VALID;
 
 ALTER TABLE ONLY ci_build_needs
     ADD CONSTRAINT ci_build_needs_pkey PRIMARY KEY (id);
@@ -20390,7 +20412,7 @@ ALTER TABLE ONLY issues_self_managed_prometheus_alert_events
     ADD CONSTRAINT issues_self_managed_prometheus_alert_events_pkey PRIMARY KEY (issue_id, self_managed_prometheus_alert_event_id);
 
 ALTER TABLE ONLY sprints
-    ADD CONSTRAINT iteration_start_and_due_daterange_group_id_constraint EXCLUDE USING gist (group_id WITH =, daterange(start_date, due_date, '[]'::text) WITH &&) WHERE ((group_id IS NOT NULL));
+    ADD CONSTRAINT iteration_start_and_due_date_iterations_cadence_id_constraint EXCLUDE USING gist (iterations_cadence_id WITH =, daterange(start_date, due_date, '[]'::text) WITH &&) WHERE ((group_id IS NOT NULL));
 
 ALTER TABLE ONLY sprints
     ADD CONSTRAINT iteration_start_and_due_daterange_project_id_constraint EXCLUDE USING gist (project_id WITH =, daterange(start_date, due_date, '[]'::text) WITH &&) WHERE ((project_id IS NOT NULL));
@@ -21261,18 +21283,6 @@ CREATE UNIQUE INDEX any_approver_project_rule_type_unique_index ON approval_proj
 
 CREATE INDEX approval_mr_rule_index_merge_request_id ON approval_merge_request_rules USING btree (merge_request_id);
 
-CREATE UNIQUE INDEX backup_labels_group_id_project_id_title_idx ON backup_labels USING btree (group_id, project_id, title);
-
-CREATE INDEX backup_labels_group_id_title_idx ON backup_labels USING btree (group_id, title) WHERE (project_id = NULL::integer);
-
-CREATE INDEX backup_labels_project_id_idx ON backup_labels USING btree (project_id);
-
-CREATE INDEX backup_labels_template_idx ON backup_labels USING btree (template) WHERE template;
-
-CREATE INDEX backup_labels_title_idx ON backup_labels USING btree (title);
-
-CREATE INDEX backup_labels_type_project_id_idx ON backup_labels USING btree (type, project_id);
-
 CREATE UNIQUE INDEX bulk_import_trackers_uniq_relation_by_entity ON bulk_import_trackers USING btree (bulk_import_entity_id, relation);
 
 CREATE INDEX ci_builds_gitlab_monitor_metrics ON ci_builds USING btree (status, created_at, project_id) WHERE ((type)::text = 'Ci::Build'::text);
@@ -21346,8 +21356,6 @@ CREATE UNIQUE INDEX idx_metrics_users_starred_dashboard_on_user_project_dashboar
 CREATE INDEX idx_mr_cc_diff_files_on_mr_cc_id_and_sha ON merge_request_context_commit_diff_files USING btree (merge_request_context_commit_id, sha);
 
 CREATE UNIQUE INDEX idx_on_compliance_management_frameworks_namespace_id_name ON compliance_management_frameworks USING btree (namespace_id, name);
-
-CREATE INDEX idx_on_issues_where_service_desk_reply_to_is_not_null ON issues USING btree (id) WHERE (service_desk_reply_to IS NOT NULL);
 
 CREATE INDEX idx_packages_build_infos_on_package_id ON packages_build_infos USING btree (package_id);
 
@@ -21590,6 +21598,8 @@ CREATE INDEX index_boards_epic_board_positions_on_epic_id ON boards_epic_board_p
 CREATE INDEX index_boards_epic_board_positions_on_scoped_relative_position ON boards_epic_board_positions USING btree (epic_board_id, epic_id, relative_position);
 
 CREATE INDEX index_boards_epic_boards_on_group_id ON boards_epic_boards USING btree (group_id);
+
+CREATE INDEX index_boards_epic_list_user_preferences_on_epic_list_id ON boards_epic_list_user_preferences USING btree (epic_list_id);
 
 CREATE INDEX index_boards_epic_lists_on_epic_board_id ON boards_epic_lists USING btree (epic_board_id);
 
@@ -21967,6 +21977,8 @@ CREATE INDEX index_csv_issue_imports_on_project_id ON csv_issue_imports USING bt
 
 CREATE INDEX index_csv_issue_imports_on_user_id ON csv_issue_imports USING btree (user_id);
 
+CREATE INDEX index_custom_emoji_on_creator_id ON custom_emoji USING btree (creator_id);
+
 CREATE UNIQUE INDEX index_custom_emoji_on_namespace_id_and_name ON custom_emoji USING btree (namespace_id, name);
 
 CREATE UNIQUE INDEX index_daily_build_group_report_results_unique_columns ON ci_daily_build_group_report_results USING btree (project_id, ref_path, date, group_name);
@@ -22113,7 +22125,11 @@ CREATE INDEX index_environments_on_project_id_state_environment_type ON environm
 
 CREATE INDEX index_environments_on_state_and_auto_stop_at ON environments USING btree (state, auto_stop_at) WHERE ((auto_stop_at IS NOT NULL) AND ((state)::text = 'available'::text));
 
+CREATE UNIQUE INDEX index_epic_board_list_preferences_on_user_and_list ON boards_epic_list_user_preferences USING btree (user_id, epic_list_id);
+
 CREATE INDEX index_epic_issues_on_epic_id ON epic_issues USING btree (epic_id);
+
+CREATE INDEX index_epic_issues_on_epic_id_and_issue_id ON epic_issues USING btree (epic_id, issue_id);
 
 CREATE UNIQUE INDEX index_epic_issues_on_issue_id ON epic_issues USING btree (issue_id);
 
@@ -22415,7 +22431,7 @@ CREATE UNIQUE INDEX index_issuable_slas_on_issue_id ON issuable_slas USING btree
 
 CREATE INDEX index_issue_assignees_on_user_id ON issue_assignees USING btree (user_id);
 
-CREATE UNIQUE INDEX index_issue_email_participants_on_issue_id_and_email ON issue_email_participants USING btree (issue_id, email);
+CREATE UNIQUE INDEX index_issue_email_participants_on_issue_id_and_lower_email ON issue_email_participants USING btree (issue_id, lower(email));
 
 CREATE INDEX index_issue_links_on_source_id ON issue_links USING btree (source_id);
 
@@ -23857,6 +23873,8 @@ CREATE UNIQUE INDEX term_agreements_unique_index ON term_agreements USING btree 
 
 CREATE INDEX tmp_idx_deduplicate_vulnerability_occurrences ON vulnerability_occurrences USING btree (project_id, report_type, location_fingerprint, primary_identifier_id, id);
 
+CREATE INDEX tmp_idx_on_namespaces_delayed_project_removal ON namespaces USING btree (id) WHERE (delayed_project_removal = true);
+
 CREATE INDEX tmp_index_on_security_findings_scan_id ON security_findings USING btree (scan_id) WHERE (uuid IS NULL);
 
 CREATE INDEX tmp_index_on_vulnerabilities_non_dismissed ON vulnerabilities USING btree (id) WHERE (state <> 2);
@@ -24449,9 +24467,6 @@ ALTER TABLE ONLY vulnerabilities
 ALTER TABLE ONLY labels
     ADD CONSTRAINT fk_7de4989a69 FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE;
 
-ALTER TABLE ONLY backup_labels
-    ADD CONSTRAINT fk_7de4989a69 FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE;
-
 ALTER TABLE ONLY merge_requests
     ADD CONSTRAINT fk_7e85395a64 FOREIGN KEY (sprint_id) REFERENCES sprints(id) ON DELETE CASCADE;
 
@@ -24523,6 +24538,9 @@ ALTER TABLE ONLY milestones
 
 ALTER TABLE ONLY vulnerabilities
     ADD CONSTRAINT fk_959d40ad0a FOREIGN KEY (confirmed_by_id) REFERENCES users(id) ON DELETE SET NULL;
+
+ALTER TABLE ONLY boards_epic_list_user_preferences
+    ADD CONSTRAINT fk_95eac55851 FOREIGN KEY (epic_list_id) REFERENCES boards_epic_lists(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY application_settings
     ADD CONSTRAINT fk_964370041d FOREIGN KEY (usage_stats_set_by_user_id) REFERENCES users(id) ON DELETE SET NULL;
@@ -24686,6 +24704,9 @@ ALTER TABLE ONLY todos
 ALTER TABLE ONLY geo_event_log
     ADD CONSTRAINT fk_cff7185ad2 FOREIGN KEY (reset_checksum_event_id) REFERENCES geo_reset_checksum_events(id) ON DELETE CASCADE;
 
+ALTER TABLE ONLY custom_emoji
+    ADD CONSTRAINT fk_custom_emoji_creator_id FOREIGN KEY (creator_id) REFERENCES users(id) ON DELETE CASCADE;
+
 ALTER TABLE ONLY bulk_import_entities
     ADD CONSTRAINT fk_d06d023c30 FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE;
 
@@ -24820,6 +24841,9 @@ ALTER TABLE ONLY design_management_designs_versions
 
 ALTER TABLE ONLY analytics_devops_adoption_segments
     ADD CONSTRAINT fk_f5aa768998 FOREIGN KEY (namespace_id) REFERENCES namespaces(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY boards_epic_list_user_preferences
+    ADD CONSTRAINT fk_f5f2fe5c1f FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY cluster_agents
     ADD CONSTRAINT fk_f7d43dee13 FOREIGN KEY (created_by_user_id) REFERENCES users(id) ON DELETE SET NULL;
@@ -25962,9 +25986,6 @@ ALTER TABLE ONLY serverless_domain_cluster
     ADD CONSTRAINT fk_rails_c09009dee1 FOREIGN KEY (pages_domain_id) REFERENCES pages_domains(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY labels
-    ADD CONSTRAINT fk_rails_c1ac5161d8 FOREIGN KEY (group_id) REFERENCES namespaces(id) ON DELETE CASCADE;
-
-ALTER TABLE ONLY backup_labels
     ADD CONSTRAINT fk_rails_c1ac5161d8 FOREIGN KEY (group_id) REFERENCES namespaces(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY project_feature_usages
