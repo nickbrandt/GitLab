@@ -91,10 +91,11 @@ export default {
         .then((response) => {
           this.store.setCycleAnalyticsData(response);
           this.selectDefaultStage();
-          this.isLoading = false;
         })
         .catch(() => {
           this.handleError();
+        })
+        .finally(() => {
           this.isLoading = false;
         });
     },
@@ -124,10 +125,11 @@ export default {
         .then((response) => {
           this.isEmptyStage = !response.events.length;
           this.store.setStageEvents(response.events, stage);
-          this.isLoadingStage = false;
         })
         .catch(() => {
           this.isEmptyStage = true;
+        })
+        .finally(() => {
           this.isLoadingStage = false;
         });
     },
