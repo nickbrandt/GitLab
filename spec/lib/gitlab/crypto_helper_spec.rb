@@ -67,37 +67,5 @@ RSpec.describe Gitlab::CryptoHelper do
         end
       end
     end
-
-    context 'when token was encrypted using random nonce' do
-      let(:value) { 'random-value' }
-
-      # for compatibility with tokens encrypted using dynamic nonce
-      let!(:encrypted) do
-        iv = create_nonce
-        encrypted_token = described_class.create_encrypted_token(value, iv)
-        TokenWithIv.create!(hashed_token: Digest::SHA256.digest(encrypted_token), hashed_plaintext_token: Digest::SHA256.digest(encrypted_token), iv: iv)
-        encrypted_token
-      end
-
-      before do
-        stub_feature_flags(dynamic_nonce_creation: true)
-      end
-
-      it 'correctly decrypts encrypted string' do
-        decrypted = described_class.aes256_gcm_decrypt(encrypted)
-
-        expect(decrypted).to eq value
-      end
-
-      it 'does not save hashed token with iv value in database' do
-        expect { described_class.aes256_gcm_decrypt(encrypted) }.not_to change { TokenWithIv.count }
-      end
-    end
-  end
-
-  def create_nonce
-    cipher = OpenSSL::Cipher.new('aes-256-gcm')
-    cipher.encrypt # Required before '#random_iv' can be called
-    cipher.random_iv # Ensures that the IV is the correct length respective to the algorithm used.
   end
 end
