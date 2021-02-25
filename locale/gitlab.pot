@@ -30967,6 +30967,9 @@ msgstr ""
 msgid "Tip: add a"
 msgstr ""
 
+msgid "Tip: add a %{linkStart}CODEOWNERS%{linkEnd} to automatically add approvers based on file paths and file types."
+msgstr ""
+
 msgid "Title"
 msgstr ""
 
