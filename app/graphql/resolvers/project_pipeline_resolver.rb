@@ -12,7 +12,7 @@ module Resolvers
 
     argument :sha, GraphQL::STRING_TYPE,
              required: false,
-             description: 'Sha of the Pipeline, e.g., ""dyd0f15ay83993f5ab66k927w28673882x99100b".'
+             description: 'SHA of the Pipeline, e.g., "dyd0f15ay83993f5ab66k927w28673882x99100b".'
 
     def ready?(iid: nil, sha: nil)
       unless iid.present? ^ sha.present?

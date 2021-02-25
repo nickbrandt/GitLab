@@ -54,7 +54,7 @@ RSpec.describe Resolvers::ProjectPipelineResolver do
   end
 
   it 'keeps the queries under the threshold for sha' do
-    create(:ci_pipeline, project: project, sha: 'sha')
+    create(:ci_pipeline, project: project, sha: 'sha2')
 
     control = ActiveRecord::QueryRecorder.new do
       batch_sync { resolve_pipeline(project, { sha: 'sha' }) }
@@ -78,6 +78,11 @@ RSpec.describe Resolvers::ProjectPipelineResolver do
 
   it 'errors when no iid or sha is passed' do
     expect { resolve_pipeline(project, {}) }
+      .to raise_error(Gitlab::Graphql::Errors::ArgumentError)
+  end
+
+  it 'errors when both iid and sha are passed' do
+    expect { resolve_pipeline(project, { iid: '1234', sha: 'sha' }) }
       .to raise_error(Gitlab::Graphql::Errors::ArgumentError)
   end
 

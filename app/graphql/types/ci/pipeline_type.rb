@@ -96,7 +96,7 @@ module Types
             description: "Relative path to the pipeline's page."
 
       field :commit_path, GraphQL::STRING_TYPE, null: true,
-            description: 'Relative path to the'
+            description: 'Path to the commit that triggered the pipeline.'
 
       field :project, Types::ProjectType, null: true,
             description: 'Project the pipeline belongs to.'
