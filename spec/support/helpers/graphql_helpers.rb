@@ -259,39 +259,6 @@ module GraphqlHelpers
     ::Gitlab::Utils::MergeHash.merge(Array.wrap(variables).map(&:to_h)).to_json
   end
 
-  def new_resolver(resolved_value = 'Resolved value', method: :resolve)
-    case resolved_value
-    when :resolve
-      simple_resolver(resolved_value)
-    when :find_object
-      find_object_resolver(resolved_value)
-    else
-      raise "Cannot build a resolver for #{method}"
-    end
-  end
-
-  def simple_resolver(resolved_value = 'Resolved value')
-    Class.new(Resolvers::BaseResolver) do
-      define_method :resolve do |**_args|
-        resolved_value
-      end
-    end
-  end
-
-  def find_object_resolver(resolved_value = 'Found object')
-    Class.new(Resolvers::BaseResolver) do
-      include ::Gitlab::Graphql::Authorize::AuthorizeResource
-
-      def resolve(**args)
-        authorized_find!(**args)
-      end
-
-      define_method :find_object do |**_args|
-        resolved_value
-      end
-    end
-  end
-
   # Recursively convert a Hash with Ruby-style keys to GraphQL fieldname-style keys
   #
   # prepare_input_for_mutation({ 'my_key' => 1 })
@@ -660,10 +627,12 @@ module GraphqlHelpers
     end
   end
 
-  def execute_query(query_type, schema = empty_schema)
+  # assumes query_string to be let-bound in the current context
+  def execute_query(query_type, schema: empty_schema, graphql: query_string)
     schema.query(query_type)
+
     schema.execute(
-      query_string,
+      graphql,
       context: { current_user: user },
       variables: {}
     )

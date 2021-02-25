@@ -4,6 +4,7 @@ require 'spec_helper'
 
 RSpec.describe 'Gitlab::Graphql::Authorize' do
   include GraphqlHelpers
+  include Graphql::ResolverFactories
 
   let_it_be(:user) { create(:user) }
   let(:permission_single) { :foo }
@@ -13,7 +14,7 @@ RSpec.describe 'Gitlab::Graphql::Authorize' do
   let(:result) do
     schema = empty_schema
     schema.use(Gitlab::Graphql::Authorize)
-    execute_query(query_type, schema)
+    execute_query(query_type, schema: schema)
   end
 
   subject { result.dig('data', 'item') }
@@ -59,7 +60,7 @@ RSpec.describe 'Gitlab::Graphql::Authorize' do
     describe 'with a single permission' do
       let(:query_type) do
         query_factory do |query|
-          query.field :item, type, null: true, resolver: simple_resolver(test_object), authorize: permission_single
+          query.field :item, type, null: true, resolver: new_resolver(test_object), authorize: permission_single
         end
       end
 
@@ -70,7 +71,7 @@ RSpec.describe 'Gitlab::Graphql::Authorize' do
       let(:query_type) do
         permissions = permission_collection
         query_factory do |qt|
-          qt.field :item, type, null: true, resolver: simple_resolver(test_object) do
+          qt.field :item, type, null: true, resolver: new_resolver(test_object) do
             authorize permissions
           end
         end
@@ -83,7 +84,7 @@ RSpec.describe 'Gitlab::Graphql::Authorize' do
   describe 'Field authorizations when field is a built in type' do
     let(:query_type) do
       query_factory do |query|
-        query.field :item, type, null: true, resolver: simple_resolver(test_object)
+        query.field :item, type, null: true, resolver: new_resolver(test_object)
       end
     end
 
@@ -136,7 +137,7 @@ RSpec.describe 'Gitlab::Graphql::Authorize' do
   describe 'Type authorizations' do
     let(:query_type) do
       query_factory do |query|
-        query.field :item, type, null: true, resolver: simple_resolver(test_object)
+        query.field :item, type, null: true, resolver: new_resolver(test_object)
       end
     end
 
@@ -173,7 +174,7 @@ RSpec.describe 'Gitlab::Graphql::Authorize' do
 
     let(:query_type) do
       query_factory do |query|
-        query.field :item, type, null: true, resolver: simple_resolver(test_object), authorize: permission_2
+        query.field :item, type, null: true, resolver: new_resolver(test_object), authorize: permission_2
       end
     end
 
@@ -192,7 +193,7 @@ RSpec.describe 'Gitlab::Graphql::Authorize' do
 
     let(:query_type) do
       query_factory do |query|
-        query.field :item, type.connection_type, null: true, resolver: simple_resolver([test_object, second_test_object])
+        query.field :item, type.connection_type, null: true, resolver: new_resolver([test_object, second_test_object])
       end
     end
 
@@ -212,7 +213,7 @@ RSpec.describe 'Gitlab::Graphql::Authorize' do
     describe 'limiting connections with multiple objects' do
       let(:query_type) do
         query_factory do |query|
-          query.field :item, type.connection_type, null: true, resolver: simple_resolver([test_object, second_test_object])
+          query.field :item, type.connection_type, null: true, resolver: new_resolver([test_object, second_test_object])
         end
       end
 
@@ -236,7 +237,7 @@ RSpec.describe 'Gitlab::Graphql::Authorize' do
 
     let(:query_type) do
       query_factory do |query|
-        query.field :item, [type], null: true, resolver: simple_resolver([test_object])
+        query.field :item, [type], null: true, resolver: new_resolver([test_object])
       end
     end
 
@@ -264,13 +265,13 @@ RSpec.describe 'Gitlab::Graphql::Authorize' do
       type_factory do |type|
         type.graphql_name 'FakeProjectType'
         type.field :test_issues, issue_type.connection_type, null: false,
-                   resolver: simple_resolver(Issue.where(project: [visible_project, other_project]).order(id: :asc))
+                   resolver: new_resolver(Issue.where(project: [visible_project, other_project]).order(id: :asc))
       end
     end
 
     let(:query_type) do
       query_factory do |query|
-        query.field :test_project, project_type, null: false, resolver: simple_resolver(visible_project)
+        query.field :test_project, project_type, null: false, resolver: new_resolver(visible_project)
       end
     end
 
