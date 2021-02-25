@@ -104,7 +104,7 @@ module Gitlab
       case plan_name
       when 'Gold', 'Ultimate'
         _('After that, you will not be able to use merge approvals or epics as well as many security features.')
-      when 'Silver'
+      when 'Premium', 'Silver'
         _('After that, you will not be able to use merge approvals or epics as well as many other features.')
       else
         _('After that, you will not be able to use merge approvals or code quality as well as many other features.')
