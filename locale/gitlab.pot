@@ -22810,6 +22810,9 @@ msgstr ""
 msgid "Profiles|Add status emoji"
 msgstr ""
 
+msgid "Profiles|An error occurred while updating your username, please try again."
+msgstr ""
+
 msgid "Profiles|Avatar cropper"
 msgstr ""
 
