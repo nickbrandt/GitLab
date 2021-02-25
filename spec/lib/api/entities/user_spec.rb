@@ -39,8 +39,18 @@ RSpec.describe API::Entities::User do
   context 'with project bot user' do
     let(:user) { create(:user, :project_bot) }
 
-    it 'does not expose project bot user name' do
-      expect(subject).not_to include(:name)
+    context 'when the requester is not an admin' do
+      it 'does not expose project bot user name' do
+        expect(subject).not_to include(:name)
+      end
+    end
+
+    context 'when the requester is an admin' do
+      let(:current_user) { create(:user, :admin) }
+
+      it 'exposes project bot user name' do
+        expect(subject).to include(:name)
+      end
     end
   end
 end
