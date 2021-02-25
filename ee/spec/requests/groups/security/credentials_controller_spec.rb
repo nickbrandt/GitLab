@@ -18,13 +18,13 @@ RSpec.describe Groups::Security::CredentialsController do
     group_with_managed_accounts.add_owner(owner)
     group_with_managed_accounts.add_maintainer(maintainer)
 
-    sign_in(owner)
+    login_as(owner)
   end
 
   describe 'GET #index' do
     let(:filter) {}
 
-    subject { get :index, params: { group_id: group_id.to_param, filter: filter } }
+    subject { get group_security_credentials_path(group_id: group_id.to_param, filter: filter) }
 
     context 'when `credentials_inventory` feature is enabled' do
       before do
@@ -137,16 +137,16 @@ RSpec.describe Groups::Security::CredentialsController do
     end
   end
 
-  describe 'POST #destroy' do
+  describe 'DELETE #destroy' do
     let(:credentials_path) { group_security_credentials_path(filter: 'ssh_keys') }
 
-    it_behaves_like 'credentials inventory controller delete SSH key', group_managed_account: true
+    it_behaves_like 'credentials inventory delete SSH key', group_managed_account: true
   end
 
   describe 'PUT #revoke' do
     shared_examples_for 'responds with 404' do
       it do
-        put :revoke, params: { group_id: group_id.to_param, id: token_id }
+        put revoke_group_security_credential_path(group_id: group_id.to_param, id: token_id)
 
         expect(response).to have_gitlab_http_status(:not_found)
       end
@@ -154,7 +154,7 @@ RSpec.describe Groups::Security::CredentialsController do
 
     shared_examples_for 'displays the flash success message' do
       it do
-        put :revoke, params: { group_id: group_id.to_param, id: token_id }
+        put revoke_group_security_credential_path(group_id: group_id.to_param, id: token_id)
 
         expect(response).to redirect_to(group_security_credentials_path)
         expect(flash[:notice]).to start_with 'Revoked personal access token '
@@ -163,7 +163,7 @@ RSpec.describe Groups::Security::CredentialsController do
 
     shared_examples_for 'displays the flash error message' do
       it do
-        put :revoke, params: { group_id: group_id.to_param, id: token_id }
+        put revoke_group_security_credential_path(group_id: group_id.to_param, id: token_id)
 
         expect(response).to redirect_to(group_security_credentials_path)
         expect(flash[:alert]).to eql 'Not permitted to revoke'
@@ -228,7 +228,7 @@ RSpec.describe Groups::Security::CredentialsController do
                 it 'informs the token owner' do
                   expect(CredentialsInventoryMailer).to receive_message_chain(:personal_access_token_revoked_email, :deliver_later)
 
-                  put :revoke, params: { group_id: group_id.to_param, id: personal_access_token.id }
+                  put revoke_group_security_credential_path(group_id: group_id.to_param, id: personal_access_token.id)
                 end
 
                 context 'when credentials_inventory_revocation_emails flag is disabled' do
@@ -238,7 +238,7 @@ RSpec.describe Groups::Security::CredentialsController do
 
                   it 'does not inform the token owner' do
                     expect do
-                      put :revoke, params: { group_id: group_id.to_param, id: personal_access_token.id }
+                      put revoke_group_security_credential_path(group_id: group_id.to_param, id: personal_access_token.id)
                     end.not_to change { ActionMailer::Base.deliveries.size }
                   end
                 end
@@ -292,7 +292,11 @@ RSpec.describe Groups::Security::CredentialsController do
         let_it_be(:token_id) { personal_access_token.id }
         let_it_be(:group_id) { create(:group).id }
 
-        it_behaves_like 'responds with 404'
+        it 'responds with 404' do
+          expect do
+            put revoke_group_security_credential_path(group_id: group_id.to_param, id: token_id)
+          end.to raise_error(ActionController::RoutingError)
+        end
       end
     end
 

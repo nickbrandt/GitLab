@@ -2,7 +2,9 @@
 
 require 'spec_helper'
 
-RSpec.describe Admin::CredentialsController do
+RSpec.describe Admin::CredentialsController, type: :request do
+  include AdminModeHelper
+
   let_it_be(:admin) { create(:admin) }
   let_it_be(:user) { create(:user) }
   let_it_be(:personal_access_token) { create(:personal_access_token, user: user) }
@@ -10,7 +12,8 @@ RSpec.describe Admin::CredentialsController do
   describe 'GET #index' do
     context 'admin user' do
       before do
-        sign_in(admin)
+        login_as(admin)
+        enable_admin_mode!(admin)
       end
 
       context 'when `credentials_inventory` feature is enabled' do
@@ -19,13 +22,9 @@ RSpec.describe Admin::CredentialsController do
         end
 
         it 'responds with 200' do
-          get :index
+          get admin_credentials_path
 
           expect(response).to have_gitlab_http_status(:ok)
-        end
-
-        it_behaves_like 'tracking unique visits', :index do
-          let(:target_id) { 'i_compliance_credential_inventory' }
         end
 
         describe 'filtering by type of credential' do
@@ -33,35 +32,35 @@ RSpec.describe Admin::CredentialsController do
 
           shared_examples_for 'filtering by `personal_access_tokens`' do
             specify do
-              get :index, params: params
+              get admin_credentials_path(filter: filter)
 
               expect(assigns(:credentials)).to match_array(user.personal_access_tokens)
             end
           end
 
           context 'no credential type specified' do
-            let(:params) { {} }
+            let(:filter) { nil }
 
             it_behaves_like 'filtering by `personal_access_tokens`'
           end
 
           context 'non-existent credential type specified' do
-            let(:params) { { filter: 'non_existent_credential_type' } }
+            let(:filter) { 'non_existent_credential_type' }
 
             it_behaves_like 'filtering by `personal_access_tokens`'
           end
 
           context 'credential type specified as `personal_access_tokens`' do
-            let(:params) { { filter: 'personal_access_tokens' } }
+            let(:filter) { 'personal_access_tokens' }
 
             it_behaves_like 'filtering by `personal_access_tokens`'
           end
 
           context 'credential type specified as `ssh_keys`' do
             it 'filters by ssh keys' do
-              ssh_keys =  create_list(:personal_key, 2, user: user)
+              ssh_keys = create_list(:personal_key, 2, user: user)
 
-              get :index, params: { filter: 'ssh_keys' }
+              get admin_credentials_path(filter: 'ssh_keys')
 
               expect(assigns(:credentials)).to match_array(ssh_keys)
             end
@@ -71,7 +70,7 @@ RSpec.describe Admin::CredentialsController do
             it 'filters by gpg keys' do
               gpg_key = create(:gpg_key)
 
-              get :index, params: { filter: 'gpg_keys' }
+              get admin_credentials_path(filter: 'gpg_keys')
 
               expect(assigns(:credentials)).to match_array([gpg_key])
             end
@@ -82,10 +81,31 @@ RSpec.describe Admin::CredentialsController do
               end
 
               it 'responds with not found' do
-                get :index, params: { filter: 'gpg_keys' }
+                get admin_credentials_path(filter: 'gpg_keys')
 
                 expect(response).to have_gitlab_http_status(:not_found)
               end
+            end
+
+            # There is currently N+1 issue when checking verified_emails per user:
+            # https://gitlab.com/gitlab-org/gitlab/-/issues/322773
+            # Therefore we are currently adding + 1 to the control until this is resolved
+            it 'avoids N+1 queries' do
+              control_user = create(:user, name: 'User Name', email: GpgHelpers::User1.emails.first)
+              new_user = create(:user, name: 'User Name', email: GpgHelpers::User2.emails.first)
+
+              create(:gpg_key, user: control_user, key: GpgHelpers::User1.public_key)
+              create(:gpg_key, user: control_user, key: GpgHelpers::User1.public_key2)
+
+              control = ActiveRecord::QueryRecorder.new(skip_cached: false) do
+                get admin_credentials_path(filter: 'gpg_keys')
+              end.count
+
+              create(:gpg_key, user: new_user, key: GpgHelpers::User2.public_key)
+
+              expect do
+                get admin_credentials_path(filter: 'gpg_keys')
+              end.not_to exceed_query_limit(control + 1)
             end
           end
         end
@@ -97,7 +117,7 @@ RSpec.describe Admin::CredentialsController do
         end
 
         it 'returns 404' do
-          get :index
+          get admin_credentials_path
 
           expect(response).to have_gitlab_http_status(:not_found)
         end
@@ -106,27 +126,27 @@ RSpec.describe Admin::CredentialsController do
 
     context 'non-admin user' do
       before do
-        sign_in(user)
+        login_as(user)
       end
 
       it 'returns 404' do
-        get :index
+        get admin_credentials_path
 
         expect(response).to have_gitlab_http_status(:not_found)
       end
     end
   end
 
-  describe 'POST #destroy' do
+  describe 'DELETE #destroy' do
     let(:credentials_path) { admin_credentials_path(filter: 'ssh_keys') }
 
-    it_behaves_like 'credentials inventory controller delete SSH key'
+    it_behaves_like 'credentials inventory delete SSH key'
   end
 
   describe 'PUT #revoke' do
     shared_examples_for 'responds with 404' do
       it do
-        put :revoke, params: { id: token_id }
+        put revoke_admin_credential_path(id: token_id)
 
         expect(response).to have_gitlab_http_status(:not_found)
       end
@@ -134,7 +154,7 @@ RSpec.describe Admin::CredentialsController do
 
     shared_examples_for 'displays the flash success message' do
       it do
-        put :revoke, params: { id: token_id }
+        put revoke_admin_credential_path(id: token_id)
 
         expect(response).to redirect_to(admin_credentials_path)
         expect(flash[:notice]).to start_with 'Revoked personal access token '
@@ -143,7 +163,7 @@ RSpec.describe Admin::CredentialsController do
 
     shared_examples_for 'displays the flash error message' do
       it do
-        put :revoke, params: { id: token_id }
+        put revoke_admin_credential_path(id: token_id)
 
         expect(response).to redirect_to(admin_credentials_path)
         expect(flash[:alert]).to eql 'Not permitted to revoke'
@@ -152,7 +172,8 @@ RSpec.describe Admin::CredentialsController do
 
     context 'admin user' do
       before do
-        sign_in(admin)
+        login_as(admin)
+        enable_admin_mode!(admin)
       end
 
       context 'when `credentials_inventory` feature is enabled' do
@@ -198,7 +219,7 @@ RSpec.describe Admin::CredentialsController do
             it 'informs the token owner' do
               expect(CredentialsInventoryMailer).to receive_message_chain(:personal_access_token_revoked_email, :deliver_later)
 
-              put :revoke, params: { id: personal_access_token.id }
+              put revoke_admin_credential_path(id: personal_access_token.id)
             end
           end
         end
@@ -217,12 +238,28 @@ RSpec.describe Admin::CredentialsController do
 
     context 'non-admin user' do
       before do
-        sign_in(user)
+        login_as(user)
       end
 
       let(:token_id) { personal_access_token.id }
 
       it_behaves_like 'responds with 404'
     end
+  end
+end
+
+RSpec.describe Admin::CredentialsController, type: :controller do
+  include AdminModeHelper
+
+  let_it_be(:admin) { create(:admin) }
+
+  before do
+    stub_licensed_features(credentials_inventory: true)
+    sign_in(admin)
+    enable_admin_mode!(admin)
+  end
+
+  it_behaves_like 'tracking unique visits', :index do
+    let(:target_id) { 'i_compliance_credential_inventory' }
   end
 end
