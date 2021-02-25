@@ -12493,9 +12493,6 @@ msgstr ""
 msgid "Failed to load related branches"
 msgstr ""
 
-msgid "Failed to load sidebar confidential toggle"
-msgstr ""
-
 msgid "Failed to load sidebar lock status"
 msgstr ""
 
@@ -27809,6 +27806,9 @@ msgstr ""
 msgid "Something went wrong while resolving this discussion. Please try again."
 msgstr ""
 
+msgid "Something went wrong while setting %{issuableType} confidentiality."
+msgstr ""
+
 msgid "Something went wrong while stopping this environment. Please try again."
 msgstr ""
 
@@ -31500,6 +31500,12 @@ msgstr ""
 msgid "Turn On"
 msgstr ""
 
+msgid "Turn off"
+msgstr ""
+
+msgid "Turn on"
+msgstr ""
+
 msgid "Turn on %{strongStart}usage ping%{strongEnd} to activate analysis of user activity, known as %{docLinkStart}Cohorts%{docLinkEnd}."
 msgstr ""
 
@@ -33802,6 +33808,9 @@ msgid "You are going to transfer %{project_full_name} to another namespace. Are 
 msgstr ""
 
 msgid "You are going to turn off the confidentiality. This means %{strongStart}everyone%{strongEnd} will be able to see and leave a comment on this %{issuableType}."
+msgstr ""
+
+msgid "You are going to turn on confidentiality. Only team members with %{strongStart}at least Reporter access%{strongEnd} will be able to see and leave comments on the %{issuableType}."
 msgstr ""
 
 msgid "You are going to turn on the confidentiality. This means that only team members with %{strongStart}at least Reporter access%{strongEnd} are able to see and leave comments on the %{issuableType}."
