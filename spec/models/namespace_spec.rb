@@ -1502,4 +1502,30 @@ RSpec.describe Namespace do
       it { is_expected.to be(true) }
     end
   end
+
+  context 'behaviour of FactoryBot traits that create associations' do
+    context 'creating a namespace with an associated aggregation_schedule record' do
+      it 'creates only one Namespace record and one Namespace::AggregationSchedule record' do
+        expect { create(:namespace, :with_aggregation_schedule) }
+          .to change { Namespace.count }.by(1)
+          .and change { Namespace::AggregationSchedule.count }.by(1)
+      end
+    end
+
+    context 'creating a namespace with an associated root_storage_statistics record' do
+      it 'creates only one Namespace record and one Namespace::RootStorageStatistics record' do
+        expect { create(:namespace, :with_root_storage_statistics) }
+          .to change { Namespace.count }.by(1)
+          .and change { Namespace::RootStorageStatistics.count }.by(1)
+      end
+    end
+
+    context 'creating a namespace with an associated namespace_settings record' do
+      it 'creates only one Namespace record and one NamespaceSetting record' do
+        expect { create(:namespace, :with_namespace_settings) }
+          .to change { Namespace.count }.by(1)
+          .and change { NamespaceSetting.count }.by(1)
+      end
+    end
+  end
 end
