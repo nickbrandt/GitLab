@@ -78,6 +78,14 @@ RSpec.describe 'get list of epic boards' do
         assert_field_value('id', [global_id_of(list3), global_id_of(list1), global_id_of(list2)])
         assert_field_value('collapsed', [false, true, false])
       end
+
+      it 'returns the correct values for count' do
+        create_list(:epic, 2, group: group) # epics in backlog, the list which is returned first
+
+        post_graphql(pagination_query, current_user: current_user)
+
+        assert_field_value('epicsCount', [2, 0, 0])
+      end
     end
   end
 
