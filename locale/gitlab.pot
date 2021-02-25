@@ -8884,6 +8884,9 @@ msgstr ""
 msgid "Credentials"
 msgstr ""
 
+msgid "CredentialsInventory|GPG Keys"
+msgstr ""
+
 msgid "CredentialsInventory|No credentials found"
 msgstr ""
 
