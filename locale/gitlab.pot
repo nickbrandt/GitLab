@@ -9785,7 +9785,7 @@ msgstr ""
 msgid "DeleteValueStream|'%{name}' Value Stream deleted"
 msgstr ""
 
-msgid "DeleteValueStream|Are you sure you want to delete \"%{name}\" Value Stream?"
+msgid "DeleteValueStream|Are you sure you want to delete the \"%{name}\" Value Stream?"
 msgstr ""
 
 msgid "DeleteValueStream|Delete %{name}"
@@ -14922,6 +14922,9 @@ msgstr ""
 msgid "Hi %{username}!"
 msgstr ""
 
+msgid "Hide"
+msgstr ""
+
 msgid "Hide archived projects"
 msgstr ""
 
@@ -19571,6 +19574,9 @@ msgstr ""
 msgid "Move"
 msgstr ""
 
+msgid "Move down"
+msgstr ""
+
 msgid "Move issue"
 msgstr ""
 
@@ -19587,6 +19593,9 @@ msgid "Move test case"
 msgstr ""
 
 msgid "Move this issue to another project."
+msgstr ""
+
+msgid "Move up"
 msgstr ""
 
 msgid "MoveIssue|Cannot move issue due to insufficient permissions!"
