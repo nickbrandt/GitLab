@@ -1,5 +1,5 @@
 <script>
-import { GlIcon, GlEmptyState, GlLoadingIcon } from '@gitlab/ui';
+import { GlIcon, GlEmptyState, GlLoadingIcon, GlSprintf } from '@gitlab/ui';
 import Cookies from 'js-cookie';
 import { deprecatedCreateFlash as Flash } from '~/flash';
 import { __ } from '~/locale';
@@ -19,6 +19,7 @@ export default {
     GlIcon,
     GlEmptyState,
     GlLoadingIcon,
+    GlSprintf,
     banner,
     'stage-issue-component': stageComponent,
     'stage-plan-component': stageComponent,
@@ -64,12 +65,6 @@ export default {
     },
   },
   created() {
-    // Conditional check placed here to prevent this method from being called on the
-    // new Value Stream Analytics page (i.e. the new page will be initialized blank and only
-    // after a group is selected the cycle analyitcs data will be fetched). Once the
-    // old (current) page has been removed this entire created method as well as the
-    // variable itself can be completely removed.
-    // Follow up issue: https://gitlab.com/gitlab-org/gitlab-foss/issues/64490
     this.fetchCycleAnalyticsData();
   },
   methods: {
@@ -138,6 +133,10 @@ export default {
       Cookies.set(OVERVIEW_DIALOG_COOKIE, '1', { expires: 365 });
     },
   },
+  dayRangeOptions: [7, 30, 90],
+  i18n: {
+    dropdownText: __('Last %{days} days'),
+  },
 };
 </script>
 <template>
@@ -155,25 +154,19 @@ export default {
             <div class="js-ca-dropdown dropdown inline">
               <button class="dropdown-menu-toggle" data-toggle="dropdown" type="button">
                 <span class="dropdown-label">
-                  {{ n__('Last %d day', 'Last %d days', startDate) }}
+                  <gl-sprintf :message="$options.i18n.dropdownText">
+                    <template #days>{{ startDate }}</template>
+                  </gl-sprintf>
                   <gl-icon name="chevron-down" class="dropdown-menu-toggle-icon gl-top-3" />
                 </span>
               </button>
               <ul class="dropdown-menu dropdown-menu-right">
-                <li>
-                  <a href="#" @click.prevent="handleDateSelect(7)">{{
-                    n__('Last %d day', 'Last %d days', 7)
-                  }}</a>
-                </li>
-                <li>
-                  <a href="#" @click.prevent="handleDateSelect(30)">{{
-                    n__('Last %d day', 'Last %d days', 30)
-                  }}</a>
-                </li>
-                <li>
-                  <a href="#" @click.prevent="handleDateSelect(90)">{{
-                    n__('Last %d day', 'Last %d days', 90)
-                  }}</a>
+                <li v-for="days in $options.dayRangeOptions" :key="`day-range-${days}`">
+                  <a href="#" @click.prevent="handleDateSelect(days)">
+                    <gl-sprintf :message="$options.i18n.dropdownText">
+                      <template #days>{{ days }}</template>
+                    </gl-sprintf>
+                  </a>
                 </li>
               </ul>
             </div>
@@ -186,7 +179,7 @@ export default {
             <nav class="col-headers">
               <ul>
                 <li class="stage-header pl-5">
-                  <span class="stage-name.font-weight-bold">{{
+                  <span class="stage-name font-weight-bold">{{
                     s__('ProjectLifecycle|Stage')
                   }}</span>
                   <span
@@ -199,7 +192,7 @@ export default {
                   </span>
                 </li>
                 <li class="median-header">
-                  <span class="stage-name.font-weight-bold">{{ __('Median') }}</span>
+                  <span class="stage-name font-weight-bold">{{ __('Median') }}</span>
                   <span
                     class="has-tooltip"
                     data-placement="top"
@@ -216,7 +209,7 @@ export default {
                 <li class="event-header pl-3">
                   <span
                     v-if="currentStage && currentStage.legend"
-                    class="stage-name.font-weight-bold"
+                    class="stage-name font-weight-bold"
                     >{{ currentStage ? __(currentStage.legend) : __('Related Issues') }}</span
                   >
                   <span
@@ -231,7 +224,7 @@ export default {
                   </span>
                 </li>
                 <li class="total-time-header pr-5 text-right">
-                  <span class="stage-name.font-weight-bold">{{ __('Time') }}</span>
+                  <span class="stage-name font-weight-bold">{{ __('Time') }}</span>
                   <span
                     class="has-tooltip"
                     data-placement="top"
@@ -250,7 +243,7 @@ export default {
               <ul>
                 <stage-nav-item
                   v-for="stage in state.stages"
-                  :key="`ca-stage-title-${stage.title}`"
+                  :key="stage.title"
                   :title="stage.title"
                   :is-user-allowed="stage.isUserAllowed"
                   :value="stage.value"
