@@ -898,20 +898,20 @@
     stylelint-declaration-strict-value "1.7.7"
     stylelint-scss "3.18.0"
 
-"@gitlab/svgs@1.182.0":
-  version "1.182.0"
-  resolved "https://registry.yarnpkg.com/@gitlab/svgs/-/svgs-1.182.0.tgz#600cb577c598ff63325c3f6f049e3254abdbb580"
-  integrity sha512-hV6Hkd92bNyzGm2awdwtyXVjT71QZkfAMVV9qHg9fhu5swA4qLrxzXpYBBfeY3/e2KJIByVfROP8tSFws0R6Kw==
+"@gitlab/svgs@1.183.0":
+  version "1.183.0"
+  resolved "https://registry.yarnpkg.com/@gitlab/svgs/-/svgs-1.183.0.tgz#58a3f49d2355531bfc073f35cbd71855b4a0f9da"
+  integrity sha512-cOcFlgmTkRhfljT+0arKFtkYMLFMXLk0q74WtMqb9YFRtuPmthqfH0zZd47XZ2yFTSvbEJfcyAXXrPIuX8f8Rg==
 
 "@gitlab/tributejs@1.0.0":
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@gitlab/tributejs/-/tributejs-1.0.0.tgz#672befa222aeffc83e7d799b0500a7a4418e59b8"
   integrity sha512-nmKw1+hB6MHvlmPz63yPwVs1qQkycHwsKgxpEbzmky16Y6mL4EJMk3w1b8QlOAF/AIAzjCERPhe/R4MJiohbZw==
 
-"@gitlab/ui@27.7.1":
-  version "27.7.1"
-  resolved "https://registry.yarnpkg.com/@gitlab/ui/-/ui-27.7.1.tgz#e62a9a8d96a5f0e61f09fdbbe1771027caaa7aa4"
-  integrity sha512-LRmP2SD73NT9ntvKw1pJShPP6DmjCBmu+mBSZiAj535AGpA+GoQcyi+PTXY12nUjnsPwulaFOOhvFPo8IeFm2Q==
+"@gitlab/ui@27.14.0":
+  version "27.14.0"
+  resolved "https://registry.yarnpkg.com/@gitlab/ui/-/ui-27.14.0.tgz#f80c11df3650380f66aa763867afa32d1901d407"
+  integrity sha512-cQaMN4pjcV0lCic3w1eiZUru9kV8XHwI3ZRT3LOWoBRQEbK0r3qv71SNKzEGDOtVPYq+WBl0/PRDlThk9H+CAg==
   dependencies:
     "@babel/standalone" "^7.0.0"
     "@gitlab/vue-toasted" "^1.3.0"
@@ -919,7 +919,7 @@
     copy-to-clipboard "^3.0.8"
     dompurify "^2.2.6"
     echarts "^4.9.0"
-    highlight.js "^9.13.1"
+    highlight.js "^10.6.0"
     js-beautify "^1.8.8"
     lodash "^4.17.20"
     portal-vue "^2.1.6"
@@ -5923,7 +5923,12 @@ he@^1.1.0, he@^1.1.1, he@^1.2.0:
   resolved "https://registry.yarnpkg.com/he/-/he-1.2.0.tgz#84ae65fa7eafb165fddb61566ae14baf05664f0f"
   integrity sha512-F/1DnUGPopORZi0ni+CvrCgHQ5FyEAHRLSApuYWMmrbSwoN2Mn/7k+Gl38gJnR7yyDZk6WLXwiGod1JOWNDKGw==
 
-highlight.js@^9.13.1, highlight.js@~9.13.0:
+highlight.js@^10.6.0:
+  version "10.6.0"
+  resolved "https://registry.yarnpkg.com/highlight.js/-/highlight.js-10.6.0.tgz#0073aa71d566906965ba6e1b7be7b2682f5e18b6"
+  integrity sha512-8mlRcn5vk/r4+QcqerapwBYTe+iPL5ih6xrNylxrnBdHQiijDETfXX7VIxC3UiCRiINBJfANBAsPzAvRQj8RpQ==
+
+highlight.js@~9.13.0:
   version "9.13.1"
   resolved "https://registry.yarnpkg.com/highlight.js/-/highlight.js-9.13.1.tgz#054586d53a6863311168488a0f58d6c505ce641e"
   integrity sha512-Sc28JNQNDzaH6PORtRLMvif9RSn1mYuOoX3omVjnb0+HbpPygU2ALBI0R/wsiqCb4/fcp07Gdo8g+fhtFrQl6A==
