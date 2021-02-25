@@ -13746,6 +13746,9 @@ msgstr ""
 msgid "GitHub import"
 msgstr ""
 
+msgid "GitHubImporter|*Merged by: %{author} at %{timestamp}*"
+msgstr ""
+
 msgid "GitLab"
 msgstr ""
 
