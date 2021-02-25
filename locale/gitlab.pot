@@ -23447,9 +23447,6 @@ msgstr ""
 msgid "Pipeline|Duration"
 msgstr ""
 
-msgid "Pipeline|Existing branch name or tag"
-msgstr ""
-
 msgid "Pipeline|Failed"
 msgstr ""
 
@@ -23492,9 +23489,6 @@ msgstr ""
 msgid "Pipeline|Raw text search is not currently supported. Please use the available search tokens."
 msgstr ""
 
-msgid "Pipeline|Run for"
-msgstr ""
-
 msgid "Pipeline|Run for branch name or tag"
 msgstr ""
 
@@ -23504,16 +23498,10 @@ msgstr ""
 msgid "Pipeline|Running"
 msgstr ""
 
-msgid "Pipeline|Search branches"
-msgstr ""
-
 msgid "Pipeline|Skipped"
 msgstr ""
 
 msgid "Pipeline|Specify variable values to be used in this run. The values specified in %{linkStart}CI/CD settings%{linkEnd} will be used by default."
-msgstr ""
-
-msgid "Pipeline|Specify variable values to be used in this run. The values specified in %{settings_link} will be used by default."
 msgstr ""
 
 msgid "Pipeline|Stages"

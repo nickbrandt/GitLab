@@ -657,17 +657,12 @@ RSpec.describe 'Pipelines', :js do
       let(:project) { create(:project, :repository) }
 
       before do
-        stub_feature_flags(new_pipeline_form: false)
         visit new_project_pipeline_path(project)
       end
 
       context 'for valid commit', :js do
         before do
           click_button project.default_branch
-
-          page.within '.dropdown-menu' do
-            click_link 'master'
-          end
         end
 
         context 'with gitlab-ci.yml' do
@@ -676,21 +671,31 @@ RSpec.describe 'Pipelines', :js do
           end
 
           it 'creates a new pipeline' do
-            expect { click_on 'Run pipeline' }
+            expect do
+              click_on 'Run Pipeline'
+              wait_for_requests
+            end
               .to change { Ci::Pipeline.count }.by(1)
+
+            wait_for_requests
 
             expect(Ci::Pipeline.last).to be_web
           end
 
           context 'when variables are specified' do
             it 'creates a new pipeline with variables' do
-              page.within '.ci-variable-row-body' do
-                fill_in "Input variable key", with: "key_name"
-                fill_in "Input variable value", with: "value"
+              page.within(all("[data-testid='ci-variable-row']")[0]) do
+                find("[data-testid='pipeline-form-ci-variable-key']").set('key_name')
+                find("[data-testid='pipeline-form-ci-variable-value']").set('value')
               end
 
-              expect { click_on 'Run pipeline' }
+              expect do
+                click_on 'Run Pipeline'
+                wait_for_requests
+              end
                 .to change { Ci::Pipeline.count }.by(1)
+
+              wait_for_requests
 
               expect(Ci::Pipeline.last.variables.map { |var| var.slice(:key, :secret_value) })
                 .to eq [{ key: "key_name", secret_value: "value" }.with_indifferent_access]
@@ -700,7 +705,8 @@ RSpec.describe 'Pipelines', :js do
 
         context 'without gitlab-ci.yml' do
           before do
-            click_on 'Run pipeline'
+            click_on 'Run Pipeline'
+            wait_for_requests
           end
 
           it { expect(page).to have_content('Missing CI config file') }
@@ -709,13 +715,28 @@ RSpec.describe 'Pipelines', :js do
 
             stub_ci_pipeline_to_return_yaml_file
 
-            page.within '.dropdown-menu' do
-              click_link 'master'
+            expect do
+              click_on 'Run Pipeline'
+              wait_for_requests
             end
-
-            expect { click_on 'Run pipeline' }
               .to change { Ci::Pipeline.count }.by(1)
           end
+        end
+      end
+    end
+
+    describe 'Run Pipelines' do
+      let(:project) { create(:project, :repository) }
+
+      before do
+        visit new_project_pipeline_path(project)
+      end
+
+      describe 'new pipeline page' do
+        it 'has field to add a new pipeline' do
+          expect(page).to have_selector("[data-testid='ref-select']")
+          expect(find("[data-testid='ref-select']")).to have_content project.default_branch
+          expect(page).to have_content('Run for')
         end
       end
     end
