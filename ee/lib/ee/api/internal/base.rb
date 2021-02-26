@@ -39,7 +39,11 @@ module EE
 
               return { success: false, message: 'Two-factor authentication is not enabled for this user' } unless user.two_factor_enabled?
 
-              otp_validation_result = ::Users::ValidateOtpService.new(user).execute(params.fetch(:otp_attempt))
+              if params.fetch(:push_auth)
+                otp_validation_result = ::Users::ValidateOtpService.new(user).pushauth
+              else
+                otp_validation_result = ::Users::ValidateOtpService.new(user).execute(params.fetch(:otp_attempt))
+              end
 
               if otp_validation_result[:status] == :success
                 ::Gitlab::Auth::Otp::SessionEnforcer.new(actor.key).update_session
