@@ -2,7 +2,7 @@
   .modal-dialog
     .modal-content
       = form_tag import_csv_namespace_project_issues_path, multipart: true do
-        .modal-header.gl-display-flex
+        .modal-header
           %h4.gl-m-0
             = _('Import issues')
           %a.close{ href: '#', 'data-dismiss' => 'modal' } ×
