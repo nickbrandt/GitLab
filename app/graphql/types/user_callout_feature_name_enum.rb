@@ -3,10 +3,10 @@
 module Types
   class UserCalloutFeatureNameEnum < BaseEnum
     graphql_name 'UserCalloutFeatureNameEnum'
-    description 'Name of the feature that the callout is for'
+    description 'Name of the feature that the callout is for.'
 
     ::UserCallout.feature_names.keys.each do |feature_name|
-      value feature_name.upcase, value: feature_name
+      value feature_name.upcase, value: feature_name, description: "Callout feature name for #{feature_name}."
     end
   end
 end
