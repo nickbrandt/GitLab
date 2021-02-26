@@ -23,12 +23,37 @@ module Gitlab
             error(ex.message)
           end
 
+          def pushauth
+            body = { username: user.username }
+
+            response = Gitlab::HTTP.post(
+              pushauth_url,
+              headers: { 'Content-Type': 'application/json' },
+              body: body.to_json,
+              basic_auth: api_credentials)
+
+            # Successful authentication results in HTTP 200: OK
+            # https://docs.fortinet.com/document/fortiauthenticator/6.2.1/rest-api-solution-guide/943094/push-authentication-pushauth
+            response.ok? ? success : error_from_response(response)
+          rescue StandardError => ex
+            Gitlab::AppLogger.error(ex)
+            error(ex.message)
+          end
+
           private
 
           def auth_url
             host = ::Gitlab.config.forti_authenticator.host
             port = ::Gitlab.config.forti_authenticator.port
             path = 'api/v1/auth/'
+
+            "https://#{host}:#{port}/#{path}"
+          end
+
+          def pushauth_url
+            host = ::Gitlab.config.forti_authenticator.host
+            port = ::Gitlab.config.forti_authenticator.port
+            path = 'api/v1/pushauth/'
 
             "https://#{host}:#{port}/#{path}"
           end

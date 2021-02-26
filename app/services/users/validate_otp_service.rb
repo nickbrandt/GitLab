@@ -15,6 +15,13 @@ module Users
                   end
     end
 
+    def pushauth
+      strategy.pushauth
+    rescue StandardError => ex
+      Gitlab::ErrorTracking.log_exception(ex)
+      error(message: ex.message)
+    end
+
     def execute(otp_code)
       strategy.validate(otp_code)
     rescue StandardError => ex
