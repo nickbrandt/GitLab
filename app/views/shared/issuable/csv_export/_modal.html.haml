@@ -3,7 +3,7 @@
   .modal.issuable-export-modal{ class: class_name }
     .modal-dialog
       .modal-content{ data: { qa_selector: "export_issuable_modal" } }
-        .modal-header.gl-display-flex
+        .modal-header
           %h4.gl-m-0
             = _("Export %{issuable_type}" % { issuable_type: issuable_type.humanize(capitalize: false) })
           %button.close{ type: "button", "data-dismiss": "modal", "aria-label" => _('Close') }
