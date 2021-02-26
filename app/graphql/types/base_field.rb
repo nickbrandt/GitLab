@@ -22,6 +22,8 @@ module Types
 
       # We want to avoid the overhead of this in prod
       extension ::Gitlab::Graphql::CallsGitaly::FieldExtension if Gitlab.dev_or_test_env?
+
+      extension ::Gitlab::Graphql::Present::FieldExtension
     end
 
     def may_call_gitaly?
