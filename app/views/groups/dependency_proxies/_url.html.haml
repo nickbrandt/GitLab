@@ -1,6 +1,4 @@
--# The namespace path can include uppercase letters, which
--# Docker doesn't allow. The proxy expects it to be downcased.
-- proxy_url = "#{group_url(@group).downcase}#{DependencyProxy::URL_SUFFIX}"
+- proxy_url = group_dependency_proxy_url(@group)
 
 %h5.prepend-top-20= _('Dependency proxy URL')
 

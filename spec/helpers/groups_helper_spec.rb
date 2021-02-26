@@ -23,6 +23,13 @@ RSpec.describe GroupsHelper do
     end
   end
 
+  describe 'group_dependency_proxy_url' do
+    it 'converts uppercase letters to lowercase' do
+      group = create(:group, path: 'GroupWithUPPERcaseLetters')
+      expect(group_dependency_proxy_url(group)).to end_with("/groupwithuppercaseletters#{DependencyProxy::URL_SUFFIX}")
+    end
+  end
+
   describe 'group_lfs_status' do
     let(:group) { create(:group) }
     let!(:project) { create(:project, namespace_id: group.id) }
