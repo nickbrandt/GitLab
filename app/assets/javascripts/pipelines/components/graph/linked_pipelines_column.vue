@@ -3,7 +3,12 @@ import getPipelineDetails from 'shared_queries/pipelines/get_pipeline_details.qu
 import { LOAD_FAILURE } from '../../constants';
 import { ONE_COL_WIDTH, UPSTREAM } from './constants';
 import LinkedPipeline from './linked_pipeline.vue';
-import { unwrapPipelineData, toggleQueryPollingByVisibility, reportToSentry } from './utils';
+import {
+  getQueryHeaders,
+  reportToSentry,
+  toggleQueryPollingByVisibility,
+  unwrapPipelineData
+} from './utils';
 
 export default {
   components: {
@@ -14,6 +19,13 @@ export default {
     columnTitle: {
       type: String,
       required: true,
+    },
+    configPaths: {
+      type: Object,
+      required: true,
+      validator: function(value) {
+        return Object.keys(value).includes('graphqlResourceEtag');
+      }
     },
     linkedPipelines: {
       type: Array,
@@ -73,16 +85,7 @@ export default {
         query: getPipelineDetails,
         pollInterval: 10000,
         context() {
-          return {
-            fetchOptions: {
-              method: 'GET',
-            },
-            headers: {
-              'X-GITLAB-GRAPHQL-FEATURE-CORRELATION': 'verify/ci/pipeline-graph',
-              'X-GITLAB-GRAPHQL-RESOURCE-ETAG': this.graphqlResourceEtag,
-              'X-REQUESTED_WITH': 'XMLHttpRequest',
-            },
-          }
+          return getQueryHeaders(this.configPaths.graphqlResourceEtag);
         },
         variables() {
           return {
@@ -187,6 +190,7 @@ export default {
               v-if="isExpanded(pipeline.id)"
               :type="type"
               class="d-inline-block gl-mt-n2"
+              :config-paths="configPaths"
               :pipeline="currentPipeline"
               :is-linked-pipeline="true"
             />

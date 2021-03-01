@@ -4,7 +4,12 @@ import getPipelineDetails from 'shared_queries/pipelines/get_pipeline_details.qu
 import { __ } from '~/locale';
 import { DEFAULT, DRAW_FAILURE, LOAD_FAILURE } from '../../constants';
 import PipelineGraph from './graph_component.vue';
-import { unwrapPipelineData, toggleQueryPollingByVisibility, reportToSentry } from './utils';
+import {
+  getQueryHeaders,
+  reportToSentry,
+  toggleQueryPollingByVisibility,
+  unwrapPipelineData
+} from './utils';
 
 export default {
   name: 'PipelineGraphWrapper',
@@ -14,6 +19,9 @@ export default {
     PipelineGraph,
   },
   inject: {
+    graphqlResourceEtag: {
+      default: '',
+    },
     metricsPath: {
       default: '',
     },
@@ -21,9 +29,6 @@ export default {
       default: '',
     },
     pipelineProjectPath: {
-      default: '',
-    },
-    graphqlResourceEtag: {
       default: '',
     },
   },
@@ -42,16 +47,7 @@ export default {
   apollo: {
     pipeline: {
       context() {
-        return {
-          fetchOptions: {
-            method: 'GET',
-          },
-          headers: {
-            'X-GITLAB-GRAPHQL-FEATURE-CORRELATION': 'verify/ci/pipeline-graph',
-            'X-GITLAB-GRAPHQL-RESOURCE-ETAG': this.graphqlResourceEtag,
-            'X-REQUESTED_WITH': 'XMLHttpRequest',
-          },
-        };
+        return getQueryHeaders(this.graphqlResourceEtag);
       },
       query: getPipelineDetails,
       pollInterval: 10000,
@@ -88,6 +84,12 @@ export default {
             variant: 'danger',
           };
       }
+    },
+    configPaths(){
+      return {
+        graphqlResourceEtag: this.graphqlResourceEtag,
+        metricsPath: this.metricsPath,
+      };
     },
     showLoadingIcon() {
       /*
@@ -126,7 +128,7 @@ export default {
     <gl-loading-icon v-if="showLoadingIcon" class="gl-mx-auto gl-my-4" size="lg" />
     <pipeline-graph
       v-if="pipeline"
-      :metrics-path="metricsPath"
+      :config-paths="configPaths"
       :pipeline="pipeline"
       @error="reportFailure"
       @refreshPipelineGraph="refreshPipelineGraph"

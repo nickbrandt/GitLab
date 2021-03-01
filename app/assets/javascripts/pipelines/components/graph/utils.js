@@ -10,6 +10,39 @@ const addMulti = (mainPipelineProjectPath, linkedPipeline) => {
   };
 };
 
+const getQueryHeaders = (etagResource) => {
+  return {
+    fetchOptions: {
+      method: 'GET',
+    },
+    headers: {
+      'X-GITLAB-GRAPHQL-FEATURE-CORRELATION': 'verify/ci/pipeline-graph',
+      'X-GITLAB-GRAPHQL-RESOURCE-ETAG': etagResource,
+      'X-REQUESTED_WITH': 'XMLHttpRequest',
+    },
+  };
+};
+
+const reportToSentry = (component, failureType) => {
+  Sentry.withScope((scope) => {
+    scope.setTag('component', component);
+    Sentry.captureException(failureType);
+  });
+};
+
+const toggleQueryPollingByVisibility = (queryRef, interval = 10000) => {
+  const stopStartQuery = (query) => {
+    if (!Visibility.hidden()) {
+      query.startPolling(interval);
+    } else {
+      query.stopPolling();
+    }
+  };
+
+  stopStartQuery(queryRef);
+  Visibility.change(stopStartQuery.bind(null, queryRef));
+};
+
 const transformId = (linkedPipeline) => {
   return { ...linkedPipeline, id: getIdFromGraphQLId(linkedPipeline.id) };
 };
@@ -42,24 +75,4 @@ const unwrapPipelineData = (mainPipelineProjectPath, data) => {
   };
 };
 
-const toggleQueryPollingByVisibility = (queryRef, interval = 10000) => {
-  const stopStartQuery = (query) => {
-    if (!Visibility.hidden()) {
-      query.startPolling(interval);
-    } else {
-      query.stopPolling();
-    }
-  };
-
-  stopStartQuery(queryRef);
-  Visibility.change(stopStartQuery.bind(null, queryRef));
-};
-
-export { unwrapPipelineData, toggleQueryPollingByVisibility };
-
-export const reportToSentry = (component, failureType) => {
-  Sentry.withScope((scope) => {
-    scope.setTag('component', component);
-    Sentry.captureException(failureType);
-  });
-};
+export { getQueryHeaders, reportToSentry, toggleQueryPollingByVisibility, unwrapPipelineData };
