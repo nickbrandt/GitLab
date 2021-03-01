@@ -110,7 +110,7 @@ $selection-summary-height: 68px;
     @include sticky-top-positioning($security-filter-height + $selection-summary-height);
   }
 
-  tr:hover .js-description {
+  tr:hover .vulnerability-title {
     text-decoration: underline;
   }
 }
