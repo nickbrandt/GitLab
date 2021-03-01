@@ -33870,6 +33870,9 @@ msgstr ""
 msgid "You are not allowed to unlink your primary login account"
 msgstr ""
 
+msgid "You are not authorized to delete this site profile"
+msgstr ""
+
 msgid "You are not authorized to perform this action"
 msgstr ""
 
