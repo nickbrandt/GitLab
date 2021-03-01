@@ -7,11 +7,13 @@ class AddIsRemovedToOncallParticipant < ActiveRecord::Migration[6.0]
 
   def up
     with_lock_retries do
-      add_column :incident_management_oncall_participants, :is_removed, :boolean, default: false
+      add_column :incident_management_oncall_participants, :is_removed, :boolean, default: false, null: false
     end
   end
 
   def down
-    remove_column :incident_management_oncall_participants, :is_removed
+    with_lock_retries do
+      remove_column :incident_management_oncall_participants, :is_removed
+    end
   end
 end

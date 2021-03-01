@@ -13234,7 +13234,7 @@ CREATE TABLE incident_management_oncall_participants (
     user_id bigint NOT NULL,
     color_palette smallint NOT NULL,
     color_weight smallint NOT NULL,
-    is_removed boolean DEFAULT false
+    is_removed boolean DEFAULT false NOT NULL
 );
 
 CREATE SEQUENCE incident_management_oncall_participants_id_seq
