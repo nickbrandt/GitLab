@@ -18,6 +18,9 @@ import availableNamespacesQuery from '../graphql/queries/available_namespaces.qu
 import bulkImportSourceGroupsQuery from '../graphql/queries/bulk_import_source_groups.query.graphql';
 import ImportTableRow from './import_table_row.vue';
 
+const PAGE_SIZES = [20, 50, 100];
+const DEFAULT_PAGE_SIZE = PAGE_SIZES[0];
+
 export default {
   components: {
     GlEmptyState,
@@ -47,7 +50,7 @@ export default {
     return {
       filter: '',
       page: 1,
-      perPage: 20,
+      perPage: DEFAULT_PAGE_SIZE,
     };
   },
 
@@ -132,7 +135,7 @@ export default {
     },
   },
 
-  PAGE_SIZES: [20, 50, 100],
+  PAGE_SIZES,
 };
 </script>
 
