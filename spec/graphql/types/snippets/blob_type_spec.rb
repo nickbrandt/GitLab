@@ -27,11 +27,10 @@ RSpec.describe GitlabSchema.types['SnippetBlob'] do
   specify { expect(described_class.fields['externalStorage'].type).not_to be_non_null }
   specify { expect(described_class.fields['renderedAsText'].type).to be_non_null }
 
-  let_it_be(:snippet) { create(:snippet, :public, :repository) }
+  let_it_be(:blob) { create(:snippet, :public, :repository).blobs.first }
 
   described_class.fields.each_value do |field|
     it "resolves #{field.graphql_name} using the presenter", :request_store do
-      blob = Snippet.find(snippet.id).blobs.first
       presented = SnippetBlobPresenter.new(blob)
 
       expect(resolve_field(field, blob)).to eq(presented.try(field.method_sym))

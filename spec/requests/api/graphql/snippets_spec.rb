@@ -6,7 +6,6 @@ RSpec.describe 'snippets' do
   include GraphqlHelpers
 
   let_it_be(:current_user) { create(:user) }
-
   let_it_be(:snippets) { create_list(:personal_snippet, 3, :repository, author: current_user) }
 
   describe 'querying for all fields' do
@@ -26,7 +25,7 @@ RSpec.describe 'snippets' do
 
   describe 'snippet_blob_content' do
     let_it_be(:query_file) do
-      Pathname.new(Rails.root.join('app/graphql/queries/snippet/snippet_blob_content.query.graphql'))
+      Rails.root.join('app/graphql/queries/snippet/snippet_blob_content.query.graphql')
     end
 
     it 'can query for rich snippet blob content' do
