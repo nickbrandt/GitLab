@@ -6,6 +6,12 @@ info: To determine the technical writer assigned to the Stage/Group associated w
 
 # Share Projects with other Groups
 
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/247208) in GitLab 13.10.
+> - It's [deployed behind a feature flag](../../feature_flags.md), enabled by default.
+> - It's enabled on GitLab.com.
+> - It's recommended for production use.
+> - For GitLab self-managed instances, ask a GitLab administrator to [enable it](#enable-or-disable-project-sharing).
+
 You can share projects with other [groups](../../group/index.md). This makes it
 possible to add a group of users to a project with a single action.
 
@@ -63,3 +69,22 @@ a project with another group](../members/share_project_with_groups.md).
 This allows for tighter control over project access.
 
 Learn more about [Share with group lock](../../group/index.md#share-with-group-lock).
+
+### Enable or disable project sharing
+
+Project sharing with groups is under development but ready for production use. It is
+deployed behind a feature flag that is **enabled by default**.
+[GitLab administrators with access to the GitLab Rails console](../../../administration/feature_flags.md)
+can opt to disable it.
+
+To enable it:
+
+```ruby
+Feature.enable(:invite_members_group_modal)
+```
+
+To disable it:
+
+```ruby
+Feature.disable(:invite_members_group_modal)
+```
