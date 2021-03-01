@@ -109,4 +109,8 @@ $selection-summary-height: 68px;
   thead.below-selection-summary th {
     @include sticky-top-positioning($security-filter-height + $selection-summary-height);
   }
+
+  tr:hover .js-description {
+    text-decoration: underline;
+  }
 }
