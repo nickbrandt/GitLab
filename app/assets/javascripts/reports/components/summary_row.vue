@@ -49,18 +49,9 @@ export default {
     },
     rowClasses() {
       if (!this.nestedSummary) {
-        return ['report-block-list-issue', 'report-block-list-issue-parent'];
+        return ['gl-px-5'];
       }
-      return [
-        'gl-display-flex',
-        'gl-pl-7',
-        'gl-py-3',
-        'gl-pr-3',
-        'gl-border-t-solid',
-        'gl-border-t-gray-100',
-        'gl-border-t-1',
-        { 'gl-bg-gray-10': this.statusIcon === ICON_WARNING },
-      ];
+      return ['gl-pl-7', 'gl-pr-5', { 'gl-bg-gray-10': this.statusIcon === ICON_WARNING }];
     },
     statusIconSize() {
       if (!this.nestedSummary) {
@@ -72,7 +63,10 @@ export default {
 };
 </script>
 <template>
-  <div class="gl-align-items-center" :class="rowClasses">
+  <div
+    class="gl-border-t-solid gl-border-t-gray-100 gl-border-t-1 gl-py-3 gl-display-flex gl-align-items-center"
+    :class="rowClasses"
+  >
     <div class="gl-mr-3">
       <gl-loading-icon
         v-if="statusIcon === 'loading'"
