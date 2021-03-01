@@ -430,6 +430,9 @@ msgid_plural "%{count} issues selected"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "%{count} items per page"
+msgstr ""
+
 msgid "%{count} merge request selected"
 msgid_plural "%{count} merge requests selected"
 msgstr[0] ""
@@ -1191,6 +1194,9 @@ msgid "1-9 contributions"
 msgstr ""
 
 msgid "10-19 contributions"
+msgstr ""
+
+msgid "1000+"
 msgstr ""
 
 msgid "1st contribution!"
@@ -5128,6 +5134,9 @@ msgstr ""
 msgid "BulkImport|No parent"
 msgstr ""
 
+msgid "BulkImport|Showing %{start}-%{end} of %{total}"
+msgstr ""
+
 msgid "BulkImport|Showing %{start}-%{end} of %{total} from %{link}"
 msgstr ""
 
@@ -8551,6 +8560,9 @@ msgstr ""
 msgid "Create a merge request"
 msgstr ""
 
+msgid "Create a new %{codeStart}.gitlab-ci.yml%{codeEnd} file at the root of the repository to get started."
+msgstr ""
+
 msgid "Create a new branch"
 msgstr ""
 
@@ -9062,6 +9074,18 @@ msgid "CustomizeHomepageBanner|This page shows a list of your projects by defaul
 msgstr ""
 
 msgid "Cycle Time"
+msgstr ""
+
+msgid "CycleAnalyticsEvent|%{label_reference} label was added to the issue"
+msgstr ""
+
+msgid "CycleAnalyticsEvent|%{label_reference} label was added to the merge request"
+msgstr ""
+
+msgid "CycleAnalyticsEvent|%{label_reference} label was removed from the issue"
+msgstr ""
+
+msgid "CycleAnalyticsEvent|%{label_reference} label was removed from the merge request"
 msgstr ""
 
 msgid "CycleAnalyticsEvent|Issue closed"
@@ -17399,6 +17423,9 @@ msgid_plural "Last %d days"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "Last %{days} days"
+msgstr ""
+
 msgid "Last 2 weeks"
 msgstr ""
 
@@ -18869,6 +18896,9 @@ msgid "MergeRequests|started a thread on an outdated change in commit %{linkStar
 msgstr ""
 
 msgid "MergeRequests|started a thread on commit %{linkStart}%{commitDisplay}%{linkEnd}"
+msgstr ""
+
+msgid "MergeRequest|Approved by @%{username}"
 msgstr ""
 
 msgid "MergeRequest|Compare %{target} and %{source}"
@@ -21214,6 +21244,9 @@ msgstr ""
 msgid "OperationsDashboard|The operations dashboard provides a summary of each project's operational health, including pipeline and alert statuses."
 msgstr ""
 
+msgid "Optimize your workflow with CI/CD Pipelines"
+msgstr ""
+
 msgid "Optional"
 msgstr ""
 
@@ -22085,9 +22118,6 @@ msgid "Pipelines|There are currently no finished pipelines."
 msgstr ""
 
 msgid "Pipelines|There are currently no pipelines."
-msgstr ""
-
-msgid "Pipelines|There is no %{filePath} file in this repository, please add one and visit the Pipeline Editor again."
 msgstr ""
 
 msgid "Pipelines|There was an error fetching the pipelines. Try again in a few moments or contact your support team."

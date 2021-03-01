@@ -1244,12 +1244,22 @@ Represents a DAST Profile.
 
 | Field | Type | Description |
 | ----- | ---- | ----------- |
+| `branch` | DastProfileBranch | The associated branch. Will always return `null` if `dast_branch_selection` feature flag is disabled. |
 | `dastScannerProfile` | DastScannerProfile | The associated scanner profile. |
 | `dastSiteProfile` | DastSiteProfile | The associated site profile. |
 | `description` | String | The description of the scan. |
 | `editPath` | String | Relative web path to the edit page of a profile. |
 | `id` | DastProfileID! | ID of the profile. |
 | `name` | String | The name of the profile. |
+
+### DastProfileBranch
+
+Represents a DAST Profile Branch.
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `exists` | Boolean | Indicates whether or not the branch exists. |
+| `name` | String | The name of the branch. |
 
 ### DastProfileCreatePayload
 
