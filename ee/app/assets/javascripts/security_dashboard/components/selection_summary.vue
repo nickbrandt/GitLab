@@ -1,5 +1,5 @@
 <script>
-import { GlButton, GlAlert } from '@gitlab/ui';
+import { GlButton, GlAlert, GlFormInput } from '@gitlab/ui';
 import vulnerabilityStateMutations from 'ee/security_dashboard/graphql/mutate_vulnerability_state';
 import { __, s__, n__ } from '~/locale';
 import toast from '~/vue_shared/plugins/global_toast';
@@ -10,6 +10,7 @@ export default {
   components: {
     GlButton,
     GlAlert,
+    GlFormInput,
     StatusDropdown,
   },
   props: {
@@ -20,6 +21,7 @@ export default {
   },
   data() {
     return {
+      comment: '',
       updateErrorText: null,
       selectedStatus: null,
       selectedStatusPayload: undefined,
@@ -90,6 +92,7 @@ export default {
       n__('%d vulnerability updated', '%d vulnerabilities updated', count),
     vulnerabilitiesUpdateFailed: (vulnIds) =>
       s__(`SecurityReports|Failed updating vulnerabilities with the following IDs: ${vulnIds}`),
+    reasonForStatusChange: s__('SecurityReports|Reason for status change...'),
   },
 };
 </script>
@@ -108,8 +111,15 @@ export default {
             ><b>{{ selectedVulnerabilitiesCount }}</b> {{ $options.i18n.selected }}</span
           >
         </div>
-        <div class="gl-flex-fill-1 gl-ml-6 gl-mr-4">
+        <div class="gl-display-flex gl-flex-fill-1 gl-ml-6 gl-mr-4">
           <status-dropdown @change="handleStatusDropdownChange" />
+          <gl-form-input
+            v-if="selectedStatus"
+            class="gl-flex-grow gl-flex-fill-1 gl-w-auto gl-ml-4"
+            v-model="comment"
+            :placeholder="$options.i18n.reasonForStatusChange"
+            autofocus
+          />
         </div>
         <template v-if="shouldShowActionButtons">
           <gl-button type="button" class="gl-mr-4" @click="resetSelected">
