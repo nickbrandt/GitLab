@@ -138,6 +138,20 @@ eos
     ).execute
   end
 
+  def update_file_in_repo(
+    project, start_branch, branch_name, filename, content,
+        commit_message: 'Edit content')
+    Files::UpdateService.new(
+      project,
+      project.owner,
+      commit_message: commit_message,
+      start_branch: start_branch,
+      branch_name: branch_name,
+      file_path: filename,
+      file_content: content
+    ).execute
+  end
+
   def commit_options(repo, index, target, ref, message)
     options = {}
     options[:tree] = index.write_tree(repo)
