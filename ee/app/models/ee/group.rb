@@ -484,7 +484,6 @@ module EE
 
     def execute_subgroup_hooks(event)
       return unless subgroup?
-      return unless parent.group? # TODO: Remove this after fixing https://gitlab.com/gitlab-org/gitlab/-/issues/301013
       return unless feature_available?(:group_webhooks)
 
       run_after_commit do

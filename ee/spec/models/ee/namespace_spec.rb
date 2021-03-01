@@ -222,12 +222,13 @@ RSpec.describe Namespace do
 
     describe '.eligible_for_subscription' do
       let_it_be(:namespace) { create :namespace }
-      let_it_be(:sub_namespace) { create(:namespace, parent: namespace) }
+      let_it_be(:group) { create :group }
+      let_it_be(:subgroup) { create(:group, parent: group) }
 
       subject { described_class.eligible_for_subscription.ids }
 
       context 'when there is no subscription' do
-        it { is_expected.to eq([namespace.id]) }
+        it { is_expected.to contain_exactly(group.id, namespace.id) }
       end
 
       context 'when there is a subscription' do
@@ -238,28 +239,31 @@ RSpec.describe Namespace do
             context 'and has not yet been trialed' do
               before do
                 create :gitlab_subscription, plan, namespace: namespace
-                create :gitlab_subscription, plan, namespace: sub_namespace
+                create :gitlab_subscription, plan, namespace: group
+                create :gitlab_subscription, plan, namespace: subgroup
               end
 
-              it { is_expected.to eq([namespace.id]) }
+              it { is_expected.to contain_exactly(group.id, namespace.id) }
             end
 
             context 'but has already had a trial' do
               before do
-                create :gitlab_subscription, plan, :expired_trial, namespace: namespace
-                create :gitlab_subscription, plan, :expired_trial, namespace: sub_namespace
+                create :gitlab_subscription, plan, namespace: namespace
+                create :gitlab_subscription, plan, :expired_trial, namespace: group
+                create :gitlab_subscription, plan, :expired_trial, namespace: subgroup
               end
 
-              it { is_expected.to eq([namespace.id]) }
+              it { is_expected.to contain_exactly(group.id, namespace.id) }
             end
 
             context 'but is currently being trialed' do
               before do
-                create :gitlab_subscription, plan, :active_trial, namespace: namespace
-                create :gitlab_subscription, plan, :active_trial, namespace: sub_namespace
+                create :gitlab_subscription, plan, namespace: namespace
+                create :gitlab_subscription, plan, :active_trial, namespace: group
+                create :gitlab_subscription, plan, :active_trial, namespace: subgroup
               end
 
-              it { is_expected.to eq([namespace.id]) }
+              it { is_expected.to contain_exactly(group.id, namespace.id) }
             end
           end
         end
@@ -277,10 +281,11 @@ RSpec.describe Namespace do
           with_them do
             before do
               create :gitlab_subscription, plan_name, :active_trial, namespace: namespace
-              create :gitlab_subscription, plan_name, :active_trial, namespace: sub_namespace
+              create :gitlab_subscription, plan_name, :active_trial, namespace: group
+              create :gitlab_subscription, plan_name, :active_trial, namespace: subgroup
             end
 
-            it { is_expected.to eq([namespace.id]) }
+            it { is_expected.to contain_exactly(group.id, namespace.id) }
           end
         end
 
@@ -291,6 +296,7 @@ RSpec.describe Namespace do
             context 'and has not yet been trialed' do
               before do
                 create :gitlab_subscription, plan, namespace: namespace
+                create :gitlab_subscription, plan, namespace: group
               end
 
               it { is_expected.to be_empty }
@@ -366,22 +372,23 @@ RSpec.describe Namespace do
     describe '#validate_shared_runner_minutes_support' do
       context 'when changing :shared_runners_minutes_limit' do
         before do
-          namespace.shared_runners_minutes_limit = 100
+          group.shared_runners_minutes_limit = 100
         end
 
-        context 'when group is subgroup' do
-          let_it_be(:root_ancestor) { create(:group) }
-          let(:namespace) { create(:namespace, parent: root_ancestor) }
+        context 'when group is a subgroup' do
+          let(:group) { create(:group, :nested) }
 
           it 'is invalid' do
-            expect(namespace).not_to be_valid
-            expect(namespace.errors[:shared_runners_minutes_limit]).to include('is not supported for this namespace')
+            expect(group).not_to be_valid
+            expect(group.errors[:shared_runners_minutes_limit]).to include('is not supported for this namespace')
           end
         end
 
         context 'when group is root' do
+          let(:group) { create(:group) }
+
           it 'is valid' do
-            expect(namespace).to be_valid
+            expect(group).to be_valid
           end
         end
       end
@@ -702,49 +709,54 @@ RSpec.describe Namespace do
         allow(Gitlab).to receive(:com?).and_return(true)
       end
 
-      context 'when namespace has a subscription associated' do
-        before do
-          create(:gitlab_subscription, namespace: namespace, hosted_plan: ultimate_plan, start_date: start_date)
-        end
+      context 'for personal namespaces' do
+        context 'when namespace has a subscription associated' do
+          before do
+            create(:gitlab_subscription, namespace: namespace, hosted_plan: ultimate_plan, start_date: start_date)
+          end
 
-        context 'when this subscription was purchased before EoA rollout (legacy)' do
-          let(:start_date) { GitlabSubscription::EOA_ROLLOUT_DATE.to_date - 3.days }
+          context 'when this subscription was purchased before EoA rollout (legacy)' do
+            let(:start_date) { GitlabSubscription::EOA_ROLLOUT_DATE.to_date - 3.days }
 
-          it 'returns the legacy plan from the subscription' do
-            expect(namespace.actual_plan).to eq(ultimate_plan)
-            expect(namespace.gitlab_subscription).to be_present
+            it 'returns the legacy plan from the subscription' do
+              expect(namespace.actual_plan).to eq(ultimate_plan)
+              expect(namespace.gitlab_subscription).to be_present
+            end
+          end
+
+          context 'when this subscription was purchase after EoA rollout (new plan)' do
+            let(:start_date) { GitlabSubscription::EOA_ROLLOUT_DATE.to_date + 3.days }
+
+            it 'returns the new plan from the subscription' do
+              expect(namespace.actual_plan).to be_an_instance_of(Subscriptions::NewPlanPresenter)
+              expect(namespace.gitlab_subscription).to be_present
+            end
           end
         end
 
-        context 'when this subscription was purchase after EoA rollout (new plan)' do
-          let(:start_date) { GitlabSubscription::EOA_ROLLOUT_DATE.to_date + 3.days }
-
-          it 'returns the new plan from the subscription' do
-            expect(namespace.actual_plan).to be_an_instance_of(Subscriptions::NewPlanPresenter)
+        context 'when namespace does not have a subscription associated' do
+          it 'generates a subscription and returns free plan' do
+            expect(namespace.actual_plan).to eq(Plan.free)
             expect(namespace.gitlab_subscription).to be_present
+          end
+
+          context 'when free plan does exist' do
+            before do
+              free_plan
+            end
+
+            it 'generates a subscription' do
+              expect(namespace.actual_plan).to eq(free_plan)
+              expect(namespace.gitlab_subscription).to be_present
+            end
           end
         end
       end
 
-      context 'when namespace does not have a subscription associated' do
-        it 'generates a subscription and returns free plan' do
-          expect(namespace.actual_plan).to eq(Plan.free)
-          expect(namespace.gitlab_subscription).to be_present
-        end
-
-        context 'when free plan does exist' do
-          before do
-            free_plan
-          end
-
-          it 'generates a subscription' do
-            expect(namespace.actual_plan).to eq(free_plan)
-            expect(namespace.gitlab_subscription).to be_present
-          end
-        end
-
-        context 'when namespace is a subgroup with a parent' do
-          let(:subgroup) { create(:namespace, parent: namespace) }
+      context 'for groups' do
+        context 'when the group is a subgroup with a parent' do
+          let(:parent) { create(:group) }
+          let(:subgroup) { create(:group, parent: parent) }
 
           context 'when free plan does exist' do
             before do
@@ -757,9 +769,9 @@ RSpec.describe Namespace do
             end
           end
 
-          context 'when namespace has a subscription associated' do
+          context 'when parent group has a subscription associated' do
             before do
-              create(:gitlab_subscription, namespace: namespace, hosted_plan: ultimate_plan)
+              create(:gitlab_subscription, namespace: parent, hosted_plan: ultimate_plan)
             end
 
             it 'returns the plan from the subscription' do
@@ -784,38 +796,43 @@ RSpec.describe Namespace do
         allow(Gitlab).to receive(:com?).and_return(true)
       end
 
-      context 'when namespace has a subscription associated' do
-        before do
-          create(:gitlab_subscription, namespace: namespace, hosted_plan: ultimate_plan)
-        end
-
-        it 'returns an associated plan name' do
-          expect(namespace.actual_plan_name).to eq 'ultimate'
-        end
-      end
-
-      context 'when namespace does not have subscription associated' do
-        it 'returns a free plan name' do
-          expect(namespace.actual_plan_name).to eq 'free'
-        end
-      end
-
-      context 'when namespace is a subgroup with a parent' do
-        let(:subgroup) { create(:namespace, parent: namespace) }
-
+      context 'for personal namespaces' do
         context 'when namespace has a subscription associated' do
           before do
             create(:gitlab_subscription, namespace: namespace, hosted_plan: ultimate_plan)
           end
 
           it 'returns an associated plan name' do
-            expect(subgroup.actual_plan_name).to eq 'ultimate'
+            expect(namespace.actual_plan_name).to eq 'ultimate'
           end
         end
 
         context 'when namespace does not have subscription associated' do
           it 'returns a free plan name' do
-            expect(subgroup.actual_plan_name).to eq 'free'
+            expect(namespace.actual_plan_name).to eq 'free'
+          end
+        end
+      end
+
+      context 'for groups' do
+        context 'when the group is a subgroup with a parent' do
+          let(:parent) { create(:group) }
+          let(:subgroup) { create(:group, parent: parent) }
+
+          context 'when parent group has a subscription associated' do
+            before do
+              create(:gitlab_subscription, namespace: parent, hosted_plan: ultimate_plan)
+            end
+
+            it 'returns an associated plan name' do
+              expect(subgroup.actual_plan_name).to eq 'ultimate'
+            end
+          end
+
+          context 'when parent group does not have subscription associated' do
+            it 'returns a free plan name' do
+              expect(subgroup.actual_plan_name).to eq 'free'
+            end
           end
         end
       end
@@ -1584,46 +1601,64 @@ RSpec.describe Namespace do
   end
 
   describe '#closest_gitlab_subscription' do
-    subject { namespace.closest_gitlab_subscription }
+    subject { group.closest_gitlab_subscription }
 
     context 'when there is a root ancestor' do
-      let(:namespace) { create(:namespace, parent: root) }
+      let(:group) { create(:group, parent: root) }
 
       context 'when root has a subscription' do
-        let(:root) { create(:namespace_with_plan) }
+        let(:root) { create(:group_with_plan) }
 
         it { is_expected.to be_a(GitlabSubscription) }
       end
 
       context 'when root has no subscription' do
-        let(:root) { create(:namespace) }
+        let(:root) { create(:group) }
 
         it { is_expected.to be_nil }
       end
     end
 
     context 'when there is no root ancestor' do
-      context 'has a subscription' do
-        let(:namespace) { create(:namespace_with_plan) }
+      context 'for groups' do
+        context 'has a subscription' do
+          let(:group) { create(:group_with_plan) }
 
-        it { is_expected.to be_a(GitlabSubscription) }
+          it { is_expected.to be_a(GitlabSubscription) }
+        end
+
+        context 'it has no subscription' do
+          let(:group) { create(:group) }
+
+          it { is_expected.to be_nil }
+        end
       end
 
-      context 'it has no subscription' do
-        let(:namespace) { create(:namespace) }
+      context 'for personal namespaces' do
+        subject { namespace.closest_gitlab_subscription }
 
-        it { is_expected.to be_nil }
+        context 'has a subscription' do
+          let(:namespace) { create(:namespace_with_plan) }
+
+          it { is_expected.to be_a(GitlabSubscription) }
+        end
+
+        context 'it has no subscription' do
+          let(:namespace) { create(:namespace) }
+
+          it { is_expected.to be_nil }
+        end
       end
     end
   end
 
   describe '#namespace_limit' do
-    let(:namespace) { create(:namespace, parent: parent) }
+    let(:group) { create(:group, parent: parent) }
 
-    subject(:namespace_limit) { namespace.namespace_limit }
+    subject(:namespace_limit) { group.namespace_limit }
 
     context 'when there is a parent namespace' do
-      let_it_be(:parent) { create(:namespace) }
+      let_it_be(:parent) { create(:group) }
 
       context 'with a namespace limit' do
         it 'returns the parent namespace limit' do
@@ -1645,19 +1680,43 @@ RSpec.describe Namespace do
     context 'when there is no parent ancestor' do
       let(:parent) { nil }
 
-      context 'with a namespace limit' do
-        it 'returns the namespace limit' do
-          limit = create(:namespace_limit, namespace: namespace)
+      context 'for personal namespaces' do
+        let(:namespace) { create(:namespace, parent: parent) }
 
-          expect(namespace_limit).to be_persisted
-          expect(namespace_limit).to eq limit
+        subject(:namespace_limit) { namespace.namespace_limit }
+
+        context 'with a namespace limit' do
+          it 'returns the namespace limit' do
+            limit = create(:namespace_limit, namespace: namespace)
+
+            expect(namespace_limit).to be_persisted
+            expect(namespace_limit).to eq limit
+          end
+        end
+
+        context 'with no namespace limit' do
+          it 'builds namespace limit' do
+            expect(namespace_limit).to be_present
+            expect(namespace_limit).not_to be_persisted
+          end
         end
       end
 
-      context 'with no namespace limit' do
-        it 'builds namespace limit' do
-          expect(namespace_limit).to be_present
-          expect(namespace_limit).not_to be_persisted
+      context 'for groups' do
+        context 'with a namespace limit' do
+          it 'returns the namespace limit' do
+            limit = create(:namespace_limit, namespace: group)
+
+            expect(namespace_limit).to be_persisted
+            expect(namespace_limit).to eq limit
+          end
+        end
+
+        context 'with no namespace limit' do
+          it 'builds namespace limit' do
+            expect(namespace_limit).to be_present
+            expect(namespace_limit).not_to be_persisted
+          end
         end
       end
     end
