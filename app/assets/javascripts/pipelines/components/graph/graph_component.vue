@@ -19,7 +19,9 @@ export default {
       type: Object,
       required: true,
       validator(value) {
-        return Object.keys(value).includes('graphqlResourceEtag');
+        return (
+          Object.keys(value).includes('graphqlResourceEtag') && value.graphqlResourceEtag.length > 0
+        );
       },
     },
     pipeline: {
