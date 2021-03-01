@@ -46,13 +46,11 @@ RSpec.describe Resolvers::LabelsResolver do
       end
     end
 
-    context 'at project level' do
+    context 'with a parent project' do
       before_all do
         group.add_developer(current_user)
       end
 
-      # because :include_ancestor_groups, :include_descendant_groups, :only_group_labels default to false
-      # the `nil` value would be equivalent to passing in `false` so just check for `nil` option
       # the expected result is wrapped in a lambda to get around the phase restrictions of RSpec::Parameterized
       where(:include_ancestor_groups, :search_term, :expected_labels) do
         nil   | nil   | -> { [label1, label2, subgroup_label1, subgroup_label2] }
