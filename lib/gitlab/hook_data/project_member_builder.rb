@@ -5,6 +5,25 @@ module Gitlab
     class ProjectMemberBuilder < BaseBuilder
       alias_method :project_member, :object
 
+      # Sample data
+
+      # {
+      #   :event_name=>"user_add_to_team",
+      #   :project_name=>"GitLab Project",
+      #   :project_path=>"gitlab",
+      #   :project_path_with_namespace=>"namespace/gitlab",
+      #   :project_id=>1,
+      #   :user_username=>"robert",
+      #   :user_name=>"Robert Mills",
+      #   :user_email=>"robert@example.com",
+      #   :user_id=>14,
+      #   :acess_level=>"Developer",
+      #   :project_visibility=>"internal",
+      #   :created_at=>"2020-11-04T10:12:10Z",
+      #   :updated_at=>"2020-11-04T10:12:10Z",
+      #   :expires_at=>"2020-12-04T10:12:10Z"
+      # }
+
       def build(event)
         [
           timestamps_data,
