@@ -23,12 +23,14 @@ describe('IssueDueDate', () => {
     }
   });
 
+  const findDueDateCollapsed = () => wrapper.findByTestId('due-date-collapsed');
   const findDueDateValue = () => wrapper.findByTestId('due-date-value');
 
   describe('when dueDate is null', () => {
     it('renders "None" as value', () => {
       createComponent();
 
+      expect(findDueDateCollapsed().text()).toBe('None');
       expect(findDueDateValue().text()).toBe('None');
     });
   });
@@ -45,6 +47,7 @@ describe('IssueDueDate', () => {
         },
       });
 
+      expect(findDueDateCollapsed().text()).toBe('Feb 14, 2021');
       expect(findDueDateValue().text()).toBe('Feb 14, 2021 (Past due)');
     });
   });
@@ -61,6 +64,7 @@ describe('IssueDueDate', () => {
         },
       });
 
+      expect(findDueDateCollapsed().text()).toBe('Feb 14, 2021');
       expect(findDueDateValue().text()).toBe('Feb 14, 2021');
     });
   });

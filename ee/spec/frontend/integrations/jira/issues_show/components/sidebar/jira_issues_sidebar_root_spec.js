@@ -38,24 +38,21 @@ describe('JiraIssuesSidebar', () => {
   it('renders Labels block', () => {
     createComponent();
 
-    expect(findLabelsSelect().exists()).toBe(true);
-    expect(findLabelsSelect().props('selectedLabels')).toEqual(mockJiraIssue.labels);
+    expect(findLabelsSelect().props('selectedLabels')).toBe(mockJiraIssue.labels);
   });
 
   it('renders Assignee block', () => {
     createComponent();
     const assignee = findAssignee();
 
-    expect(assignee.exists()).toBe(true);
-    expect(assignee.props('assignee')).toEqual(mockJiraIssue.assignees[0]);
+    expect(assignee.props('assignee')).toBe(mockJiraIssue.assignees[0]);
   });
 
   it('renders IssueDueDate', () => {
     createComponent();
     const dueDate = findIssueDueDate();
 
-    expect(dueDate.exists()).toBe(true);
-    expect(dueDate.props('dueDate')).toEqual(mockJiraIssue.dueDate);
+    expect(dueDate.props('dueDate')).toBe(mockJiraIssue.dueDate);
   });
 
   describe('when references.relative is null', () => {

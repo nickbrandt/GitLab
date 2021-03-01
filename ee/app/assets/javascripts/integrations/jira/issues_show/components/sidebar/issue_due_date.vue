@@ -55,7 +55,11 @@ export default {
 
 <template>
   <div class="block">
-    <div v-gl-tooltip.html="dueDateTooltipProps" class="sidebar-collapsed-icon">
+    <div
+      v-gl-tooltip.html="dueDateTooltipProps"
+      class="sidebar-collapsed-icon"
+      data-testid="due-date-collapsed"
+    >
       <gl-icon name="calendar" />
       <span v-if="dueDate">{{ dueDateInWords }}</span>
       <span v-else>{{ $options.i18n.none }}</span>
