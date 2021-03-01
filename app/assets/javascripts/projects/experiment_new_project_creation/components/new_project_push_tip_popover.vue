@@ -1,5 +1,5 @@
 <script>
-import { GlPopover, GlFormInputGroup, GlFormInput } from '@gitlab/ui';
+import { GlPopover, GlFormInputGroup } from '@gitlab/ui';
 import { __ } from '~/locale';
 import ClipboardButton from '~/vue_shared/components/clipboard_button.vue';
 
@@ -8,7 +8,6 @@ export default {
     GlPopover,
     GlFormInputGroup,
     ClipboardButton,
-    GlFormInput,
   },
   inject: ['pushToCreateProjectCommand', 'workingWithProjectsHelpPath'],
   props: {
@@ -39,14 +38,13 @@ export default {
       </label>
     </p>
     <p>
-      <gl-form-input-group>
-        <gl-form-input
-          id="push-to-create-tip"
-          class="monospace js-select-on-focus"
-          readonly
-          :value="pushToCreateProjectCommand"
-          :aria-label="$options.i18n.commandInputAriaLabel"
-        />
+      <gl-form-input-group
+        id="push-to-create-tip"
+        :value="pushToCreateProjectCommand"
+        readonly
+        select-on-click
+        :aria-label="$options.i18n.commandInputAriaLabel"
+      >
         <template #append>
           <clipboard-button
             :text="pushToCreateProjectCommand"

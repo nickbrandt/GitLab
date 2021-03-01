@@ -1,4 +1,4 @@
-import { GlPopover, GlFormInputGroup, GlFormInput } from '@gitlab/ui';
+import { GlPopover, GlFormInputGroup } from '@gitlab/ui';
 import { shallowMount } from '@vue/test-utils';
 import NewProjectPushTipPopover from '~/projects/experiment_new_project_creation/components/new_project_push_tip_popover.vue';
 import ClipboardButton from '~/vue_shared/components/clipboard_button.vue';
@@ -11,7 +11,7 @@ describe('New project push tip popover', () => {
 
   const findPopover = () => wrapper.findComponent(GlPopover);
   const findClipboardButton = () => wrapper.findComponent(ClipboardButton);
-  const findFormInput = () => wrapper.findComponent(GlFormInput);
+  const findFormInput = () => wrapper.findComponent(GlFormInputGroup);
   const findHelpLink = () => wrapper.find('a');
   const findTarget = () => document.getElementById(targetId);
 
@@ -49,11 +49,14 @@ describe('New project push tip popover', () => {
   });
 
   it('renders a readonly form input with the push to create command', () => {
-    expect(findFormInput().attributes()).toMatchObject({
+    expect(findFormInput().props()).toMatchObject({
       value: pushToCreateProjectCommand,
-      readonly: '',
+      selectOnClick: true,
     });
-    expect(findFormInput().classes()).toContain('js-select-on-focus');
+    expect(findFormInput().attributes()).toMatchObject({
+      'aria-label': 'Push project from command line',
+      readonly: 'readonly',
+    });
   });
 
   it('allows copying the push command using the clipboard button', () => {
