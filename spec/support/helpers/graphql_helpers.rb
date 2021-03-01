@@ -259,6 +259,17 @@ module GraphqlHelpers
     ::Gitlab::Utils::MergeHash.merge(Array.wrap(variables).map(&:to_h)).to_json
   end
 
+  def new_resolver(resolved_value = 'Resolved value', method: :resolve)
+    case resolved_value
+    when :resolve
+      simple_resolver(resolved_value)
+    when :find_object
+      find_object_resolver(resolved_value)
+    else
+      raise "Cannot build a resolver for #{method}"
+    end
+  end
+
   def simple_resolver(resolved_value = 'Resolved value')
     Class.new(Resolvers::BaseResolver) do
       define_method :resolve do |**_args|
