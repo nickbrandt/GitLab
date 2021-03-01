@@ -10,6 +10,7 @@ const addMulti = (mainPipelineProjectPath, linkedPipeline) => {
   };
 };
 
+/* eslint-disable @gitlab/require-i18n-strings */
 const getQueryHeaders = (etagResource) => {
   return {
     fetchOptions: {
@@ -22,6 +23,7 @@ const getQueryHeaders = (etagResource) => {
     },
   };
 };
+/* eslint-enable @gitlab/require-i18n-strings */
 
 const reportToSentry = (component, failureType) => {
   Sentry.withScope((scope) => {

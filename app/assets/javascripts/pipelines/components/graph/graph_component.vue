@@ -18,9 +18,9 @@ export default {
     configPaths: {
       type: Object,
       required: true,
-      validator: function(value) {
+      validator(value) {
         return Object.keys(value).includes('graphqlResourceEtag');
-      }
+      },
     },
     pipeline: {
       type: Object,

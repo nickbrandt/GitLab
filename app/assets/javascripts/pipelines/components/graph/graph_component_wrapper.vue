@@ -8,7 +8,7 @@ import {
   getQueryHeaders,
   reportToSentry,
   toggleQueryPollingByVisibility,
-  unwrapPipelineData
+  unwrapPipelineData,
 } from './utils';
 
 export default {
@@ -85,7 +85,7 @@ export default {
           };
       }
     },
-    configPaths(){
+    configPaths() {
       return {
         graphqlResourceEtag: this.graphqlResourceEtag,
         metricsPath: this.metricsPath,
