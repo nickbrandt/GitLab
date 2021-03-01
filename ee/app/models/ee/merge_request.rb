@@ -271,7 +271,7 @@ module EE
     end
 
     def security_reports_up_to_date?
-      project.latest_pipeline_with_security_reports(only_successful: true) == project.all_pipelines.newest_first(ref: target_branch).take
+      project.security_reports_up_to_date_for_ref?(target_branch)
     end
 
     private
