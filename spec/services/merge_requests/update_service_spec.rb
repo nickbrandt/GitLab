@@ -48,6 +48,8 @@ RSpec.describe MergeRequests::UpdateService, :mailer do
     end
 
     context 'valid params' do
+      let(:locked) { true }
+
       let(:opts) do
         {
           title: 'New title',
@@ -58,7 +60,7 @@ RSpec.describe MergeRequests::UpdateService, :mailer do
           label_ids: [label.id],
           target_branch: 'target',
           force_remove_source_branch: '1',
-          discussion_locked: true
+          discussion_locked: locked
         }
       end
 
@@ -118,26 +120,54 @@ RSpec.describe MergeRequests::UpdateService, :mailer do
           MergeRequests::UpdateService.new(project, user, opts).execute(draft_merge_request)
         end
 
-        it 'tracks discussion locking' do
-          merge_request.update!(discussion_locked: false)
+        context 'when MR is locked' do
+          context 'when locked again' do
+            it 'does not track discussion locking' do
+              expect(Gitlab::UsageDataCounters::MergeRequestActivityUniqueCounter)
+                .not_to receive(:track_discussion_locked_action)
 
-          expect(Gitlab::UsageDataCounters::MergeRequestActivityUniqueCounter)
-            .to receive(:track_discussion_locked_action).once.with(user: user)
+              opts[:discussion_locked] = true
 
-          opts[:discussion_locked] = true
+              MergeRequests::UpdateService.new(project, user, opts).execute(merge_request)
+            end
+          end
 
-          MergeRequests::UpdateService.new(project, user, opts).execute(merge_request)
+          context 'when unlocked' do
+            it 'tracks dicussion unlocking' do
+              expect(Gitlab::UsageDataCounters::MergeRequestActivityUniqueCounter)
+                .to receive(:track_discussion_unlocked_action).once.with(user: user)
+
+              opts[:discussion_locked] = false
+
+              MergeRequests::UpdateService.new(project, user, opts).execute(merge_request)
+            end
+          end
         end
 
-        it 'tracks dicussion unlocking' do
-          merge_request.update!(discussion_locked: true)
+        context 'when MR is unlocked' do
+          let(:locked) { false }
 
-          expect(Gitlab::UsageDataCounters::MergeRequestActivityUniqueCounter)
-            .to receive(:track_discussion_unlocked_action).once.with(user: user)
+          context 'when unlocked again' do
+            it 'does not track discussion unlocking' do
+              expect(Gitlab::UsageDataCounters::MergeRequestActivityUniqueCounter)
+                .not_to receive(:track_discussion_unlocked_action)
 
-          opts[:discussion_locked] = false
+              opts[:discussion_locked] = false
 
-          MergeRequests::UpdateService.new(project, user, opts).execute(merge_request)
+              MergeRequests::UpdateService.new(project, user, opts).execute(merge_request)
+            end
+          end
+
+          context 'when locked' do
+            it 'tracks dicussion locking' do
+              expect(Gitlab::UsageDataCounters::MergeRequestActivityUniqueCounter)
+                .to receive(:track_discussion_locked_action).once.with(user: user)
+
+              opts[:discussion_locked] = true
+
+              MergeRequests::UpdateService.new(project, user, opts).execute(merge_request)
+            end
+          end
         end
       end
 
