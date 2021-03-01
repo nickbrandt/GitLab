@@ -4920,24 +4920,24 @@ Values for sorting alerts.
 
 | Value | Description |
 | ----- | ----------- |
-| `CREATED_ASC` | Created at ascending order |
-| `CREATED_DESC` | Created at descending order |
-| `CREATED_TIME_ASC` | Created time by ascending order |
-| `CREATED_TIME_DESC` | Created time by descending order |
-| `ENDED_AT_ASC` | End time by ascending order |
-| `ENDED_AT_DESC` | End time by descending order |
-| `EVENT_COUNT_ASC` | Events count by ascending order |
-| `EVENT_COUNT_DESC` | Events count by descending order |
-| `SEVERITY_ASC` | Severity from less critical to more critical |
-| `SEVERITY_DESC` | Severity from more critical to less critical |
-| `STARTED_AT_ASC` | Start time by ascending order |
-| `STARTED_AT_DESC` | Start time by descending order |
-| `STATUS_ASC` | Status by order: Ignored > Resolved > Acknowledged > Triggered |
-| `STATUS_DESC` | Status by order: Triggered > Acknowledged > Resolved > Ignored |
-| `UPDATED_ASC` | Updated at ascending order |
-| `UPDATED_DESC` | Updated at descending order |
-| `UPDATED_TIME_ASC` | Created time by ascending order |
-| `UPDATED_TIME_DESC` | Created time by descending order |
+| `CREATED_ASC` | Created at ascending order. |
+| `CREATED_DESC` | Created at descending order. |
+| `CREATED_TIME_ASC` | Created time by ascending order. |
+| `CREATED_TIME_DESC` | Created time by descending order. |
+| `ENDED_AT_ASC` | End time by ascending order. |
+| `ENDED_AT_DESC` | End time by descending order. |
+| `EVENT_COUNT_ASC` | Events count by ascending order. |
+| `EVENT_COUNT_DESC` | Events count by descending order. |
+| `SEVERITY_ASC` | Severity from less critical to more critical. |
+| `SEVERITY_DESC` | Severity from more critical to less critical. |
+| `STARTED_AT_ASC` | Start time by ascending order. |
+| `STARTED_AT_DESC` | Start time by descending order. |
+| `STATUS_ASC` | Status by order: Ignored > Resolved > Acknowledged > Triggered. |
+| `STATUS_DESC` | Status by order: Triggered > Acknowledged > Resolved > Ignored. |
+| `UPDATED_ASC` | Updated at ascending order. |
+| `UPDATED_DESC` | Updated at descending order. |
+| `UPDATED_TIME_ASC` | Created time by ascending order. |
+| `UPDATED_TIME_DESC` | Created time by descending order. |
 | `created_asc` **{warning-solid}** | **Deprecated:** Use CREATED_ASC. Deprecated in 13.5. |
 | `created_desc` **{warning-solid}** | **Deprecated:** Use CREATED_DESC. Deprecated in 13.5. |
 | `updated_asc` **{warning-solid}** | **Deprecated:** Use UPDATED_ASC. Deprecated in 13.5. |
@@ -4949,8 +4949,8 @@ Filters the alerts based on given domain.
 
 | Value | Description |
 | ----- | ----------- |
-| `operations` | Alerts for operations domain |
-| `threat_monitoring` | Alerts for threat monitoring domain |
+| `operations` | Alerts for operations domain. |
+| `threat_monitoring` | Alerts for threat monitoring domain. |
 
 ### AlertManagementIntegrationType
 
@@ -4958,8 +4958,8 @@ Values of types of integrations.
 
 | Value | Description |
 | ----- | ----------- |
-| `HTTP` | Integration with any monitoring tool |
-| `PROMETHEUS` | Prometheus integration |
+| `HTTP` | Integration with any monitoring tool. |
+| `PROMETHEUS` | Prometheus integration. |
 
 ### AlertManagementPayloadAlertFieldName
 
@@ -4984,9 +4984,9 @@ Values for alert field types used in the custom mapping.
 
 | Value | Description |
 | ----- | ----------- |
-| `ARRAY` | Array field type |
-| `DATETIME` | DateTime field type |
-| `STRING` | String field type |
+| `ARRAY` | Array field type. |
+| `DATETIME` | DateTime field type. |
+| `STRING` | String field type. |
 
 ### AlertManagementSeverity
 
@@ -5046,8 +5046,8 @@ Values for YAML processor result.
 
 | Value | Description |
 | ----- | ----------- |
-| `INVALID` | The configuration file is not valid |
-| `VALID` | The configuration file is valid |
+| `INVALID` | The configuration file is not valid. |
+| `VALID` | The configuration file is valid. |
 
 ### CommitActionMode
 
@@ -5055,18 +5055,18 @@ Mode of a commit action.
 
 | Value | Description |
 | ----- | ----------- |
-| `CHMOD` | Chmod command |
-| `CREATE` | Create command |
-| `DELETE` | Delete command |
-| `MOVE` | Move command |
-| `UPDATE` | Update command |
+| `CHMOD` | Chmod command. |
+| `CREATE` | Create command. |
+| `DELETE` | Delete command. |
+| `MOVE` | Move command. |
+| `UPDATE` | Update command. |
 
 ### CommitEncoding
 
 | Value | Description |
 | ----- | ----------- |
-| `BASE64` | Base64 encoding |
-| `TEXT` | Text encoding |
+| `BASE64` | Base64 encoding. |
+| `TEXT` | Text encoding. |
 
 ### ContainerExpirationPolicyCadenceEnum
 
@@ -5115,12 +5115,12 @@ Values for sorting container repositories.
 
 | Value | Description |
 | ----- | ----------- |
-| `CREATED_ASC` | Created at ascending order |
-| `CREATED_DESC` | Created at descending order |
-| `NAME_ASC` | Name by ascending order |
-| `NAME_DESC` | Name by descending order |
-| `UPDATED_ASC` | Updated at ascending order |
-| `UPDATED_DESC` | Updated at descending order |
+| `CREATED_ASC` | Created at ascending order. |
+| `CREATED_DESC` | Created at descending order. |
+| `NAME_ASC` | Name by ascending order. |
+| `NAME_DESC` | Name by descending order. |
+| `UPDATED_ASC` | Updated at ascending order. |
+| `UPDATED_DESC` | Updated at descending order. |
 | `created_asc` **{warning-solid}** | **Deprecated:** Use CREATED_ASC. Deprecated in 13.5. |
 | `created_desc` **{warning-solid}** | **Deprecated:** Use CREATED_DESC. Deprecated in 13.5. |
 | `updated_asc` **{warning-solid}** | **Deprecated:** Use UPDATED_ASC. Deprecated in 13.5. |
@@ -5146,18 +5146,18 @@ Status of a container repository.
 
 | Value | Description |
 | ----- | ----------- |
-| `FAILED_VALIDATION` | Site validation process finished but failed |
-| `INPROGRESS_VALIDATION` | Site validation process is in progress |
-| `NONE` | No site validation exists |
-| `PASSED_VALIDATION` | Site validation process finished successfully |
-| `PENDING_VALIDATION` | Site validation process has not started |
+| `FAILED_VALIDATION` | Site validation process finished but failed. |
+| `INPROGRESS_VALIDATION` | Site validation process is in progress. |
+| `NONE` | No site validation exists. |
+| `PASSED_VALIDATION` | Site validation process finished successfully. |
+| `PENDING_VALIDATION` | Site validation process has not started. |
 
 ### DastSiteValidationStrategyEnum
 
 | Value | Description |
 | ----- | ----------- |
-| `HEADER` | Header validation |
-| `TEXT_FILE` | Text file validation |
+| `HEADER` | Header validation. |
+| `TEXT_FILE` | Text file validation. |
 
 ### DataVisualizationColorEnum
 
@@ -5208,7 +5208,7 @@ Mutation event of a design within a version.
 | `CREATION` | A creation event |
 | `DELETION` | A deletion event |
 | `MODIFICATION` | A modification event |
-| `NONE` | No change |
+| `NONE` | No change. |
 
 ### DiffPositionType
 
@@ -5235,10 +5235,10 @@ Roadmap sort values.
 
 | Value | Description |
 | ----- | ----------- |
-| `end_date_asc` | End date at ascending order |
-| `end_date_desc` | End date at descending order |
-| `start_date_asc` | Start date at ascending order |
-| `start_date_desc` | Start date at descending order |
+| `end_date_asc` | End date at ascending order. |
+| `end_date_desc` | End date at descending order. |
+| `start_date_asc` | Start date at ascending order. |
+| `start_date_desc` | Start date at descending order. |
 
 ### EpicState
 
@@ -5256,8 +5256,8 @@ State event of an epic.
 
 | Value | Description |
 | ----- | ----------- |
-| `CLOSE` | Close the epic |
-| `REOPEN` | Reopen the epic |
+| `CLOSE` | Close the epic. |
+| `REOPEN` | Reopen the epic. |
 
 ### EpicWildcardId
 
@@ -5265,8 +5265,8 @@ Epic ID wildcard values.
 
 | Value | Description |
 | ----- | ----------- |
-| `ANY` | Any epic is assigned |
-| `NONE` | No epic is assigned |
+| `ANY` | Any epic is assigned. |
+| `NONE` | No epic is assigned. |
 
 ### EventAction
 
@@ -5326,10 +5326,10 @@ State of a GitLab issue or merge request.
 
 | Value | Description |
 | ----- | ----------- |
-| `all` | All available |
-| `closed` | In closed state |
-| `locked` | Discussion has been locked |
-| `opened` | In open state |
+| `all` | All available. |
+| `closed` | In closed state. |
+| `locked` | Discussion has been locked. |
+| `opened` | In open state. |
 
 ### IssueSort
 
@@ -5337,27 +5337,27 @@ Values for sorting issues.
 
 | Value | Description |
 | ----- | ----------- |
-| `CREATED_ASC` | Created at ascending order |
-| `CREATED_DESC` | Created at descending order |
-| `DUE_DATE_ASC` | Due date by ascending order |
-| `DUE_DATE_DESC` | Due date by descending order |
-| `LABEL_PRIORITY_ASC` | Label priority by ascending order |
-| `LABEL_PRIORITY_DESC` | Label priority by descending order |
-| `MILESTONE_DUE_ASC` | Milestone due date by ascending order |
-| `MILESTONE_DUE_DESC` | Milestone due date by descending order |
-| `PRIORITY_ASC` | Priority by ascending order |
-| `PRIORITY_DESC` | Priority by descending order |
-| `PUBLISHED_ASC` | Published issues shown last |
-| `PUBLISHED_DESC` | Published issues shown first |
-| `RELATIVE_POSITION_ASC` | Relative position by ascending order |
-| `SEVERITY_ASC` | Severity from less critical to more critical |
-| `SEVERITY_DESC` | Severity from more critical to less critical |
-| `SLA_DUE_AT_ASC` | Issues with earliest SLA due time shown first |
-| `SLA_DUE_AT_DESC` | Issues with latest SLA due time shown first |
-| `UPDATED_ASC` | Updated at ascending order |
-| `UPDATED_DESC` | Updated at descending order |
-| `WEIGHT_ASC` | Weight by ascending order |
-| `WEIGHT_DESC` | Weight by descending order |
+| `CREATED_ASC` | Created at ascending order. |
+| `CREATED_DESC` | Created at descending order. |
+| `DUE_DATE_ASC` | Due date by ascending order. |
+| `DUE_DATE_DESC` | Due date by descending order. |
+| `LABEL_PRIORITY_ASC` | Label priority by ascending order. |
+| `LABEL_PRIORITY_DESC` | Label priority by descending order. |
+| `MILESTONE_DUE_ASC` | Milestone due date by ascending order. |
+| `MILESTONE_DUE_DESC` | Milestone due date by descending order. |
+| `PRIORITY_ASC` | Priority by ascending order. |
+| `PRIORITY_DESC` | Priority by descending order. |
+| `PUBLISHED_ASC` | Published issues shown last. |
+| `PUBLISHED_DESC` | Published issues shown first. |
+| `RELATIVE_POSITION_ASC` | Relative position by ascending order. |
+| `SEVERITY_ASC` | Severity from less critical to more critical. |
+| `SEVERITY_DESC` | Severity from more critical to less critical. |
+| `SLA_DUE_AT_ASC` | Issues with earliest SLA due time shown first. |
+| `SLA_DUE_AT_DESC` | Issues with latest SLA due time shown first. |
+| `UPDATED_ASC` | Updated at ascending order. |
+| `UPDATED_DESC` | Updated at descending order. |
+| `WEIGHT_ASC` | Weight by ascending order. |
+| `WEIGHT_DESC` | Weight by descending order. |
 | `created_asc` **{warning-solid}** | **Deprecated:** Use CREATED_ASC. Deprecated in 13.5. |
 | `created_desc` **{warning-solid}** | **Deprecated:** Use CREATED_DESC. Deprecated in 13.5. |
 | `updated_asc` **{warning-solid}** | **Deprecated:** Use UPDATED_ASC. Deprecated in 13.5. |
@@ -5369,10 +5369,10 @@ State of a GitLab issue.
 
 | Value | Description |
 | ----- | ----------- |
-| `all` | All available |
-| `closed` | In closed state |
-| `locked` | Discussion has been locked |
-| `opened` | In open state |
+| `all` | All available. |
+| `closed` | In closed state. |
+| `locked` | Discussion has been locked. |
+| `opened` | In open state. |
 
 ### IssueStateEvent
 
@@ -5380,8 +5380,8 @@ Values for issue state events.
 
 | Value | Description |
 | ----- | ----------- |
-| `CLOSE` | Closes the issue |
-| `REOPEN` | Reopens the issue |
+| `CLOSE` | Closes the issue. |
+| `REOPEN` | Reopens the issue. |
 
 ### IssueType
 
@@ -5411,9 +5411,9 @@ Iteration ID wildcard values.
 
 | Value | Description |
 | ----- | ----------- |
-| `ANY` | An iteration is assigned |
-| `CURRENT` | Current iteration |
-| `NONE` | No iteration is assigned |
+| `ANY` | An iteration is assigned. |
+| `CURRENT` | Current iteration. |
+| `NONE` | No iteration is assigned. |
 
 ### JobArtifactFileType
 
@@ -5463,16 +5463,16 @@ Possible identifier types for a measurement.
 
 | Value | Description |
 | ----- | ----------- |
-| `GROUPS` | Group count |
-| `ISSUES` | Issue count |
-| `MERGE_REQUESTS` | Merge request count |
-| `PIPELINES` | Pipeline count |
-| `PIPELINES_CANCELED` | Pipeline count with canceled status |
-| `PIPELINES_FAILED` | Pipeline count with failed status |
-| `PIPELINES_SKIPPED` | Pipeline count with skipped status |
-| `PIPELINES_SUCCEEDED` | Pipeline count with success status |
-| `PROJECTS` | Project count |
-| `USERS` | User count |
+| `GROUPS` | Group count. |
+| `ISSUES` | Issue count. |
+| `MERGE_REQUESTS` | Merge request count. |
+| `PIPELINES` | Pipeline count. |
+| `PIPELINES_CANCELED` | Pipeline count with canceled status. |
+| `PIPELINES_FAILED` | Pipeline count with failed status. |
+| `PIPELINES_SKIPPED` | Pipeline count with skipped status. |
+| `PIPELINES_SUCCEEDED` | Pipeline count with success status. |
+| `PROJECTS` | Project count. |
+| `USERS` | User count. |
 
 ### MergeRequestNewState
 
@@ -5489,18 +5489,18 @@ Values for sorting merge requests.
 
 | Value | Description |
 | ----- | ----------- |
-| `CREATED_ASC` | Created at ascending order |
-| `CREATED_DESC` | Created at descending order |
-| `LABEL_PRIORITY_ASC` | Label priority by ascending order |
-| `LABEL_PRIORITY_DESC` | Label priority by descending order |
-| `MERGED_AT_ASC` | Merge time by ascending order |
-| `MERGED_AT_DESC` | Merge time by descending order |
-| `MILESTONE_DUE_ASC` | Milestone due date by ascending order |
-| `MILESTONE_DUE_DESC` | Milestone due date by descending order |
-| `PRIORITY_ASC` | Priority by ascending order |
-| `PRIORITY_DESC` | Priority by descending order |
-| `UPDATED_ASC` | Updated at ascending order |
-| `UPDATED_DESC` | Updated at descending order |
+| `CREATED_ASC` | Created at ascending order. |
+| `CREATED_DESC` | Created at descending order. |
+| `LABEL_PRIORITY_ASC` | Label priority by ascending order. |
+| `LABEL_PRIORITY_DESC` | Label priority by descending order. |
+| `MERGED_AT_ASC` | Merge time by ascending order. |
+| `MERGED_AT_DESC` | Merge time by descending order. |
+| `MILESTONE_DUE_ASC` | Milestone due date by ascending order. |
+| `MILESTONE_DUE_DESC` | Milestone due date by descending order. |
+| `PRIORITY_ASC` | Priority by ascending order. |
+| `PRIORITY_DESC` | Priority by descending order. |
+| `UPDATED_ASC` | Updated at ascending order. |
+| `UPDATED_DESC` | Updated at descending order. |
 | `created_asc` **{warning-solid}** | **Deprecated:** Use CREATED_ASC. Deprecated in 13.5. |
 | `created_desc` **{warning-solid}** | **Deprecated:** Use CREATED_DESC. Deprecated in 13.5. |
 | `updated_asc` **{warning-solid}** | **Deprecated:** Use UPDATED_ASC. Deprecated in 13.5. |
@@ -5512,11 +5512,11 @@ State of a GitLab merge request.
 
 | Value | Description |
 | ----- | ----------- |
-| `all` | All available |
-| `closed` | In closed state |
-| `locked` | Discussion has been locked |
-| `merged` | Merge Request has been merged |
-| `opened` | In open state |
+| `all` | All available. |
+| `closed` | In closed state. |
+| `locked` | Discussion has been locked. |
+| `merged` | Merge Request has been merged. |
+| `opened` | In open state. |
 
 ### MilestoneStateEnum
 
@@ -5524,8 +5524,8 @@ Current state of milestone.
 
 | Value | Description |
 | ----- | ----------- |
-| `active` | Milestone is currently active |
-| `closed` | Milestone is closed |
+| `active` | Milestone is currently active. |
+| `closed` | Milestone is closed. |
 
 ### MoveType
 
@@ -5533,8 +5533,8 @@ The position to which the adjacent object should be moved.
 
 | Value | Description |
 | ----- | ----------- |
-| `after` | The adjacent object will be moved after the object that is being moved |
-| `before` | The adjacent object will be moved before the object that is being moved |
+| `after` | The adjacent object will be moved after the object that is being moved. |
+| `before` | The adjacent object will be moved before the object that is being moved. |
 
 ### MutationOperationMode
 
@@ -5542,9 +5542,9 @@ Different toggles for changing mutator behavior.
 
 | Value | Description |
 | ----- | ----------- |
-| `APPEND` | Performs an append operation |
-| `REMOVE` | Performs a removal operation |
-| `REPLACE` | Performs a replace operation |
+| `APPEND` | Performs an append operation. |
+| `REMOVE` | Performs a removal operation. |
+| `REPLACE` | Performs a replace operation. |
 
 ### NamespaceProjectSort
 
@@ -5552,8 +5552,8 @@ Values for sorting projects.
 
 | Value | Description |
 | ----- | ----------- |
-| `SIMILARITY` | Most similar to the search query |
-| `STORAGE` | Sort by storage size |
+| `SIMILARITY` | Most similar to the search query. |
+| `STORAGE` | Sort by storage size. |
 
 ### OncallRotationUnitEnum
 
@@ -5627,10 +5627,10 @@ State of a Geo registry.
 
 | Value | Description |
 | ----- | ----------- |
-| `FAILED` | Registry that failed to sync |
-| `PENDING` | Registry waiting to be synced |
-| `STARTED` | Registry currently syncing |
-| `SYNCED` | Registry that is synced |
+| `FAILED` | Registry that failed to sync. |
+| `PENDING` | Registry waiting to be synced. |
+| `STARTED` | Registry currently syncing. |
+| `SYNCED` | Registry that is synced. |
 
 ### ReleaseAssetLinkType
 
@@ -5649,10 +5649,10 @@ Values for sorting releases.
 
 | Value | Description |
 | ----- | ----------- |
-| `CREATED_ASC` | Created at ascending order |
-| `CREATED_DESC` | Created at descending order |
-| `RELEASED_AT_ASC` | Released at by ascending order |
-| `RELEASED_AT_DESC` | Released at by descending order |
+| `CREATED_ASC` | Created at ascending order. |
+| `CREATED_DESC` | Created at descending order. |
+| `RELEASED_AT_ASC` | Released at by ascending order. |
+| `RELEASED_AT_DESC` | Released at by descending order. |
 
 ### RequirementState
 
@@ -5715,10 +5715,10 @@ State of a Sentry error.
 
 | Value | Description |
 | ----- | ----------- |
-| `IGNORED` | Error has been ignored |
-| `RESOLVED` | Error has been resolved |
-| `RESOLVED_IN_NEXT_RELEASE` | Error has been ignored until next release |
-| `UNRESOLVED` | Error is unresolved |
+| `IGNORED` | Error has been ignored. |
+| `RESOLVED` | Error has been resolved. |
+| `RESOLVED_IN_NEXT_RELEASE` | Error has been ignored until next release. |
+| `UNRESOLVED` | Error is unresolved. |
 
 ### ServiceType
 
@@ -5778,10 +5778,10 @@ Common sort values.
 
 | Value | Description |
 | ----- | ----------- |
-| `CREATED_ASC` | Created at ascending order |
-| `CREATED_DESC` | Created at descending order |
-| `UPDATED_ASC` | Updated at ascending order |
-| `UPDATED_DESC` | Updated at descending order |
+| `CREATED_ASC` | Created at ascending order. |
+| `CREATED_DESC` | Created at descending order. |
+| `UPDATED_ASC` | Updated at ascending order. |
+| `UPDATED_DESC` | Updated at descending order. |
 | `created_asc` **{warning-solid}** | **Deprecated:** Use CREATED_ASC. Deprecated in 13.5. |
 | `created_desc` **{warning-solid}** | **Deprecated:** Use CREATED_DESC. Deprecated in 13.5. |
 | `updated_asc` **{warning-solid}** | **Deprecated:** Use UPDATED_ASC. Deprecated in 13.5. |
@@ -5819,12 +5819,12 @@ State of a test report.
 
 | Value | Description |
 | ----- | ----------- |
-| `ALERT` | An Alert |
-| `COMMIT` | A Commit |
-| `DESIGN` | A Design |
-| `EPIC` | An Epic |
-| `ISSUE` | An Issue |
-| `MERGEREQUEST` | A MergeRequest |
+| `ALERT` | An Alert. |
+| `COMMIT` | A Commit. |
+| `DESIGN` | A Design. |
+| `EPIC` | An Epic. |
+| `ISSUE` | An Issue. |
+| `MERGEREQUEST` | A MergeRequest. |
 
 ### TypeEnum
 
@@ -5839,9 +5839,9 @@ Possible states of a user.
 
 | Value | Description |
 | ----- | ----------- |
-| `active` | The user is active and is able to use the system |
-| `blocked` | The user has been blocked and is prevented from using the system |
-| `deactivated` | The user is no longer active and is unable to use the system |
+| `active` | The user is active and is able to use the system. |
+| `blocked` | The user has been blocked and is prevented from using the system. |
+| `deactivated` | The user is no longer active and is unable to use the system. |
 
 ### VisibilityLevelsEnum
 
@@ -5941,16 +5941,16 @@ Vulnerability sort values.
 
 | Value | Description |
 | ----- | ----------- |
-| `detected_asc` | Detection timestamp in ascending order |
-| `detected_desc` | Detection timestamp in descending order |
-| `report_type_asc` | Report Type in ascending order |
-| `report_type_desc` | Report Type in descending order |
-| `severity_asc` | Severity in ascending order |
-| `severity_desc` | Severity in descending order |
-| `state_asc` | State in ascending order |
-| `state_desc` | State in descending order |
-| `title_asc` | Title in ascending order |
-| `title_desc` | Title in descending order |
+| `detected_asc` | Detection timestamp in ascending order. |
+| `detected_desc` | Detection timestamp in descending order. |
+| `report_type_asc` | Report Type in ascending order. |
+| `report_type_desc` | Report Type in descending order. |
+| `severity_asc` | Severity in ascending order. |
+| `severity_desc` | Severity in descending order. |
+| `state_asc` | State in ascending order. |
+| `state_desc` | State in descending order. |
+| `title_asc` | Title in ascending order. |
+| `title_desc` | Title in descending order. |
 
 ### VulnerabilityState
 
