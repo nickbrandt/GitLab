@@ -241,7 +241,7 @@ RSpec.describe 'Gitlab::Graphql::Authorize' do
       end
     end
 
-    subject { result['data']['item'].first }
+    subject { result.dig('data', 'item', 0) }
 
     include_examples 'authorization with a single permission'
   end
@@ -286,7 +286,7 @@ RSpec.describe 'Gitlab::Graphql::Authorize' do
     end
 
     it 'renders the issues the user has access to' do
-      issue_edges = result['data']['testProject']['testIssues']['edges']
+      issue_edges = result.dig('data', 'testProject', 'testIssues', 'edges')
       issue_ids = issue_edges.map { |issue_edge| issue_edge['node']&.fetch('id') }
 
       expect(issue_edges.size).to eq(visible_issues.size)
