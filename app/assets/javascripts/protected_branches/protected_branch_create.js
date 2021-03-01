@@ -16,6 +16,7 @@ export default class ProtectedBranchCreate {
     this.currentProjectUserDefaults = {};
     this.buildDropdowns();
     this.$codeOwnerToggle = this.$form.find('.js-code-owner-toggle');
+    this.$forcePushToggle = this.$form.find('.js-force-push-toggle');
     this.bindEvents();
   }
 
@@ -23,11 +24,16 @@ export default class ProtectedBranchCreate {
     if (this.hasLicense) {
       this.$codeOwnerToggle.on('click', this.onCodeOwnerToggleClick.bind(this));
     }
+    this.$forcePushToggle.on('click', this.onForcePushToggleClick.bind(this));
     this.$form.on('submit', this.onFormSubmit.bind(this));
   }
 
   onCodeOwnerToggleClick() {
     this.$codeOwnerToggle.toggleClass('is-checked');
+  }
+
+  onForcePushToggleClick() {
+    this.$forcePushToggle.toggleClass('is-checked');
   }
 
   buildDropdowns() {

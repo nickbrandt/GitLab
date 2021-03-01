@@ -15,6 +15,7 @@ export default class ProtectedBranchEdit {
     this.$allowedToMergeDropdown = this.$wrap.find('.js-allowed-to-merge');
     this.$allowedToPushDropdown = this.$wrap.find('.js-allowed-to-push');
     this.$codeOwnerToggle = this.$wrap.find('.js-code-owner-toggle');
+    this.$forcePushToggle = this.$wrap.find('.js-force-push-toggle');
 
     this.$wraps[ACCESS_LEVELS.MERGE] = this.$allowedToMergeDropdown.closest(
       `.${ACCESS_LEVELS.MERGE}-container`,
@@ -31,6 +32,11 @@ export default class ProtectedBranchEdit {
     if (this.hasLicense) {
       this.$codeOwnerToggle.on('click', this.onCodeOwnerToggleClick.bind(this));
     }
+    this.$forcePushToggle.on('click', this.onForcePushToggleClick.bind(this));
+  }
+
+  onForcePushToggleClick() {
+    this.$forcePushToggle.toggleClass('is-checked');
   }
 
   onCodeOwnerToggleClick() {
