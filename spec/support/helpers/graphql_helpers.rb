@@ -25,20 +25,24 @@ module GraphqlHelpers
   # Run this resolver exactly as it would be called in the framework. This
   # includes all authorization hooks, all argument processing and all result
   # wrapping.
+  # see: GraphqlHelpers#resolve_field
   def resolve(
-    resolver_class, # The resolver at test. Should be a BaseResolver
-    obj: nil, args: {}, ctx: {}, schema: GitlabSchema,
-    parent: :not_given,
-    lookahead: :not_given)
+    resolver_class, # [Class[<= BaseResolver]] The resolver at test.
+    obj: nil, # [Any] The BaseObject#object for the resolver (available as `#object` in the resolver).
+    args: {}, # [Hash] The arguments to the resolver (using client names).
+    ctx: {},  # [#to_h] The current context values.
+    schema: GitlabSchema, # [GraphQL::Schema] Schema to use during execution.
+    parent: :not_given, # A GraphQL query node to be passed as the `:parent` extra.
+    lookahead: :not_given # A GraphQL lookahead object to be passed as the `:lookahead` extra.
+  )
     # All resolution goes through fields, so we need to create one here that
     # uses our resolver. Thankfully, apart from the field name, resolvers
     # contain all the configuration needed to define one.
     field_options = resolver_class.field_options.merge(name: 'field_value')
     field = ::Types::BaseField.new(**field_options)
 
-    if resolver_class <= ::Mutations::BaseMutation && !args.key?(:input)
-      args = { input: args }
-    end
+    # All mutations accept a single `:input` argument. Wrap arguments here.
+    args = { input: args } if resolver_class <= ::Mutations::BaseMutation && !args.key?(:input)
 
     resolve_field(field, obj,
                   args: args,
