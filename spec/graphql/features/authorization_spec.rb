@@ -13,10 +13,10 @@ RSpec.describe 'Gitlab::Graphql::Authorize' do
   let(:result) do
     schema = empty_schema
     schema.use(Gitlab::Graphql::Authorize)
-    execute_query(query_type, schema)['data']
+    execute_query(query_type, schema)
   end
 
-  subject { result['item'] }
+  subject { result.dig('data', 'item') }
 
   shared_examples 'authorization with a single permission' do
     it 'returns the protected field when user has permission' do
@@ -196,7 +196,7 @@ RSpec.describe 'Gitlab::Graphql::Authorize' do
       end
     end
 
-    subject { result.dig('item', 'edges') }
+    subject { result.dig('data', 'item', 'edges') }
 
     it 'returns only the elements visible to the user' do
       permit(permission_single)
@@ -240,7 +240,7 @@ RSpec.describe 'Gitlab::Graphql::Authorize' do
       end
     end
 
-    subject { result['item'].first }
+    subject { result['data']['item'].first }
 
     include_examples 'authorization with a single permission'
   end
@@ -285,7 +285,7 @@ RSpec.describe 'Gitlab::Graphql::Authorize' do
     end
 
     it 'renders the issues the user has access to' do
-      issue_edges = result['testProject']['testIssues']['edges']
+      issue_edges = result['data']['testProject']['testIssues']['edges']
       issue_ids = issue_edges.map { |issue_edge| issue_edge['node']&.fetch('id') }
 
       expect(issue_edges.size).to eq(visible_issues.size)
