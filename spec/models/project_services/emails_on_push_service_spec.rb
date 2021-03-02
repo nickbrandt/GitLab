@@ -19,6 +19,52 @@ RSpec.describe EmailsOnPushService do
 
       it { is_expected.not_to validate_presence_of(:recipients) }
     end
+
+    describe 'validates number of recipients' do
+      before do
+        stub_const("#{described_class}::RECIPIENTS_LIMIT", 2)
+      end
+
+      let_it_be(:project) { create_default(:project).freeze }
+
+      subject(:service) { described_class.new(project: project, recipients: recipients, active: true) }
+
+      context 'valid number of recipients' do
+        let(:recipients) { 'foo@bar.com' }
+
+        it { is_expected.to be_valid }
+      end
+
+      context 'invalid number of recipients' do
+        let(:recipients) { 'foo@bar.com bar@foo.com bob@gitlab.com' }
+
+        it { is_expected.not_to be_valid }
+
+        it 'adds an error message' do
+          service.valid?
+
+          expect(service.errors).to contain_exactly('Recipients max number is 2')
+        end
+
+        context 'when service is not active' do
+          before do
+            service.active = false
+          end
+
+          it { is_expected.to be_valid }
+        end
+      end
+    end
+  end
+
+  describe 'callbacks' do
+    describe 'before_validation' do
+      let(:service) { described_class.new(project: create(:project), recipients: '<invalid> foobar valid@recipient.com dup@lica.te dup@lica.te') }
+
+      it 'removes invalid email addresses and removes duplicates' do
+        expect { service.valid? }.to change { service.recipients }.to('valid@recipient.com dup@lica.te')
+      end
+    end
   end
 
   describe '.new' do
