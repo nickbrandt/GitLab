@@ -3,8 +3,8 @@
 require 'spec_helper'
 
 RSpec.describe Gitlab::HookData::ProjectMemberBuilder do
-  let_it_be(:project) { create(:project, name: "gitlab", visibility_level: 10) }
-  let_it_be(:user) { create(:user, name: "John Doe", username: "johndoe", email: "john@example.com") }
+  let_it_be(:project) { create(:project, :internal, name: 'gitlab') }
+  let_it_be(:user) { create(:user, name: 'John Doe', username: 'johndoe', email: 'john@example.com') }
   let_it_be(:project_member) { create(:project_member, :developer, user: user, project: project) }
 
   describe '#build' do
@@ -20,16 +20,16 @@ RSpec.describe Gitlab::HookData::ProjectMemberBuilder do
       shared_examples_for 'includes the required attributes' do
         it 'includes the required attributes' do
           expect(data).to include(*attributes)
-          expect(data[:project_name]).to eq("gitlab")
+          expect(data[:project_name]).to eq('gitlab')
           expect(data[:project_path]).to eq(project.path)
           expect(data[:project_path_with_namespace]).to eq(project.full_path)
           expect(data[:project_id]).to eq(project.id)
-          expect(data[:user_username]).to eq("johndoe")
-          expect(data[:user_name]).to eq("John Doe")
-          expect(data[:user_id]).to eq(project_member.user.id)
-          expect(data[:user_email]).to eq("john@example.com")
-          expect(data[:access_level]).to eq("Developer")
-          expect(data[:project_visibility]).to eq("internal")
+          expect(data[:user_username]).to eq('johndoe')
+          expect(data[:user_name]).to eq('John Doe')
+          expect(data[:user_id]).to eq(user.id)
+          expect(data[:user_email]).to eq('john@example.com')
+          expect(data[:access_level]).to eq('Developer')
+          expect(data[:project_visibility]).to eq('internal')
         end
       end
 
