@@ -2,11 +2,13 @@
 
 require 'spec_helper'
 
-RSpec.describe Mutations::Admin::Analytics::DevopsAdoption::Segments::Create do
+RSpec.describe Mutations::Analytics::DevopsAdoption::Segments::Create do
   include GraphqlHelpers
 
-  let_it_be(:admin) { create(:admin) }
   let_it_be(:group) { create(:group, name: 'bbbb') }
+  let_it_be(:reporter) { create(:user).tap { |u| group.add_reporter(u) } }
+  let(:current_user) { reporter }
+
   let(:variables) { { namespace_id: group.to_gid.to_s } }
 
   let(:mutation) do
@@ -30,13 +32,25 @@ RSpec.describe Mutations::Admin::Analytics::DevopsAdoption::Segments::Create do
   end
 
   before do
-    stub_licensed_features(instance_level_devops_adoption: true)
+    stub_licensed_features(group_level_devops_adoption: true)
   end
 
-  it_behaves_like 'DevOps Adoption top level errors'
+  context 'when the user cannot manage segments' do
+    let(:current_user) { create(:user) }
+
+    it_behaves_like 'a mutation that returns a top-level access error'
+  end
+
+  context 'when the feature is not available' do
+    before do
+      stub_licensed_features(group_level_devops_adoption: false)
+    end
+
+    it_behaves_like 'a mutation that returns a top-level access error'
+  end
 
   it 'creates the segment with the group' do
-    post_graphql_mutation(mutation, current_user: admin)
+    post_graphql_mutation(mutation, current_user: current_user)
 
     expect(mutation_response['errors']).to be_empty
 
