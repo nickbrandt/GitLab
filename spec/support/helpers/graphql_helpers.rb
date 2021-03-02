@@ -42,6 +42,7 @@ module GraphqlHelpers
     field = ::Types::BaseField.new(**field_options)
 
     # All mutations accept a single `:input` argument. Wrap arguments here.
+    # See the unwrapping below in GraphqlHelpers#resolve_field
     args = { input: args } if resolver_class <= ::Mutations::BaseMutation && !args.key?(:input)
 
     resolve_field(field, obj,
@@ -115,7 +116,9 @@ module GraphqlHelpers
       # TODO: This will need to change when we move to the interpreter - at that
       # point we will call `field#resolve`
 
-      # hack alert
+      # Unwrap the arguments to mutations. This pairs with the wrapping in GraphqlHelpers#resolve
+      # If arguments are not wrapped first, then arguments processing will raise.
+      # If arguments are not unwrapped here, then the resolve method of the mutation will raise argument errors.
       arguments = arguments.to_kwargs[:input] if field.resolver && field.resolver <= ::Mutations::BaseMutation
 
       field.resolve_field(parent, arguments, query_ctx)
