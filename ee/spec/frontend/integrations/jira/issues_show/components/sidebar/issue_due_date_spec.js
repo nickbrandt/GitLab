@@ -17,10 +17,8 @@ describe('IssueDueDate', () => {
   };
 
   afterEach(() => {
-    if (wrapper) {
-      wrapper.destroy();
-      wrapper = null;
-    }
+    wrapper.destroy();
+    wrapper = null;
   });
 
   const findDueDateCollapsed = () => wrapper.findByTestId('due-date-collapsed');
