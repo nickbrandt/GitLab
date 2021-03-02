@@ -71,6 +71,7 @@ export default {
       type: Number,
       required: false,
       default: 0,
+      validator: (value) => [0, 1, 2].includes(value),
     },
   },
   computed: {
