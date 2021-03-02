@@ -505,6 +505,9 @@ msgstr ""
 msgid "%{edit_in_new_fork_notice} Try to upload a file again."
 msgstr ""
 
+msgid "%{emailPrefix}@company.com"
+msgstr ""
+
 msgid "%{extra} more downstream pipelines"
 msgstr ""
 
@@ -10223,6 +10226,11 @@ msgstr ""
 msgid "Deployments"
 msgstr ""
 
+msgid "Deployments|%{deployments} environment impacted."
+msgid_plural "Deployments|%{deployments} environments impacted."
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "Deployment|API"
 msgstr ""
 
@@ -16587,16 +16595,31 @@ msgstr ""
 msgid "InviteMember|Add members to this project and start collaborating with your team."
 msgstr ""
 
+msgid "InviteMember|Don't worry, you can always invite teammates later"
+msgstr ""
+
 msgid "InviteMember|Invite Members (optional)"
 msgstr ""
 
 msgid "InviteMember|Invite another member"
 msgstr ""
 
+msgid "InviteMember|Invite another teammate"
+msgstr ""
+
 msgid "InviteMember|Invite members"
 msgstr ""
 
+msgid "InviteMember|Invite teammates to your GitLab group"
+msgstr ""
+
+msgid "InviteMember|Invite users to your group %{group_name} so you can collaborate on your projects"
+msgstr ""
+
 msgid "InviteMember|Invite your team"
+msgstr ""
+
+msgid "InviteMember|Invite your teammates"
 msgstr ""
 
 msgid "InviteMember|Invited users will be added with developer level permissions. %{linkStart}View the documentation%{linkEnd} to see how to change this later."
@@ -16606,6 +16629,12 @@ msgid "InviteMember|Oops, this feature isn't ready yet"
 msgstr ""
 
 msgid "InviteMember|See who can invite members for you"
+msgstr ""
+
+msgid "InviteMember|Send invitations"
+msgstr ""
+
+msgid "InviteMember|Skip this for now"
 msgstr ""
 
 msgid "InviteMember|Until then, ask an owner to invite new project members for you"
@@ -32850,6 +32879,9 @@ msgstr ""
 msgid "View alert details."
 msgstr ""
 
+msgid "View all environments."
+msgstr ""
+
 msgid "View all issues"
 msgstr ""
 
@@ -35483,9 +35515,6 @@ msgid "math|The math in this entry is taking too long to render and may not be d
 msgstr ""
 
 msgid "math|There was an error rendering this math block"
-msgstr ""
-
-msgid "member%{number}@company.com"
 msgstr ""
 
 msgid "merge request"
