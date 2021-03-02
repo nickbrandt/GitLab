@@ -21,7 +21,7 @@ fields and methods on a model are available via GraphQL.
 
 WARNING:
 Fields that are deprecated are marked with **{warning-solid}**.
-Items (fields, enums, etc) that have been removed according to our [deprecation process](../index.md#deprecation-process) can be found
+Items (fields, enums, etc) that have been removed according to our [deprecation process](../index.md#deprecation-and-removal-process) can be found
 in [Removed Items](../removed_items.md).
 
 <!-- vale gitlab.Spelling = NO -->
