@@ -1,0 +1,5 @@
+---
+title: Fix long polling to default to 50 s instead of 50 ns
+merge_request: 687
+author:
+type: fixed
