@@ -998,11 +998,11 @@ RSpec.describe Project do
       end
 
       it 'has a shared runner' do
-        expect(project.any_runners?).to be_truthy
+        expect(project.any_active_runners?).to be_truthy
       end
 
       it 'checks the presence of shared runner' do
-        expect(project.any_runners? { |runner| runner == shared_runner }).to be_truthy
+        expect(project.any_active_runners? { |runner| runner == shared_runner }).to be_truthy
       end
 
       context 'with used pipeline minutes' do
@@ -1014,7 +1014,7 @@ RSpec.describe Project do
         end
 
         it 'does not have a shared runner' do
-          expect(project.any_runners?).to be_falsey
+          expect(project.any_active_runners?).to be_falsey
         end
       end
     end
