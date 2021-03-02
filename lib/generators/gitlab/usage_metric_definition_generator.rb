@@ -91,14 +91,12 @@ module Gitlab
       key_path.split('.').last
     end
 
-    def metric_definition_lookup
-      Dir.glob(File.join('config', 'metrics', '**', '[0-9]*_*.yml'))
+    def metric_definitions
+      @definitions ||= Gitlab::Usage::MetricDefinition.definitions
     end
 
     def metric_definition_exists?
-      metric_definition_lookup.grep(/\d+_#{metric_name}.yml$/).any? do |path|
-        YAML.safe_load(File.open(path))['key_path'] == key_path
-      end
+      metric_definitions[key_path].present?
     end
   end
 end
