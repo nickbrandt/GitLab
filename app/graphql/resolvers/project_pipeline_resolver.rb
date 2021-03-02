@@ -8,15 +8,15 @@ module Resolvers
 
     argument :iid, GraphQL::ID_TYPE,
              required: false,
-             description: 'IID of the Pipeline, e.g., "1".'
+             description: 'IID of the Pipeline. For example, "1".'
 
     argument :sha, GraphQL::STRING_TYPE,
              required: false,
-             description: 'SHA of the Pipeline, e.g., "dyd0f15ay83993f5ab66k927w28673882x99100b".'
+             description: 'SHA of the Pipeline. For example, "dyd0f15ay83993f5ab66k927w28673882x99100b".'
 
     def ready?(iid: nil, sha: nil)
       unless iid.present? ^ sha.present?
-        raise Gitlab::Graphql::Errors::ArgumentError, 'Provide either an iid or sha'
+        raise Gitlab::Graphql::Errors::ArgumentError, 'Provide one of an IID or SHA'
       end
 
       super
@@ -25,13 +25,13 @@ module Resolvers
     def resolve(iid: nil, sha: nil)
       if iid
         BatchLoader::GraphQL.for(iid).batch(key: project) do |iids, loader, args|
-          finder = ::Ci::PipelinesFinder.new(project, context[:current_user], iids: iids)
+          finder = ::Ci::PipelinesFinder.new(project, current_user, iids: iids)
 
           finder.execute.each { |pipeline| loader.call(pipeline.iid.to_s, pipeline) }
         end
       else
         BatchLoader::GraphQL.for(sha).batch(key: project) do |shas, loader, args|
-          finder = ::Ci::PipelinesFinder.new(project, context[:current_user], shas: sha)
+          finder = ::Ci::PipelinesFinder.new(project, current_user, shas: shas)
 
           finder.execute.each { |pipeline| loader.call(pipeline.sha.to_s, pipeline) }
         end
