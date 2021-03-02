@@ -8,3 +8,4 @@ export const SURVEY_BANNER_CURRENT_ID = 'survey1';
 
 export const DEFAULT_SCANNER = 'GitLab';
 export const SCANNER_ID_PREFIX = 'gid://gitlab/Vulnerabilities::Scanner/';
+export const PROJECT_ID_PREFIX = 'gid://gitlab/Project/';
