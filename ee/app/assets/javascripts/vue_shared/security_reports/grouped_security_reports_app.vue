@@ -3,7 +3,6 @@ import { GlButton, GlSprintf, GlLink, GlModalDirective } from '@gitlab/ui';
 import { once } from 'lodash';
 import { mapActions, mapState, mapGetters } from 'vuex';
 import { componentNames } from 'ee/reports/components/issue_body';
-import FuzzingArtifactsDownload from 'ee/security_dashboard/components/fuzzing_artifacts_download.vue';
 import { fetchPolicies } from '~/lib/graphql';
 import { mrStates } from '~/mr_popover/constants';
 import GroupedIssuesList from '~/reports/components/grouped_issues_list.vue';
@@ -44,7 +43,6 @@ export default {
     GlLink,
     DastModal,
     GlButton,
-    FuzzingArtifactsDownload,
   },
   directives: {
     'gl-modal': GlModalDirective,
@@ -277,7 +275,6 @@ export default {
       'secretDetectionStatusIcon',
     ]),
     ...mapGetters(MODULE_API_FUZZING, ['groupedApiFuzzingText', 'apiFuzzingStatusIcon']),
-    ...mapGetters('pipelineJobs', ['hasFuzzingArtifacts', 'fuzzingJobsWithArtifact']),
     securityTab() {
       return `${this.pipelinePath}/security`;
     },
@@ -639,11 +636,12 @@ export default {
             <template #summary>
               <security-summary :message="groupedCoverageFuzzingText" />
             </template>
-            <fuzzing-artifacts-download
-              v-if="hasFuzzingArtifacts"
-              :jobs="fuzzingJobsWithArtifact"
-              :project-id="projectId"
-            />
+            <artifact-download
+              v-if="shouldShowDownloadGuidance"
+              :report-types="[$options.reportTypes.COVERAGE_FUZZING]"
+              :target-project-full-path="targetProjectFullPath"
+              :mr-iid="mrIid"
+            />            
           </summary-row>
 
           <grouped-issues-list
