@@ -3,12 +3,12 @@
 require 'spec_helper'
 
 RSpec.describe Gitlab::HookData::ProjectMemberBuilder do
-  let_it_be(:project1) { create(:project, :internal) }
-  let_it_be(:user1) { create(:user) }
-  let_it_be(:project_member1) { create(:project_member, :developer, user: user1, project: project1) }
+  let_it_be(:project) { create(:project, name: "gitlab", visibility_level: 10) }
+  let_it_be(:user) { create(:user, name: "John Doe", username: "johndoe", email: "john@example.com") }
+  let_it_be(:project_member) { create(:project_member, :developer, user: user, project: project) }
 
   describe '#build' do
-    let(:data) { described_class.new(project_member1).build(event) }
+    let(:data) { described_class.new(project_member).build(event) }
     let(:event_name) { data[:event_name] }
     let(:attributes) do
       [
@@ -20,16 +20,16 @@ RSpec.describe Gitlab::HookData::ProjectMemberBuilder do
       shared_examples_for 'includes the required attributes' do
         it 'includes the required attributes' do
           expect(data).to include(*attributes)
-          expect(data[:project_name]).to eq(project1.name)
-          expect(data[:project_path]).to eq(project1.path)
-          expect(data[:project_path_with_namespace]).to eq(project1.full_path)
-          expect(data[:project_id]).to eq(project1.id)
-          expect(data[:user_username]).to eq(project_member1.user.username)
-          expect(data[:user_name]).to eq(project_member1.user.name)
-          expect(data[:user_id]).to eq(project_member1.user.id)
-          expect(data[:user_email]).to eq(project_member1.user.email)
-          expect(data[:access_level]).to eq(project_member1.human_access)
-          expect(data[:project_visibility]).to eq('visibilitylevel|internal')
+          expect(data[:project_name]).to eq("gitlab")
+          expect(data[:project_path]).to eq(project.path)
+          expect(data[:project_path_with_namespace]).to eq(project.full_path)
+          expect(data[:project_id]).to eq(project.id)
+          expect(data[:user_username]).to eq("johndoe")
+          expect(data[:user_name]).to eq("John Doe")
+          expect(data[:user_id]).to eq(project_member.user.id)
+          expect(data[:user_email]).to eq("john@example.com")
+          expect(data[:access_level]).to eq("Developer")
+          expect(data[:project_visibility]).to eq("internal")
         end
       end
 

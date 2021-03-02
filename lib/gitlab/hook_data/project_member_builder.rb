@@ -8,21 +8,20 @@ module Gitlab
       # Sample data
 
       # {
-      #   :event_name=>"user_add_to_team",
-      #   :project_name=>"GitLab Project",
+      #   :created_at=>"2021-03-02T10:43:17Z",
+      #   :updated_at=>"2021-03-02T10:43:17Z",
+      #   :project_name=>"gitlab",
       #   :project_path=>"gitlab",
-      #   :project_path_with_namespace=>"namespace/gitlab",
+      #   :project_path_with_namespace=>"namespace1/gitlab",
       #   :project_id=>1,
-      #   :user_username=>"robert",
-      #   :user_name=>"Robert Mills",
-      #   :user_email=>"robert@example.com",
-      #   :user_id=>14,
-      #   :acess_level=>"Developer",
+      #   :user_username=>"johndoe",
+      #   :user_name=>"John Doe",
+      #   :user_email=>"john@example.com",
+      #   :user_id=>2,
+      #   :access_level=>"Developer",
       #   :project_visibility=>"internal",
-      #   :created_at=>"2020-11-04T10:12:10Z",
-      #   :updated_at=>"2020-11-04T10:12:10Z",
-      #   :expires_at=>"2020-12-04T10:12:10Z"
-      # }
+      #   :event_name=>"user_update_for_team"
+      #  }
 
       def build(event)
         [
@@ -47,7 +46,7 @@ module Gitlab
           user_email:                   project_member.user.email,
           user_id:                      project_member.user.id,
           access_level:                 project_member.human_access,
-          project_visibility:           Project.visibility_levels.key(project.visibility_level_value).downcase
+          project_visibility:           project.visibility
         }
       end
 
