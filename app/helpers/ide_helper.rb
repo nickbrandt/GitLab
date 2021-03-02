@@ -12,7 +12,12 @@ module IdeHelper
       "web-ide-help-page-path" => help_page_path('user/project/web_ide/index.md'),
       "clientside-preview-enabled": Gitlab::CurrentSettings.web_ide_clientside_preview_enabled?.to_s,
       "render-whitespace-in-code": current_user.render_whitespace_in_code.to_s,
-      "codesandbox-bundler-url": Gitlab::CurrentSettings.web_ide_clientside_preview_bundler_url
+      "codesandbox-bundler-url": Gitlab::CurrentSettings.web_ide_clientside_preview_bundler_url,
+      "branch-name" => @branch_name,
+      "file-path" => @file_path,
+      "merge-request" => @merge_request,
+      "forked-project" => @forked_project,
+      "project" => @project.to_json,
     }
   end
 end
