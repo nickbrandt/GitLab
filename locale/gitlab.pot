@@ -2817,21 +2817,6 @@ msgstr ""
 msgid "AlertMappingBuilder|Title is a required field for alerts in GitLab. Should the payload field you specified not be available, specifiy which field we should use instead. "
 msgstr ""
 
-msgid "AlertSettings|1. Select integration type"
-msgstr ""
-
-msgid "AlertSettings|2. Name integration"
-msgstr ""
-
-msgid "AlertSettings|3. Set up webhook"
-msgstr ""
-
-msgid "AlertSettings|4. Sample alert payload (optional)"
-msgstr ""
-
-msgid "AlertSettings|5. Map fields (optional)"
-msgstr ""
-
 msgid "AlertSettings|API URL"
 msgstr ""
 
@@ -2841,7 +2826,7 @@ msgstr ""
 msgid "AlertSettings|Add URL and auth key to your Prometheus config file"
 msgstr ""
 
-msgid "AlertSettings|Add new integrations"
+msgid "AlertSettings|Add new integration"
 msgstr ""
 
 msgid "AlertSettings|Alert test payload"
@@ -2851,6 +2836,9 @@ msgid "AlertSettings|Authorization key"
 msgstr ""
 
 msgid "AlertSettings|Authorization key has been successfully reset. Please save your changes now."
+msgstr ""
+
+msgid "AlertSettings|Configure details"
 msgstr ""
 
 msgid "AlertSettings|Copy"
@@ -2889,19 +2877,25 @@ msgstr ""
 msgid "AlertSettings|Learn more about our our upcoming %{linkStart}integrations%{linkEnd}"
 msgstr ""
 
-msgid "AlertSettings|Proceed with editing"
+msgid "AlertSettings|Map fields (optional)"
 msgstr ""
 
-msgid "AlertSettings|Prometheus"
+msgid "AlertSettings|Name integration"
+msgstr ""
+
+msgid "AlertSettings|Parse payload for custom mapping"
+msgstr ""
+
+msgid "AlertSettings|Proceed with editing"
 msgstr ""
 
 msgid "AlertSettings|Prometheus API base URL"
 msgstr ""
 
-msgid "AlertSettings|Provide an example payload from the monitoring tool you intend to integrate with. This payload can be used to create a custom mapping (optional), or to test the integration (also optional)."
+msgid "AlertSettings|Provide an example payload from the monitoring tool you intend to integrate with. This payload can be used to create a custom mapping (optional)."
 msgstr ""
 
-msgid "AlertSettings|Provide an example payload from the monitoring tool you intend to integrate with. This payload can be used to test the integration (optional)."
+msgid "AlertSettings|Provide an example payload from the monitoring tool you intend to integrate with. This will allow you to send an alert to an active GitLab alerting point."
 msgstr ""
 
 msgid "AlertSettings|Reset Key"
@@ -2919,10 +2913,10 @@ msgstr ""
 msgid "AlertSettings|Review your external service's documentation to learn where to provide this information to your external service, and the %{linkStart}GitLab documentation%{linkEnd} to learn more about configuring your endpoint."
 msgstr ""
 
-msgid "AlertSettings|Sample payload has been parsed. You can now map the fields."
+msgid "AlertSettings|Sample alert payload (optional)"
 msgstr ""
 
-msgid "AlertSettings|Save and test payload"
+msgid "AlertSettings|Sample payload has been parsed. You can now map the fields."
 msgstr ""
 
 msgid "AlertSettings|Save integration"
@@ -2931,7 +2925,10 @@ msgstr ""
 msgid "AlertSettings|Select integration type"
 msgstr ""
 
-msgid "AlertSettings|Submit payload"
+msgid "AlertSettings|Send"
+msgstr ""
+
+msgid "AlertSettings|Send test alert"
 msgstr ""
 
 msgid "AlertSettings|Test alert payload"
@@ -2956,6 +2953,9 @@ msgid "AlertSettings|Utilize the URL and authorization key below to authorize Pr
 msgstr ""
 
 msgid "AlertSettings|Utilize the URL and authorization key below to authorize an external service to send alerts to GitLab. Review your external service's documentation to learn where to add these details, and the %{linkStart}GitLab documentation%{linkEnd} to learn more about configuring your endpoint."
+msgstr ""
+
+msgid "AlertSettings|View credentials"
 msgstr ""
 
 msgid "AlertSettings|Webhook URL"
@@ -2988,7 +2988,7 @@ msgstr ""
 msgid "AlertsIntegrations|Integration Name"
 msgstr ""
 
-msgid "AlertsIntegrations|Integration payload is invalid. You can still save your changes."
+msgid "AlertsIntegrations|Integration payload is invalid."
 msgstr ""
 
 msgid "AlertsIntegrations|No integrations have been added yet"
@@ -5413,6 +5413,9 @@ msgid "CanaryIngress|You are changing the ratio of the canary rollout for %{envi
 msgstr ""
 
 msgid "Cancel"
+msgstr ""
+
+msgid "Cancel and close"
 msgstr ""
 
 msgid "Cancel index deletion"
