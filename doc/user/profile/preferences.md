@@ -114,7 +114,7 @@ You can include the following options for your default dashboard view:
 - Starred projects
 - Your projects' activity
 - Starred projects' activity
-- Followed User' Activity
+- Followed Users' Activity
 - Your groups
 - Your [To-Do List](../todos.md)
 - Assigned Issues
