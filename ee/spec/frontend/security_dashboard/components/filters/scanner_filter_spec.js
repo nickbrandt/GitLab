@@ -1,8 +1,8 @@
 import { GlDropdownItem } from '@gitlab/ui';
 import { shallowMount } from '@vue/test-utils';
 import { sampleSize, cloneDeep } from 'lodash';
-import FilterItem from 'ee/security_dashboard/components/filters/filter_item.vue';
-import ScannerFilter from 'ee/security_dashboard/components/filters/scanner_filter.vue';
+import FilterItem from 'ee/security_dashboard/components/shared/filters/filter_item.vue';
+import ScannerFilter from 'ee/security_dashboard/components/shared/filters/scanner_filter.vue';
 import { DEFAULT_SCANNER } from 'ee/security_dashboard/constants';
 import { scannerFilter } from 'ee/security_dashboard/helpers';
 

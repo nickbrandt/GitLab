@@ -2,10 +2,10 @@ import { within } from '@testing-library/dom';
 import { shallowMount } from '@vue/test-utils';
 import CsvExportButton from 'ee/security_dashboard/components/csv_export_button.vue';
 import DashboardNotConfigured from 'ee/security_dashboard/components/empty_states/instance_dashboard_not_configured.vue';
-import FirstClassInstanceDashboard from 'ee/security_dashboard/components/first_class_instance_security_dashboard.vue';
-import FirstClassInstanceVulnerabilities from 'ee/security_dashboard/components/first_class_instance_security_dashboard_vulnerabilities.vue';
-import Filters from 'ee/security_dashboard/components/first_class_vulnerability_filters.vue';
-import SecurityDashboardLayout from 'ee/security_dashboard/components/security_dashboard_layout.vue';
+import InstanceReport from 'ee/security_dashboard/components/instance/instance_vulnerability_report.vue';
+import InstanceReportVulnerabilities from 'ee/security_dashboard/components/instance/instance_vulnerability_report_vulnerabilities.vue';
+import Filters from 'ee/security_dashboard/components/shared/vulnerability_report_filters.vue';
+import ReportLayout from 'ee/security_dashboard/components/shared/vulnerability_report_layout.vue';
 import VulnerabilitiesCountList from 'ee/security_dashboard/components/vulnerability_count_list.vue';
 
 describe('First Class Instance Dashboard Component', () => {
@@ -17,14 +17,14 @@ describe('First Class Instance Dashboard Component', () => {
 
   const vulnerabilitiesExportEndpoint = '/vulnerabilities/exports';
 
-  const findInstanceVulnerabilities = () => wrapper.find(FirstClassInstanceVulnerabilities);
+  const findInstanceVulnerabilities = () => wrapper.find(InstanceReportVulnerabilities);
   const findCsvExportButton = () => wrapper.find(CsvExportButton);
   const findEmptyState = () => wrapper.find(DashboardNotConfigured);
   const findFilters = () => wrapper.find(Filters);
   const findVulnerabilitiesCountList = () => wrapper.find(VulnerabilitiesCountList);
 
   const createWrapper = ({ data = {}, stubs, mocks = defaultMocks() }) => {
-    return shallowMount(FirstClassInstanceDashboard, {
+    return shallowMount(InstanceReport, {
       data() {
         return { ...data };
       },
@@ -34,7 +34,7 @@ describe('First Class Instance Dashboard Component', () => {
       },
       stubs: {
         ...stubs,
-        SecurityDashboardLayout,
+        ReportLayout,
       },
     });
   };

@@ -1,7 +1,7 @@
 import { createLocalVue, shallowMount } from '@vue/test-utils';
 import VueRouter from 'vue-router';
-import FilterBody from 'ee/security_dashboard/components/filters/filter_body.vue';
-import StandardFilter from 'ee/security_dashboard/components/filters/standard_filter.vue';
+import FilterBody from 'ee/security_dashboard/components/shared/filters/filter_body.vue';
+import StandardFilter from 'ee/security_dashboard/components/shared/filters/standard_filter.vue';
 
 const localVue = createLocalVue();
 localVue.use(VueRouter);

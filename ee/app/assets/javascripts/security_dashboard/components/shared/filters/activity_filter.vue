@@ -1,7 +1,7 @@
 <script>
 import { GlDropdownDivider } from '@gitlab/ui';
 import { xor, remove } from 'lodash';
-import { activityOptions } from '../../helpers';
+import { activityOptions } from '../../../helpers';
 import FilterBody from './filter_body.vue';
 import FilterItem from './filter_item.vue';
 import StandardFilter from './standard_filter.vue';

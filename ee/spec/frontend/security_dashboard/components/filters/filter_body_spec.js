@@ -1,6 +1,6 @@
 import { GlDropdown, GlSearchBoxByType } from '@gitlab/ui';
 import { mount } from '@vue/test-utils';
-import FilterBody from 'ee/security_dashboard/components/filters/filter_body.vue';
+import FilterBody from 'ee/security_dashboard/components/shared/filters/filter_body.vue';
 
 describe('Filter Body component', () => {
   let wrapper;

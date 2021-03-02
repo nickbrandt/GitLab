@@ -5,11 +5,11 @@ import Cookies from 'js-cookie';
 import AutoFixUserCallout from 'ee/security_dashboard/components/auto_fix_user_callout.vue';
 import CsvExportButton from 'ee/security_dashboard/components/csv_export_button.vue';
 import ReportsNotConfigured from 'ee/security_dashboard/components/empty_states/reports_not_configured.vue';
-import FirstClassProjectSecurityDashboard from 'ee/security_dashboard/components/first_class_project_security_dashboard.vue';
-import Filters from 'ee/security_dashboard/components/first_class_vulnerability_filters.vue';
+import ProjectReport from 'ee/security_dashboard/components/project/project_vulnerability_report.vue';
 import ProjectPipelineStatus from 'ee/security_dashboard/components/project_pipeline_status.vue';
 import ProjectVulnerabilitiesApp from 'ee/security_dashboard/components/project_vulnerabilities.vue';
-import SecurityDashboardLayout from 'ee/security_dashboard/components/security_dashboard_layout.vue';
+import Filters from 'ee/security_dashboard/components/shared/vulnerability_report_filters.vue';
+import ReportLayout from 'ee/security_dashboard/components/shared/vulnerability_report_layout.vue';
 import VulnerabilityCountList from 'ee/security_dashboard/components/vulnerability_count_list.vue';
 
 const props = {
@@ -48,13 +48,13 @@ describe('First class Project Security Dashboard component', () => {
   const findAutoFixUserCallout = () => wrapper.find(AutoFixUserCallout);
 
   const createComponent = (options) => {
-    wrapper = shallowMount(FirstClassProjectSecurityDashboard, {
+    wrapper = shallowMount(ProjectReport, {
       propsData: {
         ...props,
         ...options.props,
       },
       provide,
-      stubs: { SecurityDashboardLayout, GlBanner },
+      stubs: { ReportLayout, GlBanner },
       ...options,
     });
   };

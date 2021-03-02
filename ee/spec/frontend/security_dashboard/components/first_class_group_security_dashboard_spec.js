@@ -2,10 +2,10 @@ import { GlLoadingIcon } from '@gitlab/ui';
 import { shallowMount } from '@vue/test-utils';
 import CsvExportButton from 'ee/security_dashboard/components/csv_export_button.vue';
 import DashboardNotConfigured from 'ee/security_dashboard/components/empty_states/group_dashboard_not_configured.vue';
-import FirstClassGroupDashboard from 'ee/security_dashboard/components/first_class_group_security_dashboard.vue';
-import FirstClassGroupVulnerabilities from 'ee/security_dashboard/components/first_class_group_security_dashboard_vulnerabilities.vue';
-import Filters from 'ee/security_dashboard/components/first_class_vulnerability_filters.vue';
-import SecurityDashboardLayout from 'ee/security_dashboard/components/security_dashboard_layout.vue';
+import GroupReport from 'ee/security_dashboard/components/group/group_vulnerability_report.vue';
+import GroupReportVulnerabilities from 'ee/security_dashboard/components/group/group_vulnerability_report_vulnerabilities.vue';
+import Filters from 'ee/security_dashboard/components/shared/vulnerability_report_filters.vue';
+import VulnerabilityReportLayout from 'ee/security_dashboard/components/shared/vulnerability_report_layout.vue';
 import VulnerabilitiesCountList from 'ee/security_dashboard/components/vulnerability_count_list.vue';
 
 describe('First Class Group Dashboard Component', () => {
@@ -16,8 +16,8 @@ describe('First Class Group Dashboard Component', () => {
   const groupFullPath = 'group-full-path';
   const vulnerabilitiesExportEndpoint = '/vulnerabilities/exports';
 
-  const findDashboardLayout = () => wrapper.find(SecurityDashboardLayout);
-  const findGroupVulnerabilities = () => wrapper.find(FirstClassGroupVulnerabilities);
+  const findReportLayout = () => wrapper.find(VulnerabilityReportLayout);
+  const findGroupVulnerabilities = () => wrapper.find(GroupReportVulnerabilities);
   const findCsvExportButton = () => wrapper.find(CsvExportButton);
   const findFilters = () => wrapper.find(Filters);
   const findLoadingIcon = () => wrapper.find(GlLoadingIcon);
@@ -25,7 +25,7 @@ describe('First Class Group Dashboard Component', () => {
   const findVulnerabilitiesCountList = () => wrapper.find(VulnerabilitiesCountList);
 
   const createWrapper = ({ data } = {}) => {
-    return shallowMount(FirstClassGroupDashboard, {
+    return shallowMount(GroupReport, {
       propsData: {
         dashboardDocumentation,
         emptyStateSvgPath,
@@ -53,7 +53,7 @@ describe('First Class Group Dashboard Component', () => {
     });
 
     it('dashboard should have display none because it needs to fetch the projects', () => {
-      expect(findDashboardLayout().attributes('class')).toEqual('gl-display-none');
+      expect(findReportLayout().attributes('class')).toEqual('gl-display-none');
     });
 
     it('should not display the dashboard not configured component', () => {
@@ -104,7 +104,7 @@ describe('First Class Group Dashboard Component', () => {
     });
 
     it('dashboard should no more have display none', () => {
-      expect(findDashboardLayout().attributes('class')).toEqual('');
+      expect(findReportLayout().attributes('class')).toEqual('');
     });
 
     it('should not display the dashboard not configured component', () => {
@@ -132,7 +132,7 @@ describe('First Class Group Dashboard Component', () => {
     });
 
     it('dashboard should not be rendered', () => {
-      expect(findDashboardLayout().exists()).toBe(false);
+      expect(findReportLayout().exists()).toBe(false);
     });
 
     it('should display the dashboard not configured component', () => {

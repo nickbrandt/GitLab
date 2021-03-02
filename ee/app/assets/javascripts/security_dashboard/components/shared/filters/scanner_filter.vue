@@ -2,7 +2,7 @@
 import { GlDropdownDivider, GlDropdownItem, GlTruncate } from '@gitlab/ui';
 import { union, uniq, without, get, set, keyBy } from 'lodash';
 import { DEFAULT_SCANNER } from 'ee/security_dashboard/constants';
-import { createScannerOption } from '../../helpers';
+import { createScannerOption } from '../../../helpers';
 import FilterBody from './filter_body.vue';
 import FilterItem from './filter_item.vue';
 import StandardFilter from './standard_filter.vue';

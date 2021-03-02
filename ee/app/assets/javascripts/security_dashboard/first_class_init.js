@@ -1,9 +1,9 @@
 import Vue from 'vue';
 import { DASHBOARD_TYPES } from 'ee/security_dashboard/store/constants';
 import { parseBoolean } from '~/lib/utils/common_utils';
-import FirstClassGroupSecurityDashboard from './components/first_class_group_security_dashboard.vue';
-import FirstClassInstanceSecurityDashboard from './components/first_class_instance_security_dashboard.vue';
-import FirstClassProjectSecurityDashboard from './components/first_class_project_security_dashboard.vue';
+import GroupVulnerabilityReport from './components/group/group_vulnerability_report.vue';
+import InstanceVulnerabilityReport from './components/instance/instance_vulnerability_report.vue';
+import ProjectVulnerabilityReport from './components/project/project_vulnerability_report.vue';
 import UnavailableState from './components/unavailable_state.vue';
 import apolloProvider from './graphql/provider';
 import createRouter from './router';
@@ -77,7 +77,7 @@ export default (el, dashboardType) => {
   let component;
 
   if (dashboardType === DASHBOARD_TYPES.PROJECT) {
-    component = FirstClassProjectSecurityDashboard;
+    component = ProjectVulnerabilityReport;
     props.pipeline = {
       createdAt: pipelineCreatedAt,
       id: pipelineId,
@@ -89,11 +89,11 @@ export default (el, dashboardType) => {
     provide.autoFixDocumentation = autoFixDocumentation;
     provide.autoFixMrsPath = autoFixMrsPath;
   } else if (dashboardType === DASHBOARD_TYPES.GROUP) {
-    component = FirstClassGroupSecurityDashboard;
+    component = GroupVulnerabilityReport;
     props.groupFullPath = groupFullPath;
   } else if (dashboardType === DASHBOARD_TYPES.INSTANCE) {
     provide.instanceDashboardSettingsPath = instanceDashboardSettingsPath;
-    component = FirstClassInstanceSecurityDashboard;
+    component = InstanceVulnerabilityReport;
   }
 
   const router = createRouter();

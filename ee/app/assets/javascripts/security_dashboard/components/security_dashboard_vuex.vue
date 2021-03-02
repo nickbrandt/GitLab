@@ -5,14 +5,14 @@ import { vulnerabilityModalMixin } from 'ee/vue_shared/security_reports/mixins/v
 import Filters from './filters.vue';
 import FuzzingArtifactsDownload from './fuzzing_artifacts_download.vue';
 import LoadingError from './loading_error.vue';
-import SecurityDashboardLayout from './security_dashboard_layout.vue';
 import SecurityDashboardTable from './security_dashboard_table.vue';
+import VulnerabilityReportLayout from './shared/vulnerability_report_layout.vue';
 
 export default {
   components: {
     Filters,
     IssueModal,
-    SecurityDashboardLayout,
+    VulnerabilityReportLayout,
     SecurityDashboardTable,
     FuzzingArtifactsDownload,
     LoadingError,
@@ -94,7 +94,7 @@ export default {
       :illustrations="loadingErrorIllustrations"
     />
     <template v-else>
-      <security-dashboard-layout>
+      <vulnerability-report-layout>
         <template #header>
           <filters>
             <template v-if="hasFuzzingArtifacts" #buttons>
@@ -112,7 +112,7 @@ export default {
             <slot name="empty-state"></slot>
           </template>
         </security-dashboard-table>
-      </security-dashboard-layout>
+      </vulnerability-report-layout>
 
       <issue-modal
         :modal="modal"

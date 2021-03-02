@@ -1,14 +1,14 @@
 <script>
 import { GlAlert } from '@gitlab/ui';
-import SecurityDashboardLayout from 'ee/security_dashboard/components/security_dashboard_layout.vue';
+import VulnerabilityReportLayout from 'ee/security_dashboard/components/shared/vulnerability_report_layout.vue';
 import projectsQuery from 'ee/security_dashboard/graphql/queries/get_instance_security_dashboard_projects.query.graphql';
-import { createProjectLoadingError } from '../helpers';
-import ProjectManager from './first_class_project_manager/project_manager.vue';
+import { createProjectLoadingError } from '../../helpers';
+import ProjectManager from '../first_class_project_manager/project_manager.vue';
 
 export default {
   components: {
     ProjectManager,
-    SecurityDashboardLayout,
+    VulnerabilityReportLayout,
     GlAlert,
   },
   apollo: {
@@ -37,12 +37,12 @@ export default {
 </script>
 
 <template>
-  <security-dashboard-layout>
+  <vulnerability-report-layout>
     <gl-alert v-if="hasError" variant="danger">
       {{ errorMessage }}
     </gl-alert>
     <div v-else class="gl-display-flex gl-justify-content-center">
       <project-manager :projects="projects" />
     </div>
-  </security-dashboard-layout>
+  </vulnerability-report-layout>
 </template>
