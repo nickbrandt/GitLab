@@ -7,4 +7,8 @@ class RawUsageData < ApplicationRecord
   def update_sent_at!
     self.update_column(:sent_at, Time.current)
   end
+
+  def update_version_usage_data_id!(usage_data_id)
+    self.update_column(:version_usage_data_id_value, usage_data_id)
+  end
 end
