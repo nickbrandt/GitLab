@@ -6,6 +6,8 @@ module Ci
   class RegisterJobService
     attr_reader :runner, :metrics
 
+    TEMPORARY_LOCK_TIMEOUT = 3.seconds
+
     Result = Struct.new(:build, :build_json, :valid?)
 
     def initialize(runner)
@@ -30,6 +32,20 @@ module Ci
       each_build(params) do |build|
         depth += 1
         @metrics.increment_queue_operation(:queue_iteration)
+
+        # We read builds from replicas
+        # It is likely that some other concurrent connection is processing
+        # a given build at a given moment. To avoid an expensive compute
+        # we perform an exclusive lease on Redis to acquire a build temporarily
+        unless acquire_temporary_lock(build.id)
+          @metrics.increment_queue_operation(:build_temporary_locked)
+
+          # We failed to acquire lock
+          # - our queue is not complete as some resources are locked temporarily
+          # - we need to re-process it again to ensure that all builds are handled
+          valid = false
+          next
+        end
 
         result = process_build(build, params)
         next unless result
@@ -168,6 +184,16 @@ module Ci
       end
 
       !failure_reason
+    end
+
+    def acquire_temporary_lock(build_id)
+      return true unless Feature.enabled?(:ci_register_job_temporary_lock, runner)
+
+      key = "build/register/#{build_id}"
+
+      Gitlab::ExclusiveLease
+        .new(key, timeout: TEMPORARY_LOCK_TIMEOUT.to_i)
+        .try_obtain
     end
 
     def scheduler_failure!(build)
