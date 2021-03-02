@@ -3,6 +3,7 @@ import ScheduleShift from 'ee/oncall_schedules/components/schedule/components/sc
 import RotationsAssignee from 'ee/oncall_schedules/components/rotations/components/rotation_assignee.vue';
 import { incrementDateByDays } from 'ee/oncall_schedules/components/schedule/utils';
 import { PRESET_TYPES, DAYS_IN_WEEK } from 'ee/oncall_schedules/constants';
+import { useFakeDate } from 'helpers/fake_date';
 
 const shift = {
   participant: {
@@ -20,6 +21,9 @@ const timeframeItem = new Date(2021, 0, 13);
 const timeframe = [timeframeItem, incrementDateByDays(timeframeItem, DAYS_IN_WEEK)];
 
 describe('ee/oncall_schedules/components/schedule/components/schedule_shift.vue', () => {
+  // Some tests in this suite are dependent that today is Jan 2021
+  useFakeDate(2021, 0, 20);
+
   let wrapper;
 
   function createComponent({ props = {}, data = {} } = {}) {
