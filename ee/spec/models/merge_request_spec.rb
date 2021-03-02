@@ -1277,12 +1277,13 @@ RSpec.describe MergeRequest do
     subject { merge_request.security_reports_up_to_date? }
 
     context 'when the target branch security reports are up to date' do
-      it { is_expected.to be_truthy }
+      it { is_expected.to be true }
     end
 
     context 'when the target branch security reports are out of date' do
       let_it_be(:bad_pipeline) { create(:ee_ci_pipeline, :failed, project: project, ref: merge_request.target_branch) }
-      it { is_expected.to be_falsy }
+
+      it { is_expected.to be false }
     end
   end
 end
