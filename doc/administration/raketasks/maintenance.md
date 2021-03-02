@@ -13,13 +13,13 @@ GitLab provides Rake tasks for general maintenance.
 This command gathers information about your GitLab installation and the system it runs on.
 These may be useful when asking for help or reporting issues.
 
-**Omnibus Installation**
+**For Omnibus installations**
 
 ```shell
 sudo gitlab-rake gitlab:env:info
 ```
 
-**Source Installation**
+**For installations from source**
 
 ```shell
 bundle exec rake gitlab:env:info RAILS_ENV=production
@@ -76,13 +76,13 @@ installations: a license cannot be installed into GitLab Community Edition.
 These may be useful when raising tickets with Support, or for programmatically
 checking your license parameters.
 
-**Omnibus Installation**
+**For Omnibus installations**
 
 ```shell
 sudo gitlab-rake gitlab:license:info
 ```
 
-**Source Installation**
+**For installations from source**
 
 ```shell
 bundle exec rake gitlab:license:info RAILS_ENV=production
@@ -119,13 +119,13 @@ You may also have a look at our troubleshooting guides for:
 
 To run `gitlab:check`, run:
 
-**Omnibus Installation**
+**For Omnibus installations**
 
 ```shell
 sudo gitlab-rake gitlab:check
 ```
 
-**Source Installation**
+**For installations from source**
 
 ```shell
 bundle exec rake gitlab:check RAILS_ENV=production
@@ -182,13 +182,13 @@ Checking GitLab ... Finished
 
 In some case it is necessary to rebuild the `authorized_keys` file. To do this, run:
 
-**Omnibus Installation**
+**For Omnibus installations**
 
 ```shell
 sudo gitlab-rake gitlab:shell:setup
 ```
 
-**Source Installation**
+**For installations from source**
 
 ```shell
 cd /home/git/gitlab
@@ -205,24 +205,26 @@ Do you want to continue (yes/no)? yes
 
 ## Clear issue and merge request description template names cache
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/54706) in GitLab 13.10
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/54706) in GitLab 13.10.
 
-If for some reason the issue or merge request description template names in the dropdown
-do not reflect the actual description template names in the repository, you may want to
-consider clearing the Redis cache that stores the template names information. To do so, you
-need to run:
+If the issue or merge request description template names in the dropdown
+do not reflect the actual description template names in the repository, consider clearing
+the Redis cache that stores the template names information.
+You can clear the cache of
+[all issues and merge request templates in the installation](#clear-cache-for-all-issue-and-merge-request-template-names)
+or [in a specific project](#clear-cache-for-issue-and-merge-request-template-names-in-specific-projects).
 
 ### Clear cache for all issue and merge request template names
 
-In cases where you want to refresh issue and merge request templates for all projects in your installation:
+If you want to refresh issue and merge request templates for all projects:
 
-**Omnibus Installation**
+**For Omnibus installations**
 
 ```shell
 sudo gitlab-rake cache:clear:description_templates
 ```
 
-**Source Installation**
+**For installations from source**
 
 ```shell
 cd /home/git/gitlab
@@ -231,17 +233,16 @@ sudo -u git -H bundle exec rake cache:clear:description_templates RAILS_ENV=prod
 
 ### Clear cache for issue and merge request template names in specific projects
 
-In cases where you want to refresh issue and merge request templates for specific projects
+If you want to refresh issue and merge request templates for specific projects,
+provide a comma-separated list of IDs as the `project_ids` parameter to the Rake task.
 
-Provide a comma separate list of ids as `project_ids` parameter to the Rake task.
-
-**Omnibus Installation**
+**For Omnibus installations**
 
 ```shell
 sudo gitlab-rake cache:clear:description_templates project_ids=10,25,35
 ```
 
-**Source Installation**
+**For installations from source**
 
 ```shell
 cd /home/git/gitlab
@@ -253,13 +254,13 @@ sudo -u git -H bundle exec rake cache:clear:description_templates project_ids=10
 If for some reason the dashboard displays the wrong information, you might want to
 clear Redis' cache. To do this, run:
 
-**Omnibus Installation**
+**For Omnibus installations**
 
 ```shell
 sudo gitlab-rake cache:clear
 ```
 
-**Source Installation**
+**For installations from source**
 
 ```shell
 cd /home/git/gitlab
@@ -274,7 +275,7 @@ missing some icons. In that case, try to precompile the assets again.
 This only applies to source installations and does NOT apply to
 Omnibus packages.
 
-**Source Installation**
+**For installations from source**
 
 ```shell
 cd /home/git/gitlab
@@ -294,13 +295,13 @@ Sometimes you need to know if your GitLab installation can connect to a TCP
 service on another machine - perhaps a PostgreSQL or HTTPS server. A Rake task
 is included to help you with this:
 
-**Omnibus Installation**
+**For Omnibus installations**
 
 ```shell
 sudo gitlab-rake gitlab:tcp_check[example.com,80]
 ```
 
-**Source Installation**
+**For installations from source**
 
 ```shell
 cd /home/git/gitlab
