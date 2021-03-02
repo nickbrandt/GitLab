@@ -10223,6 +10223,11 @@ msgstr ""
 msgid "Deployments"
 msgstr ""
 
+msgid "Deployments|%{deployments} environment impacted."
+msgid_plural "Deployments|%{deployments} environments impacted."
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "Deployment|API"
 msgstr ""
 
@@ -32848,6 +32853,9 @@ msgid "View alert details at"
 msgstr ""
 
 msgid "View alert details."
+msgstr ""
+
+msgid "View all environments."
 msgstr ""
 
 msgid "View all issues"
