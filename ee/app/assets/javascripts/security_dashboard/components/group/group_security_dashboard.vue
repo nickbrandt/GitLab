@@ -23,7 +23,10 @@ export default {
     projects: {
       query: groupProjectsQuery,
       variables() {
-        return { fullPath: this.groupFullPath };
+        return {
+          fullPath: this.groupFullPath,
+          pageSize: 1,
+        };
       },
       update(data) {
         return data?.group?.projects?.nodes ?? [];
