@@ -35,6 +35,9 @@ module Registrations
           record_experiment_user(:trial_onboarding_issues, trial_onboarding_context)
           record_experiment_conversion_event(:trial_onboarding_issues)
 
+          experiment(:registrations_group_invite, actor: @project.group)
+            .track(:signup_successful, property: @project.namespace_id)
+
           redirect_to trial_getting_started_users_sign_up_welcome_path(learn_gitlab_project_id: learn_gitlab_project.id)
         else
           redirect_to users_sign_up_experience_level_path(namespace_path: @project.namespace)
