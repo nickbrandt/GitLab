@@ -4,7 +4,7 @@ import LinksLayer from '../graph_shared/links_layer.vue';
 import { DOWNSTREAM, MAIN, UPSTREAM, ONE_COL_WIDTH } from './constants';
 import LinkedPipelinesColumn from './linked_pipelines_column.vue';
 import StageColumnComponent from './stage_column_component.vue';
-import { reportToSentry } from './utils';
+import { reportToSentry, validateConfigPaths } from './utils';
 
 export default {
   name: 'PipelineGraph',
@@ -18,11 +18,7 @@ export default {
     configPaths: {
       type: Object,
       required: true,
-      validator(value) {
-        return (
-          Object.keys(value).includes('graphqlResourceEtag') && value.graphqlResourceEtag.length > 0
-        );
-      },
+      validator: validateConfigPaths,
     },
     pipeline: {
       type: Object,

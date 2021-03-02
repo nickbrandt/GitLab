@@ -77,4 +77,12 @@ const unwrapPipelineData = (mainPipelineProjectPath, data) => {
   };
 };
 
-export { getQueryHeaders, reportToSentry, toggleQueryPollingByVisibility, unwrapPipelineData };
+const validateConfigPaths = (value) => value.graphqlResourceEtag?.length > 0;
+
+export {
+  getQueryHeaders,
+  reportToSentry,
+  toggleQueryPollingByVisibility,
+  unwrapPipelineData,
+  validateConfigPaths,
+};

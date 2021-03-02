@@ -8,6 +8,7 @@ import {
   reportToSentry,
   toggleQueryPollingByVisibility,
   unwrapPipelineData,
+  validateConfigPaths,
 } from './utils';
 
 export default {
@@ -23,9 +24,7 @@ export default {
     configPaths: {
       type: Object,
       required: true,
-      validator(value) {
-        return Object.keys(value).includes('graphqlResourceEtag');
-      },
+      validator: validateConfigPaths,
     },
     linkedPipelines: {
       type: Array,
