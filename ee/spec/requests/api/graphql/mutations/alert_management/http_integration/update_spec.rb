@@ -48,10 +48,11 @@ RSpec.describe 'Updating an existing HTTP Integration' do
   let(:mutation_response) { graphql_mutation_response(:http_integration_update) }
 
   shared_examples 'ignoring the custom mapping' do
-    it 'updates integration without the custom mapping params' do
+    it 'updates integration without the custom mapping params', :aggregate_failures do
       post_graphql_mutation(mutation, current_user: current_user)
 
       expect(response).to have_gitlab_http_status(:success)
+      integration.reload
       expect(integration.payload_example).to eq({})
       expect(integration.payload_attribute_mapping).to eq({})
     end
@@ -66,6 +67,26 @@ RSpec.describe 'Updating an existing HTTP Integration' do
   it_behaves_like 'updating an existing HTTP integration'
   it_behaves_like 'validating the payload_example'
   it_behaves_like 'validating the payload_attribute_mappings'
+
+  it 'updates the custom mapping params', :aggregate_failures do
+    post_graphql_mutation(mutation, current_user: current_user)
+
+    expect(response).to have_gitlab_http_status(:success)
+    integration.reload
+    expect(integration.payload_example).to eq(Gitlab::Json.parse(payload_example))
+    expect(integration.payload_attribute_mapping).to eq(
+      'start_time' => {
+        'label' => 'Start time',
+        'path' => %w[started_at],
+        'type' => 'datetime'
+      },
+      'title' => {
+        'label' => nil,
+        'path' => %w[alert name],
+        'type' => 'string'
+      }
+    )
+  end
 
   context 'when the custom mappings attributes are not part of the mutation variables' do
     let_it_be(:payload_example) do
@@ -100,7 +121,7 @@ RSpec.describe 'Updating an existing HTTP Integration' do
       end
     end
 
-    it 'does not resets the custom mapping attributes', :aggregate_failures do
+    it 'does not reset the custom mapping attributes', :aggregate_failures do
       post_graphql_mutation(mutation, current_user: current_user)
 
       integration_response = mutation_response['integration']
