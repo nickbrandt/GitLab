@@ -32,10 +32,6 @@ RSpec.describe Gitlab::CryptoHelper do
   end
 
   describe '.aes256_gcm_decrypt' do
-    before do
-      stub_feature_flags(dynamic_nonce_creation: false)
-    end
-
     context 'when token was encrypted using static nonce' do
       let(:encrypted) { described_class.aes256_gcm_encrypt('some-value', nonce: described_class::AES256_GCM_IV_STATIC) }
 
@@ -53,18 +49,6 @@ RSpec.describe Gitlab::CryptoHelper do
 
       it 'does not save hashed token with iv value in database' do
         expect { described_class.aes256_gcm_decrypt(encrypted) }.not_to change { TokenWithIv.count }
-      end
-
-      context 'with feature flag switched on' do
-        before do
-          stub_feature_flags(dynamic_nonce_creation: true)
-        end
-
-        it 'correctly decrypts encrypted string' do
-          decrypted = described_class.aes256_gcm_decrypt(encrypted)
-
-          expect(decrypted).to eq 'some-value'
-        end
       end
     end
   end
