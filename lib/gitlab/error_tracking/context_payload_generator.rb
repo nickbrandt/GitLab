@@ -8,24 +8,22 @@ module Gitlab
       end
 
       def generate(exception, extra = {})
-        payload = {}
-
-        append_extra!(payload, exception, extra)
-        append_tags!(payload)
-        append_user!(payload)
-
-        payload
+        {
+          extra: extra_payload(exception, extra),
+          tags: tags_payload,
+          user: user_payload
+        }
       end
 
       private
 
-      def append_extra!(payload, exception, extra)
+      def extra_payload(exception, extra)
         inline_extra = exception.try(:sentry_extra_data)
         if inline_extra.present? && inline_extra.is_a?(Hash)
           extra = extra.merge(inline_extra)
         end
 
-        payload[:extra] = sanitize_request_parameters(extra)
+        sanitize_request_parameters(extra)
       end
 
       def sanitize_request_parameters(parameters)
@@ -33,20 +31,17 @@ module Gitlab
         filter.filter(parameters)
       end
 
-      def append_tags!(payload)
-        payload[:tags] = {}
-        payload[:tags]
-          .merge!(extra_tags_from_env)
-          .merge!(
-            program: Gitlab.process_name,
-            locale: I18n.locale,
-            feature_category: current_context['meta.feature_category'],
-            Labkit::Correlation::CorrelationId::LOG_KEY.to_sym => Labkit::Correlation::CorrelationId.current_id
-          )
+      def tags_payload
+        extra_tags_from_env.merge!(
+          program: Gitlab.process_name,
+          locale: I18n.locale,
+          feature_category: current_context['meta.feature_category'],
+          Labkit::Correlation::CorrelationId::LOG_KEY.to_sym => Labkit::Correlation::CorrelationId.current_id
+        )
       end
 
-      def append_user!(payload)
-        payload[:user] = {
+      def user_payload
+        {
           username: current_context['meta.user']
         }
       end

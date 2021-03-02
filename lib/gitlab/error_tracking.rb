@@ -108,8 +108,8 @@ module Gitlab
         end
 
         if logging
-          formater = Gitlab::ErrorTracking::LogFormatter.new
-          log_hash = formater.generate_log(exception, context_payload)
+          formatter = Gitlab::ErrorTracking::LogFormatter.new
+          log_hash = formatter.generate_log(exception, context_payload)
 
           Gitlab::ErrorTracking::Logger.error(log_hash)
         end

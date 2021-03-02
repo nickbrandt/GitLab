@@ -37,22 +37,18 @@ module Gitlab
         extra = Raven.context.extra.merge(context_payload[:extra])
         extra = extra.except(:server)
 
-        sidekiq_extra = extra[:sidekiq]
         # The extra value for sidekiq is a hash whose keys are strings.
-        if sidekiq_extra.is_a?(Hash) && sidekiq_extra.key?('args')
-          sidekiq_extra = sidekiq_extra.dup
+        if extra[:sidekiq].is_a?(Hash) && extra[:sidekiq].key?('args')
+          sidekiq_extra = extra.delete(:sidekiq)
           sidekiq_extra['args'] = Gitlab::ErrorTracking::Processor::SidekiqProcessor.loggable_arguments(
             sidekiq_extra['args'], sidekiq_extra['class']
           )
+          payload["extra.sidekiq"] = sidekiq_extra
         end
-
-        extra[:sidekiq] = sidekiq_extra if sidekiq_extra
 
         extra.each do |key, value|
           payload["extra.#{key}"] = value
         end
-
-        payload
       end
     end
   end

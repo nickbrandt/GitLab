@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'spec_helper'
+require 'fast_spec_helper'
 
 RSpec.describe Gitlab::ErrorTracking::LogFormatter do
   let(:exception) { StandardError.new('boom') }
@@ -43,7 +43,7 @@ RSpec.describe Gitlab::ErrorTracking::LogFormatter do
     ::Raven::Context.clear!
   end
 
-  it 'appends error-related log fields' do
+  it 'appends error-related log fields and filters sensitive Sidekiq arguments' do
     payload = described_class.new.generate_log(exception, context_payload)
 
     expect(payload).to eql(

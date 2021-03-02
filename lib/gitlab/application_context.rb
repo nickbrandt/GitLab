@@ -32,7 +32,7 @@ module Gitlab
     end
 
     def self.current_context_include?(attribute_name)
-      Labkit::Context.current.to_h.include?(Labkit::Context.log_key(attribute_name))
+      current.include?(Labkit::Context.log_key(attribute_name))
     end
 
     def initialize(**args)
