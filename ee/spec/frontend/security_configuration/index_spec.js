@@ -40,7 +40,7 @@ describe('Security Configuration App', () => {
 
         // This is a temporary flag just for this spike. Used to switch between
         // re-architected implementation and original.
-        newSecurityConfiguration: false,
+        newSecurityConfiguration: true,
       };
       initSecurityConfiguration(el);
 

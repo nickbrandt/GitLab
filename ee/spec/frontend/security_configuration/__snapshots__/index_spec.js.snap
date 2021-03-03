@@ -39,9 +39,9 @@ exports[`Security Configuration App given no enabled scanners matches the snapsh
     <table
       aria-busy="false"
       aria-colcount="3"
-      aria-describedby="__BVID__74__caption_"
+      aria-describedby="__BVID__77__caption_"
       class="table b-table gl-table b-table-stacked-md"
-      id="__BVID__74"
+      id="__BVID__77"
       role="table"
     >
       <!---->
@@ -104,8 +104,8 @@ exports[`Security Configuration App given no enabled scanners matches the snapsh
                
               <div>
                 
-        Analyze your source code for known vulnerabilities.
-        
+      Analyze your source code for known vulnerabilities.
+      
                 <a
                   aria-label="Feature documentation for Static Application Security Testing (SAST)"
                   class="gl-link"
@@ -115,8 +115,8 @@ exports[`Security Configuration App given no enabled scanners matches the snapsh
                   target="_blank"
                 >
                   
-          More information
-        
+        More information
+      
                 </a>
               </div>
             </div>
@@ -129,9 +129,12 @@ exports[`Security Configuration App given no enabled scanners matches the snapsh
           >
             <div>
               <div>
-                
+                <div>
+                  
   Not enabled
-  
+
+                </div>
+                 
                 <!---->
               </div>
             </div>
@@ -180,8 +183,8 @@ exports[`Security Configuration App given no enabled scanners matches the snapsh
                
               <div>
                 
-        Analyze a review version of your web application.
-        
+      Analyze a review version of your web application.
+      
                 <a
                   aria-label="Feature documentation for Dynamic Application Security Testing (DAST)"
                   class="gl-link"
@@ -191,8 +194,8 @@ exports[`Security Configuration App given no enabled scanners matches the snapsh
                   target="_blank"
                 >
                   
-          More information
-        
+        More information
+      
                 </a>
               </div>
             </div>
@@ -207,8 +210,7 @@ exports[`Security Configuration App given no enabled scanners matches the snapsh
               <div>
                 
   Not enabled
-  
-                <!---->
+
               </div>
             </div>
           </td>
@@ -242,8 +244,8 @@ exports[`Security Configuration App given no enabled scanners matches the snapsh
                
               <div>
                 
-        Saved scan settings and target site settings which are reusable.
-        
+      Saved scan settings and target site settings which are reusable.
+      
                 <a
                   aria-label="Feature documentation for DAST Scans"
                   class="gl-link"
@@ -253,8 +255,8 @@ exports[`Security Configuration App given no enabled scanners matches the snapsh
                   target="_blank"
                 >
                   
-          More information
-        
+        More information
+      
                 </a>
               </div>
             </div>
@@ -269,8 +271,7 @@ exports[`Security Configuration App given no enabled scanners matches the snapsh
               <div>
                 
   Available for on-demand DAST
-  
-                <!---->
+
               </div>
             </div>
           </td>
@@ -318,8 +319,8 @@ exports[`Security Configuration App given no enabled scanners matches the snapsh
                
               <div>
                 
-        Analyze your dependencies for known vulnerabilities.
-        
+      Analyze your dependencies for known vulnerabilities.
+      
                 <a
                   aria-label="Feature documentation for Dependency Scanning"
                   class="gl-link"
@@ -329,8 +330,8 @@ exports[`Security Configuration App given no enabled scanners matches the snapsh
                   target="_blank"
                 >
                   
-          More information
-        
+        More information
+      
                 </a>
               </div>
             </div>
@@ -345,8 +346,7 @@ exports[`Security Configuration App given no enabled scanners matches the snapsh
               <div>
                 
   Not enabled
-  
-                <!---->
+
               </div>
             </div>
           </td>
@@ -380,8 +380,8 @@ exports[`Security Configuration App given no enabled scanners matches the snapsh
                
               <div>
                 
-        Check your Docker images for known vulnerabilities.
-        
+      Check your Docker images for known vulnerabilities.
+      
                 <a
                   aria-label="Feature documentation for Container Scanning"
                   class="gl-link"
@@ -391,8 +391,8 @@ exports[`Security Configuration App given no enabled scanners matches the snapsh
                   target="_blank"
                 >
                   
-          More information
-        
+        More information
+      
                 </a>
               </div>
             </div>
@@ -407,8 +407,7 @@ exports[`Security Configuration App given no enabled scanners matches the snapsh
               <div>
                 
   Not enabled
-  
-                <!---->
+
               </div>
             </div>
           </td>
@@ -442,8 +441,8 @@ exports[`Security Configuration App given no enabled scanners matches the snapsh
                
               <div>
                 
-        Analyze your source code and git history for secrets.
-        
+      Analyze your source code and git history for secrets.
+      
                 <a
                   aria-label="Feature documentation for Secret Detection"
                   class="gl-link"
@@ -453,8 +452,8 @@ exports[`Security Configuration App given no enabled scanners matches the snapsh
                   target="_blank"
                 >
                   
-          More information
-        
+        More information
+      
                 </a>
               </div>
             </div>
@@ -469,8 +468,7 @@ exports[`Security Configuration App given no enabled scanners matches the snapsh
               <div>
                 
   Not enabled
-  
-                <!---->
+
               </div>
             </div>
           </td>
@@ -504,8 +502,8 @@ exports[`Security Configuration App given no enabled scanners matches the snapsh
                
               <div>
                 
-        Find bugs in your code with coverage-guided fuzzing.
-        
+      Find bugs in your code with coverage-guided fuzzing.
+      
                 <a
                   aria-label="Feature documentation for Coverage Fuzzing"
                   class="gl-link"
@@ -515,8 +513,8 @@ exports[`Security Configuration App given no enabled scanners matches the snapsh
                   target="_blank"
                 >
                   
-          More information
-        
+        More information
+      
                 </a>
               </div>
             </div>
@@ -531,8 +529,7 @@ exports[`Security Configuration App given no enabled scanners matches the snapsh
               <div>
                 
   Not enabled
-  
-                <!---->
+
               </div>
             </div>
           </td>
@@ -566,8 +563,8 @@ exports[`Security Configuration App given no enabled scanners matches the snapsh
                
               <div>
                 
-        Find bugs in your code with API fuzzing.
-        
+      Find bugs in your code with API fuzzing.
+      
                 <a
                   aria-label="Feature documentation for API Fuzzing"
                   class="gl-link"
@@ -577,8 +574,8 @@ exports[`Security Configuration App given no enabled scanners matches the snapsh
                   target="_blank"
                 >
                   
-          More information
-        
+        More information
+      
                 </a>
               </div>
             </div>
@@ -593,8 +590,7 @@ exports[`Security Configuration App given no enabled scanners matches the snapsh
               <div>
                 
   Not enabled
-  
-                <!---->
+
               </div>
             </div>
           </td>
@@ -628,8 +624,8 @@ exports[`Security Configuration App given no enabled scanners matches the snapsh
                
               <div>
                 
-        Search your project dependencies for their licenses and apply policies.
-        
+      Search your project dependencies for their licenses and apply policies.
+      
                 <a
                   aria-label="Feature documentation for License Compliance"
                   class="gl-link"
@@ -639,8 +635,8 @@ exports[`Security Configuration App given no enabled scanners matches the snapsh
                   target="_blank"
                 >
                   
-          More information
-        
+        More information
+      
                 </a>
               </div>
             </div>
@@ -655,8 +651,7 @@ exports[`Security Configuration App given no enabled scanners matches the snapsh
               <div>
                 
   Not enabled
-  
-                <!---->
+
               </div>
             </div>
           </td>
@@ -721,9 +716,9 @@ exports[`Security Configuration App given some enabled by ADO matches the snapsh
     <table
       aria-busy="false"
       aria-colcount="3"
-      aria-describedby="__BVID__136__caption_"
+      aria-describedby="__BVID__141__caption_"
       class="table b-table gl-table b-table-stacked-md"
-      id="__BVID__136"
+      id="__BVID__141"
       role="table"
     >
       <!---->
@@ -786,8 +781,8 @@ exports[`Security Configuration App given some enabled by ADO matches the snapsh
                
               <div>
                 
-        Analyze your source code for known vulnerabilities.
-        
+      Analyze your source code for known vulnerabilities.
+      
                 <a
                   aria-label="Feature documentation for Static Application Security Testing (SAST)"
                   class="gl-link"
@@ -797,8 +792,8 @@ exports[`Security Configuration App given some enabled by ADO matches the snapsh
                   target="_blank"
                 >
                   
-          More information
-        
+        More information
+      
                 </a>
               </div>
             </div>
@@ -811,9 +806,12 @@ exports[`Security Configuration App given some enabled by ADO matches the snapsh
           >
             <div>
               <div>
-                
+                <div>
+                  
   Not enabled
-  
+
+                </div>
+                 
                 <!---->
               </div>
             </div>
@@ -826,6 +824,7 @@ exports[`Security Configuration App given some enabled by ADO matches the snapsh
           >
             <div>
               <a
+                auto-devops-enabled="true"
                 class="btn btn-success btn-md gl-button"
                 data-testid="enableButton"
                 href="/markrian-test/test-public-project/-/security/configuration/sast"
@@ -862,8 +861,8 @@ exports[`Security Configuration App given some enabled by ADO matches the snapsh
                
               <div>
                 
-        Analyze a review version of your web application.
-        
+      Analyze a review version of your web application.
+      
                 <a
                   aria-label="Feature documentation for Dynamic Application Security Testing (DAST)"
                   class="gl-link"
@@ -873,8 +872,8 @@ exports[`Security Configuration App given some enabled by ADO matches the snapsh
                   target="_blank"
                 >
                   
-          More information
-        
+        More information
+      
                 </a>
               </div>
             </div>
@@ -889,8 +888,7 @@ exports[`Security Configuration App given some enabled by ADO matches the snapsh
               <div>
                 
   Not enabled
-  
-                <!---->
+
               </div>
             </div>
           </td>
@@ -924,8 +922,8 @@ exports[`Security Configuration App given some enabled by ADO matches the snapsh
                
               <div>
                 
-        Saved scan settings and target site settings which are reusable.
-        
+      Saved scan settings and target site settings which are reusable.
+      
                 <a
                   aria-label="Feature documentation for DAST Scans"
                   class="gl-link"
@@ -935,8 +933,8 @@ exports[`Security Configuration App given some enabled by ADO matches the snapsh
                   target="_blank"
                 >
                   
-          More information
-        
+        More information
+      
                 </a>
               </div>
             </div>
@@ -951,8 +949,7 @@ exports[`Security Configuration App given some enabled by ADO matches the snapsh
               <div>
                 
   Available for on-demand DAST
-  
-                <!---->
+
               </div>
             </div>
           </td>
@@ -964,6 +961,7 @@ exports[`Security Configuration App given some enabled by ADO matches the snapsh
           >
             <div>
               <a
+                auto-devops-enabled="true"
                 class="btn btn-default btn-md gl-button"
                 data-testid="manageButton"
                 href="/markrian-test/test-public-project/-/security/configuration/dast_profiles"
@@ -1000,8 +998,8 @@ exports[`Security Configuration App given some enabled by ADO matches the snapsh
                
               <div>
                 
-        Analyze your dependencies for known vulnerabilities.
-        
+      Analyze your dependencies for known vulnerabilities.
+      
                 <a
                   aria-label="Feature documentation for Dependency Scanning"
                   class="gl-link"
@@ -1011,8 +1009,8 @@ exports[`Security Configuration App given some enabled by ADO matches the snapsh
                   target="_blank"
                 >
                   
-          More information
-        
+        More information
+      
                 </a>
               </div>
             </div>
@@ -1027,8 +1025,7 @@ exports[`Security Configuration App given some enabled by ADO matches the snapsh
               <div>
                 
   Not enabled
-  
-                <!---->
+
               </div>
             </div>
           </td>
@@ -1062,8 +1059,8 @@ exports[`Security Configuration App given some enabled by ADO matches the snapsh
                
               <div>
                 
-        Check your Docker images for known vulnerabilities.
-        
+      Check your Docker images for known vulnerabilities.
+      
                 <a
                   aria-label="Feature documentation for Container Scanning"
                   class="gl-link"
@@ -1073,8 +1070,8 @@ exports[`Security Configuration App given some enabled by ADO matches the snapsh
                   target="_blank"
                 >
                   
-          More information
-        
+        More information
+      
                 </a>
               </div>
             </div>
@@ -1089,8 +1086,7 @@ exports[`Security Configuration App given some enabled by ADO matches the snapsh
               <div>
                 
   Enabled with Auto DevOps
-  
-                <!---->
+
               </div>
             </div>
           </td>
@@ -1124,8 +1120,8 @@ exports[`Security Configuration App given some enabled by ADO matches the snapsh
                
               <div>
                 
-        Analyze your source code and git history for secrets.
-        
+      Analyze your source code and git history for secrets.
+      
                 <a
                   aria-label="Feature documentation for Secret Detection"
                   class="gl-link"
@@ -1135,8 +1131,8 @@ exports[`Security Configuration App given some enabled by ADO matches the snapsh
                   target="_blank"
                 >
                   
-          More information
-        
+        More information
+      
                 </a>
               </div>
             </div>
@@ -1151,8 +1147,7 @@ exports[`Security Configuration App given some enabled by ADO matches the snapsh
               <div>
                 
   Enabled with Auto DevOps
-  
-                <!---->
+
               </div>
             </div>
           </td>
@@ -1186,8 +1181,8 @@ exports[`Security Configuration App given some enabled by ADO matches the snapsh
                
               <div>
                 
-        Find bugs in your code with coverage-guided fuzzing.
-        
+      Find bugs in your code with coverage-guided fuzzing.
+      
                 <a
                   aria-label="Feature documentation for Coverage Fuzzing"
                   class="gl-link"
@@ -1197,8 +1192,8 @@ exports[`Security Configuration App given some enabled by ADO matches the snapsh
                   target="_blank"
                 >
                   
-          More information
-        
+        More information
+      
                 </a>
               </div>
             </div>
@@ -1213,8 +1208,7 @@ exports[`Security Configuration App given some enabled by ADO matches the snapsh
               <div>
                 
   Not enabled
-  
-                <!---->
+
               </div>
             </div>
           </td>
@@ -1248,8 +1242,8 @@ exports[`Security Configuration App given some enabled by ADO matches the snapsh
                
               <div>
                 
-        Find bugs in your code with API fuzzing.
-        
+      Find bugs in your code with API fuzzing.
+      
                 <a
                   aria-label="Feature documentation for API Fuzzing"
                   class="gl-link"
@@ -1259,8 +1253,8 @@ exports[`Security Configuration App given some enabled by ADO matches the snapsh
                   target="_blank"
                 >
                   
-          More information
-        
+        More information
+      
                 </a>
               </div>
             </div>
@@ -1275,8 +1269,7 @@ exports[`Security Configuration App given some enabled by ADO matches the snapsh
               <div>
                 
   Not enabled
-  
-                <!---->
+
               </div>
             </div>
           </td>
@@ -1288,6 +1281,7 @@ exports[`Security Configuration App given some enabled by ADO matches the snapsh
           >
             <div>
               <a
+                auto-devops-enabled="true"
                 class="btn btn-success btn-md gl-button"
                 data-testid="enableButton"
                 href="/markrian-test/test-public-project/-/security/configuration/api_fuzzing"
@@ -1324,8 +1318,8 @@ exports[`Security Configuration App given some enabled by ADO matches the snapsh
                
               <div>
                 
-        Search your project dependencies for their licenses and apply policies.
-        
+      Search your project dependencies for their licenses and apply policies.
+      
                 <a
                   aria-label="Feature documentation for License Compliance"
                   class="gl-link"
@@ -1335,8 +1329,8 @@ exports[`Security Configuration App given some enabled by ADO matches the snapsh
                   target="_blank"
                 >
                   
-          More information
-        
+        More information
+      
                 </a>
               </div>
             </div>
@@ -1351,8 +1345,7 @@ exports[`Security Configuration App given some enabled by ADO matches the snapsh
               <div>
                 
   Enabled with Auto DevOps
-  
-                <!---->
+
               </div>
             </div>
           </td>
@@ -1417,9 +1410,9 @@ exports[`Security Configuration App given some enabled scanners (gitlab-ui) matc
     <table
       aria-busy="false"
       aria-colcount="3"
-      aria-describedby="__BVID__8__caption_"
+      aria-describedby="__BVID__9__caption_"
       class="table b-table gl-table b-table-stacked-md"
-      id="__BVID__8"
+      id="__BVID__9"
       role="table"
     >
       <!---->
@@ -1482,8 +1475,8 @@ exports[`Security Configuration App given some enabled scanners (gitlab-ui) matc
                
               <div>
                 
-        Analyze your source code for known vulnerabilities.
-        
+      Analyze your source code for known vulnerabilities.
+      
                 <a
                   aria-label="Feature documentation for Static Application Security Testing (SAST)"
                   class="gl-link"
@@ -1493,8 +1486,8 @@ exports[`Security Configuration App given some enabled scanners (gitlab-ui) matc
                   target="_blank"
                 >
                   
-          More information
-        
+        More information
+      
                 </a>
               </div>
             </div>
@@ -1507,10 +1500,11 @@ exports[`Security Configuration App given some enabled scanners (gitlab-ui) matc
           >
             <div>
               <div>
-                
+                <div>
+                  
   Enabled
-  
-                <br />
+
+                </div>
                  
                 <a
                   class="gl-link"
@@ -1565,8 +1559,8 @@ exports[`Security Configuration App given some enabled scanners (gitlab-ui) matc
                
               <div>
                 
-        Analyze a review version of your web application.
-        
+      Analyze a review version of your web application.
+      
                 <a
                   aria-label="Feature documentation for Dynamic Application Security Testing (DAST)"
                   class="gl-link"
@@ -1576,8 +1570,8 @@ exports[`Security Configuration App given some enabled scanners (gitlab-ui) matc
                   target="_blank"
                 >
                   
-          More information
-        
+        More information
+      
                 </a>
               </div>
             </div>
@@ -1592,8 +1586,7 @@ exports[`Security Configuration App given some enabled scanners (gitlab-ui) matc
               <div>
                 
   Not enabled
-  
-                <!---->
+
               </div>
             </div>
           </td>
@@ -1627,8 +1620,8 @@ exports[`Security Configuration App given some enabled scanners (gitlab-ui) matc
                
               <div>
                 
-        Saved scan settings and target site settings which are reusable.
-        
+      Saved scan settings and target site settings which are reusable.
+      
                 <a
                   aria-label="Feature documentation for DAST Scans"
                   class="gl-link"
@@ -1638,8 +1631,8 @@ exports[`Security Configuration App given some enabled scanners (gitlab-ui) matc
                   target="_blank"
                 >
                   
-          More information
-        
+        More information
+      
                 </a>
               </div>
             </div>
@@ -1654,8 +1647,7 @@ exports[`Security Configuration App given some enabled scanners (gitlab-ui) matc
               <div>
                 
   Available for on-demand DAST
-  
-                <!---->
+
               </div>
             </div>
           </td>
@@ -1703,8 +1695,8 @@ exports[`Security Configuration App given some enabled scanners (gitlab-ui) matc
                
               <div>
                 
-        Analyze your dependencies for known vulnerabilities.
-        
+      Analyze your dependencies for known vulnerabilities.
+      
                 <a
                   aria-label="Feature documentation for Dependency Scanning"
                   class="gl-link"
@@ -1714,8 +1706,8 @@ exports[`Security Configuration App given some enabled scanners (gitlab-ui) matc
                   target="_blank"
                 >
                   
-          More information
-        
+        More information
+      
                 </a>
               </div>
             </div>
@@ -1730,8 +1722,7 @@ exports[`Security Configuration App given some enabled scanners (gitlab-ui) matc
               <div>
                 
   Enabled
-  
-                <!---->
+
               </div>
             </div>
           </td>
@@ -1765,8 +1756,8 @@ exports[`Security Configuration App given some enabled scanners (gitlab-ui) matc
                
               <div>
                 
-        Check your Docker images for known vulnerabilities.
-        
+      Check your Docker images for known vulnerabilities.
+      
                 <a
                   aria-label="Feature documentation for Container Scanning"
                   class="gl-link"
@@ -1776,8 +1767,8 @@ exports[`Security Configuration App given some enabled scanners (gitlab-ui) matc
                   target="_blank"
                 >
                   
-          More information
-        
+        More information
+      
                 </a>
               </div>
             </div>
@@ -1792,8 +1783,7 @@ exports[`Security Configuration App given some enabled scanners (gitlab-ui) matc
               <div>
                 
   Enabled
-  
-                <!---->
+
               </div>
             </div>
           </td>
@@ -1827,8 +1817,8 @@ exports[`Security Configuration App given some enabled scanners (gitlab-ui) matc
                
               <div>
                 
-        Analyze your source code and git history for secrets.
-        
+      Analyze your source code and git history for secrets.
+      
                 <a
                   aria-label="Feature documentation for Secret Detection"
                   class="gl-link"
@@ -1838,8 +1828,8 @@ exports[`Security Configuration App given some enabled scanners (gitlab-ui) matc
                   target="_blank"
                 >
                   
-          More information
-        
+        More information
+      
                 </a>
               </div>
             </div>
@@ -1854,8 +1844,7 @@ exports[`Security Configuration App given some enabled scanners (gitlab-ui) matc
               <div>
                 
   Enabled
-  
-                <!---->
+
               </div>
             </div>
           </td>
@@ -1889,8 +1878,8 @@ exports[`Security Configuration App given some enabled scanners (gitlab-ui) matc
                
               <div>
                 
-        Find bugs in your code with coverage-guided fuzzing.
-        
+      Find bugs in your code with coverage-guided fuzzing.
+      
                 <a
                   aria-label="Feature documentation for Coverage Fuzzing"
                   class="gl-link"
@@ -1900,8 +1889,8 @@ exports[`Security Configuration App given some enabled scanners (gitlab-ui) matc
                   target="_blank"
                 >
                   
-          More information
-        
+        More information
+      
                 </a>
               </div>
             </div>
@@ -1916,8 +1905,7 @@ exports[`Security Configuration App given some enabled scanners (gitlab-ui) matc
               <div>
                 
   Not enabled
-  
-                <!---->
+
               </div>
             </div>
           </td>
@@ -1951,8 +1939,8 @@ exports[`Security Configuration App given some enabled scanners (gitlab-ui) matc
                
               <div>
                 
-        Find bugs in your code with API fuzzing.
-        
+      Find bugs in your code with API fuzzing.
+      
                 <a
                   aria-label="Feature documentation for API Fuzzing"
                   class="gl-link"
@@ -1962,8 +1950,8 @@ exports[`Security Configuration App given some enabled scanners (gitlab-ui) matc
                   target="_blank"
                 >
                   
-          More information
-        
+        More information
+      
                 </a>
               </div>
             </div>
@@ -1978,8 +1966,7 @@ exports[`Security Configuration App given some enabled scanners (gitlab-ui) matc
               <div>
                 
   Not enabled
-  
-                <!---->
+
               </div>
             </div>
           </td>
@@ -2027,8 +2014,8 @@ exports[`Security Configuration App given some enabled scanners (gitlab-ui) matc
                
               <div>
                 
-        Search your project dependencies for their licenses and apply policies.
-        
+      Search your project dependencies for their licenses and apply policies.
+      
                 <a
                   aria-label="Feature documentation for License Compliance"
                   class="gl-link"
@@ -2038,8 +2025,8 @@ exports[`Security Configuration App given some enabled scanners (gitlab-ui) matc
                   target="_blank"
                 >
                   
-          More information
-        
+        More information
+      
                 </a>
               </div>
             </div>
@@ -2054,8 +2041,7 @@ exports[`Security Configuration App given some enabled scanners (gitlab-ui) matc
               <div>
                 
   Enabled
-  
-                <!---->
+
               </div>
             </div>
           </td>
