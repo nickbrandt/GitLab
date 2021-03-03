@@ -3,6 +3,8 @@
 require 'spec_helper'
 
 RSpec.describe TrialStatusWidgetHelper do
+  using RSpec::Parameterized::TableSyntax
+
   describe '#billing_plans_and_trials_available?' do
     before do
       stub_application_setting(check_namespace_plan: trials_available)
@@ -24,7 +26,7 @@ RSpec.describe TrialStatusWidgetHelper do
   end
 
   describe '#eligible_for_trial_status_widget?' do
-    let_it_be(:user) { create(:user) }
+    let(:user) { instance_double(User) }
     let(:group) { instance_double(Group, trial_active?: trial_active) }
     let(:user_can_admin_group) { true }
 
@@ -36,32 +38,19 @@ RSpec.describe TrialStatusWidgetHelper do
 
     subject { helper.eligible_for_trial_status_widget?(group) }
 
-    context 'when the group has an active trial' do
-      let(:trial_active) { true }
-
-      context 'and the user can admin the group' do
-        let(:user_can_admin_group) { true }
-
-        it { is_expected.to be_truthy }
-      end
-
-      context 'but the user cannot admin the group' do
-        let(:user_can_admin_group) { false }
-
-        it { is_expected.to be_falsey }
-      end
+    where :trial_active, :user_can_admin_group, :expected_result do
+      true  | true  | true
+      true  | false | false
+      false | true  | false
+      false | false | false
     end
 
-    context 'when the group does not have an active trial' do
-      let(:trial_active) { false }
-
-      it { is_expected.to be_falsey }
+    with_them do
+      it { is_expected.to eq(expected_result) }
     end
   end
 
   describe '#plan_title_for_group' do
-    using RSpec::Parameterized::TableSyntax
-
     let_it_be(:group) { create(:group) }
 
     subject { helper.plan_title_for_group(group) }
