@@ -8,6 +8,8 @@ import { formatDate } from '~/lib/utils/datetime_utility';
 import { truncate } from '~/lib/utils/text_utility';
 import mockRotations from '../../mocks/mock_rotation.json';
 
+jest.mock('lodash/uniqueId', () => (prefix) => `${prefix}fakeUniqueId`);
+
 describe('RotationAssignee', () => {
   let wrapper;
 
@@ -71,9 +73,7 @@ describe('RotationAssignee', () => {
     });
 
     it('should render an assignee schedule and rotation information in a popover', () => {
-      // eslint-disable-next-line no-underscore-dangle
-      const UID = wrapper.vm._uid;
-      expect(findPopOver().attributes('target')).toBe(`${assignee.participant.user.id}-${UID}`);
+      expect(findPopOver().attributes('target')).toBe('rotation-assignee-fakeUniqueId');
       expect(findStartsAt().text()).toContain(formattedDate(assignee.startsAt));
       expect(findEndsAt().text()).toContain(formattedDate(assignee.endsAt));
     });
