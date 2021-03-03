@@ -24,10 +24,6 @@ export default {
     GlLink,
   },
   inject: {
-    createSastMergeRequestPath: {
-      from: 'createSastMergeRequestPath',
-      default: '',
-    },
     sastAnalyzersDocumentationPath: {
       from: 'sastAnalyzersDocumentationPath',
       default: '',
