@@ -14767,6 +14767,12 @@ msgstr ""
 msgid "GroupSettings|Prevent sharing a project within %{group} with other groups"
 msgstr ""
 
+msgid "GroupSettings|Project access tokens enabled"
+msgstr ""
+
+msgid "GroupSettings|Projects in this group can use %{link_start}project access tokens%{link_end}."
+msgstr ""
+
 msgid "GroupSettings|Projects will be permanently deleted after a %{waiting_period}-day delay. This delay can be %{customization_link} in instance settings"
 msgstr ""
 

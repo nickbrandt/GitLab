@@ -4,7 +4,7 @@ module Groups
   class UpdateService < Groups::BaseService
     include UpdateVisibilityLevel
 
-    SETTINGS_PARAMS = [:allow_mfa_for_subgroups].freeze
+    SETTINGS_PARAMS = [:allow_mfa_for_subgroups, :resource_access_tokens_enabled].freeze
 
     def execute
       reject_parent_id!

@@ -247,6 +247,7 @@ class GroupsController < Groups::ApplicationController
       :description,
       :emails_disabled,
       :mentions_disabled,
+      :resource_access_tokens_enabled,
       :lfs_enabled,
       :name,
       :path,

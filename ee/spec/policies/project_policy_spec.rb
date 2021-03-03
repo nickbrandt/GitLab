@@ -1660,7 +1660,7 @@ RSpec.describe ProjectPolicy do
 
     context 'on GitLab.com paid' do
       let_it_be(:group) { create(:group_with_plan, plan: :bronze_plan) }
-      let_it_be(:project) { create(:project, group: group) }
+      let(:project) { create(:project, group: group) }
 
       before do
         allow(::Gitlab).to receive(:com?).and_return(true)
@@ -1674,6 +1674,26 @@ RSpec.describe ProjectPolicy do
         end
 
         it { is_expected.to be_allowed(:admin_resource_access_tokens) }
+
+        context 'when project access tokens are disabled' do
+          before do
+            group.namespace_settings.update!(resource_access_tokens_enabled: false)
+          end
+
+          it { is_expected.not_to be_allowed(:admin_resource_access_tokens) }
+        end
+
+        context 'when parent group has project access tokens disabled' do
+          let(:parent) { create(:group_with_plan, plan: :bronze_plan) }
+          let(:group) { create(:group, parent: parent) }
+          let(:project) { create(:project, group: group) }
+
+          before do
+            parent.namespace_settings.update!(resource_access_tokens_enabled: false)
+          end
+
+          it { is_expected.not_to be_allowed(:admin_resource_access_tokens) }
+        end
       end
 
       context 'with developer' do
@@ -1683,7 +1703,7 @@ RSpec.describe ProjectPolicy do
           project.add_developer(developer)
         end
 
-        it { is_expected.not_to be_allowed(:admin_resource_access_tokens)}
+        it { is_expected.not_to be_allowed(:admin_resource_access_tokens) }
       end
     end
   end

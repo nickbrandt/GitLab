@@ -327,6 +327,19 @@ RSpec.describe Groups::UpdateService do
     end
   end
 
+  context 'resource access tokens enabled' do
+    let(:group) { create(:group) }
+    let(:params) { { resource_access_tokens_enabled: false } }
+
+    subject { described_class.new(group, user, params).execute }
+
+    it 'changes settings' do
+      subject
+
+      expect(group.namespace_settings.reload.resource_access_tokens_enabled).to eq(false)
+    end
+  end
+
   def update_group(group, user, opts)
     Groups::UpdateService.new(group, user, opts).execute
   end

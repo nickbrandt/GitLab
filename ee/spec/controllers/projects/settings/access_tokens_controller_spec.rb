@@ -34,6 +34,17 @@ RSpec.describe Projects::Settings::AccessTokensController do
 
       it { is_expected.to have_gitlab_http_status(:not_found) }
     end
+
+    context 'when project access tokens are disabled' do
+      let(:group) { create(:group_with_plan, plan: :bronze_plan) }
+      let(:project) { create(:project, group: group) }
+
+      before do
+        group.namespace_settings.update!(resource_access_tokens_enabled: false)
+      end
+
+      it { is_expected.to have_gitlab_http_status(:not_found) }
+    end
   end
 
   describe '#index' do

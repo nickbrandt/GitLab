@@ -9,6 +9,29 @@ RSpec.shared_examples 'Self-managed Core resource access tokens' do
     let(:current_user) { owner }
 
     it { is_expected.to be_allowed(:admin_resource_access_tokens) }
+
+    context 'when project access tokens are disabled' do
+      let(:group) { create(:group) }
+      let(:project) { create(:project, group: group) }
+
+      before do
+        group.namespace_settings.update!(resource_access_tokens_enabled: false)
+      end
+
+      it { is_expected.not_to be_allowed(:admin_resource_access_tokens) }
+    end
+
+    context 'when parent group has project access tokens disabled' do
+      let(:parent) { create(:group) }
+      let(:group) { create(:group, parent: parent) }
+      let(:project) { create(:project, group: group) }
+
+      before do
+        parent.namespace_settings.update!(resource_access_tokens_enabled: false)
+      end
+
+      it { is_expected.not_to be_allowed(:admin_resource_access_tokens) }
+    end
   end
 
   context 'with developer' do

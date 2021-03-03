@@ -720,7 +720,11 @@ class ProjectPolicy < BasePolicy
   end
 
   def resource_access_token_available?
-    true
+    group = project.group
+
+    return true unless group # always enable for projects in personal namespaces
+
+    group.root_ancestor.namespace_settings.resource_access_tokens_enabled?
   end
 
   def project
