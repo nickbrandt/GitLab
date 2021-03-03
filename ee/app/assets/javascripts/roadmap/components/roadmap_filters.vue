@@ -1,21 +1,30 @@
 <script>
+import { mapState, mapActions } from 'vuex';
 import {
   GlFormGroup,
   GlSegmentedControl,
+  GlDaterangePicker,
   GlDropdown,
+  GlDropdownForm,
   GlDropdownItem,
   GlDropdownDivider,
 } from '@gitlab/ui';
-import { mapState, mapActions } from 'vuex';
 
 import { visitUrl, mergeUrlParams, updateHistory, setUrlParams } from '~/lib/utils/url_utility';
 import { __ } from '~/locale';
 import FilteredSearchBar from '~/vue_shared/components/filtered_search_bar/filtered_search_bar_root.vue';
+import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 
 import { EPICS_STATES, PRESET_TYPES } from '../constants';
 import EpicsFilteredSearchMixin from '../mixins/filtered_search_mixin';
 
+const pickerType = {
+  Start: 'start',
+  End: 'end',
+};
+
 export default {
+  pickerType,
   epicStates: EPICS_STATES,
   availablePresets: [
     { text: __('Quarters'), value: PRESET_TYPES.QUARTERS },
@@ -43,12 +52,20 @@ export default {
   components: {
     GlFormGroup,
     GlSegmentedControl,
+    GlDaterangePicker,
     GlDropdown,
+    GlDropdownForm,
     GlDropdownItem,
     GlDropdownDivider,
     FilteredSearchBar,
   },
-  mixins: [EpicsFilteredSearchMixin],
+  mixins: [EpicsFilteredSearchMixin, glFeatureFlagsMixin()],
+  data() {
+    return {
+      startDatePickerOpen: false,
+      dueDatePickerOpen: false,
+    };
+  },
   computed: {
     ...mapState(['presetType', 'epicsState', 'sortedBy', 'filterParams']),
     selectedEpicStateTitle() {
@@ -77,6 +94,28 @@ export default {
   },
   methods: {
     ...mapActions(['setEpicsState', 'setFilterParams', 'setSortedBy', 'fetchEpics']),
+    handleDaterangeDropdownHide(e) {
+      /**
+       * Since datepicker is not bound to dropdown container,
+       * opening month or year dropdown within calendar causes
+       * dropdown to close so this is a small workaround where
+       * we check if either of datepickers are still visible
+       * before closing the dropdown.
+       */
+      if (this.startDatePickerOpen || this.endDatePickerOpen) {
+        e.preventDefault();
+      }
+    },
+    handleDaterangePickerToggle(type, state) {
+      if (type === this.$options.pickerType.Start) {
+        this.startDatePickerOpen = state;
+      } else {
+        this.endDatePickerOpen = state;
+      }
+    },
+    handleDaterangeInput({ startDate, endDate }) {
+      debugger;
+    },
     handleRoadmapLayoutChange(presetType) {
       visitUrl(mergeUrlParams({ layout: presetType }, window.location.href));
     },
@@ -101,6 +140,31 @@ export default {
     <div
       class="epics-details-filters filtered-search-block gl-display-flex gl-flex-direction-column flex-xl-row row-content-block second-block"
     >
+      <gl-dropdown
+        v-if="glFeatures.roadmapDaterangeFilter"
+        icon="calendar"
+        class="gl-mr-3 gl-md-mr-0 gl-md-mb-2 roadmap-daterange-dropdown"
+        :header-text="__('Roadmap date range')"
+        @hide="handleDaterangeDropdownHide"
+      >
+        <gl-dropdown-form>
+          <div class="gl-p-4">
+            <gl-daterange-picker
+              label-class="gl-display-block"
+              start-picker-class="gl-mb-5"
+              :start-picker-target="null"
+              :start-picker-container="null"
+              :end-picker-container="null"
+              :end-picker-target="null"
+              @start-picker-open="handleDaterangePickerToggle($options.pickerType.Start, true)"
+              @start-picker-close="handleDaterangePickerToggle($options.pickerType.Start, false)"
+              @end-picker-open="handleDaterangePickerToggle($options.pickerType.End, true)"
+              @end-picker-close="handleDaterangePickerToggle($options.pickerType.End, false)"
+              @input="handleDaterangeInput"
+            />
+          </div>
+        </gl-dropdown-form>
+      </gl-dropdown>
       <gl-form-group class="mb-0">
         <gl-segmented-control
           :checked="presetType"

@@ -10,6 +10,7 @@ module Groups
     before_action do
       push_frontend_feature_flag(:roadmap_buffered_rendering, @group)
       push_frontend_feature_flag(:async_filtering, @group, default_enabled: true)
+      push_frontend_feature_flag(:roadmap_daterange_filter, @group, type: :development, default_enabled: :yaml)
     end
 
     feature_category :roadmaps
