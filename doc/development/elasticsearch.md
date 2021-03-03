@@ -286,6 +286,63 @@ Follow these best practices for best results:
 - Consider adding a retry limit if there is potential for the migration to fail.
   This ensures that migrations can be halted if an issue occurs.
 
+## Deleting Elasticsearch migrations in a major version upgrade
+
+Since our Elasticsearch migrations usually require us to support multiple code
+paths for a long period of time it's important to clean those up when we safely
+can.
+
+We choose to use GitLab major version upgrades as a safe time to remove
+backwards compatibility for indices that have not been fully migrated. We
+[document this in our upgrade
+documentation](../update/index.md#upgrading-to-a-new-major-version). We also
+choose to remove the migration code and tests so that:
+
+1. We don't need to maintain any code that is called from our Elasticsearch
+   migrations
+1. We don't waste CI time running tests for migrations that we don't support
+   anymore
+
+To be extra safe we will not delete migrations that were created in the last
+minor version before the major upgrade. So if the we are upgrading to `%14.0`
+we should not delete migrations that were only added in `%13.11`. This is an
+extra safety net as we expect there are migrations that get merged that may
+take multiple weeks to finish on GitLab.com. It would be bad if we upgraded
+GitLab.com to `%14.0` before the migrations in `%13.11` were finished. Since
+our deployments to GitLab.com are automated and we currently don't have
+automated checks to prevent this the extra precaution is warranted.
+Additionally, even if we did have automated checks to prevent it, we wouldn't
+actually want to hold up GitLab.com deployments on Elasticsearch migrations as
+they may still have another week to go and that's too long to block
+deployments.
+
+### Process for removing migrations
+
+For every migration that was created 2 minor versions before the major version
+being upgraded to we do the following:
+
+1. Confirm the migration has actually completed successfully for GitLab.com
+1. Replace the content of `migrate` and `completed?` methods as follows:
+
+   ```ruby
+   def migrate
+     raise "Migration has been deleted in the last major version upgrade." \
+       "Migrations are supposed to be finished before upgrading major version https://docs.gitlab.com/ee/update/#upgrading-to-a-new-major-version ." \
+       "In order to correct this issue you will need to reacreate your index from scratch https://docs.gitlab.com/ee/integration/elasticsearch.html#last-resort-to-recreate-an-index ."
+   end
+
+   def completed?
+     false
+   end
+   ```
+
+1. Delete any spec files to support this migration
+1. Remove any logic handling backwards compatibility for this migration. You
+   can find this by looking for
+   `Elastic::DataMigrationService.migration_has_finished?(:migration_name_in_lowercase)`
+1. Create a merge request with these changes. Noting that we should not
+   accidentally merge this before the major release is started.
+
 ## Performance Monitoring
 
 ### Prometheus
