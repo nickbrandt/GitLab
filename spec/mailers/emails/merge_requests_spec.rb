@@ -39,7 +39,7 @@ RSpec.describe Emails::MergeRequests do
   end
 
   describe "#resolved_all_discussions_email" do
-    subject { Notify.resolved_all_discussions_email(user.id, merge_request.id, current_user.id) }
+    subject { Notify.resolved_all_discussions_email(recipient.id, merge_request.id, current_user.id) }
 
     it "includes the name of the resolver" do
       expect(subject).to have_body_text current_user.name
