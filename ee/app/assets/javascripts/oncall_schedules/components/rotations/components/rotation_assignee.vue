@@ -1,5 +1,6 @@
 <script>
 import { GlAvatar, GlPopover } from '@gitlab/ui';
+import { uniqueId } from 'lodash';
 import { formatDate } from '~/lib/utils/datetime_utility';
 import { truncate } from '~/lib/utils/text_utility';
 import { __, sprintf } from '~/locale';
@@ -57,8 +58,7 @@ export default {
       });
     },
     rotationAssigneeUniqueID() {
-      const { _uid } = this;
-      return `${this.assignee.user.id}-${_uid}`;
+      return uniqueId('rotation-assignee-');
     },
     rotationMobileView() {
       return this.shiftWidth <= SHIFT_WIDTHS.xs;
