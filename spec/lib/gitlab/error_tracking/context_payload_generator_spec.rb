@@ -140,7 +140,7 @@ RSpec.describe Gitlab::ErrorTracking::ContextPayloadGenerator do
       )
     end
 
-    it 'appends exception embeded extra metadata to the payload' do
+    it 'appends exception embedded extra metadata to the payload' do
       allow(exception).to receive(:sentry_extra_data).and_return(
         some_other_info: 'another_info',
         mr_url: 'https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/1'
@@ -155,7 +155,7 @@ RSpec.describe Gitlab::ErrorTracking::ContextPayloadGenerator do
       )
     end
 
-    it 'filters senstive extra info' do
+    it 'filters sensitive extra info' do
       extra[:my_token] = '456'
       allow(exception).to receive(:sentry_extra_data).and_return(
         mr_url: 'https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/1',
