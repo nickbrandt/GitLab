@@ -5646,6 +5646,12 @@ msgstr ""
 msgid "Capacity threshold"
 msgstr ""
 
+msgid "CascadingSettings|cannot be changed because it is locked by an ancestor"
+msgstr ""
+
+msgid "CascadingSettings|cannot be nil when locking the attribute"
+msgstr ""
+
 msgid "Certain user content will be moved to a system-wide \"Ghost User\" in order to maintain content for posterity. For further information, please refer to the %{link_start}user account deletion documentation.%{link_end}"
 msgstr ""
 
