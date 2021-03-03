@@ -37,7 +37,6 @@ func (s *Static) ServeExisting(prefix urlprefix.Prefix, cache CacheMode, notFoun
 		// %20 in their name.
 		relativePath, err := s.validatePath(prefix.Strip(r.URL.Path))
 		if err != nil {
-			helper.LogError(r, err)
 			notFoundHandler.ServeHTTP(w, r)
 			return
 		}
