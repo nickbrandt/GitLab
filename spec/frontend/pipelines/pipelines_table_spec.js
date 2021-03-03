@@ -31,8 +31,6 @@ describe('Pipelines Table', () => {
   const findGlTable = () => wrapper.findComponent(GlTable);
   const findLegacyTable = () => wrapper.findByTestId('ci-table');
 
-  preloadFixtures(jsonFixtureName);
-
   beforeEach(() => {
     const { pipelines } = getJSONFixture(jsonFixtureName);
     pipeline = pipelines.find((p) => p.user !== null && p.commit !== null);
