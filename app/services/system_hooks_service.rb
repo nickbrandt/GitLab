@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class SystemHooksService
-  BUILDER_DRIVEN_EVENT_DATA_AVAILABLE_FOR_CLASSES = [GroupMember, Group, ProjectMember].freeze
+  BUILDER_DRIVEN_EVENT_DATA_AVAILABLE_FOR_CLASSES = [GroupMember, Group, ProjectMember, User].freeze
 
   def execute_hooks_for(model, event)
     data = build_event_data(model, event)
