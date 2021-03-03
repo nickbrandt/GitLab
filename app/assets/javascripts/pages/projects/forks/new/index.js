@@ -1,11 +1,12 @@
 import Vue from 'vue';
-import ForkForm from './components/fork_form.vue';
+import App from './components/app.vue';
 import ForkGroupsList from './components/fork_groups_list.vue';
 
 const mountElement = document.getElementById('fork-groups-mount-element');
 
 if (gon.features.forkProjectForm) {
   const {
+    forkIllustration,
     endpoint,
     newGroupPath,
     projectFullPath,
@@ -21,8 +22,9 @@ if (gon.features.forkProjectForm) {
   new Vue({
     el: mountElement,
     render(h) {
-      return h(ForkForm, {
+      return h(App, {
         props: {
+          forkIllustration,
           endpoint,
           newGroupPath,
           projectFullPath,
