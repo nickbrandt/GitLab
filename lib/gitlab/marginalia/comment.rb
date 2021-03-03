@@ -37,6 +37,10 @@ module Gitlab
           job
         end
       end
+
+      def endpoint_id
+        Labkit::Context.current.to_h['meta.caller_id']
+      end
     end
   end
 end
