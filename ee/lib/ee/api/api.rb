@@ -39,6 +39,7 @@ module EE
         mount ::API::VulnerabilityIssueLinks
         mount ::API::VulnerabilityExports
         mount ::API::MergeRequestApprovalRules
+        mount ::API::MergeRequestJiraIssue
         mount ::API::ProjectAliases
         mount ::API::Dependencies
         mount ::API::VisualReviewDiscussions
