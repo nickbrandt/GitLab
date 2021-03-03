@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import { parseBooleanDataAttributes } from '~/lib/utils/dom_utils';
 import SecurityConfigurationApp from './components/app.vue';
+import NewSecurityConfigurationApp from './components/new/app.vue';
 
 export const initSecurityConfiguration = (el) => {
   if (!el) {
@@ -23,13 +24,14 @@ export const initSecurityConfiguration = (el) => {
     gitlabCiHistoryPath,
   } = el.dataset;
 
+  const AppComponent = gon.features?.newSecurityConfiguration
+    ? NewSecurityConfigurationApp
+    : SecurityConfigurationApp;
+
   return new Vue({
     el,
-    components: {
-      SecurityConfigurationApp,
-    },
     render(createElement) {
-      return createElement(SecurityConfigurationApp, {
+      return createElement(AppComponent, {
         props: {
           autoDevopsHelpPagePath,
           autoDevopsPath,

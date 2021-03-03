@@ -1,23 +1,20 @@
 <script>
-import { GlAlert, GlLink, GlSprintf, GlTable } from '@gitlab/ui';
+import { GlAlert, GlLink, GlSprintf } from '@gitlab/ui';
 import { parseBoolean } from '~/lib/utils/common_utils';
-import { sprintf, s__, __ } from '~/locale';
+import { s__, __ } from '~/locale';
 import LocalStorageSync from '~/vue_shared/components/local_storage_sync.vue';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
-import AutoFixSettings from './auto_fix_settings.vue';
-import FeatureStatus from './feature_status.vue';
-import ManageFeature from './manage_feature.vue';
+import AutoFixSettings from '../auto_fix_settings.vue';
+import SecurityScannersTable from './security_scanners_table.vue';
 
 export default {
   components: {
     GlAlert,
     GlLink,
     GlSprintf,
-    GlTable,
     AutoFixSettings,
     LocalStorageSync,
-    FeatureStatus,
-    ManageFeature,
+    SecurityScannersTable,
   },
   mixins: [glFeatureFlagsMixin()],
   props: {
@@ -25,11 +22,6 @@ export default {
       type: Boolean,
       required: false,
       default: false,
-    },
-    // TODO: remove this required but unused prop!
-    helpPagePath: {
-      type: String,
-      required: true,
     },
     autoDevopsHelpPagePath: {
       type: String,
@@ -78,6 +70,12 @@ export default {
     autoDevopsAlertDismissed: 'false',
   }),
   computed: {
+    scanDetails() {
+      return this.features.reduce((acc, feature) => {
+        acc[feature.type] = feature;
+        return acc;
+      }, {});
+    },
     devopsMessage() {
       return this.autoDevopsEnabled
         ? __(
@@ -89,28 +87,6 @@ export default {
     },
     devopsUrl() {
       return this.autoDevopsEnabled ? this.autoDevopsHelpPagePath : this.latestPipelinePath;
-    },
-    fields() {
-      const borderClasses = 'gl-border-b-1! gl-border-b-solid! gl-border-gray-100!';
-      const thClass = `gl-text-gray-900 gl-bg-transparent! ${borderClasses}`;
-
-      return [
-        {
-          key: 'feature',
-          label: s__('SecurityConfiguration|Security Control'),
-          thClass,
-        },
-        {
-          key: 'status',
-          label: s__('SecurityConfiguration|Status'),
-          thClass,
-        },
-        {
-          key: 'manage',
-          label: s__('SecurityConfiguration|Manage'),
-          thClass,
-        },
-      ];
     },
     shouldShowAutoDevopsAlert() {
       return Boolean(
@@ -124,11 +100,6 @@ export default {
   methods: {
     dismissAutoDevopsAlert() {
       this.autoDevopsAlertDismissed = 'true';
-    },
-    getFeatureDocumentationLinkLabel(item) {
-      return sprintf(s__('SecurityConfiguration|Feature documentation for %{featureName}'), {
-        featureName: item.name,
-      });
     },
   },
   autoDevopsAlertMessage: s__(`
@@ -172,38 +143,13 @@ export default {
       </gl-sprintf>
     </gl-alert>
 
-    <gl-table ref="securityControlTable" :items="features" :fields="fields" stacked="md">
-      <template #cell(feature)="{ item }">
-        <div class="gl-text-gray-900">{{ item.name }}</div>
-        <div>
-          {{ item.description }}
-          <gl-link
-            target="_blank"
-            :href="item.link"
-            :aria-label="getFeatureDocumentationLinkLabel(item)"
-            data-testid="docsLink"
-          >
-            {{ s__('SecurityConfiguration|More information') }}
-          </gl-link>
-        </div>
-      </template>
+    <security-scanners-table
+      :scan-details="scanDetails"
+      :auto-devops-enabled="autoDevopsEnabled"
+      :gitlab-ci-present="gitlabCiPresent"
+      :gitlab-ci-history-path="gitlabCiHistoryPath"
+    />
 
-      <template #cell(status)="{ item }">
-        <feature-status
-          :feature="item"
-          :gitlab-ci-present="gitlabCiPresent"
-          :gitlab-ci-history-path="gitlabCiHistoryPath"
-        />
-      </template>
-
-      <template #cell(manage)="{ item }">
-        <manage-feature
-          :feature="item"
-          :auto-devops-enabled="autoDevopsEnabled"
-          :create-sast-merge-request-path="createSastMergeRequestPath"
-        />
-      </template>
-    </gl-table>
     <auto-fix-settings v-if="glFeatures.securityAutoFix" v-bind="autoFixSettingsProps" />
   </article>
 </template>
