@@ -138,8 +138,8 @@ RSpec.describe API::API do
       let_it_be(:user) { create(:user) }
       let(:component_map) do
         {
-          "application"       => "test",
-          "endpoint_id"       => "/api/:version/users/:id"
+          "application" => "test",
+          "endpoint_id" => "/api/:version/users/:id"
         }
       end
 

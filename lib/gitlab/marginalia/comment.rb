@@ -39,7 +39,7 @@ module Gitlab
       end
 
       def endpoint_id
-        Labkit::Context.current.to_h['meta.caller_id']
+        Labkit::Context.current&.get_attribute(:caller_id)
       end
     end
   end
