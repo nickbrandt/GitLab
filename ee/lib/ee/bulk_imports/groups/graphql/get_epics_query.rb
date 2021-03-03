@@ -21,6 +21,7 @@ module EE
                     has_next_page: hasNextPage
                   }
                   nodes {
+                    id
                     iid
                     title
                     description
@@ -34,6 +35,9 @@ module EE
                     due_date_is_fixed: dueDateIsFixed
                     relative_position: relativePosition
                     confidential
+                    author {
+                      public_email: publicEmail
+                    }
                     parent {
                       iid
                     }
@@ -54,10 +58,10 @@ module EE
             GRAPHQL
           end
 
-          def variables(entity)
+          def variables(context)
             {
-              full_path: entity.source_full_path,
-              cursor: entity.next_page_for(:epics)
+              full_path: context.entity.source_full_path,
+              cursor: context.entity.next_page_for(:epics)
             }
           end
 

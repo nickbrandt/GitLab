@@ -79,7 +79,8 @@ An individual user can be added as an approver for a project if they are a membe
 - The project's immediate parent group.
 - A group that has access to the project via a [share](../members/share_project_with_groups.md).
 
-A group of users can also be added as approvers. In the future, group approvers may be
+A group of users can also be added as approvers, though they will only count as approvers if
+they have direct membership to the group. In the future, group approvers may be
 [restricted to only groups with share access to the project](https://gitlab.com/gitlab-org/gitlab/-/issues/2048).
 
 If a user is added as an individual approver and is also part of a group approver,
@@ -124,7 +125,7 @@ users with Developer or higher permissions, as well as by Code Owners,
 indistinguishably.
 
 Alternatively, you can **require**
-[Code Owner's approvals for Protected Branches](../protected_branches.md#protected-branches-approval-by-code-owners). **(PREMIUM)**
+[Code Owner's approvals for protected branches](../protected_branches.md#protected-branches-approval-by-code-owners). **(PREMIUM)**
 
 #### Merge Request approval segregation of duties
 
@@ -138,14 +139,14 @@ to push or merge code to any branches.
 
 To enable this access:
 
-1. [Create a new group](../../group/index.md#create-a-new-group), and then
+1. [Create a new group](../../group/index.md#create-a-group), and then
    [add the user to the group](../../group/index.md#add-users-to-a-group),
    ensuring you select the Reporter role for the user.
 1. [Share the project with your group](../members/share_project_with_groups.md#sharing-a-project-with-a-group-of-users),
    based on the Reporter role.
 1. Navigate to your project's **Settings > General**, and in the
    **Merge request approvals** section, click **Expand**.
-1. [Add the group](../../group/index.md#create-a-new-group) to the permission list
+1. [Add the group](../../group/index.md#create-a-group) to the permission list
    for the protected branch.
 
 ![Update approval rule](img/update_approval_rule_v13_4.png)
@@ -227,7 +228,7 @@ reduces the number of approvals left for all rules that the approver belongs to.
 
 ![Approvals premium merge request widget](img/approvals_premium_mr_widget_v13_3.png)
 
-#### Scoped to Protected Branch **(PREMIUM)**
+#### Scoped to protected branch **(PREMIUM)**
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/460) in [GitLab Premium](https://about.gitlab.com/pricing/) 12.8.
 
@@ -239,7 +240,7 @@ the **Target branch** dropdown.
 
 Alternatively, you can select a very specific protected branch from the **Target branch** dropdown:
 
-![Scoped to Protected Branch](img/scoped_to_protected_branch_v12_8.png)
+![Scoped to protected branch](img/scoped_to_protected_branch_v12_8.png)
 
 To enable this configuration, see [Code Owner’s approvals for protected branches](../protected_branches.md#protected-branches-approval-by-code-owners).
 
@@ -319,16 +320,28 @@ their own authors. To change this setting:
 
 Note that users can edit the approval rules in every merge request and override pre-defined settings unless it's set [**not to allow** overrides](#prevent-overriding-default-approvals).
 
+You can prevent authors from approving their own merge requests
+[at the instance level](../../admin_area/merge_requests_approvals.md). When enabled,
+this setting is disabled on the project level, and not editable.
+
 #### Prevent approval of merge requests by their committers **(PREMIUM)**
 
 > - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/10441) in GitLab 11.10.
 > - Moved to GitLab Premium in 13.9.
 
-You can prevent users that have committed to a merge request from approving it. To
-enable this feature:
+You can prevent users who have committed to a merge request from approving it,
+though code authors can still approve. You can enable this feature
+[at the instance level](../../admin_area/merge_requests_approvals.md), which
+disables changes to this feature at the project level. If you prefer to manage
+this feature at the project level, you can:
 
 1. Check the **Prevent MR approvals from users who make commits to the MR.** checkbox.
+   If this check box is disabled, this feature has been disabled
+   [at the instance level](../../admin_area/merge_requests_approvals.md).
 1. Click **Save changes**.
+
+Read the official Git documentation for an explanation of the
+[differences between authors and committers](https://git-scm.com/book/en/v2/Git-Basics-Viewing-the-Commit-History).
 
 #### Require authentication when approving a merge request
 

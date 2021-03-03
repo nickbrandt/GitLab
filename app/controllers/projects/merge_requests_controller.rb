@@ -11,7 +11,6 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
   include RecordUserLastActivity
   include SourcegraphDecorator
   include DiffHelper
-  include CommentAndCloseFlag
 
   skip_before_action :merge_request, only: [:index, :bulk_update, :export_csv]
   before_action :apply_diff_view_cookie!, only: [:show]
@@ -30,31 +29,26 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
   before_action :authenticate_user!, only: [:assign_related_issues]
   before_action :check_user_can_push_to_source_branch!, only: [:rebase]
   before_action only: [:show] do
-    push_frontend_feature_flag(:multiline_comments, @project, default_enabled: true)
     push_frontend_feature_flag(:file_identifier_hash)
     push_frontend_feature_flag(:batch_suggestions, @project, default_enabled: true)
     push_frontend_feature_flag(:approvals_commented_by, @project, default_enabled: true)
-    push_frontend_feature_flag(:merge_request_widget_graphql, @project)
+    push_frontend_feature_flag(:merge_request_widget_graphql, @project, default_enabled: :yaml)
     push_frontend_feature_flag(:drag_comment_selection, @project, default_enabled: true)
     push_frontend_feature_flag(:unified_diff_components, @project, default_enabled: true)
-    push_frontend_feature_flag(:default_merge_ref_for_diffs, @project)
+    push_frontend_feature_flag(:default_merge_ref_for_diffs, @project, default_enabled: :yaml)
     push_frontend_feature_flag(:core_security_mr_widget_counts, @project)
     push_frontend_feature_flag(:remove_resolve_note, @project, default_enabled: true)
     push_frontend_feature_flag(:diffs_gradual_load, @project, default_enabled: true)
     push_frontend_feature_flag(:codequality_backend_comparison, @project, default_enabled: :yaml)
-    push_frontend_feature_flag(:suggestions_custom_commit, @project)
     push_frontend_feature_flag(:local_file_reviews, default_enabled: :yaml)
     push_frontend_feature_flag(:paginated_notes, @project, default_enabled: :yaml)
-    push_frontend_feature_flag(:ci_mini_pipeline_gl_dropdown, @project, type: :development, default_enabled: :yaml)
 
     record_experiment_user(:invite_members_version_a)
     record_experiment_user(:invite_members_version_b)
   end
 
   before_action do
-    push_frontend_feature_flag(:merge_request_reviewers, @project, default_enabled: true)
     push_frontend_feature_flag(:mr_collapsed_approval_rules, @project)
-    push_frontend_feature_flag(:reviewer_approval_rules, @project, default_enabled: :yaml)
   end
 
   around_action :allow_gitaly_ref_name_caching, only: [:index, :show, :discussions]
@@ -168,6 +162,14 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
         all: @pipelines.count
       }
     }
+  end
+
+  def sast_reports
+    reports_response(merge_request.compare_sast_reports(current_user), head_pipeline)
+  end
+
+  def secret_detection_reports
+    reports_response(merge_request.compare_secret_detection_reports(current_user), head_pipeline)
   end
 
   def context_commits
@@ -497,7 +499,7 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
     params = request.query_parameters
     params[:view] = "inline"
 
-    if Feature.enabled?(:default_merge_ref_for_diffs, project)
+    if Feature.enabled?(:default_merge_ref_for_diffs, project, default_enabled: :yaml)
       params = params.merge(diff_head: true)
     end
 

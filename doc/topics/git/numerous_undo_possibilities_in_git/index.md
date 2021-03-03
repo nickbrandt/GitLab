@@ -5,7 +5,7 @@ info: To determine the technical writer assigned to the Stage/Group associated w
 type: howto
 ---
 
-# Numerous undo possibilities in Git
+# Numerous undo possibilities in Git **(FREE)**
 
 This tutorial shows you different ways of undoing your work in Git.
 We assume you have a basic working knowledge of Git. Check the GitLab
@@ -64,7 +64,7 @@ To avoid chaos with
 development workflows have to be followed. It depends on your internal
 workflow how certain changes or commits can be undone or changed.
 
-[GitLab Flow](https://about.gitlab.com/blog/2014/09/29/gitlab-flow/) provides a good
+[GitLab Flow](https://about.gitlab.com/topics/version-control/what-is-gitlab-flow/) provides a good
 balance between developers clashing with each other while
 developing the same feature and cooperating seamlessly. However, it does not enable
 joined development of the same feature by multiple developers by default.

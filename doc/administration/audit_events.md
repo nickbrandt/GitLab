@@ -9,7 +9,7 @@ info: To determine the technical writer assigned to the Stage/Group associated w
 GitLab offers a way to view the changes made within the GitLab server for owners and administrators on a [paid plan](https://about.gitlab.com/pricing/).
 
 GitLab system administrators can also take advantage of the logs located on the
-file system. See [the logs system documentation](logs.md) for more details.
+file system. See [the logs system documentation](logs.md#audit_jsonlog) for more details.
 
 You can generate an [Audit report](audit_reports.md) of audit events.
 
@@ -36,11 +36,16 @@ There are two kinds of events logged:
 - Instance events scoped to the whole GitLab instance, used by your Compliance team to
   perform formal audits.
 
-### Impersonation data **(PREMIUM)**
+### Impersonation data
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/536) in [GitLab Premium](https://about.gitlab.com/pricing/) 13.0.
 
-Impersonation is where an administrator uses credentials to perform an action as a different user.
+When a user is being [impersonated](../user/admin_area/index.md#user-impersonation), their actions are logged as audit events as usual, with two additional details:
+
+1. Usual audit events include information about the impersonating administrator. These are visible in their respective Audit Event pages depending on their type (Group/Project/User).
+1. Extra audit events are recorded for the start and stop of the administrator's impersonation session. These are visible in the instance Audit Events.
+
+![audit events](img/impersonated_audit_events_v13_8.png)
 
 ### Group events **(PREMIUM)**
 
@@ -162,7 +167,7 @@ It may make the user interface for your project or audit events very busy, and t
 to prevent performance degradations on GitLab instances with very high Git write traffic.
 
 In an upcoming release, Audit Events for Git push events will be enabled
-by default. Follow [#7865](https://gitlab.com/gitlab-org/gitlab/-/issues/7865) for updates.
+by default. Follow our [Partitioning strategy for Audit Events epic](https://gitlab.com/groups/gitlab-org/-/epics/3206) for updates.
 
 If you still wish to enable **Repository push** events in your instance, follow
 the steps bellow.

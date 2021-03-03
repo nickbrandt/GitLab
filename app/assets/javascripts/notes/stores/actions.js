@@ -1,24 +1,25 @@
-import Vue from 'vue';
 import $ from 'jquery';
 import Visibility from 'visibilityjs';
-import axios from '~/lib/utils/axios_utils';
-import updateIssueConfidentialMutation from '~/sidebar/components/confidential/mutations/update_issue_confidential.mutation.graphql';
-import updateMergeRequestLockMutation from '~/sidebar/components/lock/mutations/update_merge_request_lock.mutation.graphql';
-import updateIssueLockMutation from '~/sidebar/components/lock/mutations/update_issue_lock.mutation.graphql';
-import { __, sprintf } from '~/locale';
+import Vue from 'vue';
 import Api from '~/api';
-import TaskList from '../../task_list';
-import { deprecatedCreateFlash as Flash } from '../../flash';
-import Poll from '../../lib/utils/poll';
-import * as constants from '../constants';
+import { EVENT_ISSUABLE_VUE_APP_CHANGE } from '~/issuable/constants';
+import axios from '~/lib/utils/axios_utils';
+import { __, sprintf } from '~/locale';
+import { confidentialWidget } from '~/sidebar/components/confidential/sidebar_confidentiality_widget.vue';
+import updateIssueLockMutation from '~/sidebar/components/lock/mutations/update_issue_lock.mutation.graphql';
+import updateMergeRequestLockMutation from '~/sidebar/components/lock/mutations/update_merge_request_lock.mutation.graphql';
 import loadAwardsHandler from '../../awards_handler';
-import sidebarTimeTrackingEventHub from '../../sidebar/event_hub';
+import { deprecatedCreateFlash as Flash } from '../../flash';
 import { isInViewport, scrollToElement, isInMRPage } from '../../lib/utils/common_utils';
+import Poll from '../../lib/utils/poll';
 import { mergeUrlParams } from '../../lib/utils/url_utility';
-import eventHub from '../event_hub';
+import sidebarTimeTrackingEventHub from '../../sidebar/event_hub';
+import TaskList from '../../task_list';
 import mrWidgetEventHub from '../../vue_merge_request_widget/event_hub';
-import * as utils from './utils';
+import * as constants from '../constants';
+import eventHub from '../event_hub';
 import * as types from './mutation_types';
+import * as utils from './utils';
 
 let eTagPoll;
 
@@ -267,7 +268,7 @@ export const toggleStateButtonLoading = ({ commit }, value) =>
   commit(types.TOGGLE_STATE_BUTTON_LOADING, value);
 
 export const emitStateChangedEvent = ({ getters }, data) => {
-  const event = new CustomEvent('issuable_vue_app:change', {
+  const event = new CustomEvent(EVENT_ISSUABLE_VUE_APP_CHANGE, {
     detail: {
       data,
       isClosed: getters.openState === constants.CLOSED,
@@ -339,6 +340,15 @@ export const saveNote = ({ commit, dispatch }, noteData) => {
      */
     if (hasQuickActions && message) {
       eTagPoll.makeRequest();
+
+      // synchronizing the quick action with the sidebar widget
+      // this is a temporary solution until we have confidentiality real-time updates
+      if (
+        confidentialWidget.setConfidentiality &&
+        message.some((m) => m.includes('confidential'))
+      ) {
+        confidentialWidget.setConfidentiality();
+      }
 
       $('.js-gfm-input').trigger('clear-commands-cache.atwho');
 
@@ -718,30 +728,4 @@ export const updateAssignees = ({ commit }, assignees) => {
 
 export const updateDiscussionPosition = ({ commit }, updatedPosition) => {
   commit(types.UPDATE_DISCUSSION_POSITION, updatedPosition);
-};
-
-export const updateConfidentialityOnIssuable = (
-  { getters, commit },
-  { confidential, fullPath },
-) => {
-  const { iid } = getters.getNoteableData;
-
-  return utils.gqClient
-    .mutate({
-      mutation: updateIssueConfidentialMutation,
-      variables: {
-        input: {
-          projectPath: fullPath,
-          iid: String(iid),
-          confidential,
-        },
-      },
-    })
-    .then(({ data }) => {
-      const {
-        issueSetConfidential: { issue },
-      } = data;
-
-      setConfidentiality({ commit }, issue.confidential);
-    });
 };

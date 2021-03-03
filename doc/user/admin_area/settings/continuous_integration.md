@@ -50,13 +50,13 @@ To change it at the:
    1. Change the value of maximum artifacts size (in MB).
    1. Click **Save changes** for the changes to take effect.
 
-- [Group level](../../group/index.md#group-settings) (this will override the instance setting):
+- Group level (this will override the instance setting):
 
   1. Go to the group's **Settings > CI / CD > General Pipelines**.
   1. Change the value of **maximum artifacts size (in MB)**.
   1. Click **Save changes** for the changes to take effect.
 
-- [Project level](../../../ci/pipelines/settings.md) (this will override the instance and group settings):
+- Project level (this will override the instance and group settings):
 
   1. Go to the project's **Settings > CI / CD > General Pipelines**.
   1. Change the value of **maximum artifacts size (in MB)**.
@@ -85,6 +85,25 @@ Any changes to this setting will apply to new artifacts only. The expiration tim
 be updated for artifacts created before this setting was changed.
 The administrator may need to manually search for and expire previously-created
 artifacts, as described in the [troubleshooting documentation](../../../administration/troubleshooting/gitlab_rails_cheat_sheet.md#remove-artifacts-more-than-a-week-old).
+
+## Keep the latest artifacts for all jobs in the latest successful pipelines **(CORE ONLY)**
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/50889) in GitLab Core 13.9.
+
+When enabled (default), the artifacts for the most recent pipeline for a ref are
+locked against deletion and kept regardless of the expiry time.
+
+When disabled, the latest artifacts for any **new** successful or fixed pipelines
+are allowed to expire.
+
+This setting takes precedence over the [project level setting](../../../ci/pipelines/job_artifacts.md#keep-artifacts-from-most-recent-successful-jobs).
+If disabled at the instance level, you cannot enable this per-project.
+
+When you disable the feature, the latest artifacts do not immediately expire.
+A new pipeline must run before the latest artifacts can expire and be deleted.
+
+NOTE:
+All application settings have a [customizable cache expiry interval](../../../administration/application_settings_cache.md) which can delay the settings affect.
 
 ## Shared runners pipeline minutes quota **(PREMIUM SELF)**
 
@@ -192,18 +211,18 @@ To set required pipeline configuration:
 
 ## Package Registry configuration
 
-### NPM Forwarding **(PREMIUM SELF)**
+### npm Forwarding **(PREMIUM SELF)**
 
-GitLab administrators can disable the forwarding of NPM requests to [npmjs.com](https://www.npmjs.com/).
+GitLab administrators can disable the forwarding of npm requests to [npmjs.com](https://www.npmjs.com/).
 
 To disable it:
 
 1. Go to **Admin Area > Settings > CI/CD**.
 1. Expand the **Package Registry** section.
-1. Uncheck **Enable forwarding of NPM package requests to npmjs.org**.
+1. Uncheck **Enable forwarding of npm package requests to npmjs.org**.
 1. Click **Save changes**.
 
-![NPM package requests forwarding](img/admin_package_registry_npm_package_requests_forward.png)
+![npm package requests forwarding](img/admin_package_registry_npm_package_requests_forward.png)
 
 ### Package file size limits
 
@@ -217,14 +236,13 @@ To set the maximum file size:
 1. Enter the maximum file size, in bytes.
 1. Click **Save size limits**.
 
-<!-- ## Troubleshooting
+## Troubleshooting
 
-Include any troubleshooting steps that you can foresee. If you know beforehand what issues
-one might have when setting this up, or when something is changed, or on upgrading, it's
-important to describe those, too. Think of things that may go wrong and include them here.
-This is important to minimize requests for support, and to avoid doc comments with
-questions that you know someone might ask.
+### 413 Request Entity Too Large
 
-Each scenario can be a third-level heading, e.g. `### Getting error message X`.
-If you have none to add when creating a doc, leave this section in place
-but commented out to help encourage others to add to it in the future. -->
+When build jobs fail with the following error,
+increase the [maximum artifacts size](#maximum-artifacts-size).
+
+```plaintext
+Uploading artifacts as "archive" to coordinator... too large archive <job-id> responseStatus=413 Request Entity Too Large status=413" at end of a build job on pipeline when trying to store artifacts to <object-storage>.
+```

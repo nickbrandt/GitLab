@@ -24,7 +24,8 @@
 #     alt_usage_data(fallback: nil) { Gitlab.config.registry.enabled }
 #
 #   * redis_usage_data method
-#     handles ::Redis::CommandError, Gitlab::UsageDataCounters::BaseCounter::UnknownEvent
+#     handles ::Redis::CommandError, Gitlab::UsageDataCounters::BaseCounter::UnknownEvent,
+#     Gitlab::UsageDataCounters::HLLRedisCounter::EventError
 #     returns -1 when a block is sent or hash with all values -1 when a counter is sent
 #     different behaviour due to 2 different implementations of redis counter
 #
@@ -80,30 +81,17 @@ module Gitlab
         DISTRIBUTED_HLL_FALLBACK
       end
 
-      def save_aggregated_metrics(metric_name:, time_period:, recorded_at_timestamp:, data:)
-        unless data.is_a? ::Gitlab::Database::PostgresHll::Buckets
-          Gitlab::ErrorTracking.track_and_raise_for_dev_exception(StandardError.new("Unsupported data type: #{data.class}"))
-          return
-        end
-
-        # the longest recorded usage ping generation time for gitlab.com
-        # was below 40 hours, there is added error margin of 20 h
-        usage_ping_generation_period = 80.hours
-
-        # add timestamp at the end of the key to avoid stale keys if
-        # usage ping job is retried
-        redis_key = "#{metric_name}_#{time_period_to_human_name(time_period)}-#{recorded_at_timestamp}"
-
-        Gitlab::Redis::SharedState.with do |redis|
-          redis.set(redis_key, data.to_json, ex: usage_ping_generation_period)
-        end
-      rescue ::Redis::CommandError => e
-        Gitlab::ErrorTracking.track_and_raise_for_dev_exception(e)
-      end
-
       def sum(relation, column, batch_size: nil, start: nil, finish: nil)
         Gitlab::Database::BatchCount.batch_sum(relation, column, batch_size: batch_size, start: start, finish: finish)
       rescue ActiveRecord::StatementInvalid
+        FALLBACK
+      end
+
+      def add(*args)
+        return -1 if args.any?(&:negative?)
+
+        args.sum
+      rescue StandardError
         FALLBACK
       end
 
@@ -152,20 +140,6 @@ module Gitlab
         Gitlab::UsageDataCounters::HLLRedisCounter.track_event(event_name.to_s, values: values)
       end
 
-      def time_period_to_human_name(time_period)
-        return ALL_TIME_PERIOD_HUMAN_NAME if time_period.blank?
-
-        date_range = time_period.values[0]
-        start_date = date_range.first.to_date
-        end_date = date_range.last.to_date
-
-        if (end_date - start_date).to_i > 7
-          MONTHLY_PERIOD_HUMAN_NAME
-        else
-          WEEKLY_PERIOD_HUMAN_NAME
-        end
-      end
-
       private
 
       def prometheus_client(verify:)
@@ -195,7 +169,7 @@ module Gitlab
 
       def redis_usage_counter
         yield
-      rescue ::Redis::CommandError, Gitlab::UsageDataCounters::BaseCounter::UnknownEvent
+      rescue ::Redis::CommandError, Gitlab::UsageDataCounters::BaseCounter::UnknownEvent, Gitlab::UsageDataCounters::HLLRedisCounter::EventError
         FALLBACK
       end
 

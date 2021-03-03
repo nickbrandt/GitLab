@@ -6,6 +6,9 @@ export const healthStatus = {
   AT_RISK: 'atRisk',
 };
 
+export const edit = __('Edit');
+export const none = __('None');
+
 export const healthStatusTextMap = {
   [healthStatus.ON_TRACK]: __('On track'),
   [healthStatus.NEEDS_ATTENTION]: __('Needs attention'),
@@ -16,8 +19,14 @@ export const iterationSelectTextMap = {
   iteration: __('Iteration'),
   noIteration: __('No iteration'),
   noIterationItem: [{ title: __('No iteration'), id: null }],
+  assignIteration: __('Assign Iteration'),
   iterationSelectFail: __('Failed to set iteration on this issue. Please try again.'),
+  currentIterationFetchError: __('Failed to fetch the iteration for this issue. Please try again.'),
+  iterationsFetchError: __('Failed to fetch the iterations for the group. Please try again.'),
+  noIterationsFound: __('No iterations found'),
 };
+
+export const noIteration = null;
 
 export const iterationDisplayState = 'opened';
 

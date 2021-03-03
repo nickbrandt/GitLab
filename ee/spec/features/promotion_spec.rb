@@ -82,7 +82,7 @@ RSpec.describe 'Promotions', :js do
     it 'appears in milestone page' do
       visit project_milestone_path(project, milestone)
 
-      expect(find('#promote_burndown_charts')).to have_content "Upgrade your plan to improve milestones with Burndown Charts."
+      expect(find('#promote_burndown_charts')).to have_content 'Upgrade your plan to improve milestones with Burndown Charts.'
     end
 
     it 'does not show when cookie is set' do
@@ -180,29 +180,27 @@ RSpec.describe 'Promotions', :js do
       visit project_issue_path(project, issue)
       wait_for_requests
 
-      find('.btn-link.js-toggle-button.js-weight-sidebar-callout').click
+      click_link 'Learn more'
 
       expect(find('.promotion-issue-weight-sidebar-message')).to have_content 'Improve issues management with Issue weight and GitLab Enterprise Edition'
     end
 
-    it 'is removed after dismissal', quarantine: 'https://gitlab.com/gitlab-org/gitlab/-/issues/222518' do
+    it 'is removed after dismissal' do
       visit project_issue_path(project, issue)
       wait_for_requests
 
-      within 'div.js-weight-sidebar-callout' do
-        find('.btn-link.js-toggle-button.js-weight-sidebar-callout').click
-        click_link "Don't show me this again"
-      end
+      click_link 'Learn more'
+      click_link 'Not now, thanks'
 
-      expect(page).not_to have_selector('.js-weight-sidebar-callout')
+      expect(page).not_to have_content('.js-weight-sidebar-callout')
     end
 
     it 'does not appear on page after dismissal and reload' do
       visit project_issue_path(project, issue)
       wait_for_requests
 
-      find('.btn-link.js-toggle-button.js-weight-sidebar-callout').click
-      find('.js-weight-sidebar-callout .js-close-callout').click
+      click_link 'Learn more'
+      click_link 'Not now, thanks'
       visit project_issue_path(project, issue)
 
       expect(page).not_to have_selector('.js-weight-sidebar-callout')
@@ -212,8 +210,8 @@ RSpec.describe 'Promotions', :js do
       visit project_issue_path(project, issue)
       wait_for_requests
 
-      find('.btn-link.js-toggle-button.js-weight-sidebar-callout').click
-      find('.btn-link.js-toggle-button.js-weight-sidebar-callout').click
+      click_link 'Learn more'
+      click_link 'Learn more'
 
       expect(page).to have_selector('.js-weight-sidebar-callout')
       expect(page).to have_selector('.promotion-issue-sidebar-message', visible: false)
@@ -230,7 +228,7 @@ RSpec.describe 'Promotions', :js do
         visit project_issue_path(project, issue)
         wait_for_requests
 
-        find('.btn-link.js-toggle-button.js-weight-sidebar-callout').click
+        click_link 'Learn more'
 
         expect(page).to have_link 'Try it for free', href: new_trial_registration_path(glm_source: 'gitlab.com', glm_content: 'discover-issue-weights'), class: 'issue-weights-trial-cta'
         expect(find('.js-close-callout.js-close-session.tr-issue-weights-not-now-cta')).to have_content 'Not now, thanks!'
@@ -264,6 +262,10 @@ RSpec.describe 'Promotions', :js do
 
       project.add_maintainer(user)
       sign_in(user)
+    end
+
+    include_context '"Security & Compliance" permissions' do
+      let(:response) { inspect_requests { visit project_audit_events_path(project) }.first }
     end
 
     it 'appears on the page' do

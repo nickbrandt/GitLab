@@ -1,8 +1,8 @@
 import Vue from 'vue';
 import VueApollo from 'vue-apollo';
 import Translate from '~/vue_shared/translate';
-import { createApolloClient } from './graphql/client_factory';
 import ImportTable from './components/import_table.vue';
+import { createApolloClient } from './graphql/client_factory';
 
 Vue.use(Translate);
 Vue.use(VueApollo);
@@ -14,14 +14,18 @@ export function mountImportGroupsApp(mountElement) {
     statusPath,
     availableNamespacesPath,
     createBulkImportPath,
+    jobsPath,
     sourceUrl,
+    groupPathRegex,
   } = mountElement.dataset;
   const apolloProvider = new VueApollo({
     defaultClient: createApolloClient({
+      sourceUrl,
       endpoints: {
         status: statusPath,
         availableNamespaces: availableNamespacesPath,
         createBulkImport: createBulkImportPath,
+        jobs: jobsPath,
       },
     }),
   });
@@ -33,6 +37,7 @@ export function mountImportGroupsApp(mountElement) {
       return createElement(ImportTable, {
         props: {
           sourceUrl,
+          groupPathRegex: new RegExp(`^(${groupPathRegex})$`),
         },
       });
     },

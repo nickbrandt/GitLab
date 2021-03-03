@@ -1,11 +1,11 @@
 ---
-stage: Create
-group: Source Code
+stage: Plan
+group: Project Management
 info: "To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#assignments"
 type: reference
 ---
 
-# Invalidate Markdown Cache
+# Invalidate Markdown Cache **(FREE)**
 
 For performance reasons, GitLab caches the HTML version of Markdown text
 in fields like comments, issue descriptions, and merge request descriptions. These

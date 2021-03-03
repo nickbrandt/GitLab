@@ -1,11 +1,11 @@
 ---
 stage: Create
-group: Source Code
+group: Code Review
 info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#assignments
 type: reference, concepts
 ---
 
-# Merge when pipeline succeeds
+# Merge when pipeline succeeds **(FREE)**
 
 When reviewing a merge request that looks ready to merge but still has a
 pipeline running, you can set it to merge automatically when the
@@ -94,7 +94,7 @@ merge-request-pipeline-job:
 ```
 
 You should avoid configuration like this, and only use branch (`push`) pipelines
-or merge request pipelines, when possible. See [`rules` documentation](../../../ci/yaml/README.md#prevent-duplicate-pipelines)
+or merge request pipelines, when possible. See [`rules` documentation](../../../ci/yaml/README.md#avoid-duplicate-pipelines)
 for details on avoiding two pipelines for a single merge request.
 
 ### Skipped pipelines

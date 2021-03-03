@@ -5,7 +5,7 @@ info: "To determine the technical writer assigned to the Stage/Group associated 
 disqus_identifier: 'https://docs.gitlab.com/ee/workflow/gitlab_flow.html'
 ---
 
-# Introduction to GitLab Flow
+# Introduction to GitLab Flow **(FREE)**
 
 ![GitLab Flow](img/gitlab_flow.png)
 
@@ -187,7 +187,7 @@ The name of a branch might be dictated by organizational standards.
 When you are done or want to discuss the code, open a merge request.
 A merge request is an online place to discuss the change and review the code.
 
-If you open the merge request but do not assign it to anyone, it is a [draft merge request](../user/project/merge_requests/work_in_progress_merge_requests.md).
+If you open the merge request but do not assign it to anyone, it is a [draft merge request](../user/project/merge_requests/drafts.md).
 These are used to discuss the proposed implementation but are not ready for inclusion in the `master` branch yet.
 Start the title of the merge request with `[Draft]`, `Draft:` or `(Draft)` to prevent it from being merged before it's ready.
 
@@ -310,6 +310,18 @@ An example of a good commit message is: "Combine templates to reduce duplicate c
 The words "change," "improve," "fix," and "refactor" don't add much information to a commit message.
 For example, "Improve XML generation" could be better written as "Properly escape special characters in XML generation."
 For more information about formatting commit messages, please see this excellent [blog post by Tim Pope](https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html).
+
+To add more context to a commit message, consider adding information regarding the
+origin of the change. For example, the URL of a GitLab issue, or a Jira issue number,
+containing more information for users who need in-depth context about the change.
+
+For example:
+
+```plaintext
+Properly escape special characters in XML generation.
+
+Issue: gitlab.com/gitlab-org/gitlab/-/issues/1
+```
 
 ## Testing before merging
 

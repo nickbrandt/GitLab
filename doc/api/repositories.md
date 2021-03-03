@@ -5,7 +5,7 @@ info: "To determine the technical writer assigned to the Stage/Group associated 
 type: reference, api
 ---
 
-# Repositories API **(CORE)**
+# Repositories API **(FREE)**
 
 ## List repository tree
 
@@ -281,19 +281,12 @@ Example response:
 
 ## Generate changelog data
 
-> - [Introduced](https://gitlab.com/groups/gitlab-com/gl-infra/-/epics/351) in GitLab 13.9.
-> - It's [deployed behind a feature flag](../user/feature_flags.md), disabled by default.
-> - It's disabled on GitLab.com.
-> - It's not yet recommended for production use.
-> - To use it in GitLab self-managed instances, ask a GitLab administrator to [enable it](#enable-or-disable-generating-changelog-data).
-
-WARNING:
-This feature might not be available to you. Check the **version history** note above for details.
+> [Introduced](https://gitlab.com/groups/gitlab-com/gl-infra/-/epics/351) in GitLab 13.9.
 
 Generate changelog data based on commits in a repository.
 
-Given a version (using semantic versioning) and a range of commits,
-GitLab generates a changelog for all commits that use a particular
+Given a version (using [semantic versioning](https://semver.org/)) and a range
+of commits, GitLab generates a changelog for all commits that use a particular
 [Git trailer](https://git-scm.com/docs/git-interpret-trailers).
 
 The output of this process is a new section in a changelog file in the Git
@@ -309,13 +302,80 @@ Supported attributes:
 | Attribute | Type     | Required   | Description |
 | :-------- | :------- | :--------- | :---------- |
 | `version` | string   | yes | The version to generate the changelog for. The format must follow [semantic versioning](https://semver.org/). |
-| `from`    | string   | yes | The start of the range of commits (as a SHA) to use for generating the changelog. This commit itself isn't included in the list. |
-| `to`      | string   | yes | The end of the range of commits (as a SHA) to use for the changelog. This commit _is_ included in the list. |
+| `from`    | string   | no | The start of the range of commits (as a SHA) to use for generating the changelog. This commit itself isn't included in the list. |
+| `to`      | string   | no | The end of the range of commits (as a SHA) to use for the changelog. This commit _is_ included in the list. Defaults to the branch specified in the `branch` attribute. |
 | `date`    | datetime | no | The date and time of the release, defaults to the current time. |
 | `branch`  | string   | no | The branch to commit the changelog changes to, defaults to the project's default branch. |
 | `trailer` | string   | no | The Git trailer to use for including commits, defaults to `Changelog`. |
 | `file`    | string   | no | The file to commit the changes to, defaults to `CHANGELOG.md`. |
 | `message` | string   | no | The commit message to produce when committing the changes, defaults to `Add changelog for version X` where X is the value of the `version` argument. |
+
+If the `from` attribute is unspecified, GitLab uses the Git tag of the last
+stable version that came before the version specified in the `version`
+attribute. For this to work, your project must create Git tags for versions
+using one of the following formats:
+
+- `vX.Y.Z`
+- `X.Y.Z`
+
+Where `X.Y.Z` is a version that follows [semantic
+versioning](https://semver.org/). For example, consider a project with the
+following tags:
+
+- v1.0.0-pre1
+- v1.0.0
+- v1.1.0
+- v2.0.0
+
+If the `version` attribute is `2.1.0`, GitLab uses tag v2.0.0. And when the
+version is `1.1.1`, or `1.2.0`, GitLab uses tag v1.1.0. The tag `v1.0.0-pre1` is
+never used, because pre-release tags are ignored.
+
+If `from` is unspecified and no tag to use is found, the API produces an error.
+To solve such an error, you must explicitly specify a value for the `from`
+attribute.
+
+### Examples
+
+These examples use [cURL](https://curl.se/) to perform HTTP requests.
+The example commands use these values:
+
+- **Project ID**: 42
+- **Location**: hosted on GitLab.com
+- **Example API token**: `token`
+
+This command generates a changelog for version `1.0.0`.
+
+The commit range:
+
+- Starts with the tag of the last release.
+- Ends with the last commit on the target branch. The default target branch is the project's default branch.
+
+If the last tag is `v0.9.0` and the default branch is `main`, the range of commits
+included in this example is `v0.9.0..main`:
+
+```shell
+curl --header "PRIVATE-TOKEN: token" --data "version=1.0.0" "https://gitlab.com/api/v4/projects/42/repository/changelog"
+```
+
+To generate the data on a different branch, specify the `branch` parameter. This
+command generates data from the `foo` branch:
+
+```shell
+curl --header "PRIVATE-TOKEN: token" --data "version=1.0.0&branch=foo" "https://gitlab.com/api/v4/projects/42/repository/changelog"
+```
+
+To use a different trailer, use the `trailer` parameter:
+
+```shell
+curl --header "PRIVATE-TOKEN: token" --data "version=1.0.0&trailer=Type" "https://gitlab.com/api/v4/projects/42/repository/changelog"
+```
+
+To store the results in a different file, use the `file` parameter:
+
+```shell
+curl --header "PRIVATE-TOKEN: token" --data "version=1.0.0&file=NEWS" "https://gitlab.com/api/v4/projects/42/repository/changelog"
+```
 
 ### How it works
 
@@ -410,6 +470,7 @@ follows:
 - [{{ title }}]({{ commit.reference }})\
 {% if author.contributor %} by {{ author.reference }}{% end %}\
 {% if merge_request %} ([merge request]({{ merge_request.reference }})){% end %}
+
 {% end %}
 
 {% end %}
@@ -457,11 +518,40 @@ If a line ends in a backslash, the next newline is ignored. This allows you to
 wrap code across multiple lines, without introducing unnecessary newlines in the
 Markdown output.
 
+Tags that use `{%` and `%}` (known as expression tags) consume the newline that
+directly follows them, if any. This means that this:
+
+```plaintext
+---
+{% if foo %}
+bar
+{% end %}
+---
+```
+
+Compiles into this:
+
+```plaintext
+---
+bar
+---
+```
+
+Instead of this:
+
+```plaintext
+---
+
+bar
+
+---
+```
+
 You can specify a custom template in your configuration like so:
 
 ```yaml
 ---
-template: >
+template: |
   {% if categories %}
   {% each categories %}
   ### {{ title }}
@@ -469,6 +559,7 @@ template: >
   {% each entries %}
   - [{{ title }}]({{ commit.reference }})\
   {% if author.contributor %} by {{ author.reference }}{% end %}
+
   {% end %}
 
   {% end %}
@@ -476,6 +567,9 @@ template: >
   No changes.
   {% end %}
 ```
+
+Note that when specifying the template you should use `template: |` and not
+`template: >`, as the latter doesn't preserve newlines in the template.
 
 ### Template data
 
@@ -505,25 +599,6 @@ In an entry, the following variables are available (here `foo.bar` means that
 - `merge_request.reference`: a reference to the merge request that first
   introduced the change (for example, `gitlab-org/gitlab!50063`).
 
-The `author` and `merge_request` objects might not be present if the data couldn't
-be determined (for example, when a commit was created without a corresponding merge
-request).
-
-### Enable or disable generating changelog data **(CORE ONLY)**
-
-This feature is under development and not ready for production use. It is
-deployed behind a feature flag that is **disabled by default**.
-[GitLab administrators with access to the GitLab Rails console](../administration/feature_flags.md)
-can enable it.
-
-To enable it for a project:
-
-```ruby
-Feature.enable(:changelog_api, Project.find(id_of_the_project))
-```
-
-To disable it for a project:
-
-```ruby
-Feature.disable(:changelog_api, Project.find(id_of_the_project))
-```
+The `author` and `merge_request` objects might not be present if the data
+couldn't be determined. For example, when a commit is created without a
+corresponding merge request, no merge request is displayed.

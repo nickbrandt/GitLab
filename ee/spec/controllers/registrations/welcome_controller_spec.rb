@@ -33,10 +33,56 @@ RSpec.describe Registrations::WelcomeController do
         sign_in(another_user)
       end
 
-      it 'sets the learn_gitlab_project and renders' do
+      it 'renders 404' do
         subject
 
         is_expected.to have_gitlab_http_status(:not_found)
+      end
+    end
+  end
+
+  describe '#trial_onboarding_board' do
+    subject(:trial_onboarding_board) do
+      get :trial_onboarding_board, params: { learn_gitlab_project_id: project.id }
+    end
+
+    context 'without a signed in user' do
+      it { is_expected.to redirect_to new_user_session_path }
+    end
+
+    context 'with any other user signed in except the creator' do
+      before do
+        sign_in(another_user)
+      end
+
+      it 'renders 404' do
+        subject
+
+        is_expected.to have_gitlab_http_status(:not_found)
+      end
+    end
+
+    context 'with the creator user signed' do
+      before do
+        sign_in(user)
+      end
+
+      context 'gitlab onboarding project is not imported yet' do
+        it 'redirects to the boards path' do
+          subject
+
+          is_expected.to redirect_to(project_boards_path(project))
+        end
+      end
+
+      context 'gitlab onboarding project is imported yet' do
+        let_it_be(:board) { create(:board, project: project, name: EE::Registrations::WelcomeController::TRIAL_ONBOARDING_BOARD_NAME) }
+
+        it 'redirects to the board path' do
+          subject
+
+          is_expected.to redirect_to(project_board_path(project, board))
+        end
       end
     end
   end
@@ -108,11 +154,17 @@ RSpec.describe Registrations::WelcomeController do
       end
 
       describe 'redirection' do
-        it { is_expected.to redirect_to dashboard_projects_path }
-
-        context 'when part of the onboarding issues experiment' do
+        context 'when signup_onboarding is not enabled' do
           before do
-            stub_experiment_for_subject(onboarding_issues: true)
+            allow(controller.helpers).to receive(:signup_onboarding_enabled?).and_return(false)
+          end
+
+          it { is_expected.to redirect_to dashboard_projects_path }
+        end
+
+        context 'when signup_onboarding is enabled' do
+          before do
+            allow(controller.helpers).to receive(:signup_onboarding_enabled?).and_return(true)
           end
 
           it { is_expected.to redirect_to new_users_sign_up_group_path }

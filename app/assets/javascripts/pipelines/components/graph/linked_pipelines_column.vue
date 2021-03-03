@@ -1,9 +1,15 @@
 <script>
 import getPipelineDetails from 'shared_queries/pipelines/get_pipeline_details.query.graphql';
 import { LOAD_FAILURE } from '../../constants';
-import LinkedPipeline from './linked_pipeline.vue';
 import { ONE_COL_WIDTH, UPSTREAM } from './constants';
-import { unwrapPipelineData, toggleQueryPollingByVisibility, reportToSentry } from './utils';
+import LinkedPipeline from './linked_pipeline.vue';
+import {
+  getQueryHeaders,
+  reportToSentry,
+  toggleQueryPollingByVisibility,
+  unwrapPipelineData,
+  validateConfigPaths,
+} from './utils';
 
 export default {
   components: {
@@ -14,6 +20,11 @@ export default {
     columnTitle: {
       type: String,
       required: true,
+    },
+    configPaths: {
+      type: Object,
+      required: true,
+      validator: validateConfigPaths,
     },
     linkedPipelines: {
       type: Array,
@@ -61,6 +72,9 @@ export default {
     isUpstream() {
       return this.type === UPSTREAM;
     },
+    minWidth() {
+      return this.isUpstream ? 0 : this.$options.minWidth;
+    },
   },
   methods: {
     getPipelineData(pipeline) {
@@ -69,6 +83,9 @@ export default {
       this.$apollo.addSmartQuery('currentPipeline', {
         query: getPipelineDetails,
         pollInterval: 10000,
+        context() {
+          return getQueryHeaders(this.configPaths.graphqlResourceEtag);
+        },
         variables() {
           return {
             projectPath,
@@ -132,8 +149,8 @@ export default {
 
       this.$emit('pipelineExpandToggle', jobName, expanded);
     },
-    showDownstreamContainer(id) {
-      return !this.isUpstream && (this.isExpanded(id) || this.isLoadingPipeline(id));
+    showContainer(id) {
+      return this.isExpanded(id) || this.isLoadingPipeline(id);
     },
   },
 };
@@ -164,14 +181,15 @@ export default {
             @pipelineExpandToggle="onPipelineExpandToggle"
           />
           <div
-            v-if="showDownstreamContainer(pipeline.id)"
-            :style="{ minWidth: $options.minWidth }"
+            v-if="showContainer(pipeline.id)"
+            :style="{ minWidth }"
             class="gl-display-inline-block"
           >
             <pipeline-graph
               v-if="isExpanded(pipeline.id)"
               :type="type"
               class="d-inline-block gl-mt-n2"
+              :config-paths="configPaths"
               :pipeline="currentPipeline"
               :is-linked-pipeline="true"
             />

@@ -6,9 +6,9 @@ import { updateHistory, setUrlParams } from '~/lib/utils/url_utility';
 import FilteredSearchBar from '~/vue_shared/components/filtered_search_bar/filtered_search_bar_root.vue';
 
 import { DEFAULT_SKELETON_COUNT } from '../constants';
-import IssuableTabs from './issuable_tabs.vue';
-import IssuableItem from './issuable_item.vue';
 import IssuableBulkEditSidebar from './issuable_bulk_edit_sidebar.vue';
+import IssuableItem from './issuable_item.vue';
+import IssuableTabs from './issuable_tabs.vue';
 
 export default {
   components: {
@@ -122,6 +122,11 @@ export default {
       required: false,
       default: true,
     },
+    labelFilterParam: {
+      type: String,
+      required: false,
+      default: null,
+    },
   },
   data() {
     return {
@@ -180,7 +185,7 @@ export default {
       handler(params) {
         if (Object.keys(params).length) {
           updateHistory({
-            url: setUrlParams(params, window.location.href, true),
+            url: setUrlParams(params, window.location.href, true, false, true),
             title: document.title,
             replace: true,
           });
@@ -258,6 +263,7 @@ export default {
           :issuable-symbol="issuableSymbol"
           :issuable="issuable"
           :enable-label-permalinks="enableLabelPermalinks"
+          :label-filter-param="labelFilterParam"
           :show-checkbox="showBulkEditSidebar"
           :checked="issuableChecked(issuable)"
           @checked-input="handleIssuableCheckedInput(issuable, $event)"

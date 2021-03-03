@@ -1,10 +1,11 @@
+import { GlButtonGroup, GlButton, GlDropdown, GlDropdownItem } from '@gitlab/ui';
+import { shallowMount } from '@vue/test-utils';
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
-import { shallowMount } from '@vue/test-utils';
-import { GlButtonGroup, GlButton, GlDropdown, GlDropdownItem } from '@gitlab/ui';
 import { createMockDirective, getBinding } from 'helpers/vue_mock_directive';
 import waitForPromises from 'helpers/wait_for_promises';
 import httpStatus from '~/lib/utils/http_status';
+import CustomNotificationsModal from '~/notifications/components/custom_notifications_modal.vue';
 import NotificationsDropdown from '~/notifications/components/notifications_dropdown.vue';
 import NotificationsDropdownItem from '~/notifications/components/notifications_dropdown_item.vue';
 
@@ -14,17 +15,26 @@ const mockToastShow = jest.fn();
 describe('NotificationsDropdown', () => {
   let wrapper;
   let mockAxios;
+  let glModalDirective;
 
   function createComponent(injectedProperties = {}) {
+    glModalDirective = jest.fn();
+
     return shallowMount(NotificationsDropdown, {
       stubs: {
         GlButtonGroup,
         GlDropdown,
         GlDropdownItem,
         NotificationsDropdownItem,
+        CustomNotificationsModal,
       },
       directives: {
         GlTooltip: createMockDirective(),
+        glModal: {
+          bind(_, { value }) {
+            glModalDirective(value);
+          },
+        },
       },
       provide: {
         dropdownItems: mockDropdownItems,
@@ -94,6 +104,19 @@ describe('NotificationsDropdown', () => {
 
         expect(findButton().text()).toBe('');
       });
+
+      it('opens the modal when the user clicks the button', async () => {
+        jest.spyOn(axios, 'put');
+        mockAxios.onPut('/api/v4/notification_settings').reply(httpStatus.OK, {});
+
+        wrapper = createComponent({
+          initialNotificationLevel: 'custom',
+        });
+
+        findButton().vm.$emit('click');
+
+        expect(glModalDirective).toHaveBeenCalled();
+      });
     });
 
     describe('when notification level is not "custom"', () => {
@@ -139,7 +162,7 @@ describe('NotificationsDropdown', () => {
           initialNotificationLevel: level,
         });
 
-        const tooltipElement = findByTestId('notificationButton');
+        const tooltipElement = findByTestId('notification-button');
         const tooltip = getBinding(tooltipElement.element, 'gl-tooltip');
 
         expect(tooltip.value.title).toBe(`${tooltipTitlePrefix} - ${title}`);
@@ -232,9 +255,20 @@ describe('NotificationsDropdown', () => {
       expect(
         mockToastShow,
       ).toHaveBeenCalledWith(
-        'An error occured while updating the notification settings. Please try again.',
+        'An error occurred while updating the notification settings. Please try again.',
         { type: 'error' },
       );
+    });
+
+    it('opens the modal when the user clicks on the "Custom" dropdown item', async () => {
+      mockAxios.onPut('/api/v4/notification_settings').reply(httpStatus.OK, {});
+      wrapper = createComponent();
+
+      const mockModalShow = jest.spyOn(wrapper.vm.$refs.customNotificationsModal, 'open');
+
+      await clickDropdownItemAt(5);
+
+      expect(mockModalShow).toHaveBeenCalled();
     });
   });
 });

@@ -19,6 +19,9 @@ module Gitlab
         ensure_repository_does_not_exist!
 
         repository.create_from_bundle(path_to_bundle)
+        update_importable_repository_info
+
+        true
       rescue => e
         shared.error(e)
         false
@@ -32,10 +35,14 @@ module Gitlab
 
       attr_accessor :path_to_bundle, :shared
 
+      def update_importable_repository_info
+        # No-op. Overridden in EE
+      end
+
       def ensure_repository_does_not_exist!
         if repository.exists?
           shared.logger.info(
-            message: %Q{Deleting existing "#{repository.path}" to re-import it.}
+            message: %Q{Deleting existing "#{repository.disk_path}" to re-import it.}
           )
 
           Repositories::DestroyService.new(repository).execute
@@ -44,3 +51,5 @@ module Gitlab
     end
   end
 end
+
+Gitlab::ImportExport::RepoRestorer.prepend_if_ee('EE::Gitlab::ImportExport::RepoRestorer')

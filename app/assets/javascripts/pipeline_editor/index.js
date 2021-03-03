@@ -2,12 +2,17 @@ import Vue from 'vue';
 
 import VueApollo from 'vue-apollo';
 import createDefaultClient from '~/lib/graphql';
-import typeDefs from './graphql/typedefs.graphql';
+import { resetServiceWorkersPublicPath } from '../lib/utils/webpack';
 import { resolvers } from './graphql/resolvers';
-
+import typeDefs from './graphql/typedefs.graphql';
 import PipelineEditorApp from './pipeline_editor_app.vue';
 
 export const initPipelineEditor = (selector = '#js-pipeline-editor') => {
+  // Prevent issues loading syntax validation workers
+  // Fixes https://gitlab.com/gitlab-org/gitlab/-/issues/297252
+  // TODO Remove when https://gitlab.com/gitlab-org/gitlab/-/issues/321656 is resolved
+  resetServiceWorkersPublicPath();
+
   const el = document.querySelector(selector);
 
   if (!el) {
@@ -20,6 +25,7 @@ export const initPipelineEditor = (selector = '#js-pipeline-editor') => {
     // Add to provide/inject API for static values
     ciConfigPath,
     defaultBranch,
+    emptyStateIllustrationPath,
     lintHelpPagePath,
     newMergeRequestPath,
     projectFullPath,
@@ -46,6 +52,7 @@ export const initPipelineEditor = (selector = '#js-pipeline-editor') => {
     provide: {
       ciConfigPath,
       defaultBranch,
+      emptyStateIllustrationPath,
       lintHelpPagePath,
       newMergeRequestPath,
       projectFullPath,

@@ -44,16 +44,18 @@ To enable 2FA:
 
 1. **In GitLab:**
    1. Sign in to your GitLab account.
-   1. Go to your [**Profile settings**](../index.md#profile-settings).
+   1. Go to your [**User settings**](../index.md#user-settings).
    1. Go to **Account**.
    1. Select **Enable Two-factor Authentication**.
 1. **On your device (usually your phone):**
    1. Install a compatible application, like:
-      - [Authenticator](https://mattrubin.me/authenticator/): open source app for iOS devices.
-      - [andOTP](https://github.com/andOTP/andOTP): feature rich open source app for Android which supports PGP encrypted backups.
-      - [FreeOTP](https://freeotp.github.io/): open source app for Android.
-      - [Google Authenticator](https://support.google.com/accounts/answer/1066447?hl=en): proprietary app for iOS and Android.
-      - [SailOTP](https://openrepos.net/content/seiichiro0185/sailotp): open source app for SailFish OS.
+      - [Authy](https://authy.com/)
+      - [Duo Mobile](https://duo.com/product/multi-factor-authentication-mfa/duo-mobile-app)
+      - [LastPass](https://lastpass.com/auth/)
+      - [Authenticator](https://mattrubin.me/authenticator/)
+      - [andOTP](https://github.com/andOTP/andOTP)
+      - [Google Authenticator](https://support.google.com/accounts/answer/1066447?hl=en)
+      - [SailOTP](https://openrepos.net/content/seiichiro0185/sailotp)
    1. In the application, add a new entry in one of two ways:
       - Scan the code presented in GitLab with your device's camera to add the
         entry automatically.
@@ -246,7 +248,7 @@ Search for `security.webauth.u2f` and double click on it to toggle to `true`.
 To set up 2FA with a U2F device:
 
 1. Sign in to your GitLab account.
-1. Go to your [**Profile settings**](../index.md#profile-settings).
+1. Go to your [**User settings**](../index.md#user-settings).
 1. Go to **Account**.
 1. Click **Enable Two-Factor Authentication**.
 1. Connect your U2F device.
@@ -282,7 +284,7 @@ and the following mobile browsers:
 To set up 2FA with a WebAuthn compatible device:
 
 1. Sign in to your GitLab account.
-1. Go to your [**Profile settings**](../index.md#profile-settings).
+1. Go to your [**User settings**](../index.md#user-settings).
 1. Go to **Account**.
 1. Select **Enable Two-Factor Authentication**.
 1. Plug in your WebAuthn device.
@@ -349,7 +351,7 @@ request and you're automatically signed in.
 If you ever need to disable 2FA:
 
 1. Sign in to your GitLab account.
-1. Go to your [**Profile settings**](../index.md#profile-settings).
+1. Go to your [**User settings**](../index.md#user-settings).
 1. Go to **Account**.
 1. Click **Disable**, under **Two-Factor Authentication**.
 
@@ -434,7 +436,7 @@ a new set of recovery codes with SSH:
    When prompted for a two-factor code, enter one of the recovery codes obtained
    from the command-line output.
 
-After signing in, visit your **Profile settings > Account**  immediately to set
+After signing in, visit your **User settings > Account**  immediately to set
 up two-factor authentication with a new device.
 
 ### Regenerate 2FA recovery codes
@@ -443,8 +445,8 @@ To regenerate 2FA recovery codes, you need access to a desktop browser:
 
 1. Navigate to GitLab.
 1. Sign in to your GitLab account.
-1. Go to your [**Profile settings**](../index.md#profile-settings).
-1. Select **{account}** **Account > Two-Factor Authentication (2FA)**.
+1. Go to your [**User settings**](../index.md#user-settings).
+1. Select **Account > Two-Factor Authentication (2FA)**.
 1. If you've already configured 2FA, click **Manage two-factor authentication**.
 1. In the **Register Two-Factor Authenticator** pane, click **Regenerate recovery codes**.
 

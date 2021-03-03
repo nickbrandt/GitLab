@@ -120,14 +120,13 @@ This shows commands that have taken a long time and may be a performance
 concern.
 
 The
-[fluent-plugin-redis-slowlog](https://gitlab.com/gitlab-org/fluent-plugin-redis-slowlog)
-project is responsible for taking the slowlog entries from Redis and
-passing to fluentd (and ultimately Elasticsearch).
+[`fluent-plugin-redis-slowlog`](https://gitlab.com/gitlab-org/fluent-plugin-redis-slowlog)
+project is responsible for taking the `slowlog` entries from Redis and
+passing to Fluentd (and ultimately Elasticsearch).
 
 ## Analyzing the entire keyspace
 
-The [Redis Keyspace
-Analyzer](https://gitlab.com/gitlab-com/gl-infra/redis-keyspace-analyzer)
+The [Redis Keyspace Analyzer](https://gitlab.com/gitlab-com/gl-infra/redis-keyspace-analyzer)
 project contains tools for dumping the full key list and memory usage of a Redis
 instance, and then analyzing those lists while eliminating potentially sensitive
 data from the results. It can be used to find the most frequent key patterns, or
@@ -185,9 +184,8 @@ The Redis [`PFCOUNT`](https://redis.io/commands/pfcount),
 [`PFMERGE`](https://redis.io/commands/pfmergge) commands operate on
 HyperLogLogs, a data structure that allows estimating the number of unique
 elements with low memory usage. (In addition to the `PFCOUNT` documentation,
-Thoughtbot's article on [HyperLogLogs in
-Redis](https://thoughtbot.com/blog/hyperloglogs-in-redis) provides a good
-background here.)
+Thoughtbot's article on [HyperLogLogs in Redis](https://thoughtbot.com/blog/hyperloglogs-in-redis)
+provides a good background here.)
 
 [`Gitlab::Redis::HLL`](https://gitlab.com/gitlab-org/gitlab/blob/master/lib/gitlab/redis/hll.rb)
 provides a convenient interface for adding and counting values in HyperLogLogs.

@@ -40,6 +40,10 @@ FactoryBot.define do
       end
     end
 
+    trait :created do
+      status { :created }
+    end
+
     factory :ci_pipeline do
       transient { ci_ref_presence { true } }
 
@@ -51,10 +55,6 @@ FactoryBot.define do
         status { :failed }
         yaml_errors { 'invalid YAML' }
         failure_reason { :config_error }
-      end
-
-      trait :created do
-        status { :created }
       end
 
       trait :preparing do
@@ -90,6 +90,30 @@ FactoryBot.define do
 
         after(:build) do |pipeline, evaluator|
           pipeline.builds << build(:ci_build, :report_results, pipeline: pipeline, project: pipeline.project)
+        end
+      end
+
+      trait :with_codequality_report do
+        status { :success }
+
+        after(:build) do |pipeline, evaluator|
+          pipeline.builds << build(:ci_build, :codequality_report, pipeline: pipeline, project: pipeline.project)
+        end
+      end
+
+      trait :with_sast_report do
+        status { :success }
+
+        after(:build) do |pipeline, evaluator|
+          pipeline.builds << build(:ci_build, :sast_report, pipeline: pipeline, project: pipeline.project)
+        end
+      end
+
+      trait :with_secret_detection_report do
+        status { :success }
+
+        after(:build) do |pipeline, evaluator|
+          pipeline.builds << build(:ci_build, :secret_detection_report, pipeline: pipeline, project: pipeline.project)
         end
       end
 

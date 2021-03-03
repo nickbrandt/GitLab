@@ -183,6 +183,24 @@ RSpec.describe Gitlab::Utils::UsageData do
     end
   end
 
+  describe '#add' do
+    it 'adds given values' do
+      expect(described_class.add(1, 3)).to eq(4)
+    end
+
+    it 'adds given values' do
+      expect(described_class.add).to eq(0)
+    end
+
+    it 'returns the fallback value when adding fails' do
+      expect(described_class.add(nil, 3)).to eq(-1)
+    end
+
+    it 'returns the fallback value one of the arguments is negative' do
+      expect(described_class.add(-1, 1)).to eq(-1)
+    end
+  end
+
   describe '#alt_usage_data' do
     it 'returns the fallback when it gets an error' do
       expect(described_class.alt_usage_data { raise StandardError } ).to eq(-1)
@@ -201,6 +219,12 @@ RSpec.describe Gitlab::Utils::UsageData do
     context 'with block given' do
       it 'returns the fallback when it gets an error' do
         expect(described_class.redis_usage_data { raise ::Redis::CommandError } ).to eq(-1)
+      end
+
+      it 'returns the fallback when Redis HLL raises any error' do
+        stub_const("Gitlab::Utils::UsageData::FALLBACK", 15)
+
+        expect(described_class.redis_usage_data { raise Gitlab::UsageDataCounters::HLLRedisCounter::CategoryMismatch } ).to eq(15)
       end
 
       it 'returns the evaluated block when given' do
@@ -370,99 +394,6 @@ RSpec.describe Gitlab::Utils::UsageData do
 
         described_class.track_usage_event(event_name, value)
       end
-    end
-  end
-
-  describe '#save_aggregated_metrics', :clean_gitlab_redis_shared_state do
-    let(:timestamp) { Time.current.to_i }
-    let(:time_period) { { created_at: 7.days.ago..Date.current } }
-    let(:metric_name) { 'test_metric' }
-    let(:method_params) do
-      {
-        metric_name: metric_name,
-        time_period: time_period,
-        recorded_at_timestamp: timestamp,
-        data: data
-      }
-    end
-
-    context 'with compatible data argument' do
-      let(:data) { ::Gitlab::Database::PostgresHll::Buckets.new(141 => 1, 56 => 1) }
-
-      it 'persists serialized data in Redis' do
-        time_period_name = 'weekly'
-
-        expect(described_class).to receive(:time_period_to_human_name).with(time_period).and_return(time_period_name)
-        Gitlab::Redis::SharedState.with do |redis|
-          expect(redis).to receive(:set).with("#{metric_name}_#{time_period_name}-#{timestamp}", '{"141":1,"56":1}', ex: 80.hours)
-        end
-
-        described_class.save_aggregated_metrics(**method_params)
-      end
-
-      context 'error handling' do
-        before do
-          allow(Gitlab::Redis::SharedState).to receive(:with).and_raise(::Redis::CommandError)
-        end
-
-        it 'rescues and reraise ::Redis::CommandError for development and test environments' do
-          expect { described_class.save_aggregated_metrics(**method_params) }.to raise_error ::Redis::CommandError
-        end
-
-        context 'for environment different than development' do
-          before do
-            stub_rails_env('production')
-          end
-
-          it 'rescues ::Redis::CommandError' do
-            expect { described_class.save_aggregated_metrics(**method_params) }.not_to raise_error
-          end
-        end
-      end
-    end
-
-    context 'with incompatible data argument' do
-      let(:data) { 1 }
-
-      context 'for environment different than development' do
-        before do
-          stub_rails_env('production')
-        end
-
-        it 'does not persist data in Redis' do
-          Gitlab::Redis::SharedState.with do |redis|
-            expect(redis).not_to receive(:set)
-          end
-
-          described_class.save_aggregated_metrics(**method_params)
-        end
-      end
-
-      it 'raises error for development environment' do
-        expect { described_class.save_aggregated_metrics(**method_params) }.to raise_error /Unsupported data type/
-      end
-    end
-  end
-
-  describe '#time_period_to_human_name' do
-    it 'translates empty time period as all_time' do
-      expect(described_class.time_period_to_human_name({})).to eql 'all_time'
-    end
-
-    it 'translates time period not longer than 7 days as weekly', :aggregate_failures do
-      days_6_time_period = 6.days.ago..Date.current
-      days_7_time_period = 7.days.ago..Date.current
-
-      expect(described_class.time_period_to_human_name(column_name: days_6_time_period)).to eql 'weekly'
-      expect(described_class.time_period_to_human_name(column_name: days_7_time_period)).to eql 'weekly'
-    end
-
-    it 'translates time period longer than 7 days as monthly', :aggregate_failures do
-      days_8_time_period = 8.days.ago..Date.current
-      days_31_time_period = 31.days.ago..Date.current
-
-      expect(described_class.time_period_to_human_name(column_name: days_8_time_period)).to eql 'monthly'
-      expect(described_class.time_period_to_human_name(column_name: days_31_time_period)).to eql 'monthly'
     end
   end
 end

@@ -5,9 +5,10 @@ import {
   GlBadge,
   GlSafeHtmlDirective as SafeHtml,
 } from '@gitlab/ui';
+import { mapState } from 'vuex';
 import { generateBadges } from 'ee_else_ce/members/utils';
-import { __ } from '~/locale';
 import { glEmojiTag } from '~/emoji';
+import { __ } from '~/locale';
 import { AVATAR_SIZE } from '../../constants';
 
 export default {
@@ -34,11 +35,16 @@ export default {
     },
   },
   computed: {
+    ...mapState(['canManageMembers']),
     user() {
       return this.member.user;
     },
     badges() {
-      return generateBadges(this.member, this.isCurrentUser).filter((badge) => badge.show);
+      return generateBadges({
+        member: this.member,
+        isCurrentUser: this.isCurrentUser,
+        canManageMembers: this.canManageMembers,
+      }).filter((badge) => badge.show);
     },
     statusEmoji() {
       return this.user?.status?.emoji;

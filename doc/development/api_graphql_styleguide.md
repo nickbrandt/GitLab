@@ -13,6 +13,7 @@ This document outlines the style guide for the GitLab [GraphQL API](../api/graph
 <!-- vale gitlab.Spelling = NO -->
 We use the [GraphQL Ruby gem](https://graphql-ruby.org/) written by [Robert Mosolgo](https://github.com/rmosolgo/).
 <!-- vale gitlab.Spelling = YES -->
+In addition, we have a subscription to [GraphQL Pro](https://graphql.pro/). For details see [GraphQL Pro subscription](graphql_guide/graphql_pro.md).
 
 All GraphQL queries are directed to a single endpoint
 ([`app/controllers/graphql_controller.rb#execute`](https://gitlab.com/gitlab-org/gitlab/blob/master/app%2Fcontrollers%2Fgraphql_controller.rb)),
@@ -67,9 +68,32 @@ Complexity is explained [on our client-facing API page](../api/graphql/index.md#
 Fields default to adding `1` to a query's complexity score, but developers can
 [specify a custom complexity](#field-complexity) when defining a field.
 
+To estimate the complexity of a query, you can run the
+[`gitlab:graphql:analyze`](rake_tasks.md#analyze-graphql-queries)
+Rake task.
+
 ### Request timeout
 
 Requests time out at 30 seconds.
+
+## Breaking changes
+
+The GitLab GraphQL API is [versionless](https://graphql.org/learn/best-practices/#versioning) which means
+developers must familiarize themselves with our [deprecation cycle of breaking changes](#breaking-changes).
+
+Breaking changes are:
+
+- Removing or renaming a field, argument, enum value or mutation.
+- Changing the type of a field, argument or enum value.
+- Raising the [complexity](#max-complexity) of a field or complexity multipliers in a resolver.
+- Changing the [max page size](#page-size-limit) of a connection.
+- Lowering the global limits for query complexity and depth.
+- Anything else that can result in queries hitting a limit that previously was allowed.
+
+Fields that use the [`feature_flag` property](#feature_flag-property) and the flag is disabled by default are exempt
+from the deprecation process, and can be removed at any time without notice.
+
+See the [deprecating fields and enum values](#deprecating-fields-arguments-and-enum-values) section for how to deprecate items.
 
 ## Global IDs
 
@@ -485,15 +509,18 @@ def foo
 end
 ```
 
-## Deprecating fields and enum values
+## Deprecating fields, arguments, and enum values
 
 The GitLab GraphQL API is versionless, which means we maintain backwards
-compatibility with older versions of the API with every change. Rather
-than removing a field or [enum value](#enums), we need to _deprecate_ it instead.
-The deprecated parts of the schema can then be removed in a future release
-in accordance with the [GitLab deprecation process](../api/graphql/index.md#deprecation-process).
+compatibility with older versions of the API with every change.
 
-Fields and enum values are deprecated using the `deprecated` property.
+Rather than removing fields, arguments, or [enum values](#enums), they
+must be _deprecated_ instead.
+
+The deprecated parts of the schema can then be removed in a future release
+in accordance with the [GitLab deprecation process](../api/graphql/index.md#deprecation-and-removal-process).
+
+Fields, arguments, and enum values are deprecated using the `deprecated` property.
 The value of the property is a `Hash` of:
 
 - `reason` - Reason for the deprecation.
@@ -513,14 +540,15 @@ is appended to the `description`.
 
 ### Deprecation reason style guide
 
-Where the reason for deprecation is due to the field or enum value being
-replaced, the `reason` must be:
+Where the reason for deprecation is due to the field, argument, or enum value being
+replaced, the `reason` must indicate the replacement. For example, the
+following is a `reason` for a replaced field:
 
 ```plaintext
 Use `otherFieldName`
 ```
 
-Example:
+Examples:
 
 ```ruby
 field :designs, ::Types::DesignManagement::DesignCollectionType, null: true,
@@ -539,8 +567,8 @@ module Types
 end
 ```
 
-If the field is not being replaced by another field, a descriptive
-deprecation `reason` should be given.
+If the field, argument, or enum value being deprecated is not being replaced,
+a descriptive deprecation `reason` should be given.
 
 See also [Aliasing and deprecating mutations](#aliasing-and-deprecating-mutations).
 
@@ -589,7 +617,7 @@ end
 ```
 
 Enum values can be deprecated using the
-[`deprecated` keyword](#deprecating-fields-and-enum-values).
+[`deprecated` keyword](#deprecating-fields-arguments-and-enum-values).
 
 ### Defining GraphQL enums dynamically from Rails enums
 
@@ -1562,7 +1590,7 @@ mount_aliased_mutation 'BarMutation', Mutations::FooMutation
 ```
 
 This allows us to rename a mutation and continue to support the old name,
-when coupled with the [`deprecated`](#deprecating-fields-and-enum-values)
+when coupled with the [`deprecated`](#deprecating-fields-arguments-and-enum-values)
 argument.
 
 Example:

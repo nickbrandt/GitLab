@@ -1,14 +1,14 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils';
 import { GlAlert, GlButton, GlLoadingIcon, GlTabs } from '@gitlab/ui';
+import { shallowMount, createLocalVue } from '@vue/test-utils';
 import VueApollo from 'vue-apollo';
-import waitForPromises from 'helpers/wait_for_promises';
 import createMockApollo from 'helpers/mock_apollo_helper';
-import TextEditor from '~/pipeline_editor/components/text_editor.vue';
-
+import waitForPromises from 'helpers/wait_for_promises';
 import httpStatusCodes from '~/lib/utils/http_status';
-
-import { COMMIT_SUCCESS, COMMIT_FAILURE, LOAD_FAILURE_UNKNOWN } from '~/pipeline_editor/constants';
 import CommitForm from '~/pipeline_editor/components/commit/commit_form.vue';
+import TextEditor from '~/pipeline_editor/components/editor/text_editor.vue';
+
+import PipelineEditorEmptyState from '~/pipeline_editor/components/ui/pipeline_editor_empty_state.vue';
+import { COMMIT_SUCCESS, COMMIT_FAILURE, LOAD_FAILURE_UNKNOWN } from '~/pipeline_editor/constants';
 import getCiConfigData from '~/pipeline_editor/graphql/queries/ci_config.graphql';
 import PipelineEditorApp from '~/pipeline_editor/pipeline_editor_app.vue';
 import PipelineEditorHome from '~/pipeline_editor/pipeline_editor_home.vue';
@@ -93,6 +93,7 @@ describe('Pipeline editor app component', () => {
   const findAlert = () => wrapper.findComponent(GlAlert);
   const findEditorHome = () => wrapper.findComponent(PipelineEditorHome);
   const findTextEditor = () => wrapper.findComponent(TextEditor);
+  const findEmptyState = () => wrapper.findComponent(PipelineEditorEmptyState);
 
   beforeEach(() => {
     mockBlobContentData = jest.fn();
@@ -147,45 +148,51 @@ describe('Pipeline editor app component', () => {
       });
     });
 
-    describe('when no file exists', () => {
-      const noFileAlertMsg =
-        'There is no .gitlab-ci.yml file in this repository, please add one and visit the Pipeline Editor again.';
+    describe('when no CI config file exists', () => {
+      describe('in a project without a repository', () => {
+        it('shows an empty state and does not show editor home component', async () => {
+          mockBlobContentData.mockRejectedValueOnce({
+            response: {
+              status: httpStatusCodes.BAD_REQUEST,
+            },
+          });
+          createComponentWithApollo();
 
-      it('shows a 404 error message and does not show editor home component', async () => {
-        mockBlobContentData.mockRejectedValueOnce({
-          response: {
-            status: httpStatusCodes.NOT_FOUND,
-          },
+          await waitForPromises();
+
+          expect(findEmptyState().exists()).toBe(true);
+          expect(findAlert().exists()).toBe(false);
+          expect(findEditorHome().exists()).toBe(false);
         });
-        createComponentWithApollo();
-
-        await waitForPromises();
-
-        expect(findAlert().text()).toBe(noFileAlertMsg);
-        expect(findEditorHome().exists()).toBe(false);
       });
 
-      it('shows a 400 error message and does not show editor home component', async () => {
-        mockBlobContentData.mockRejectedValueOnce({
-          response: {
-            status: httpStatusCodes.BAD_REQUEST,
-          },
+      describe('in a project with a repository', () => {
+        it('shows an empty state and does not show editor home component', async () => {
+          mockBlobContentData.mockRejectedValueOnce({
+            response: {
+              status: httpStatusCodes.NOT_FOUND,
+            },
+          });
+          createComponentWithApollo();
+
+          await waitForPromises();
+
+          expect(findEmptyState().exists()).toBe(true);
+          expect(findAlert().exists()).toBe(false);
+          expect(findEditorHome().exists()).toBe(false);
         });
-        createComponentWithApollo();
-
-        await waitForPromises();
-
-        expect(findAlert().text()).toBe(noFileAlertMsg);
-        expect(findEditorHome().exists()).toBe(false);
       });
 
-      it('shows a unkown error message', async () => {
-        mockBlobContentData.mockRejectedValueOnce(new Error('My error!'));
-        createComponentWithApollo();
-        await waitForPromises();
+      describe('because of a fetching error', () => {
+        it('shows a unkown error message', async () => {
+          mockBlobContentData.mockRejectedValueOnce(new Error('My error!'));
+          createComponentWithApollo();
+          await waitForPromises();
 
-        expect(findAlert().text()).toBe(wrapper.vm.$options.errorTexts[LOAD_FAILURE_UNKNOWN]);
-        expect(findEditorHome().exists()).toBe(true);
+          expect(findEmptyState().exists()).toBe(false);
+          expect(findAlert().text()).toBe(wrapper.vm.$options.errorTexts[LOAD_FAILURE_UNKNOWN]);
+          expect(findEditorHome().exists()).toBe(true);
+        });
       });
     });
 
@@ -194,6 +201,7 @@ describe('Pipeline editor app component', () => {
 
       describe('and the commit mutation succeeds', () => {
         beforeEach(() => {
+          window.scrollTo = jest.fn();
           createComponent();
 
           findEditorHome().vm.$emit('commit', { type: COMMIT_SUCCESS });
@@ -202,11 +210,16 @@ describe('Pipeline editor app component', () => {
         it('shows a confirmation message', () => {
           expect(findAlert().text()).toBe(wrapper.vm.$options.successTexts[COMMIT_SUCCESS]);
         });
+
+        it('scrolls to the top of the page to bring attention to the confirmation message', () => {
+          expect(window.scrollTo).toHaveBeenCalledWith({ top: 0, behavior: 'smooth' });
+        });
       });
       describe('and the commit mutation fails', () => {
         const commitFailedReasons = ['Commit failed'];
 
         beforeEach(() => {
+          window.scrollTo = jest.fn();
           createComponent();
 
           findEditorHome().vm.$emit('showError', {
@@ -220,11 +233,17 @@ describe('Pipeline editor app component', () => {
             `${updateFailureMessage} ${commitFailedReasons[0]}`,
           );
         });
+
+        it('scrolls to the top of the page to bring attention to the error message', () => {
+          expect(window.scrollTo).toHaveBeenCalledWith({ top: 0, behavior: 'smooth' });
+        });
       });
+
       describe('when an unknown error occurs', () => {
         const unknownReasons = ['Commit failed'];
 
         beforeEach(() => {
+          window.scrollTo = jest.fn();
           createComponent();
 
           findEditorHome().vm.$emit('showError', {
@@ -237,6 +256,10 @@ describe('Pipeline editor app component', () => {
           expect(findAlert().text()).toMatchInterpolatedText(
             `${updateFailureMessage} ${unknownReasons[0]}`,
           );
+        });
+
+        it('scrolls to the top of the page to bring attention to the error message', () => {
+          expect(window.scrollTo).toHaveBeenCalledWith({ top: 0, behavior: 'smooth' });
         });
       });
     });

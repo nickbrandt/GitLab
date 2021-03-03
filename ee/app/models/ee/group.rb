@@ -20,7 +20,8 @@ module EE
 
       has_many :epics
       has_many :epic_boards, class_name: 'Boards::EpicBoard', inverse_of: :group
-
+      has_many :iterations
+      has_many :iterations_cadences, class_name: 'Iterations::Cadence'
       has_one :saml_provider
       has_many :scim_identities
       has_many :ip_restrictions, autosave: true
@@ -227,8 +228,7 @@ module EE
     end
 
     def saml_group_sync_available?
-      ::Feature.enabled?(:saml_group_links, self, default_enabled: true) &&
-        feature_available?(:group_saml_group_sync) && root_ancestor.saml_enabled?
+      feature_available?(:group_saml_group_sync) && root_ancestor.saml_enabled?
     end
 
     override :multiple_issue_boards_available?
@@ -290,21 +290,21 @@ module EE
     end
 
     # For now, we are not billing for members with a Guest role for subscriptions
-    # with a Gold plan. The other plans will treat Guest members as a regular member
+    # with a Gold/Ultimate plan. The other plans will treat Guest members as a regular member
     # for billing purposes.
     #
     # We are plucking the user_ids from the "Members" table in an array and
     # converting the array of user_ids to a Set which will have unique user_ids.
     def billed_user_ids(requested_hosted_plan = nil)
-      if [actual_plan_name, requested_hosted_plan].include?(::Plan::GOLD)
-        strong_memoize(:gold_billed_user_ids) do
+      if ([actual_plan_name, requested_hosted_plan] & [::Plan::GOLD, ::Plan::ULTIMATE]).any?
+        strong_memoize(:billed_user_ids) do
           (billed_group_members.non_guests.distinct.pluck(:user_id) +
           billed_project_members.non_guests.distinct.pluck(:user_id) +
           billed_shared_non_guests_group_members.non_guests.distinct.pluck(:user_id) +
           billed_invited_non_guests_group_to_project_members.non_guests.distinct.pluck(:user_id)).to_set
         end
       else
-        strong_memoize(:non_gold_billed_user_ids) do
+        strong_memoize(:non_billed_user_ids) do
           (billed_group_members.distinct.pluck(:user_id) +
           billed_project_members.distinct.pluck(:user_id) +
           billed_shared_group_members.distinct.pluck(:user_id) +
@@ -484,7 +484,6 @@ module EE
 
     def execute_subgroup_hooks(event)
       return unless subgroup?
-      return unless parent.group? # TODO: Remove this after fixing https://gitlab.com/gitlab-org/gitlab/-/issues/301013
       return unless feature_available?(:group_webhooks)
 
       run_after_commit do

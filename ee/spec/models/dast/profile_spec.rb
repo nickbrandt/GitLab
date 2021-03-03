@@ -15,10 +15,12 @@ RSpec.describe Dast::Profile, type: :model do
     it { is_expected.to be_valid }
     it { is_expected.to validate_length_of(:name).is_at_most(255) }
     it { is_expected.to validate_length_of(:description).is_at_most(255) }
+    it { is_expected.to validate_length_of(:branch_name).is_at_most(255) }
     it { is_expected.to validate_uniqueness_of(:name).scoped_to(:project_id) }
     it { is_expected.to validate_presence_of(:project_id) }
     it { is_expected.to validate_presence_of(:dast_site_profile_id) }
     it { is_expected.to validate_presence_of(:dast_scanner_profile_id) }
+    it { is_expected.to validate_presence_of(:name) }
 
     context 'when the project_id and dast_site_profile.project_id do not match' do
       let(:project) { create(:project) }
@@ -47,6 +49,17 @@ RSpec.describe Dast::Profile, type: :model do
         end
       end
     end
+
+    context 'when the description is nil' do
+      subject { build(:dast_profile, description: nil) }
+
+      it 'is not valid' do
+        aggregate_failures do
+          expect(subject.valid?).to be_falsey
+          expect(subject.errors.full_messages).to include('Description can\'t be nil')
+        end
+      end
+    end
   end
 
   describe 'scopes' do
@@ -59,6 +72,26 @@ RSpec.describe Dast::Profile, type: :model do
         aggregate_failures do
           expect(result).to include(subject)
           expect(result).not_to include(another_dast_profile)
+        end
+      end
+    end
+  end
+
+  describe 'instance methods' do
+    describe '#branch' do
+      context 'when the associated project does not have a repository' do
+        it 'returns nil' do
+          expect(subject.branch).to be_nil
+        end
+      end
+
+      context 'when the associated project has a repository' do
+        let_it_be(:project) { create(:project, :repository) }
+
+        subject { create(:dast_profile, project: project) }
+
+        it 'returns a Dast::Branch' do
+          expect(subject.branch).to be_a(Dast::Branch)
         end
       end
     end

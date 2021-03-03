@@ -105,7 +105,7 @@ module CommitsHelper
       tooltip = _("Browse Directory")
     end
 
-    link_to url, class: "btn gl-button btn-default has-tooltip", title: tooltip, data: { container: "body" } do
+    link_to url, class: "btn gl-button btn-default btn-icon has-tooltip", title: tooltip, data: { container: "body" } do
       sprite_icon('folder-open')
     end
   end
@@ -124,6 +124,14 @@ module CommitsHelper
 
   def commit_signature_badge_classes(additional_classes)
     %w(btn gpg-status-box) + Array(additional_classes)
+  end
+
+  def conditionally_paginate_diff_files(diffs, paginate:, per: Projects::CommitController::COMMIT_DIFFS_PER_PAGE)
+    if paginate
+      Kaminari.paginate_array(diffs.diff_files.to_a).page(params[:page]).per(per)
+    else
+      diffs.diff_files
+    end
   end
 
   protected
@@ -166,7 +174,7 @@ module CommitsHelper
     path = project_blob_path(project, tree_join(commit_sha, diff_new_path))
     title = replaced ? _('View replaced file @ ') : _('View file @ ')
 
-    link_to(path, class: 'btn') do
+    link_to(path, class: 'btn gl-button btn-default') do
       raw(title) + content_tag(:span, truncate_sha(commit_sha), class: 'commit-sha')
     end
   end

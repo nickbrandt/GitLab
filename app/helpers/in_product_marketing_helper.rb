@@ -27,11 +27,11 @@ module InProductMarketingHelper
   end
 
   def in_product_marketing_logo(track, series)
-    inline_image_link('mailers/in_product_marketing', "#{track}-#{series}.png", width: '150')
+    inline_image_link('mailers/in_product_marketing', "#{track}-#{series}.png", { width: '150', style: 'width: 150px;' })
   end
 
   def about_link(folder, image, width)
-    link_to inline_image_link(folder, image, { width: width, alt: s_('InProductMarketing|go to about.gitlab.com') }), 'https://about.gitlab.com/'
+    link_to inline_image_link(folder, image, { width: width, style: "width: #{width}px;", alt: s_('InProductMarketing|go to about.gitlab.com') }), 'https://about.gitlab.com/'
   end
 
   def in_product_marketing_tagline(track, series)
@@ -47,7 +47,7 @@ module InProductMarketingHelper
         s_('InProductMarketing|Are your runners ready?')
       ],
       trial: [
-        s_('InProductMarketing|Start a free trial of GitLab Gold – no CC required'),
+        s_('InProductMarketing|Start a free trial of GitLab Ultimate – no CC required'),
         s_('InProductMarketing|Improve app security with a 30-day trial'),
         s_('InProductMarketing|Start with a GitLab Gold free trial')
       ],
@@ -344,7 +344,7 @@ module InProductMarketingHelper
   end
 
   def inline_image_link(folder, image, **options)
-    attachments[image] = File.read(Rails.root.join("app/assets/images", folder, image))
+    attachments.inline[image] = File.read(Rails.root.join("app/assets/images", folder, image))
     image_tag attachments[image].url, **options
   end
 end

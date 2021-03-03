@@ -1,6 +1,6 @@
 ---
 stage: Create
-group: Source Code
+group: Code Review
 info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#assignments
 type: index, reference
 ---
@@ -82,11 +82,10 @@ Click **Expand file** on any file to view the changes for that file.
 
 For larger merge requests, consider reviewing one file at a time. To enable this feature:
 
-1. In the top right corner of the navigation bar, click your user avatar.
-1. Click **Settings**.
-1. In the left sidebar, go to **Preferences**.
+1. In the top-right corner, select your avatar.
+1. Select **Preferences**.
 1. Scroll to the **Behavior** section and select **Show one file at a time on merge request's Changes tab**.
-1. Click **Save changes** to apply.
+1. Select **Save changes**.
 
 After you enable this setting, GitLab displays only one file at a time in the **Changes** tab when you review merge requests. You can click **Prev** and **Next** to view other changed files.
 
@@ -97,7 +96,7 @@ this behavior, you can do so from your **User preferences** (as explained above)
 merge request:
 
 1. Go to the merge request's **Changes** tab.
-1. Click the cog icon (**{settings}**) to reveal the merge request's settings dropdown.
+1. Select the cog icon (**{settings}**) to reveal the merge request's settings dropdown.
 1. Select or deselect the checkbox **Show one file at a time** to change the setting accordingly.
 
 This change overrides the choice you made in your user preferences and persists until you clear your
@@ -109,11 +108,11 @@ browser's cookies or change this behavior again.
 
 To seamlessly navigate among commits in a merge request:
 
-1. Click the **Commits** tab.
-1. Click a commit to open it in the single-commit view.
+1. Select the **Commits** tab.
+1. Select a commit to open it in the single-commit view.
 1. Navigate through the commits by either:
 
-   - Clicking **Prev** and **Next** buttons on the top-right of the page.
+   - Selecting **Prev** and **Next** buttons on the top-right of the page.
    - Using the <kbd>X</kbd> and <kbd>C</kbd> keyboard shortcuts.
 
 ![Merge requests commit navigation](img/commit_nav_v13_4.png)
@@ -188,53 +187,33 @@ Feature.disable(:local_file_reviews)
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/issues/13950) in GitLab 11.5.
 
 In a merge request, you can leave comments in any part of the file being changed.
-In the Merge Request Diff UI, click the **{comment}** **comment** icon in the gutter
-to expand the diff lines and leave a comment, just as you would for a changed line.
+In the Merge Request Diff UI, you can:
 
-![Comment on any diff file line](img/comment-on-any-diff-line.png)
+- **Comment on a single line**: Click the **{comment}** **comment** icon in the
+  gutter to expand the diff lines and display a comment box.
+- [**Comment on multiple lines**](#commenting-on-multiple-lines).
 
 ### Commenting on multiple lines
 
 > - [Introduced](https://gitlab.com/gitlab-org/ux-research/-/issues/870) in GitLab 13.2.
-> - It's deployed behind a feature flag, enabled by default.
-> - [Became enabled by default](https://gitlab.com/gitlab-org/gitlab/-/issues/221268) on GitLab 13.3.
-> - It's enabled on GitLab.com.
-> - It can be disabled or enabled per-project.
-> - It's recommended for production use.
-> - For GitLab self-managed instances, GitLab administrators can opt to [disable it](#enable-or-disable-multiline-comments). **(FREE SELF)**
+> - [Added](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/49875) click-and-drag features in GitLab 13.8.
+> - [Feature flag removed](https://gitlab.com/gitlab-org/gitlab/-/issues/299121) in GitLab 13.9.
 
-GitLab provides a way to select which lines of code a comment refers to. After starting a comment
-a dropdown selector is shown to select the first line that this comment refers to.
-The last line is the line that the comment icon was initially clicked on.
+When commenting on a diff, you can select which lines of code your comment refers
+to by either:
 
-New comments default to single line comments by having the first and last lines
-the same. Selecting a different starting line turns this into a multiline comment.
+![Comment on any diff file line](img/comment-on-any-diff-line_v13_10.png)
 
-![Multiline comment selection highlighted](img/multiline-comment-highlighted.png)
+- Clicking and dragging the **{comment}** **comment** icon in the gutter to highlight
+  lines in the diff. GitLab expands the diff lines and displays a comment box.
+- After starting a comment by clicking the **{comment}** **comment** icon in the
+  gutter, select the first line number your comment refers to in the **Commenting on lines**
+  select box. New comments default to single-line comments, unless you select
+  a different starting line.
 
-Once a multiline comment is saved the lines of code pertaining to that comment are listed directly
-above it.
+Multiline comments display the comment's line numbers above the body of the comment:
 
 ![Multiline comment selection displayed above comment](img/multiline-comment-saved.png)
-
-### Enable or disable multiline comments **(FREE SELF)**
-
-The multiline comments feature is under development but ready for production use.
-It is deployed behind a feature flag that is **disabled by default**.
-[GitLab administrators with access to the GitLab Rails console](../../../administration/feature_flags.md)
-can opt to enable it for your instance.
-
-To disable it:
-
-```ruby
-Feature.disable(:multiline_comments)
-```
-
-To enable it:
-
-```ruby
-Feature.enable(:multiline_comments)
-```
 
 ## Pipeline status in merge requests widgets
 

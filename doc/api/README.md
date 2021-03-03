@@ -200,17 +200,11 @@ With a few API endpoints you can use a [GitLab CI/CD job token](../user/project/
 to authenticate with the API:
 
 - Packages:
-  - [Composer Repository](../user/packages/composer_repository/index.md)
-  - [Conan Repository](../user/packages/conan_repository/index.md)
+  - [Package Registry](../user/packages/package_registry/index.md)
   - [Container Registry](../user/packages/container_registry/index.md)
     (`$CI_REGISTRY_PASSWORD` is `$CI_JOB_TOKEN`)
-  - [Go Proxy](../user/packages/go_proxy/index.md)
-  - [Maven Repository](../user/packages/maven_repository/index.md#authenticate-with-a-ci-job-token-in-maven)
-  - [NPM Repository](../user/packages/npm_registry/index.md#authenticate-with-a-ci-job-token)
-  - [NuGet Repository](../user/packages/nuget_repository/index.md)
-  - [PyPI Repository](../user/packages/pypi_repository/index.md#authenticate-with-a-ci-job-token)
-  - [Generic packages](../user/packages/generic_packages/index.md#publish-a-generic-package-by-using-cicd)
 - [Get job artifacts](job_artifacts.md#get-job-artifacts)
+- [Get job token's job](jobs.md#get-job-tokens-job)
 - [Pipeline triggers](pipeline_triggers.md) (using the `token=` parameter)
 - [Release creation](releases/index.md#create-a-release)
 - [Terraform plan](../user/infrastructure/index.md)
@@ -750,7 +744,7 @@ specifically used by GitLab.com, see
 The GitLab API supports the `application/json` content type by default, though
 some API endpoints also support `text/plain`.
 
-In [GitLab 13.9 and later](https://gitlab.com/gitlab-org/gitlab/-/issues/250342),
+In [GitLab 13.10 and later](https://gitlab.com/gitlab-org/gitlab/-/issues/250342),
 API endpoints do not support `text/plain` by default, unless it's explicitly documented.
 
 This change is deployed behind the `:api_always_use_application_json` [feature flag](../user/feature_flags.md),

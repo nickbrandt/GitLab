@@ -28,7 +28,7 @@ in the pipeline detail view.
 
 Consider the following workflow:
 
-1. Your `master` branch is rock solid, your project is using GitLab CI/CD and
+1. Your default branch is rock solid, your project is using GitLab CI/CD and
    your pipelines indicate that there isn't anything broken.
 1. Someone from your team submits a merge request, a test fails and the pipeline
    gets the known red icon. To investigate more, you have to go through the job
@@ -44,7 +44,7 @@ First, GitLab Runner uploads all [JUnit report format XML files](https://www.ibm
 as [artifacts](pipelines/job_artifacts.md#artifactsreportsjunit) to GitLab. Then, when you visit a merge request, GitLab starts
 comparing the head and base branch's JUnit report format XML files, where:
 
-- The base branch is the target branch (usually `master`).
+- The base branch is the target branch (usually the default branch).
 - The head branch is the source branch (the latest pipeline in each merge request).
 
 The reports panel has a summary showing how many tests failed, how many had errors
@@ -197,7 +197,7 @@ There are a few tools that can produce JUnit report format XML files in C/C++.
 #### GoogleTest
 
 In the following example, `gtest` is used to generate the test reports.
-If there are multiple gtest executables created for different architectures (`x86`, `x64` or `arm`),
+If there are multiple `gtest` executables created for different architectures (`x86`, `x64` or `arm`),
 you will be required to run each test providing a unique filename. The results
 will then be aggregated together.
 
@@ -329,6 +329,11 @@ You can also retrieve the reports via the [GitLab API](../api/pipelines.md#get-a
 > - It's deployed behind a feature flag, disabled by default.
 > - To use it in GitLab self-managed instances, ask a GitLab administrator to [enable it](#enabling-the-junit-screenshots-feature). **(FREE SELF)**
 
+WARNING:
+This feature might not be available to you. Check the **version history** note above for details.
+
+When [this issue](https://gitlab.com/gitlab-org/gitlab/-/issues/6061) is complete, the attached file will be visible on the pipeline details page.
+
 If JUnit report format XML files contain an `attachment` tag, GitLab parses the attachment.
 
 Upload your screenshots as [artifacts](pipelines/job_artifacts.md#artifactsreportsjunit) to GitLab. The `attachment` tag **must** contain the absolute path to the screenshots you uploaded.
@@ -338,8 +343,6 @@ Upload your screenshots as [artifacts](pipelines/job_artifacts.md#artifactsrepor
   <system-out>[[ATTACHMENT|/absolute/path/to/some/file]]</system-out>
 </testcase>
 ```
-
-When [this issue](https://gitlab.com/gitlab-org/gitlab/-/issues/6061) is complete, the attached file will be visible on the pipeline details page.
 
 ### Enabling the JUnit screenshots feature **(FREE SELF)**
 

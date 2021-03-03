@@ -9,12 +9,14 @@ allowlist
 allowlisted
 allowlisting
 allowlists
+anonymization
 anonymized
 Ansible
 Anthos
 approvers
 architected
 architecting
+archiver
 Arel
 Artifactory
 Asana
@@ -39,6 +41,7 @@ autoscales
 autoscaling
 awardable
 awardables
+Ayoa
 Axios
 Azure
 B-tree
@@ -54,6 +57,7 @@ backtracing
 badging
 Bamboo
 Bazel
+Bhyve
 Bitbucket
 blockquote
 blockquoted
@@ -81,11 +85,13 @@ Caddy
 callstack
 callstacks
 Camo
+canonicalized
 CentOS
 Certbot
 changeset
 changesets
 chai
+ChaosKube
 chatbot
 chatbots
 ChatOps
@@ -108,6 +114,8 @@ Contentful
 Corosync
 Coursier
 cron
+cronjob
+cronjobs
 crons
 crontab
 crontabs
@@ -119,6 +127,8 @@ CrowdIn
 CSV
 cybersecurity
 Dangerfile
+datasource
+datasources
 datetime
 Debian
 Decompressor
@@ -181,6 +191,7 @@ failsafe
 Falco
 falsy
 fastlane
+Fastzip
 favicon
 favorited
 Figma
@@ -198,6 +209,8 @@ fuzzer
 Gantt
 Gemnasium
 Gemojione
+Getter
+Getters
 gettext
 Git
 Gitaly
@@ -274,6 +287,7 @@ kaniko
 Karma
 Kerberos
 keyset
+keyspace
 keytab
 keytabs
 Kibana
@@ -344,6 +358,7 @@ mixins
 mockup
 mockups
 ModSecurity
+Monokai
 monorepo
 monorepos
 multiline
@@ -359,12 +374,15 @@ Nanoc
 negatable
 Netlify
 Nokogiri
+noteable
+noteables
 npm
 nullability
 nullable
 Nurtch
 nyc
 OAuth
+Octokit
 offboarded
 offboarding
 offboards
@@ -396,8 +414,11 @@ Poedit
 polyfill
 polyfills
 pooler
+postfixed
+postgres.ai
 PostgreSQL
 precompile
+precompiled
 preconfigure
 preconfigured
 preconfigures
@@ -412,6 +433,7 @@ prepend
 prepended
 prepending
 prepends
+prepopulated
 Prettifier
 Pritaly
 Priyanka
@@ -434,6 +456,7 @@ queryable
 Quicktime
 Rackspace
 Raspbian
+rbtrace
 Rdoc
 reachability
 Realplayer
@@ -468,6 +491,7 @@ reinitialize
 reinitializing
 relicensing
 remediations
+replicables
 repmgr
 repmgrd
 repurposing
@@ -479,6 +503,10 @@ resync
 resynced
 resyncing
 resyncs
+retarget
+retargeted
+retargeting
+retargets
 reusability
 reverified
 reverifies
@@ -506,10 +534,12 @@ Salesforce
 sandboxing
 sanitization
 sbt
+scalers
 scatterplot
 scatterplots
 Schemastore
 scrollable
+Semgrep
 Sendmail
 Sentry
 serializer
@@ -525,11 +555,13 @@ Sidekiq
 Silverlight
 Sisense
 Sitespeed
+skippable
 Slack
 Slackbot
 Slony
 smartcard
 smartcards
+snapshotting
 Sobelow
 Solarized
 Sourcegraph
@@ -548,10 +580,15 @@ strace
 strikethrough
 strikethroughs
 stunnel
+stylelint
+subchart
+subcharts
 subfolder
 subfolders
 subgraph
 subgraphs
+subgroup
+subgroups
 subkey
 subkeys
 sublicense
@@ -605,12 +642,14 @@ todos
 tokenizer
 Tokenizers
 tokenizing
+tolerations
 toolchain
 toolchains
 toolkit
 toolkits
 tooltip
 tooltips
+transactionally
 transpile
 transpiled
 transpiles
@@ -619,6 +658,7 @@ Trello
 triaged
 triages
 triaging
+Trivy
 truthy
 Truststore
 Twilio
@@ -650,6 +690,9 @@ unencoded
 unencoder
 unencodes
 unencrypted
+unfollow
+unfollowed
+unfollows
 Unicorn
 unindexed
 unlink
@@ -688,6 +731,8 @@ unreplicated
 unresolve
 unresolved
 unresolving
+unreviewed
+unsanitized
 unschedule
 unscoped
 unshare
@@ -704,6 +749,7 @@ unstash
 unstashed
 unstashing
 unsynced
+unsynchronized
 untarred
 untracked
 untrusted
@@ -735,6 +781,7 @@ WebdriverIO
 Webex
 webpack
 webserver
+Webservice
 websocket
 websockets
 whitepaper
@@ -755,3 +802,4 @@ Yubico
 Zeitwerk
 Zendesk
 zsh
+Zstandard

@@ -228,7 +228,7 @@ module Ci
       end
 
       def with_preloads
-        preload(:job_artifacts_archive, :job_artifacts, project: [:namespace])
+        preload(:job_artifacts_archive, :job_artifacts, :tags, project: [:namespace])
       end
     end
 
@@ -510,7 +510,6 @@ module Ci
           .concat(scoped_variables)
           .concat(job_variables)
           .concat(persisted_environment_variables)
-          .to_runner_variables
       end
     end
 
@@ -564,7 +563,10 @@ module Ci
     end
 
     def features
-      { trace_sections: true }
+      {
+        trace_sections: true,
+        failure_reasons: self.class.failure_reasons.keys
+      }
     end
 
     def merge_request
@@ -786,7 +788,9 @@ module Ci
     end
 
     def artifacts_file_for_type(type)
-      job_artifacts.find_by(file_type: Ci::JobArtifact.file_types[type])&.file
+      file_types = Ci::JobArtifact.associated_file_types_for(type)
+      file_types_ids = file_types&.map { |file_type| Ci::JobArtifact.file_types[file_type] }
+      job_artifacts.find_by(file_type: file_types_ids)&.file
     end
 
     def coverage_regex
@@ -906,19 +910,12 @@ module Ci
     end
 
     def collect_coverage_reports!(coverage_report)
-      project_path, worktree_paths = if Feature.enabled?(:smart_cobertura_parser, project)
-                                       # If the flag is disabled, we intentionally pass nil
-                                       # for both project_path and worktree_paths to fallback
-                                       # to the non-smart behavior of the parser
-                                       [project.full_path, pipeline.all_worktree_paths]
-                                     end
-
       each_report(Ci::JobArtifact::COVERAGE_REPORT_FILE_TYPES) do |file_type, blob|
         Gitlab::Ci::Parsers.fabricate!(file_type).parse!(
           blob,
           coverage_report,
-          project_path: project_path,
-          worktree_paths: worktree_paths
+          project_path: project.full_path,
+          worktree_paths: pipeline.all_worktree_paths
         )
       end
 
@@ -988,7 +985,7 @@ module Ci
       # TODO: Have `debug_mode?` check against data on sent back from runner
       # to capture all the ways that variables can be set.
       # See (https://gitlab.com/gitlab-org/gitlab/-/issues/290955)
-      variables.any? { |variable| variable[:key] == 'CI_DEBUG_TRACE' && variable[:value].casecmp('true') == 0 }
+      variables['CI_DEBUG_TRACE']&.value&.casecmp('true') == 0
     end
 
     def drop_with_exit_code!(failure_reason, exit_code)

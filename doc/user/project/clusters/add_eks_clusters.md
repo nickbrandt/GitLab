@@ -4,7 +4,7 @@ group: Configure
 info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#assignments
 ---
 
-# Adding EKS clusters **(CORE)**
+# Adding EKS clusters **(FREE)**
 
 GitLab supports adding new and existing EKS clusters.
 
@@ -326,7 +326,7 @@ If a default Storage Class doesn't already exist and is desired, follow Amazon's
 to create one.
 
 Alternatively, disable PostgreSQL by setting the project variable
-[`POSTGRES_ENABLED`](../../../topics/autodevops/customize.md#environment-variables) to `false`.
+[`POSTGRES_ENABLED`](../../../topics/autodevops/customize.md#cicd-variables) to `false`.
 
 ### Deploy the app to EKS
 

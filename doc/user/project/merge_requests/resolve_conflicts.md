@@ -1,11 +1,11 @@
 ---
 stage: Create
-group: Source Code
+group: Code Review
 info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#assignments
 type: reference, concepts
 ---
 
-# Merge request conflict resolution
+# Merge request conflict resolution **(FREE)**
 
 Merge conflicts occur when two branches have different changes that cannot be
 merged automatically.

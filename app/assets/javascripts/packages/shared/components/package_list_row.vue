@@ -1,10 +1,10 @@
 <script>
 import { GlButton, GlIcon, GlLink, GlSprintf, GlTooltipDirective, GlTruncate } from '@gitlab/ui';
-import timeagoMixin from '~/vue_shared/mixins/timeago';
 import ListItem from '~/vue_shared/components/registry/list_item.vue';
+import timeagoMixin from '~/vue_shared/mixins/timeago';
 import { getPackageTypeLabel } from '../utils';
-import PackageTags from './package_tags.vue';
 import PackagePath from './package_path.vue';
+import PackageTags from './package_tags.vue';
 import PublishMethod from './publish_method.vue';
 
 export default {
@@ -123,7 +123,7 @@ export default {
       <gl-button
         data-testid="action-delete"
         icon="remove"
-        category="primary"
+        category="secondary"
         variant="danger"
         :title="s__('PackageRegistry|Remove package')"
         :aria-label="s__('PackageRegistry|Remove package')"

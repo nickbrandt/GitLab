@@ -50,6 +50,7 @@ Rails.application.routes.draw do
     resource :welcome, only: [:show, :update], controller: 'welcome' do
       Gitlab.ee do
         get :trial_getting_started, on: :collection
+        get :trial_onboarding_board, on: :collection
       end
     end
 
@@ -57,6 +58,7 @@ Rails.application.routes.draw do
 
     Gitlab.ee do
       resources :groups, only: [:new, :create]
+      resources :group_invites, only: [:new, :create]
       resources :projects, only: [:new, :create]
     end
   end
@@ -164,9 +166,6 @@ Rails.application.routes.draw do
         post :gc
       end
     end
-
-    # Notification settings
-    resources :notification_settings, only: [:create, :update]
 
     resources :invites, only: [:show], constraints: { id: /[A-Za-z0-9_-]+/ } do
       member do

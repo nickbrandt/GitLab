@@ -72,7 +72,7 @@ First, set up the project. Once done, you can use the Static Site Editor to
 
 1. To get started, create a new project from the [Static Site Editor - Middleman](https://gitlab.com/gitlab-org/project-templates/static-site-editor-middleman)
    template. You can either [fork it](../repository/forking_workflow.md#creating-a-fork)
-   or [create a new project from a template](../../../gitlab-basics/create-project.md#built-in-templates).
+   or [create a new project from a template](../working_with_projects.md#built-in-templates).
 1. Edit the [`data/config.yml`](#static-site-generator-configuration) configuration file
    to replace `<username>` and `<project-name>` with the proper values for
    your project's path.
@@ -102,7 +102,7 @@ To edit a file:
    in the bottom-right corner.
 1. When you're done, click **Submit changes...**.
 1. (Optional) Adjust the default title and description of the merge request, to submit
-   with your changes. Alternatively, select a [merge request template](../../../user/project/description_templates.md#creating-merge-request-templates)
+   with your changes. Alternatively, select a [merge request template](../../../user/project/description_templates.md#create-a-merge-request-template)
    from the dropdown menu and edit it accordingly.
 1. Click **Submit changes**.
 1. A new merge request is automatically created and you can assign a colleague for review.

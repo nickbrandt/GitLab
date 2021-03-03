@@ -130,15 +130,24 @@ module SearchHelper
   end
 
   def search_sort_options
-    options = []
-    options << {
-      title: _('Created date'),
-      sortable: true,
-      sortParam: {
-        asc: 'created_asc',
-        desc: 'created_desc'
+    [
+      {
+        title: _('Created date'),
+        sortable: true,
+        sortParam: {
+          asc: 'created_asc',
+          desc: 'created_desc'
+        }
+      },
+      {
+        title: _('Last updated'),
+        sortable: true,
+        sortParam: {
+          asc: 'updated_asc',
+          desc: 'updated_desc'
+        }
       }
-    }
+    ]
   end
 
   private
@@ -397,7 +406,7 @@ module SearchHelper
     # Closed is considered "danger" for MR so we need to handle separately
     if issuable.is_a?(::MergeRequest)
       if issuable.merged?
-        :primary
+        :info
       elsif issuable.closed?
         :danger
       else

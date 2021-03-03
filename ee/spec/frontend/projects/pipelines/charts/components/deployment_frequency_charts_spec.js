@@ -1,15 +1,14 @@
 import { GlSprintf, GlLink } from '@gitlab/ui';
+import * as Sentry from '@sentry/browser';
 import { shallowMount } from '@vue/test-utils';
 import MockAdapter from 'axios-mock-adapter';
 import { useFakeDate } from 'helpers/fake_date';
-import CiCdAnalyticsAreaChart from '~/projects/pipelines/charts/components/ci_cd_analytics_area_chart.vue';
-import axios from '~/lib/utils/axios_utils';
 import createFlash from '~/flash';
-import * as Sentry from '~/sentry/wrapper';
+import axios from '~/lib/utils/axios_utils';
 import httpStatus from '~/lib/utils/http_status';
+import CiCdAnalyticsCharts from '~/projects/pipelines/charts/components/ci_cd_analytics_charts.vue';
 
 jest.mock('~/flash');
-jest.mock('~/sentry/wrapper');
 
 const lastWeekData = getJSONFixture(
   'api/project_analytics/daily_deployment_frequencies_for_last_week.json',
@@ -101,9 +100,8 @@ describe('ee_component/projects/pipelines/charts/components/deployment_frequency
     });
 
     it('converts the data from the API into data usable by the chart component', () => {
-      wrapper.findAll(CiCdAnalyticsAreaChart).wrappers.forEach((chartWrapper) => {
-        expect(chartWrapper.props().chartData[0].data).toMatchSnapshot();
-      });
+      const chartWrapper = wrapper.find(CiCdAnalyticsCharts);
+      expect(chartWrapper.props().charts).toMatchSnapshot();
     });
 
     it('does not show a flash message', () => {
@@ -124,12 +122,19 @@ describe('ee_component/projects/pipelines/charts/components/deployment_frequency
   });
 
   describe('when there are network errors', () => {
+    let captureExceptionSpy;
     beforeEach(async () => {
       mock = new MockAdapter(axios);
 
       createComponent();
 
+      captureExceptionSpy = jest.spyOn(Sentry, 'captureException');
+
       await axios.waitForAll();
+    });
+
+    afterEach(() => {
+      captureExceptionSpy.mockRestore();
     });
 
     it('shows a flash message', () => {
@@ -140,7 +145,7 @@ describe('ee_component/projects/pipelines/charts/components/deployment_frequency
     });
 
     it('reports an error to Sentry', () => {
-      expect(Sentry.captureException).toHaveBeenCalledTimes(1);
+      expect(captureExceptionSpy).toHaveBeenCalledTimes(1);
 
       const expectedErrorMessage = [
         'Something went wrong while getting deployment frequency data:',
@@ -149,7 +154,7 @@ describe('ee_component/projects/pipelines/charts/components/deployment_frequency
         'Error: Request failed with status code 404',
       ].join('\n');
 
-      expect(Sentry.captureException).toHaveBeenCalledWith(new Error(expectedErrorMessage));
+      expect(captureExceptionSpy).toHaveBeenCalledWith(new Error(expectedErrorMessage));
     });
   });
 });

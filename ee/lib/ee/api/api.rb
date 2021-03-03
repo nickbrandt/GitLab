@@ -12,6 +12,7 @@ module EE
 
         mount ::API::AuditEvents
         mount ::API::ProjectApprovalRules
+        mount ::API::ExternalApprovalRules
         mount ::API::ProjectApprovalSettings
         mount ::API::EpicIssues
         mount ::API::EpicLinks
@@ -43,6 +44,7 @@ module EE
         mount ::API::VisualReviewDiscussions
         mount ::API::Analytics::CodeReviewAnalytics
         mount ::API::Analytics::GroupActivityAnalytics
+        mount ::API::Analytics::GroupDeploymentFrequency
         mount ::API::Analytics::ProjectDeploymentFrequency
         mount ::API::ProtectedEnvironments
         mount ::API::ResourceWeightEvents

@@ -1,7 +1,7 @@
-import { mount, shallowMount } from '@vue/test-utils';
 import { GlAlert, GlButton } from '@gitlab/ui';
-import LinksLayer from '~/pipelines/components/graph_shared/links_layer.vue';
+import { mount, shallowMount } from '@vue/test-utils';
 import LinksInner from '~/pipelines/components/graph_shared/links_inner.vue';
+import LinksLayer from '~/pipelines/components/graph_shared/links_layer.vue';
 import { generateResponse, mockPipelineResponse } from '../graph/mock_data';
 
 describe('links layer component', () => {
@@ -72,6 +72,24 @@ describe('links layer component', () => {
 
       it('renders the alert component', () => {
         expect(findAlert().exists()).toBe(true);
+      });
+
+      it('does not render the inner links component', () => {
+        expect(findLinksInner().exists()).toBe(false);
+      });
+    });
+
+    describe('with width or height measurement at 0', () => {
+      beforeEach(() => {
+        createComponent({ props: { containerMeasurements: { width: 0, height: 100 } } });
+      });
+
+      it('renders the default slot', () => {
+        expect(wrapper.html()).toContain(slotContent);
+      });
+
+      it('does not render the alert component', () => {
+        expect(findAlert().exists()).toBe(false);
       });
 
       it('does not render the inner links component', () => {
