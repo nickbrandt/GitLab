@@ -56,16 +56,19 @@ module Security
       @requested_reports ||= pipeline&.security_reports(report_types: report_types)&.reports || {}
     end
 
+    # rubocop: disable CodeReuse/ActiveRecord
     def vulnerabilities_by_finding_fingerprint(report_type, report)
       Vulnerabilities::Finding
         .with_vulnerabilities_for_state(
           project: pipeline.project,
           report_type: report_type,
           project_fingerprints: report.findings.map(&:project_fingerprint))
+       .eager_load(:vulnerability)
        .each_with_object({}) do |finding, hash|
         hash[finding.project_fingerprint] = finding.vulnerability
       end
     end
+    # rubocop: enable CodeReuse/ActiveRecord
 
     # This finder is used for fetching vulnerabilities for any pipeline, if we used it to fetch
     # vulnerabilities for a non-default-branch, the findings will be unpersisted, so we

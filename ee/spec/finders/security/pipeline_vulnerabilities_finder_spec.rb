@@ -73,6 +73,38 @@ RSpec.describe Security::PipelineVulnerabilitiesFinder do
           end
         end
       end
+
+      it 'does not have N+1 queries' do
+        # We need to create a situation where we have one Vulnerabilities::Finding
+        # AND one Vulnerability for each finding in the sast and dast reports
+        #
+        # Running the pipeline vulnerabilities finder on both report types should
+        # use the same number of queries, regardless of the number of findings
+        # contained in the pipeline report.
+
+        sast_findings = pipeline.security_reports.reports['sast'].findings
+        dep_findings = pipeline.security_reports.reports['dependency_scanning'].findings
+        # this test is invalid if we don't have more sast findings than dep findings
+        expect(sast_findings.count).to be > dep_findings.count
+
+        (sast_findings + dep_findings).each do |report_finding|
+          # create a finding and a vulnerability for each report finding
+          # (the vulnerability is created with the :confirmed trait)
+          create(:vulnerabilities_finding,
+            :confirmed,
+            project: project,
+            report_type: report_finding.report_type,
+            project_fingerprint: report_finding.project_fingerprint)
+        end
+
+        dep_scan_queries = ActiveRecord::QueryRecorder.new do
+          described_class.new(pipeline: pipeline, params: { report_type: %w[dependency_scanning] }).execute
+        end.count
+
+        expect do
+          described_class.new(pipeline: pipeline, params: { report_type: %w[sast] }).execute
+        end.not_to exceed_query_limit(dep_scan_queries)
+      end
     end
 
     context 'by report type' do

@@ -1,0 +1,5 @@
+---
+title: Eager load vulnerabilities for better database performance
+merge_request: 55692
+author:
+type: performance
