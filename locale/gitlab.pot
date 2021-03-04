@@ -5199,6 +5199,9 @@ msgstr ""
 msgid "Busy"
 msgstr ""
 
+msgid "Buy CI Minutes"
+msgstr ""
+
 msgid "Buy License"
 msgstr ""
 
