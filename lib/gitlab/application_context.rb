@@ -8,6 +8,8 @@ module Gitlab
 
     Attribute = Struct.new(:name, :type)
 
+    KNOWN_KEYS = Labkit::Context::KNOWN_KEYS
+
     APPLICATION_ATTRIBUTES = [
       Attribute.new(:project, Project),
       Attribute.new(:namespace, Namespace),
