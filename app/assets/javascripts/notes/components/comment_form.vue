@@ -133,9 +133,6 @@ export default {
         noteable: this.noteableDisplayName,
       });
     },
-    buttonVariant() {
-      return this.isOpen ? 'warning' : 'default';
-    },
     actionButtonClassNames() {
       return {
         'btn-reopen': !this.isOpen,
@@ -425,8 +422,6 @@ export default {
               <gl-button
                 v-if="canToggleIssueState"
                 :loading="isToggleStateButtonLoading"
-                category="secondary"
-                :variant="buttonVariant"
                 :class="[actionButtonClassNames, 'btn-comment btn-comment-and-close']"
                 :disabled="isSubmitting"
                 data-testid="close-reopen-button"
