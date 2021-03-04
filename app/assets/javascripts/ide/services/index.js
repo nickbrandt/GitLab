@@ -61,18 +61,6 @@ export default {
       )
       .then(({ data }) => data);
   },
-  getProjectData(namespace, project) {
-    const projectPath = `${namespace}/${project}`;
-
-    return Promise.all([fetchApiProjectData(projectPath), fetchGqlProjectData(projectPath)]).then(
-      ([apiProjectData, gqlProjectData]) => ({
-        data: {
-          ...apiProjectData,
-          ...gqlProjectData,
-        },
-      }),
-    );
-  },
   getProjectMergeRequests(projectId, params = {}) {
     return Api.projectMergeRequests(projectId, params);
   },
