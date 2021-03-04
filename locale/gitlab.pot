@@ -1031,9 +1031,6 @@ msgstr ""
 msgid "(deleted)"
 msgstr ""
 
-msgid "(line: %{startLine})"
-msgstr ""
-
 msgid "(max size 15 MB)"
 msgstr ""
 
@@ -5200,6 +5197,9 @@ msgid "Business metrics (Custom)"
 msgstr ""
 
 msgid "Busy"
+msgstr ""
+
+msgid "Buy CI Minutes"
 msgstr ""
 
 msgid "Buy License"
@@ -16546,9 +16546,6 @@ msgstr ""
 msgid "Invite members"
 msgstr ""
 
-msgid "Invite team members"
-msgstr ""
-
 msgid "Invite your team"
 msgstr ""
 
@@ -22031,9 +22028,6 @@ msgstr ""
 msgid "Pipeline Schedules"
 msgstr ""
 
-msgid "Pipeline cannot be run."
-msgstr ""
-
 msgid "Pipeline minutes quota"
 msgstr ""
 
@@ -22292,6 +22286,9 @@ msgstr ""
 msgid "Pipeline|Branch name"
 msgstr ""
 
+msgid "Pipeline|Branches or tags could not be loaded."
+msgstr ""
+
 msgid "Pipeline|Canceled"
 msgstr ""
 
@@ -22350,6 +22347,9 @@ msgid "Pipeline|Pipeline"
 msgstr ""
 
 msgid "Pipeline|Pipeline %{idStart}#%{idEnd} %{statusStart}%{statusEnd} for %{commitStart}%{commitEnd}"
+msgstr ""
+
+msgid "Pipeline|Pipeline cannot be run."
 msgstr ""
 
 msgid "Pipeline|Pipelines"
