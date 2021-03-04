@@ -9,7 +9,7 @@ type: index
 
 # Installation **(FREE SELF)**
 
-GitLab can be installed in most GNU/Linux distributions and with several
+GitLab can be installed in most GNU/Linux distributions, and with several
 cloud providers. To get the best experience from GitLab, you must balance
 performance, reliability, ease of administration (backups, upgrades, and
 troubleshooting), and the cost of hosting.
@@ -25,33 +25,33 @@ database, and additional requirements to support GitLab.
 Depending on your platform, select from the following available methods to
 install GitLab:
 
-| Installation method | Description | When to choose |
-| ------------------- | ----------- | -------------- |
-|[Linux package](https://docs.gitlab.com/omnibus/installation/) | The official deb/rpm packages (also known as Omnibus GitLab) that contain a bundle of GitLab and the components it depends on, including PostgreSQL, Redis, and Sidekiq. | This is the **recommended method** that can get you started. The Linux packages are mature, scalable, and are used today on GitLab.com. If you need additional flexibility and resilience, we recommend deploying GitLab as described in the [reference architecture documentation](../administration/reference_architectures/index.md). |
-|[Helm charts](https://docs.gitlab.com/charts/) | The cloud native Helm chart for installing GitLab and all of its components on Kubernetes. | When installing GitLab on Kubernetes, there are some trade-offs that you need to be aware of: <br/>- Administration and troubleshooting requires Kubernetes knowledge.<br/>- It can be more expensive for smaller installations. The default installation requires more resources than a single node Linux package deployment, as most services are deployed in a redundant fashion.<br/>- There are some feature [limitations to be aware of](https://docs.gitlab.com/charts/#limitations).<br/><br/> Choose this method if your infrastructure is built on Kubernetes, and you're familiar with how it works. The methods for management, observability, and some concepts are different than traditional deployments. |
-|[Docker](https://docs.gitlab.com/omnibus/docker/) | The GitLab packages, Dockerized. | Choose this method if you're familiar with Docker. |
-|[Source](installation.md) | Install GitLab and all of its components from scratch. | Choose this method if none of the above are available for your platform. Useful for unsupported systems like \*BSD.|
-| [GitLab Environment Toolkit (GET)](https://gitlab.com/gitlab-org/quality/gitlab-environment-toolkit#documentation) | The GitLab Environment toolkit provides a set of automation tools to easily deploy a [reference architecture](../administration/reference_architectures/index.md) on most major cloud providers. | Since GET is in **beta** and not yet recommended for production use, choose this method if you want to test how to deploy GitLab in scalable environment. |
+| Installation method                                            | Description | When to choose |
+|----------------------------------------------------------------|-------------|----------------|
+| [Linux package](https://docs.gitlab.com/omnibus/installation/) | The official deb/rpm packages (also known as Omnibus GitLab) that contains a bundle of GitLab and the components it depends on, including PostgreSQL, Redis, and Sidekiq. | This is the recommended method for getting started. The Linux packages are mature, scalable, and are used today on GitLab.com. If you need additional flexibility and resilience, we recommend deploying GitLab as described in the [reference architecture documentation](../administration/reference_architectures/index.md). |
+| [Helm charts](https://docs.gitlab.com/charts/)                 | The cloud native Helm chart for installing GitLab and all of its components on Kubernetes. | When installing GitLab on Kubernetes, there are some trade-offs that you need to be aware of: <br/>- Administration and troubleshooting requires Kubernetes knowledge.<br/>- It can be more expensive for smaller installations. The default installation requires more resources than a single node Linux package deployment, as most services are deployed in a redundant fashion.<br/>- There are some feature [limitations to be aware of](https://docs.gitlab.com/charts/#limitations).<br/><br/> Use this method if your infrastructure is built on Kubernetes and you're familiar with how it works. The methods for management, observability, and some concepts are different than traditional deployments. |
+| [Docker](https://docs.gitlab.com/omnibus/docker/)              | The GitLab packages, Dockerized. | Use this method if you're familiar with Docker. |
+| [Source](installation.md)                                      | Install GitLab and all of its components from scratch. | Use this method if none of the previous methods are available for your platform. Useful for unsupported systems like \*BSD.|
+| [GitLab Environment Toolkit (GET)](https://gitlab.com/gitlab-org/quality/gitlab-environment-toolkit#documentation) | The GitLab Environment toolkit provides a set of automation tools to deploy a [reference architecture](../administration/reference_architectures/index.md) on most major cloud providers. | Since GET is in beta and not yet recommended for production use, use this method if you want to test deploying GitLab in scalable environment. |
 
-## Installing GitLab on cloud providers
+## Install GitLab on cloud providers
 
-No matter the installation method, GitLab can be installed on a variety of cloud
-providers, provided the cloud provider supports it. Here are a few guides, the
-majority of them using the Linux packages.
+Regardless of the installation method, you can install GitLab on several cloud
+providers, assuming the cloud provider supports it. Here are several possible installation
+methods, the majority which use the Linux packages:
 
-| Cloud provider | Description |
-| -------------- | ----------- |
-| [AWS (HA)](aws/index.md) |Install GitLab on AWS using the community AMIs that GitLab provides. |
+| Cloud provider                                                | Description |
+|---------------------------------------------------------------|-------------|
+| [AWS (HA)](aws/index.md)                                      | Install GitLab on AWS using the community AMIs provided by GitLab. |
 | [Google Cloud Platform (GCP)](google_cloud_platform/index.md) | Install GitLab on a VM in GCP. |
-| [Azure](azure/index.md) | Install GitLab from Azure Marketplace. |
-| [DigitalOcean](https://about.gitlab.com/blog/2016/04/27/getting-started-with-gitlab-and-digitalocean/) | Install GitLab on DigitalOcean. You can also [quickly test GitLab on DigitalOcean using Docker Machine](digitaloceandocker.md). |
+| [Azure](azure/index.md)                                       | Install GitLab from Azure Marketplace. |
+| [DigitalOcean](https://about.gitlab.com/blog/2016/04/27/getting-started-with-gitlab-and-digitalocean/) | Install GitLab on DigitalOcean. You can also [test GitLab on DigitalOcean using Docker Machine](digitaloceandocker.md). |
 
 ## Next steps
 
 Here are a few resources you might want to check out after completing the
 installation:
 
-- [Upload a license](../user/admin_area/license.md)  or [start a free trial](https://about.gitlab.com/free-trial/):
+- [Upload a license](../user/admin_area/license.md) or [start a free trial](https://about.gitlab.com/free-trial/):
   Activate all GitLab Enterprise Edition functionality with a license.
 - [Set up runners](https://docs.gitlab.com/runner/): Set up one or more GitLab
   Runners, the agents that are responsible for all of the GitLab CI/CD features.
@@ -68,7 +68,7 @@ installation:
   an authentication mechanism for GitLab.
 - [Back up and restore GitLab](../raketasks/backup_restore.md): Learn the different
   ways you can back up or restore GitLab.
-- [Upgrade GitLab](../update/README.md): Every 22nd of the month, a new feature-rich GitLab version
+- [Upgrade GitLab](../update/index.md): Every 22nd of the month, a new feature-rich GitLab version
   is released. Learn how to upgrade to it, or to an interim release that contains a security fix.
 - [Scaling GitLab](../administration/reference_architectures/index.md):
   GitLab supports several different types of clustering.
