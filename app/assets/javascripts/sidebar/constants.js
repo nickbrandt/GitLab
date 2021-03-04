@@ -6,6 +6,8 @@ import getMergeRequestParticipants from '~/vue_shared/components/sidebar/queries
 import updateAssigneesMutation from '~/vue_shared/components/sidebar/queries/update_issue_assignees.mutation.graphql';
 import updateMergeRequestParticipantsMutation from '~/vue_shared/components/sidebar/queries/update_mr_assignees.mutation.graphql';
 
+export const ASSIGNEES_DEBOUNCE_DELAY = 250;
+
 export const assigneesQueries = {
   [IssuableType.Issue]: {
     query: getIssueParticipants,
