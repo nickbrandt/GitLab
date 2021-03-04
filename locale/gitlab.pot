@@ -8685,6 +8685,9 @@ msgstr ""
 msgid "Create new %{name} by email"
 msgstr ""
 
+msgid "Create new CI/CD pipeline"
+msgstr ""
+
 msgid "Create new Value Stream"
 msgstr ""
 
@@ -33453,6 +33456,9 @@ msgid "We will notify %{inviter} that you declined their invitation to join GitL
 msgstr ""
 
 msgid "We would like to inform you that your subscription GitLab Enterprise Edition %{plan_name} is nearing its user limit. You have %{active_user_count} active users, which is almost at the user limit of %{maximum_user_count}."
+msgstr ""
+
+msgid "We'll continuously validate your pipeline configuration. The validation results will appear here."
 msgstr ""
 
 msgid "We've found no vulnerabilities"
