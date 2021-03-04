@@ -3,6 +3,12 @@
 require 'spec_helper'
 
 RSpec.describe Gitlab::Usage::Metrics::NamesSuggestions::Generator do
+  include UsageDataHelpers
+
+  before do
+    stub_usage_data_connections
+  end
+
   describe '#generate' do
     context 'for count metrics' do
       it 'return correct name' do

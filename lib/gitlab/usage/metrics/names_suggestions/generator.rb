@@ -40,7 +40,6 @@ module Gitlab
               "add_#{args.join('_and_')}"
             end
 
-
             def parse_target_and_source(column, relation)
               if column
                 "#{column}_from_#{relation.table_name}"
