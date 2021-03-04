@@ -75,49 +75,34 @@ export const createRouter = (store, defaultBranch) => {
 
   router.beforeEach((to, from, next) => {
     if (to.params.namespace && to.params.project) {
-      performanceMarkAndMeasure({ mark: WEBIDE_MARK_FETCH_PROJECT_DATA_START });
-      store
-        .dispatch('getProjectData', {
-          namespace: to.params.namespace,
-          projectId: to.params.project,
-        })
-        .then(() => {
-          const basePath = to.params.pathMatch || '';
-          const projectId = `${to.params.namespace}/${to.params.project}`;
-          const branchId = to.params.branchid;
-          const mergeRequestId = to.params.mrid;
+      const basePath = to.params.pathMatch || '';
+      const projectId = `${to.params.namespace}/${to.params.project}`;
+      const branchId = to.params.branchid;
+      const mergeRequestId = to.params.mrid;
 
-          if (branchId) {
-            performanceMarkAndMeasure({
-              mark: WEBIDE_MARK_FETCH_PROJECT_DATA_FINISH,
-              measures: [
-                {
-                  name: WEBIDE_MEASURE_FETCH_PROJECT_DATA,
-                  start: WEBIDE_MARK_FETCH_PROJECT_DATA_START,
-                },
-              ],
-            });
-            store.dispatch('openBranch', {
-              projectId,
-              branchId,
-              basePath,
-            });
-          } else if (mergeRequestId) {
-            store.dispatch('openMergeRequest', {
-              projectId,
-              mergeRequestId,
-              targetProjectId: to.query.target_project,
-            });
-          }
-        })
-        .catch((e) => {
-          createFlash({
-            message: __('Error while loading the project data. Please try again.'),
-            fadeTransition: false,
-            addBodyClass: true,
-          });
-          throw e;
+      performanceMarkAndMeasure({ mark: WEBIDE_MARK_FETCH_PROJECT_DATA_START });
+      if (branchId) {
+        performanceMarkAndMeasure({
+          mark: WEBIDE_MARK_FETCH_PROJECT_DATA_FINISH,
+          measures: [
+            {
+              name: WEBIDE_MEASURE_FETCH_PROJECT_DATA,
+              start: WEBIDE_MARK_FETCH_PROJECT_DATA_START,
+            },
+          ],
         });
+        store.dispatch('openBranch', {
+          projectId,
+          branchId,
+          basePath,
+        });
+      } else if (mergeRequestId) {
+        store.dispatch('openMergeRequest', {
+          projectId,
+          mergeRequestId,
+          targetProjectId: to.query.target_project,
+        });
+      }
     }
 
     next();
