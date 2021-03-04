@@ -15,7 +15,7 @@ module Mutations
         description: 'The user callout dismissed.'
 
       def resolve(feature_name:)
-        user_callout = find_callout(feature_name)
+        user_callout = current_user.find_or_initialize_callout(feature_name)
 
         user_callout.update(dismissed_at: Time.current) if user_callout.valid?
         errors = errors_on_object(user_callout)
@@ -24,12 +24,6 @@ module Mutations
           user_callout: user_callout,
           errors: errors
         }
-      end
-
-      private
-
-      def find_callout(feature_name)
-        current_user.callouts.find_or_initialize_by(feature_name: ::UserCallout.feature_names[feature_name]) # rubocop:disable CodeReuse/ActiveRecord
       end
     end
   end
