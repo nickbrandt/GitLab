@@ -110,7 +110,7 @@ RSpec.describe Gitlab::ApplicationContext do
     it 'does not cause queries' do
       context = described_class.new(project: create(:project), namespace: create(:group, :nested), user: create(:user))
 
-      expect { context.use { Labkit::Context.current.to_h } }.not_to exceed_query_limit(0)
+      expect { context.use { Gitlab::ApplicationContext.current } }.not_to exceed_query_limit(0)
     end
   end
 end
