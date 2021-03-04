@@ -173,6 +173,11 @@ msgid_plural "%d days"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "%d epic"
+msgid_plural "%d epics"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "%d error"
 msgid_plural "%d errors"
 msgstr[0] ""
@@ -557,6 +562,9 @@ msgid "%{issuesCount} issues with a limit of %{maxIssueCount}"
 msgstr ""
 
 msgid "%{issuesSize} with a limit of %{maxIssueCount}"
+msgstr ""
+
+msgid "%{itemsCount} issues with a limit of %{maxIssueCount}"
 msgstr ""
 
 msgid "%{labelStart}Actual response:%{labelEnd} %{headers}"
@@ -3457,6 +3465,9 @@ msgid "An error occurred while loading merge requests."
 msgstr ""
 
 msgid "An error occurred while loading project creation UI"
+msgstr ""
+
+msgid "An error occurred while loading the access tokens form, please try again."
 msgstr ""
 
 msgid "An error occurred while loading the data. Please try again."
@@ -12036,9 +12047,6 @@ msgstr ""
 msgid "Error uploading file"
 msgstr ""
 
-msgid "Error uploading file. Please try again."
-msgstr ""
-
 msgid "Error uploading file: %{stripped}"
 msgstr ""
 
@@ -13194,6 +13202,9 @@ msgid "Folder/%{name}"
 msgstr ""
 
 msgid "Follow"
+msgstr ""
+
+msgid "Followed Users' Activity"
 msgstr ""
 
 msgid "Followed users"
@@ -21031,6 +21042,9 @@ msgstr ""
 msgid "OnCallSchedules|Restrict to time intervals"
 msgstr ""
 
+msgid "OnCallSchedules|Rotation end date/time must come after start date/time"
+msgstr ""
+
 msgid "OnCallSchedules|Rotation length"
 msgstr ""
 
@@ -25003,9 +25017,6 @@ msgstr ""
 msgid "Remove due date"
 msgstr ""
 
-msgid "Remove file"
-msgstr ""
-
 msgid "Remove fork relationship"
 msgstr ""
 
@@ -28367,9 +28378,6 @@ msgid "Start a new discussion…"
 msgstr ""
 
 msgid "Start a new merge request"
-msgstr ""
-
-msgid "Start a new merge request with these changes"
 msgstr ""
 
 msgid "Start a review"

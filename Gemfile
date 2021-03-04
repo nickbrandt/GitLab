@@ -74,6 +74,9 @@ gem 'acme-client', '~> 2.0', '>= 2.0.6'
 # Browser detection
 gem 'browser', '~> 4.2'
 
+# OS detection for usage ping
+gem 'ohai', '~> 16.10'
+
 # GPG
 gem 'gpgme', '~> 2.0.19'
 
@@ -157,7 +160,7 @@ gem 'wikicloth', '0.8.1'
 gem 'asciidoctor', '~> 2.0.10'
 gem 'asciidoctor-include-ext', '~> 0.3.1', require: false
 gem 'asciidoctor-plantuml', '~> 0.0.12'
-gem 'asciidoctor-kroki', '~> 0.3.0', require: false
+gem 'asciidoctor-kroki', '~> 0.4.0', require: false
 gem 'rouge', '~> 3.26.0'
 gem 'truncato', '~> 0.7.11'
 gem 'bootstrap_form', '~> 4.2.0'
