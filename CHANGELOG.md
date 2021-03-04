@@ -1012,6 +1012,17 @@ entry.
 - Add verbiage + link sast to show it's in core. !51935
 
 
+## 13.7.8 (2021-03-04)
+
+### Security (5 changes)
+
+- Bump thrift gem to 0.14.0.
+- Allow only owners to manage group variables.
+- Do not store marshalled sessions ids in Redis.
+- Workhorse: prevent escaped router path traversal.
+- Fix XSS vulnerability for swagger file viewer.
+
+
 ## 13.7.7 (2021-02-11)
 
 ### Security (9 changes)
