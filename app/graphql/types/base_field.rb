@@ -21,9 +21,7 @@ module Types
       super(**kwargs, &block)
 
       # We want to avoid the overhead of this in prod
-      unless Rails.env.production?
-        extension ::Gitlab::Graphql::CallsGitaly::FieldExtension
-      end
+      extension ::Gitlab::Graphql::CallsGitaly::FieldExtension if Gitlab.dev_or_test_env?
     end
 
     def may_call_gitaly?
