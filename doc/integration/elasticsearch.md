@@ -344,7 +344,7 @@ Sometimes, you might want to abandon the unfinished reindex job and resume the i
 
 1. Uncheck the "Pause Elasticsearch indexing" checkbox in **Admin Area > Settings > Advanced Search**.
 
-## Background migrations
+## Advanced Search migrations
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/234046) in GitLab 13.6.
 
@@ -352,7 +352,7 @@ With reindex migrations running in the background, there's no need for a manual
 intervention. This usually happens in situations where new features are added to
 Advanced Search, which means adding or changing the way content is indexed.
 
-To confirm that the background migrations ran, you can check with:
+To confirm that the Advanced Search migrations ran, you can check with:
 
 ```shell
 curl "$CLUSTER_URL/gitlab-production-migrations/_search?q=*" | jq .
@@ -406,7 +406,7 @@ If there appears to be no way you can get the migration to succeed you may
 consider the [last resort to recreate the index from
 scratch](#last-resort-to-recreate-an-index). This may allow you to skip over
 the problem because a newly created index will skip all migrations as the index
-will be recreated with the correct up to date schema.
+will be recreated with the correct up-to-date schema.
 
 ### All migrations must be finished before doing a major upgrade
 

@@ -249,12 +249,12 @@ end
 
 ### Multi-version compatibility
 
-These Elasticsearch migrations, like any other GitLab changes, need to support the case where
+These Advanced Search migrations, like any other GitLab changes, need to support the case where
 [multiple versions of the application are running at the same time](multi_version_compatibility.md).
 
 Depending on the order of deployment, it's possible that the migration
 has started or finished and there's still a server running the application code from before the
-migration. We need to take this into consideration until we can [ensure all Elasticsearch migrations
+migration. We need to take this into consideration until we can [ensure all Advanced Search migrations
 start after the deployment has finished](https://gitlab.com/gitlab-org/gitlab/-/issues/321619).
 
 ### Reverting a migration
@@ -268,7 +268,7 @@ some data is moved) to a later merge request after the migrations have
 completed successfully. To be safe, for self-managed customers we should also
 defer it to another release if there is risk of important data loss.
 
-### Best practices for Elasticsearch migrations
+### Best practices for Advanced Search migrations
 
 Follow these best practices for best results:
 
@@ -286,11 +286,11 @@ Follow these best practices for best results:
 - Consider adding a retry limit if there is potential for the migration to fail.
   This ensures that migrations can be halted if an issue occurs.
 
-## Deleting Elasticsearch migrations in a major version upgrade
+## Deleting Advanced Search migrations in a major version upgrade
 
-Since our Elasticsearch migrations usually require us to support multiple code
-paths for a long period of time it's important to clean those up when we safely
-can.
+Since our Advanced Search migrations usually require us to support multiple
+code paths for a long period of time it's important to clean those up when we
+safely can.
 
 We choose to use GitLab major version upgrades as a safe time to remove
 backwards compatibility for indices that have not been fully migrated. We
@@ -298,7 +298,7 @@ backwards compatibility for indices that have not been fully migrated. We
 documentation](../update/index.md#upgrading-to-a-new-major-version). We also
 choose to remove the migration code and tests so that:
 
-1. We don't need to maintain any code that is called from our Elasticsearch
+1. We don't need to maintain any code that is called from our Advanced Search
    migrations
 1. We don't waste CI time running tests for migrations that we don't support
    anymore
@@ -312,8 +312,8 @@ GitLab.com to `%14.0` before the migrations in `%13.11` were finished. Since
 our deployments to GitLab.com are automated and we currently don't have
 automated checks to prevent this the extra precaution is warranted.
 Additionally, even if we did have automated checks to prevent it, we wouldn't
-actually want to hold up GitLab.com deployments on Elasticsearch migrations as
-they may still have another week to go and that's too long to block
+actually want to hold up GitLab.com deployments on Advanced Search migrations
+as they may still have another week to go and that's too long to block
 deployments.
 
 ### Process for removing migrations
@@ -326,7 +326,7 @@ being upgraded to we do the following:
 
    ```ruby
    def migrate
-     raise "Migration has been deleted in the last major version upgrade." \
+     log_raise "Migration has been deleted in the last major version upgrade." \
        "Migrations are supposed to be finished before upgrading major version https://docs.gitlab.com/ee/update/#upgrading-to-a-new-major-version ." \
        "In order to correct this issue you will need to reacreate your index from scratch https://docs.gitlab.com/ee/integration/elasticsearch.html#last-resort-to-recreate-an-index ."
    end
