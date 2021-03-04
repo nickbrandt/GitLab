@@ -281,7 +281,7 @@ example [`resources.yml` file](#example-resourcesyml-file) in the following ways
     after you install the `gitlab-kas` sub-chart, or enable `gitlab-kas` for Omnibus GitLab.
     When using the sub-chart, you must set `wss://kas.host.tld:443` as
     `kas-address`, where `host.tld` is the domain you've setup for your GitLab installation.
-    When using Omnibus GitLab, you must set `wss://GitLab.host.tld:443/-/kubernetes-agent` as
+    When using Omnibus GitLab, you must set `wss://GitLab.host.tld:443/-/kubernetes-agent/` as
     `kas-address`, where `GitLab.host.tld` is your GitLab hostname.
   - When using the sub-chart, specify the `ws` scheme (such as `ws://kas.host.tld:80`)
     to use an unencrypted WebSockets connection.
@@ -346,7 +346,7 @@ spec:
         - --token-file=/config/token
         - --kas-address
         - wss://kas.host.tld:443 # change this line for the one below if using Omnibus GitLab
-        # - wss://gitlab.host.tld:443/-/kubernetes-agent
+        # - wss://gitlab.host.tld:443/-/kubernetes-agent/
         volumeMounts:
         - name: token-volume
           mountPath: /config
