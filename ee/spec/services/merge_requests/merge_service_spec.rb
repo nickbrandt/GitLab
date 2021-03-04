@@ -43,6 +43,78 @@ RSpec.describe MergeRequests::MergeService do
         expect(rule.approved_approvers).to contain_exactly(approver)
       end
     end
+
+    context 'jira issue enforcement' do
+      subject do
+        perform_enqueued_jobs do
+          service.execute(merge_request)
+        end
+      end
+
+      shared_examples 'merges the MR with no error' do
+        it do
+          subject
+
+          expect(merge_request.reload.merged?).to eq(true)
+        end
+      end
+
+      context 'when feature is available' do
+        before do
+          stub_licensed_features(jira_issue_association_enforcement: true)
+          stub_feature_flags(jira_issue_association_on_merge_request: true)
+        end
+
+        context 'when jira issue is required for merge' do
+          before do
+            project.create_project_setting(prevent_merge_without_jira_issue: true)
+          end
+
+          context 'when issue key is NOT specified in MR title / description' do
+            it 'returns appropriate merge error' do
+              subject
+
+              expect(merge_request.merge_error).to include('Before this can be merged, a Jira issue must be linked in the title or description')
+            end
+          end
+
+          context 'when issue key is specified in MR title / description' do
+            before do
+              merge_request.update!(title: "Fixes login issue SECURITY-1234")
+            end
+
+            it_behaves_like 'merges the MR with no error'
+          end
+        end
+
+        context 'when jira issue is NOT required for merge' do
+          before do
+            project.create_project_setting(prevent_merge_without_jira_issue: false)
+          end
+
+          it_behaves_like 'merges the MR with no error'
+        end
+      end
+
+      context 'when feature is NOT available' do
+        using RSpec::Parameterized::TableSyntax
+
+        where(:licensed, :feature_flag) do
+          false | true
+          true  | false
+          false | false
+        end
+
+        with_them do
+          before do
+            stub_licensed_features(jira_issue_association_enforcement: licensed)
+            stub_feature_flags(jira_issue_association_on_merge_request: feature_flag)
+          end
+
+          it_behaves_like 'merges the MR with no error'
+        end
+      end
+    end
   end
 
   it_behaves_like 'merge validation hooks', persisted: true
