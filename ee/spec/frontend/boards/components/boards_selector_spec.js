@@ -35,7 +35,7 @@ describe('BoardsSelector', () => {
   const createStore = () => {
     return new Vuex.Store({
       getters: {
-        isEpicBoard: () => true,
+        isEpicBoard: () => false,
       },
     });
   };
