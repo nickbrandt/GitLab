@@ -20,7 +20,7 @@ RSpec.describe Elastic::IndexingControlService, :clean_gitlab_redis_shared_state
   end
 
   let(:stored_context) do
-    { "#{Labkit::Context::LOG_KEY}.project" => 'gitlab-org/gitlab' }
+    { "#{Gitlab::ApplicationContext::LOG_KEY}.project" => 'gitlab-org/gitlab' }
   end
 
   let(:worker_args) { [1, 2] }
