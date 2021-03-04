@@ -17,7 +17,7 @@ RSpec.describe "projects/security/policies/show", type: :view do
   it 'renders the default state' do
     expect(rendered).to have_selector('h2')
     expect(rendered).to have_selector('h4')
-    expect(response).to have_css('input[id=orchestration_management_project_id]', visible: false)
+    expect(response).to have_css('input[id=orchestration_policy_project_id]', visible: false)
     expect(rendered).to have_button('Save changes')
   end
 end

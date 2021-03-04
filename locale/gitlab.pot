@@ -8530,6 +8530,9 @@ msgstr ""
 msgid "Could not upload your designs as one or more files uploaded are not supported."
 msgstr ""
 
+msgid "Couldn't assign policy to project"
+msgstr ""
+
 msgid "Country"
 msgstr ""
 
@@ -22658,6 +22661,9 @@ msgstr ""
 msgid "Point to any links you like: documentation, built binaries, or other related materials. These can be internal or external links from your GitLab instance. Duplicate URLs are not allowed."
 msgstr ""
 
+msgid "Policy project doesn't exists"
+msgstr ""
+
 msgid "Pre-defined push rules."
 msgstr ""
 
@@ -28852,6 +28858,9 @@ msgid "Succeeded"
 msgstr ""
 
 msgid "Successful purchase image"
+msgstr ""
+
+msgid "Successfull"
 msgstr ""
 
 msgid "Successfully activated"
