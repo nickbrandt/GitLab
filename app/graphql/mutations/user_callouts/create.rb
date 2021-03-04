@@ -15,13 +15,13 @@ module Mutations
         description: 'The user callout dismissed.'
 
       def resolve(feature_name:)
-        user_callout = current_user.find_or_initialize_callout(feature_name)
-
-        user_callout.update(dismissed_at: Time.current) if user_callout.valid?
-        errors = errors_on_object(user_callout)
+        callout = Users::DismissUserCalloutService.new(
+          container: nil, current_user: current_user, params: { feature_name: feature_name }
+        ).execute
+        errors = errors_on_object(callout)
 
         {
-          user_callout: user_callout,
+          user_callout: callout,
           errors: errors
         }
       end

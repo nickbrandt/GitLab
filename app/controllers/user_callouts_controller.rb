@@ -4,8 +4,9 @@ class UserCalloutsController < ApplicationController
   feature_category :navigation
 
   def create
-    callout = current_user.find_or_initialize_callout(feature_name)
-    callout.update(dismissed_at: Time.current) if callout.valid?
+    callout = Users::DismissUserCalloutService.new(
+      container: nil, current_user: current_user, params: { feature_name: feature_name }
+    ).execute
 
     if callout.persisted?
       respond_to do |format|

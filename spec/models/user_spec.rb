@@ -5487,7 +5487,7 @@ RSpec.describe User do
     subject(:find_or_initialize_callout) { user.find_or_initialize_callout(feature_name) }
 
     let(:user) { create(:user) }
-    let(:feature_name) { UserCallout.feature_names.keys.first }
+    let(:feature_name) { UserCallout.feature_names.each_key.first }
 
     context 'when callout exists' do
       let!(:callout) { create(:user_callout, user: user, feature_name: feature_name) }
