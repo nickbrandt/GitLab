@@ -12,19 +12,16 @@ RSpec.describe 'layouts/nav/sidebar/_group' do
   let(:user) { create(:user) }
 
   describe 'trial status widget', :aggregate_failures do
+    using RSpec::Parameterized::TableSyntax
+
     let!(:gitlab_subscription) { create(:gitlab_subscription, :active_trial, namespace: group) }
 
-    let(:trials_available) { false }
+    let(:show_widget) { false }
     let(:experiment_enabled) { false }
-    let(:eligible_for_widget) { false }
 
     before do
-      allow(view).to receive(:billing_plans_and_trials_available?).and_return(trials_available)
-      allow(view).to receive(:eligible_for_trial_status_widget?).and_return(eligible_for_widget)
-
-      allow(view).to receive(:record_experiment_group)
-      allow(view).to receive(:experiment_enabled?).and_return(experiment_enabled)
-
+      allow(view).to receive(:show_trial_status_widget?).and_return(show_widget)
+      allow(view).to receive(:trial_status_widget_experiment_enabled?).and_return(experiment_enabled)
       render
     end
 
@@ -51,30 +48,15 @@ RSpec.describe 'layouts/nav/sidebar/_group' do
       end
     end
 
-    context 'when billing plans & trials are not available' do
-      include_examples 'does not render'
+    where :show_widget, :experiment_enabled, :examples_to_include do
+      true  | true  | 'does render'
+      true  | false | 'does not render'
+      false | true  | 'does not render'
+      false | false | 'does not render'
     end
 
-    context 'when billing plans & trials are available' do
-      let(:trials_available) { true }
-
-      context 'but the group and/or user are not eligible to see the widget' do
-        include_examples 'does not render'
-      end
-
-      context 'and the group and/or user are eligible to see the widget' do
-        let(:eligible_for_widget) { true }
-
-        context 'but the experiment is not enabled for the group' do
-          include_examples 'does not render'
-        end
-
-        context 'and the experiment is enabled for the group' do
-          let(:experiment_enabled) { true }
-
-          include_examples 'does render'
-        end
-      end
+    with_them do
+      include_examples(params[:examples_to_include])
     end
   end
 
