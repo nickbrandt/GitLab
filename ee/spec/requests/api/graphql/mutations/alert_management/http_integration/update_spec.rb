@@ -88,12 +88,12 @@ RSpec.describe 'Updating an existing HTTP Integration' do
     )
   end
 
-  context 'when the custom mappings attributes are not part of the mutation variables' do
-    let_it_be(:payload_example) do
+  context 'when the integration already has custom mapping params' do
+    let_it_be(:current_payload_example) do
       { 'alert' => { 'name' => 'Test alert', 'desc' => 'Description' } }
     end
 
-    let_it_be(:mapping) do
+    let_it_be(:current_mapping) do
       {
         'title' => { 'path' => %w(alert name), 'type' => 'string', 'label' => 'Title' },
         'description' => { 'path' => %w(alert desc), 'type' => 'string' }
@@ -101,38 +101,78 @@ RSpec.describe 'Updating an existing HTTP Integration' do
     end
 
     let_it_be(:integration) do
-      create(:alert_management_http_integration, project: project, payload_example: payload_example, payload_attribute_mapping: mapping)
+      create(:alert_management_http_integration, project: project, payload_example: current_payload_example, payload_attribute_mapping: current_mapping)
     end
 
-    let(:mutation) do
-      variables = {
-        id: GitlabSchema.id_from_object(integration).to_s,
-        name: 'Modified Name'
-      }
-      graphql_mutation(:http_integration_update, variables) do
-        <<~QL
-          clientMutationId
-          errors
-          integration {
-            id
-            name
-          }
-        QL
+    context 'when the custom mappings attributes are blank' do
+      let(:payload_example) { "{}" }
+      let(:payload_attribute_mappings) { [] }
+
+      it 'resets the custom mapping params', :aggregate_failures do
+        post_graphql_mutation(mutation, current_user: current_user)
+
+        integration_response = mutation_response['integration']
+
+        expect(response).to have_gitlab_http_status(:success)
+        expect(integration_response['id']).to eq(GitlabSchema.id_from_object(integration).to_s)
+        expect(integration_response['name']).to eq('Modified Name')
+
+        integration.reload
+        expect(integration.payload_example).to eq({})
+        expect(integration.payload_attribute_mapping).to eq({})
       end
     end
 
-    it 'does not reset the custom mapping attributes', :aggregate_failures do
-      post_graphql_mutation(mutation, current_user: current_user)
+    context 'when the custom mappings attributes are nils' do
+      let(:payload_example) { nil }
+      let(:payload_attribute_mappings) { nil }
 
-      integration_response = mutation_response['integration']
+      it 'resets the custom mapping params', :aggregate_failures do
+        post_graphql_mutation(mutation, current_user: current_user)
 
-      expect(response).to have_gitlab_http_status(:success)
-      expect(integration_response['id']).to eq(GitlabSchema.id_from_object(integration).to_s)
-      expect(integration_response['name']).to eq('Modified Name')
+        integration_response = mutation_response['integration']
 
-      integration.reload
-      expect(integration.payload_example).to eq(payload_example)
-      expect(integration.payload_attribute_mapping).to eq(mapping)
+        expect(response).to have_gitlab_http_status(:success)
+        expect(integration_response['id']).to eq(GitlabSchema.id_from_object(integration).to_s)
+        expect(integration_response['name']).to eq('Modified Name')
+
+        integration.reload
+        expect(integration.payload_example).to eq({})
+        expect(integration.payload_attribute_mapping).to eq({})
+      end
+    end
+
+    context 'when the custom mappings attributes are not part of the mutation variables' do
+      let(:mutation) do
+        variables = {
+          id: GitlabSchema.id_from_object(integration).to_s,
+          name: 'Modified Name'
+        }
+        graphql_mutation(:http_integration_update, variables) do
+          <<~QL
+            clientMutationId
+            errors
+            integration {
+              id
+              name
+            }
+          QL
+        end
+      end
+
+      it 'does not reset the custom mapping attributes', :aggregate_failures do
+        post_graphql_mutation(mutation, current_user: current_user)
+
+        integration_response = mutation_response['integration']
+
+        expect(response).to have_gitlab_http_status(:success)
+        expect(integration_response['id']).to eq(GitlabSchema.id_from_object(integration).to_s)
+        expect(integration_response['name']).to eq('Modified Name')
+
+        integration.reload
+        expect(integration.payload_example).to eq(current_payload_example)
+        expect(integration.payload_attribute_mapping).to eq(current_mapping)
+      end
     end
   end
 
