@@ -27,11 +27,14 @@ module API
         # Examples:
         #   GET /projects/:id/merge_requests/:merge_request_iid/jira_issue
         desc 'Get Jira Issue association for merge request'
+        params do
+          requires :id, type: String, desc: 'The ID of a project'
+          requires :merge_request_iid, types: [Integer, String], desc: 'The IID of a merge request'
+        end
         get 'jira_issue' do
           forbidden! unless can?(current_user, :read_merge_request, user_project)
-          not_found! unless user_project.project_setting.prevent_merge_without_jira_issue
 
-          merge_request = find_merge_request_with_access(params[:merge_request_iid])
+          merge_request = find_merge_request_with_access(declared(params)[:merge_request_iid])
 
           present_jira_issue(merge_request)
         end

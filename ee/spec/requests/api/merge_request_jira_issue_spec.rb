@@ -12,14 +12,6 @@ RSpec.describe API::MergeRequestJiraIssue do
 
     subject { get api(url, current_user) }
 
-    shared_examples 'not found' do
-      specify do
-        subject
-
-        expect(response).to have_gitlab_http_status(:not_found)
-      end
-    end
-
     context 'when feature is available' do
       before do
         stub_licensed_features(jira_issue_association_enforcement: true)
@@ -49,7 +41,11 @@ RSpec.describe API::MergeRequestJiraIssue do
             project.create_project_setting(prevent_merge_without_jira_issue: false)
           end
 
-          it_behaves_like 'not found'
+          it 'does not include attribute issue_keys' do
+            subject
+
+            expect(json_response).not_to have_key(:issue_keys)
+          end
         end
 
         context 'when jira issue is required for merge' do
@@ -57,17 +53,17 @@ RSpec.describe API::MergeRequestJiraIssue do
             project.create_project_setting(prevent_merge_without_jira_issue: true)
           end
 
-          it 'responds with not found' do
+          it 'responds with status :ok' do
             subject
 
             expect(response).to have_gitlab_http_status(:ok)
           end
 
           context 'when Jira issue is not provided in MR title/description' do
-            it 'responds with not found' do
+            it 'responds with empty issue key' do
               subject
 
-              expect(json_response["is_present"]).to eq(false)
+              expect(json_response["issue_keys"]).to be_empty
             end
           end
 
@@ -76,22 +72,22 @@ RSpec.describe API::MergeRequestJiraIssue do
               merge_request.update!(title: 'Fix PRODUCT-1234')
             end
 
-            it 'responds with not found' do
+            it 'responds with the issue key in MR title' do
               subject
 
-              expect(json_response["is_present"]).to eq(true)
+              expect(json_response["issue_keys"]).to eq(["PRODUCT-1234"])
             end
           end
 
           context 'when Jira issue is provided in MR description' do
             before do
-              merge_request.update!(description: 'Jira issue associated: PRODUCT-1234')
+              merge_request.update!(description: 'Jira issue associated: FEATURE-1234')
             end
 
-            it 'responds with not found' do
+            it 'responds with the issue key in MR description' do
               subject
 
-              expect(json_response["is_present"]).to eq(true)
+              expect(json_response["issue_keys"]).to eq(["FEATURE-1234"])
             end
           end
         end
@@ -102,6 +98,14 @@ RSpec.describe API::MergeRequestJiraIssue do
       using RSpec::Parameterized::TableSyntax
 
       let(:current_user) { user }
+
+      shared_examples 'not found' do
+        specify do
+          subject
+
+          expect(response).to have_gitlab_http_status(:not_found)
+        end
+      end
 
       where(:licensed, :feature_flag) do
         false | true
