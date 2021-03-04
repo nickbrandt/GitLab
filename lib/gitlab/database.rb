@@ -260,7 +260,15 @@ module Gitlab
     # @return [String]
     def self.get_write_location(ar_connection)
       row = ar_connection
-              .select_all('SELECT CASE WHEN pg_is_in_recovery() = true THEN pg_last_wal_replay_lsn()::text ELSE pg_current_wal_insert_lsn()::text END AS location;')
+              .select_all(<<~SQL)
+              SELECT CASE 
+                WHEN pg_is_in_recovery() = true AND EXISTS (SELECT 1 FROM pg_stat_get_wal_senders())
+                  THEN pg_last_wal_replay_lsn()::text 
+                WHEN pg_is_in_recovery() = false 
+                  THEN pg_current_wal_insert_lsn()::text
+                  ELSE NULL
+                END AS location;
+              SQL
               .first
 
       row['location'] if row
