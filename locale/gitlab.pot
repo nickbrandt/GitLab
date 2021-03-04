@@ -35195,6 +35195,9 @@ msgstr ""
 msgid "ciReport|is loading, errors when loading results"
 msgstr ""
 
+msgid "closed"
+msgstr ""
+
 msgid "closed issue"
 msgstr ""
 
