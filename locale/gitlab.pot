@@ -11876,9 +11876,6 @@ msgstr ""
 msgid "Epics|To schedule your epic's %{epicDateType} date based on milestones, assign a milestone with a %{epicDateType} date to any issue in the epic."
 msgstr ""
 
-msgid "Epics|Unable to perform this action"
-msgstr ""
-
 msgid "Epics|Unable to save epic. Please try again"
 msgstr ""
 
@@ -27879,9 +27876,6 @@ msgstr ""
 msgid "Something went wrong on our end. Please try again."
 msgstr ""
 
-msgid "Something went wrong trying to change the confidentiality of this issue"
-msgstr ""
-
 msgid "Something went wrong trying to change the locked state of this %{issuableDisplayName}"
 msgstr ""
 
@@ -31708,12 +31702,6 @@ msgstr ""
 msgid "Tuning settings"
 msgstr ""
 
-msgid "Turn Off"
-msgstr ""
-
-msgid "Turn On"
-msgstr ""
-
 msgid "Turn off"
 msgstr ""
 
@@ -34031,9 +34019,6 @@ msgid "You are going to turn off the confidentiality. This means %{strongStart}e
 msgstr ""
 
 msgid "You are going to turn on confidentiality. Only team members with %{strongStart}at least Reporter access%{strongEnd} will be able to see and leave comments on the %{issuableType}."
-msgstr ""
-
-msgid "You are going to turn on the confidentiality. This means that only team members with %{strongStart}at least Reporter access%{strongEnd} are able to see and leave comments on the %{issuableType}."
 msgstr ""
 
 msgid "You are not allowed to approve a user"
