@@ -12025,6 +12025,25 @@ CREATE SEQUENCE diff_note_positions_id_seq
 
 ALTER SEQUENCE diff_note_positions_id_seq OWNED BY diff_note_positions.id;
 
+CREATE TABLE dora_daily_metrics (
+    id bigint NOT NULL,
+    environment_id bigint NOT NULL,
+    date date NOT NULL,
+    deployment_frequency integer,
+    lead_time_for_changes_in_seconds integer,
+    CONSTRAINT dora_daily_metrics_deployment_frequency_positive CHECK ((deployment_frequency >= 0)),
+    CONSTRAINT dora_daily_metrics_lead_time_for_changes_in_seconds_positive CHECK ((lead_time_for_changes_in_seconds >= 0))
+);
+
+CREATE SEQUENCE dora_daily_metrics_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE dora_daily_metrics_id_seq OWNED BY dora_daily_metrics.id;
+
 CREATE TABLE draft_notes (
     id bigint NOT NULL,
     merge_request_id integer NOT NULL,
@@ -19007,6 +19026,8 @@ ALTER TABLE ONLY design_user_mentions ALTER COLUMN id SET DEFAULT nextval('desig
 
 ALTER TABLE ONLY diff_note_positions ALTER COLUMN id SET DEFAULT nextval('diff_note_positions_id_seq'::regclass);
 
+ALTER TABLE ONLY dora_daily_metrics ALTER COLUMN id SET DEFAULT nextval('dora_daily_metrics_id_seq'::regclass);
+
 ALTER TABLE ONLY draft_notes ALTER COLUMN id SET DEFAULT nextval('draft_notes_id_seq'::regclass);
 
 ALTER TABLE ONLY elastic_reindexing_subtasks ALTER COLUMN id SET DEFAULT nextval('elastic_reindexing_subtasks_id_seq'::regclass);
@@ -20214,6 +20235,9 @@ ALTER TABLE ONLY design_user_mentions
 
 ALTER TABLE ONLY diff_note_positions
     ADD CONSTRAINT diff_note_positions_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY dora_daily_metrics
+    ADD CONSTRAINT dora_daily_metrics_pkey PRIMARY KEY (id);
 
 ALTER TABLE ONLY draft_notes
     ADD CONSTRAINT draft_notes_pkey PRIMARY KEY (id);
@@ -22095,6 +22119,8 @@ CREATE INDEX index_deployments_on_environment_id_and_id ON deployments USING btr
 
 CREATE INDEX index_deployments_on_environment_id_and_iid_and_project_id ON deployments USING btree (environment_id, iid, project_id);
 
+CREATE INDEX index_deployments_on_environment_id_status_and_finished_at ON deployments USING btree (environment_id, status, finished_at);
+
 CREATE INDEX index_deployments_on_environment_status_sha ON deployments USING btree (environment_id, status, sha);
 
 CREATE INDEX index_deployments_on_id_and_status_and_created_at ON deployments USING btree (id, status, created_at);
@@ -22148,6 +22174,8 @@ CREATE UNIQUE INDEX index_design_management_versions_on_sha_and_issue_id ON desi
 CREATE UNIQUE INDEX index_design_user_mentions_on_note_id ON design_user_mentions USING btree (note_id);
 
 CREATE UNIQUE INDEX index_diff_note_positions_on_note_id_and_diff_type ON diff_note_positions USING btree (note_id, diff_type);
+
+CREATE UNIQUE INDEX index_dora_daily_metrics_on_environment_id_and_date ON dora_daily_metrics USING btree (environment_id, date);
 
 CREATE INDEX index_draft_notes_on_author_id ON draft_notes USING btree (author_id);
 
@@ -25136,6 +25164,9 @@ ALTER TABLE ONLY boards_epic_board_positions
 
 ALTER TABLE ONLY geo_repository_created_events
     ADD CONSTRAINT fk_rails_1f49e46a61 FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY dora_daily_metrics
+    ADD CONSTRAINT fk_rails_1fd07aff6f FOREIGN KEY (environment_id) REFERENCES environments(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY boards_epic_lists
     ADD CONSTRAINT fk_rails_1fe6b54909 FOREIGN KEY (label_id) REFERENCES labels(id) ON DELETE CASCADE;
