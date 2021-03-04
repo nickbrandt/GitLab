@@ -63,7 +63,7 @@ module Gitlab
       end
 
       def executed_sql(sql)
-        @sql_executed << sql unless @count > LOG_THRESHOLD
+        @sql_executed << sql if @count <= LOG_THRESHOLD
       end
 
       def raise_error?
