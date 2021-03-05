@@ -177,4 +177,32 @@ describe('Boards - Getters', () => {
       expect(getters.activeGroupProjects(state)).toEqual([mockGroupProject1]);
     });
   });
+
+  describe('isIssueBoard', () => {
+    it('returns true when issuableType on state is issue', () => {
+      const state = {
+        issuableType: 'issue',
+      };
+
+      expect(getters.isIssueBoard(state)).toBe(true);
+    });
+
+    it('returns false when issuableType on state is not issue', () => {
+      const state = {
+        issuableType: 'epic',
+      };
+
+      expect(getters.isIssueBoard(state)).toBe(false);
+    });
+  });
+
+  describe('isEpicBoard', () => {
+    afterEach(() => {
+      window.gon = { features: {} };
+    });
+
+    it('returns false', () => {
+      expect(getters.isEpicBoard()).toBe(false);
+    });
+  });
 });
