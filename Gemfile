@@ -519,7 +519,7 @@ gem 'valid_email', '~> 0.1'
 gem 'json', '~> 2.3.0'
 gem 'json-schema', '~> 2.8.0'
 gem 'json_schemer', '~> 0.2.12'
-gem 'oj', '~> 3.10.6'
+gem 'oj', '~> 3.11.2'
 gem 'multi_json', '~> 1.14.1'
 gem 'yajl-ruby', '~> 1.4.1', require: 'yajl'
 
