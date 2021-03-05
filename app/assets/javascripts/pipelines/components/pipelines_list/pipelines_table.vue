@@ -70,7 +70,6 @@ export default {
     },
     {
       key: 'actions',
-      label: '',
       thClass: DEFAULT_TH_CLASSES,
       tdClass: DEFAULT_TD_CLASS,
       columnClass: 'gl-w-20p',
@@ -190,6 +189,7 @@ export default {
       fixed
     >
       <template #head(actions)>
+        <span class="gl-display-block gl-lg-display-none!">{{ s__('Pipeline|Actions') }}</span>
         <slot name="table-header-actions"></slot>
       </template>
 
