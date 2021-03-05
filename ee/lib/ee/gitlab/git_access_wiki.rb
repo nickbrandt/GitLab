@@ -50,7 +50,7 @@ module EE
         super
       end
 
-      override right_feature_access_level?
+      override :right_feature_access_level?
       def right_feature_access_level?
         return super unless container.is_a?(GroupWiki)
 

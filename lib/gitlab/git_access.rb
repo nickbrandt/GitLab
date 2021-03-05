@@ -111,7 +111,7 @@ module Gitlab
     end
 
     def right_feature_access_level?
-     (project? && project&.repository_access_level != ::Featurable::DISABLED
+     project? && project&.repository_access_level != ::Featurable::DISABLED
     end
 
     def user_can_download_code?
