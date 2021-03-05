@@ -1,5 +1,5 @@
 ---
-title: Updates ProjectPipelineResolver to use SHA as well as IID
+title: Allow search for pipeline by SHA as well as IID via GraphQL
 merge_request: 54471
 author:
 type: changed
