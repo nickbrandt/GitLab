@@ -10796,6 +10796,30 @@ Status: `data_available`
 
 Tiers: 
 
+### `redis_hll_counters.pipeline_authoring.o_pipeline_authoring_unique_users_pushing_mr_ciconfigfile_monthly`
+
+Monthly unique user count having merge requests which contains the CI config file
+
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_28d/20210301144228_o_pipeline_authoring_unique_users_pushing_mr_ciconfigfile_monthly.yml)
+
+Group: `group::pipeline authoring`
+
+Status: `implemented`
+
+Tiers: `free`, `premium`, `ultimate`
+
+### `redis_hll_counters.pipeline_authoring.o_pipeline_authoring_unique_users_pushing_mr_ciconfigfile_weekly`
+
+Weekly unique user count having merge requests which contains the CI config file
+
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_7d/20210301144209_o_pipeline_authoring_unique_users_pushing_mr_ciconfigfile_weekly.yml)
+
+Group: `group::pipeline authoring`
+
+Status: `implemented`
+
+Tiers: `free`, `premium`, `ultimate`
+
 ### `redis_hll_counters.quickactions.i_quickactions_approve_monthly`
 
 Missing description
