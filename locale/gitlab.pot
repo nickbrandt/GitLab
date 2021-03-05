@@ -3966,6 +3966,12 @@ msgid_plural "Are you sure you want to import %d repositories?"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "Are you sure you want to lock %{path}?"
+msgstr ""
+
+msgid "Are you sure you want to lock this directory?"
+msgstr ""
+
 msgid "Are you sure you want to lose unsaved changes?"
 msgstr ""
 
@@ -4024,6 +4030,12 @@ msgid "Are you sure you want to stop this environment?"
 msgstr ""
 
 msgid "Are you sure you want to unlock %{path_lock_path}?"
+msgstr ""
+
+msgid "Are you sure you want to unlock %{path}?"
+msgstr ""
+
+msgid "Are you sure you want to unlock this directory?"
 msgstr ""
 
 msgid "Are you sure you want to unsubscribe from the %{type}: %{link_to_noteable_text}?"
