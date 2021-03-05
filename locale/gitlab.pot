@@ -26597,9 +26597,6 @@ msgstr ""
 msgid "SecurityConfiguration|Enable"
 msgstr ""
 
-msgid "SecurityConfiguration|Enable via Merge Request"
-msgstr ""
-
 msgid "SecurityConfiguration|Enabled"
 msgstr ""
 
