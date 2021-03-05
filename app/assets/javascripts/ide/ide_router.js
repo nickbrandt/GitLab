@@ -2,7 +2,6 @@ import Vue from 'vue';
 import createFlash from '~/flash';
 import IdeRouter from '~/ide/ide_router_extension';
 import { joinPaths } from '~/lib/utils/url_utility';
-import { __ } from '~/locale';
 import {
   WEBIDE_MARK_FETCH_PROJECT_DATA_START,
   WEBIDE_MARK_FETCH_PROJECT_DATA_FINISH,

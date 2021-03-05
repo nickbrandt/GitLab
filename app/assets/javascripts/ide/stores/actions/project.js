@@ -1,11 +1,11 @@
 import { escape } from 'lodash';
 import createFlash from '~/flash';
+import getUserPermissions from '~/ide/queries/getUserPermissions.query.graphql';
+import { query } from '~/ide/services/gql';
 import { __, sprintf } from '~/locale';
 import api from '../../../api';
 import service from '../../services';
 import * as types from '../mutation_types';
-import { query } from '~/ide/services/gql';
-import getUserPermissions from '~/ide/queries/getUserPermissions.query';
 
 const fetchProjectPermissionsData = (projectPath) =>
   query({

@@ -2,6 +2,7 @@ import { identity } from 'lodash';
 import Vue from 'vue';
 import { mapActions } from 'vuex';
 import { DEFAULT_BRANCH } from '~/ide/constants';
+import * as types from '~/ide/stores/mutation_types';
 import PerformancePlugin from '~/performance/vue_performance_plugin';
 import Translate from '~/vue_shared/translate';
 import { parseBoolean } from '../lib/utils/common_utils';
@@ -10,7 +11,6 @@ import ide from './components/ide.vue';
 import { createRouter } from './ide_router';
 import { DEFAULT_THEME } from './lib/themes';
 import { createStore } from './stores';
-import * as types from '~/ide/stores/mutation_types';
 
 Vue.use(Translate);
 
