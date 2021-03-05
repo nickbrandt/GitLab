@@ -51,6 +51,15 @@ module Gitlab
             )
           end
 
+          def pushauth
+            # Returns '200 OK' on successful verification.
+            post(
+              url: url('/pushauth'),
+              headers: { 'Authorization': "Bearer #{access_token}" },
+              body: { username: user.username }.to_json
+            )
+          end
+
           def url(path)
             BASE_API_URL + path
           end
