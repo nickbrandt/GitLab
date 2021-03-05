@@ -2,18 +2,18 @@ import { GlSprintf } from '@gitlab/ui';
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import { nextTick } from 'vue';
 import Vuex from 'vuex';
-import RemoveMemberModal from 'ee/billings/seat_usage/components/remove_member_modal.vue';
+import RemoveBillableMemberModal from 'ee/billings/seat_usage/components/remove_billable_member_modal.vue';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
 
-describe('RemoveMemberModal', () => {
+describe('RemoveBillableMemberModal', () => {
   let wrapper;
 
   const defaultState = {
     namespaceName: 'foo',
     namespaceId: '1',
-    memberToRemove: {
+    billableMemberToRemove: {
       id: 2,
       username: 'username',
       name: 'First Last',
@@ -27,7 +27,7 @@ describe('RemoveMemberModal', () => {
   };
 
   const createComponent = (mountFn = shallowMount) => {
-    wrapper = mountFn(RemoveMemberModal, {
+    wrapper = mountFn(RemoveBillableMemberModal, {
       store: createStore(),
       stubs: {
         GlSprintf,
@@ -53,13 +53,13 @@ describe('RemoveMemberModal', () => {
 
     it('renders the title with username', () => {
       expect(wrapper.attributes('title')).toBe(
-        `Remove user @${defaultState.memberToRemove.username} from your subscription`,
+        `Remove user @${defaultState.billableMemberToRemove.username} from your subscription`,
       );
     });
 
     it('renders the confirmation label with username', () => {
       expect(wrapper.find('label').text()).toContain(
-        defaultState.memberToRemove.username.substring(1),
+        defaultState.billableMemberToRemove.username.substring(1),
       );
     });
   });
