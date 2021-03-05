@@ -35672,7 +35672,7 @@ msgstr ""
 msgid "manual"
 msgstr ""
 
-msgid "math|The math in this entry is taking too long to render and may not be displayed as expected. For performance reasons, math blocks are also limited to %{maxChars} characters. Consider splitting up large formulae, splitting math blocks among multiple entries, or using an image instead."
+msgid "math|Displaying this math block may cause performance issues on this page"
 msgstr ""
 
 msgid "math|There was an error rendering this math block"
