@@ -1845,7 +1845,7 @@ class Project < ApplicationRecord
     # where().update_all to perform update in the single transaction with check for null
     ProjectPagesMetadatum
       .where(project_id: id, pages_deployment_id: nil)
-      .update_all(pages_deployment_id: deployment.id)
+      .update_all(deployed: deployment.present?, pages_deployment_id: deployment&.id)
   end
 
   def write_repository_config(gl_full_path: full_path)
