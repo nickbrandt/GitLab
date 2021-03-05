@@ -1,0 +1,5 @@
+---
+title: Use URL.EscapePath() in upstream router
+merge_request:
+author:
+type: security
