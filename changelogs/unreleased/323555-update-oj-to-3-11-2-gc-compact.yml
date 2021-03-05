@@ -1,5 +1,5 @@
 ---
 title: Update OJ to 3.11.2, fix segfault from GC.compact
-merge_request:
+merge_request: 55828
 author:
 type: fixed
