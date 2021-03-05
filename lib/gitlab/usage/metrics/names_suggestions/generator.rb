@@ -5,6 +5,8 @@ module Gitlab
     module Metrics
       module NamesSuggestions
         class Generator < ::Gitlab::UsageData
+          FREE_TEXT_METRIC_NAME = "<please fill metric name>"
+
           class << self
             def generate(key_path)
               uncached_data.deep_stringify_keys.dig(*key_path.split('.'))
@@ -21,11 +23,15 @@ module Gitlab
             end
 
             def redis_usage_counter
-              "names_suggestions_for_redis_counters_are_not_supported_yet"
+              FREE_TEXT_METRIC_NAME
+            end
+
+            def alt_usage_data(*)
+              FREE_TEXT_METRIC_NAME
             end
 
             def redis_usage_data_totals(counter)
-              counter.fallback_totals.transform_values { |_| "names_suggestions_for_redis_counters_are_not_supported_yet" }
+              counter.fallback_totals.transform_values { |_| FREE_TEXT_METRIC_NAME}
             end
 
             def sum(relation, column, *rest)

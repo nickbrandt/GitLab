@@ -36,7 +36,13 @@ RSpec.describe Gitlab::Usage::Metrics::NamesSuggestions::Generator do
 
     context 'for redis metrics' do
       it 'return correct name' do
-        expect(described_class.generate('analytics_unique_visits.analytics_unique_visits_for_any_target')).to eq 'names_suggestions_for_redis_counters_are_not_supported_yet'
+        expect(described_class.generate('analytics_unique_visits.analytics_unique_visits_for_any_target')).to eq '<please fill metric name>'
+      end
+    end
+
+    context 'for alt_usage_data metrics' do
+      it 'return correct name' do
+        expect(described_class.generate('settings.operating_system')).to eq '<please fill metric name>'
       end
     end
   end
