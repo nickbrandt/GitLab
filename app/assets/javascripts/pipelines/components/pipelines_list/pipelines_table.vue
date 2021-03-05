@@ -202,11 +202,7 @@ export default {
       </template>
 
       <template #cell(pipeline)="{ item }">
-        <pipeline-url
-          class="gl-text-truncate"
-          :pipeline="item"
-          :pipeline-schedule-url="pipelineScheduleUrl"
-        />
+        <pipeline-url :pipeline="item" :pipeline-schedule-url="pipelineScheduleUrl" />
       </template>
 
       <template #cell(triggerer)="{ item }">
