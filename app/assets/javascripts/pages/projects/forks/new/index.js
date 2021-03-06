@@ -21,6 +21,10 @@ if (gon.features.forkProjectForm) {
   // eslint-disable-next-line no-new
   new Vue({
     el: mountElement,
+    provide: {
+      newGroupPath,
+      visibilityHelpPath,
+    },
     render(h) {
       return h(App, {
         props: {

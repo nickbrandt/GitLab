@@ -1,4 +1,4 @@
-- page_title _("ForkProject|Fork project")
+- page_title s_("ForkProject|Fork project")
 
 - if Feature.enabled?(:fork_project_form)
   #fork-groups-mount-element{ data: { fork_illustration: image_path('illustrations/project-create-new-sm.svg'),
@@ -15,15 +15,15 @@
   .row.gl-mt-3
     .col-lg-3
       %h4.gl-mt-0
-        = _("Fork project")
+        = s_("ForkProject|Fork project")
       %p
-        = _("A fork is a copy of a project.")
+        = s_("ForkProject|A fork is a copy of a project.")
         %br
-        = _('Forking a repository allows you to make changes without affecting the original project.')
+        = s_('ForkProject|Forking a repository allows you to make changes without affecting the original project.')
     .col-lg-9
       - if @own_namespace.present?
         .fork-thumbnail-container.js-fork-content
           %h5.gl-mt-0.gl-mb-0.gl-ml-3.gl-mr-3
-            = _("Select a namespace to fork the project")
+            = s_("ForkProject|Select a namespace to fork the project")
           = render 'fork_button', namespace: @own_namespace
       #fork-groups-mount-element{ data: { endpoint: new_project_fork_path(@project, format: :json) } }

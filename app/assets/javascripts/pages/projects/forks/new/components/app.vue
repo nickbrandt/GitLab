@@ -14,15 +14,7 @@ export default {
       type: String,
       required: true,
     },
-    newGroupPath: {
-      type: String,
-      required: true,
-    },
     projectFullPath: {
-      type: String,
-      required: true,
-    },
-    visibilityHelpPath: {
       type: String,
       required: true,
     },
@@ -68,9 +60,7 @@ export default {
     <div class="col-lg-9">
       <fork-form
         :endpoint="endpoint"
-        :new-group-path="newGroupPath"
         :project-full-path="projectFullPath"
-        :visibility-help-path="visibilityHelpPath"
         :project-id="projectId"
         :project-name="projectName"
         :project-path="projectPath"

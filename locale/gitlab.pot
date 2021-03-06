@@ -1315,9 +1315,6 @@ msgstr ""
 msgid "A file with '%{file_name}' already exists in %{branch} branch"
 msgstr ""
 
-msgid "A fork is a copy of a project."
-msgstr ""
-
 msgid "A group is a collection of several projects"
 msgstr ""
 
@@ -13306,6 +13303,9 @@ msgstr ""
 msgid "ForkProject|Select a namespace"
 msgstr ""
 
+msgid "ForkProject|Select a namespace to fork the project"
+msgstr ""
+
 msgid "ForkProject|The project can be accessed by any logged in user."
 msgstr ""
 
@@ -13322,9 +13322,6 @@ msgid "ForkedFromProjectPath|Forked from"
 msgstr ""
 
 msgid "ForkedFromProjectPath|Forked from an inaccessible project"
-msgstr ""
-
-msgid "Forking a repository allows you to make changes without affecting the original project."
 msgstr ""
 
 msgid "Forking in progress"
@@ -26877,9 +26874,6 @@ msgid "Select a group to invite"
 msgstr ""
 
 msgid "Select a label"
-msgstr ""
-
-msgid "Select a namespace to fork the project"
 msgstr ""
 
 msgid "Select a new namespace"
