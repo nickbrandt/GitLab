@@ -155,19 +155,23 @@ export function sortEmoji(items) {
   return [...items].sort((a, b) => a.score - b.score || a.fieldValue.localeCompare(b.fieldValue));
 }
 
+export const CATEGORY_NAMES = [
+  'activity',
+  'people',
+  'nature',
+  'food',
+  'travel',
+  'objects',
+  'symbols',
+  'flags',
+];
+
 let emojiCategoryMap;
 export function getEmojiCategoryMap() {
   if (!emojiCategoryMap) {
-    emojiCategoryMap = {
-      activity: [],
-      people: [],
-      nature: [],
-      food: [],
-      travel: [],
-      objects: [],
-      symbols: [],
-      flags: [],
-    };
+    emojiCategoryMap = CATEGORY_NAMES.reduce((acc, category) => {
+      return { ...acc, [category]: [] };
+    }, {});
     Object.keys(emojiMap).forEach((name) => {
       const emoji = emojiMap[name];
       if (emojiCategoryMap[emoji.c]) {

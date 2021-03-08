@@ -4534,6 +4534,9 @@ msgstr ""
 msgid "Average per day: %{average}"
 msgstr ""
 
+msgid "AwardEmoji|No emojis found."
+msgstr ""
+
 msgid "Back to page %{number}"
 msgstr ""
 
