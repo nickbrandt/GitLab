@@ -12,5 +12,9 @@ FactoryBot.define do
         participant.rotation.project.add_developer(participant.user)
       end
     end
+
+    trait :utc do
+      association :rotation, :utc, factory: :incident_management_oncall_rotation
+    end
   end
 end
