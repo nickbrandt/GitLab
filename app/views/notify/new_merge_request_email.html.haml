@@ -1,5 +1,5 @@
 %p.details
-  #{link_to @merge_request.author_name, user_url(@merge_request.author)} created a merge request:
+  #{link_to @merge_request.author_name, user_url(@merge_request.author)} created a #{link_to _("merge request"), @merge_request}:
 
 %p
   .branch
