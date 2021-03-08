@@ -22,12 +22,13 @@ module Elastic
           }
         end
 
-        # only attempt to set project permissions if associated to a project
-        # do not add the permission fields unless the `remove_permissions_data_from_notes_documents`
+        # 1. do not add the permission fields unless the `remove_permissions_data_from_notes_documents`
         # migration has completed otherwise the migration will never finish
-        if target.project && Elastic::DataMigrationService.migration_has_finished?(:remove_permissions_data_from_notes_documents)
-          data['visibility_level'] = target.project.visibility_level
-          merge_project_feature_access_level(data, noteable)
+        # 2. only attempt to set visibility data when target is searchable
+        if target.searchable? && Elastic::DataMigrationService.migration_has_finished?(:remove_permissions_data_from_notes_documents)
+          data['visibility_level'] = target.project&.visibility_level || Gitlab::VisibilityLevel::PRIVATE
+          # use noteable_type to support Commit notes where the commit is not available
+          merge_project_feature_access_level(data, target.noteable_type)
         end
 
         data.merge(generic_attributes)
@@ -35,15 +36,15 @@ module Elastic
 
       private
 
-      def merge_project_feature_access_level(data, noteable)
-        return unless noteable
+      def merge_project_feature_access_level(data, noteable_type)
+        return unless noteable_type
 
-        case noteable
-        when Snippet
+        case noteable_type
+        when 'Snippet'
           data['snippets_access_level'] = safely_read_project_feature_for_elasticsearch(:snippets)
-        when Commit
+        when 'Commit'
           data['repository_access_level'] = safely_read_project_feature_for_elasticsearch(:repository)
-        when Issue, MergeRequest
+        when 'Issue', 'MergeRequest'
           access_level_attribute = ProjectFeature.access_level_attribute(noteable)
           data[access_level_attribute.to_s] = safely_read_project_feature_for_elasticsearch(noteable)
         else

@@ -121,8 +121,8 @@ RSpec.describe Note, :elastic do
       expect(note.__elasticsearch__.as_indexed_json).to eq(expected_hash)
     end
 
-    it 'does not raise error for notes with null noteable references' do
-      note = create(:note_on_issue)
+    it 'does not raise error for notes on commits where commit is not found and noteable is null' do
+      note = create(:note_on_commit)
       allow(note).to receive(:noteable).and_return(nil)
 
       expect { note.__elasticsearch__.as_indexed_json }.not_to raise_error
@@ -150,7 +150,7 @@ RSpec.describe Note, :elastic do
       :discussion_note_on_personal_snippet        | nil                          | false
       :note_on_merge_request                      | ProjectFeature::PUBLIC       | 'merge_requests_access_level'
       :discussion_note_on_commit                  | ProjectFeature::PRIVATE      | 'repository_access_level'
-      :track_mr_picking_note                      | ProjectFeature::PUBLIC       | 'merge_requests_access_level'
+      :track_mr_picking_note                      | nil                          | false
     end
 
     with_them do
