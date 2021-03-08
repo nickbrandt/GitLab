@@ -10479,6 +10479,9 @@ msgstr ""
 msgid "Detect host keys"
 msgstr ""
 
+msgid "DevOps Adoption"
+msgstr ""
+
 msgid "DevOps Report"
 msgstr ""
 
