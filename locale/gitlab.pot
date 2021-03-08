@@ -24599,7 +24599,7 @@ msgstr ""
 msgid "PushRules|Restrict push operations for this project."
 msgstr ""
 
-msgid "PushRules|Save Push Rules"
+msgid "PushRules|Save push rules"
 msgstr ""
 
 msgid "PushRules|Select push rules"
