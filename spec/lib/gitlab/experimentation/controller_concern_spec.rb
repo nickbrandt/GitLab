@@ -523,7 +523,6 @@ RSpec.describe Gitlab::Experimentation::ControllerConcern, type: :controller do
   describe '#record_experiment_group' do
     let(:group) { 'a group object' }
     let(:experiment_key) { :some_experiment_key }
-
     let(:dnt_enabled) { false }
     let(:experiment_active) { true }
     let(:rollout_strategy) { :whatever }

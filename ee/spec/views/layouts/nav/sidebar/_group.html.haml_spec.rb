@@ -16,16 +16,20 @@ RSpec.describe 'layouts/nav/sidebar/_group' do
 
     let!(:gitlab_subscription) { create(:gitlab_subscription, :active_trial, namespace: group) }
 
+    let(:experiment_key) { :show_trial_status_in_sidebar }
     let(:show_widget) { false }
     let(:experiment_enabled) { false }
 
     before do
       allow(view).to receive(:show_trial_status_widget?).and_return(show_widget)
-      allow(view).to receive(:trial_status_widget_experiment_enabled?).and_return(experiment_enabled)
-      render
+      allow(view).to receive(:experiment_enabled?).with(experiment_key, subject: group).and_return(experiment_enabled)
+      allow(view).to receive(:record_experiment_group)
     end
 
-    subject { rendered }
+    subject do
+      render
+      rendered
+    end
 
     shared_examples 'does not render' do
       it 'does not render' do
@@ -48,15 +52,31 @@ RSpec.describe 'layouts/nav/sidebar/_group' do
       end
     end
 
+    shared_examples 'does record experiment subject' do
+      it 'records the group as an experiment subject' do
+        expect(view).to receive(:record_experiment_group).with(experiment_key, group)
+        subject
+      end
+    end
+
+    shared_examples 'does not record experiment subject' do
+      it 'does not record the group as an experiment subject' do
+        expect(view).not_to receive(:record_experiment_group)
+        subject
+      end
+    end
+
     where :show_widget, :experiment_enabled, :examples_to_include do
-      true  | true  | 'does render'
-      true  | false | 'does not render'
-      false | true  | 'does not render'
-      false | false | 'does not render'
+      true  | true  | ['does record experiment subject', 'does render']
+      true  | false | ['does record experiment subject', 'does not render']
+      false | true  | ['does not record experiment subject', 'does not render']
+      false | false | ['does not record experiment subject', 'does not render']
     end
 
     with_them do
-      include_examples(params[:examples_to_include])
+      params[:examples_to_include].each do |example_set|
+        include_examples(example_set)
+      end
     end
   end
 
