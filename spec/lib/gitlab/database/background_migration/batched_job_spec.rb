@@ -13,7 +13,7 @@ RSpec.describe Gitlab::Database::BackgroundMigration::BatchedJob, type: :model d
     let(:batched_job) { build(:batched_background_migration_job) }
     let(:batched_migration) { batched_job.batched_migration }
 
-    describe '#migration_job_class' do
+    describe '#migration_aborted?' do
       before do
         batched_migration.status = :aborted
       end
