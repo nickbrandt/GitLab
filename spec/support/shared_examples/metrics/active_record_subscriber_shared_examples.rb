@@ -99,26 +99,30 @@ RSpec.shared_examples 'record ActiveRecord metrics' do |db_role|
   end
 
   context 'when web transaction is available' do
-    let(:transaction) { double('Gitlab::Metrics::WebTransaction', increment: nil, observe: nil) }
+    let(:transaction) { double('Gitlab::Metrics::WebTransaction') }
 
     before do
       allow(::Gitlab::Metrics::WebTransaction).to receive(:current)
         .and_return(transaction)
       allow(::Gitlab::Metrics::BackgroundTransaction).to receive(:current)
         .and_return(nil)
+      allow(transaction).to receive(:increment)
+      allow(transaction).to receive(:observe)
     end
 
     it_behaves_like 'record ActiveRecord metrics in a metrics transaction', db_role
   end
 
   context 'when background transaction is available' do
-    let(:transaction) { double('Gitlab::Metrics::BackgroundTransaction', increment: nil, observe: nil) }
+    let(:transaction) { double('Gitlab::Metrics::BackgroundTransaction') }
 
     before do
       allow(::Gitlab::Metrics::WebTransaction).to receive(:current)
         .and_return(nil)
       allow(::Gitlab::Metrics::BackgroundTransaction).to receive(:current)
         .and_return(transaction)
+      allow(transaction).to receive(:increment)
+      allow(transaction).to receive(:observe)
     end
 
     it_behaves_like 'record ActiveRecord metrics in a metrics transaction', db_role
