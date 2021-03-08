@@ -3,9 +3,14 @@
 module Elastic
   module Latest
     class NoteInstanceProxy < ApplicationInstanceProxy
-      delegate :noteable, to: :target
+      delegate :noteable, :noteable_type, to: :target
 
       def as_indexed_json(options = {})
+        # notes on commits should return the commit object when `notable` is called
+        # however, `noteable` can be null when a commit has been deleted so an error is raised
+        # to alert the caller that the document should be deleted from the index
+        raise Elastic::Latest::DocumentShouldBeDeletedFromIndexError if noteable.blank? && noteable_type == 'Commit'
+
         data = {}
 
         # We don't use as_json(only: ...) because it calls all virtual and serialized attributtes
@@ -22,13 +27,12 @@ module Elastic
           }
         end
 
-        # 1. do not add the permission fields unless the `remove_permissions_data_from_notes_documents`
+        # do not add the permission fields unless the `remove_permissions_data_from_notes_documents`
         # migration has completed otherwise the migration will never finish
-        # 2. only attempt to set visibility data when target is searchable
-        if target.searchable? && Elastic::DataMigrationService.migration_has_finished?(:remove_permissions_data_from_notes_documents)
+        if Elastic::DataMigrationService.migration_has_finished?(:remove_permissions_data_from_notes_documents)
           data['visibility_level'] = target.project&.visibility_level || Gitlab::VisibilityLevel::PRIVATE
           # use noteable_type to support Commit notes where the commit is not available
-          merge_project_feature_access_level(data, target.noteable_type)
+          merge_project_feature_access_level(data)
         end
 
         data.merge(generic_attributes)
@@ -36,7 +40,7 @@ module Elastic
 
       private
 
-      def merge_project_feature_access_level(data, noteable_type)
+      def merge_project_feature_access_level(data)
         return unless noteable_type
 
         case noteable_type
