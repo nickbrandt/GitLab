@@ -277,6 +277,33 @@ RSpec.describe Security::StoreReportService, '#execute' do
         expect(Gitlab::AppLogger).to have_received(:warn).exactly(new_report.findings.length).times
       end
     end
+
+    context 'vulnerability issue link' do
+      context 'when there is no assoiciated issue feedback with finding' do
+        it 'does not insert issue links from the new pipeline' do
+          expect { subject }.to change { Vulnerabilities::IssueLink.count }.by(0)
+        end
+      end
+
+      context 'when there is an assoiciated issue feedback with finding' do
+        let(:issue) { create(:issue, project: project) }
+        let(:issue_feedback) do
+          create(
+            :vulnerability_feedback,
+            :sast,
+            :issue,
+            issue: issue,
+            project: project,
+            project_fingerprint: new_report.findings.first.project_fingerprint
+          )
+        end
+
+        it 'inserts issue links from the new pipeline' do
+          issue_feedback
+          expect { subject }.to change { Vulnerabilities::IssueLink.count }.by(1)
+        end
+      end
+    end
   end
 
   context 'with existing data from same pipeline' do
