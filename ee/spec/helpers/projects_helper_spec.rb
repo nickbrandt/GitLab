@@ -229,6 +229,7 @@ RSpec.describe ProjectsHelper do
         projects/threat_monitoring#new
         projects/threat_monitoring#edit
         projects/threat_monitoring#alert_details
+        projects/security/policies#show
         projects/audit_events#index
       ]
     end

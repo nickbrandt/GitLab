@@ -184,6 +184,7 @@ module EE
         projects/threat_monitoring#new
         projects/threat_monitoring#edit
         projects/threat_monitoring#alert_details
+        projects/security/policies#show
         projects/audit_events#index
       ]
     end
@@ -359,6 +360,10 @@ module EE
 
       if can?(current_user, :read_threat_monitoring, project)
         nav_tabs << :threat_monitoring
+      end
+
+      if can?(current_user, :security_orchestration_policies, project)
+        nav_tabs << :security_orchestration_policies
       end
 
       if show_audit_events?(project)
