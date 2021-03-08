@@ -27,6 +27,20 @@ RSpec.describe Gitlab::ApplicationContext do
     end
   end
 
+  describe '.with_raw_context' do
+    it 'yields the block' do
+      expect { |b| described_class.with_raw_context({}, &b) }.to yield_control
+    end
+
+    it 'passes the attributes unaltered on to labkit' do
+      attrs = { foo: :bar }
+
+      expect(Labkit::Context).to receive(:with_context).with(attrs)
+
+      described_class.with_raw_context(attrs) {}
+    end
+  end
+
   describe '.push' do
     it 'passes the expected context on to labkit' do
       fake_proc = duck_type(:call)
