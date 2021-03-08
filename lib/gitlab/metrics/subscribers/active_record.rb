@@ -67,11 +67,9 @@ module Gitlab
         end
 
         def observe(histogram, event)
-          # puts "web_transaction = #{web_transaction}"
           web_transaction&.observe(histogram, event.duration / 1000.0) do
             buckets DURATION_BUCKET
           end
-          # puts "background_transaction = #{background_transaction}"
           background_transaction&.observe(histogram, event.duration / 1000.0) do
             buckets DURATION_BUCKET
           end
