@@ -6,11 +6,11 @@ module Elastic
       attr_reader :record_id, :class_name
 
       def initialize(record_id, class_name)
-        @id, @class_name = record_id, class_name
+        @record_id, @class_name = record_id, class_name
       end
 
       def message
-        "#{class_name} with id #{@database_record.es_id} should be deleted from the index."
+        "#{class_name} with id #{record_id} should be deleted from the index."
       end
     end
   end
