@@ -42,7 +42,7 @@ RSpec.shared_examples 'store ActiveRecord info in RequestStore' do |db_role|
   end
 end
 
-RSpec.shared_examples 'record ActiveRecord metrics' do |db_role|
+RSpec.shared_examples 'record ActiveRecord metrics in a metrics transaction' do |db_role|
   it 'increments only db counters' do
     if record_query
       expect(transaction).to receive(:increment).with(:gitlab_transaction_db_count_total, 1)
@@ -78,5 +78,49 @@ RSpec.shared_examples 'record ActiveRecord metrics' do |db_role|
     end
 
     subscriber.sql(event)
+  end
+end
+
+RSpec.shared_examples 'record ActiveRecord metrics' do |db_role|
+  context 'when both web and background transaction are available' do
+    before do
+      allow(::Gitlab::Metrics::WebTransaction).to receive(:current)
+        .and_return(nil)
+      allow(::Gitlab::Metrics::BackgroundTransaction).to receive(:current)
+        .and_return(nil)
+    end
+
+    it 'does not capture the metrics' do
+      expect_any_instance_of(Gitlab::Metrics::Transaction).not_to receive(:increment) # rubocop:disable RSpec/AnyInstanceOf
+      expect_any_instance_of(Gitlab::Metrics::Transaction).not_to receive(:observe) # rubocop:disable RSpec/AnyInstanceOf
+
+      subscriber.sql(event)
+    end
+  end
+
+  context 'when web transaction is available' do
+    let(:transaction) { double('Gitlab::Metrics::WebTransaction', increment: nil, observe: nil) }
+
+    before do
+      allow(::Gitlab::Metrics::WebTransaction).to receive(:current)
+        .and_return(transaction)
+      allow(::Gitlab::Metrics::BackgroundTransaction).to receive(:current)
+        .and_return(nil)
+    end
+
+    it_behaves_like 'record ActiveRecord metrics in a metrics transaction', db_role
+  end
+
+  context 'when background transaction is available' do
+    let(:transaction) { double('Gitlab::Metrics::BackgroundTransaction', increment: nil, observe: nil) }
+
+    before do
+      allow(::Gitlab::Metrics::WebTransaction).to receive(:current)
+        .and_return(nil)
+      allow(::Gitlab::Metrics::BackgroundTransaction).to receive(:current)
+        .and_return(transaction)
+    end
+
+    it_behaves_like 'record ActiveRecord metrics in a metrics transaction', db_role
   end
 end
