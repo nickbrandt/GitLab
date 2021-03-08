@@ -233,4 +233,132 @@ RSpec.describe Gitlab::SubscriptionPortal::Client do
       end
     end
   end
+
+  describe '#plan_data' do
+    let(:plan_tags) { 'CI_1000_MINUTES_PLAN' }
+    let(:headers) do
+      {
+        "Accept" => "application/json",
+        "Content-Type" => "application/json",
+        "X-Admin-Email" => "gl_com_api@gitlab.com",
+        "X-Admin-Token" => "customer_admin_token"
+      }
+    end
+
+    let(:params) do
+      { query: <<~GQL
+        {
+          plans(planTags: {:plan_tags=>\"#{plan_tags}\"}) {
+            id,
+            name,
+            code,
+            active,
+            deprecated,
+            free,
+            pricePerMonth,
+            pricePerYear,
+            features,
+            aboutPageHref,
+            hideDeprecatedCard,
+          }
+        }
+      GQL
+      }
+    end
+
+    subject(:plan_data) { described_class.plan_data(plan_tags: plan_tags) }
+
+    context 'when the response contains errors' do
+      before do
+        expect(described_class).to receive(:http_post).with('graphql', headers, params).and_return(response)
+      end
+
+      let(:response) do
+        {
+          success: true,
+          data: {
+            'errors' => [{ 'message' => 'this will be ignored' }]
+          }
+        }
+      end
+
+      it 'returns a failure' do
+        expect(plan_data).to eq({ success: false })
+      end
+    end
+
+    context 'when the response does not contain errors' do
+      using RSpec::Parameterized::TableSyntax
+
+      where(:name, :code, :active, :deprecated, :free, :price_per_month, :price_per_year, :features, :about_page_href, :hide_deprecated_card) do
+        '1000 CI minutes pack' | 'ci_minutes' | true | false | false | 1.0 | 12.0 | [] | '/about' | false
+        nil | 'ci_minutes' | true | false | false | 1.0 | 12.0 | [] | '/about' | false
+        '1000 CI minutes pack' | nil | true | false | false | 1.0 | 12.0 | [] | '/about' | false
+        '1000 CI minutes pack' | 'ci_minutes' | false | false | false | 1.0 | 12.0 | [] | '/about' | false
+        '1000 CI minutes pack' | 'ci_minutes' | true | true | false | 1.0 | 12.0 | [] | '/about' | false
+        '1000 CI minutes pack' | 'ci_minutes' | true | false | true | 1.0 | 12.0 | [] | '/about' | false
+        '1000 CI minutes pack' | 'ci_minutes' | true | false | true | 0.83 | 10.0 | [] | '/about' | false
+        '1000 CI minutes pack' | 'ci_minutes' | nil | true | false | 1.0 | 12.0 | [] | '/about' | false
+        '1000 CI minutes pack' | 'ci_minutes' | true | nil | true | 1.0 | 12.0 | [] | '/about' | false
+        '1000 CI minutes pack' | 'ci_minutes' | true | false | nil | 0.83 | 10.0 | [] | '/about' | false
+        '1000 CI minutes pack' | 'ci_minutes' | true | false | true | 0.83 | 10.0 | ['feature_1'] | '/about' | false
+        '1000 CI minutes pack' | 'ci_minutes' | true | false | false | 1.0 | 12.0 | [] | nil | false
+        '1000 CI minutes pack' | 'ci_minutes' | true | false | false | 1.0 | 12.0 | [] | '/about' | true
+      end
+
+      with_them do
+        before do
+          allow(described_class).to receive(:http_post).and_return({
+              success: true,
+              data: { "data" => { "plans" => [{
+                "name" => name,
+                "code" => code,
+                "active" => active,
+                "deprecated" => deprecated,
+                "free" => free,
+                "pricePerMonth" => price_per_month,
+                "pricePerYear" => price_per_year,
+                "features" => features,
+                "aboutPageHref" => about_page_href,
+                "hideDeprecatedCard" => hide_deprecated_card
+                }] } }
+          })
+        end
+
+        it 'returns the correct response' do
+          expect(plan_data).to eq({
+            success: true,
+            plans: [{
+              name: name,
+              code: code,
+              active: active == true,
+              deprecated: deprecated == true,
+              free: free == true,
+              price_per_month: price_per_month,
+              price_per_year: price_per_year,
+              features: features,
+              about_page_href: about_page_href,
+              hide_deprecated_card: hide_deprecated_card
+            }]
+          })
+        end
+      end
+
+      context 'when plans is nil' do
+        before do
+          allow(described_class).to receive(:http_post).and_return({
+            success: true,
+            data: { "data" => { "plans" => nil } }
+          })
+        end
+
+        it 'returns the correct response' do
+          expect(plan_data).to eq({
+            success: true,
+            plans: nil
+          })
+        end
+      end
+    end
+  end
 end
