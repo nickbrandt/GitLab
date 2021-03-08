@@ -6,7 +6,7 @@ RSpec.describe Gitlab::Metrics::Subscribers::ActiveRecord do
   using RSpec::Parameterized::TableSyntax
 
   let(:env) { {} }
-  let(:subscriber)  { described_class.new }
+  let(:subscriber) { described_class.new }
   let(:connection) { double(:connection) }
   let(:payload) { { sql: 'SELECT * FROM users WHERE id = 10', connection: connection } }
 
