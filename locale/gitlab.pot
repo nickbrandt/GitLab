@@ -21611,9 +21611,6 @@ msgstr ""
 msgid "PackageRegistry|Maven Command"
 msgstr ""
 
-msgid "PackageRegistry|Maven XML"
-msgstr ""
-
 msgid "PackageRegistry|NuGet"
 msgstr ""
 
@@ -21648,6 +21645,9 @@ msgid "PackageRegistry|PyPI"
 msgstr ""
 
 msgid "PackageRegistry|Recipe: %{recipe}"
+msgstr ""
+
+msgid "PackageRegistry|Registry setup"
 msgstr ""
 
 msgid "PackageRegistry|Remove package"
