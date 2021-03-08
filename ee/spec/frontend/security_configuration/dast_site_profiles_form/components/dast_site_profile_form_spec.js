@@ -1,4 +1,4 @@
-import { GlForm, GlModal } from '@gitlab/ui';
+import { GlForm, GlFormGroup, GlModal } from '@gitlab/ui';
 import { within } from '@testing-library/dom';
 import { createLocalVue, mount, shallowMount } from '@vue/test-utils';
 import merge from 'lodash/merge';
@@ -8,7 +8,7 @@ import DastSiteAuthSection from 'ee/security_configuration/dast_site_profiles_fo
 import DastSiteProfileForm from 'ee/security_configuration/dast_site_profiles_form/components/dast_site_profile_form.vue';
 import dastSiteProfileCreateMutation from 'ee/security_configuration/dast_site_profiles_form/graphql/dast_site_profile_create.mutation.graphql';
 import dastSiteProfileUpdateMutation from 'ee/security_configuration/dast_site_profiles_form/graphql/dast_site_profile_update.mutation.graphql';
-import { siteProfiles } from 'ee_jest/on_demand_scans/mocks/mock_data';
+import { siteProfiles, policySiteProfile } from 'ee_jest/on_demand_scans/mocks/mock_data';
 import * as responses from 'ee_jest/security_configuration/dast_site_profiles_form/mock_data/apollo_mock';
 import { TEST_HOST } from 'helpers/test_constants';
 import { extendedWrapper } from 'helpers/vue_test_utils_helper';
@@ -46,6 +46,7 @@ describe('DastSiteProfileForm', () => {
   const withinComponent = () => within(wrapper.element);
 
   const findForm = () => wrapper.findComponent(GlForm);
+  const findAllFormGroups = () => wrapper.findAllComponents(GlFormGroup);
   const findAuthSection = () => wrapper.findComponent(DastSiteAuthSection);
   const findCancelModal = () => wrapper.findComponent(GlModal);
   const findByNameAttribute = (name) => wrapper.find(`[name="${name}"]`);
@@ -57,6 +58,7 @@ describe('DastSiteProfileForm', () => {
   const findSubmitButton = () => wrapper.findByTestId('dast-site-profile-form-submit-button');
   const findCancelButton = () => wrapper.findByTestId('dast-site-profile-form-cancel-button');
   const findAlert = () => wrapper.findByTestId('dast-site-profile-form-alert');
+  const findPolicyAlert = () => wrapper.findByTestId('dast-policy-site-profile-form-alert');
   const submitForm = () => findForm().vm.$emit('submit', { preventDefault: () => {} });
 
   const setFieldValue = async (field, value) => {
@@ -331,6 +333,52 @@ describe('DastSiteProfileForm', () => {
       expect(findAuthSection().exists()).toBe(false);
       expect(findExcludedUrlsInput().exists()).toBe(false);
       expect(findRequestHeadersInput().exists()).toBe(false);
+    });
+  });
+
+  describe('when profile does not come from a policy', () => {
+    beforeEach(() => {
+      createComponent({
+        propsData: {
+          siteProfile: siteProfileOne,
+        },
+      });
+    });
+
+    it('should enable all form groups', () => {
+      const formGroups = findAllFormGroups();
+      for (let i = 0; i < formGroups.length; i += 1) {
+        expect(formGroups.at(i).attributes('disabled')).toBe(undefined);
+      }
+    });
+
+    it('should show the policy profile alert', () => {
+      expect(findPolicyAlert().exists()).toBe(false);
+    });
+  });
+
+  describe('when profile does comes from a policy', () => {
+    beforeEach(() => {
+      createComponent({
+        propsData: {
+          siteProfile: policySiteProfile,
+        },
+      });
+    });
+
+    it('should show the policy profile alert', () => {
+      expect(findPolicyAlert().exists()).toBe(true);
+    });
+
+    it('should disable all form groups', () => {
+      const formGroups = findAllFormGroups();
+      for (let i = 0; i < formGroups.length; i += 1) {
+        expect(formGroups.at(i).attributes('disabled')).toBe('true');
+      }
+    });
+
+    it('should disable the save button', () => {
+      expect(findSubmitButton().props('disabled')).toBe(true);
     });
   });
 });

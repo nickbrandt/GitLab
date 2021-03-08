@@ -114,18 +114,18 @@ export default {
 
       return [...dataFields, ...staticFields];
     },
-    isPolicyProfile() {
-      return true;
-    },
-    deleteTitle() {
-      return this.isPolicyProfile
+  },
+  methods: {
+    deleteTitle(item) {
+      return this.isPolicyProfile(item)
         ? s__('DastProfiles|This profile is currently being used in a policy.')
         : s__('DastProfiles|Delete profile');
     },
-  },
-  methods: {
     handleDelete() {
       this.$emit('delete-profile', this.toBeDeletedProfileId);
+    },
+    isPolicyProfile(item) {
+      return Boolean(item?.referencedInSecurityPolicies?.length);
     },
     prepareProfileDeletion(profileId) {
       this.toBeDeletedProfileId = profileId;
@@ -207,20 +207,20 @@ export default {
               </gl-dropdown-item>
 
               <gl-dropdown-item
-                v-gl-tooltip.viewport
+                v-gl-tooltip="{ boundary: 'viewport', disabled: !isPolicyProfile(item) }"
                 boundary="viewport"
                 :class="{
-                  'gl-cursor-default': isPolicyProfile,
+                  'gl-cursor-default': isPolicyProfile(item),
                 }"
-                :disabled="isPolicyProfile"
-                :aria-disabled="isPolicyProfile"
+                :disabled="isPolicyProfile(item)"
+                :aria-disabled="isPolicyProfile(item)"
                 variant="danger"
-                :title="deleteTitle"
+                :title="deleteTitle(item)"
                 @click="prepareProfileDeletion(item.id)"
               >
                 <span
                   :class="{
-                    'gl-text-gray-200!': isPolicyProfile,
+                    'gl-text-gray-200!': isPolicyProfile(item),
                   }"
                 >
                   {{ __('Delete') }}
@@ -236,15 +236,20 @@ export default {
             >
               {{ __('Edit') }}
             </gl-button>
-            <span v-gl-tooltip.hover.focus :title="deleteTitle">
+            <span
+              v-gl-tooltip.hover.focus
+              :title="deleteTitle(item)"
+              data-testid="dast-profile-delete-tooltip"
+            >
               <gl-button
                 category="tertiary"
                 icon="remove"
                 variant="danger"
                 size="small"
                 class="gl-mx-3 gl-my-1 gl-md-display-none"
-                :disabled="isPolicyProfile"
-                :aria-disabled="isPolicyProfile"
+                data-testid="dast-profile-delete-button"
+                :disabled="isPolicyProfile(item)"
+                :aria-disabled="isPolicyProfile(item)"
                 @click="prepareProfileDeletion(item.id)"
               />
             </span>

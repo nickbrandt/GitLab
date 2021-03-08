@@ -141,7 +141,7 @@ export default {
       return !isEqual(serializeFormObject(this.form.fields), this.initialFormValues);
     },
     isPolicyProfile() {
-      return true;
+      return Boolean(this.siteProfile?.referencedInSecurityPolicies?.length);
     },
   },
   async mounted() {
@@ -247,11 +247,17 @@ export default {
       {{ i18n.title }}
     </h2>
 
-    <gl-alert v-if="isPolicyProfile" variant="info" class="gl-mb-5" :dismissible="false">
+    <gl-alert
+      v-if="isPolicyProfile"
+      data-testid="dast-policy-site-profile-form-alert"
+      variant="info"
+      class="gl-mb-5"
+      :dismissible="false"
+    >
       {{
         sprintf(
           s__(
-            'DastProfiles|This site profile is currently being used by a policy. To make edits you must it from the active policy.',
+            'DastProfiles|This site profile is currently being used by a policy. To make edits you must remove it from the active policy.',
           ),
           { profileName: form.fields.profileName.value },
         )
@@ -364,7 +370,7 @@ export default {
     <dast-site-auth-section
       v-if="glFeatures.securityDastSiteProfilesAdditionalFields"
       v-model="authSection"
-      :is-policy-profile="isPolicyProfile"
+      :disabled="isPolicyProfile"
       :show-validation="form.showValidation"
     />
 

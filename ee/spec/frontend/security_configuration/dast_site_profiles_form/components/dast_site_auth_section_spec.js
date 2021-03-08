@@ -1,15 +1,16 @@
-import { GlFormCheckbox } from '@gitlab/ui';
-import { mount } from '@vue/test-utils';
+import { GlFormCheckbox, GlFormGroup } from '@gitlab/ui';
+import { mount, shallowMount } from '@vue/test-utils';
 import DastSiteAuthSection from 'ee/security_configuration/dast_site_profiles_form/components/dast_site_auth_section.vue';
 import { extendedWrapper } from 'helpers/vue_test_utils_helper';
 
 describe('DastSiteAuthSection', () => {
   let wrapper;
 
-  const createComponent = ({ fields = {} } = {}) => {
+  const createComponent = ({ mountFn = mount, fields = {}, disabled = false } = {}) => {
     wrapper = extendedWrapper(
-      mount(DastSiteAuthSection, {
+      mountFn(DastSiteAuthSection, {
         propsData: {
+          disabled,
           value: { fields },
         },
       }),
@@ -24,6 +25,7 @@ describe('DastSiteAuthSection', () => {
     wrapper.destroy();
   });
 
+  const findAllFormGroups = () => wrapper.findAllComponents(GlFormGroup);
   const findByNameAttribute = (name) => wrapper.find(`[name="${name}"]`);
   const findAuthForm = () => wrapper.findByTestId('auth-form');
   const findAuthCheckbox = () => wrapper.find(GlFormCheckbox);
@@ -113,6 +115,26 @@ describe('DastSiteAuthSection', () => {
         });
 
         expect(getLatestInputEventPayload().state).toBe(true);
+      });
+    });
+
+    describe('when profile does not come from a policy', () => {
+      it('should enable all form groups', () => {
+        createComponent({ mountFn: shallowMount, fields: { enabled: true } });
+        const formGroups = findAllFormGroups();
+        for (let i = 0; i < formGroups.length; i += 1) {
+          expect(formGroups.at(i).attributes('disabled')).toBe(undefined);
+        }
+      });
+    });
+
+    describe('when profile does comes from a policy', () => {
+      it('should disable all form groups', () => {
+        createComponent({ mountFn: shallowMount, disabled: true, fields: { enabled: true } });
+        const formGroups = findAllFormGroups();
+        for (let i = 0; i < formGroups.length; i += 1) {
+          expect(formGroups.at(i).attributes('disabled')).toBe('true');
+        }
       });
     });
   });

@@ -153,7 +153,7 @@ export default {
       return this.formHasErrors || this.requiredFieldEmpty || this.isPolicyProfile;
     },
     isPolicyProfile() {
-      return true;
+      return Boolean(this.profile?.referencedInSecurityPolicies?.length);
     },
   },
 
@@ -247,7 +247,13 @@ export default {
   <gl-form @submit.prevent="onSubmit">
     <h2 class="gl-mb-6">{{ i18n.title }}</h2>
 
-    <gl-alert v-if="isPolicyProfile" variant="info" class="gl-mb-5" :dismissible="false">
+    <gl-alert
+      v-if="isPolicyProfile"
+      data-testid="dast-policy-scanner-profile-alert"
+      variant="info"
+      class="gl-mb-5"
+      :dismissible="false"
+    >
       {{
         sprintf(
           s__(
@@ -258,7 +264,13 @@ export default {
       }}
     </gl-alert>
 
-    <gl-alert v-if="showAlert" variant="danger" class="gl-mb-5" @dismiss="hideErrors">
+    <gl-alert
+      v-if="showAlert"
+      data-testid="dast-scanner-profile-alert"
+      variant="danger"
+      class="gl-mb-5"
+      @dismiss="hideErrors"
+    >
       {{ s__('DastProfiles|Could not create the scanner profile. Please try again.') }}
       <ul v-if="errors.length" class="gl-mt-3 gl-mb-0">
         <li v-for="error in errors" :key="error" v-text="error"></li>

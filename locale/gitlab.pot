@@ -9643,7 +9643,7 @@ msgstr ""
 msgid "DastProfiles|This scanner profile is currently being used by a policy. To make edits you must remove it from the active policy."
 msgstr ""
 
-msgid "DastProfiles|This site profile is currently being used by a policy. To make edits you must it from the active policy."
+msgid "DastProfiles|This site profile is currently being used by a policy. To make edits you must remove it from the active policy."
 msgstr ""
 
 msgid "DastProfiles|Turn on AJAX spider"
