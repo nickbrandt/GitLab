@@ -35761,9 +35761,6 @@ msgstr ""
 msgid "mrWidget|Fork project merge requests do not create merge request pipelines that validate a post merge result unless invoked by a project member."
 msgstr ""
 
-msgid "mrWidget|If the %{branch} branch exists in your local repository, you can merge this merge request manually using the"
-msgstr ""
-
 msgid "mrWidget|If the %{missingBranchName} branch exists in your local repository, you can merge this merge request manually using the command line"
 msgstr ""
 
@@ -35914,16 +35911,10 @@ msgstr ""
 msgid "mrWidget|You can merge after removing denied licenses"
 msgstr ""
 
-msgid "mrWidget|You can merge this merge request manually using the"
-msgstr ""
-
 msgid "mrWidget|Your password"
 msgstr ""
 
 msgid "mrWidget|branch does not exist."
-msgstr ""
-
-msgid "mrWidget|command line"
 msgstr ""
 
 msgid "mrWidget|into"
