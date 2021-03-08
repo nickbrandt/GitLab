@@ -9,7 +9,7 @@ module Elastic
         # notes on commits should return the commit object when `notable` is called
         # however, `noteable` can be null when a commit has been deleted so an error is raised
         # to alert the caller that the document should be deleted from the index
-        raise Elastic::Latest::DocumentShouldBeDeletedFromIndexError if noteable.blank? && noteable_type == 'Commit'
+        raise Elastic::Latest::DocumentShouldBeDeletedFromIndexError.new(target.id, target.class.name) if noteable.blank? && noteable_type == 'Commit'
 
         data = {}
 
