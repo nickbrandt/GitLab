@@ -178,6 +178,6 @@ DRIs:
 |------------------------------|------------------------|
 | Leadership                   | Darva Satcher          |
 | Product                      | Patrick Deuley         |
-| Engineering                  |                        |
+| Engineering                  | Paul Slaughter         |
 
 <!-- vale gitlab.Spelling = YES -->
