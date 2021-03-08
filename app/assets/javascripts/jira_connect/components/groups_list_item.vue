@@ -36,7 +36,7 @@ export default {
           persistAlert({
             title: s__('Integrations|Namespace successfully linked'),
             message: s__(
-              'You should now see GitLab.com activity inside your Jira Cloud issues. %{linkStart}Learn more%{linkEnd}',
+              'Integrations|You should now see GitLab.com activity inside your Jira Cloud issues. %{linkStart}Learn more%{linkEnd}',
             ),
             linkUrl: helpPagePath('integration/jira_development_panel.html', { anchor: 'usage' }),
             variant: 'success',

@@ -41,17 +41,8 @@ export default {
 
       return this.usersPath;
     },
-    alertLinkUrl() {
-      return this.alert?.linkUrl;
-    },
-    alertTitle() {
-      return this.alert?.title;
-    },
-    alertMessage() {
-      return this.alert?.message;
-    },
-    alertVariant() {
-      return this.alert?.variant;
+    shouldShowAlert() {
+      return Boolean(this.alert?.message);
     },
   },
   modal: {
@@ -81,20 +72,20 @@ export default {
 <template>
   <div>
     <gl-alert
-      v-if="alertMessage"
+      v-if="shouldShowAlert"
       class="gl-mb-7"
-      :variant="alertVariant"
-      :title="alertTitle"
+      :variant="alert.variant"
+      :title="alert.title"
       @dismiss="setAlert"
     >
-      <gl-sprintf v-if="alertLinkUrl" :message="alertMessage">
+      <gl-sprintf v-if="alert.linkUrl" :message="alert.message">
         <template #link="{ content }">
-          <gl-link :href="alertLinkUrl" target="_blank">{{ content }}</gl-link>
+          <gl-link :href="alert.linkUrl" target="_blank">{{ content }}</gl-link>
         </template>
       </gl-sprintf>
 
       <template v-else>
-        {{ alertMessage }}
+        {{ alert.message }}
       </template>
     </gl-alert>
 
