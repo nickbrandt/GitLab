@@ -1,6 +1,5 @@
 # frozen_string_literal: true
-
-class FetchSubscriptionPlansService
+class GitlabSubscriptions::FetchSubscriptionPlansService
   URL = "#{EE::SUBSCRIPTIONS_URL}/gitlab_plans".freeze
 
   def initialize(plan:, namespace_id: nil)
