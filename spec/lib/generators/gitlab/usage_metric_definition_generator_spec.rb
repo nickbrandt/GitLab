@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'generator_helper'
-require 'rails/generators/testing/behaviour'
 
 RSpec.describe Gitlab::UsageMetricDefinitionGenerator do
   describe 'Validation' do
