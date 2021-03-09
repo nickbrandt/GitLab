@@ -97,13 +97,14 @@ RSpec.describe Security::PipelineVulnerabilitiesFinder do
             project_fingerprint: report_finding.project_fingerprint)
         end
 
-        dep_scan_queries = ActiveRecord::QueryRecorder.new do
-          described_class.new(pipeline: pipeline, params: { report_type: %w[dependency_scanning] }).execute
-        end.count
+        # there's something being cached... need to run this once to get rid of that
+        described_class.new(pipeline: pipeline, params: { report_type: %w[dependency_scanning] }).execute
 
-        expect do
+        expect {
+          described_class.new(pipeline: pipeline, params: { report_type: %w[dependency_scanning] }).execute
+        }.to issue_same_number_of_queries_as {
           described_class.new(pipeline: pipeline, params: { report_type: %w[sast] }).execute
-        end.not_to exceed_query_limit(dep_scan_queries)
+        }
       end
     end
 
