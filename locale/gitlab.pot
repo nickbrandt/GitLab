@@ -14290,6 +14290,9 @@ msgstr ""
 msgid "Geo|Data replication lag"
 msgstr ""
 
+msgid "Geo|Data type"
+msgstr ""
+
 msgid "Geo|Discover GitLab Geo"
 msgstr ""
 
@@ -14309,6 +14312,9 @@ msgid "Geo|Geo nodes are paused using a command run on the node"
 msgstr ""
 
 msgid "Geo|Geo sites"
+msgstr ""
+
+msgid "Geo|Git"
 msgstr ""
 
 msgid "Geo|Go to the primary site"
@@ -14419,9 +14425,6 @@ msgstr ""
 msgid "Geo|Replication Details"
 msgstr ""
 
-msgid "Geo|Replication counts"
-msgstr ""
-
 msgid "Geo|Replication details"
 msgstr ""
 
@@ -14476,6 +14479,9 @@ msgstr ""
 msgid "Geo|Synced at"
 msgstr ""
 
+msgid "Geo|Synchronization"
+msgstr ""
+
 msgid "Geo|Synchronization failed - %{error}"
 msgstr ""
 
@@ -14513,6 +14519,9 @@ msgid "Geo|Undefined"
 msgstr ""
 
 msgid "Geo|Unknown state"
+msgstr ""
+
+msgid "Geo|Verification"
 msgstr ""
 
 msgid "Geo|Verification failed - %{error}"
@@ -14867,6 +14876,9 @@ msgid "Gitpod|Gitpod URL"
 msgstr ""
 
 msgid "Gitpod|e.g. https://gitpod.example.com"
+msgstr ""
+
+msgid "Git|File"
 msgstr ""
 
 msgid "Given access %{time_ago}"
