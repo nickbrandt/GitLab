@@ -1,14 +1,19 @@
 /* global List */
 
-import { mount } from '@vue/test-utils';
+import { mount, createLocalVue } from '@vue/test-utils';
 import MockAdapter from 'axios-mock-adapter';
 import Vue from 'vue';
+import Vuex from 'vuex';
 import boardNewIssue from '~/boards/components/board_new_issue_deprecated.vue';
 import boardsStore from '~/boards/stores/boards_store';
 import axios from '~/lib/utils/axios_utils';
 
 import '~/boards/models/list';
 import { listObj, boardsMockInterceptor } from './mock_data';
+
+const localVue = createLocalVue();
+
+localVue.use(Vuex);
 
 describe('Issue boards new issue form', () => {
   let wrapper;
@@ -43,11 +48,17 @@ describe('Issue boards new issue form', () => {
     newIssueMock = Promise.resolve(promiseReturn);
     jest.spyOn(list, 'newIssue').mockImplementation(() => newIssueMock);
 
+    const store = new Vuex.Store({
+      getters: { isGroupBoard: () => false },
+    });
+
     wrapper = mount(BoardNewIssueComp, {
       propsData: {
         disabled: false,
         list,
       },
+      store,
+      localVue,
       provide: {
         groupId: null,
       },
