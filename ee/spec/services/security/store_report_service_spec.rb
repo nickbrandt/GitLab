@@ -285,9 +285,9 @@ RSpec.describe Security::StoreReportService, '#execute' do
         end
       end
 
-      context 'when there is an assoiciated issue feedback with finding' do
+      context 'when there is an associated issue feedback with finding' do
         let(:issue) { create(:issue, project: project) }
-        let(:issue_feedback) do
+        let!(:issue_feedback) do
           create(
             :vulnerability_feedback,
             :sast,
@@ -299,8 +299,21 @@ RSpec.describe Security::StoreReportService, '#execute' do
         end
 
         it 'inserts issue links from the new pipeline' do
-          issue_feedback
           expect { subject }.to change { Vulnerabilities::IssueLink.count }.by(1)
+        end
+
+        it 'the issue link is valid' do
+          subject
+
+          finding = Vulnerabilities::Finding.find_by(uuid: new_report.findings.first.uuid)
+          vulnerability_id = finding.vulnerability_id
+          issue_id = issue.id
+          issue_link = Vulnerabilities::IssueLink.find_by(
+            vulnerability_id: vulnerability_id,
+            issue_id: issue_id
+          )
+
+          expect(issue_link).not_to be_nil
         end
       end
     end
