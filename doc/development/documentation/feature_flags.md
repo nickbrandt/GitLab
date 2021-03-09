@@ -14,8 +14,9 @@ feature flag depends on its state (enabled or disabled). When the state
 changes, the developer who made the change **must update the documentation**
 accordingly.
 
-Every feature introduced to the codebase, even if it's behind a feature flag, must be documented.
-For context, see the [latest merge request that updated this guideline](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/47917#note_459984428).
+Every feature introduced to the codebase, even if it's behind a feature flag,
+must be documented. For context, see the
+[latest merge request that updated this guideline](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/47917#note_459984428).
 
 ## Criteria
 
