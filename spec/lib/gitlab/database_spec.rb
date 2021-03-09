@@ -459,7 +459,7 @@ RSpec.describe Gitlab::Database do
       events
     end
 
-    context 'without a tranastion block' do
+    context 'without a transaction block' do
       it 'does not publish a transaction event' do
         events = subscribe_events do
           User.first

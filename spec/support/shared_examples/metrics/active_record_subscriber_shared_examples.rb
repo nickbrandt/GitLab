@@ -83,16 +83,23 @@ end
 
 RSpec.shared_examples 'record ActiveRecord metrics' do |db_role|
   context 'when both web and background transaction are available' do
+    let(:transaction) { double('Gitlab::Metrics::WebTransaction') }
+    let(:background_transaction) { double('Gitlab::Metrics::WebTransaction') }
+
     before do
       allow(::Gitlab::Metrics::WebTransaction).to receive(:current)
-        .and_return(nil)
+        .and_return(transaction)
       allow(::Gitlab::Metrics::BackgroundTransaction).to receive(:current)
-        .and_return(nil)
+        .and_return(background_transaction)
+      allow(transaction).to receive(:increment)
+      allow(transaction).to receive(:observe)
     end
 
-    it 'does not capture the metrics' do
-      expect_any_instance_of(Gitlab::Metrics::Transaction).not_to receive(:increment) # rubocop:disable RSpec/AnyInstanceOf
-      expect_any_instance_of(Gitlab::Metrics::Transaction).not_to receive(:observe) # rubocop:disable RSpec/AnyInstanceOf
+    it_behaves_like 'record ActiveRecord metrics in a metrics transaction', db_role
+
+    it 'captures the metrics for web only' do
+      expect(background_transaction).not_to receive(:observe)
+      expect(background_transaction).not_to receive(:increment)
 
       subscriber.sql(event)
     end

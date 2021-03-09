@@ -3,7 +3,7 @@
 module Gitlab
   module Metrics
     class BackgroundTransaction < Transaction
-      # Separate web transaction instance and web transaction instance
+      # Separate web transaction instance and background transaction instance
       BACKGROUND_THREAD_KEY = :_gitlab_metrics_background_transaction
       BACKGROUND_BASE_LABEL_KEYS = %i(endpoint_id feature_category).freeze
 
@@ -33,9 +33,7 @@ module Gitlab
       end
 
       def labels
-        return @labels if @labels
-
-        @labels = {
+        @labels ||= {
           endpoint_id: current_context&.get_attribute(:caller_id),
           feature_category: current_context&.get_attribute(:feature_category)
         }

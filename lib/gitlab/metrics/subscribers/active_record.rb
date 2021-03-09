@@ -61,27 +61,19 @@ module Gitlab
         end
 
         def increment(counter)
-          web_transaction&.increment("gitlab_transaction_#{counter}_total".to_sym, 1)
-          background_transaction&.increment("gitlab_transaction_#{counter}_total".to_sym, 1)
+          current_transaction&.increment("gitlab_transaction_#{counter}_total".to_sym, 1)
 
           Gitlab::SafeRequestStore[counter] = Gitlab::SafeRequestStore[counter].to_i + 1
         end
 
         def observe(histogram, event)
-          web_transaction&.observe(histogram, event.duration / 1000.0) do
-            buckets DURATION_BUCKET
-          end
-          background_transaction&.observe(histogram, event.duration / 1000.0) do
+          current_transaction&.observe(histogram, event.duration / 1000.0) do
             buckets DURATION_BUCKET
           end
         end
 
-        def web_transaction
-          ::Gitlab::Metrics::WebTransaction.current
-        end
-
-        def background_transaction
-          ::Gitlab::Metrics::BackgroundTransaction.current
+        def current_transaction
+          ::Gitlab::Metrics::WebTransaction.current || ::Gitlab::Metrics::BackgroundTransaction.current
         end
       end
     end
