@@ -290,20 +290,21 @@ RSpec.describe Gitlab::SubscriptionPortal::Client do
     context 'when the response does not contain errors' do
       using RSpec::Parameterized::TableSyntax
 
-      where(:name, :code, :active, :deprecated, :free, :price_per_month, :price_per_year, :features, :about_page_href, :hide_deprecated_card) do
-        '1000 CI minutes pack' | 'ci_minutes' | true | false | false | 1.0 | 12.0 | [] | '/about' | false
-        nil | 'ci_minutes' | true | false | false | 1.0 | 12.0 | [] | '/about' | false
-        '1000 CI minutes pack' | nil | true | false | false | 1.0 | 12.0 | [] | '/about' | false
-        '1000 CI minutes pack' | 'ci_minutes' | false | false | false | 1.0 | 12.0 | [] | '/about' | false
-        '1000 CI minutes pack' | 'ci_minutes' | true | true | false | 1.0 | 12.0 | [] | '/about' | false
-        '1000 CI minutes pack' | 'ci_minutes' | true | false | true | 1.0 | 12.0 | [] | '/about' | false
-        '1000 CI minutes pack' | 'ci_minutes' | true | false | true | 0.83 | 10.0 | [] | '/about' | false
-        '1000 CI minutes pack' | 'ci_minutes' | nil | true | false | 1.0 | 12.0 | [] | '/about' | false
-        '1000 CI minutes pack' | 'ci_minutes' | true | nil | true | 1.0 | 12.0 | [] | '/about' | false
-        '1000 CI minutes pack' | 'ci_minutes' | true | false | nil | 0.83 | 10.0 | [] | '/about' | false
-        '1000 CI minutes pack' | 'ci_minutes' | true | false | true | 0.83 | 10.0 | ['feature_1'] | '/about' | false
-        '1000 CI minutes pack' | 'ci_minutes' | true | false | false | 1.0 | 12.0 | [] | nil | false
-        '1000 CI minutes pack' | 'ci_minutes' | true | false | false | 1.0 | 12.0 | [] | '/about' | true
+      where(:id, :name, :code, :active, :deprecated, :free, :price_per_month, :price_per_year, :features, :about_page_href, :hide_deprecated_card) do
+        'plans_id' | '1000 CI minutes pack' | 'ci_minutes' | true | false | false | 1.0 | 12.0 | [] | '/about' | false
+        nil | '1000 CI minutes pack' | 'ci_minutes' | true | false | false | 1.0 | 12.0 | [] | '/about' | false
+        'plans_id' | nil | 'ci_minutes' | true | false | false | 1.0 | 12.0 | [] | '/about' | false
+        'plans_id' | '1000 CI minutes pack' | nil | true | false | false | 1.0 | 12.0 | [] | '/about' | false
+        'plans_id' | '1000 CI minutes pack' | 'ci_minutes' | false | false | false | 1.0 | 12.0 | [] | '/about' | false
+        'plans_id' | '1000 CI minutes pack' | 'ci_minutes' | true | true | false | 1.0 | 12.0 | [] | '/about' | false
+        'plans_id' | '1000 CI minutes pack' | 'ci_minutes' | true | false | true | 1.0 | 12.0 | [] | '/about' | false
+        'plans_id' | '1000 CI minutes pack' | 'ci_minutes' | true | false | true | 0.83 | 10.0 | [] | '/about' | false
+        'plans_id' | '1000 CI minutes pack' | 'ci_minutes' | nil | true | false | 1.0 | 12.0 | [] | '/about' | false
+        'plans_id' | '1000 CI minutes pack' | 'ci_minutes' | true | nil | true | 1.0 | 12.0 | [] | '/about' | false
+        'plans_id' | '1000 CI minutes pack' | 'ci_minutes' | true | false | nil | 0.83 | 10.0 | [] | '/about' | false
+        'plans_id' | '1000 CI minutes pack' | 'ci_minutes' | true | false | true | 0.83 | 10.0 | ['feature_1'] | '/about' | false
+        'plans_id' | '1000 CI minutes pack' | 'ci_minutes' | true | false | false | 1.0 | 12.0 | [] | nil | false
+        'plans_id' | '1000 CI minutes pack' | 'ci_minutes' | true | false | false | 1.0 | 12.0 | [] | '/about' | true
       end
 
       with_them do

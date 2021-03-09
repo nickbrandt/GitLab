@@ -95,40 +95,7 @@ module Gitlab
 
           response = http_post("graphql", admin_headers, { query: query }).dig(:data)
 
-          if response['errors'].blank?
-            plans = response.dig('data', 'plans')&.map do |plan|
-              name = plan.dig('name')
-              code = plan.dig('code')
-              active = plan.dig('active').to_s.casecmp("true") == 0
-              deprecated = plan.dig('deprecated').to_s.casecmp("true") == 0
-              free = plan.dig('free').to_s.casecmp("true") == 0
-              price_per_month = plan.dig('pricePerMonth').to_f
-              price_per_year = plan.dig('pricePerYear').to_f
-              features = Array(plan.dig('features'))
-              about_page_href = plan.dig('aboutPageHref')
-              hide_deprecated_card = plan.dig('hideDeprecatedCard')
-
-              {
-                name: name,
-                code: code,
-                active: active,
-                deprecated: deprecated,
-                free: free,
-                price_per_month: price_per_month,
-                price_per_year: price_per_year,
-                features: features,
-                about_page_href: about_page_href,
-                hide_deprecated_card: hide_deprecated_card
-              }
-            end
-
-            {
-              success: true,
-              plans: plans
-            }
-          else
-            { success: false }
-          end
+          response['errors'].presence || response.dig('data', 'plans')
         end
 
         private

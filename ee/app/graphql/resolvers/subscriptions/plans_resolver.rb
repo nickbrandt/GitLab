@@ -8,7 +8,7 @@ module Resolvers
       description 'Get subscription plan data'
 
       argument :plan_tags, [::Types::Subscriptions::PlanTagType], required: false,
-               description: 'Text to echo back.'
+               description: 'An enum that represents either a Plan or group of Plans.'
 
       def resolve(**args)
         return unless buy_minutes_feature_available?
