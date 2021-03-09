@@ -8739,6 +8739,9 @@ msgstr ""
 msgid "Create snippet"
 msgstr ""
 
+msgid "Create tag %{tagName}"
+msgstr ""
+
 msgid "Create wildcard: %{searchTerm}"
 msgstr ""
 
@@ -20652,6 +20655,9 @@ msgstr ""
 msgid "No start date"
 msgstr ""
 
+msgid "No tag selected"
+msgstr ""
+
 msgid "No template"
 msgstr ""
 
@@ -26357,6 +26363,9 @@ msgid "Search merge requests"
 msgstr ""
 
 msgid "Search milestones"
+msgstr ""
+
+msgid "Search or create tag"
 msgstr ""
 
 msgid "Search or filter results..."
