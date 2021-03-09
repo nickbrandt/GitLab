@@ -14840,6 +14840,18 @@ Status: `data_available`
 
 Tiers: `free`
 
+### `usage_activity_by_stage.monitor.projects_with_enabled_alert_integrations_histogram`
+
+Histogram (buckets 1 to 100) of projects with at least 1 enabled integration.
+
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/20210309165717_projects_with_enabled_alert_integrations_histogram.yml)
+
+Group: `group::monitor`
+
+Status: `data_available`
+
+Tiers: `free`, `premium`, `ultimate`
+
 ### `usage_activity_by_stage.monitor.projects_with_error_tracking_enabled`
 
 Projects where error tracking is enabled
