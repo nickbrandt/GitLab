@@ -127,7 +127,7 @@ describe('JiraConnectApp', () => {
       });
 
       describe('when alert is set in localStoage', () => {
-        it('renders alert on mount', async () => {
+        it('renders alert on mount', () => {
           persistAlert({ message: 'error message' });
           createComponent();
 
