@@ -53,14 +53,14 @@ RSpec.describe NamespaceSettings::UpdateService do
 
         it 'updates the setting' do
           expect { service.execute }
-            .to change { group.namespace_settings.resource_access_tokens_enabled }
+            .to change { group.resource_access_tokens_enabled }
             .from(true).to(false)
         end
       end
 
       context 'with a non-admin user' do
         it 'does not update the setting' do
-          expect { service.execute }.not_to change { group.namespace_settings.resource_access_tokens_enabled }
+          expect { service.execute }.not_to change { group.resource_access_tokens_enabled }
           expect(group.errors.messages[:resource_access_tokens_enabled]).to include("can only be changed by a group admin.")
         end
       end

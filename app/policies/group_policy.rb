@@ -242,7 +242,7 @@ class GroupPolicy < BasePolicy
   end
 
   def resource_access_token_available?
-    group.root_ancestor.namespace_settings.resource_access_tokens_enabled?
+    group.root_ancestor.resource_access_tokens_enabled?
   end
 end
 

@@ -3,7 +3,7 @@
 
 .form-group.gl-mb-3
   .form-check
-    = f.check_box :resource_access_tokens_enabled, checked: group.namespace_settings.resource_access_tokens_enabled?, class: 'form-check-input', data: { qa_selector: 'resource_access_tokens_enabled_checkbox' }
+    = f.check_box :resource_access_tokens_enabled, checked: group.resource_access_tokens_enabled?, class: 'form-check-input', data: { qa_selector: 'resource_access_tokens_enabled_checkbox' }
     = f.label :resource_access_tokens_enabled, class: 'form-check-label' do
       %span.gl-display-block= s_('GroupSettings|Project access tokens enabled')
       - project_access_tokens_link = help_page_path('user/project/settings/project_access_tokens')
