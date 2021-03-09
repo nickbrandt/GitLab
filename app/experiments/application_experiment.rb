@@ -5,8 +5,8 @@ class ApplicationExperiment < Gitlab::Experiment # rubocop:disable Gitlab/Namesp
     return false if Feature::Definition.get(feature_flag_name).nil? # there has to be a feature flag yaml file
     return false unless Gitlab.dev_env_or_com? # we have to be in an environment that allows experiments
 
-    # the feature flag has to be rolled out
-    Feature.get(feature_flag_name).state != :off # rubocop:disable Gitlab/AvoidFeatureGet
+    # the feature flag has to be enabled conditionally or fully for the experiment to be enabled
+    Feature.get(feature_flag_name).state == :conditional || Feature.get(feature_flag_name).state == :on # rubocop:disable Gitlab/AvoidFeatureGet
   end
 
   def publish(_result)
