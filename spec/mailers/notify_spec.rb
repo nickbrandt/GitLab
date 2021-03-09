@@ -365,7 +365,12 @@ RSpec.describe Notify do
 
         it 'contains a link to merge request author' do
           is_expected.to have_body_text merge_request.author_name
-          is_expected.to have_body_text 'created a merge request:'
+          is_expected.to have_body_text 'created a'
+        end
+
+        it 'contains a link to the merge request url' do
+          is_expected.to have_body_text merge_request
+          is_expected.to have_body_text 'merge request'
         end
       end
 
