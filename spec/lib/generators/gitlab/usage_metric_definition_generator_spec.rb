@@ -41,7 +41,6 @@ RSpec.describe Gitlab::UsageMetricDefinitionGenerator do
     end
   end
 
-
   describe 'Name suggestions' do
     let(:temp_dir) { Dir.mktmpdir }
 
