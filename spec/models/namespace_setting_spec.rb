@@ -87,6 +87,7 @@ RSpec.describe NamespaceSetting, type: :model do
           settings.resource_access_tokens_enabled = false
 
           expect(settings).to be_invalid
+          expect(group.namespace_settings.errors.messages[:resource_access_tokens_enabled]).to include("is not allowed since the group is not top-level group.")
         end
       end
     end

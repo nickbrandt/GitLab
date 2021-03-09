@@ -39,7 +39,7 @@ RSpec.describe Projects::Settings::AccessTokensController do
       let(:project) { create(:project, group: group) }
 
       before do
-        group.namespace_settings.update!(resource_access_tokens_enabled: false)
+        group.namespace_settings.update_column(:resource_access_tokens_enabled, false)
       end
 
       it { is_expected.to have_gitlab_http_status(:not_found) }

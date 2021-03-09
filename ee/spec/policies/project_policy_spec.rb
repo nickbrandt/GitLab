@@ -1677,7 +1677,7 @@ RSpec.describe ProjectPolicy do
 
         context 'when project access tokens are disabled' do
           before do
-            group.namespace_settings.update!(resource_access_tokens_enabled: false)
+            group.namespace_settings.update_column(:resource_access_tokens_enabled, false)
           end
 
           it { is_expected.not_to be_allowed(:admin_resource_access_tokens) }
@@ -1689,7 +1689,7 @@ RSpec.describe ProjectPolicy do
           let(:project) { create(:project, group: group) }
 
           before do
-            parent.namespace_settings.update!(resource_access_tokens_enabled: false)
+            parent.namespace_settings.update_column(:resource_access_tokens_enabled, false)
           end
 
           it { is_expected.not_to be_allowed(:admin_resource_access_tokens) }

@@ -34,7 +34,7 @@ class NamespaceSetting < ApplicationRecord
   end
 
   def allow_resource_access_tokens_enabled_for_group
-    if namespace&.subgroup? && resource_access_tokens_enabled == false
+    if namespace&.subgroup? && !resource_access_tokens_enabled
       errors.add(:resource_access_tokens_enabled, _('is not allowed since the group is not top-level group.'))
     end
   end
