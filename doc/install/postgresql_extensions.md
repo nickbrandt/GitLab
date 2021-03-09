@@ -9,10 +9,10 @@ info: To determine the technical writer assigned to the Stage/Group associated w
 This guide documents how to manage PostgreSQL extensions for installations with an external
 PostgreSQL database.
 
-The following extensions must be loaded into the GitLab database.
+The following extensions must be loaded into the GitLab database:
 
 | Extension    | Minimum GitLab version |
-| ------------ | ---------------------- |
+|--------------|------------------------|
 | `pg_trgm`    | 8.6                    |
 | `btree_gist` | 13.1                   |
 
