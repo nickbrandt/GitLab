@@ -9,8 +9,8 @@ module Gitlab
       SERIALIZE_KEYS = %i(line_code rich_text text type index old_pos new_pos).freeze
 
       attr_reader :line_code
-      attr_writer :rich_text
-      attr_accessor :text, :index, :type, :old_pos, :new_pos
+      attr_writer :text, :rich_text
+      attr_accessor :index, :type, :old_pos, :new_pos
 
       def initialize(text, type, index, old_pos, new_pos, parent_file: nil, line_code: nil, rich_text: nil)
         @text, @type, @index = text, type, index
@@ -46,6 +46,12 @@ module Gitlab
         hash = {}
         SERIALIZE_KEYS.each { |key| hash[key] = send(key) } # rubocop:disable GitlabSecurity/PublicSend
         hash
+      end
+
+      def text(prefix: true)
+        return @text if prefix
+
+        @text&.slice(1..).to_s
       end
 
       def old_line
