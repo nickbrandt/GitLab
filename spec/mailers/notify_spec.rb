@@ -369,8 +369,7 @@ RSpec.describe Notify do
         end
 
         it 'contains a link to the merge request url' do
-          is_expected.to have_body_text merge_request
-          is_expected.to have_body_text 'merge request'
+          is_expected.to have_link('merge request', href: project_merge_request_url(merge_request.target_project, merge_request))
         end
       end
 
