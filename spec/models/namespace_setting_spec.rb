@@ -66,5 +66,29 @@ RSpec.describe NamespaceSetting, type: :model do
         end
       end
     end
+
+    describe '#allow_resource_access_tokens_enabled_for_group' do
+      let(:settings) {  group.namespace_settings }
+
+      context 'group is top-level group' do
+        let(:group) { create(:group) }
+
+        it 'is valid' do
+          settings.resource_access_tokens_enabled = false
+
+          expect(settings).to be_valid
+        end
+      end
+
+      context 'group is a subgroup' do
+        let(:group) { create(:group, parent: create(:group)) }
+
+        it 'is invalid' do
+          settings.resource_access_tokens_enabled = false
+
+          expect(settings).to be_invalid
+        end
+      end
+    end
   end
 end

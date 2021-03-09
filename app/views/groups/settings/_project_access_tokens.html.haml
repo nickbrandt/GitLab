@@ -1,4 +1,4 @@
-- return unless Gitlab.com? && group.feature_available_non_trial?(:resource_access_token)
+- return if Gitlab.com?
 - return unless group.root?
 
 .form-group.gl-mb-3

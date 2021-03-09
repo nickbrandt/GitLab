@@ -5,6 +5,7 @@ class NamespaceSetting < ApplicationRecord
 
   validate :default_branch_name_content
   validate :allow_mfa_for_group
+  validate :allow_resource_access_tokens_enabled_for_group
 
   before_validation :normalize_default_branch_name
 
@@ -29,6 +30,12 @@ class NamespaceSetting < ApplicationRecord
   def allow_mfa_for_group
     if namespace&.subgroup? && allow_mfa_for_subgroups == false
       errors.add(:allow_mfa_for_subgroups, _('is not allowed since the group is not top-level group.'))
+    end
+  end
+
+  def allow_resource_access_tokens_enabled_for_group
+    if namespace&.subgroup? && resource_access_tokens_enabled == false
+      errors.add(:resource_access_tokens_enabled, _('is not allowed since the group is not top-level group.'))
     end
   end
 end
