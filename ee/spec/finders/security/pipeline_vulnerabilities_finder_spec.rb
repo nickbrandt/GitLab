@@ -97,13 +97,13 @@ RSpec.describe Security::PipelineVulnerabilitiesFinder do
             project_fingerprint: report_finding.project_fingerprint)
         end
 
-        # there's something being cached... need to run this once to get rid of that
+        # Need to warm the cache
         described_class.new(pipeline: pipeline, params: { report_type: %w[dependency_scanning] }).execute
 
-        expect {
-          described_class.new(pipeline: pipeline, params: { report_type: %w[dependency_scanning] }).execute
-        }.to issue_same_number_of_queries_as {
+        expect do
           described_class.new(pipeline: pipeline, params: { report_type: %w[sast] }).execute
+        end.to issue_same_number_of_queries_as {
+          described_class.new(pipeline: pipeline, params: { report_type: %w[dependency_scanning] }).execute
         }
       end
     end

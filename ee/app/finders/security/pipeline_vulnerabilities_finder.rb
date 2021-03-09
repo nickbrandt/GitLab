@@ -59,9 +59,8 @@ module Security
     def vulnerabilities_by_finding_fingerprint(report_type, report)
       Vulnerabilities::Finding
         .by_project_fingerprints(report.findings.map(&:project_fingerprint))
-        .where(
-          project: pipeline.project,
-          report_type: report_type)
+        .by_projects(pipeline.project)
+        .by_report_types(report_type)
         .select(:vulnerability_id, :project_fingerprint)
        .each_with_object({}) do |finding, hash|
         hash[finding.project_fingerprint] = finding.vulnerability_id
