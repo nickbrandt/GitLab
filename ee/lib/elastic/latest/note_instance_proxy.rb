@@ -31,7 +31,6 @@ module Elastic
         # migration has completed otherwise the migration will never finish
         if Elastic::DataMigrationService.migration_has_finished?(:remove_permissions_data_from_notes_documents)
           data['visibility_level'] = target.project&.visibility_level || Gitlab::VisibilityLevel::PRIVATE
-          # use noteable_type to support Commit notes where the commit is not available
           merge_project_feature_access_level(data)
         end
 
@@ -49,8 +48,9 @@ module Elastic
         when 'Commit'
           data['repository_access_level'] = safely_read_project_feature_for_elasticsearch(:repository)
         when 'Issue', 'MergeRequest'
-          access_level_attribute = ProjectFeature.access_level_attribute(noteable)
-          data[access_level_attribute.to_s] = safely_read_project_feature_for_elasticsearch(noteable)
+          klass = noteable_type.constantize
+          access_level_attribute = ProjectFeature.access_level_attribute(klass)
+          data[access_level_attribute.to_s] = safely_read_project_feature_for_elasticsearch(klass)
         else
           # do nothing for other note types (DesignManagement::Design, AlertManagement::Alert, Epic, Vulnerability )
           # are indexed but not currently searchable so we will not add permission
