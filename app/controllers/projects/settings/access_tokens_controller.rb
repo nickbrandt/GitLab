@@ -43,7 +43,15 @@ module Projects
       private
 
       def check_feature_availability
-        render_404 unless project_access_token_available?(@project)
+        return if project_access_token_available?(@project) 
+        return if active_tokens? && current_user.can?(:admin_project, @project)
+
+        render_404
+      end
+
+      def active_tokens?
+        active = finder(state: 'active').execute
+        !active.empty?
       end
 
       def create_params

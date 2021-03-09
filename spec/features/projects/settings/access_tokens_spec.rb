@@ -5,7 +5,8 @@ require 'spec_helper'
 RSpec.describe 'Project > Settings > Access Tokens', :js do
   let_it_be(:user) { create(:user) }
   let_it_be(:bot_user) { create(:user, :project_bot) }
-  let_it_be(:project) { create(:project) }
+  let_it_be(:group) { create(:group) }
+  let_it_be(:project) { create(:project, group: group) }
 
   before_all do
     project.add_maintainer(user)
@@ -66,6 +67,30 @@ RSpec.describe 'Project > Settings > Access Tokens', :js do
       visit project_settings_access_tokens_path(project)
 
       expect(active_project_access_tokens).to have_text(project_access_token.name)
+    end
+
+    context 'when project access tokens are disabled but there are active tokens' do
+      before do
+        group.namespace_settings.update_column(:resource_access_tokens_enabled, false)
+      end
+
+      it 'does not show project access token creation form' do
+        visit project_settings_access_tokens_path(project)
+
+        expect(page).not_to have_selector('.new_project_access_token')
+      end
+
+      it 'shows active project access tokens' do
+        visit project_settings_access_tokens_path(project)
+
+        expect(active_project_access_tokens).to have_text(project_access_token.name)
+      end
+
+      it 'shows project access tokens disabled sidebar text' do
+        visit project_settings_access_tokens_path(project)
+
+        expect(find('.profile-settings-sidebar')).to have_text('Project access tokens are disabled in this group.')
+      end
     end
   end
 

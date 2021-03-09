@@ -32,6 +32,17 @@ RSpec.shared_examples 'Self-managed Core resource access tokens' do
 
       it { is_expected.not_to be_allowed(:admin_resource_access_tokens) }
     end
+
+    context 'with a personal namespace project' do
+      let(:namespace) { create(:namespace) }
+      let(:project) { create(:project, namespace: namespace) }
+
+      before do
+        project.add_maintainer(current_user)
+      end
+
+      it { is_expected.to be_allowed(:admin_resource_access_tokens) }
+    end
   end
 
   context 'with developer' do
@@ -51,5 +62,14 @@ RSpec.shared_examples 'GitLab.com Core resource access tokens' do
     let(:current_user) { owner }
 
     it { is_expected.not_to be_allowed(:admin_resource_access_tokens) }
+
+    context 'with a personal namespace project' do
+      context 'with a free plan' do
+        let(:namespace) { create(:namespace) }
+        let(:project) { create(:project, namespace: namespace) }
+
+        it { is_expected.not_to be_allowed(:admin_resource_access_tokens) }
+      end
+    end
   end
 end

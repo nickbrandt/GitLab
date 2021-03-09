@@ -1,6 +1,3 @@
-- return if Gitlab.com?
-- return unless group.root?
-
 .form-group.gl-mb-3
   .form-check
     = f.check_box :resource_access_tokens_enabled, checked: group.resource_access_tokens_enabled?, class: 'form-check-input', data: { qa_selector: 'resource_access_tokens_enabled_checkbox' }

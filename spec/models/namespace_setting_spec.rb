@@ -83,11 +83,17 @@ RSpec.describe NamespaceSetting, type: :model do
       context 'group is a subgroup' do
         let(:group) { create(:group, parent: create(:group)) }
 
-        it 'is invalid' do
+        it 'is invalid when resource access tokens are not enabled' do
           settings.resource_access_tokens_enabled = false
 
           expect(settings).to be_invalid
           expect(group.namespace_settings.errors.messages[:resource_access_tokens_enabled]).to include("is not allowed since the group is not top-level group.")
+        end
+
+        it 'is valid when resource access tokens are enabled' do
+          settings.resource_access_tokens_enabled = true
+
+          expect(settings).to be_valid
         end
       end
     end

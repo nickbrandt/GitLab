@@ -4,7 +4,8 @@ require('spec_helper')
 
 RSpec.describe Projects::Settings::AccessTokensController do
   let_it_be(:user) { create(:user) }
-  let_it_be(:project) { create(:project) }
+  let_it_be(:group) { create(:group) }
+  let_it_be(:project) { create(:project, group: group) }
   let_it_be(:bot_user) { create(:user, :project_bot) }
 
   before_all do
@@ -31,6 +32,20 @@ RSpec.describe Projects::Settings::AccessTokensController do
 
     it_behaves_like 'feature unavailable'
     it_behaves_like 'project access tokens available #index'
+
+    context 'when project access tokens are disabled' do
+      before do
+        group.namespace_settings.update_column(:resource_access_tokens_enabled, false)
+      end
+
+      it { is_expected.to have_gitlab_http_status(:not_found) }
+
+      context 'when project has active tokens' do
+        let(:project_access_token) { create(:personal_access_token, user: bot_user) }
+
+        it_behaves_like 'project access tokens available #index'
+      end
+    end
   end
 
   describe '#create' do
@@ -40,6 +55,24 @@ RSpec.describe Projects::Settings::AccessTokensController do
 
     it_behaves_like 'feature unavailable'
     it_behaves_like 'project access tokens available #create'
+
+    context 'when project access tokens are disabled' do
+      before do
+        group.namespace_settings.update_column(:resource_access_tokens_enabled, false)
+      end
+
+      it 'does not create the token' do
+        expect { subject }.not_to change { PersonalAccessToken.count }
+      end
+
+      it 'does not add the project bot as a member' do
+        expect { subject }.not_to change { Member.count }
+      end
+
+      it 'does not create the project bot user' do
+        expect { subject }.not_to change { User.count }
+      end
+    end
   end
 
   describe '#revoke', :sidekiq_inline do
@@ -49,5 +82,13 @@ RSpec.describe Projects::Settings::AccessTokensController do
 
     it_behaves_like 'feature unavailable'
     it_behaves_like 'project access tokens available #revoke'
+
+    context 'when project access tokens are disabled' do
+      before do
+        group.namespace_settings.update_column(:resource_access_tokens_enabled, false)
+      end
+
+      it_behaves_like 'project access tokens available #revoke'
+    end
   end
 end

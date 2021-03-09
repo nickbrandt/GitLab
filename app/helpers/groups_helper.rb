@@ -216,6 +216,10 @@ module GroupsHelper
     @group_projects_sort || @sort || params[:sort] || sort_value_recently_created
   end
 
+  def render_project_access_tokens_checkbox?(group)
+    group.root?
+  end
+
   private
 
   def just_created?

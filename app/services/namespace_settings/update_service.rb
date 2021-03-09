@@ -13,9 +13,9 @@ module NamespaceSettings
     end
 
     def execute
-      if group.namespace_settings
-        check_admin_resource_access_tokens_enabled
+      check_admin_resource_access_tokens_enabled
 
+      if group.namespace_settings
         group.namespace_settings.attributes = settings_params
       else
         group.build_namespace_settings(settings_params)
@@ -23,7 +23,9 @@ module NamespaceSettings
     end
 
     def check_admin_resource_access_tokens_enabled
-      unless can?(current_user, :admin_resource_access_tokens, group)
+      return if settings_params[:resource_access_tokens_enabled].nil?
+
+      unless can?(current_user, :admin_group, group)
         settings_params.delete(:resource_access_tokens_enabled)
         group.errors.add(:resource_access_tokens_enabled, _('can only be changed by a group admin.'))
       end

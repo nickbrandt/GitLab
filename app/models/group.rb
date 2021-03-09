@@ -119,7 +119,6 @@ class Group < Namespace
   delegate :default_branch_name, to: :namespace_settings
   delegate :resource_access_tokens_enabled, :resource_access_tokens_enabled=, :resource_access_tokens_enabled?, to: :namespace_settings
 
-
   class << self
     def sort_by_attribute(method)
       if method == 'storage_size_desc'

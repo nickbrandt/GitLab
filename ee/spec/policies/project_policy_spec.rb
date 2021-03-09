@@ -1675,6 +1675,24 @@ RSpec.describe ProjectPolicy do
 
         it { is_expected.to be_allowed(:admin_resource_access_tokens) }
 
+        context 'with a personal namespace project' do
+          context 'with a paid plan' do
+            let(:namespace) { create(:namespace_with_plan, plan: :bronze_plan) }
+            let(:project) { create(:project, namespace: namespace) }
+
+            it { is_expected.to be_allowed(:admin_resource_access_tokens) }
+          end
+        end
+
+        context 'with a personal namespace project' do
+          context 'with a free plan' do
+            let(:namespace) { create(:namespace_with_plan, plan: :free_plan) }
+            let(:project) { create(:project, namespace: namespace) }
+
+            it { is_expected.to be_allowed(:admin_resource_access_tokens) }
+          end
+        end
+
         context 'when project access tokens are disabled' do
           before do
             group.namespace_settings.update_column(:resource_access_tokens_enabled, false)
