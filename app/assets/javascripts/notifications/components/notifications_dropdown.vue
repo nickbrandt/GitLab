@@ -117,7 +117,7 @@ export default {
 </script>
 
 <template>
-  <div :class="containerClass" data-testid="notification-button">
+  <div :class="containerClass">
     <gl-dropdown
       v-gl-tooltip="{ title: buttonTooltip }"
       data-testid="notification-dropdown"

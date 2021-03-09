@@ -25,7 +25,7 @@ RSpec.describe 'User visits the notifications tab', :js do
     let(:project) { create(:project, emails_disabled: true) }
 
     it 'notification button is disabled' do
-      expect(page).to have_selector('[data-testid="notification-dropdown"].disabled')
+      expect(page).to have_selector('[data-testid="notification-dropdown"] .disabled')
     end
   end
 end
