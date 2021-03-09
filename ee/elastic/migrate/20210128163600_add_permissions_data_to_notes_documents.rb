@@ -4,7 +4,7 @@ class AddPermissionsDataToNotesDocuments < Elastic::Migration
   batched!
   throttle_delay 3.minutes
 
-  QUERY_BATCH_SIZE = 9000
+  QUERY_BATCH_SIZE = 9_000
   UPDATE_BATCH_SIZE = 100
 
   def migrate

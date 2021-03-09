@@ -148,9 +148,10 @@ RSpec.describe Gitlab::Elastic::BulkIndexer, :elastic do
       end
 
       it 'deletes the issue from the index if DocumentShouldBeDeletedFromIndexException is raised' do
-        allow(issue_as_ref.database_record.__elasticsearch__)
+        database_record = issue_as_ref.database_record
+        allow(database_record.__elasticsearch__)
           .to receive(:as_indexed_json)
-                .and_raise ::Elastic::Latest::DocumentShouldBeDeletedFromIndexError.new(issue_as_ref.database_record.id, issue_as_ref.database_record.class.name)
+                .and_raise ::Elastic::Latest::DocumentShouldBeDeletedFromIndexError.new(database_record.class.name, database_record.id)
 
         expect(indexer.process(issue_as_ref).flush).to be_empty
 

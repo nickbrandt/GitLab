@@ -3,10 +3,10 @@
 module Elastic
   module Latest
     class DocumentShouldBeDeletedFromIndexError < StandardError
-      attr_reader :record_id, :class_name
+      attr_reader :class_name, :record_id
 
-      def initialize(record_id, class_name)
-        @record_id, @class_name = record_id, class_name
+      def initialize(class_name, record_id)
+        @class_name, @record_id = class_name, record_id
       end
 
       def message
