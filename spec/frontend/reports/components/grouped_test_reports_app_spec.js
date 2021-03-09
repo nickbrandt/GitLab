@@ -42,7 +42,7 @@ describe('Grouped test reports app', () => {
   const findHeader = () => wrapper.find('[data-testid="report-section-code-text"]');
   const findExpandButton = () => wrapper.find('[data-testid="report-section-expand-button"]');
   const findFullTestReportLink = () => wrapper.find('[data-testid="group-test-reports-full-link"]');
-  const findSummaryDescription = () => wrapper.find('[data-testid="test-summary-row-description"]');
+  const findSummaryDescription = () => wrapper.find('[data-testid="summary-row-description"]');
   const findIssueDescription = () => wrapper.find('[data-testid="test-issue-body-description"]');
   const findAllIssueDescriptions = () =>
     wrapper.findAll('[data-testid="test-issue-body-description"]');
@@ -291,6 +291,27 @@ describe('Grouped test reports app', () => {
 
       expect(findSummaryDescription().text()).toContain(
         `An error occurred while loading ${name} result`,
+      );
+    });
+  });
+
+  describe('with a report parsing errors', () => {
+    beforeEach(() => {
+      const reports = failedReport;
+      reports.suites[0].suite_errors = {
+        head: 'JUnit XML parsing failed: 2:24: FATAL: attributes construct error',
+        base: 'JUnit data parsing failed: string not matched',
+      };
+      setReports(reports);
+      mountComponent();
+    });
+
+    it('renders the error messages', () => {
+      expect(findSummaryDescription().text()).toContain(
+        'JUnit XML parsing failed: 2:24: FATAL: attributes construct error',
+      );
+      expect(findSummaryDescription().text()).toContain(
+        'JUnit data parsing failed: string not matched',
       );
     });
   });

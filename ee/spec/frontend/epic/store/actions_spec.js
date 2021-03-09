@@ -6,6 +6,7 @@ import defaultState from 'ee/epic/store/state';
 import epicUtils from 'ee/epic/utils/epic_utils';
 
 import testAction from 'helpers/vuex_action_helper';
+import { EVENT_ISSUABLE_VUE_APP_CHANGE } from '~/issuable/constants';
 import axios from '~/lib/utils/axios_utils';
 
 import { mockEpicMeta, mockEpicData } from '../mock_data';
@@ -216,7 +217,7 @@ describe('Epic Store Actions', () => {
       actions.triggerIssuableEvent({}, data);
 
       expect(epicUtils.triggerDocumentEvent).toHaveBeenCalledWith(
-        'issuable_vue_app:change',
+        EVENT_ISSUABLE_VUE_APP_CHANGE,
         data.isEpicOpen,
       );
 
@@ -1246,61 +1247,16 @@ describe('Epic Store Actions', () => {
   });
 
   describe('updateConfidentialityOnIssuable', () => {
-    let mock;
-    const mockUpdateConfidentialMutationRes = {
-      updateEpic: {
-        clientMutationId: null,
-        errors: [],
-        __typename: 'UpdateEpicPayload',
-      },
-    };
-
-    const data = {
-      confidential: true,
-    };
-
-    beforeEach(() => {
-      mock = new MockAdapter(axios);
-    });
-
-    afterEach(() => {
-      mock.restore();
-    });
-
-    it('commits SET_EPIC_CONFIDENTIAL when request is successful', (done) => {
-      mock.onPut(/(.*)/).replyOnce(200, {});
-      jest.spyOn(epicUtils.gqClient, 'mutate').mockResolvedValue({
-        data: mockUpdateConfidentialMutationRes,
-      });
-
+    it('should commit `SET_EPIC_CONFIDENTIAL` mutation with param `sidebarCollapsed', (done) => {
+      const confidential = true;
       testAction(
         actions.updateConfidentialityOnIssuable,
-        { ...data },
+        confidential,
         state,
         [{ payload: true, type: 'SET_EPIC_CONFIDENTIAL' }],
         [],
         done,
       );
-    });
-
-    it("doesn't commit/dispatch and throws error when request fails", (done) => {
-      mock.onPut(/(.*)/).replyOnce(500, {});
-      const errors = ['bar'];
-
-      jest.spyOn(epicUtils.gqClient, 'mutate').mockResolvedValue({
-        data: {
-          updateEpic: {
-            ...mockUpdateConfidentialMutationRes,
-            errors,
-          },
-        },
-      });
-
-      testAction(actions.updateConfidentialityOnIssuable, { ...data }, state, [], [])
-        .catch((err) => {
-          expect(err).toEqual('bar');
-        })
-        .finally(done);
     });
   });
 });

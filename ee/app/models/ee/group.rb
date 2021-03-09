@@ -228,13 +228,16 @@ module EE
     end
 
     def saml_group_sync_available?
-      ::Feature.enabled?(:saml_group_links, self, default_enabled: true) &&
-        feature_available?(:group_saml_group_sync) && root_ancestor.saml_enabled?
+      feature_available?(:group_saml_group_sync) && root_ancestor.saml_enabled?
     end
 
     override :multiple_issue_boards_available?
     def multiple_issue_boards_available?
       feature_available?(:multiple_group_issue_boards)
+    end
+
+    def multiple_iteration_cadences_available?
+      feature_available?(:multiple_iteration_cadences)
     end
 
     def group_project_template_available?
@@ -467,6 +470,10 @@ module EE
       group_wiki_repository&.shard_name || ::Repository.pick_storage_shard
     end
 
+    def iteration_cadences_feature_flag_enabled?
+      ::Feature.enabled?(:iteration_cadences, self, default_enabled: :yaml)
+    end
+
     private
 
     override :post_create_hook
@@ -485,7 +492,6 @@ module EE
 
     def execute_subgroup_hooks(event)
       return unless subgroup?
-      return unless parent.group? # TODO: Remove this after fixing https://gitlab.com/gitlab-org/gitlab/-/issues/301013
       return unless feature_available?(:group_webhooks)
 
       run_after_commit do

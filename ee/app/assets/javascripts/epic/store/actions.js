@@ -1,5 +1,6 @@
 import epicDetailsQuery from 'shared_queries/epic/epic_details.query.graphql';
 import { deprecatedCreateFlash as flash } from '~/flash';
+import { EVENT_ISSUABLE_VUE_APP_CHANGE } from '~/issuable/constants';
 
 import axios from '~/lib/utils/axios_utils';
 import { visitUrl } from '~/lib/utils/url_utility';
@@ -60,7 +61,7 @@ export const triggerIssuableEvent = (_, { isEpicOpen }) => {
   // comment form (part of Notes app) We've wrapped
   // call to `$(document).trigger` within `triggerDocumentEvent`
   // for ease of testing
-  epicUtils.triggerDocumentEvent('issuable_vue_app:change', isEpicOpen);
+  epicUtils.triggerDocumentEvent(EVENT_ISSUABLE_VUE_APP_CHANGE, isEpicOpen);
   epicUtils.triggerDocumentEvent('issuable:change', isEpicOpen);
 };
 
@@ -194,34 +195,8 @@ export const saveDate = ({ state, dispatch }, { dateType, dateTypeIsFixed, newDa
     });
 };
 
-export const updateConfidentialityOnIssuable = ({ state, commit }, { confidential }) => {
-  const updateEpicInput = {
-    iid: `${state.epicIid}`,
-    groupPath: state.fullPath,
-    confidential,
-  };
-
-  return epicUtils.gqClient
-    .mutate({
-      mutation: updateEpic,
-      variables: {
-        updateEpicInput,
-      },
-    })
-    .then(({ data }) => {
-      if (!data?.updateEpic?.errors.length) {
-        commit(types.SET_EPIC_CONFIDENTIAL, confidential);
-      } else {
-        const errMsg =
-          data?.updateEpic?.errors[0]?.replace(/Confidential /, '') ||
-          s__('Epics|Unable to perform this action');
-        throw errMsg;
-      }
-    })
-    .catch((error) => {
-      flash(error);
-      throw error;
-    });
+export const updateConfidentialityOnIssuable = ({ commit }, confidential) => {
+  commit(types.SET_EPIC_CONFIDENTIAL, confidential);
 };
 
 /**

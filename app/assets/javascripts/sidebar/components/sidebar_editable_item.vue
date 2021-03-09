@@ -87,7 +87,7 @@ export default {
       <gl-button
         v-if="canUpdate"
         variant="link"
-        class="gl-text-gray-900! gl-hover-text-blue-800! gl-ml-auto js-sidebar-dropdown-toggle hide-collapsed"
+        class="gl-text-gray-900! gl-hover-text-blue-800! gl-ml-auto hide-collapsed"
         data-testid="edit-button"
         :data-track-event="tracking.event"
         :data-track-label="tracking.label"
@@ -98,7 +98,7 @@ export default {
         {{ __('Edit') }}
       </gl-button>
     </div>
-    <div v-show="!edit" class="gl-text-gray-500" data-testid="collapsed-content">
+    <div v-show="!edit" data-testid="collapsed-content">
       <slot name="collapsed">{{ __('None') }}</slot>
     </div>
     <div v-show="edit" data-testid="expanded-content">

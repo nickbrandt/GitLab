@@ -1,16 +1,12 @@
 import { getByText } from '@testing-library/dom';
 import MockAdapter from 'axios-mock-adapter';
-import Issue, { EVENT_ISSUABLE_VUE_APP_CHANGE } from '~/issue';
+import { EVENT_ISSUABLE_VUE_APP_CHANGE } from '~/issuable/constants';
+import Issue from '~/issue';
 import axios from '~/lib/utils/axios_utils';
 
 describe('Issue', () => {
   let testContext;
   let mock;
-
-  beforeAll(() => {
-    preloadFixtures('issues/closed-issue.html');
-    preloadFixtures('issues/open-issue.html');
-  });
 
   beforeEach(() => {
     mock = new MockAdapter(axios);

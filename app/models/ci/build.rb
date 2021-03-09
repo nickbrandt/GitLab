@@ -510,7 +510,6 @@ module Ci
           .concat(scoped_variables)
           .concat(job_variables)
           .concat(persisted_environment_variables)
-          .to_runner_variables
       end
     end
 
@@ -694,7 +693,7 @@ module Ci
     end
 
     def any_runners_online?
-      project.any_runners? { |runner| runner.active? && runner.online? && runner.can_pick?(self) }
+      project.any_active_runners? { |runner| runner.match_build_if_online?(self) }
     end
 
     def stuck?
@@ -813,14 +812,15 @@ module Ci
     end
 
     def cache
-      cache = options[:cache]
+      cache = Array.wrap(options[:cache])
 
-      if cache && project.jobs_cache_index
-        cache = cache.merge(
-          key: "#{cache[:key]}-#{project.jobs_cache_index}")
+      if project.jobs_cache_index
+        cache = cache.map do |single_cache|
+          single_cache.merge(key: "#{single_cache[:key]}-#{project.jobs_cache_index}")
+        end
       end
 
-      [cache]
+      cache
     end
 
     def credentials
@@ -986,7 +986,7 @@ module Ci
       # TODO: Have `debug_mode?` check against data on sent back from runner
       # to capture all the ways that variables can be set.
       # See (https://gitlab.com/gitlab-org/gitlab/-/issues/290955)
-      variables.any? { |variable| variable[:key] == 'CI_DEBUG_TRACE' && variable[:value].casecmp('true') == 0 }
+      variables['CI_DEBUG_TRACE']&.value&.casecmp('true') == 0
     end
 
     def drop_with_exit_code!(failure_reason, exit_code)

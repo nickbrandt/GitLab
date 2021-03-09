@@ -44,7 +44,10 @@ is fetched from its project, `relative` format would be the same as `short` form
 diffs associated with the set of changes have the same size limitations applied as other diffs
 returned by the API or viewed via the UI. When these limits impact the results, the `overflow`
 field contains a value of `true`. Diff data without these limits applied can be retrieved by
-adding the `access_raw_diffs` parameter, but it is slower and more resource-intensive.
+adding the `access_raw_diffs` parameter, accessing diffs not from the database but from Gitaly directly.
+This approach is generally slower and more resource-intensive, but isn't subject to size limits
+placed on database-backed diffs. [Limits inherent to Gitaly](../development/diffs.md#diff-limits)
+still apply.
 
 ## List merge requests
 
@@ -846,7 +849,7 @@ Parameters:
 |----------------------------------|----------------|----------|------------------------------------------------------------------------------------------------------------------|
 | `id`                             | integer/string | yes      | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) owned by the authenticated user. |
 | `merge_request_iid`              | integer        | yes      | The internal ID of the merge request.                                                                            |
-| `access_raw_diffs`               | boolean        | no       | Retrieve change diffs without size limitations.                                                                  |
+| `access_raw_diffs`               | boolean        | no       | Retrieve change diffs via Gitaly.                                                                 |
 
 ```json
 {
@@ -1061,7 +1064,7 @@ POST /projects/:id/merge_requests
 | `title`                    | string  | yes      | Title of MR.                                                                     |
 | `assignee_id`              | integer | no       | Assignee user ID.                                                                |
 | `assignee_ids`             | integer array | no | The ID of the user(s) to assign the MR to. Set to `0` or provide an empty value to unassign all assignees. |
-| `reviewer_ids`             | integer array | no | The ID of the user(s) added as a reviewer to the MR. If set to `0` or left empty, there will be no reviewers added.  |
+| `reviewer_ids`             | integer array | no | The ID of the user(s) added as a reviewer to the MR. If set to `0` or left empty, no reviewers are added.  |
 | `description`              | string  | no       | Description of MR. Limited to 1,048,576 characters. |
 | `target_project_id`        | integer | no       | The target project (numeric ID).                                                 |
 | `labels`                   | string  | no       | Labels for MR as a comma-separated list.                                         |

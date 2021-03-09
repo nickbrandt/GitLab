@@ -5,6 +5,10 @@ require 'spec_helper'
 RSpec.describe 'factories' do
   include Database::DatabaseHelpers
 
+  # https://gitlab.com/groups/gitlab-org/-/epics/5464 tracks the remaining
+  # skipped traits.
+  #
+  # Consider adding a code comment if a trait cannot produce a valid object.
   def skipped_traits
     [
       [:audit_event, :unauthenticated],
@@ -13,11 +17,7 @@ RSpec.describe 'factories' do
       [:ci_job_artifact, :raw],
       [:ci_job_artifact, :gzip],
       [:ci_job_artifact, :correct_checksum],
-      [:design_version, :empty],
       [:environment, :non_playable],
-      [:go_module_commit, :files],
-      [:go_module_commit, :package],
-      [:go_module_version, :pseudo],
       [:composer_cache_file, :object_storage],
       [:debian_project_component_file, :object_storage],
       [:debian_project_distribution, :object_storage],

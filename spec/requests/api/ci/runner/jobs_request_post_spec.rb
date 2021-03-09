@@ -17,9 +17,8 @@ RSpec.describe API::Ci::Runner, :clean_gitlab_redis_shared_state do
   end
 
   describe '/api/v4/jobs' do
-    let(:root_namespace) { create(:namespace) }
-    let(:namespace) { create(:namespace, parent: root_namespace) }
-    let(:project) { create(:project, namespace: namespace, shared_runners_enabled: false) }
+    let(:group) { create(:group, :nested) }
+    let(:project) { create(:project, namespace: group, shared_runners_enabled: false) }
     let(:pipeline) { create(:ci_pipeline, project: project, ref: 'master') }
     let(:runner) { create(:ci_runner, :project, projects: [project]) }
     let(:user) { create(:user) }
@@ -795,6 +794,50 @@ RSpec.describe API::Ci::Runner, :clean_gitlab_redis_shared_state do
 
             expect(response).to have_gitlab_http_status(:created)
             expect(json_response.dig('artifacts').first).not_to have_key('exclude')
+          end
+        end
+
+        describe 'setting the application context' do
+          subject { request_job }
+
+          context 'when triggered by a user' do
+            let(:job) { create(:ci_build, user: user, project: project) }
+
+            subject { request_job(id: job.id) }
+
+            it_behaves_like 'storing arguments in the application context' do
+              let(:expected_params) { { user: user.username, project: project.full_path } }
+            end
+
+            it_behaves_like 'not executing any extra queries for the application context', 3 do
+              # Extra queries: User, Project, Route
+              let(:subject_proc) { proc { request_job(id: job.id) } }
+            end
+          end
+
+          context 'when the runner is of project type' do
+            it_behaves_like 'storing arguments in the application context' do
+              let(:expected_params) { { project: project.full_path } }
+            end
+
+            it_behaves_like 'not executing any extra queries for the application context', 2 do
+              # Extra queries: Project, Route
+              let(:subject_proc) { proc { request_job } }
+            end
+          end
+
+          context 'when the runner is of group type' do
+            let(:group) { create(:group) }
+            let(:runner) { create(:ci_runner, :group, groups: [group]) }
+
+            it_behaves_like 'storing arguments in the application context' do
+              let(:expected_params) { { root_namespace: group.full_path_components.first } }
+            end
+
+            it_behaves_like 'not executing any extra queries for the application context', 2 do
+              # Extra queries: Group, Route
+              let(:subject_proc) { proc { request_job } }
+            end
           end
         end
 

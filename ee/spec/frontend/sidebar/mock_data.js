@@ -86,7 +86,8 @@ export const mockMutationResponse = {
 
 export const issuableQueryResponse = {
   data: {
-    project: {
+    workspace: {
+      __typename: 'Project',
       issuable: {
         __typename: 'Issue',
         id: 'gid://gitlab/Issue/1',
@@ -109,6 +110,13 @@ export const issuableQueryResponse = {
               username: 'francina.skiles',
               webUrl: '/franc',
             },
+            {
+              id: 'gid://gitlab/User/3',
+              avatarUrl: '/avatar',
+              name: 'John Doe',
+              username: 'johndoe',
+              webUrl: '/john',
+            },
           ],
         },
         assignees: {
@@ -130,31 +138,38 @@ export const issuableQueryResponse = {
 
 export const searchQueryResponse = {
   data: {
-    users: {
-      nodes: [
-        {
-          id: '1',
-          avatarUrl: '/avatar',
-          name: 'root',
-          username: 'root',
-          webUrl: 'root',
-        },
-        {
-          id: '3',
-          avatarUrl: '/avatar',
-          name: 'rookie',
-          username: 'rookie',
-          webUrl: 'rookie',
-        },
-      ],
+    workspace: {
+      __typename: 'Project',
+      users: {
+        nodes: [
+          {
+            user: {
+              id: '1',
+              avatarUrl: '/avatar',
+              name: 'root',
+              username: 'root',
+              webUrl: 'root',
+            },
+          },
+          {
+            user: {
+              id: '2',
+              avatarUrl: '/avatar2',
+              name: 'rookie',
+              username: 'rookie',
+              webUrl: 'rookie',
+            },
+          },
+        ],
+      },
     },
   },
 };
 
 export const updateIssueAssigneesMutationResponse = {
   data: {
-    issueSetAssignees: {
-      issue: {
+    issuableSetAssignees: {
+      issuable: {
         id: 'gid://gitlab/Issue/1',
         iid: '1',
         assignees: {
@@ -196,7 +211,6 @@ export const updateIssueAssigneesMutationResponse = {
         },
         __typename: 'Issue',
       },
-      __typename: 'IssueSetAssigneesPayload',
     },
   },
 };

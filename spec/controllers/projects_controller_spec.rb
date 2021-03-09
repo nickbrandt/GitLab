@@ -231,7 +231,7 @@ RSpec.describe ProjectsController do
 
           get :show, params: { namespace_id: empty_project.namespace, id: empty_project }
 
-          expect_snowplow_event(category: 'empty_repo_upload', action: 'view_project_show', context: [{ schema: 'iglu:com.gitlab/gitlab_experiment/jsonschema/0-3-0', data: anything }])
+          expect_snowplow_event(category: 'empty_repo_upload', action: 'view_project_show', context: [{ schema: 'iglu:com.gitlab/gitlab_experiment/jsonschema/0-3-0', data: anything }], property: 'empty')
         end
       end
 
@@ -1361,6 +1361,14 @@ RSpec.describe ProjectsController do
 
             expect(response.body).to eq('This endpoint has been requested too many times. Try again later.')
             expect(response).to have_gitlab_http_status(:too_many_requests)
+          end
+
+          it 'applies correct scope when throttling' do
+            expect(Gitlab::ApplicationRateLimiter)
+              .to receive(:throttled?)
+              .with(:project_download_export, scope: [user, project])
+
+            post action, params: { namespace_id: project.namespace, id: project }
           end
         end
       end

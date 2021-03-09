@@ -162,8 +162,11 @@ For NameID, the following settings are recommended; for SCIM, the following sett
 
 ### OneLogin setup notes
 
-The GitLab app listed in the OneLogin app catalog is for self-managed GitLab instances.
-For GitLab.com, use a generic SAML Test Connector such as the SAML Test Connector (Advanced).
+OneLogin supports their own [GitLab (SaaS)](https://onelogin.service-now.com/support?id=kb_article&sys_id=92e4160adbf16cd0ca1c400e0b961923&kb_category=50984e84db738300d5505eea4b961913)
+application.
+
+If you decide to use the OneLogin generic [SAML Test Connector (Advanced)](https://onelogin.service-now.com/support?id=kb_article&sys_id=b2c19353dbde7b8024c780c74b9619fb&kb_category=93e869b0db185340d5505eea4b961934),
+we recommend the following settings:
 
 | GitLab Setting | OneLogin Field |
 |--------------|----------------|
@@ -184,7 +187,7 @@ For more information, see our [discussion on providers](#providers).
 Your identity provider may have relevant documentation. It may be generic SAML documentation, or specifically targeted for GitLab. Examples:
 
 - [ADFS (Active Directory Federation Services)](https://docs.microsoft.com/en-us/windows-server/identity/ad-fs/operations/create-a-relying-party-trust)
-- [Auth0](https://auth0.com/docs/protocols/saml-configuration-options/configure-auth0-as-saml-identity-provider)
+- [Auth0](https://auth0.com/docs/protocols/saml-protocol/configure-auth0-as-saml-identity-provider)
 - [Google Workspace](https://support.google.com/a/answer/6087519?hl=en)
 - [JumpCloud](https://support.jumpcloud.com/support/s/article/single-sign-on-sso-with-gitlab-2019-08-21-10-36-47)
 - [PingOne by Ping Identity](https://docs.pingidentity.com/bundle/pingone/page/xsh1564020480660-1.html)
@@ -362,7 +365,7 @@ the user gets the highest access level from the groups. For example, if one grou
 is linked as `Guest` and another `Maintainer`, a user in both groups gets `Maintainer`
 access.
 
-Users who are not members of any mapped SAML groups are removed from the GitLab group. 
+Users who are not members of any mapped SAML groups are removed from the GitLab group.
 
 You can prevent accidental member removal. For example, if you have a SAML group link for `Owner` level access
 in a top-level group, you should also set up a group link for all other members.

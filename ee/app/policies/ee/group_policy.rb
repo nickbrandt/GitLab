@@ -37,6 +37,11 @@ module EE
         @subject.feature_available?(:group_activity_analytics)
       end
 
+      condition(:group_devops_adoption_available) do
+        ::Feature.enabled?(:group_devops_adoption, @subject, default_enabled: :yaml) &&
+          @subject.feature_available?(:group_level_devops_adoption)
+      end
+
       condition(:dora4_analytics_available) do
         @subject.feature_available?(:dora4_analytics)
       end
@@ -144,7 +149,7 @@ module EE
       end
 
       rule { reporter }.policy do
-        enable :admin_list
+        enable :admin_issue_board_list
         enable :view_productivity_analytics
         enable :view_type_of_work_charts
         enable :read_group_timelogs
@@ -191,6 +196,10 @@ module EE
         enable :view_group_ci_cd_analytics
       end
 
+      rule { reporter & group_devops_adoption_available }.policy do
+        enable :view_group_devops_adoption
+      end
+
       rule { owner & ~has_parent & prevent_group_forking_available }.policy do
         enable :change_prevent_group_forking
       end
@@ -201,11 +210,15 @@ module EE
         enable :read_epic_board_list
       end
 
-      rule { can?(:read_group) & iterations_available }.enable :read_iteration
+      rule { can?(:read_group) & iterations_available }.policy do
+        enable :read_iteration
+        enable :read_iteration_cadence
+      end
 
       rule { developer & iterations_available }.policy do
         enable :create_iteration
         enable :admin_iteration
+        enable :create_iteration_cadence
       end
 
       rule { reporter & epics_available }.policy do
@@ -288,7 +301,7 @@ module EE
         prevent :read_group
       end
 
-      rule { ip_enforcement_prevents_access & ~owner }.policy do
+      rule { ip_enforcement_prevents_access & ~owner & ~auditor }.policy do
         prevent :read_group
       end
 
@@ -341,7 +354,7 @@ module EE
         prevent :admin_milestone
         prevent :upload_file
         prevent :admin_label
-        prevent :admin_list
+        prevent :admin_issue_board_list
         prevent :admin_issue
         prevent :admin_pipeline
         prevent :add_cluster

@@ -21,13 +21,13 @@ class Groups::BoardsController < Groups::ApplicationController
 
   def boards_finder
     strong_memoize :boards_finder do
-      Boards::ListService.new(parent, current_user)
+      Boards::BoardsFinder.new(parent, current_user)
     end
   end
 
   def board_finder
     strong_memoize :board_finder do
-      Boards::ListService.new(parent, current_user, board_id: params[:id])
+      Boards::BoardsFinder.new(parent, current_user, board_id: params[:id])
     end
   end
 
@@ -44,6 +44,6 @@ class Groups::BoardsController < Groups::ApplicationController
   end
 
   def authorize_read_board!
-    access_denied! unless can?(current_user, :read_board, group)
+    access_denied! unless can?(current_user, :read_issue_board, group)
   end
 end

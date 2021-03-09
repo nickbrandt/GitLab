@@ -31,10 +31,6 @@ class ProjectsController < Projects::ApplicationController
   # Project Export Rate Limit
   before_action :export_rate_limit, only: [:export, :download_export, :generate_new_export]
 
-  before_action do
-    push_frontend_feature_flag(:vue_notification_dropdown, @project, default_enabled: :yaml)
-  end
-
   before_action only: [:edit] do
     push_frontend_feature_flag(:allow_editing_commit_messages, @project)
   end
@@ -94,21 +90,13 @@ class ProjectsController < Projects::ApplicationController
     # Refresh the repo in case anything changed
     @repository = @project.repository
 
-    respond_to do |format|
-      if result[:status] == :success
-        flash[:notice] = _("Project '%{project_name}' was successfully updated.") % { project_name: @project.name }
-
-        format.html do
-          redirect_to(edit_project_path(@project, anchor: 'js-general-project-settings'))
-        end
-      else
-        flash[:alert] = result[:message]
-        @project.reset
-
-        format.html { render_edit }
-      end
-
-      format.js
+    if result[:status] == :success
+      flash[:notice] = _("Project '%{project_name}' was successfully updated.") % { project_name: @project.name }
+      redirect_to(edit_project_path(@project, anchor: 'js-general-project-settings'))
+    else
+      flash[:alert] = result[:message]
+      @project.reset
+      render 'edit'
     end
   end
 
@@ -333,7 +321,10 @@ class ProjectsController < Projects::ApplicationController
     if can?(current_user, :download_code, @project)
       return render 'projects/no_repo' unless @project.repository_exists?
 
-      experiment(:empty_repo_upload, project: @project).track(:view_project_show) if @project.can_current_user_push_to_default_branch?
+      if @project.can_current_user_push_to_default_branch?
+        property = @project.empty_repo? ? 'empty' : 'nonempty'
+        experiment(:empty_repo_upload, project: @project).track(:view_project_show, property: property)
+      end
 
       if @project.empty_repo?
         record_experiment_user(:invite_members_empty_project_version_a)
@@ -530,7 +521,7 @@ class ProjectsController < Projects::ApplicationController
   def export_rate_limit
     prefixed_action = "project_#{params[:action]}".to_sym
 
-    project_scope = params[:action] == :download_export ? @project : nil
+    project_scope = params[:action] == 'download_export' ? @project : nil
 
     if rate_limiter.throttled?(prefixed_action, scope: [current_user, project_scope].compact)
       rate_limiter.log_request(request, "#{prefixed_action}_request_limit".to_sym, current_user)

@@ -900,11 +900,11 @@ not directly accessible via `tag`:
 sudo gitlab-ctl registry-garbage-collect -m
 ```
 
-Without the `-m` flag, the Container Registry only removes layers that are not referenced by any manifest, tagged or not.
-
 Since this is a way more destructive operation, this behavior is disabled by default.
 You are likely expecting this way of operation, but before doing that, ensure
 that you have backed up all registry data.
+
+When the command is used without the `-m` flag, the Container Registry only removes layers that are not referenced by any manifest, tagged or not.
 
 ### Performing garbage collection without downtime
 
@@ -1144,7 +1144,7 @@ project or branch name. Special characters can include:
 - Trailing hyphen/dash
 - Double hyphen/dash
 
-To get around this, you can [change the group path](../../user/group/index.md#changing-a-groups-path),
+To get around this, you can [change the group path](../../user/group/index.md#change-a-groups-path),
 [change the project path](../../user/project/settings/index.md#renaming-a-repository) or change the
 branch name. Another option is to create a [push rule](../../push_rules/push_rules.md) to prevent
 this at the instance level.

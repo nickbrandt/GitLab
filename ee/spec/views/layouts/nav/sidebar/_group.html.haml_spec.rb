@@ -5,31 +5,101 @@ require 'spec_helper'
 RSpec.describe 'layouts/nav/sidebar/_group' do
   before do
     assign(:group, group)
-    allow(view).to receive(:show_trial_status_widget?).with(group).and_return(show_trial_status_widget)
+    allow(view).to receive(:show_trial_status_widget?).and_return(false)
   end
 
   let(:group) { create(:group) }
   let(:user) { create(:user) }
-  let(:show_trial_status_widget) { false }
 
-  describe 'trial status widget' do
+  describe 'trial status widget', :aggregate_failures do
     let!(:gitlab_subscription) { create(:gitlab_subscription, :active_trial, namespace: group) }
+    let(:show_widget) { false }
 
-    context 'when the experiment is off' do
-      it 'is not rendered' do
-        render
+    before do
+      allow(view).to receive(:show_trial_status_widget?).and_return(show_widget)
+      render
+    end
 
-        expect(rendered).not_to have_selector '#js-trial-status-widget'
+    subject { rendered }
+
+    context 'when the widget should not be shown' do
+      it 'does not render' do
+        is_expected.not_to have_selector '#js-trial-status-widget'
+        is_expected.not_to have_selector '#js-trial-status-popover'
       end
     end
 
-    context 'when the experiment is on' do
-      let(:show_trial_status_widget) { true }
+    context 'when the widget should be shown' do
+      let(:show_widget) { true }
 
-      it 'is rendered' do
+      it 'renders both the widget & popover component initialization elements' do
+        is_expected.to have_selector '#js-trial-status-widget'
+        is_expected.to have_selector '#js-trial-status-popover'
+      end
+
+      it 'supplies the same popover-trigger id value to both initialization elements' do
+        expected_id = 'trial-status-sidebar-widget'
+
+        is_expected.to have_selector "[data-container-id=#{expected_id}]"
+        is_expected.to have_selector "[data-target-id=#{expected_id}]"
+      end
+    end
+  end
+
+  describe 'DevOps adoption link' do
+    let!(:current_user) { create(:user) }
+
+    before do
+      group.add_maintainer(current_user)
+
+      allow(view).to receive(:current_user).and_return(current_user)
+    end
+
+    context 'DevOps adoption feature is available' do
+      before do
+        stub_licensed_features(group_level_devops_adoption: true)
+      end
+
+      it 'is visible' do
         render
 
-        expect(rendered).to have_selector '#js-trial-status-widget'
+        expect(rendered).to have_text 'DevOps Adoption'
+      end
+
+      context 'feature flag is disabled' do
+        before do
+          stub_feature_flags(group_devops_adoption: false)
+        end
+
+        it 'is not visible' do
+          render
+
+          expect(rendered).not_to have_text 'DevOps Adoption'
+        end
+      end
+    end
+
+    context 'DevOps apoption feature is not available' do
+      before do
+        stub_licensed_features(group_level_devops_adoption: false)
+      end
+
+      it 'is not visible' do
+        render
+
+        expect(rendered).not_to have_text 'DevOps Adoption'
+      end
+
+      context 'feature flag is disabled' do
+        before do
+          stub_feature_flags(group_devops_adoption: false)
+        end
+
+        it 'is not visible' do
+          render
+
+          expect(rendered).not_to have_text 'DevOps Adoption'
+        end
       end
     end
   end

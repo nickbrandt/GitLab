@@ -247,6 +247,7 @@ control over how the Pages daemon runs and serves content in your environment.
 | `log_directory`                         | Absolute path to a log directory. |
 | `log_format`                            | The log output format: `text` or `json`. |
 | `log_verbose`                           | Verbose logging, true/false. |
+| `propagate_correlation_id`              | Set to true (false by default) to re-use existing Correlation ID from the incoming request header `X-Request-ID` if present. If a reverse proxy sets this header, the value will be propagated in the request chain. |
 | `max_connections`                       | Limit on the number of concurrent connections to the HTTP, HTTPS or proxy listeners. |
 | `metrics_address`                       | The address to listen on for metrics requests. |
 | `redirect_http`                         | Redirect pages from HTTP to HTTPS, true/false. |
@@ -350,7 +351,7 @@ When adding a custom domain, users are required to prove they own it by
 adding a GitLab-controlled verification code to the DNS records for that domain.
 
 If your user base is private or otherwise trusted, you can disable the
-verification requirement. Navigate to **Admin Area > Settings > Preferences** and
+verification requirement. Go to **Admin Area > Settings > Preferences** and
 uncheck **Require users to prove ownership of custom domains** in the **Pages** section.
 This setting is enabled by default.
 
@@ -365,7 +366,7 @@ sites served under a custom domain.
 To enable it, you must:
 
 1. Choose an email address on which you want to receive notifications about expiring domains.
-1. Navigate to your instance's **Admin Area > Settings > Preferences** and expand **Pages** settings.
+1. Go to your instance's **Admin Area > Settings > Preferences** and expand **Pages** settings.
 1. Enter the email address for receiving notifications and accept Let's Encrypt's Terms of Service as shown below.
 1. Click **Save changes**.
 
@@ -419,7 +420,7 @@ The scope to use for authentication must match the GitLab Pages OAuth applicatio
 pre-existing applications must modify the GitLab Pages OAuth application. Follow these steps to do
 this:
 
-1. Navigate to your instance's **Admin Area > Settings > Applications** and expand **GitLab Pages**
+1. Go to your instance's **Admin Area > Settings > Applications** and expand **GitLab Pages**
    settings.
 1. Clear the `api` scope's checkbox and select the desired scope's checkbox (for example,
    `read_api`).
@@ -437,7 +438,7 @@ This can be useful to preserve information published with Pages websites to the 
 of your instance only.
 To do that:
 
-1. Navigate to your instance's **Admin Area > Settings > Preferences** and expand **Pages** settings.
+1. Go to your instance's **Admin Area > Settings > Preferences** and expand **Pages** settings.
 1. Check the **Disable public access to Pages sites** checkbox.
 1. Click **Save changes**.
 
@@ -526,6 +527,25 @@ Follow the steps below to configure verbose logging of GitLab Pages daemon.
 
 1. [Reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure).
 
+## Propagating the correlation ID
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-pages/-/merge_requests/438) in GitLab 13.10.
+
+Setting the `propagate_correlation_id` to true will allow installations behind a reverse proxy generate
+and set a correlation ID to requests sent to GitLab Pages. When a reverse proxy sets the header value `X-Request-ID`,
+the value will be propagated in the request chain.
+Users [can find the correlation ID in the logs](../troubleshooting/tracing_correlation_id.md#identify-the-correlation-id-for-a-request).
+
+To enable the propagation of the correlation ID:
+
+1. Set the parameter to true in `/etc/gitlab/gitlab.rb`:
+
+   ```ruby
+   gitlab_pages['propagate_correlation_id'] = true
+   ```
+
+1. [Reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure).
+
 ## Change storage path
 
 Follow the steps below to change the default path where GitLab Pages' contents
@@ -604,13 +624,13 @@ The default is 100MB.
 
 To override the global maximum pages size for a specific project:
 
-1. Navigate to your project's **Settings > Pages** page.
+1. Go to your project's **Settings > Pages** page.
 1. Edit the **Maximum size of pages**.
 1. Click **Save changes**.
 
 To override the global maximum pages size for a specific group:
 
-1. Navigate to your group's **Settings > General** page and expand **Pages**.
+1. Go to your group's **Settings > General** page and expand **Pages**.
 1. Edit the **Maximum size of pages**.
 1. Click **Save changes**.
 
@@ -842,7 +862,7 @@ In installations from source:
        remote_directory: "pages" # The bucket name
        connection:
          provider: AWS # Only AWS supported at the moment
-         aws_access_key_id: AWS_ACESS_KEY_ID
+         aws_access_key_id: AWS_ACCESS_KEY_ID
          aws_secret_access_key: AWS_SECRET_ACCESS_KEY
          region: eu-central-1
    ```
@@ -949,14 +969,15 @@ to define the explicit address that the GitLab Pages daemon should listen on:
 gitlab_pages['listen_proxy'] = '127.0.0.1:8090'
 ```
 
-### 404 error after transferring project to a different group or user
+### 404 error after transferring the project to a different group or user, or changing project path
 
 If you encounter a `404 Not Found` error a Pages site after transferring a project to
-another group or user, you must trigger a domain configuration update for Pages. To do
-so, write something in the `.update` file. The Pages daemon monitors for changes to this
-file, and reloads the configuration when changes occur.
+another group or user, or changing project path, you must trigger a domain configuration
+update for Pages. To do so, write something in the `.update` file. The Pages daemon
+monitors for changes to this file, and reloads the configuration when changes occur.
 
-Use this example to fix a `404 Not Found` error after transferring a project with Pages:
+Use this example to fix a `404 Not Found` error after transferring a project or changing
+a project path with Pages:
 
 ```shell
 date > /var/opt/gitlab/gitlab-rails/shared/pages/.update

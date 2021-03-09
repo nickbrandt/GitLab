@@ -581,7 +581,7 @@ RSpec.describe Ci::Build do
       end
 
       it 'that cannot handle build' do
-        expect_any_instance_of(Ci::Runner).to receive(:can_pick?).and_return(false)
+        expect_any_instance_of(Ci::Runner).to receive(:matches_build?).with(build).and_return(false)
         is_expected.to be_falsey
       end
     end
@@ -817,13 +817,69 @@ RSpec.describe Ci::Build do
   end
 
   describe '#cache' do
-    let(:options) { { cache: { key: "key", paths: ["public"], policy: "pull-push" } } }
+    let(:options) do
+      { cache: [{ key: "key", paths: ["public"], policy: "pull-push" }] }
+    end
+
+    context 'with multiple_cache_per_job FF disabled' do
+      before do
+        stub_feature_flags(multiple_cache_per_job: false)
+      end
+      let(:options) { { cache: { key: "key", paths: ["public"], policy: "pull-push" } } }
+
+      subject { build.cache }
+
+      context 'when build has cache' do
+        before do
+          allow(build).to receive(:options).and_return(options)
+        end
+
+        context 'when project has jobs_cache_index' do
+          before do
+            allow_any_instance_of(Project).to receive(:jobs_cache_index).and_return(1)
+          end
+
+          it { is_expected.to be_an(Array).and all(include(key: "key-1")) }
+        end
+
+        context 'when project does not have jobs_cache_index' do
+          before do
+            allow_any_instance_of(Project).to receive(:jobs_cache_index).and_return(nil)
+          end
+
+          it { is_expected.to eq([options[:cache]]) }
+        end
+      end
+
+      context 'when build does not have cache' do
+        before do
+          allow(build).to receive(:options).and_return({})
+        end
+
+        it { is_expected.to eq([]) }
+      end
+    end
 
     subject { build.cache }
 
     context 'when build has cache' do
       before do
         allow(build).to receive(:options).and_return(options)
+      end
+
+      context 'when build has multiple caches' do
+        let(:options) do
+          { cache: [
+            { key: "key", paths: ["public"], policy: "pull-push" },
+            { key: "key2", paths: ["public"], policy: "pull-push" }
+          ] }
+        end
+
+        before do
+          allow_any_instance_of(Project).to receive(:jobs_cache_index).and_return(1)
+        end
+
+        it { is_expected.to match([a_hash_including(key: "key-1"), a_hash_including(key: "key2-1")]) }
       end
 
       context 'when project has jobs_cache_index' do
@@ -839,7 +895,7 @@ RSpec.describe Ci::Build do
           allow_any_instance_of(Project).to receive(:jobs_cache_index).and_return(nil)
         end
 
-        it { is_expected.to eq([options[:cache]]) }
+        it { is_expected.to eq(options[:cache]) }
       end
     end
 
@@ -848,7 +904,7 @@ RSpec.describe Ci::Build do
         allow(build).to receive(:options).and_return({})
       end
 
-      it { is_expected.to eq([nil]) }
+      it { is_expected.to be_empty }
     end
   end
 
@@ -2405,6 +2461,7 @@ RSpec.describe Ci::Build do
           { key: 'CI_PROJECT_REPOSITORY_LANGUAGES', value: project.repository_languages.map(&:name).join(',').downcase, public: true, masked: false },
           { key: 'CI_DEFAULT_BRANCH', value: project.default_branch, public: true, masked: false },
           { key: 'CI_PROJECT_CONFIG_PATH', value: project.ci_config_path_or_default, public: true, masked: false },
+          { key: 'CI_CONFIG_PATH', value: project.ci_config_path_or_default, public: true, masked: false },
           { key: 'CI_PAGES_DOMAIN', value: Gitlab.config.pages.host, public: true, masked: false },
           { key: 'CI_PAGES_URL', value: project.pages_url, public: true, masked: false },
           { key: 'CI_DEPENDENCY_PROXY_SERVER', value: "#{Gitlab.config.gitlab.host}:#{Gitlab.config.gitlab.port}", public: true, masked: false },
@@ -2415,7 +2472,6 @@ RSpec.describe Ci::Build do
           { key: 'CI_API_V4_URL', value: 'http://localhost/api/v4', public: true, masked: false },
           { key: 'CI_PIPELINE_IID', value: pipeline.iid.to_s, public: true, masked: false },
           { key: 'CI_PIPELINE_SOURCE', value: pipeline.source, public: true, masked: false },
-          { key: 'CI_CONFIG_PATH', value: pipeline.config_path, public: true, masked: false },
           { key: 'CI_COMMIT_SHA', value: build.sha, public: true, masked: false },
           { key: 'CI_COMMIT_SHORT_SHA', value: build.short_sha, public: true, masked: false },
           { key: 'CI_COMMIT_BEFORE_SHA', value: build.before_sha, public: true, masked: false },
@@ -2440,7 +2496,8 @@ RSpec.describe Ci::Build do
         build.yaml_variables = []
       end
 
-      it { is_expected.to eq(predefined_variables) }
+      it { is_expected.to be_instance_of(Gitlab::Ci::Variables::Collection) }
+      it { expect(subject.to_runner_variables).to eq(predefined_variables) }
 
       context 'when ci_job_jwt feature flag is disabled' do
         before do
@@ -2495,7 +2552,7 @@ RSpec.describe Ci::Build do
           end
 
           it 'returns variables in order depending on resource hierarchy' do
-            is_expected.to eq(
+            expect(subject.to_runner_variables).to eq(
               [dependency_proxy_var,
                job_jwt_var,
                build_pre_var,
@@ -2525,7 +2582,7 @@ RSpec.describe Ci::Build do
           end
 
           it 'matches explicit variables ordering' do
-            received_variables = subject.map { |variable| variable.fetch(:key) }
+            received_variables = subject.map { |variable| variable[:key] }
 
             expect(received_variables).to eq expected_variables
           end
@@ -2618,7 +2675,7 @@ RSpec.describe Ci::Build do
             it_behaves_like 'containing environment variables'
 
             it 'puts $CI_ENVIRONMENT_URL in the last so all other variables are available to be used when runners are trying to expand it' do
-              expect(subject.last).to eq(environment_variables.last)
+              expect(subject.to_runner_variables.last).to eq(environment_variables.last)
             end
           end
         end
@@ -2951,7 +3008,7 @@ RSpec.describe Ci::Build do
       end
 
       it 'overrides YAML variable using a pipeline variable' do
-        variables = subject.reverse.uniq { |variable| variable[:key] }.reverse
+        variables = subject.to_runner_variables.reverse.uniq { |variable| variable[:key] }.reverse
 
         expect(variables)
           .not_to include(key: 'MYVAR', value: 'myvar', public: true, masked: false)
@@ -3245,47 +3302,6 @@ RSpec.describe Ci::Build do
       let(:environment) { nil }
 
       it { is_expected.to be_empty }
-    end
-  end
-
-  describe '#scoped_variables_hash' do
-    context 'when overriding CI variables' do
-      before do
-        project.variables.create!(key: 'MY_VAR', value: 'my value 1')
-        pipeline.variables.create!(key: 'MY_VAR', value: 'my value 2')
-      end
-
-      it 'returns a regular hash created using valid ordering' do
-        expect(build.scoped_variables_hash).to include('MY_VAR': 'my value 2')
-        expect(build.scoped_variables_hash).not_to include('MY_VAR': 'my value 1')
-      end
-    end
-
-    context 'when overriding user-provided variables' do
-      let(:build) do
-        create(:ci_build, pipeline: pipeline, yaml_variables: [{ key: 'MY_VAR', value: 'myvar', public: true }])
-      end
-
-      before do
-        pipeline.variables.build(key: 'MY_VAR', value: 'pipeline value')
-      end
-
-      it 'returns a hash including variable with higher precedence' do
-        expect(build.scoped_variables_hash).to include('MY_VAR': 'pipeline value')
-        expect(build.scoped_variables_hash).not_to include('MY_VAR': 'myvar')
-      end
-    end
-
-    context 'when overriding CI instance variables' do
-      before do
-        create(:ci_instance_variable, key: 'MY_VAR', value: 'my value 1')
-        group.variables.create!(key: 'MY_VAR', value: 'my value 2')
-      end
-
-      it 'returns a regular hash created using valid ordering' do
-        expect(build.scoped_variables_hash).to include('MY_VAR': 'my value 2')
-        expect(build.scoped_variables_hash).not_to include('MY_VAR': 'my value 1')
-      end
     end
   end
 

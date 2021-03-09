@@ -5,7 +5,7 @@ info: To determine the technical writer assigned to the Stage/Group associated w
 type: reference
 ---
 
-# Requirements
+# Requirements **(FREE SELF)**
 
 This page includes useful information on the supported Operating Systems as well
 as the hardware requirements that are needed to install and use GitLab.
@@ -80,7 +80,7 @@ From GitLab 13.1:
 Beginning in GitLab 12.9, we only support Node.js 10.13.0 or higher, and we have dropped
 support for Node.js 8. (Node.js 6 support was dropped in GitLab 11.8)
 
-We recommend Node 12.x, as it's faster.
+We recommend Node 14.x, as it's faster.
 
 GitLab uses [webpack](https://webpack.js.org/) to compile frontend assets, which requires a minimum
 version of Node.js 10.13.0.
@@ -110,7 +110,8 @@ Apart from a local hard drive you can also mount a volume that supports the netw
 If you have enough RAM and a recent CPU the speed of GitLab is mainly limited by hard drive seek times. Having a fast drive (7200 RPM and up) or a solid state drive (SSD) will improve the responsiveness of GitLab.
 
 NOTE:
-Since file system performance may affect the overall performance of GitLab, [we don't recommend using AWS EFS for storage](../administration/nfs.md#avoid-using-awss-elastic-file-system-efs).
+Since file system performance may affect the overall performance of GitLab,
+[we don't recommend using cloud-based file systems for storage](../administration/nfs.md#avoid-using-cloud-based-file-systems).
 
 ### CPU
 

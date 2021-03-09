@@ -373,8 +373,8 @@ RSpec.describe Ci::Pipeline, :mailer, factory_default: :keep do
     end
   end
 
-  describe '#merge_request_pipeline?' do
-    subject { pipeline.merge_request_pipeline? }
+  describe '#merged_result_pipeline?' do
+    subject { pipeline.merged_result_pipeline? }
 
     let!(:pipeline) do
       create(:ci_pipeline, source: :merge_request_event, merge_request: merge_request, target_sha: target_sha)
@@ -419,24 +419,6 @@ RSpec.describe Ci::Pipeline, :mailer, factory_default: :keep do
       let(:merge_request) { create(:merge_request, :with_detached_merge_request_pipeline) }
 
       it { is_expected.to eq(:detached) }
-    end
-  end
-
-  describe '#for_merged_result?' do
-    subject { pipeline.for_merged_result? }
-
-    let(:pipeline) { merge_request.all_pipelines.last }
-
-    context 'when pipeline is merge request pipeline' do
-      let(:merge_request) { create(:merge_request, :with_merge_request_pipeline) }
-
-      it { is_expected.to be_truthy }
-    end
-
-    context 'when pipeline is detached merge request pipeline' do
-      let(:merge_request) { create(:merge_request, :with_detached_merge_request_pipeline) }
-
-      it { is_expected.to be_falsey }
     end
   end
 
@@ -825,7 +807,6 @@ RSpec.describe Ci::Pipeline, :mailer, factory_default: :keep do
       expect(keys).to eq %w[
         CI_PIPELINE_IID
         CI_PIPELINE_SOURCE
-        CI_CONFIG_PATH
         CI_COMMIT_SHA
         CI_COMMIT_SHORT_SHA
         CI_COMMIT_BEFORE_SHA
@@ -1150,22 +1131,28 @@ RSpec.describe Ci::Pipeline, :mailer, factory_default: :keep do
           end
 
           context 'when commit status is retried' do
-            before do
+            let!(:old_commit_status) do
               create(:commit_status, pipeline: pipeline,
-                                    stage: 'build',
-                                    name: 'mac',
-                                    stage_idx: 0,
-                                    status: 'success')
-
-              Ci::ProcessPipelineService
-                .new(pipeline)
-                .execute
+                                     stage: 'build',
+                                     name: 'mac',
+                                     stage_idx: 0,
+                                     status: 'success')
             end
 
-            it 'ignores the previous state' do
-              expect(statuses).to eq([%w(build success),
-                                      %w(test success),
-                                      %w(deploy running)])
+            context 'when FF ci_remove_update_retried_from_process_pipeline is disabled' do
+              before do
+                stub_feature_flags(ci_remove_update_retried_from_process_pipeline: false)
+
+                Ci::ProcessPipelineService
+                  .new(pipeline)
+                  .execute
+              end
+
+              it 'ignores the previous state' do
+                expect(statuses).to eq([%w(build success),
+                                        %w(test success),
+                                        %w(deploy running)])
+              end
             end
           end
         end
@@ -1449,28 +1436,10 @@ RSpec.describe Ci::Pipeline, :mailer, factory_default: :keep do
     end
 
     describe 'pipeline caching' do
-      context 'if pipeline is cacheable' do
-        before do
-          pipeline.source = 'push'
-        end
+      it 'performs ExpirePipelinesCacheWorker' do
+        expect(ExpirePipelineCacheWorker).to receive(:perform_async).with(pipeline.id)
 
-        it 'performs ExpirePipelinesCacheWorker' do
-          expect(ExpirePipelineCacheWorker).to receive(:perform_async).with(pipeline.id)
-
-          pipeline.cancel
-        end
-      end
-
-      context 'if pipeline is not cacheable' do
-        before do
-          pipeline.source = 'webide'
-        end
-
-        it 'deos not perform ExpirePipelinesCacheWorker' do
-          expect(ExpirePipelineCacheWorker).not_to receive(:perform_async)
-
-          pipeline.cancel
-        end
+        pipeline.cancel
       end
     end
 

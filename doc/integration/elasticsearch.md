@@ -11,10 +11,7 @@ info: To determine the technical writer assigned to the Stage/Group associated w
 
 This document describes how to enable Advanced Search. After
 Advanced Search is enabled, you'll have the benefit of fast search response times
-and the advantage of the following special searches:
-
-- [Advanced Search](../user/search/advanced_global_search.md)
-- [Advanced Search Syntax](../user/search/advanced_search_syntax.md)
+and the advantage of the [special searches](../user/search/advanced_search.md).
 
 ## Version requirements
 
@@ -41,7 +38,7 @@ each node should have:
 
 - [Memory](https://www.elastic.co/guide/en/elasticsearch/guide/current/hardware.html#_memory): 8 GiB (minimum).
 - [CPU](https://www.elastic.co/guide/en/elasticsearch/guide/current/hardware.html#_cpus): Modern processor with multiple cores.
-- [Storage](https://www.elastic.co/guide/en/elasticsearch/guide/current/hardware.html#_disks): Use SSD storage. You will need enough storage for 50% of the total size of your Git repositories.
+- [Storage](https://www.elastic.co/guide/en/elasticsearch/guide/current/hardware.html#_disks): Use SSD storage. The total storage size of all Elasticsearch nodes is about 50% of the total size of your Git repositories. It includes one primary and one replica.
 
 A few notes on CPU and storage:
 
