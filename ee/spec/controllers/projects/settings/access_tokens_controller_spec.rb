@@ -36,7 +36,6 @@ RSpec.describe Projects::Settings::AccessTokensController do
     end
 
     context 'when project access tokens are disabled' do
-      let(:group) { create(:group_with_plan, plan: :bronze_plan) }
       let(:project) { create(:project, group: group) }
 
       before do

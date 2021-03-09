@@ -1344,7 +1344,7 @@ RSpec.describe GroupPolicy do
 
         it { is_expected.to be_allowed(:admin_resource_access_tokens) }
 
-        context 'when project access tokens are disabled' do
+        context 'when resource access tokens are disabled' do
           before do
             group.namespace_settings.update!(resource_access_tokens_enabled: false)
           end
@@ -1352,10 +1352,9 @@ RSpec.describe GroupPolicy do
           it { is_expected.not_to be_allowed(:admin_resource_access_tokens) }
         end
 
-        context 'when parent group has project access tokens disabled' do
+        context 'when parent group has resource access tokens disabled' do
           let(:parent) { create(:group_with_plan, plan: :bronze_plan) }
           let(:group) { create(:group, parent: parent) }
-          let(:project) { create(:project, group: group) }
 
           before do
             parent.namespace_settings.update!(resource_access_tokens_enabled: false)
