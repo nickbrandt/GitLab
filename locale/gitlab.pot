@@ -32227,6 +32227,9 @@ msgstr ""
 msgid "Upload CSV file"
 msgstr ""
 
+msgid "Upload File"
+msgstr ""
+
 msgid "Upload License"
 msgstr ""
 
