@@ -123,7 +123,7 @@ module ApplicationSettingImplementation
         raw_blob_request_limit: 300,
         recaptcha_enabled: false,
         repository_checks_enabled: true,
-        repository_storages_weighted: { default: 100 },
+        repository_storages_weighted: { 'default' => 100 },
         repository_storages: ['default'],
         require_admin_approval_after_user_signup: true,
         require_two_factor_authentication: false,
