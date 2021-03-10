@@ -39,8 +39,6 @@ const groupsSelect = () => {
               };
             },
             results(data, page) {
-              if (data.length) return { results: [] };
-
               const groups = data.length ? data : data.results || [];
               const more = data.pagination ? data.pagination.more : false;
               const results = groups.filter((group) => skipGroups.indexOf(group.id) === -1);
