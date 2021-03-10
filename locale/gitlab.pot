@@ -3811,6 +3811,9 @@ msgid_plural "ApprovalRuleSummary|%{count} approvals required from %{membersCoun
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "ApprovalRule|Add approvers"
+msgstr ""
+
 msgid "ApprovalRule|Approval rules"
 msgstr ""
 
@@ -3820,6 +3823,9 @@ msgstr ""
 msgid "ApprovalRule|Approvers"
 msgstr ""
 
+msgid "ApprovalRule|Examples: QA, Security."
+msgstr ""
+
 msgid "ApprovalRule|Name"
 msgstr ""
 
@@ -3827,9 +3833,6 @@ msgid "ApprovalRule|Rule name"
 msgstr ""
 
 msgid "ApprovalRule|Target branch"
-msgstr ""
-
-msgid "ApprovalRule|e.g. QA, Security, etc."
 msgstr ""
 
 msgid "ApprovalStatusTooltip|Adheres to separation of duties"
