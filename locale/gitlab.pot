@@ -21583,6 +21583,9 @@ msgstr ""
 msgid "PackageRegistry|Add Conan Remote"
 msgstr ""
 
+msgid "PackageRegistry|Add Gradle Groovy DSL repository command"
+msgstr ""
+
 msgid "PackageRegistry|Add NuGet Source"
 msgstr ""
 
@@ -21619,6 +21622,9 @@ msgstr ""
 msgid "PackageRegistry|Copy Conan Setup Command"
 msgstr ""
 
+msgid "PackageRegistry|Copy Gradle Groovy DSL install command"
+msgstr ""
+
 msgid "PackageRegistry|Copy Maven XML"
 msgstr ""
 
@@ -21635,6 +21641,9 @@ msgid "PackageRegistry|Copy NuGet Setup Command"
 msgstr ""
 
 msgid "PackageRegistry|Copy Pip command"
+msgstr ""
+
+msgid "PackageRegistry|Copy add Gradle Groovy DSL repository command"
 msgstr ""
 
 msgid "PackageRegistry|Copy and paste this inside your %{codeStart}pom.xml%{codeEnd} %{codeStart}dependencies%{codeEnd} block."
@@ -21686,6 +21695,9 @@ msgid "PackageRegistry|Generic"
 msgstr ""
 
 msgid "PackageRegistry|GitLab Packages allows organizations to utilize GitLab as a private repository for a variety of common package formats. %{linkStart}More Information%{linkEnd}"
+msgstr ""
+
+msgid "PackageRegistry|Gradle Groovy DSL install command"
 msgstr ""
 
 msgid "PackageRegistry|If you haven't already done so, you will need to add the below to your %{codeStart}.pypirc%{codeEnd} file."
@@ -21758,6 +21770,27 @@ msgid "PackageRegistry|Settings for Maven packages"
 msgstr ""
 
 msgid "PackageRegistry|Settings saved successfully"
+msgstr ""
+
+msgid "PackageRegistry|Show Composer commands"
+msgstr ""
+
+msgid "PackageRegistry|Show Conan commands"
+msgstr ""
+
+msgid "PackageRegistry|Show Gradle Groovy DSL commands"
+msgstr ""
+
+msgid "PackageRegistry|Show Maven commands"
+msgstr ""
+
+msgid "PackageRegistry|Show NPM commands"
+msgstr ""
+
+msgid "PackageRegistry|Show Nuget commands"
+msgstr ""
+
+msgid "PackageRegistry|Show PyPi commands"
 msgstr ""
 
 msgid "PackageRegistry|Sorry, your filter produced no results"
