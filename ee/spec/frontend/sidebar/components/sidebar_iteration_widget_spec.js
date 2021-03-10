@@ -1,24 +1,34 @@
-import { GlDropdown, GlDropdownItem, GlDropdownText, GlLink, GlSearchBoxByType } from '@gitlab/ui';
+import {
+  GlDropdown,
+  GlDropdownItem,
+  GlDropdownText,
+  GlLink,
+  GlSearchBoxByType,
+  GlFormInput,
+  GlLoadingIcon,
+} from '@gitlab/ui';
 import * as Sentry from '@sentry/browser';
-import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { createLocalVue, shallowMount, mount } from '@vue/test-utils';
 import VueApollo from 'vue-apollo';
 
-import IterationSelect from 'ee/sidebar/components/iteration_select.vue';
+import SidebarIterationWidget from 'ee/sidebar/components/sidebar_iteration_widget.vue';
 import { iterationSelectTextMap, iterationDisplayState } from 'ee/sidebar/constants';
 import groupIterationsQuery from 'ee/sidebar/queries/group_iterations.query.graphql';
-import currentIterationQuery from 'ee/sidebar/queries/issue_iteration.query.graphql';
-import setIssueIterationMutation from 'ee/sidebar/queries/set_iteration_on_issue.mutation.graphql';
+import projectIssueIterationMutation from 'ee/sidebar/queries/project_issue_iteration.mutation.graphql';
+import projectIssueIterationQuery from 'ee/sidebar/queries/project_issue_iteration.query.graphql';
 import createMockApollo from 'helpers/mock_apollo_helper';
 import { extendedWrapper } from 'helpers/vue_test_utils_helper';
 import waitForPromises from 'helpers/wait_for_promises';
 import createFlash from '~/flash';
+import { IssuableType } from '~/issue_show/constants';
+import SidebarEditableItem from '~/sidebar/components/sidebar_editable_item.vue';
 
 import {
   mockIssue,
-  mockIterationsResponse,
+  mockGroupIterationsResponse,
   mockIteration2,
   mockMutationResponse,
-  emptyIterationsResponse,
+  emptyGroupIterationsResponse,
   noCurrentIterationResponse,
 } from '../mock_data';
 
@@ -26,16 +36,15 @@ jest.mock('~/flash');
 
 const localVue = createLocalVue();
 
-describe('IterationSelect', () => {
+describe('SidebarIterationWidget', () => {
   let wrapper;
   let mockApollo;
-  let showDropdown;
 
-  const promiseData = { issueSetIteration: { issue: { iteration: { id: '123' } } } };
+  const promiseData = { issuableSetIteration: { issue: { iteration: { id: '123' } } } };
   const firstErrorMsg = 'first error';
   const promiseWithErrors = {
     ...promiseData,
-    issueSetIteration: { ...promiseData.issueSetIteration, errors: [firstErrorMsg] },
+    issuableSetIteration: { ...promiseData.issuableSetIteration, errors: [firstErrorMsg] },
   };
 
   const mutationSuccess = () => jest.fn().mockResolvedValue({ data: promiseData });
@@ -50,65 +59,87 @@ describe('IterationSelect', () => {
   const findDropdownItemWithText = (text) =>
     findAllDropdownItems().wrappers.find((x) => x.text() === text);
 
+  const findSidebarEditableItem = () => wrapper.findComponent(SidebarEditableItem);
+  const findEditButton = () => findSidebarEditableItem().find('[data-testid="edit-button"]');
+  const findEditableLoadingIcon = () => findSidebarEditableItem().find(GlLoadingIcon);
   const findIterationItems = () => wrapper.findByTestId('iteration-items');
   const findSelectedIteration = () => wrapper.findByTestId('select-iteration');
   const findNoIterationItem = () => wrapper.findByTestId('no-iteration-item');
-  const findLoadingIconTitle = () => wrapper.findByTestId('loading-icon-title');
   const findLoadingIconDropdown = () => wrapper.findByTestId('loading-icon-dropdown');
-  const findEditButton = () => wrapper.findByTestId('iteration-edit-link');
 
-  const toggleDropdown = async (spy = () => {}) => {
-    findEditButton().vm.$emit('click', { stopPropagation: spy });
-
+  const waitForDropdown = async () => {
+    // BDropdown first changes its `visible` property
+    // in a requestAnimationFrame callback.
+    // It then emits `shown` event in a watcher for `visible`
+    // Hence we need both of these:
+    await waitForPromises();
     await wrapper.vm.$nextTick();
   };
 
+  const waitForApollo = async () => {
+    jest.runOnlyPendingTimers();
+    await waitForPromises();
+  };
+
+  // Used with createComponentWithApollo which uses 'mount'
+  const clickEdit = async () => {
+    await findEditButton().trigger('click');
+
+    await waitForDropdown();
+
+    // We should wait for iterations list to be fetched.
+    await waitForApollo();
+  };
+
+  // Used with createComponent which shallow mounts components
+  const toggleDropdown = async () => {
+    wrapper.vm.$refs.editable.expand();
+
+    await waitForDropdown();
+  };
+
   const createComponentWithApollo = async ({
-    props = { canEdit: true },
     requestHandlers = [],
     currentIterationSpy = jest.fn().mockResolvedValue(noCurrentIterationResponse),
-    groupIterationsSpy = jest.fn().mockResolvedValue(mockIterationsResponse),
+    groupIterationsSpy = jest.fn().mockResolvedValue(mockGroupIterationsResponse),
   } = {}) => {
     localVue.use(VueApollo);
     mockApollo = createMockApollo([
-      [currentIterationQuery, currentIterationSpy],
+      [projectIssueIterationQuery, currentIterationSpy],
       [groupIterationsQuery, groupIterationsSpy],
       ...requestHandlers,
     ]);
 
     wrapper = extendedWrapper(
-      shallowMount(IterationSelect, {
+      mount(SidebarIterationWidget, {
         localVue,
+        provide: { canUpdate: true },
         apolloProvider: mockApollo,
         propsData: {
-          groupPath: mockIssue.groupPath,
-          projectPath: mockIssue.projectPath,
-          issueIid: mockIssue.iid,
-          ...props,
+          workspacePath: mockIssue.projectPath,
+          iterationsWorkspacePath: mockIssue.groupPath,
+          iid: mockIssue.iid,
+          issuableType: IssuableType.Issue,
         },
+        attachTo: document.body,
       }),
     );
 
-    showDropdown = jest.spyOn(wrapper.vm, 'showDropdown').mockImplementation();
+    await waitForApollo();
   };
 
-  const createComponent = ({
-    data = {},
-    mutationPromise = mutationSuccess,
-    queries = {},
-    props = { canEdit: true },
-    stubs = { GlSearchBoxByType },
-  } = {}) => {
+  const createComponent = ({ data = {}, mutationPromise = mutationSuccess, queries = {} } = {}) => {
     wrapper = extendedWrapper(
-      shallowMount(IterationSelect, {
+      shallowMount(SidebarIterationWidget, {
+        provide: { canUpdate: true },
         data() {
           return data;
         },
         propsData: {
-          groupPath: '',
-          projectPath: '',
-          issueIid: '',
-          ...props,
+          workspacePath: '',
+          iterationsWorkspacePath: '',
+          iid: '',
+          issuableType: IssuableType.Issue,
         },
         mocks: {
           $apollo: {
@@ -120,11 +151,17 @@ describe('IterationSelect', () => {
             },
           },
         },
-        stubs,
+        stubs: {
+          SidebarEditableItem,
+          GlSearchBoxByType,
+          GlDropdown,
+        },
       }),
     );
 
-    showDropdown = jest.spyOn(wrapper.vm, 'showDropdown').mockImplementation();
+    // We need to mock out `showDropdown` which
+    // invokes `show` method of BDropdown used inside GlDropdown.
+    jest.spyOn(wrapper.vm, 'showDropdown').mockImplementation();
   };
 
   afterEach(() => {
@@ -140,6 +177,7 @@ describe('IterationSelect', () => {
         },
         stubs: {
           GlDropdown,
+          SidebarEditableItem,
         },
       });
     });
@@ -153,7 +191,7 @@ describe('IterationSelect', () => {
     });
 
     it('does not show a loading spinner next to the iteration heading', () => {
-      expect(findLoadingIconTitle().exists()).toBe(false);
+      expect(findEditableLoadingIcon().exists()).toBe(false);
     });
 
     it('shows a loading spinner while fetching the current iteration', () => {
@@ -161,12 +199,9 @@ describe('IterationSelect', () => {
         queries: {
           currentIteration: { loading: true },
         },
-        stubs: {
-          GlDropdown,
-        },
       });
 
-      expect(findLoadingIconTitle().exists()).toBe(true);
+      expect(findEditableLoadingIcon().exists()).toBe(true);
     });
 
     it('shows the title of the selected iteration while updating', () => {
@@ -178,77 +213,22 @@ describe('IterationSelect', () => {
         queries: {
           currentIteration: { loading: false },
         },
-        stubs: {
-          GlDropdown,
-        },
       });
 
-      expect(findLoadingIconTitle().exists()).toBe(true);
+      expect(findEditableLoadingIcon().exists()).toBe(true);
       expect(findSelectedIteration().text()).toBe('Some iteration title');
     });
 
     describe('when current iteration does not exist', () => {
       it('renders "None" as the selected iteration title', () => {
-        createComponent({
-          stubs: {
-            GlDropdown,
-          },
-        });
+        createComponent();
 
         expect(findSelectedIteration().text()).toBe('None');
       });
     });
   });
 
-  describe('when a user cannot edit', () => {
-    it('cannot find the edit button', () => {
-      createComponent({
-        props: { canEdit: false },
-        stubs: {
-          GlDropdown,
-        },
-      });
-
-      expect(findEditButton().exists()).toBe(false);
-    });
-  });
-
   describe('when a user can edit', () => {
-    it('opens the dropdown on click of the edit button', async () => {
-      createComponent({ props: { canEdit: true } });
-
-      expect(findDropdown().isVisible()).toBe(false);
-
-      await toggleDropdown();
-
-      expect(findDropdown().isVisible()).toBe(true);
-      expect(showDropdown).toHaveBeenCalledTimes(1);
-    });
-
-    it('focuses on the input on click of the edit button', async () => {
-      createComponent({ props: { canEdit: true } });
-      const setFocus = jest.spyOn(wrapper.vm, 'setFocus').mockImplementation();
-
-      await toggleDropdown();
-
-      findDropdown().vm.$emit('shown');
-
-      await wrapper.vm.$nextTick();
-
-      expect(setFocus).toHaveBeenCalledTimes(1);
-    });
-
-    it('stops propagation of the click event to avoid opening milestone dropdown', async () => {
-      const spy = jest.fn();
-      createComponent({ props: { canEdit: true } });
-
-      expect(findDropdown().isVisible()).toBe(false);
-
-      await toggleDropdown(spy);
-
-      expect(spy).toHaveBeenCalledTimes(1);
-    });
-
     describe('when user is editing', () => {
       describe('when rendering the dropdown', () => {
         it('shows a loading spinner while fetching a list of iterations', async () => {
@@ -359,7 +339,7 @@ describe('IterationSelect', () => {
                   findDropdownItemWithText('title').vm.$emit('click');
                 });
 
-                it('calls createFlash with $expectedMsg', async () => {
+                it(`calls createFlash with "${expectedMsg}"`, async () => {
                   await wrapper.vm.$nextTick();
                   expect(createFlash).toHaveBeenCalledWith(expectedMsg);
                 });
@@ -384,77 +364,49 @@ describe('IterationSelect', () => {
           });
         });
       });
+    });
+  });
 
-      describe('when the user off clicks', () => {
-        describe('when the dropdown is open', () => {
-          beforeEach(async () => {
-            createComponent();
+  describe('with mock apollo', () => {
+    let error;
 
-            await toggleDropdown();
-          });
-
-          it('closes the dropdown', async () => {
-            expect(findDropdown().isVisible()).toBe(true);
-
-            await toggleDropdown();
-
-            expect(findDropdown().isVisible()).toBe(false);
-          });
-        });
-      });
-
-      // A user might press "ESC" to hide the dropdown.
-      // We need to make sure that
-      // toggleDropdown() gets called to set 'editing' to 'false'
-      describe('when the dropdown emits "hidden"', () => {
-        beforeEach(async () => {
-          createComponent();
-
-          await toggleDropdown();
-        });
-
-        it('should hide the dropdown', async () => {
-          expect(findDropdown().isVisible()).toBe(true);
-
-          findDropdown().vm.$emit('hidden');
-          await wrapper.vm.$nextTick();
-
-          expect(findDropdown().isVisible()).toBe(false);
-        });
-      });
+    beforeEach(() => {
+      jest.spyOn(Sentry, 'captureException');
+      error = new Error('mayday');
     });
 
-    describe('With mock apollo', () => {
-      let error;
+    describe("when issuable type is 'issue'", () => {
+      describe('when dropdown is expanded and user can edit', () => {
+        let iterationMutationSpy;
+        beforeEach(async () => {
+          iterationMutationSpy = jest.fn().mockResolvedValue(mockMutationResponse);
 
-      beforeEach(() => {
-        jest.spyOn(Sentry, 'captureException');
-        error = new Error('mayday');
-      });
+          await createComponentWithApollo({
+            requestHandlers: [[projectIssueIterationMutation, iterationMutationSpy]],
+          });
 
-      describe('when clicking on dropdown item', () => {
+          await clickEdit();
+        });
+
+        it('renders the dropdown on clicking edit', async () => {
+          expect(findDropdown().isVisible()).toBe(true);
+        });
+
+        it('focuses on the input when dropdown is shown', async () => {
+          expect(document.activeElement).toEqual(wrapper.find(GlFormInput).element);
+        });
+
         describe('when currentIteration is not equal to iteration id', () => {
-          let setIssueIterationSpy;
-
           describe('when update is successful', () => {
-            setIssueIterationSpy = jest.fn().mockResolvedValue(mockMutationResponse);
-            beforeEach(async () => {
-              createComponentWithApollo({
-                requestHandlers: [[setIssueIterationMutation, setIssueIterationSpy]],
-              });
-
-              await toggleDropdown();
-              jest.runOnlyPendingTimers();
-              await wrapper.vm.$nextTick();
-
+            beforeEach(() => {
               findDropdownItemWithText(mockIteration2.title).vm.$emit('click');
             });
 
             it('calls setIssueIteration mutation', () => {
-              expect(setIssueIterationSpy).toHaveBeenCalledWith({
+              expect(iterationMutationSpy).toHaveBeenCalledWith({
                 iid: mockIssue.iid,
                 iterationId: mockIteration2.id,
-                projectPath: mockIssue.projectPath,
+                fullPath: mockIssue.projectPath,
               });
             });
 
@@ -463,15 +415,70 @@ describe('IterationSelect', () => {
             });
           });
         });
+
+        describe('iterations', () => {
+          let groupIterationsSpy;
+
+          it('should call createFlash and Sentry if iterations query fails', async () => {
+            await createComponentWithApollo({
+              groupIterationsSpy: jest.fn().mockRejectedValue(error),
+            });
+
+            await clickEdit();
+
+            expect(createFlash).toHaveBeenNthCalledWith(1, {
+              message: wrapper.vm.$options.i18n.iterationsFetchError,
+            });
+            expect(Sentry.captureException.mock.calls[0][0].networkError).toBe(error);
+          });
+
+          it('only fetches iterations when dropdown is opened', async () => {
+            groupIterationsSpy = jest.fn().mockResolvedValueOnce(emptyGroupIterationsResponse);
+            await createComponentWithApollo({ groupIterationsSpy });
+
+            expect(groupIterationsSpy).not.toHaveBeenCalled();
+
+            await clickEdit();
+
+            expect(groupIterationsSpy).toHaveBeenNthCalledWith(1, {
+              fullPath: mockIssue.groupPath,
+              title: '',
+              state: iterationDisplayState,
+            });
+          });
+
+          describe('when a user is searching', () => {
+            const mockSearchTerm = 'foobar';
+
+            beforeEach(async () => {
+              groupIterationsSpy = jest.fn().mockResolvedValueOnce(emptyGroupIterationsResponse);
+              await createComponentWithApollo({ groupIterationsSpy });
+
+              await clickEdit();
+            });
+
+            it('sends a groupIterations query with the entered search term "foo"', async () => {
+              findSearchBox().vm.$emit('input', mockSearchTerm);
+              await wrapper.vm.$nextTick();
+
+              // Account for debouncing
+              jest.runAllTimers();
+
+              expect(groupIterationsSpy).toHaveBeenNthCalledWith(2, {
+                fullPath: mockIssue.groupPath,
+                title: mockSearchTerm,
+                state: iterationDisplayState,
+              });
+            });
+          });
+        });
       });
 
       describe('currentIterations', () => {
         it('should call createFlash and Sentry if currentIterations query fails', async () => {
-          createComponentWithApollo({
+          await createComponentWithApollo({
             currentIterationSpy: jest.fn().mockRejectedValue(error),
           });
-
-          await waitForPromises();
 
           expect(createFlash).toHaveBeenNthCalledWith(1, {
             message: wrapper.vm.$options.i18n.currentIterationFetchError,
@@ -479,65 +486,6 @@ describe('IterationSelect', () => {
           expect(Sentry.captureException.mock.calls[0][0].networkError).toBe(error);
         });
       });
-
-      describe('iterations', () => {
-        let groupIterationsSpy;
-
-        it('should call createFlash and Sentry if iterations query fails', async () => {
-          createComponentWithApollo({
-            groupIterationsSpy: jest.fn().mockRejectedValue(error),
-          });
-
-          await toggleDropdown();
-          jest.runOnlyPendingTimers();
-          await waitForPromises();
-
-          expect(createFlash).toHaveBeenNthCalledWith(1, {
-            message: wrapper.vm.$options.i18n.iterationsFetchError,
-          });
-          expect(Sentry.captureException.mock.calls[0][0].networkError).toBe(error);
-        });
-
-        it('only fetches iterations when dropdown is opened', async () => {
-          groupIterationsSpy = jest.fn().mockResolvedValueOnce(emptyIterationsResponse);
-          createComponentWithApollo({ groupIterationsSpy });
-
-          await wrapper.vm.$nextTick();
-          jest.runOnlyPendingTimers();
-
-          expect(groupIterationsSpy).not.toHaveBeenCalled();
-
-          await toggleDropdown();
-          jest.runOnlyPendingTimers();
-
-          expect(groupIterationsSpy).toHaveBeenCalled();
-        });
-
-        describe('when a user is searching', () => {
-          const mockSearchTerm = 'foobar';
-
-          beforeEach(async () => {
-            groupIterationsSpy = jest.fn().mockResolvedValueOnce(emptyIterationsResponse);
-            createComponentWithApollo({ groupIterationsSpy });
-
-            await toggleDropdown();
-          });
-
-          it('sends a groupIterations query with the entered search term "foo"', async () => {
-            findSearchBox().vm.$emit('input', mockSearchTerm);
-
-            await wrapper.vm.$nextTick();
-            jest.runOnlyPendingTimers();
-
-            expect(groupIterationsSpy).toHaveBeenNthCalledWith(1, {
-              fullPath: mockIssue.groupPath,
-              title: `"${mockSearchTerm}"`,
-              state: iterationDisplayState,
-            });
-          });
-        });
-      });
     });
   });
 });
-//
