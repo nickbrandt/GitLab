@@ -47,16 +47,6 @@ class SystemHooksService
       if event == :rename || event == :transfer
         data[:old_path_with_namespace] = model.old_path_with_namespace
       end
-    when User
-      data.merge!(user_data(model))
-
-      case event
-      when :rename
-        data[:old_username] = model.username_before_last_save
-      when :failed_login
-        data[:state] = model.state
-      end
-    end
 
     data
   end
@@ -79,15 +69,6 @@ class SystemHooksService
     }
   end
 
-  def user_data(model)
-    {
-      name: model.name,
-      email: model.email,
-      user_id: model.id,
-      username: model.username
-    }
-  end
-
   def builder_driven_event_data_available?(model)
     model.class.in?(BUILDER_DRIVEN_EVENT_DATA_AVAILABLE_FOR_CLASSES)
   end
@@ -100,6 +81,8 @@ class SystemHooksService
                       Gitlab::HookData::GroupBuilder
                     when ProjectMember
                       Gitlab::HookData::ProjectMemberBuilder
+                    when User
+                      Gitlab::HookData::UserBuilder
                     end
 
     builder_class.new(model).build(event)
