@@ -47,6 +47,7 @@ class SystemHooksService
       if event == :rename || event == :transfer
         data[:old_path_with_namespace] = model.old_path_with_namespace
       end
+    end
 
     data
   end

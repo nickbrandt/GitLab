@@ -28,13 +28,12 @@ module Gitlab
       end
 
       def event_specific_user_data(event)
-        event_name =  case event
-                      when :rename
-                        old_username: user.username_before_last_save
-                      when :failed_login
-                        state: user.state
-                      end
-        { event_name: event_name }
+        case event
+        when :rename
+          { old_username: user.username_before_last_save }
+        when :failed_login
+          { state: user.state }
+        end
       end
     end
   end
