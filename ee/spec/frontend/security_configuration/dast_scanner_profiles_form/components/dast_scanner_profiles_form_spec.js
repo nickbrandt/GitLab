@@ -285,19 +285,21 @@ describe('DAST Scanner Profile', () => {
   });
 
   describe('when profile does not come from a policy', () => {
+    let formGroups;
+
     beforeEach(() => {
       createComponent({
         propsData: {
           profile: defaultProfile,
         },
       });
+      formGroups = findAllFormGroups().wrappers;
     });
 
     it('should enable all form groups', () => {
-      const formGroups = findAllFormGroups();
-      for (let i = 0; i < formGroups.length; i += 1) {
-        expect(formGroups.at(i).attributes('disabled')).toBe(undefined);
-      }
+      formGroups.forEach((formGroup) => {
+        expect(formGroup.attributes('disabled')).toBe(undefined);
+      });
     });
 
     it('should show the policy profile alert', () => {
@@ -306,12 +308,15 @@ describe('DAST Scanner Profile', () => {
   });
 
   describe('when profile does comes from a policy', () => {
+    let formGroups;
+
     beforeEach(() => {
       createComponent({
         propsData: {
           profile: policyScannerProfile,
         },
       });
+      formGroups = findAllFormGroups().wrappers;
     });
 
     it('should show the policy profile alert', () => {
@@ -319,10 +324,9 @@ describe('DAST Scanner Profile', () => {
     });
 
     it('should disable all form groups', () => {
-      const formGroups = findAllFormGroups();
-      for (let i = 0; i < formGroups.length; i += 1) {
-        expect(formGroups.at(i).attributes('disabled')).toBe('true');
-      }
+      formGroups.forEach((formGroup) => {
+        expect(formGroup.attributes('disabled')).toBe('true');
+      });
     });
 
     it('should disable the save button', () => {

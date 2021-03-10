@@ -121,20 +121,20 @@ describe('DastSiteAuthSection', () => {
     describe('when profile does not come from a policy', () => {
       it('should enable all form groups', () => {
         createComponent({ mountFn: shallowMount, fields: { enabled: true } });
-        const formGroups = findAllFormGroups();
-        for (let i = 0; i < formGroups.length; i += 1) {
-          expect(formGroups.at(i).attributes('disabled')).toBe(undefined);
-        }
+        const formGroups = findAllFormGroups().wrappers;
+        formGroups.forEach((formGroup) => {
+          expect(formGroup.attributes('disabled')).toBe(undefined);
+        });
       });
     });
 
     describe('when profile does comes from a policy', () => {
       it('should disable all form groups', () => {
         createComponent({ mountFn: shallowMount, disabled: true, fields: { enabled: true } });
-        const formGroups = findAllFormGroups();
-        for (let i = 0; i < formGroups.length; i += 1) {
-          expect(formGroups.at(i).attributes('disabled')).toBe('true');
-        }
+        const formGroups = findAllFormGroups().wrappers;
+        formGroups.forEach((formGroup) => {
+          expect(formGroup.attributes('disabled')).toBe('true');
+        });
       });
     });
   });
