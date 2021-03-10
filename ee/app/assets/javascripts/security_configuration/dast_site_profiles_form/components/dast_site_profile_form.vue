@@ -143,7 +143,9 @@ export default {
           fullPath: this.fullPath,
           ...(this.isEdit ? { id: this.siteProfile.id } : {}),
           ...serializeFormObject(this.form.fields),
-          auth: isAuthEnabled ? serializeFormObject(this.authSection.fields) : {},
+          ...(this.glFeatures.securityDastSiteProfilesAdditionalFields && {
+            auth: serializeFormObject(this.authSection.fields),
+          }),
         },
       };
 
