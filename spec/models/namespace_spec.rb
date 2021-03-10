@@ -889,18 +889,23 @@ RSpec.describe Namespace do
 
   describe '#all_projects' do
     context 'when namespace is a group' do
-      let(:namespace) { create(:group) }
-      let(:child) { create(:group, parent: namespace) }
-      let!(:project1) { create(:project_empty_repo, namespace: namespace) }
-      let!(:project2) { create(:project_empty_repo, namespace: child) }
+      let_it_be(:namespace) { create(:group) }
+      let_it_be(:child) { create(:group, parent: namespace) }
+      let_it_be(:project1) { create(:project_empty_repo, namespace: namespace) }
+      let_it_be(:project2) { create(:project_empty_repo, namespace: child) }
 
-      it { expect(namespace.all_projects.to_a).to match_array([project2, project1]) }
       it { expect(child.all_projects.to_a).to match_array([project2]) }
 
       it 'queries for the namespace and its descendants' do
-        expect(Project).to receive(:where).with(namespace: [namespace, child])
+        expect(Project).to receive(:where).with(namespace: [namespace, child]).and_call_original
 
-        namespace.all_projects
+        expect(namespace.all_projects).to contain_exactly(project2, project1)
+      end
+
+      it 'handles querying namespace separately' do
+        expect(Project).to receive(:where).with(namespace: [namespace.id, child.id]).and_call_original
+
+        expect(namespace.all_projects(query_namespace_separately: true)).to contain_exactly(project2, project1)
       end
     end
 
@@ -909,7 +914,8 @@ RSpec.describe Namespace do
       let_it_be(:user_namespace) { create(:namespace, owner: user) }
       let_it_be(:project) { create(:project, namespace: user_namespace) }
 
-      it { expect(user_namespace.all_projects.to_a).to match_array([project]) }
+      it { expect(user_namespace.all_projects).to contain_exactly(project) }
+      it { expect(user_namespace.all_projects(query_namespace_separately: true)).to contain_exactly(project) }
 
       it 'only queries for the namespace itself' do
         expect(Project).to receive(:where).with(namespace: user_namespace)

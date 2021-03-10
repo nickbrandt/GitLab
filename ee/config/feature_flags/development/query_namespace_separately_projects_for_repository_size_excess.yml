@@ -1,0 +1,8 @@
+---
+name: query_namespace_separately_projects_for_repository_size_excess
+introduced_by_url: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/56176
+rollout_issue_url: https://gitlab.com/gitlab-org/gitlab/-/issues/323996
+milestone: '13.10'
+type: development
+group: group::utilization
+default_enabled: false

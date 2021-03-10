@@ -259,9 +259,18 @@ class Namespace < ApplicationRecord
 
   # Includes projects from this namespace and projects from all subgroups
   # that belongs to this namespace
-  def all_projects
-    namespace = user? ? self : self_and_descendants
-    Project.where(namespace: namespace)
+  #
+  # @param query_namespace_separately [Boolean] Query namespace ids separately
+  #   instead of using CTE in a subquery,
+  #   thus reducing risk of query plan miscalculation for complex queries.
+  def all_projects(query_namespace_separately: false)
+    namespaces = user? ? self : self_and_descendants
+
+    if query_namespace_separately && namespaces.is_a?(ActiveRecord::Relation)
+      namespaces = namespaces.pluck_primary_key
+    end
+
+    Project.where(namespace: namespaces)
   end
 
   # Includes pipelines from this namespace and pipelines from all subgroups

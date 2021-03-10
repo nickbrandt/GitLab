@@ -1327,7 +1327,7 @@ RSpec.describe Namespace do
   end
 
   describe '#total_repository_size_excess' do
-    let_it_be(:namespace) { create(:namespace) }
+    let_it_be(:namespace) { create(:group) }
 
     before do
       namespace.clear_memoization(:total_repository_size_excess)
@@ -1356,7 +1356,24 @@ RSpec.describe Namespace do
 
       context 'when namespace-level repository_size_limit is a positive number' do
         it 'returns the total excess size of projects with repositories that exceed the size limit' do
+          # Remove once query_namespace_separately_projects_for_repository_size_excess feature flag is removed
+          expect(Project).to receive(:where).with(namespace: [namespace.id]).at_least(:once).and_call_original
+
           allow(namespace).to receive(:actual_size_limit).and_return(150)
+
+          expect(namespace.total_repository_size_excess).to eq(560)
+        end
+      end
+
+      context 'when query_namespace_separately_projects_for_repository_size_excess is false' do
+        before do
+          stub_feature_flags(query_namespace_separately_projects_for_repository_size_excess: false)
+        end
+
+        it 'uses nested namespace CTE subquery' do
+          allow(namespace).to receive(:actual_size_limit).and_return(150)
+
+          expect(Project).to receive(:where).with(namespace: [namespace]).at_least(:once).and_call_original
 
           expect(namespace.total_repository_size_excess).to eq(560)
         end

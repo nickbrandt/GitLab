@@ -443,12 +443,14 @@ module EE
     end
 
     def projects_for_repository_size_excess(limit = nil)
+      query_namespace_separately = ::Feature.enabled?(:query_namespace_separately_projects_for_repository_size_excess, self)
+
       if limit
-        all_projects
+        all_projects(query_namespace_separately: query_namespace_separately)
           .with_total_repository_size_greater_than(limit)
           .without_repository_size_limit
       else
-        all_projects
+        all_projects(query_namespace_separately: query_namespace_separately)
           .with_total_repository_size_greater_than(::Project.arel_table[:repository_size_limit])
           .without_unlimited_repository_size_limit
       end
