@@ -1,29 +1,30 @@
 # frozen_string_literal: true
 
 class DeleteInconsistentEpicIssueLinks < ActiveRecord::Migration[6.0]
+  include Gitlab::Database::MigrationHelpers
+
   DOWNTIME = false
-  BATCH_SIZE = 100
+  DELAY_INTERVAL = 2.minutes
+  BATCH_SIZE = 50
+  MIGRATION = 'RemoveInaccessibleEpicIssueLinks'
+
+  disable_ddl_transaction!
 
   class Epic < ActiveRecord::Base
-    include ::EachBatch
-    self.table_name = 'epics'
+    include EachBatch
 
+    self.table_name = 'epics'
     has_many :epic_issues
     scope :with_issues, -> { joins(:epic_issues) }
   end
 
-  class EpicIssue < ActiveRecord::Base
-    self.table_name = 'epic_issues'
-  end
-
-  disable_ddl_transaction!
-
   def up
-    return unless ::Gitlab.ee?
+    return unless run_migration?
 
-    Epic.with_issues.select('group_id').distinct.each_batch(of: BATCH_SIZE) do |batch|
-      group_ids = batch.pluck(:group_id).join(',')
-      delete_broken_epic_issue_links(group_ids)
+    Epic.reset_column_information
+    Epic.with_issues.select('group_id').distinct.each_batch(of: BATCH_SIZE, column: 'group_id') do |group_batch, index|
+      group_ids = group_batch.pluck(:group_id)
+      migrate_in(index * DELAY_INTERVAL, MIGRATION, group_ids)
     end
   end
 
@@ -31,27 +32,7 @@ class DeleteInconsistentEpicIssueLinks < ActiveRecord::Migration[6.0]
     # no-op
   end
 
-  private
-
-  def delete_broken_epic_issue_links(group_ids)
-    invalid_links = ApplicationRecord.connection.execute(<<-SQL.squish)
-      SELECT epic_issues.* FROM epic_issues
-      INNER JOIN epics ON epics.id = epic_issues.epic_id
-      INNER JOIN issues ON issues.id = epic_issues.issue_id
-      INNER JOIN projects ON projects.id = issues.project_id
-      WHERE epics.group_id IN (#{group_ids})
-        AND projects.namespace_id NOT IN (WITH RECURSIVE base_and_descendants AS (
-          (SELECT namespaces.* FROM namespaces
-            WHERE namespaces.type = 'Group'
-            AND namespaces.id IN (#{group_ids}))
-          UNION
-          (SELECT namespaces.* FROM namespaces, base_and_descendants
-            WHERE namespaces.type = 'Group'
-            AND namespaces.parent_id = base_and_descendants.id))
-          SELECT namespaces.id
-          FROM base_and_descendants AS namespaces);
-    SQL
-
-    EpicIssue.where(id: invalid_links.pluck('id')).delete_all
+  def run_migration?
+    Gitlab.ee? && table_exists?(:epics) && table_exists?(:epic_issues)
   end
 end
