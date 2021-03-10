@@ -44,74 +44,35 @@ RSpec.describe MergeRequests::MergeService do
       end
     end
 
-    context 'jira issue enforcement' do
+    context 'with jira issue enforcement' do
+      using RSpec::Parameterized::TableSyntax
+
       subject do
         perform_enqueued_jobs do
           service.execute(merge_request)
         end
       end
 
-      shared_examples 'merges the MR with no error' do
-        it do
+      where(:prevent_merge, :issue_specified, :merged) do
+        true  | true  | true
+        true  | false | false
+        false | true  | true
+        false | false | true
+      end
+
+      with_them do
+        before do
+          allow(project).to receive(:prevent_merge_without_jira_issue?).and_return(prevent_merge)
+          allow(Atlassian::JiraIssueKeyExtractor).to receive(:has_keys?)
+                                                       .with(merge_request.title, merge_request.description)
+                                                       .and_return(issue_specified)
+        end
+
+        it 'sets the correct merged state and raises an error when applicable', :aggregate_failures do
           subject
 
-          expect(merge_request.reload.merged?).to eq(true)
-        end
-      end
-
-      context 'when feature is available' do
-        before do
-          stub_licensed_features(jira_issue_association_enforcement: true)
-          stub_feature_flags(jira_issue_association_on_merge_request: true)
-        end
-
-        context 'when jira issue is required for merge' do
-          before do
-            project.create_project_setting(prevent_merge_without_jira_issue: true)
-          end
-
-          context 'when issue key is NOT specified in MR title / description' do
-            it 'returns appropriate merge error' do
-              subject
-
-              expect(merge_request.merge_error).to include('Before this can be merged, a Jira issue must be linked in the title or description')
-            end
-          end
-
-          context 'when issue key is specified in MR title / description' do
-            before do
-              merge_request.update!(title: "Fixes login issue SECURITY-1234")
-            end
-
-            it_behaves_like 'merges the MR with no error'
-          end
-        end
-
-        context 'when jira issue is NOT required for merge' do
-          before do
-            project.create_project_setting(prevent_merge_without_jira_issue: false)
-          end
-
-          it_behaves_like 'merges the MR with no error'
-        end
-      end
-
-      context 'when feature is NOT available' do
-        using RSpec::Parameterized::TableSyntax
-
-        where(:licensed, :feature_flag) do
-          false | true
-          true  | false
-          false | false
-        end
-
-        with_them do
-          before do
-            stub_licensed_features(jira_issue_association_enforcement: licensed)
-            stub_feature_flags(jira_issue_association_on_merge_request: feature_flag)
-          end
-
-          it_behaves_like 'merges the MR with no error'
+          expect(merge_request.reload.merged?).to eq(merged)
+          expect(merge_request.merge_error).to include('Before this can be merged, a Jira issue must be linked in the title or description') unless merged
         end
       end
     end

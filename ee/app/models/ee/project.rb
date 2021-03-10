@@ -770,6 +770,12 @@ module EE
       end
     end
 
+    def prevent_merge_without_jira_issue?
+      return false unless jira_issue_association_required_to_merge_enabled?
+
+      prevent_merge_without_jira_issue
+    end
+
     private
 
     def group_hooks
