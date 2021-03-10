@@ -14851,7 +14851,13 @@ msgstr ""
 msgid "GroupSAML|Are you sure you want to remove the SAML group link?"
 msgstr ""
 
+msgid "GroupSAML|Before enforcing SSO, enable SAML authentication."
+msgstr ""
+
 msgid "GroupSAML|Certificate fingerprint"
+msgstr ""
+
+msgid "GroupSAML|Check SSO on git activity"
 msgstr ""
 
 msgid "GroupSAML|Configuration"
@@ -14869,7 +14875,10 @@ msgstr ""
 msgid "GroupSAML|Enable SAML authentication for this group."
 msgstr ""
 
-msgid "GroupSAML|Enforce SSO-only authentication for this group."
+msgid "GroupSAML|Enforce SSO-access for Git in this group."
+msgstr ""
+
+msgid "GroupSAML|Enforce SSO-only authentication for web activity for this group."
 msgstr ""
 
 msgid "GroupSAML|Enforce users to have dedicated group managed accounts for this group."
@@ -14963,9 +14972,6 @@ msgid "GroupSAML|The case-sensitive group name that will be sent by the SAML ide
 msgstr ""
 
 msgid "GroupSAML|This will be set as the access level of users added to the group."
-msgstr ""
-
-msgid "GroupSAML|To be able to enable enforced SSO, you first need to enable SAML authentication."
 msgstr ""
 
 msgid "GroupSAML|To be able to enable group managed accounts, you first need to enable enforced SSO."
