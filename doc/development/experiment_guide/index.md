@@ -140,15 +140,8 @@ You find out how to conduct experiments using `gitlab-experiment` in the [README
 
      The above checks whether the experiment is enabled and pushes the result to the frontend.
 
-     You can check the state of the feature flag in JavaScript:
-
-     ```javascript
-     import { isExperimentEnabled } from '~/experimentation';
-
-     if ( isExperimentEnabled('signupFlow') ) {
-       // ...
-     }
-     ```
+     The Frontend helpers for this are no longer used in production.
+     [More details TBD](https://gitlab.com/gitlab-org/gitlab/-/issues/323934).
 
    - It is also possible to run an experiment outside of the controller scope, for example in a worker:
 
@@ -238,11 +231,10 @@ expect(Gon.tracking_data).to eq(
 Which can then be used for tracking as follows:
 
 ```javascript
-import { isExperimentEnabled } from '~/lib/utils/experimentation';
 import Tracking from '~/tracking';
 
 document.addEventListener('DOMContentLoaded', () => {
-  const signupFlowExperimentEnabled = isExperimentEnabled('signupFlow');
+  const signupFlowExperimentEnabled = gon.experiments['signupFlow'];
 
   if (signupFlowExperimentEnabled && gon.tracking_data) {
     const { category, action, ...data } = gon.tracking_data;
