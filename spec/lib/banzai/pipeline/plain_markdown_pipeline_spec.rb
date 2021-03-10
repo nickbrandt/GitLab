@@ -33,14 +33,31 @@ RSpec.describe Banzai::Pipeline::PlainMarkdownPipeline do
 
     describe 'CommonMark tests', :aggregate_failures do
       it 'converts all reference punctuation to literals' do
-        markdown = %q(\@\#\!\$\&\~\%\^)
-        punctuation = %w(@ # ! $ ~ % ^)
+        reference_chars = Banzai::Filter::MarkdownPreEscapeFilter::REFERENCE_CHARACTERS
+        markdown = reference_chars.split('').map {|char| char.prepend("\\") }.join
+        punctuation = Banzai::Filter::MarkdownPreEscapeFilter::REFERENCE_CHARACTERS.split('')
+        punctuation = punctuation.delete_if {|char| char == '&' }
+        punctuation << '&amp;'
 
         result = described_class.call(markdown, project: project)
         output = result[:output].to_html
 
         punctuation.each { |char| expect(output).to include("<span>#{char}</span>") }
         expect(result[:escaped_literals]).to be_truthy
+      end
+
+      it 'ensure we handle all the GitLab reference characters' do
+        reference_chars = ObjectSpace.each_object(Class).map do |klass|
+          next unless klass.included_modules.include?(Referable)
+          next unless klass.respond_to?(:reference_prefix)
+          next unless klass.reference_prefix.length == 1
+
+          klass.reference_prefix
+        end.compact
+
+        reference_chars.all? do |char|
+          Banzai::Filter::MarkdownPreEscapeFilter::REFERENCE_CHARACTERS.include?(char)
+        end
       end
 
       it 'does not convert non-reference punctuation to spans' do
