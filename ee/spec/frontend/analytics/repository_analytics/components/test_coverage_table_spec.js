@@ -1,5 +1,6 @@
 import { GlTable } from '@gitlab/ui';
 import { mount, shallowMount, createLocalVue } from '@vue/test-utils';
+import { nextTick } from 'vue';
 import VueApollo from 'vue-apollo';
 import SelectProjectsDropdown from 'ee/analytics/repository_analytics/components/select_projects_dropdown.vue';
 import TestCoverageTable from 'ee/analytics/repository_analytics/components/test_coverage_table.vue';
@@ -34,7 +35,9 @@ describe('Test coverage table component', () => {
   const clickSelectAllProjects = async () => {
     findProjectsDropdown().vm.$emit('select-all-projects');
 
-    await wrapper.vm.$nextTick();
+    await nextTick();
+    jest.runOnlyPendingTimers();
+    await nextTick();
   };
 
   const createComponent = ({ glFeatures = {}, mockData = {}, mountFn = shallowMount } = {}) => {
@@ -98,8 +101,6 @@ describe('Test coverage table component', () => {
       createComponent({ mountFn: mount });
 
       await clickSelectAllProjects();
-      jest.runOnlyPendingTimers();
-      await wrapper.vm.$nextTick();
 
       expect(getProjectsTestCoverageSpy).toHaveBeenCalled();
 
@@ -146,8 +147,6 @@ describe('Test coverage table component', () => {
       createComponent({ mountFn: mount });
 
       await clickSelectAllProjects();
-      jest.runOnlyPendingTimers();
-      await wrapper.vm.$nextTick();
 
       expect(findTable().exists()).toBe(true);
       expect(findTableRows().at(0).text()).toContain('should be first');
@@ -164,8 +163,6 @@ describe('Test coverage table component', () => {
       createComponent({ mountFn: mount });
 
       await clickSelectAllProjects();
-      jest.runOnlyPendingTimers();
-      await wrapper.vm.$nextTick();
 
       expect(findTable().exists()).toBe(true);
       expect(findProjectNameById(id).attributes('href')).toBe(expectedPath);
@@ -182,8 +179,6 @@ describe('Test coverage table component', () => {
         });
 
         await clickSelectAllProjects();
-        jest.runOnlyPendingTimers();
-        await wrapper.vm.$nextTick();
 
         findProjectNameById(id).trigger('click');
 
@@ -203,8 +198,6 @@ describe('Test coverage table component', () => {
         });
 
         await clickSelectAllProjects();
-        jest.runOnlyPendingTimers();
-        await wrapper.vm.$nextTick();
 
         findProjectNameById(id).trigger('click');
 
