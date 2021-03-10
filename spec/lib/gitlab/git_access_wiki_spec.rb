@@ -79,4 +79,23 @@ RSpec.describe Gitlab::GitAccessWiki do
       end
     end
   end
+
+  describe '#right_feature_access_level?' do
+    subject { access.check('git-upload-pack', Gitlab::GitAccess::ANY) }
+
+    context 'when wiki is enabled' do
+      it 'has the right feature access level' do
+        expect(access.right_feature_access_level?).to be true
+      end
+    end
+
+    context 'when wiki feature is disabled' do
+      before do
+        project.project_feature.update_attribute(:wiki_access_level, ProjectFeature::DISABLED)
+      end
+      it 'does not have the right feature access level' do
+        expect(access.right_feature_access_level?).to be false
+      end
+    end
+  end
 end
