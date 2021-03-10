@@ -34,7 +34,7 @@ export default {
       variables() {
         return {
           groupFullPath: this.groupFullPath,
-          projectIds: this.selectedProjectIds,
+          projectIds: this.projectIdsToFetch,
         };
       },
       result({ data }) {
@@ -74,7 +74,7 @@ export default {
       allCoverageData: [], // All data we have ever received whether selected or not
       hasError: false,
       isLoading: false,
-      projectIds: {}, // Which project IDs have been selected
+      selectedProjectIds: {},
       projects: {},
     };
   },
@@ -84,19 +84,19 @@ export default {
     },
     skipQuery() {
       // Skip if we haven't selected any projects yet
-      return !this.allProjectsSelected && !this.selectedProjectIds.length;
+      return !this.allProjectsSelected && !this.projectIdsToFetch.length;
     },
     /**
-     * selectedProjectIds is a subset of projectIds
+     * projectIdsToFetch is a subset of selectedProjectIds
      * The difference is that it only returns the projects
      * that we have selected but haven't requested yet
      */
-    selectedProjectIds() {
+    projectIdsToFetch() {
       if (this.allProjectsSelected) {
         return null;
       }
       // Get the IDs of the projects that we haven't requested yet
-      return Object.keys(this.projectIds).filter(
+      return Object.keys(this.selectedProjectIds).filter(
         (id) => !this.allCoverageData.some((project) => project.id === id),
       );
     },
@@ -105,7 +105,7 @@ export default {
         return this.allCoverageData;
       }
 
-      return this.allCoverageData.filter(({ id }) => this.projectIds[id]);
+      return this.allCoverageData.filter(({ id }) => this.selectedProjectIds[id]);
     },
     sortedCoverageData() {
       // Sort the table by most recently updated coverage report
@@ -135,17 +135,17 @@ export default {
       if (this.allProjectsSelected) {
         // Reset all project selections to false
         this.allProjectsSelected = false;
-        this.projectIds = Object.fromEntries(
-          Object.entries(this.projectIds).map(([key]) => [key, false]),
+        this.selectedProjectIds = Object.fromEntries(
+          Object.entries(this.selectedProjectIds).map(([key]) => [key, false]),
         );
       }
 
-      if (Object.prototype.hasOwnProperty.call(this.projectIds, id)) {
-        Vue.set(this.projectIds, id, !this.projectIds[id]);
+      if (Object.prototype.hasOwnProperty.call(this.selectedProjectIds, id)) {
+        Vue.set(this.selectedProjectIds, id, !this.selectedProjectIds[id]);
         return;
       }
 
-      Vue.set(this.projectIds, id, true);
+      Vue.set(this.selectedProjectIds, id, true);
     },
   },
   tableFields: [
