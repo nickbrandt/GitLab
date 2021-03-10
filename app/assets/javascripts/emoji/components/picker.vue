@@ -2,20 +2,10 @@
 import { GlIcon, GlDropdown, GlSearchBoxByType } from '@gitlab/ui';
 import VirtualList from 'vue-virtual-scroll-list';
 import { CATEGORY_NAMES } from '~/emoji';
+import { CATEGORY_ICON_MAP } from '../constants';
 import Category from './category.vue';
 import EmojiList from './emoji_list.vue';
 import { getEmojiCategories } from './utils';
-
-const CATEGORY_ICON_MAP = {
-  activity: 'dumbbell',
-  people: 'smiley',
-  nature: 'nature',
-  food: 'food',
-  travel: 'car',
-  objects: 'object',
-  symbols: 'heart',
-  flags: 'flag',
-};
 
 export default {
   components: {

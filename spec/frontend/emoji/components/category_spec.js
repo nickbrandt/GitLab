@@ -14,32 +14,24 @@ describe('Emoji category component', () => {
     wrapper.destroy();
   });
 
-  it('renders emoji groups', () => {
+  beforeEach(() => {
     factory({
       category: 'Activity',
       emojis: [['thumbsup'], ['thumbsdown']],
     });
+  });
 
+  it('renders emoji groups', () => {
     expect(wrapper.findAll(EmojiGroup).length).toBe(2);
   });
 
   it('renders group', async () => {
-    factory({
-      category: 'Activity',
-      emojis: [['thumbsup'], ['thumbsdown']],
-    });
-
     await wrapper.setData({ renderGroup: true });
 
     expect(wrapper.find(EmojiGroup).attributes('rendergroup')).toBe('true');
   });
 
   it('renders group on appear', async () => {
-    factory({
-      category: 'Activity',
-      emojis: [['thumbsup'], ['thumbsdown']],
-    });
-
     wrapper.find(GlIntersectionObserver).vm.$emit('appear');
 
     await nextTick();
@@ -48,11 +40,6 @@ describe('Emoji category component', () => {
   });
 
   it('emits appear event on appear', async () => {
-    factory({
-      category: 'Activity',
-      emojis: [['thumbsup'], ['thumbsdown']],
-    });
-
     wrapper.find(GlIntersectionObserver).vm.$emit('appear');
 
     await nextTick();

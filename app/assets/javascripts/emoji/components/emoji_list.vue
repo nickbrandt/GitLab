@@ -1,6 +1,7 @@
 <script>
 import { chunk } from 'lodash';
 import { searchEmoji } from '~/emoji';
+import { EMOJIS_PER_ROW } from '../constants';
 import { getEmojiCategories, generateCategoryHeight } from './utils';
 
 export default {
@@ -18,7 +19,7 @@ export default {
       if (this.searchValue !== '') {
         const emojis = chunk(
           searchEmoji(this.searchValue).map(({ emoji }) => emoji.name),
-          9,
+          EMOJIS_PER_ROW,
         );
 
         return {
