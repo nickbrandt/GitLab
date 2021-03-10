@@ -120,6 +120,11 @@ msgid_plural "%d changed files"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "%d character remaining"
+msgid_plural "%d characters remaining"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "%d child epic"
 msgid_plural "%d child epics"
 msgstr[0] ""
@@ -9434,6 +9439,12 @@ msgstr ""
 msgid "DastProfiles|Enable Authentication"
 msgstr ""
 
+msgid "DastProfiles|Enter URLs in a comma-separated list."
+msgstr ""
+
+msgid "DastProfiles|Enter headers in a comma-separated list."
+msgstr ""
+
 msgid "DastProfiles|Error Details"
 msgstr ""
 
@@ -9492,6 +9503,9 @@ msgid "DastProfiles|Please enter a valid timeout value"
 msgstr ""
 
 msgid "DastProfiles|Profile name"
+msgstr ""
+
+msgid "DastProfiles|Request header names and values. Headers are added to every request made by DAST."
 msgstr ""
 
 msgid "DastProfiles|Request headers"
@@ -9561,6 +9575,9 @@ msgid "DastProfiles|Turn on AJAX spider"
 msgstr ""
 
 msgid "DastProfiles|URL"
+msgstr ""
+
+msgid "DastProfiles|URLs to skip during the authenticated scan. Use regular expression syntax to match multiple URLs."
 msgstr ""
 
 msgid "DastProfiles|Username"
@@ -18621,6 +18638,9 @@ msgid "Maximum bulk request size (MiB)"
 msgstr ""
 
 msgid "Maximum capacity"
+msgstr ""
+
+msgid "Maximum character limit - %{limit}"
 msgstr ""
 
 msgid "Maximum concurrency of Elasticsearch bulk requests per indexing operation."
