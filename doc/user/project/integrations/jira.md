@@ -242,11 +242,11 @@ with a link to the commit that resolved the issue.
 
 > [Introduced](https://gitlab.com/groups/gitlab-org/-/epics/3622) in [GitLab Premium](https://about.gitlab.com/pricing/) 13.2.
 
-You can browse and search issues from a selected Jira project directly in GitLab. This requires [configuration](#configure-gitlab) in GitLab by an administrator.
+You can browse, search and view issues from a selected Jira project directly in GitLab. This requires [configuration](#configure-gitlab) in GitLab by an administrator.
 
 ![Jira issues integration enabled](img/jira/open_jira_issues_list_v13.2.png)
 
-From the **Jira Issues** menu, click **Issues List**. The issue list defaults to sort by **Created date**, with the newest issues listed at the top. You can change this to **Last updated**.
+From the **Jira Issues** menu, select **Issues List**. The issue list defaults to sort by **Created date**, with the newest issues listed at the top. You can change this to **Last updated**.
 
 Issues are grouped into tabs based on their [Jira status](https://confluence.atlassian.com/adminjiraserver070/defining-status-field-values-749382903.html).
 
@@ -254,7 +254,39 @@ Issues are grouped into tabs based on their [Jira status](https://confluence.atl
 - The **Closed** tab displays all issues with a Jira status categorized as Done.
 - The **All** tab displays all issues of any status.
 
-Click an issue title to open its original Jira issue page for full details.
+#### View a Jira issue
+
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/299832) in [GitLab Premium](https://about.gitlab.com/pricing/) 13.10.
+> - It's [deployed behind a feature flag](../../feature_flags.md), enabled by default.
+> - It's enabled on GitLab.com.
+> - It's recommended for production use.
+> - For GitLab self-managed instances, GitLab administrators can opt to [disable it](#enable-or-disable-jira-issue-detail-view). **(PREMIUM)**
+
+WARNING:
+This feature might not be available to you. Check the **version history** note above for details.
+
+Select an issue from the list to open it in GitLab.
+
+![Jira issue detail view](img/jira/jira_issue_detail_view_v13.10.png)
+
+### Enable or disable Jira issue detail view
+
+Jira issue detail view is under development but ready for production use. It is
+deployed behind a feature flag that is **enabled by default**.
+[GitLab administrators with access to the GitLab Rails console](../../../administration/feature_flags.md)
+can disabled it.
+
+To enable it:
+
+```ruby
+Feature.enable(:jira_issues_show_integration)
+```
+
+To disable it:
+
+```ruby
+Feature.disable(:jira_issues_show_integration)
+```
 
 #### Search and filter the issues list
 
