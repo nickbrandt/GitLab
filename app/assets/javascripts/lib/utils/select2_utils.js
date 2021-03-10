@@ -3,7 +3,9 @@ import { normalizeHeaders, parseIntPagination } from './common_utils';
 
 // This is used in the select2 config to replace jQuery.ajax with axios
 export const select2AxiosTransport = (params) => {
-  return axios[params.type.toLowerCase()](params.url, {
+  axios({
+    method: params.type?.toLowerCase() || 'get',
+    url: params.url,
     params: params.data,
   })
     .then((res) => {
