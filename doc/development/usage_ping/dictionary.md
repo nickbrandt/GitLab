@@ -2818,7 +2818,7 @@ Tiers: `free`, `premium`, `ultimate`
 
 ### `counts.ldap_group_links`
 
-Number of groups that are synced via LDAP group sync `https://docs.gitlab.com/ee/user/group/index.html#manage-group-memberships-via-ldap-starter-only`
+Number of groups that are synced via LDAP group sync `https://docs.gitlab.com/ee/user/group/index.html#manage-group-memberships-via-ldap`
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_all/20210216174822_ldap_group_links.yml)
 
@@ -2830,7 +2830,7 @@ Tiers: `premium`, `ultimate`
 
 ### `counts.ldap_keys`
 
-Number of keys synced as part of LDAP `https://docs.gitlab.com/ee/administration/auth/ldap/#ldap-sync-configuration-settings-starter-only`
+Number of keys synced as part of LDAP `https://docs.gitlab.com/ee/administration/auth/ldap/#ldap-sync-configuration-settings`
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_all/20210216174824_ldap_keys.yml)
 
@@ -8468,6 +8468,30 @@ Status: `data_available`
 
 Tiers:
 
+### `redis_hll_counters.code_review.i_code_review_user_labels_changed_monthly`
+
+Count of unique users per month who changed labels of a MR
+
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_28d/20210302110607_i_code_review_user_labels_changed_monthly.yml)
+
+Group: `group::code review`
+
+Status: `implemented`
+
+Tiers: `free`, `premium`, `ultimate`
+
+### `redis_hll_counters.code_review.i_code_review_user_labels_changed_weekly`
+
+Count of unique users per week who changed labels of a MR
+
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_7d/20210302110548_i_code_review_user_labels_changed_weekly.yml)
+
+Group: `group::code review`
+
+Status: `implemented`
+
+Tiers: `free`, `premium`, `ultimate`
+
 ### `redis_hll_counters.code_review.i_code_review_user_marked_as_draft_monthly`
 
 Missing description
@@ -8515,6 +8539,30 @@ Group: `group::code review`
 Status: `data_available`
 
 Tiers:
+
+### `redis_hll_counters.code_review.i_code_review_user_milestone_changed_monthly`
+
+Count of unique users per month who changed milestone of a MR
+
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_28d/20210302110520_i_code_review_user_milestone_changed_monthly.yml)
+
+Group: `group::code review`
+
+Status: `implemented`
+
+Tiers: `free`, `premium`, `ultimate`
+
+### `redis_hll_counters.code_review.i_code_review_user_milestone_changed_weekly`
+
+Count of unique users per week who changed milestone of a MR
+
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_7d/20210302110403_i_code_review_user_milestone_changed_weekly.yml)
+
+Group: `group::code review`
+
+Status: `implemented`
+
+Tiers: `free`, `premium`, `ultimate`
 
 ### `redis_hll_counters.code_review.i_code_review_user_mr_discussion_locked_monthly`
 
@@ -14110,7 +14158,7 @@ Tiers: `free`
 
 ### `usage_activity_by_stage.manage.ldap_admin_sync_enabled`
 
-Has the instance configured LDAP Admin Sync `https://docs.gitlab.com/ee/administration/auth/ldap/#administrator-sync-starter-only`?
+Has the instance configured LDAP Admin Sync `https://docs.gitlab.com/ee/administration/auth/ldap/#administrator-sync`?
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/settings/20210216180811_ldap_admin_sync_enabled.yml)
 
@@ -14122,7 +14170,7 @@ Tiers:
 
 ### `usage_activity_by_stage.manage.ldap_group_sync_enabled`
 
-Has the instance configured LDAP Group Sync `https://docs.gitlab.com/ee/administration/auth/ldap/#group-sync-starter-only`?
+Has the instance configured LDAP Group Sync `https://docs.gitlab.com/ee/administration/auth/ldap/#group-sync`?
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/settings/20210216180809_ldap_group_sync_enabled.yml)
 
@@ -14146,7 +14194,7 @@ Tiers: `free`
 
 ### `usage_activity_by_stage.manage.ldap_servers`
 
-Number of LDAP servers configured for the instance `https://docs.gitlab.com/ee/administration/auth/ldap/#multiple-ldap-servers-starter-only`
+Number of LDAP servers configured for the instance `https://docs.gitlab.com/ee/administration/auth/ldap/#multiple-ldap-servers`
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_all/20210216180807_ldap_servers.yml)
 

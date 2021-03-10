@@ -120,6 +120,11 @@ msgid_plural "%d changed files"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "%d character remaining"
+msgid_plural "%d characters remaining"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "%d child epic"
 msgid_plural "%d child epics"
 msgstr[0] ""
@@ -1345,6 +1350,9 @@ msgstr ""
 msgid "A merge request hasn't yet been merged"
 msgstr ""
 
+msgid "A milestone list displays issues in the selected milestone."
+msgstr ""
+
 msgid "A new Auto DevOps pipeline has been created, go to %{pipelines_link_start}Pipelines page%{pipelines_link_end} for details"
 msgstr ""
 
@@ -1924,6 +1932,9 @@ msgid "Add system hook"
 msgstr ""
 
 msgid "Add to Slack"
+msgstr ""
+
+msgid "Add to board"
 msgstr ""
 
 msgid "Add to epic"
@@ -3440,9 +3451,6 @@ msgstr ""
 msgid "An error occurred while loading the file. Please try again later."
 msgstr ""
 
-msgid "An error occurred while loading the members, please try again."
-msgstr ""
-
 msgid "An error occurred while loading the merge request changes."
 msgstr ""
 
@@ -3805,6 +3813,9 @@ msgid_plural "ApprovalRuleSummary|%{count} approvals required from %{membersCoun
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "ApprovalRule|Add approvers"
+msgstr ""
+
 msgid "ApprovalRule|Approval rules"
 msgstr ""
 
@@ -3814,6 +3825,9 @@ msgstr ""
 msgid "ApprovalRule|Approvers"
 msgstr ""
 
+msgid "ApprovalRule|Examples: QA, Security."
+msgstr ""
+
 msgid "ApprovalRule|Name"
 msgstr ""
 
@@ -3821,9 +3835,6 @@ msgid "ApprovalRule|Rule name"
 msgstr ""
 
 msgid "ApprovalRule|Target branch"
-msgstr ""
-
-msgid "ApprovalRule|e.g. QA, Security, etc."
 msgstr ""
 
 msgid "ApprovalStatusTooltip|Adheres to separation of duties"
@@ -5193,15 +5204,6 @@ msgstr ""
 msgid "CHANGELOG"
 msgstr ""
 
-msgid "CI / CD"
-msgstr ""
-
-msgid "CI / CD Analytics"
-msgstr ""
-
-msgid "CI / CD Settings"
-msgstr ""
-
 msgid "CI Lint"
 msgstr ""
 
@@ -5218,6 +5220,12 @@ msgid "CI will run using the credentials assigned above."
 msgstr ""
 
 msgid "CI/CD"
+msgstr ""
+
+msgid "CI/CD Analytics"
+msgstr ""
+
+msgid "CI/CD Settings"
 msgstr ""
 
 msgid "CI/CD configuration"
@@ -6261,6 +6269,21 @@ msgid "Closed: %{closed}"
 msgstr ""
 
 msgid "Closes this %{quick_action_target}."
+msgstr ""
+
+msgid "Cloud License"
+msgstr ""
+
+msgid "CloudLicense|Activate"
+msgstr ""
+
+msgid "CloudLicense|Paste your activation code"
+msgstr ""
+
+msgid "CloudLicense|Paste your activation code below"
+msgstr ""
+
+msgid "CloudLicense|This instance is currently using the Core plan."
 msgstr ""
 
 msgid "Cluster"
@@ -7955,9 +7978,6 @@ msgid_plural "ContainerRegistry|%{count} Tags"
 msgstr[0] ""
 msgstr[1] ""
 
-msgid "ContainerRegistry|%{imageName} tags"
-msgstr ""
-
 msgid "ContainerRegistry|%{strongStart}Disabled%{strongEnd} - Tags will not be automatically deleted."
 msgstr ""
 
@@ -8060,6 +8080,9 @@ msgstr ""
 msgid "ContainerRegistry|Image repository will be deleted"
 msgstr ""
 
+msgid "ContainerRegistry|Image repository with no name located at the project URL."
+msgstr ""
+
 msgid "ContainerRegistry|Image tags"
 msgstr ""
 
@@ -8123,6 +8146,9 @@ msgid "ContainerRegistry|Remove tags older than:"
 msgstr ""
 
 msgid "ContainerRegistry|Remove these tags"
+msgstr ""
+
+msgid "ContainerRegistry|Root image"
 msgstr ""
 
 msgid "ContainerRegistry|Run cleanup:"
@@ -9425,6 +9451,12 @@ msgstr ""
 msgid "DastProfiles|Enable Authentication"
 msgstr ""
 
+msgid "DastProfiles|Enter URLs in a comma-separated list."
+msgstr ""
+
+msgid "DastProfiles|Enter headers in a comma-separated list."
+msgstr ""
+
 msgid "DastProfiles|Error Details"
 msgstr ""
 
@@ -9483,6 +9515,9 @@ msgid "DastProfiles|Please enter a valid timeout value"
 msgstr ""
 
 msgid "DastProfiles|Profile name"
+msgstr ""
+
+msgid "DastProfiles|Request header names and values. Headers are added to every request made by DAST."
 msgstr ""
 
 msgid "DastProfiles|Request headers"
@@ -9552,6 +9587,9 @@ msgid "DastProfiles|Turn on AJAX spider"
 msgstr ""
 
 msgid "DastProfiles|URL"
+msgstr ""
+
+msgid "DastProfiles|URLs to skip during the authenticated scan. Use regular expression syntax to match multiple URLs."
 msgstr ""
 
 msgid "DastProfiles|Username"
@@ -12587,6 +12625,9 @@ msgstr ""
 msgid "Failed to load labels. Please try again."
 msgstr ""
 
+msgid "Failed to load milestones."
+msgstr ""
+
 msgid "Failed to load milestones. Please try again."
 msgstr ""
 
@@ -14881,9 +14922,6 @@ msgstr ""
 msgid "Groups to synchronize"
 msgstr ""
 
-msgid "Groups with access to %{strong_open}%{project_name}%{strong_close}"
-msgstr ""
-
 msgid "GroupsDropdown|Frequently visited"
 msgstr ""
 
@@ -16348,6 +16386,9 @@ msgstr ""
 msgid "Integrations|Linked namespaces"
 msgstr ""
 
+msgid "Integrations|Namespace successfully linked"
+msgstr ""
+
 msgid "Integrations|Namespaces are your GitLab groups and subgroups that will be linked to this Jira instance."
 msgstr ""
 
@@ -16418,6 +16459,9 @@ msgid "Integrations|You can now close this window and return to the GitLab for J
 msgstr ""
 
 msgid "Integrations|You must have owner or maintainer permissions to link namespaces."
+msgstr ""
+
+msgid "Integrations|You should now see GitLab.com activity inside your Jira Cloud issues. %{linkStart}Learn more%{linkEnd}"
 msgstr ""
 
 msgid "Interactive mode"
@@ -16681,16 +16725,16 @@ msgstr ""
 msgid "InviteMembersModal|Some of the members could not be added"
 msgstr ""
 
-msgid "InviteMembersModal|You're inviting a group to the %{name} group"
+msgid "InviteMembersModal|You're inviting a group to the %{strongStart}%{name}%{strongEnd} group."
 msgstr ""
 
-msgid "InviteMembersModal|You're inviting a group to the %{name} project"
+msgid "InviteMembersModal|You're inviting a group to the %{strongStart}%{name}%{strongEnd} project."
 msgstr ""
 
-msgid "InviteMembersModal|You're inviting members to the %{name} group"
+msgid "InviteMembersModal|You're inviting members to the %{strongStart}%{name}%{strongEnd} group."
 msgstr ""
 
-msgid "InviteMembersModal|You're inviting members to the %{name} project"
+msgid "InviteMembersModal|You're inviting members to the %{strongStart}%{name}%{strongEnd} project."
 msgstr ""
 
 msgid "InviteMembers|Invite a group"
@@ -18176,6 +18220,9 @@ msgstr ""
 msgid "List the merge requests that must be merged before this one."
 msgstr ""
 
+msgid "List type"
+msgstr ""
+
 msgid "List view"
 msgstr ""
 
@@ -18608,6 +18655,9 @@ msgstr ""
 msgid "Maximum capacity"
 msgstr ""
 
+msgid "Maximum character limit - %{limit}"
+msgstr ""
+
 msgid "Maximum concurrency of Elasticsearch bulk requests per indexing operation."
 msgstr ""
 
@@ -18710,9 +18760,6 @@ msgstr ""
 msgid "Members can be added by project %{i_open}Maintainers%{i_close} or %{i_open}Owners%{i_close}"
 msgstr ""
 
-msgid "Members invited to %{strong_start}%{project_name}%{strong_end}"
-msgstr ""
-
 msgid "Members listed as CODEOWNERS of affected files."
 msgstr ""
 
@@ -18720,9 +18767,6 @@ msgid "Members of %{group} can also merge into this branch: %{branch}"
 msgstr ""
 
 msgid "Members of %{group} can also push to this branch: %{branch}"
-msgstr ""
-
-msgid "Members of %{strong_open}%{project_name}%{strong_close}"
 msgstr ""
 
 msgid "Members of a group may only view projects they have permission to access"
@@ -21078,9 +21122,6 @@ msgstr ""
 msgid "OnCallSchedules|On-call schedule"
 msgstr ""
 
-msgid "OnCallSchedules|On-call schedule for the %{timezone}"
-msgstr ""
-
 msgid "OnCallSchedules|Please note, rotations with shifts that are less than four hours are currently not supported in the weekly view."
 msgstr ""
 
@@ -21530,6 +21571,9 @@ msgstr ""
 msgid "PackageRegistry|Add Conan Remote"
 msgstr ""
 
+msgid "PackageRegistry|Add Gradle Groovy DSL repository command"
+msgstr ""
+
 msgid "PackageRegistry|Add NuGet Source"
 msgstr ""
 
@@ -21566,6 +21610,9 @@ msgstr ""
 msgid "PackageRegistry|Copy Conan Setup Command"
 msgstr ""
 
+msgid "PackageRegistry|Copy Gradle Groovy DSL install command"
+msgstr ""
+
 msgid "PackageRegistry|Copy Maven XML"
 msgstr ""
 
@@ -21582,6 +21629,9 @@ msgid "PackageRegistry|Copy NuGet Setup Command"
 msgstr ""
 
 msgid "PackageRegistry|Copy Pip command"
+msgstr ""
+
+msgid "PackageRegistry|Copy add Gradle Groovy DSL repository command"
 msgstr ""
 
 msgid "PackageRegistry|Copy and paste this inside your %{codeStart}pom.xml%{codeEnd} %{codeStart}dependencies%{codeEnd} block."
@@ -21633,6 +21683,9 @@ msgid "PackageRegistry|Generic"
 msgstr ""
 
 msgid "PackageRegistry|GitLab Packages allows organizations to utilize GitLab as a private repository for a variety of common package formats. %{linkStart}More Information%{linkEnd}"
+msgstr ""
+
+msgid "PackageRegistry|Gradle Groovy DSL install command"
 msgstr ""
 
 msgid "PackageRegistry|If you haven't already done so, you will need to add the below to your %{codeStart}.pypirc%{codeEnd} file."
@@ -21705,6 +21758,27 @@ msgid "PackageRegistry|Settings for Maven packages"
 msgstr ""
 
 msgid "PackageRegistry|Settings saved successfully"
+msgstr ""
+
+msgid "PackageRegistry|Show Composer commands"
+msgstr ""
+
+msgid "PackageRegistry|Show Conan commands"
+msgstr ""
+
+msgid "PackageRegistry|Show Gradle Groovy DSL commands"
+msgstr ""
+
+msgid "PackageRegistry|Show Maven commands"
+msgstr ""
+
+msgid "PackageRegistry|Show NPM commands"
+msgstr ""
+
+msgid "PackageRegistry|Show Nuget commands"
+msgstr ""
+
+msgid "PackageRegistry|Show PyPi commands"
 msgstr ""
 
 msgid "PackageRegistry|Sorry, your filter produced no results"
@@ -22100,7 +22174,7 @@ msgstr ""
 msgid "PipelineCharts|An unknown error occurred while processing CI/CD analytics."
 msgstr ""
 
-msgid "PipelineCharts|CI / CD Analytics"
+msgid "PipelineCharts|CI/CD Analytics"
 msgstr ""
 
 msgid "PipelineCharts|Failed:"
@@ -26928,6 +27002,9 @@ msgid "Select Page"
 msgstr ""
 
 msgid "Select Stack"
+msgstr ""
+
+msgid "Select a branch"
 msgstr ""
 
 msgid "Select a file from the left sidebar to begin editing. Afterwards, you'll be able to commit your changes."
@@ -32857,9 +32934,6 @@ msgstr ""
 msgid "Users requesting access to"
 msgstr ""
 
-msgid "Users requesting access to %{strong_start}%{project_name}%{strong_end}"
-msgstr ""
-
 msgid "Users were successfully added."
 msgstr ""
 
@@ -35294,6 +35368,15 @@ msgstr ""
 msgid "created"
 msgstr ""
 
+msgid "created %{timeAgoString} by %{email} via %{user}"
+msgstr ""
+
+msgid "created %{timeAgoString} by %{user}"
+msgstr ""
+
+msgid "created %{timeAgoString} by %{user} in Jira"
+msgstr ""
+
 msgid "created %{timeAgo}"
 msgstr ""
 
@@ -35683,13 +35766,10 @@ msgstr ""
 msgid "mrWidgetCommitsAdded|1 merge commit"
 msgstr ""
 
-msgid "mrWidgetNothingToMerge|Currently there are no changes in this merge request's source branch. Please push new commits or use a different branch."
+msgid "mrWidgetNothingToMerge|This merge request contains no changes."
 msgstr ""
 
-msgid "mrWidgetNothingToMerge|Interested parties can even contribute by pushing commits if they want to."
-msgstr ""
-
-msgid "mrWidgetNothingToMerge|Merge requests are a place to propose changes you have made to a project and discuss those changes with others."
+msgid "mrWidgetNothingToMerge|Use merge requests to propose changes to your project and discuss them with your team. To make changes, push a commit or edit this merge request to use a different branch. With %{linkStart}CI/CD%{linkEnd}, automatically test your changes before merging."
 msgstr ""
 
 msgid "mrWidget| Please restore it or use a different %{missingBranchName} branch"
@@ -36065,15 +36145,6 @@ msgid "on track"
 msgstr ""
 
 msgid "open issue"
-msgstr ""
-
-msgid "opened %{timeAgoString} by %{email} via %{user}"
-msgstr ""
-
-msgid "opened %{timeAgoString} by %{user}"
-msgstr ""
-
-msgid "opened %{timeAgoString} by %{user} in Jira"
 msgstr ""
 
 msgid "opened %{timeAgo}"
