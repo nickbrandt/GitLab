@@ -20,6 +20,10 @@ module Gitlab
       @mode = mode
     end
 
+    def to_range
+      Range.new(self.begin, self.end, self.exclude_end?)
+    end
+
     attr_reader :mode
   end
 end

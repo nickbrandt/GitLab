@@ -27,6 +27,20 @@ RSpec.describe Gitlab::MarkerRange do
     end
   end
 
+  describe '#to_range' do
+    subject { marker_range.to_range }
+
+    it { is_expected.to eq(first..last) }
+
+    context 'when mode is provided' do
+      let(:mode) { :deletion }
+
+      it 'is omitted during transformation' do
+        is_expected.not_to respond_to(:mode)
+      end
+    end
+  end
+
   describe '.from_range' do
     subject { described_class.from_range(range) }
 
