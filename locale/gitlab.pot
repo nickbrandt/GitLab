@@ -22501,6 +22501,9 @@ msgstr ""
 msgid "Pipeline|Failed"
 msgstr ""
 
+msgid "Pipeline|In progress"
+msgstr ""
+
 msgid "Pipeline|Key"
 msgstr ""
 
