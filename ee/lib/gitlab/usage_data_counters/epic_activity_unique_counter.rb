@@ -13,6 +13,8 @@ module Gitlab
       EPIC_START_DATE_SET_AS_FIXED = 'g_project_management_users_setting_epic_start_date_as_fixed'
       EPIC_START_DATE_SET_AS_INHERITED = 'g_project_management_users_setting_epic_start_date_as_inherited'
       EPIC_ISSUE_ADDED = 'g_project_management_epic_issue_added'
+      EPIC_CLOSED = 'g_project_management_epic_closed'
+      EPIC_REOPENED = 'g_project_management_epic_reopened'
 
       class << self
         def track_epic_created_action(author:, time: Time.zone.now)
@@ -37,6 +39,14 @@ module Gitlab
 
         def track_epic_issue_added(author:, time: Time.zone.now)
           track_unique_action(EPIC_ISSUE_ADDED, author, time)
+        end
+
+        def track_epic_closed_action(author:, time: Time.zone.now)
+          track_unique_action(EPIC_CLOSED, author, time)
+        end
+
+        def track_epic_reopened_action(author:, time: Time.zone.now)
+          track_unique_action(EPIC_REOPENED, author, time)
         end
 
         private
