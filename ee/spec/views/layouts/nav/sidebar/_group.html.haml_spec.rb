@@ -31,14 +31,14 @@ RSpec.describe 'layouts/nav/sidebar/_group' do
       rendered
     end
 
-    shared_examples 'does not render' do
+    shared_examples 'does not render the widget & popover' do
       it 'does not render' do
         is_expected.not_to have_selector '#js-trial-status-widget'
         is_expected.not_to have_selector '#js-trial-status-popover'
       end
     end
 
-    shared_examples 'does render' do
+    shared_examples 'renders the widget & popover' do
       it 'renders both the widget & popover component initialization elements' do
         is_expected.to have_selector '#js-trial-status-widget'
         is_expected.to have_selector '#js-trial-status-popover'
@@ -55,6 +55,7 @@ RSpec.describe 'layouts/nav/sidebar/_group' do
     shared_examples 'does record experiment subject' do
       it 'records the group as an experiment subject' do
         expect(view).to receive(:record_experiment_group).with(experiment_key, group)
+
         subject
       end
     end
@@ -62,15 +63,16 @@ RSpec.describe 'layouts/nav/sidebar/_group' do
     shared_examples 'does not record experiment subject' do
       it 'does not record the group as an experiment subject' do
         expect(view).not_to receive(:record_experiment_group)
+
         subject
       end
     end
 
     where :show_widget, :experiment_enabled, :examples_to_include do
-      true  | true  | ['does record experiment subject', 'does render']
-      true  | false | ['does record experiment subject', 'does not render']
-      false | true  | ['does not record experiment subject', 'does not render']
-      false | false | ['does not record experiment subject', 'does not render']
+      true  | true  | ['does record experiment subject', 'renders the widget & popover']
+      true  | false | ['does record experiment subject', 'does not render the widget & popover']
+      false | true  | ['does not record experiment subject', 'does not render the widget & popover']
+      false | false | ['does not record experiment subject', 'does not render the widget & popover']
     end
 
     with_them do
