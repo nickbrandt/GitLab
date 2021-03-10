@@ -1,6 +1,6 @@
 /* global List */
 
-import { mount, createLocalVue } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 import MockAdapter from 'axios-mock-adapter';
 import Vue from 'vue';
 import Vuex from 'vuex';
@@ -11,9 +11,7 @@ import axios from '~/lib/utils/axios_utils';
 import '~/boards/models/list';
 import { listObj, boardsMockInterceptor } from './mock_data';
 
-const localVue = createLocalVue();
-
-localVue.use(Vuex);
+Vue.use(Vuex);
 
 describe('Issue boards new issue form', () => {
   let wrapper;
@@ -58,7 +56,6 @@ describe('Issue boards new issue form', () => {
         list,
       },
       store,
-      localVue,
       provide: {
         groupId: null,
       },

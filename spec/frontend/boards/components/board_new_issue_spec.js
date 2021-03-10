@@ -30,7 +30,7 @@ describe('Issue boards new issue form', () => {
     const store = new Vuex.Store({
       state: { selectedProject: mockGroupProjects[0] },
       actions: { addListNewIssue: addListNewIssuesSpy },
-      getters: { isGroupBoard: () => false },
+      getters: { isGroupBoard: () => false, isProjectBoard: () => true },
     });
 
     wrapper = shallowMount(BoardNewIssue, {
