@@ -8,6 +8,7 @@ export const scannerProfiles = [
     useAjaxSpider: false,
     showDebugMessages: false,
     editPath: '/scanner_profile/edit/1',
+    referencedInSecurityPolicies: [],
   },
   {
     id: 'gid://gitlab/DastScannerProfile/2',
@@ -18,6 +19,7 @@ export const scannerProfiles = [
     useAjaxSpider: true,
     showDebugMessages: true,
     editPath: '/scanner_profile/edit/2',
+    referencedInSecurityPolicies: [],
   },
 ];
 
@@ -51,6 +53,7 @@ export const siteProfiles = [
     },
     excludedUrls: 'https://foo.com/logout,https://foo.com/send_mail',
     requestHeaders: 'log-identifier: dast-active-scan',
+    referencedInSecurityPolicies: [],
   },
   {
     id: 'gid://gitlab/DastSiteProfile/2',
@@ -64,6 +67,7 @@ export const siteProfiles = [
     },
     excludedUrls: 'https://bar.com/logout',
     requestHeaders: 'auth: gitlab-dast',
+    referencedInSecurityPolicies: [],
   },
 ];
 

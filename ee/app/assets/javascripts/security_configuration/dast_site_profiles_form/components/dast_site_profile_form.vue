@@ -255,11 +255,8 @@ export default {
       :dismissible="false"
     >
       {{
-        sprintf(
-          s__(
-            'DastProfiles|This site profile is currently being used by a policy. To make edits you must remove it from the active policy.',
-          ),
-          { profileName: form.fields.profileName.value },
+        s__(
+          'DastProfiles|This site profile is currently being used by a policy. To make edits you must remove it from the active policy.',
         )
       }}
     </gl-alert>
