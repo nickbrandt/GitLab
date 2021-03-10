@@ -4850,6 +4850,9 @@ msgstr ""
 msgid "Boards|An error occurred while generating lists. Please reload the page."
 msgstr ""
 
+msgid "Boards|An error occurred while moving the epic. Please try again."
+msgstr ""
+
 msgid "Boards|An error occurred while moving the issue. Please try again."
 msgstr ""
 
