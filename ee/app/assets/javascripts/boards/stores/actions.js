@@ -528,7 +528,7 @@ export default {
       })
       .then(({ data }) => {
         if (data?.issueMoveList?.errors.length) {
-          commit(types.MOVE_ISSUE_FAILURE, { originalIssue, fromListId, toListId, originalIndex });
+          throw new Error();
         } else {
           const issue = data.issueMoveList?.issue;
           commit(types.MOVE_ISSUE_SUCCESS, { issue });
@@ -565,7 +565,7 @@ export default {
       })
       .then(({ data }) => {
         if (data?.epicMoveList?.errors.length) {
-          commit(types.MOVE_EPIC_FAILURE, { originalEpic, fromListId, toListId, originalIndex });
+          throw new Error();
         }
       })
       .catch(() =>

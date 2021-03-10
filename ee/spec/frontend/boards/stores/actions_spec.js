@@ -1002,7 +1002,7 @@ describe('moveEpic', () => {
     issuableType: 'epic',
   };
 
-  it('should commit MOVE_EPIC mutation mutation when successful', (done) => {
+  it('should commit MOVE_EPIC mutation mutation when successful', async () => {
     jest.spyOn(gqlClient, 'mutate').mockResolvedValue({
       data: {
         epicMoveList: {
@@ -1011,15 +1011,15 @@ describe('moveEpic', () => {
       },
     });
 
-    testAction(
-      actions.moveEpic,
-      {
+    await testAction({
+      action: actions.moveEpic,
+      payload: {
         itemId: '41',
         fromListId: 'gid://gitlab/List/1',
         toListId: 'gid://gitlab/List/2',
       },
       state,
-      [
+      expectedMutations: [
         {
           type: types.MOVE_EPIC,
           payload: {
@@ -1029,12 +1029,10 @@ describe('moveEpic', () => {
           },
         },
       ],
-      [],
-      done,
-    );
+    });
   });
 
-  it('should commit MOVE_EPIC mutation and MOVE_EPIC_FAILURE mutation when unsuccessful', (done) => {
+  it('should commit MOVE_EPIC mutation and MOVE_EPIC_FAILURE mutation when unsuccessful', async () => {
     jest.spyOn(gqlClient, 'mutate').mockResolvedValue({
       data: {
         epicMoveList: {
@@ -1043,15 +1041,15 @@ describe('moveEpic', () => {
       },
     });
 
-    testAction(
-      actions.moveEpic,
-      {
+    await testAction({
+      action: actions.moveEpic,
+      payload: {
         itemId: '41',
         fromListId: 'gid://gitlab/List/1',
         toListId: 'gid://gitlab/List/2',
       },
       state,
-      [
+      expectedMutations: [
         {
           type: types.MOVE_EPIC,
           payload: {
@@ -1070,9 +1068,7 @@ describe('moveEpic', () => {
           },
         },
       ],
-      [],
-      done,
-    );
+    });
   });
 });
 
