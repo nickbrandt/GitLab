@@ -409,6 +409,11 @@ msgstr ""
 msgid "%{completedCount} completed weight"
 msgstr ""
 
+msgid "%{completedCount} of %{count} task completed"
+msgid_plural "%{completedCount} of %{count} tasks completed"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "%{completedWeight} of %{totalWeight} weight completed"
 msgstr ""
 
@@ -28104,6 +28109,9 @@ msgid "Someone edited this %{issueType} at the same time you did. The descriptio
 msgstr ""
 
 msgid "Someone edited this merge request at the same time you did. Please refresh the page to see changes."
+msgstr ""
+
+msgid "Someone edited this test case at the same time you did. The description has been updated and you will need to make your changes again."
 msgstr ""
 
 msgid "Something went wrong"
