@@ -46,6 +46,8 @@ describe('Grouped test reports app', () => {
   const findIssueListUnresolvedHeading = () => wrapper.find('[data-testid="unresolvedHeading"]');
   const findIssueListResolvedHeading = () => wrapper.find('[data-testid="resolvedHeading"]');
   const findIssueDescription = () => wrapper.find('[data-testid="test-issue-body-description"]');
+  const findIssueRecentFailures = () =>
+    wrapper.find('[data-testid="test-issue-body-recent-failures"]');
   const findAllIssueDescriptions = () =>
     wrapper.findAll('[data-testid="test-issue-body-description"]');
 
@@ -268,7 +270,7 @@ describe('Grouped test reports app', () => {
       });
 
       it('renders the recent failures count on the test case', () => {
-        expect(findIssueDescription().text()).toContain(
+        expect(findIssueRecentFailures().text()).toBe(
           'Failed 8 times in master in the last 14 days',
         );
       });

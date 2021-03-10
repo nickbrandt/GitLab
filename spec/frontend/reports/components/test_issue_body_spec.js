@@ -44,7 +44,6 @@ describe('Test issue body', () => {
 
   afterEach(() => {
     wrapper.destroy();
-    wrapper = null;
   });
 
   describe('when issue has failed status', () => {
@@ -53,7 +52,7 @@ describe('Test issue body', () => {
     });
 
     it('renders issue name', () => {
-      expect(findDescription().text()).toContain(failedIssue.name);
+      expect(findDescription().text()).toBe(failedIssue.name);
     });
 
     it('renders failed status icon', () => {
@@ -77,7 +76,7 @@ describe('Test issue body', () => {
     });
 
     it('renders issue name', () => {
-      expect(findDescription().text()).toContain(successIssue.name);
+      expect(findDescription().text()).toBe(successIssue.name);
     });
 
     it('renders success status icon', () => {
@@ -90,7 +89,9 @@ describe('Test issue body', () => {
       createComponent();
       wrapper.findComponent(GlButton).trigger('click');
 
-      expect(actionSpies.openModal).toHaveBeenCalled();
+      expect(actionSpies.openModal).toHaveBeenCalledWith(expect.any(Object), {
+        issue: failedIssue,
+      });
     });
   });
 });
