@@ -26965,6 +26965,9 @@ msgstr ""
 msgid "Select Stack"
 msgstr ""
 
+msgid "Select a branch"
+msgstr ""
+
 msgid "Select a file from the left sidebar to begin editing. Afterwards, you'll be able to commit your changes."
 msgstr ""
 
