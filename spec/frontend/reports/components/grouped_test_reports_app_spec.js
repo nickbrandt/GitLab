@@ -43,6 +43,8 @@ describe('Grouped test reports app', () => {
   const findExpandButton = () => wrapper.find('[data-testid="report-section-expand-button"]');
   const findFullTestReportLink = () => wrapper.find('[data-testid="group-test-reports-full-link"]');
   const findSummaryDescription = () => wrapper.find('[data-testid="summary-row-description"]');
+  const findIssueListUnresolvedHeading = () => wrapper.find('[data-testid="unresolvedHeading"]');
+  const findIssueListResolvedHeading = () => wrapper.find('[data-testid="resolvedHeading"]');
   const findIssueDescription = () => wrapper.find('[data-testid="test-issue-body-description"]');
   const findAllIssueDescriptions = () =>
     wrapper.findAll('[data-testid="test-issue-body-description"]');
@@ -133,6 +135,10 @@ describe('Grouped test reports app', () => {
       mountComponent();
     });
 
+    it('renders New heading', () => {
+      expect(findIssueListUnresolvedHeading().text()).toBe('New');
+    });
+
     it('renders failed summary text', () => {
       expect(findHeader().text()).toBe('Test summary contained 2 failed out of 11 total tests');
     });
@@ -144,7 +150,6 @@ describe('Grouped test reports app', () => {
     });
 
     it('renders failed issue in list', () => {
-      expect(findIssueDescription().text()).toContain('New');
       expect(findIssueDescription().text()).toContain(
         'Test#sum when a is 1 and b is 2 returns summary',
       );
@@ -155,6 +160,10 @@ describe('Grouped test reports app', () => {
     beforeEach(() => {
       setReports(newErrorsTestReports);
       mountComponent();
+    });
+
+    it('renders New heading', () => {
+      expect(findIssueListUnresolvedHeading().text()).toBe('New');
     });
 
     it('renders error summary text', () => {
@@ -168,7 +177,6 @@ describe('Grouped test reports app', () => {
     });
 
     it('renders error issue in list', () => {
-      expect(findIssueDescription().text()).toContain('New');
       expect(findIssueDescription().text()).toContain(
         'Test#sum when a is 1 and b is 2 returns summary',
       );
@@ -179,6 +187,11 @@ describe('Grouped test reports app', () => {
     beforeEach(() => {
       setReports(mixedResultsTestReports);
       mountComponent();
+    });
+
+    it('renders New and Fixed headings', () => {
+      expect(findIssueListUnresolvedHeading().text()).toBe('New');
+      expect(findIssueListResolvedHeading().text()).toBe('Fixed');
     });
 
     it('renders summary text', () => {
@@ -194,7 +207,6 @@ describe('Grouped test reports app', () => {
     });
 
     it('renders failed issue in list', () => {
-      expect(findIssueDescription().text()).toContain('New');
       expect(findIssueDescription().text()).toContain(
         'Test#subtract when a is 2 and b is 1 returns correct result',
       );
@@ -205,6 +217,10 @@ describe('Grouped test reports app', () => {
     beforeEach(() => {
       setReports(resolvedFailures);
       mountComponent();
+    });
+
+    it('renders Fixed heading', () => {
+      expect(findIssueListResolvedHeading().text()).toBe('Fixed');
     });
 
     it('renders summary text', () => {
