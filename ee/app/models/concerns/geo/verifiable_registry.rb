@@ -3,6 +3,7 @@
 module Geo
   module VerifiableRegistry
     extend ActiveSupport::Concern
+    include ::Gitlab::Geo::VerificationState
 
     class_methods do
       extend ::Gitlab::Utils::Override
