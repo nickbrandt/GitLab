@@ -2518,7 +2518,3 @@ Style/ClassEqualityComparison:
   Exclude:
     - spec/lib/peek/views/active_record_spec.rb
     - ee/spec/lib/peek/views/active_record_spec.rb
-
-Lint/HashCompareByIdentity:
-  Exclude:
-    - ee/lib/gitlab/database/load_balancing/load_balancer.rb
