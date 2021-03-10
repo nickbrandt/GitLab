@@ -181,6 +181,19 @@ RSpec.describe Note, :elastic do
         expect(note_json).to have_key('visibility_level')
         expect(note_json['visibility_level']).to eq(expected_visibility_level)
       end
+
+      context 'when the project does not exist' do
+        before do
+          note.project = nil
+        end
+
+        it 'has DISABLED access_level' do
+          if access_level
+            expect(note_json).to have_key(access_level)
+            expect(note_json[access_level]).to eq(ProjectFeature::DISABLED)
+          end
+        end
+      end
     end
   end
 
