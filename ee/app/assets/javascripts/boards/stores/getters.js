@@ -5,7 +5,7 @@ export default {
   ...gettersCE,
 
   isSwimlanesOn: (state) => {
-    return Boolean(gon?.features?.swimlanes && state.isShowingEpicsSwimlanes);
+    return Boolean(gon?.licensed_features?.swimlanes && state.isShowingEpicsSwimlanes);
   },
   getIssuesByEpic: (state, getters) => (listId, epicId) => {
     return getters

@@ -351,7 +351,7 @@ export default () => {
   toggleFocusMode(ModalStore, boardsStore);
   toggleLabels();
 
-  if (gon.features?.swimlanes) {
+  if (gon.licensed_features?.swimlanes) {
     toggleEpicsSwimlanes();
   }
 
