@@ -211,7 +211,7 @@ before upgrading to a new major version. To see the current size of the `backgro
 [Check for background migrations before upgrading](#checking-for-background-migrations-before-upgrading).
 
 If you have enabled the [Elasticsearch
-integration](../integration/elasticsearch.md) then you will also need to ensure
+integration](../integration/elasticsearch.md), then you will also need to ensure
 all Advanced Search migrations are completed in the last minor version within
 your current version. Be sure to [check for pending Advanced Search
 migrations](#checking-for-pending-advanced-search-migrations) before proceeding
