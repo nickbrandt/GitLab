@@ -1,0 +1,5 @@
+---
+title: Improve performance of group package finder queries
+merge_request: 56426
+author:
+type: performance
