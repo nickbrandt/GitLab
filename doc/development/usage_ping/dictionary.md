@@ -7134,7 +7134,7 @@ Group: `group::product intelligence`
 
 Status: `data_available`
 
-Tiers: `free`
+Tiers: `free`, `premium`, `ultimate`
 
 ### `recording_ee_finished_at`
 
