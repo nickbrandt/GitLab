@@ -1,6 +1,5 @@
 <script>
 import { GlTruncate } from '@gitlab/ui';
-import { escapeFileUrl } from '~/lib/utils/url_utility';
 import FileIcon from '~/vue_shared/components/file_icon.vue';
 import FileHeader from '~/vue_shared/components/file_row_header.vue';
 
@@ -15,11 +14,6 @@ export default {
     file: {
       type: Object,
       required: true,
-    },
-    fileUrl: {
-      type: String,
-      required: false,
-      default: '',
     },
     level: {
       type: Number,
@@ -68,9 +62,6 @@ export default {
       // don't output a title if we don't have the expanded path
       return this.file?.tree?.length ? this.file.tree[0].parentPath : false;
     },
-    fileRouterUrl() {
-      return this.fileUrl || `/project${this.file.url}`;
-    },
   },
   watch: {
     isFileActive: function fileActiveWatch(active) {
@@ -93,11 +84,7 @@ export default {
     },
     clickFile() {
       // Manual Action if a tree is selected/opened
-      if (this.isTree && this.hasUrlAtCurrentRoute()) {
-        this.toggleTreeOpen(this.file.path);
-      }
-
-      if (this.$router && !this.hasUrlAtCurrentRoute()) this.$router.push(this.fileRouterUrl);
+      if (this.isTree) this.toggleTreeOpen(this.file.path);
 
       if (this.isBlob) this.clickedFile(this.file.path);
     },
@@ -123,11 +110,6 @@ export default {
       const filePath = this.file.path.replace(/[/]$/g, '');
 
       return filePath === routePath;
-    },
-    hasUrlAtCurrentRoute() {
-      if (!this.$router || !this.$router.currentRoute) return true;
-
-      return this.$router.currentRoute.path === escapeFileUrl(this.fileRouterUrl);
     },
   },
 };
