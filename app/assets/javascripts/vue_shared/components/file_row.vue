@@ -35,8 +35,16 @@ export default {
       required: false,
       default: false,
     },
+    isActive: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   computed: {
+    isFileActive() {
+      return this.isActive || this.file.active;
+    },
     isTree() {
       return this.file.type === 'tree';
     },
@@ -51,7 +59,7 @@ export default {
     fileClass() {
       return {
         'file-open': this.isBlob && this.file.opened,
-        'is-active': this.isBlob && this.file.active,
+        'is-active': this.isBlob && this.isFileActive,
         folder: this.isTree,
         'is-open': this.file.opened,
       };
@@ -65,7 +73,7 @@ export default {
     },
   },
   watch: {
-    'file.active': function fileActiveWatch(active) {
+    isFileActive: function fileActiveWatch(active) {
       if (this.file.type === 'blob' && active) {
         this.scrollIntoView();
       }
