@@ -8,14 +8,14 @@ import {
 } from '@gitlab/ui';
 import { mapActions, mapState } from 'vuex';
 import {
-  REMOVE_MEMBER_MODAL_ID,
-  REMOVE_MEMBER_MODAL_CONTENT_TEXT_TEMPLATE,
+  REMOVE_BILLABLE_MEMBER_MODAL_ID,
+  REMOVE_BILLABLE_MEMBER_MODAL_CONTENT_TEXT_TEMPLATE,
 } from 'ee/billings/seat_usage/constants';
 import csrf from '~/lib/utils/csrf';
 import { __, s__, sprintf } from '~/locale';
 
 export default {
-  name: 'RemoveMemberModal',
+  name: 'RemoveBillableMemberModal',
   csrf,
   components: {
     GlFormInput,
@@ -32,17 +32,17 @@ export default {
     };
   },
   computed: {
-    ...mapState(['namespaceName', 'namespaceId', 'memberToRemove']),
+    ...mapState(['namespaceName', 'namespaceId', 'billableMemberToRemove']),
     modalTitle() {
       return sprintf(s__('Billing|Remove user %{username} from your subscription'), {
         username: this.usernameWithAtPrepended,
       });
     },
     canSubmit() {
-      return this.enteredMemberUsername === this.memberToRemove.username;
+      return this.enteredMemberUsername === this.billableMemberToRemove.username;
     },
     modalText() {
-      return REMOVE_MEMBER_MODAL_CONTENT_TEXT_TEMPLATE;
+      return REMOVE_BILLABLE_MEMBER_MODAL_CONTENT_TEXT_TEMPLATE;
     },
     actionPrimaryProps() {
       return {
@@ -63,13 +63,13 @@ export default {
       };
     },
     usernameWithAtPrepended() {
-      return `@${this.memberToRemove.username}`;
+      return `@${this.billableMemberToRemove.username}`;
     },
   },
   methods: {
-    ...mapActions(['removeMember', 'setMemberToRemove']),
+    ...mapActions(['removeBillableMember', 'setBillableMemberToRemove']),
   },
-  modalId: REMOVE_MEMBER_MODAL_ID,
+  modalId: REMOVE_BILLABLE_MEMBER_MODAL_ID,
   i18n: {
     inputLabel: s__('Billing|Type %{username} to confirm'),
   },
@@ -78,16 +78,15 @@ export default {
 
 <template>
   <gl-modal
-    v-if="memberToRemove"
-    v-bind="$attrs"
+    v-if="billableMemberToRemove"
     :modal-id="$options.modalId"
     :action-primary="actionPrimaryProps"
     :action-cancel="actionCancelProps"
     :title="modalTitle"
-    data-qa-selector="remove_member_modal"
+    data-qa-selector="remove_billable_member_modal"
     :ok-disabled="!canSubmit"
-    @primary="removeMember"
-    @canceled="setMemberToRemove(null)"
+    @primary="removeBillableMember"
+    @canceled="setBillableMemberToRemove(null)"
   >
     <p>
       <gl-sprintf :message="modalText">
@@ -101,7 +100,7 @@ export default {
     <label id="input-label">
       <gl-sprintf :message="this.$options.i18n.inputLabel">
         <template #username>
-          <gl-badge variant="danger">{{ memberToRemove.username }}</gl-badge>
+          <gl-badge variant="danger">{{ billableMemberToRemove.username }}</gl-badge>
         </template>
       </gl-sprintf>
     </label>
