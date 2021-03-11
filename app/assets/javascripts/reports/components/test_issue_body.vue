@@ -3,6 +3,7 @@ import { GlBadge, GlButton } from '@gitlab/ui';
 import { mapActions } from 'vuex';
 import { sprintf, n__ } from '~/locale';
 import IssueStatusIcon from '~/reports/components/issue_status_icon.vue';
+import { STATUS_NEUTRAL } from '../constants';
 
 export default {
   name: 'TestIssueBody',
@@ -32,7 +33,7 @@ export default {
       return this.issue.recent_failures?.count && this.issue.recent_failures?.base_branch;
     },
     status() {
-      return this.issue.status || 'unknown';
+      return this.issue.status || STATUS_NEUTRAL;
     },
   },
   methods: {
