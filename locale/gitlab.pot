@@ -24560,6 +24560,15 @@ msgstr ""
 msgid "ProtectedBranch|%{wildcards_link_start}Wildcards%{wildcards_link_end} such as %{code_tag_start}*-stable%{code_tag_end} or %{code_tag_start}production/*%{code_tag_end} are supported."
 msgstr ""
 
+msgid "ProtectedBranch|Allow force push"
+msgstr ""
+
+msgid "ProtectedBranch|Allow force push for all users with push access."
+msgstr ""
+
+msgid "ProtectedBranch|Allow force push:"
+msgstr ""
+
 msgid "ProtectedBranch|Allowed to merge"
 msgstr ""
 
@@ -24600,6 +24609,9 @@ msgid "ProtectedBranch|Require approval from code owners:"
 msgstr ""
 
 msgid "ProtectedBranch|There are currently no protected branches, protect a branch with the form above."
+msgstr ""
+
+msgid "ProtectedBranch|Toggle allow force push"
 msgstr ""
 
 msgid "ProtectedBranch|Toggle code owner approval"
