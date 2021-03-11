@@ -40,6 +40,7 @@ RSpec.describe Integrations::Jira::IssueDetailEntity do
         'comment' => {
           'comments' => [
             {
+              'id' => '10022',
               'author' => comment_author,
               'body' => '<p>Comment</p>',
               'created' => '2020-06-25T15:50:00.000+0000',
@@ -101,6 +102,7 @@ RSpec.describe Integrations::Jira::IssueDetailEntity do
       external_tracker: 'jira',
       comments: [
         hash_including(
+          id: '10022',
           author: hash_including({
             name: 'comment_author',
             username: 'comment@author.com',
