@@ -5562,9 +5562,6 @@ msgstr ""
 msgid "CI/CD for external repo"
 msgstr ""
 
-msgid "CI/CD settings"
-msgstr ""
-
 msgid "CICDAnalytics|%{percent}%{percentSymbol}"
 msgstr ""
 
