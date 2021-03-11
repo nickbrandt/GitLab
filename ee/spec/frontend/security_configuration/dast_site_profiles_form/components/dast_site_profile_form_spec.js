@@ -346,10 +346,9 @@ describe('DastSiteProfileForm', () => {
     });
 
     it('should enable all form groups', () => {
-      const formGroups = findAllFormGroups();
-      for (let i = 0; i < formGroups.length; i += 1) {
-        expect(formGroups.at(i).attributes('disabled')).toBe(undefined);
-      }
+      expect(
+        findAllFormGroups().wrappers.every((w) => w.attributes('disabled') === undefined),
+      ).toBe(true);
     });
 
     it('should show the policy profile alert', () => {
@@ -371,10 +370,9 @@ describe('DastSiteProfileForm', () => {
     });
 
     it('should disable all form groups', () => {
-      const formGroups = findAllFormGroups();
-      for (let i = 0; i < formGroups.length; i += 1) {
-        expect(formGroups.at(i).attributes('disabled')).toBe('true');
-      }
+      expect(findAllFormGroups().wrappers.every((w) => w.attributes('disabled') === 'true')).toBe(
+        true,
+      );
     });
 
     it('should disable the save button', () => {
