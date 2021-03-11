@@ -24557,7 +24557,7 @@ msgstr ""
 msgid "ProtectedBranch|Code owner approval"
 msgstr ""
 
-msgid "ProtectedBranch|Does not apply to users allowed to push."
+msgid "ProtectedBranch|Does not apply to users allowed to push. Optional sections are not enforced."
 msgstr ""
 
 msgid "ProtectedBranch|Protect"
