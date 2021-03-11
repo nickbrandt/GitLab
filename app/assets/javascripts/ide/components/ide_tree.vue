@@ -15,7 +15,7 @@ export default {
   },
   computed: {
     ...mapState(['currentBranchId']),
-    ...mapGetters(['currentProject', 'currentTree', 'activeFile', 'getUrlForPath']),
+    ...mapGetters(['currentProject', 'currentTree', 'activeFile']),
   },
   mounted() {
     this.initialize();

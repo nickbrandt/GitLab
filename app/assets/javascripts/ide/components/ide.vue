@@ -72,7 +72,6 @@ export default {
       'currentTree',
       'hasCurrentProject',
       'editorTheme',
-      'getUrlForPath',
     ]),
     themeName() {
       return window.gon?.user_color_scheme;
@@ -95,7 +94,7 @@ export default {
     });
   },
   methods: {
-    ...mapActions(['toggleFileFinder']),
+    ...mapActions(['toggleFileFinder', 'updateRouteWithPath']),
     onBeforeUnload(e = {}) {
       const returnValue = __('Are you sure you want to lose unsaved changes?');
 
@@ -107,7 +106,7 @@ export default {
       return returnValue;
     },
     openFile(file) {
-      this.$router.push(this.getUrlForPath(file.path));
+      this.updateRouteWithPath(file.path);
     },
     createNewFile() {
       this.$refs.newModal.open(modalTypes.blob);

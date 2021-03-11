@@ -1,5 +1,6 @@
 import Api from '~/api';
 import { addNumericSuffix } from '~/ide/utils';
+import { escapeFileUrl } from '../../lib/utils/url_utility';
 import {
   leftSidebarViews,
   packageJsonPath,
@@ -183,8 +184,15 @@ export const getAvailableFileName = (state, getters) => (path) => {
   return newPath;
 };
 
-export const getUrlForPath = (state) => (path) =>
-  `/project/${state.currentProjectId}/tree/${state.currentBranchId}/-/${path}/`;
+export const getUrlForPath = (state) => (path, branch = null) => {
+  const type = state.entries[path]?.type || 'tree';
+  const pathEnding = type === 'tree' ? '/' : '';
+  const pathPart = path ? `-/${path}${pathEnding}` : '';
+
+  return escapeFileUrl(
+    `/project/${state.currentProjectId}/${type}/${branch || state.currentBranchId}/${pathPart}`,
+  );
+};
 
 export const getJsonSchemaForPath = (state, getters) => (path) => {
   const [namespace, ...project] = state.currentProjectId.split('/');

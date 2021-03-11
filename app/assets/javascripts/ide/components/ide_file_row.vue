@@ -38,7 +38,6 @@ export default {
 <template>
   <file-row
     :file="file"
-    :file-url="getUrlForPath(file.path)"
     :is-active="isActiveFile(file)"
     v-bind="$attrs"
     @mouseleave="toggleDropdown(false)"

@@ -1,6 +1,7 @@
 <script>
 /* eslint-disable @gitlab/vue-require-i18n-strings */
 import { GlIcon } from '@gitlab/ui';
+import { escapeFileUrl } from '~/lib/utils/url_utility';
 import Timeago from '~/vue_shared/components/time_ago_tooltip.vue';
 
 export default {
@@ -25,7 +26,9 @@ export default {
   },
   computed: {
     branchHref() {
-      return this.$router.resolve(`/project/${this.projectId}/edit/${this.item.name}`).href;
+      return this.$router.resolve(
+        escapeFileUrl(`/project/${this.projectId}/edit/${this.item.name}`),
+      ).href;
     },
   },
 };

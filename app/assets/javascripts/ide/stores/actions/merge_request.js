@@ -147,7 +147,7 @@ export const getMergeRequestVersions = (
     }
   });
 
-export const openMergeRequestChanges = async ({ dispatch, getters, state, commit }, changes) => {
+export const openMergeRequestChanges = async ({ dispatch, state, commit }, changes) => {
   const entryChanges = changes
     .map((change) => ({ entry: state.entries[change.new_path], change }))
     .filter((x) => x.entry);
@@ -175,7 +175,7 @@ export const openMergeRequestChanges = async ({ dispatch, getters, state, commit
   // Activate first path.
   // We don't `getFileData` here since the editor component kicks that off. Otherwise, we'd fetch twice.
   const [firstPath, ...remainingPaths] = pathsToOpen;
-  await dispatch('router/push', getters.getUrlForPath(firstPath));
+  await dispatch('updateRouteWithPath', firstPath);
   await dispatch('setFileActive', firstPath);
 
   // Lastly, eagerly fetch the remaining paths for improved user experience.

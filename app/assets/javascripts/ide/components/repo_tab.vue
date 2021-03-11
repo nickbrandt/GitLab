@@ -43,13 +43,13 @@ export default {
   },
 
   methods: {
-    ...mapActions(['closeFile', 'updateDelayViewerUpdated']),
+    ...mapActions(['closeFile', 'updateDelayViewerUpdated', 'updateRouteWithPath']),
     clickFile(tab) {
       if (this.isActiveFile(tab)) return;
 
       this.updateDelayViewerUpdated(true);
 
-      this.$router.push(this.getUrlForPath(tab.path));
+      this.updateRouteWithPath(tab.path);
     },
     mouseOverTab() {
       if (this.fileHasChanged) {

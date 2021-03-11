@@ -206,11 +206,9 @@ export const commitChanges = ({ commit, state, getters, dispatch, rootState, roo
           if (newBranch) {
             const path = rootGetters.activeFile ? rootGetters.activeFile.path : '';
 
-            return dispatch(
-              'router/push',
-              `/project/${rootState.currentProjectId}/blob/${branchName}/-/${path}`,
-              { root: true },
-            );
+            return dispatch('router/push', rootGetters.getUrlForPath(path, branchName), {
+              root: true,
+            });
           }
 
           return dispatch(

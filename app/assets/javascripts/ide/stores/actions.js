@@ -223,7 +223,7 @@ export const renameEntry = ({ dispatch, commit, state, getters }, { path, name, 
     }
 
     if (newEntry.opened) {
-      dispatch('router/push', getters.getUrlForPath(newEntry.path), { root: true });
+      dispatch('updateRouteWithPath', newEntry.path);
     }
   }
 

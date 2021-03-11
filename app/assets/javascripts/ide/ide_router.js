@@ -1,6 +1,6 @@
 import Vue from 'vue';
+import VueRouter from 'vue-router';
 import { deprecatedCreateFlash as flash } from '~/flash';
-import IdeRouter from '~/ide/ide_router_extension';
 import { joinPaths } from '~/lib/utils/url_utility';
 import { __ } from '~/locale';
 import {
@@ -11,7 +11,7 @@ import {
 import { performanceMarkAndMeasure } from '~/performance/utils';
 import { syncRouterAndStore } from './sync_router_and_store';
 
-Vue.use(IdeRouter);
+Vue.use(VueRouter);
 
 /**
  * Routes below /-/ide/:
@@ -40,7 +40,7 @@ const EmptyRouterComponent = {
 };
 
 export const createRouter = (store) => {
-  const router = new IdeRouter({
+  const router = new VueRouter({
     mode: 'history',
     base: joinPaths(gon.relative_url_root || '', '/-/ide/'),
     routes: [

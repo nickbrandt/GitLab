@@ -36,9 +36,11 @@ export default {
     },
   },
   methods: {
-    ...mapActions(['toggleTreeOpen']),
-    clickedFile() {
+    ...mapActions(['toggleTreeOpen', 'updateRouteWithPath']),
+    clickedFile(path) {
       performanceMarkAndMeasure({ mark: WEBIDE_MARK_FILE_CLICKED });
+
+      this.updateRouteWithPath(path);
     },
   },
   IdeFileRow,

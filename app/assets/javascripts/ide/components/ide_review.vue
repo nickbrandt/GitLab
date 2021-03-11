@@ -10,7 +10,7 @@ export default {
     EditorModeDropdown,
   },
   computed: {
-    ...mapGetters(['currentMergeRequest', 'activeFile', 'getUrlForPath']),
+    ...mapGetters(['currentMergeRequest', 'activeFile']),
     ...mapState(['viewer', 'currentMergeRequestId']),
     showLatestChangesText() {
       return !this.currentMergeRequestId || this.viewer === viewerTypes.diff;

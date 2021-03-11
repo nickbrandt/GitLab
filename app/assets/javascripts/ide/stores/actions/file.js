@@ -22,11 +22,9 @@ export const closeFile = ({ commit, state, dispatch, getters }, file) => {
     const nextFileToOpen = state.openFiles[nextIndexToOpen];
 
     dispatch('setFileActive', nextFileToOpen.path);
-    dispatch('router/push', getters.getUrlForPath(nextFileToOpen.path), { root: true });
+    dispatch('updateRouteWithPath', nextFileToOpen.path);
   } else if (state.openFiles.length === 1) {
-    dispatch('router/push', `/project/${state.currentProjectId}/tree/${state.currentBranchId}/`, {
-      root: true,
-    });
+    dispatch('updateRouteWithPath', null);
   }
 
   commit(types.TOGGLE_FILE_OPEN, path);
@@ -38,6 +36,7 @@ export const setFileActive = ({ commit, dispatch }, path) => {
   commit(types.SET_FILE_ACTIVE, path);
 
   if (path) {
+    dispatch('updateRouteWithActiveFile');
     dispatch('scrollToTab');
   }
 };
@@ -191,14 +190,15 @@ export const restoreOriginalFile = ({ dispatch, state, commit }, path) => {
   }
 };
 
-export const updateRouteWithActiveFile = async ({ dispatch, getters }) => {
-  const file = getters.activeFile;
+export const updateRouteWithPath = async ({ dispatch, getters }, path) =>
+  dispatch('router/push', getters.getUrlForPath(path), { root: true });
 
-  if (!file) {
+export const updateRouteWithActiveFile = async ({ dispatch, getters }) => {
+  if (!getters.activeFile) {
     return;
   }
 
-  await dispatch('router/push', getters.getUrlForPath(file.path), { root: true });
+  dispatch('updateRouteWithPath', getters.activeFile.path);
 };
 
 export const discardFileChanges = ({ dispatch, state, commit, getters }, path) => {
@@ -210,7 +210,7 @@ export const discardFileChanges = ({ dispatch, state, commit, getters }, path) =
   if (!isDestructiveDiscard && file.path === getters.activeFile?.path) {
     dispatch('updateDelayViewerUpdated', true)
       .then(() => {
-        dispatch('router/push', getters.getUrlForPath(file.path), { root: true });
+        dispatch('updateRouteWithPath', file.path);
       })
       .catch((e) => {
         throw e;
@@ -261,13 +261,7 @@ export const openPendingTab = ({ commit, dispatch, state }, path) => {
 
   commit(types.SET_ACTIVE_COMMIT_FILE, path);
 
-  dispatch(
-    'router/push',
-    `/project/${state.currentProjectId}/tree/${state.currentBranchId}/-/${path}`,
-    {
-      root: true,
-    },
-  );
+  dispatch('updateRouteWithPath', path);
 };
 
 export const triggerFilesChange = (ctx, payload = {}) => {
