@@ -9,7 +9,7 @@ import { __ } from '~/locale';
 import updateMergeRequestLabelsMutation from '~/sidebar/queries/update_merge_request_labels.mutation.graphql';
 import { toLabelGid } from '~/sidebar/utils';
 import { DropdownVariant } from '~/vue_shared/components/sidebar/labels_select_vue/constants';
-import LabelsSelect from '~/vue_shared/components/sidebar/labels_select_vue/labels_select_root.vue';
+import LabelsSelect from '~/vue_shared/components/sidebar/labels_select_widget/labels_select_root.vue';
 
 const mutationMap = {
   [IssuableType.Issue]: {
