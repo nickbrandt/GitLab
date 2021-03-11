@@ -19,6 +19,7 @@ module Gitlab
             # This is the legacy code-path, hit if the field has a @resolver_proc
             # TODO: remove this when resolve procs are removed from the
             # graphql-ruby library, and all field instrumentation is removed.
+            # See: https://github.com/rmosolgo/graphql-ruby/issues/3385
             presented = field.owner.try(:present, object, attrs) || object
             yield(presented, arguments)
           end
