@@ -571,7 +571,9 @@ Install the gems (if you want to use Kerberos for user authentication, omit
 `kerberos` in the `--without` option below):
 
 ```shell
-sudo -u git -H bundle install --deployment --without development test mysql aws kerberos
+sudo -u git -H bundle config set deployment 'true'
+sudo -u git -H bundle config set without 'development test mysql aws kerberos'
+sudo -u git -H bundle install
 ```
 
 ### Install GitLab Shell
