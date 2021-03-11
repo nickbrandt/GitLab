@@ -1483,6 +1483,9 @@ msgstr ""
 msgid "APIFuzzing|Ex: $TestUsername"
 msgstr ""
 
+msgid "APIFuzzing|Ex: Project_Test/File/example_fuzz"
+msgstr ""
+
 msgid "APIFuzzing|Ex: Project_Test/File/example_fuzz.har"
 msgstr ""
 
@@ -1505,6 +1508,9 @@ msgid "APIFuzzing|Make sure your credentials are secured"
 msgstr ""
 
 msgid "APIFuzzing|Password for basic authentication"
+msgstr ""
+
+msgid "APIFuzzing|Postman collections are a group of saved requests you can organize into folders."
 msgstr ""
 
 msgid "APIFuzzing|Scan mode"
@@ -22821,6 +22827,9 @@ msgid "Point to any links you like: documentation, built binaries, or other rela
 msgstr ""
 
 msgid "Policy project doesn't exists"
+msgstr ""
+
+msgid "Postman collection"
 msgstr ""
 
 msgid "Pre-defined push rules."
