@@ -47,7 +47,7 @@ class Groups::Security::CredentialsController < Groups::ApplicationController
 
   override :revoke_button_available?
   def revoke_button_available?
-    ::Feature.enabled?(:revoke_managed_users_token, group)
+    true
   end
 
   override :users
