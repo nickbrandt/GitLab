@@ -3,7 +3,7 @@
 module Elastic
   module Latest
     class NoteInstanceProxy < ApplicationInstanceProxy
-      delegate :noteable, :noteable_type, to: :target
+      delegate :noteable, to: :target
 
       def as_indexed_json(options = {})
         # `noteable` can be sometimes be nil (eg. when a commit has been
@@ -41,17 +41,14 @@ module Elastic
       private
 
       def merge_project_feature_access_level(data)
-        return unless noteable_type
-
-        case noteable_type
-        when 'Snippet'
+        case noteable
+        when Snippet
           data['snippets_access_level'] = safely_read_project_feature_for_elasticsearch(:snippets)
-        when 'Commit'
+        when Commit
           data['repository_access_level'] = safely_read_project_feature_for_elasticsearch(:repository)
-        when 'Issue', 'MergeRequest'
-          klass = noteable_type.constantize
-          access_level_attribute = ProjectFeature.access_level_attribute(klass)
-          data[access_level_attribute.to_s] = safely_read_project_feature_for_elasticsearch(klass)
+        when Issue, MergeRequest
+          access_level_attribute = ProjectFeature.access_level_attribute(noteable)
+          data[access_level_attribute.to_s] = safely_read_project_feature_for_elasticsearch(noteable)
         else
           # do nothing for other note types (DesignManagement::Design, AlertManagement::Alert, Epic, Vulnerability )
           # are indexed but not currently searchable so we will not add permission
