@@ -13,12 +13,10 @@ query DastProfiles($fullPath: ID!, $after: String, $before: String, $first: Int,
           dastSiteProfile {
             id
             targetUrl
-            referencedInSecurityPolicies
           }
           dastScannerProfile {
             id
             scanType
-            referencedInSecurityPolicies
           }
           branch {
             name
