@@ -1,0 +1,5 @@
+---
+title: Refresh group open issues count cache when bulk updating issue state
+merge_request: 56386
+author:
+type: added
