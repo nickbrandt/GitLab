@@ -69,7 +69,7 @@ export default {
     },
   },
   methods: {
-    ...mapActions(['moveList']),
+    ...mapActions(['moveList', 'unsetError']),
     afterFormEnters() {
       const el = this.canDragColumns ? this.$refs.list.$el : this.$refs.list;
       el.scrollTo({ left: el.scrollWidth, behavior: 'smooth' });
@@ -100,7 +100,7 @@ export default {
 
 <template>
   <div>
-    <gl-alert v-if="error" variant="danger" :dismissible="false">
+    <gl-alert v-if="error" variant="danger" :dismissible="true" @dismiss="unsetError">
       {{ error }}
     </gl-alert>
     <component

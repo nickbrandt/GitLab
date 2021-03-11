@@ -107,6 +107,7 @@ export default () => {
       milestoneListsAvailable: parseBoolean($boardApp.dataset.milestoneListsAvailable),
       assigneeListsAvailable: parseBoolean($boardApp.dataset.assigneeListsAvailable),
       iterationListsAvailable: parseBoolean($boardApp.dataset.iterationListsAvailable),
+      issuableType: issuableTypes.issue,
     },
     store,
     apolloProvider,
