@@ -22,38 +22,4 @@ RSpec.describe 'snippets' do
       expect(graphql_data_at(:snippets, :nodes, :blobs, :nodes)).to be_present
     end
   end
-
-  describe 'snippet_blob_content' do
-    let_it_be(:query_file) do
-      Rails.root.join('app/graphql/queries/snippet/snippet_blob_content.query.graphql').read
-    end
-
-    it 'can query for rich snippet blob content' do
-      ids = snippets.map { |s| global_id_of(s) }
-      vars = {
-        rich: true,
-        paths: ['.gitattributes'],
-        ids: ids
-      }
-
-      post_graphql(query_file, current_user: current_user, variables: vars)
-
-      expect(graphql_data_at(:snippets, :nodes, :blobs, :nodes, :path))
-        .to contain_exactly('.gitattributes', '.gitattributes', '.gitattributes')
-    end
-
-    it 'can query for plain snippet blob content' do
-      ids = snippets.map { |s| global_id_of(s) }
-      vars = {
-        rich: false,
-        paths: ['.gitattributes'],
-        ids: ids
-      }
-
-      post_graphql(query_file, current_user: current_user, variables: vars)
-
-      expect(graphql_data_at(:snippets, :nodes, :blobs, :nodes, :path))
-        .to contain_exactly('.gitattributes', '.gitattributes', '.gitattributes')
-    end
-  end
 end
