@@ -45,7 +45,7 @@ describe('WebIDE', () => {
       __actions: [
         {
           action: 'create',
-          content: 'Lorem ipsum dolar sit\n',
+          content: 'Lorem ipsum dolar sit',
           encoding: 'text',
           file_path: 'foo/bar/test.txt',
           last_commit_id: '',
@@ -144,10 +144,12 @@ describe('WebIDE', () => {
 
       it('updates after rename', async () => {
         await ideHelper.renameFile('README.md', 'READMEZ.txt');
-        await ideHelper.waitForEditorModelChange(editor);
+        // waitForMonacoEditor instead of waitForEditorModelChange because a whole new model is created.
+        // In this case, openFiles will be empty in the middle of the rename which triggers us to dispose instances.
+        await ideHelper.waitForMonacoEditor();
         await vm.$nextTick();
 
-        expect(statusBar).toHaveText('1:1');
+        expect(statusBar).toHaveText('4:10');
         expect(statusBar).toHaveText('plaintext');
       });
 
