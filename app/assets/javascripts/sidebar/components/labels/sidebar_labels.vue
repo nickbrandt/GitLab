@@ -1,5 +1,4 @@
 <script>
-import $ from 'jquery';
 import { camelCase, difference, union } from 'lodash';
 import updateIssueLabelsMutation from '~/boards/graphql/issue_set_labels.mutation.graphql';
 import createFlash from '~/flash';
@@ -21,6 +20,10 @@ const mutationMap = {
     mutationName: 'mergeRequestSetLabels',
   },
 };
+
+const hideDropdownEvent = new CustomEvent('hiddenGlDropdown', {
+  bubbles: true,
+});
 
 export default {
   components: {
@@ -47,7 +50,7 @@ export default {
   },
   methods: {
     handleDropdownClose() {
-      $(this.$el).trigger('hidden.gl.dropdown');
+      this.$el.dispatchEvent(hideDropdownEvent);
     },
     getUpdateVariables(dropdownLabels) {
       const currentLabelIds = this.selectedLabels.map((label) => label.id);
