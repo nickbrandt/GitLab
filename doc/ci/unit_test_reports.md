@@ -325,13 +325,12 @@ You can also retrieve the reports via the [GitLab API](../api/pipelines.md#get-a
 
 ### Unit test reports parsing errors
 
-> - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/263457) in GitLab 13.10.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/263457) in GitLab 13.10.
 
-If parsing JUnit report XML results in an error, an indicator will be shown next to the job name. Hovering over the icon will show the parser error in a tooltip. In case of multiple parsing errors coming from [grouped jobs](jobs/index.md#group-jobs-in-a-pipeline), we will only show the first error from the group.
+If parsing JUnit report XML results in an error, an indicator is shown next to the job name. Hovering over the icon shows the parser error in a tooltip. If multiple parsing errors come from [grouped jobs](jobs/index.md#group-jobs-in-a-pipeline), GitLab shows only the first error from the group.
 
 ![Test Reports With Errors](img/pipelines_junit_test_report_with_errors_v13_10.png)
 
-In case there are multiple parsing errors from [grouped jobs](jobs/index.md#group-jobs-in-a-pipeline), we will only show the first error from the group.
 
 ## Viewing JUnit screenshots on GitLab
 
