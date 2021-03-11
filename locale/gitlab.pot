@@ -9422,6 +9422,9 @@ msgstr ""
 msgid "DastProfiles|Authentication URL"
 msgstr ""
 
+msgid "DastProfiles|Branch missing"
+msgstr ""
+
 msgid "DastProfiles|Could not create the scanner profile. Please try again."
 msgstr ""
 
@@ -9591,6 +9594,9 @@ msgid "DastProfiles|Scanner Profiles"
 msgstr ""
 
 msgid "DastProfiles|Scanner name"
+msgstr ""
+
+msgid "DastProfiles|Select branch"
 msgstr ""
 
 msgid "DastProfiles|Show debug messages"
