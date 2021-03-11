@@ -23,6 +23,8 @@ module Gitlab
       EPIC_CLOSED = 'g_project_management_epic_closed'
       EPIC_REOPENED = 'g_project_management_epic_reopened'
       ISSUE_PROMOTED_TO_EPIC = 'g_project_management_issue_promoted_to_epic'
+      EPIC_CONFIDENTIAL = 'g_project_management_users_setting_epic_confidential'
+      EPIC_VISIBLE = 'g_project_management_users_setting_epic_visible'
 
       class << self
         def track_epic_created_action(author:)
@@ -87,6 +89,14 @@ module Gitlab
 
         def track_issue_promoted_to_epic(author:)
           track_unique_action(ISSUE_PROMOTED_TO_EPIC, author)
+        end
+
+        def track_epic_confidential_action(author:)
+          track_unique_action(EPIC_CONFIDENTIAL, author)
+        end
+
+        def track_epic_visible_action(author:)
+          track_unique_action(EPIC_VISIBLE, author)
         end
 
         private
