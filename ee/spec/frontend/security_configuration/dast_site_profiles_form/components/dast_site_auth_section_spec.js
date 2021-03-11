@@ -1,4 +1,4 @@
-import { GlFormCheckbox, GlFormGroup } from '@gitlab/ui';
+import { GlFormCheckbox } from '@gitlab/ui';
 import { mount, shallowMount } from '@vue/test-utils';
 import DastSiteAuthSection from 'ee/security_configuration/dast_site_profiles_form/components/dast_site_auth_section.vue';
 import { extendedWrapper } from 'helpers/vue_test_utils_helper';
@@ -25,7 +25,7 @@ describe('DastSiteAuthSection', () => {
     wrapper.destroy();
   });
 
-  const findAllFormGroups = () => wrapper.findAllComponents(GlFormGroup);
+  const findParentFormGroup = () => wrapper.findByTestId('dast-site-auth-parent-group');
   const findByNameAttribute = (name) => wrapper.find(`[name="${name}"]`);
   const findAuthForm = () => wrapper.findByTestId('auth-form');
   const findAuthCheckbox = () => wrapper.find(GlFormCheckbox);
@@ -121,18 +121,14 @@ describe('DastSiteAuthSection', () => {
     describe('when profile does not come from a policy', () => {
       it('should enable all form groups', () => {
         createComponent({ mountFn: shallowMount, fields: { enabled: true } });
-        expect(
-          findAllFormGroups().wrappers.every((w) => w.attributes('disabled') === undefined),
-        ).toBe(true);
+        expect(findParentFormGroup().attributes('disabled')).toBe(undefined);
       });
     });
 
     describe('when profile does comes from a policy', () => {
       it('should disable all form groups', () => {
         createComponent({ mountFn: shallowMount, disabled: true, fields: { enabled: true } });
-        expect(findAllFormGroups().wrappers.every((w) => w.attributes('disabled') === 'true')).toBe(
-          true,
-        );
+        expect(findParentFormGroup().attributes('disabled')).toBe('true');
       });
     });
   });

@@ -1,4 +1,4 @@
-import { GlForm, GlFormGroup, GlModal } from '@gitlab/ui';
+import { GlForm, GlModal } from '@gitlab/ui';
 import { within } from '@testing-library/dom';
 import { mount, shallowMount } from '@vue/test-utils';
 import merge from 'lodash/merge';
@@ -40,7 +40,7 @@ describe('DAST Scanner Profile', () => {
   const withinComponent = () => within(wrapper.element);
   const findByTestId = (testId) => wrapper.find(`[data-testid="${testId}"`);
 
-  const findAllFormGroups = () => wrapper.findAllComponents(GlFormGroup);
+  const findParentFormGroup = () => findByTestId('dast-scanner-parent-group');
   const findForm = () => wrapper.find(GlForm);
   const findProfileNameInput = () => findByTestId('profile-name-input');
   const findSpiderTimeoutInput = () => findByTestId('spider-timeout-input');
@@ -294,9 +294,7 @@ describe('DAST Scanner Profile', () => {
     });
 
     it('should enable all form groups', () => {
-      expect(
-        findAllFormGroups().wrappers.every((w) => w.attributes('disabled') === undefined),
-      ).toBe(true);
+      expect(findParentFormGroup().attributes('disabled')).toBe(undefined);
     });
 
     it('should show the policy profile alert', () => {
@@ -318,9 +316,7 @@ describe('DAST Scanner Profile', () => {
     });
 
     it('should disable all form groups', () => {
-      expect(findAllFormGroups().wrappers.every((w) => w.attributes('disabled') === 'true')).toBe(
-        true,
-      );
+      expect(findParentFormGroup().attributes('disabled')).toBe('true');
     });
 
     it('should disable the save button', () => {

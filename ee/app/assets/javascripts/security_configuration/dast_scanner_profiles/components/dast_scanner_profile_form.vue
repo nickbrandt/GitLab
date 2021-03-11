@@ -274,111 +274,111 @@ export default {
       </ul>
     </gl-alert>
 
-    <gl-form-group :disabled="isPolicyProfile" :label="s__('DastProfiles|Profile name')">
-      <gl-form-input
-        v-model="form.profileName.value"
-        class="mw-460"
-        data-testid="profile-name-input"
-        type="text"
-      />
-    </gl-form-group>
-
-    <hr class="gl-border-gray-100" />
-
-    <gl-form-group :disabled="isPolicyProfile">
-      <template #label>
-        {{ s__('DastProfiles|Scan mode') }}
-        <tooltip-icon :title="i18n.tooltips.scanMode" />
-      </template>
-
-      <gl-form-radio-group
-        v-model="form.scanType.value"
-        :options="$options.SCAN_TYPE_OPTIONS"
-        data-testid="scan-type-option"
-      />
-    </gl-form-group>
-
-    <div class="row">
-      <gl-form-group
-        class="col-md-6 mb-0"
-        :disabled="isPolicyProfile"
-        :state="form.spiderTimeout.state"
-        :invalid-feedback="form.spiderTimeout.feedback"
-      >
-        <template #label>
-          {{ s__('DastProfiles|Spider timeout') }}
-          <tooltip-icon :title="i18n.tooltips.spiderTimeout" />
-        </template>
-        <gl-form-input-group
-          v-model.number="form.spiderTimeout.value"
+    <gl-form-group data-testid="dast-scanner-parent-group" :disabled="isPolicyProfile">
+      <gl-form-group :label="s__('DastProfiles|Profile name')">
+        <gl-form-input
+          v-model="form.profileName.value"
           class="mw-460"
-          data-testid="spider-timeout-input"
-          type="number"
-          :min="$options.spiderTimeoutRange.min"
-          :max="$options.spiderTimeoutRange.max"
-          @input="validateSpiderTimeout"
+          data-testid="profile-name-input"
+          type="text"
+        />
+      </gl-form-group>
+
+      <hr class="gl-border-gray-100" />
+
+      <gl-form-group>
+        <template #label>
+          {{ s__('DastProfiles|Scan mode') }}
+          <tooltip-icon :title="i18n.tooltips.scanMode" />
+        </template>
+
+        <gl-form-radio-group
+          v-model="form.scanType.value"
+          :options="$options.SCAN_TYPE_OPTIONS"
+          data-testid="scan-type-option"
+        />
+      </gl-form-group>
+
+      <div class="row">
+        <gl-form-group
+          class="col-md-6 mb-0"
+          :state="form.spiderTimeout.state"
+          :invalid-feedback="form.spiderTimeout.feedback"
         >
-          <template #append>
-            <gl-input-group-text>{{ __('Minutes') }}</gl-input-group-text>
+          <template #label>
+            {{ s__('DastProfiles|Spider timeout') }}
+            <tooltip-icon :title="i18n.tooltips.spiderTimeout" />
           </template>
-        </gl-form-input-group>
-        <div class="gl-text-gray-400 gl-my-2">
-          {{ s__('DastProfiles|Minimum = 0 (no timeout enabled), Maximum = 2880 minutes') }}
-        </div>
-      </gl-form-group>
+          <gl-form-input-group
+            v-model.number="form.spiderTimeout.value"
+            class="mw-460"
+            data-testid="spider-timeout-input"
+            type="number"
+            :min="$options.spiderTimeoutRange.min"
+            :max="$options.spiderTimeoutRange.max"
+            @input="validateSpiderTimeout"
+          >
+            <template #append>
+              <gl-input-group-text>{{ __('Minutes') }}</gl-input-group-text>
+            </template>
+          </gl-form-input-group>
+          <div class="gl-text-gray-400 gl-my-2">
+            {{ s__('DastProfiles|Minimum = 0 (no timeout enabled), Maximum = 2880 minutes') }}
+          </div>
+        </gl-form-group>
 
-      <gl-form-group
-        class="col-md-6 mb-0"
-        :disabled="isPolicyProfile"
-        :state="form.targetTimeout.state"
-        :invalid-feedback="form.targetTimeout.feedback"
-      >
-        <template #label>
-          {{ s__('DastProfiles|Target timeout') }}
-          <tooltip-icon :title="i18n.tooltips.targetTimeout" />
-        </template>
-        <gl-form-input-group
-          v-model.number="form.targetTimeout.value"
-          class="mw-460"
-          data-testid="target-timeout-input"
-          type="number"
-          :min="$options.targetTimeoutRange.min"
-          :max="$options.targetTimeoutRange.max"
-          @input="validateTargetTimeout"
+        <gl-form-group
+          class="col-md-6 mb-0"
+          :state="form.targetTimeout.state"
+          :invalid-feedback="form.targetTimeout.feedback"
         >
-          <template #append>
-            <gl-input-group-text>{{ __('Seconds') }}</gl-input-group-text>
+          <template #label>
+            {{ s__('DastProfiles|Target timeout') }}
+            <tooltip-icon :title="i18n.tooltips.targetTimeout" />
           </template>
-        </gl-form-input-group>
-        <div class="gl-text-gray-400 gl-my-2">
-          {{ s__('DastProfiles|Minimum = 1 second, Maximum = 3600 seconds') }}
-        </div>
-      </gl-form-group>
-    </div>
+          <gl-form-input-group
+            v-model.number="form.targetTimeout.value"
+            class="mw-460"
+            data-testid="target-timeout-input"
+            type="number"
+            :min="$options.targetTimeoutRange.min"
+            :max="$options.targetTimeoutRange.max"
+            @input="validateTargetTimeout"
+          >
+            <template #append>
+              <gl-input-group-text>{{ __('Seconds') }}</gl-input-group-text>
+            </template>
+          </gl-form-input-group>
+          <div class="gl-text-gray-400 gl-my-2">
+            {{ s__('DastProfiles|Minimum = 1 second, Maximum = 3600 seconds') }}
+          </div>
+        </gl-form-group>
+      </div>
 
-    <hr class="gl-border-gray-100" />
+      <hr class="gl-border-gray-100" />
 
-    <div class="row">
-      <gl-form-group class="col-md-6 mb-0" :disabled="isPolicyProfile">
-        <template #label>
-          {{ s__('DastProfiles|AJAX spider') }}
-          <tooltip-icon :title="i18n.tooltips.ajaxSpider" />
-        </template>
-        <gl-form-checkbox v-model="form.useAjaxSpider.value">{{
-          s__('DastProfiles|Turn on AJAX spider')
-        }}</gl-form-checkbox>
-      </gl-form-group>
+      <div class="row">
+        <gl-form-group class="col-md-6 mb-0">
+          <template #label>
+            {{ s__('DastProfiles|AJAX spider') }}
+            <tooltip-icon :title="i18n.tooltips.ajaxSpider" />
+          </template>
+          <gl-form-checkbox v-model="form.useAjaxSpider.value">{{
+            s__('DastProfiles|Turn on AJAX spider')
+          }}</gl-form-checkbox>
+        </gl-form-group>
 
-      <gl-form-group class="col-md-6 mb-0" :disabled="isPolicyProfile">
-        <template #label>
-          {{ s__('DastProfiles|Debug messages') }}
-          <tooltip-icon :title="i18n.tooltips.debugMessage" />
-        </template>
-        <gl-form-checkbox v-model="form.showDebugMessages.value">{{
-          s__('DastProfiles|Show debug messages')
-        }}</gl-form-checkbox>
-      </gl-form-group>
-    </div>
+        <gl-form-group class="col-md-6 mb-0">
+          <template #label>
+            {{ s__('DastProfiles|Debug messages') }}
+            <tooltip-icon :title="i18n.tooltips.debugMessage" />
+          </template>
+          <gl-form-checkbox v-model="form.showDebugMessages.value">{{
+            s__('DastProfiles|Show debug messages')
+          }}</gl-form-checkbox>
+        </gl-form-group>
+      </div>
+    </gl-form-group>
 
     <hr class="gl-border-gray-100" />
 
