@@ -9,6 +9,7 @@ const DEFAULT_PROPS = {
     username: 'root',
     name: 'Administrator',
     location: 'Vienna',
+    bot: true,
     bio: null,
     workInformation: null,
     status: null,
@@ -243,15 +244,6 @@ describe('User Popover Component', () => {
       const securityBotDocsLink = findSecurityBotDocsLink();
       expect(securityBotDocsLink.exists()).toBe(true);
       expect(securityBotDocsLink.attributes('href')).toBe(SECURITY_BOT_USER.websiteUrl);
-    });
-
-    it('does not show the link if the feature flag is disabled', () => {
-      window.gon.features = {
-        securityAutoFix: false,
-      };
-      createWrapper({ user: SECURITY_BOT_USER });
-
-      expect(findSecurityBotDocsLink().exists()).toBe(false);
     });
   });
 });
