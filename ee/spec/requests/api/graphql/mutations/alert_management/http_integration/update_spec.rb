@@ -40,6 +40,10 @@ RSpec.describe 'Updating an existing HTTP Integration' do
           name
           active
           url
+          payloadExample
+          payloadAttributeMappings {
+            fieldName
+          }
         }
       QL
     end
@@ -51,10 +55,11 @@ RSpec.describe 'Updating an existing HTTP Integration' do
     it 'updates integration without the custom mapping params', :aggregate_failures do
       post_graphql_mutation(mutation, current_user: current_user)
 
+      integration_response = mutation_response['integration']
+
       expect(response).to have_gitlab_http_status(:success)
-      integration.reload
-      expect(integration.payload_example).to eq({})
-      expect(integration.payload_attribute_mapping).to eq({})
+      expect(integration_response['payloadExample']).to eq('{}')
+      expect(integration_response['payloadAttributeMappings']).to be_empty
     end
   end
 
@@ -116,10 +121,8 @@ RSpec.describe 'Updating an existing HTTP Integration' do
         expect(response).to have_gitlab_http_status(:success)
         expect(integration_response['id']).to eq(GitlabSchema.id_from_object(integration).to_s)
         expect(integration_response['name']).to eq('Modified Name')
-
-        integration.reload
-        expect(integration.payload_example).to eq({})
-        expect(integration.payload_attribute_mapping).to eq({})
+        expect(integration_response['payloadExample']).to eq('{}')
+        expect(integration_response['payloadAttributeMappings']).to be_empty
       end
     end
 
@@ -135,10 +138,8 @@ RSpec.describe 'Updating an existing HTTP Integration' do
         expect(response).to have_gitlab_http_status(:success)
         expect(integration_response['id']).to eq(GitlabSchema.id_from_object(integration).to_s)
         expect(integration_response['name']).to eq('Modified Name')
-
-        integration.reload
-        expect(integration.payload_example).to eq({})
-        expect(integration.payload_attribute_mapping).to eq({})
+        expect(integration_response['payloadExample']).to eq('{}')
+        expect(integration_response['payloadAttributeMappings']).to be_empty
       end
     end
 
@@ -155,6 +156,10 @@ RSpec.describe 'Updating an existing HTTP Integration' do
             integration {
               id
               name
+              payloadExample
+              payloadAttributeMappings {
+                fieldName
+              }
             }
           QL
         end
@@ -168,6 +173,8 @@ RSpec.describe 'Updating an existing HTTP Integration' do
         expect(response).to have_gitlab_http_status(:success)
         expect(integration_response['id']).to eq(GitlabSchema.id_from_object(integration).to_s)
         expect(integration_response['name']).to eq('Modified Name')
+        expect(integration_response['payloadExample']).not_to eq('{}')
+        expect(integration_response['payloadAttributeMappings']).to be_present
 
         integration.reload
         expect(integration.payload_example).to eq(current_payload_example)
