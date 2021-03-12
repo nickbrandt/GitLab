@@ -149,6 +149,11 @@ export default {
     isPolicyProfile() {
       return Boolean(this.siteProfile?.referencedInSecurityPolicies?.length);
     },
+    parsedExcludedUrls() {
+      return this.form.fields.excludedUrls.value
+        .split(EXCLUDED_URLS_SEPARATOR)
+        .map((url) => url.trim());
+    },
   },
   async mounted() {
     if (this.isEdit) {
@@ -156,9 +161,6 @@ export default {
     }
   },
   methods: {
-    parseExcludedUrls(input) {
-      return input.value.split(EXCLUDED_URLS_SEPARATOR).map((url) => url.trim());
-    },
     onSubmit() {
       const isAuthEnabled =
         this.glFeatures.securityDastSiteProfilesAdditionalFields &&
@@ -186,7 +188,7 @@ export default {
             ...additionalFields,
             auth: serializeFormObject(this.authSection.fields),
             ...(additionalFields.excludedUrls && {
-              excludedUrls: this.parseExcludedUrls(this.form.fields.excludedUrls),
+              excludedUrls: this.parsedExcludedUrls,
             }),
           }),
         },
