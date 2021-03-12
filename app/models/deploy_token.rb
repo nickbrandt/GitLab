@@ -92,7 +92,7 @@ class DeployToken < ApplicationRecord
     if project_type?
       projects
     elsif group_type?
-      group.all_projects
+      group.all_projects(namespaces_table_alias: 'deploy_token_namespaces')
     end
   end
 

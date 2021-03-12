@@ -259,11 +259,12 @@ class Namespace < ApplicationRecord
 
   # Includes projects from this namespace and projects from all subgroups
   # that belongs to this namespace
-  def all_projects
+  def all_projects(namespaces_table_alias: Namespace.table_name)
     return Project.where(namespace: self) if user?
 
     if Feature.enabled?(:recursive_namespace_lookup_as_inner_join, self)
-      Project.joins("INNER JOIN (#{self_and_descendants.select(:id).to_sql}) namespaces ON namespaces.id=projects.namespace_id")
+      quoted_table_alias = self.class.connection.quote_table_name(namespaces_table_alias)
+      Project.joins("INNER JOIN (#{self_and_descendants.select(:id).to_sql}) #{quoted_table_alias} ON #{quoted_table_alias}.id=projects.namespace_id")
     else
       Project.where(namespace: self_and_descendants)
     end
