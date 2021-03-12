@@ -7,9 +7,9 @@ type: reference
 
 # Dockerfiles API
 
-In GitLab, there is an API endpoint available for Dockerfiles. For more
-information on Dockerfiles, see the
-[Docker documentation](https://docs.docker.com/engine/reference/builder/).
+In GitLab, there is an API endpoint available for instance-level Dockerfile templates.
+Default templates are defined at [vendor/Dockerfile of GitLab repository](https://gitlab.com/gitlab-org/gitlab-foss/-/tree/master/vendor/Dockerfile).
+**PREMIUM** Templates can be overridden by GitLab instance administrator(s) in [admin area](../../user/admin_area/settings/instance_template_repository.md).
 
 ## List Dockerfile templates
 
