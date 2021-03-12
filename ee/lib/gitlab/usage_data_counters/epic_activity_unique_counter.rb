@@ -12,6 +12,7 @@ module Gitlab
       EPIC_NOTE_DESTROYED = 'g_project_management_users_destroying_epic_notes'
       EPIC_START_DATE_SET_AS_FIXED = 'g_project_management_users_setting_epic_start_date_as_fixed'
       EPIC_START_DATE_SET_AS_INHERITED = 'g_project_management_users_setting_epic_start_date_as_inherited'
+      EPIC_ISSUE_ADDED = 'g_project_management_epic_issue_added'
 
       class << self
         def track_epic_created_action(author:, time: Time.zone.now)
@@ -32,6 +33,10 @@ module Gitlab
 
         def track_epic_start_date_set_as_inherited_action(author:, time: Time.zone.now)
           track_unique_action(EPIC_START_DATE_SET_AS_INHERITED, author, time)
+        end
+
+        def track_epic_issue_added(author:, time: Time.zone.now)
+          track_unique_action(EPIC_ISSUE_ADDED, author, time)
         end
 
         private
