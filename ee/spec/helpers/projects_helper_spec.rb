@@ -604,7 +604,7 @@ RSpec.describe ProjectsHelper do
     using RSpec::Parameterized::TableSyntax
 
     let(:user) { instance_double(User, admin?: false) }
-    let(:expected_data) { { requirementsAvailable: false, securityAndComplianceAvailable: true } }
+    let(:expected_data) { { requirementsAvailable: false } }
 
     subject { helper.project_permissions_panel_data(project) }
 
