@@ -331,7 +331,6 @@ If parsing JUnit report XML results in an error, an indicator is shown next to t
 
 ![Test Reports With Errors](img/pipelines_junit_test_report_with_errors_v13_10.png)
 
-
 ## Viewing JUnit screenshots on GitLab
 
 > - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/202114) in GitLab 13.0.
