@@ -42,7 +42,7 @@ module Mutations
 
           params[:participants] = find_participants(participants)
           params[:starts_at] = parse_datetime(schedule, args[:starts_at]) if args[:starts_at]
-          params[:ends_at] = parse_datetime(schedule, args[:ends_at]) if args[:ends_at]
+          params[:ends_at] = parse_datetime(schedule, args[:ends_at]) if args.key?(:ends_at)
 
           if args[:rotation_length]
             params.merge!(
@@ -51,7 +51,7 @@ module Mutations
             )
           end
 
-          if args[:active_period].present?
+          if args.key?(:active_period)
             active_period_start, active_period_end = active_period_times(args)
             params.merge!(
               active_period_start: active_period_start,

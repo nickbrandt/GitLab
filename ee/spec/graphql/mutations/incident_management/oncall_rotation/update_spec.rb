@@ -85,6 +85,10 @@ RSpec.describe Mutations::IncidentManagement::OncallRotation::Update do
           context 'when endsAt is nil' do
             let(:ends_at) { nil }
 
+            before do
+              rotation.update!(ends_at: Time.current)
+            end
+
             it 'returns the on-call rotation with no errors' do
               expect(resolve[:oncall_rotation].ends_at).to be_nil
               expect(resolve[:errors]).to be_empty
@@ -162,6 +166,21 @@ RSpec.describe Mutations::IncidentManagement::OncallRotation::Update do
           it 'raises an error' do
             expect { resolve }.to raise_error(Gitlab::Graphql::Errors::ArgumentError, 'Time given is invalid')
           end
+        end
+      end
+
+      context 'removing active period' do
+        before do
+          rotation.update!(active_period_start: "08:00", active_period_end: "17:00")
+
+          args.merge!(active_period: nil)
+        end
+
+        it 'removes the active period' do
+          expect(resolve[:errors]).to be_empty
+
+          expect(rotation.reload.active_period_start).to eq(nil)
+          expect(rotation.active_period_end).to eq(nil)
         end
       end
 
