@@ -23,9 +23,6 @@ describe('User Popover Component', () => {
   let wrapper;
 
   beforeEach(() => {
-    window.gon.features = {
-      securityAutoFix: true,
-    };
     loadFixtures(fixtureTemplate);
   });
 
