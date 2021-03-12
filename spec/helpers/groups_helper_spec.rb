@@ -18,7 +18,6 @@ RSpec.describe GroupsHelper do
 
     it 'gives default avatar_icon when no avatar is present' do
       group = create(:group)
-      group.save!
       expect(group_icon_url(group.path)).to match_asset_path('group_avatar.png')
     end
   end
