@@ -31,6 +31,7 @@ module Projects
         id: dast_profile.to_global_id.to_s,
         name: dast_profile.name,
         description: dast_profile.description,
+        branch: { name: dast_profile.branch_name },
         site_profile_id: DastSiteProfile.new(id: dast_profile.dast_site_profile_id).to_global_id.to_s,
         scanner_profile_id: DastScannerProfile.new(id: dast_profile.dast_scanner_profile_id).to_global_id.to_s
       }
