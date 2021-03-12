@@ -221,7 +221,7 @@ class IssuableFinder
       return Project.none unless group
 
       if params[:include_subgroups]
-        Project.where(namespace_id: group.self_and_descendants) # rubocop: disable CodeReuse/ActiveRecord
+        group.all_projects
       else
         group.projects
       end
