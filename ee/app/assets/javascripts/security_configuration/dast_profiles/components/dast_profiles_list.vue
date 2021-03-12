@@ -207,7 +207,11 @@ export default {
               </gl-dropdown-item>
 
               <gl-dropdown-item
-                v-gl-tooltip="{ boundary: 'viewport', disabled: !isPolicyProfile(item) }"
+                v-gl-tooltip="{
+                  boundary: 'viewport',
+                  placement: 'bottom',
+                  disabled: !isPolicyProfile(item),
+                }"
                 boundary="viewport"
                 :class="{
                   'gl-cursor-default': isPolicyProfile(item),
