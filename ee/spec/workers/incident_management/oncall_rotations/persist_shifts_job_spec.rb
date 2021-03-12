@@ -59,6 +59,7 @@ RSpec.describe IncidentManagement::OncallRotations::PersistShiftsJob do
             :incident_management_oncall_rotation,
             :with_active_period, # 8:00 - 17:00
             :with_participant,
+            :utc,
             created_at: created_at, # Monday @ 5:00
             starts_at: starts_at, # Tuesday @ 00:00
             updated_at: updated_at # Friday @ 6:00
@@ -174,6 +175,7 @@ RSpec.describe IncidentManagement::OncallRotations::PersistShiftsJob do
         let_it_be_with_reload(:rotation) do
           create(
             :incident_management_oncall_rotation,
+            :utc,
             :with_participant,
             :with_active_period, # 8:00-17:00
             starts_at: starts_at
