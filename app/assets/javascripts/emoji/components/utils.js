@@ -1,13 +1,19 @@
 import Cookies from 'js-cookie';
 import { chunk, memoize, uniq } from 'lodash';
 import { initEmojiMap, getEmojiCategoryMap } from '~/emoji';
-import { EMOJIS_PER_ROW, EMOJI_ROW_HEIGHT, CATEGORY_ROW_HEIGHT } from '../constants';
+import {
+  EMOJIS_PER_ROW,
+  EMOJI_ROW_HEIGHT,
+  CATEGORY_ROW_HEIGHT,
+  FREQUENTLY_USED_KEY,
+  FREQUENTLY_USED_COOKIE_KEY,
+} from '../constants';
 
 export const generateCategoryHeight = (emojisLength) =>
   emojisLength * EMOJI_ROW_HEIGHT + CATEGORY_ROW_HEIGHT;
 
 export const getFrequentlyUsedEmojis = () => {
-  const savedEmojis = Cookies.get('frequently_used_emojis');
+  const savedEmojis = Cookies.get(FREQUENTLY_USED_COOKIE_KEY);
 
   if (!savedEmojis) return null;
 
@@ -24,13 +30,13 @@ export const getFrequentlyUsedEmojis = () => {
 
 export const addToFrequentlyUsed = (emoji) => {
   const frequentlyUsedEmojis = uniq(
-    (Cookies.get('frequently_used_emojis') || '')
+    (Cookies.get(FREQUENTLY_USED_COOKIE_KEY) || '')
       .split(',')
       .filter((e) => e)
       .concat(emoji),
   );
 
-  Cookies.set('frequently_used_emojis', frequentlyUsedEmojis.join(','), { expires: 365 });
+  Cookies.set(FREQUENTLY_USED_COOKIE_KEY, frequentlyUsedEmojis.join(','), { expires: 365 });
 };
 
 export const hasFrequentlyUsedEmojis = () => getFrequentlyUsedEmojis() !== null;
@@ -46,7 +52,7 @@ export const getEmojiCategories = memoize(async () => {
 
   return Object.freeze(
     Object.keys(categories)
-      .filter((c) => c !== 'frequently_used')
+      .filter((c) => c !== FREQUENTLY_USED_KEY)
       .reduce((acc, category) => {
         const emojis = chunk(categories[category], EMOJIS_PER_ROW);
         const height = generateCategoryHeight(emojis.length);

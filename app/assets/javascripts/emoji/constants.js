@@ -1,5 +1,8 @@
+export const FREQUENTLY_USED_KEY = 'frequently_used';
+export const FREQUENTLY_USED_COOKIE_KEY = 'frequently_used_emojis';
+
 export const CATEGORY_ICON_MAP = {
-  frequently_used: 'history',
+  [FREQUENTLY_USED_KEY]: 'history',
   activity: 'dumbbell',
   people: 'smiley',
   nature: 'nature',

@@ -3,7 +3,7 @@ import { GlIcon, GlDropdown, GlSearchBoxByType } from '@gitlab/ui';
 import { findLastIndex } from 'lodash';
 import VirtualList from 'vue-virtual-scroll-list';
 import { CATEGORY_NAMES } from '~/emoji';
-import { CATEGORY_ICON_MAP } from '../constants';
+import { CATEGORY_ICON_MAP, FREQUENTLY_USED_KEY } from '../constants';
 import Category from './category.vue';
 import EmojiList from './emoji_list.vue';
 import { addToFrequentlyUsed, getEmojiCategories, hasFrequentlyUsedEmojis } from './utils';
@@ -33,7 +33,7 @@ export default {
   computed: {
     categoryNames() {
       return CATEGORY_NAMES.filter((c) => {
-        if (c === 'frequently_used') return hasFrequentlyUsedEmojis();
+        if (c === FREQUENTLY_USED_KEY) return hasFrequentlyUsedEmojis();
         return true;
       }).map((category) => ({
         name: category,
