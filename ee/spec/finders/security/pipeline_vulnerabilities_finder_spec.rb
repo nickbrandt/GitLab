@@ -100,10 +100,27 @@ RSpec.describe Security::PipelineVulnerabilitiesFinder do
         # Need to warm the cache
         described_class.new(pipeline: pipeline, params: { report_type: %w[dependency_scanning] }).execute
 
+        # should be the same number of queries between different report types
         expect do
           described_class.new(pipeline: pipeline, params: { report_type: %w[sast] }).execute
         end.to issue_same_number_of_queries_as {
           described_class.new(pipeline: pipeline, params: { report_type: %w[dependency_scanning] }).execute
+        }
+
+        # should also be the same number of queries on the same report type
+        # with a different number of findings
+        #
+        # The pipeline.security_reports object is created dynamically from
+        # pipeline artifacts. We're caching the value so that we can mock it
+        # and force it to include another finding.
+        orig_security_reports = pipeline.security_reports
+        new_finding = create(:ci_reports_security_finding)
+        expect do
+          described_class.new(pipeline: pipeline, params: { report_type: %w[sast] }).execute
+        end.to issue_same_number_of_queries_as {
+          orig_security_reports.reports['sast'].add_finding(new_finding)
+          allow(pipeline).to receive(:security_reports).and_return(orig_security_reports)
+          described_class.new(pipeline: pipeline, params: { report_type: %w[sast] }).execute
         }
       end
     end
