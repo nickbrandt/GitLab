@@ -20,6 +20,11 @@ export default {
       type: Array,
       required: true,
     },
+    neverShowLinks: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
   },
   data() {
     return {
@@ -43,9 +48,25 @@ export default {
       }, 0);
     },
     showAlert() {
+      /*
+        This is a hard override that allows us to turn off the links without
+        needing to remove the component entirely for iteration or based on graph type.
+      */
+      if (this.neverShowLinks) {
+          return false;
+      }
+
       return !this.containerZero && !this.showLinkedLayers && !this.alertDismissed;
     },
     showLinkedLayers() {
+      /*
+        This is a hard override that allows us to turn off the links without
+        needing to remove the component entirely for iteration or based on graph type.
+      */
+      if (this.neverShowLinks) {
+        return false;
+      }
+
       return (
         !this.containerZero && (this.showLinksOverride || this.numGroups < this.$options.MAX_GROUPS)
       );
