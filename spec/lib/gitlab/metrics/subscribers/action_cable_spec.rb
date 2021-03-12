@@ -4,6 +4,7 @@ require 'spec_helper'
 
 RSpec.describe Gitlab::Metrics::Subscribers::ActionCable, :request_store do
   let(:subscriber) { described_class.new }
+  let(:counter) { double(:counter) }
   let(:data) { { data: { event: 'updated' } } }
   let(:channel_class) { 'IssuesChannel' }
   let(:event) do
@@ -26,9 +27,11 @@ RSpec.describe Gitlab::Metrics::Subscribers::ActionCable, :request_store do
     end
 
     it 'tracks the transmit event' do
-      expect(::Gitlab::Metrics).to receive(:counter)
-        .with(Gitlab::Metrics::Subscribers::ActionCable::SINGLE_CLIENT_TRANSMISSION, /transmit/)
-        .and_call_original
+      allow(::Gitlab::Metrics).to receive(:counter).with(
+        :action_cable_single_client_transmissions_total, /transmit/
+      ).and_return(counter)
+
+      expect(counter).to receive(:increment)
 
       subscriber.transmit(event)
     end
@@ -51,9 +54,11 @@ RSpec.describe Gitlab::Metrics::Subscribers::ActionCable, :request_store do
     end
 
     it 'tracks the broadcast event' do
-      expect(::Gitlab::Metrics).to receive(:counter)
-        .with(Gitlab::Metrics::Subscribers::ActionCable::BROADCAST, /broadcast/)
-        .and_call_original
+      allow(::Gitlab::Metrics).to receive(:counter).with(
+        :action_cable_broadcasts_total, /broadcast/
+      ).and_return(counter)
+
+      expect(counter).to receive(:increment)
 
       subscriber.broadcast(event)
     end
@@ -68,10 +73,12 @@ RSpec.describe Gitlab::Metrics::Subscribers::ActionCable, :request_store do
       }
     end
 
-    it 'tracks the transmit event' do
-      expect(::Gitlab::Metrics).to receive(:counter)
-        .with(Gitlab::Metrics::Subscribers::ActionCable::TRANSMIT_SUBSCRIPTION_CONFIRMATION, /confirm/)
-        .and_call_original
+    it 'tracks the subscription confirmation event' do
+      allow(::Gitlab::Metrics).to receive(:counter).with(
+        :action_cable_subscription_confirmations_total, /confirm/
+      ).and_return(counter)
+
+      expect(counter).to receive(:increment)
 
       subscriber.transmit_subscription_confirmation(event)
     end
@@ -86,10 +93,12 @@ RSpec.describe Gitlab::Metrics::Subscribers::ActionCable, :request_store do
       }
     end
 
-    it 'tracks the transmit event' do
-      expect(::Gitlab::Metrics).to receive(:counter)
-        .with(Gitlab::Metrics::Subscribers::ActionCable::TRANSMIT_SUBSCRIPTION_REJECTION, /reject/)
-        .and_call_original
+    it 'tracks the subscription rejection event' do
+      allow(::Gitlab::Metrics).to receive(:counter).with(
+        :action_cable_subscription_rejections_total, /reject/
+      ).and_return(counter)
+
+      expect(counter).to receive(:increment)
 
       subscriber.transmit_subscription_rejection(event)
     end
