@@ -129,6 +129,7 @@ describe('Approvals ApproversSelect', () => {
       expect(Api.projectGroups).toHaveBeenCalledWith(TEST_PROJECT_ID, {
         skip_groups: [],
         search: term,
+        with_shared: true,
       });
     });
 
@@ -169,7 +170,6 @@ describe('Approvals ApproversSelect', () => {
     it('skips users', () => {
       expect(Api.projectUsers).toHaveBeenCalledWith(TEST_PROJECT_ID, '', {
         skip_users: skipUserIds,
-        with_shared: true,
       });
     });
   });
