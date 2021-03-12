@@ -1,0 +1,5 @@
+---
+title: Optimize database queries that find all projects in a group
+merge_request: 56447
+author:
+type: performance
