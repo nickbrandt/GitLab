@@ -34,6 +34,7 @@ describe('User Popover Component', () => {
   const findUserStatus = () => wrapper.find('.js-user-status');
   const findTarget = () => document.querySelector('.js-user-link');
   const findUserName = () => wrapper.find(UserNameWithStatus);
+  const findSecurityBotDocsLink = () => findByTestId('user-popover-bot-docs-link');
 
   const createWrapper = (props = {}, options = {}) => {
     wrapper = shallowMount(UserPopover, {
@@ -82,6 +83,12 @@ describe('User Popover Component', () => {
       const iconEl = wrapper.find(GlIcon);
 
       expect(iconEl.props('name')).toEqual('location');
+    });
+
+    it("should not show a link to bot's documentation", () => {
+      createWrapper();
+      const securityBotDocsLink = findSecurityBotDocsLink();
+      expect(securityBotDocsLink.exists()).toBe(false);
     });
   });
 
@@ -235,7 +242,6 @@ describe('User Popover Component', () => {
       websiteUrl: '/security/bot/docs',
       bot: true,
     };
-    const findSecurityBotDocsLink = () => findByTestId('user-popover-bot-docs-link');
 
     it("shows a link to the bot's documentation", () => {
       createWrapper({ user: SECURITY_BOT_USER });
