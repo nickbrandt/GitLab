@@ -411,7 +411,7 @@ class BranchResolver < BaseResolver
 end
 ```
 
-Then when we use it, any field that uses `BaseResolver` will have the correct
+Then when we use it, any field that uses `BranchResolver` will have the correct
 value for `calls_gitaly:`.
 
 ### Exposing permissions for a type
