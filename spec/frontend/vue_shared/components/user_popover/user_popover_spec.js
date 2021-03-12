@@ -9,7 +9,7 @@ const DEFAULT_PROPS = {
     username: 'root',
     name: 'Administrator',
     location: 'Vienna',
-    bot: true,
+    bot: false,
     bio: null,
     workInformation: null,
     status: null,
@@ -233,6 +233,7 @@ describe('User Popover Component', () => {
       name: 'GitLab Security Bot',
       username: 'GitLab-Security-Bot',
       websiteUrl: '/security/bot/docs',
+      bot: true,
     };
     const findSecurityBotDocsLink = () => findByTestId('user-popover-bot-docs-link');
 
