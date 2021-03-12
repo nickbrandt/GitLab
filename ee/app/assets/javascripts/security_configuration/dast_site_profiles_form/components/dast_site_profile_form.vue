@@ -185,7 +185,9 @@ export default {
           ...(this.glFeatures.securityDastSiteProfilesAdditionalFields && {
             ...additionalFields,
             auth: serializeFormObject(this.authSection.fields),
-            excludedUrls: this.parseExcludedUrls(this.form.fields.excludedUrls),
+            ...(additionalFields.excludedUrls && {
+              excludedUrls: this.parseExcludedUrls(this.form.fields.excludedUrls),
+            }),
           }),
         },
       };
