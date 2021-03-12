@@ -7993,6 +7993,9 @@ msgstr ""
 msgid "Container does not exist"
 msgstr ""
 
+msgid "Container must be a project."
+msgstr ""
+
 msgid "Container registry images"
 msgstr ""
 
@@ -9748,6 +9751,9 @@ msgid "Date range cannot exceed %{maxDateRange} days."
 msgstr ""
 
 msgid "Date range is greater than %{quarter_days} days"
+msgstr ""
+
+msgid "Date range must be shorter than %{max_range} days."
 msgstr ""
 
 msgid "Day of month"
@@ -29851,6 +29857,9 @@ msgstr ""
 msgid "The download link will expire in 24 hours."
 msgstr ""
 
+msgid "The environment tier must be one of %{environment_tiers}."
+msgstr ""
+
 msgid "The errors we encountered were:"
 msgstr ""
 
@@ -29925,6 +29934,9 @@ msgstr ""
 msgid "The import will time out after %{timeout}. For repositories that take longer, use a clone/push combination."
 msgstr ""
 
+msgid "The interval must be one of %{intervals}."
+msgstr ""
+
 msgid "The invitation could not be accepted."
 msgstr ""
 
@@ -29983,6 +29995,9 @@ msgid "The merge conflicts for this merge request have already been resolved. Pl
 msgstr ""
 
 msgid "The merge request can now be merged."
+msgstr ""
+
+msgid "The metric must be one of %{metrics}."
 msgstr ""
 
 msgid "The name \"%{name}\" is already taken in this directory."
@@ -30106,6 +30121,9 @@ msgid "The specified tab is invalid, please select another"
 msgstr ""
 
 msgid "The staging stage shows the time between merging the MR and deploying code to the production environment. The data will be automatically added once you deploy to production for the first time."
+msgstr ""
+
+msgid "The start date must be ealier than the end date."
 msgstr ""
 
 msgid "The status of the table below only applies to the default branch and is based on the %{linkStart}latest pipeline%{linkEnd}. Once you've enabled a scan for the default branch, any subsequent feature branch you create will include the scan."
@@ -34459,6 +34477,9 @@ msgid "You do not have any subscriptions yet"
 msgstr ""
 
 msgid "You do not have permission to access deployment frequencies"
+msgstr ""
+
+msgid "You do not have permission to access dora metrics."
 msgstr ""
 
 msgid "You do not have permission to leave this %{namespaceType}."
