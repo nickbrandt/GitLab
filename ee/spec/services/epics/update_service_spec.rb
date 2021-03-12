@@ -71,6 +71,12 @@ RSpec.describe Epics::UpdateService do
         expect(note.note).to start_with('changed title')
         expect(note.noteable).to eq(epic)
       end
+
+      it 'records epic title changed after saving' do
+        expect(::Gitlab::UsageDataCounters::EpicActivityUniqueCounter).to receive(:track_epic_title_changed_action)
+
+        update_epic(title: 'New title')
+      end
     end
 
     context 'when description has changed' do
@@ -81,6 +87,12 @@ RSpec.describe Epics::UpdateService do
 
         expect(note.note).to start_with('changed the description')
         expect(note.noteable).to eq(epic)
+      end
+
+      it 'records epic description changed after saving' do
+        expect(::Gitlab::UsageDataCounters::EpicActivityUniqueCounter).to receive(:track_epic_description_changed_action)
+
+        update_epic(description: 'New description')
       end
     end
 

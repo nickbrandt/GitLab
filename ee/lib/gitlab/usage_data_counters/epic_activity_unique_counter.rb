@@ -8,6 +8,8 @@ module Gitlab
       # slot of issue events to allow data aggregation.
       # More information in: https://gitlab.com/gitlab-org/gitlab/-/issues/322405
       EPIC_CREATED = 'g_project_management_epic_created'
+      EPIC_TITLE_CHANGED = 'g_project_management_epic_title_changed'
+      EPIC_DESCRIPTION_CHANGED = 'g_project_management_epic_description_changed'
       EPIC_NOTE_CREATED = 'g_project_management_users_creating_epic_notes'
       EPIC_NOTE_UPDATED = 'g_project_management_users_updating_epic_notes'
       EPIC_NOTE_DESTROYED = 'g_project_management_users_destroying_epic_notes'
@@ -20,6 +22,14 @@ module Gitlab
       class << self
         def track_epic_created_action(author:, time: Time.zone.now)
           track_unique_action(EPIC_CREATED, author, time)
+        end
+
+        def track_epic_title_changed_action(author:, time: Time.zone.now)
+          track_unique_action(EPIC_TITLE_CHANGED, author, time)
+        end
+
+        def track_epic_description_changed_action(author:, time: Time.zone.now)
+          track_unique_action(EPIC_DESCRIPTION_CHANGED, author, time)
         end
 
         def track_epic_note_created_action(author:, time: Time.zone.now)
