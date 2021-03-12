@@ -7,9 +7,16 @@ type: reference
 
 # Dockerfiles API
 
-In GitLab, there is an API endpoint available for instance-level Dockerfile templates.
-Default templates are defined at [vendor/Dockerfile of GitLab repository](https://gitlab.com/gitlab-org/gitlab-foss/-/tree/master/vendor/Dockerfile).
-**PREMIUM** Templates can be overridden by GitLab instance administrator(s) in [admin area](../../user/admin_area/settings/instance_template_repository.md).
+GitLab provides an API endpoint for instance-level Dockerfile templates.
+Default templates are defined at
+[`vendor/Dockerfile`](https://gitlab.com/gitlab-org/gitlab-foss/-/tree/master/vendor/Dockerfile)
+in the GitLab repository.
+
+## Override Dockerfile API templates **(PREMIUM SELF)**
+
+In [GitLab Premium and higher](https://about.gitlab.com/pricing) tiers, GitLab instance
+administrators can override templates in the
+[Admin Area](../../user/admin_area/settings/instance_template_repository.md).
 
 ## List Dockerfile templates
 
