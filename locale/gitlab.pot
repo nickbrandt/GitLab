@@ -13776,9 +13776,6 @@ msgstr ""
 msgid "Geo|Go to the primary site"
 msgstr ""
 
-msgid "Geo|Health Status"
-msgstr ""
-
 msgid "Geo|If you want to make changes, you must visit the primary site."
 msgstr ""
 
@@ -17700,9 +17697,6 @@ msgid "Last Pipeline"
 msgstr ""
 
 msgid "Last Seen"
-msgstr ""
-
-msgid "Last Updated"
 msgstr ""
 
 msgid "Last Used"
