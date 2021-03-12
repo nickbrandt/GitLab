@@ -1,0 +1,6 @@
+---
+title: Resolve 'Unable to add groups as MR approvers even if the group is a direct
+  project member'
+merge_request: 56418
+author: Kristof Goossens @kgoossens
+type: fixed
