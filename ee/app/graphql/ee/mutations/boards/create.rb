@@ -5,10 +5,10 @@ module EE
     module Boards
       module Create
         extend ActiveSupport::Concern
+        prepend ::Mutations::Boards::ScopedBoardMutation
 
         prepended do
-          prepend ::Mutations::Boards::ScopedIssueBoardArguments
-          prepend ::Mutations::Boards::ScopedBoardMutation
+          include Mutations::Boards::ScopedBoardArguments
         end
       end
     end
