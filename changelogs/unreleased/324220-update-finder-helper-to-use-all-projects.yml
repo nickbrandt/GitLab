@@ -1,0 +1,5 @@
+---
+title: Update performance of some database queries in loading packages
+merge_request: 56451
+author:
+type: performance
