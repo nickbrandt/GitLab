@@ -230,7 +230,7 @@ describe('User Popover Component', () => {
     });
   });
 
-  describe('security bot', () => {
+  describe('bot user', () => {
     const SECURITY_BOT_USER = {
       ...DEFAULT_PROPS.user,
       name: 'GitLab Security Bot',
