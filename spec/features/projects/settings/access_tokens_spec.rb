@@ -94,6 +94,19 @@ RSpec.describe 'Project > Settings > Access Tokens', :js do
     end
   end
 
+  context 'when project access tokens are disabled and there are no active tokens' do
+    before do
+      group.namespace_settings.update_column(:resource_access_tokens_enabled, false)
+    end
+
+    it 'shows page not found' do
+      visit project_settings_access_tokens_path(project)
+
+      expect(page).to have_title('Not Found')
+      expect(page).to have_content('Page Not Found')
+    end
+  end
+
   describe 'inactive tokens' do
     let!(:project_access_token) { create_project_access_token }
 

@@ -1329,7 +1329,7 @@ RSpec.describe GroupPolicy do
     it_behaves_like 'GitLab.com Core resource access tokens'
 
     context 'on GitLab.com paid' do
-      let(:group) { create(:group_with_plan, plan: :bronze_plan) }
+      let_it_be(:group) { create(:group_with_plan, plan: :bronze_plan) }
 
       before do
         allow(::Gitlab).to receive(:com?).and_return(true)

@@ -1660,7 +1660,7 @@ RSpec.describe ProjectPolicy do
 
     context 'on GitLab.com paid' do
       let_it_be(:group) { create(:group_with_plan, plan: :bronze_plan) }
-      let(:project) { create(:project, group: group) }
+      let_it_be(:project) { create(:project, group: group) }
 
       before do
         allow(::Gitlab).to receive(:com?).and_return(true)

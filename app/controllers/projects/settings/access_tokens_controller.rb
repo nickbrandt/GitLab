@@ -43,7 +43,7 @@ module Projects
       private
 
       def check_feature_availability
-        return if project_access_token_available?(@project) 
+        return if project_access_token_available?(@project)
         return if active_tokens? && current_user.can?(:admin_project, @project)
 
         render_404
