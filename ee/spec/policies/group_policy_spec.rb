@@ -1385,7 +1385,7 @@ RSpec.describe GroupPolicy do
           group.add_owner(owner)
         end
 
-        it { is_expected.to be_allowed(:admin_resource_access_tokens) }
+        it { is_expected.to be_allowed(:create_resource_access_tokens) }
       end
 
       context 'with developer' do
@@ -1395,7 +1395,7 @@ RSpec.describe GroupPolicy do
           group.add_developer(developer)
         end
 
-        it { is_expected.not_to be_allowed(:admin_resource_access_tokens)}
+        it { is_expected.not_to be_allowed(:create_resource_access_tokens)}
       end
     end
   end
