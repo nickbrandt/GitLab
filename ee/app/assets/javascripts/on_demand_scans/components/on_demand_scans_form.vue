@@ -70,7 +70,7 @@ const createProfilesApolloOptions = (name, field, { fetchQuery, fetchError }) =>
 
 export default {
   SCAN_TYPE_LABEL,
-  REF_TYPE_BRANCHES,
+  enabledRefTypes: [REF_TYPE_BRANCHES],
   saveAndRunScanBtnId: 'scan-submit-button',
   saveScanBtnId: 'scan-save-button',
   components: {
@@ -445,7 +445,7 @@ export default {
           v-model="selectedBranch"
           data-testid="dast-scan-branch-input"
           no-flip
-          :enabled-ref-types="[$options.REF_TYPE_BRANCHES]"
+          :enabled-ref-types="$options.enabledRefTypes"
           :project-id="projectPath"
           :translations="{
             dropdownHeader: __('Select a branch'),
