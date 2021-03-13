@@ -43,7 +43,6 @@ module API
       expose :visibility
       expose :owner, using: Entities::UserBasic, unless: ->(project, options) { project.group }
       expose :resolve_outdated_diff_discussions
-      expose :container_registry_enabled
       expose :container_expiration_policy, using: Entities::ContainerExpirationPolicy,
         if: -> (project, _) { project.container_expiration_policy }
 
@@ -54,6 +53,7 @@ module API
       expose(:wiki_enabled) { |project, options| project.feature_available?(:wiki, options[:current_user]) }
       expose(:jobs_enabled) { |project, options| project.feature_available?(:builds, options[:current_user]) }
       expose(:snippets_enabled) { |project, options| project.feature_available?(:snippets, options[:current_user]) }
+      expose(:container_registry_enabled) { |project, options| project.feature_available?(:container_registry, options[:current_user]) }
       expose :service_desk_enabled
       expose :service_desk_address
 

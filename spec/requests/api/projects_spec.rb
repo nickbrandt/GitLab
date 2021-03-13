@@ -184,6 +184,17 @@ RSpec.describe API::Projects do
         end
       end
 
+      it 'includes correct value of container_registry_enabled', :aggregate_failures do
+        project.project_feature.update!(container_registry_access_level: 0)
+
+        get api('/projects', user)
+        project_response = json_response.find { |p| p['id'] == project.id }
+
+        expect(response).to have_gitlab_http_status(:ok)
+        expect(json_response).to be_an Array
+        expect(project_response['container_registry_enabled']).to eq(false)
+      end
+
       it 'includes project topics' do
         get api('/projects', user)
 
