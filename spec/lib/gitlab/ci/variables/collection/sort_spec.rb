@@ -57,9 +57,9 @@ RSpec.describe Gitlab::Ci::Variables::Collection::Sort do
           },
           "variable containing escaped variable reference": {
             variables: [
-              { key: 'variable_a', value: 'value' },
               { key: 'variable_b', value: '$$variable_a' },
-              { key: 'variable_c', value: '$variable_b' }
+              { key: 'variable_c', value: '$variable_a' },
+              { key: 'variable_a', value: 'value' }
             ],
             expected_errors: nil
           }
@@ -144,11 +144,11 @@ RSpec.describe Gitlab::Ci::Variables::Collection::Sort do
           },
           "variable containing escaped variable reference": {
             variables: [
-              { key: 'variable_c', value: '$variable_b' },
               { key: 'variable_b', value: '$$variable_a' },
+              { key: 'variable_c', value: '$variable_a' },
               { key: 'variable_a', value: 'value' }
             ],
-            result: %w[variable_a variable_b variable_c]
+            result: %w[variable_b variable_a variable_c]
           }
         }
       end

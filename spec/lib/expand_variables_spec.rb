@@ -127,6 +127,32 @@ RSpec.describe ExpandVariables do
               variables: [
                 { key: 'variable', value: 'value' }
               ]
+            },
+            "complex expansions with escaped characters": {
+              value: 'key_${variable4}_$${HOME}_%%HOME%%',
+              result: 'key__${HOME}_%HOME%',
+              variables: [
+                { key: 'variable', value: 'value' }
+              ]
+            },
+            "garbled reference is maintained verbatim - 1": {
+              value: 'key${%',
+              result: 'key${%'
+            },
+            "garbled reference is maintained verbatim - 2": {
+              value: 'key$',
+              result: 'key$'
+            },
+            "garbled reference is maintained verbatim - 3": {
+              value: 'key%$%',
+              result: 'key%$%'
+            },
+            "escaped characters are resolved correctly": {
+              value: 'key-$TEST1-%%HOME%%-$${HOME}',
+              variables: [
+                { key: 'TEST1', value: 'test-3' }
+              ],
+              result: 'key-test-3-%HOME%-${HOME}'
             }
           }
         end
@@ -193,6 +219,46 @@ RSpec.describe ExpandVariables do
               variables: [
                 { key: 'variable', value: 'value' }
               ]
+            },
+            "complex expansions with escaped characters": {
+              value: 'key_${variable}_$${HOME}_%%HOME%%',
+              variables: [
+                { key: 'variable', value: '$variable2' },
+                { key: 'variable2', value: 'value' }
+              ],
+              result: 'key_$variable2_${HOME}_%HOME%'
+            },
+            "garbled reference is maintained verbatim - 1": {
+              value: 'key${%',
+              result: 'key${%'
+            },
+            "garbled reference is maintained verbatim - 2": {
+              value: 'key${%$A',
+              variables: [
+                { key: 'A', value: 'value' }
+              ],
+              result: 'key${%value'
+            },
+            "garbled reference is maintained verbatim - 3": {
+              value: 'key%$%',
+              result: 'key%$%'
+            },
+            "complex escaped characters are resolved correctly": {
+              value: 'key-$TEST2-${TEST3}-%TEST4%',
+              variables: [
+                { key: 'TEST1', value: 'test-3' },
+                { key: 'TEST2', value: '$TEST1' },
+                { key: 'TEST3', value: '$$TEST1' },
+                { key: 'TEST4', value: '$$$TEST1' }
+              ],
+              result: 'key-$TEST1-$$TEST1-$$$TEST1'
+            },
+            "empty variable is resolved correctly": {
+              value: '${TEST_EMPTY}',
+              variables: [
+                { key: 'TEST_EMPTY', value: '' }
+              ],
+              result: ''
             }
           }
         end

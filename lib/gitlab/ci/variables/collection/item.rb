@@ -36,7 +36,7 @@ module Gitlab
 
               next unless ExpandVariables.possible_var_reference?(value)
 
-              value.scan(ExpandVariables::VARIABLES_REGEXP).map(&:first)
+              value.scan(ExpandVariables::VARIABLES_REGEXP).map(&:last).compact
             end
           end
 
