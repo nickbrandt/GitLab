@@ -338,7 +338,8 @@ describe('License Report MR Widget', () => {
   });
 
   describe('approval status', () => {
-    const findLicenseComplianceHelpLink = () => wrapper.find('.js-security-approval-help-link');
+    const findLicenseComplianceHelpLink = () =>
+      wrapper.find('[data-testid="security-approval-help-link"]');
 
     it('does not show a link to security approval help page if report does not contain blacklisted licenses', () => {
       mountComponent();

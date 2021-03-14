@@ -169,7 +169,7 @@ export default {
           <gl-link
             v-if="reportContainsBlacklistedLicense && licenseComplianceDocsPath"
             :href="licenseComplianceDocsPath"
-            class="js-security-approval-help-link"
+            data-testid="security-approval-help-link"
             target="_blank"
           >
             <gl-icon :size="12" name="question" />
