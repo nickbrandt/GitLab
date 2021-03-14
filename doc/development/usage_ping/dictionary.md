@@ -9908,6 +9908,30 @@ Status: `implemented`
 
 Tiers: `premium`, `ultimate`
 
+### `redis_hll_counters.epics_usage.g_project_management_users_creating_epic_notes_monthly`
+
+Counts of MAU adding epic notes
+
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_28d/20210314215451_g_project_management_users_creating_epic_notes_monthly.yml)
+
+Group: `group:product planning`
+
+Status: `implemented`
+
+Tiers: `premium`, `ultimate`
+
+### `redis_hll_counters.epics_usage.g_project_management_users_creating_epic_notes_weekly`
+
+Counts of WAU adding epic notes
+
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_7d/20210314231518_g_project_management_users_creating_epic_notes_weekly.yml)
+
+Group: `group:product planning`
+
+Status: `implemented`
+
+Tiers: `premium`, `ultimate`
+
 ### `redis_hll_counters.epics_usage.g_project_management_users_destroying_epic_notes_monthly`
 
 Counts of MAU destroying epic notes
