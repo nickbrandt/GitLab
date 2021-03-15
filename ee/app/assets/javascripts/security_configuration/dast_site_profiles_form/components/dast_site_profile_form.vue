@@ -18,12 +18,14 @@ import { __, s__, n__, sprintf } from '~/locale';
 import validation from '~/vue_shared/directives/validation';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import tooltipIcon from '../../dast_scanner_profiles/components/tooltip_icon.vue';
+import {
+  MAX_CHAR_LIMIT_EXCLUDED_URLS,
+  MAX_CHAR_LIMIT_REQUEST_HEADERS,
+  EXCLUDED_URLS_SEPARATOR,
+} from '../constants';
 import dastSiteProfileCreateMutation from '../graphql/dast_site_profile_create.mutation.graphql';
 import dastSiteProfileUpdateMutation from '../graphql/dast_site_profile_update.mutation.graphql';
 import DastSiteAuthSection from './dast_site_auth_section.vue';
-
-const MAX_CHAR_LIMIT_EXCLUDED_URLS = 2048;
-const MAX_CHAR_LIMIT_REQUEST_HEADERS = 2048;
 
 export default {
   name: 'DastSiteProfileForm',
@@ -63,7 +65,7 @@ export default {
     },
   },
   data() {
-    const { name = '', targetUrl = '', excludedUrls = '', requestHeaders = '', auth = {} } =
+    const { name = '', targetUrl = '', excludedUrls = [], requestHeaders = '', auth = {} } =
       this.siteProfile || {};
 
     const form = {
@@ -72,7 +74,11 @@ export default {
       fields: {
         profileName: initFormField({ value: name }),
         targetUrl: initFormField({ value: targetUrl }),
-        excludedUrls: initFormField({ value: excludedUrls, required: false, skipValidation: true }),
+        excludedUrls: initFormField({
+          value: excludedUrls.join(EXCLUDED_URLS_SEPARATOR),
+          required: false,
+          skipValidation: true,
+        }),
         requestHeaders: initFormField({
           value: requestHeaders,
           required: false,
@@ -143,6 +149,11 @@ export default {
     isPolicyProfile() {
       return Boolean(this.siteProfile?.referencedInSecurityPolicies?.length);
     },
+    parsedExcludedUrls() {
+      return this.form.fields.excludedUrls.value
+        .split(EXCLUDED_URLS_SEPARATOR)
+        .map((url) => url.trim());
+    },
   },
   async mounted() {
     if (this.isEdit) {
@@ -165,13 +176,20 @@ export default {
       this.hideErrors();
       const { errorMessage } = this.i18n;
 
+      const { profileName, targetUrl, ...additionalFields } = serializeFormObject(this.form.fields);
+
       const variables = {
         input: {
           fullPath: this.fullPath,
           ...(this.isEdit ? { id: this.siteProfile.id } : {}),
-          ...serializeFormObject(this.form.fields),
+          profileName,
+          targetUrl,
           ...(this.glFeatures.securityDastSiteProfilesAdditionalFields && {
+            ...additionalFields,
             auth: serializeFormObject(this.authSection.fields),
+            ...(additionalFields.excludedUrls && {
+              excludedUrls: this.parsedExcludedUrls,
+            }),
           }),
         },
       };

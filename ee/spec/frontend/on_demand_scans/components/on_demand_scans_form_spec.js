@@ -536,7 +536,7 @@ describe('OnDemandScansForm', () => {
       const summary = subject.find(SiteProfileSelector).text();
 
       expect(summary).toMatch(authEnabledProfile.targetUrl);
-      expect(summary).toMatch(authEnabledProfile.excludedUrls);
+      expect(summary).toMatch(authEnabledProfile.excludedUrls.join(','));
       expect(summary).toMatch(authEnabledProfile.requestHeaders);
       expect(summary).toMatch(authEnabledProfile.auth.url);
       expect(summary).toMatch(authEnabledProfile.auth.username);

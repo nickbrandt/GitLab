@@ -51,7 +51,7 @@ export const siteProfiles = [
       username: 'admin',
       password: 'password',
     },
-    excludedUrls: 'https://foo.com/logout,https://foo.com/send_mail',
+    excludedUrls: ['https://foo.com/logout', 'https://foo.com/send_mail'],
     requestHeaders: 'log-identifier: dast-active-scan',
     referencedInSecurityPolicies: [],
   },
@@ -65,7 +65,7 @@ export const siteProfiles = [
     auth: {
       enabled: false,
     },
-    excludedUrls: 'https://bar.com/logout',
+    excludedUrls: ['https://bar.com/logout'],
     requestHeaders: 'auth: gitlab-dast',
     referencedInSecurityPolicies: [],
   },
@@ -81,6 +81,6 @@ export const policySiteProfile = {
   auth: {
     enabled: false,
   },
-  excludedUrls: 'https://bar.com/logout',
+  excludedUrls: ['https://bar.com/logout'],
   referencedInSecurityPolicies: ['some_policy'],
 };
