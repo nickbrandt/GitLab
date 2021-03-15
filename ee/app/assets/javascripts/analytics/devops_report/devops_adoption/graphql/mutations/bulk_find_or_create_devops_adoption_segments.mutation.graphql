@@ -1,6 +1,6 @@
-mutation($namespaceId: NamespaceID!) {
-  createDevopsAdoptionSegment(input: { namespaceId: $namespaceId }) {
-    segment {
+mutation($namespaceIds: [NamespaceID!]!) {
+  bulkFindOrCreateDevopsAdoptionSegments(input: { namespaceIds: $namespaceIds }) {
+    segments {
       id
       latestSnapshot {
         issueOpened
