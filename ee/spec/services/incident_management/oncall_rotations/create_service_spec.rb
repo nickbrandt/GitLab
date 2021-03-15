@@ -33,7 +33,8 @@ RSpec.describe IncidentManagement::OncallRotations::CreateService do
 
   describe '#execute' do
     shared_examples 'error response' do |message|
-      it 'has an informative message' do
+      it 'does not save the rotation and has an informative message' do
+        expect { execute }.not_to change(IncidentManagement::OncallRotation, :count)
         expect(execute).to be_error
         expect(execute.message).to eq(message)
       end
@@ -82,7 +83,7 @@ RSpec.describe IncidentManagement::OncallRotations::CreateService do
 
       it 'has an informative error message' do
         expect(execute).to be_error
-        expect(execute.message).to eq("A maximum of #{IncidentManagement::OncallRotations::CreateService::MAXIMUM_PARTICIPANTS} participants can be added")
+        expect(execute.message).to eq("A maximum of #{IncidentManagement::OncallRotations::SharedRotationLogic::MAXIMUM_PARTICIPANTS} participants can be added")
       end
     end
 
@@ -134,7 +135,7 @@ RSpec.describe IncidentManagement::OncallRotations::CreateService do
           expect(oncall_rotation.length).to eq(1)
           expect(oncall_rotation.length_unit).to eq('days')
 
-          expect(oncall_rotation.participants.length).to eq(1)
+          expect(oncall_rotation.participants.reload.length).to eq(1)
           expect(oncall_rotation.participants.first).to have_attributes(
             **participants.first,
             rotation: oncall_rotation,
