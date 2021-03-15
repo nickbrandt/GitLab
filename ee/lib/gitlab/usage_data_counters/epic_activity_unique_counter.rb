@@ -8,6 +8,8 @@ module Gitlab
       # slot of issue events to allow data aggregation.
       # More information in: https://gitlab.com/gitlab-org/gitlab/-/issues/322405
       EPIC_CREATED = 'g_project_management_epic_created'
+      EPIC_START_DATE_SET_AS_FIXED = 'g_project_management_users_setting_epic_start_date_as_fixed'
+      EPIC_START_DATE_SET_AS_INHERITED = 'g_project_management_users_setting_epic_start_date_as_inherited'
       EPIC_NOTE_DESTROYED = 'g_project_management_users_destroying_epic_notes'
 
       class << self
@@ -17,6 +19,14 @@ module Gitlab
 
         def track_epic_note_destroyed_action(author:, time: Time.zone.now)
           track_unique_action(EPIC_NOTE_DESTROYED, author, time)
+        end
+
+        def track_epic_start_date_set_as_fixed_action(author:, time: Time.zone.now)
+          track_unique_action(EPIC_START_DATE_SET_AS_FIXED, author, time)
+        end
+
+        def track_epic_start_date_set_as_inherited_action(author:, time: Time.zone.now)
+          track_unique_action(EPIC_START_DATE_SET_AS_INHERITED, author, time)
         end
 
         private
