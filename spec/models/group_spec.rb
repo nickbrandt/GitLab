@@ -2376,31 +2376,4 @@ RSpec.describe Group do
 
     it_behaves_like 'model with Debian distributions'
   end
-
-  describe '.ids_with_disabled_email' do
-    let!(:parent_1) { create(:group, emails_disabled: true) }
-    let!(:child_1) { create(:group, parent: parent_1) }
-
-    let!(:parent_2) { create(:group, emails_disabled: false) }
-    let!(:child_2) { create(:group, parent: parent_2) }
-
-    let!(:other_group) { create(:group, emails_disabled: false) }
-
-    subject(:group_ids_where_email_is_disabled) { described_class.ids_with_disabled_email([child_1, child_2, other_group]) }
-
-    it { is_expected.to eq(Set.new([child_1.id])) }
-  end
-
-  describe '#update_group_issues_counter_cache' do
-    let_it_be(:group) { create(:group) }
-    let_it_be(:user) { create(:user) }
-
-    it 'updates group issues count cache if over threshold' do
-      expect_any_instance_of(Groups::OpenIssuesCountService)
-        .to receive(:refresh_cache_over_threshold)
-        .and_call_original
-
-      group.update_group_issues_counter_cache(user)
-    end
-  end
 end

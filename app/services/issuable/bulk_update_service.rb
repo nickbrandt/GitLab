@@ -16,8 +16,9 @@ module Issuable
       ids = params.delete(:issuable_ids).split(",")
       set_update_params(type)
       updated_issues_count = update_issuables(type, ids)
+
       if updated_issues_count > 0 && requires_issues_count_cache_refresh?(type)
-        update_group_cached_counts
+        update_group_cached_counts(updated_issues_count)
       end
 
       response_success(payload: { count: updated_issues_count })
@@ -86,15 +87,25 @@ module Issuable
     end
 
     def requires_issues_count_cache_refresh?(type)
-      type == 'issue' && params.include?(:state_event)
+      type == 'issue' && params.include?(:state_event) && group.present?
+    end
+
+    def update_group_cached_counts(updated_issues_count)
+      count_service = Groups::OpenIssuesCountService.new(group, current_user)
+      cached_count = count_service.cached_count
+      return if cached_count.blank?
+
+      new_count = compute_new_cached_count(cached_count, updated_issues_count)
+      count_service.refresh_cache_over_threshold(new_count)
     end
 
     def group
       parent.is_a?(Group) ? parent : parent&.group
     end
 
-    def update_group_cached_counts
-      group&.update_group_issues_counter_cache(current_user)
+    def compute_new_cached_count(cached_count, updated_issues_count)
+      operation = params[:state_event] == 'closed' ? :- : :+
+      [cached_count.to_i, updated_issues_count.to_i].inject(operation)
     end
   end
 end

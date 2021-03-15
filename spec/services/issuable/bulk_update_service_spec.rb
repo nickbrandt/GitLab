@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe Issuable::BulkUpdateService do
+RSpec.describe Issuable::BulkUpdateService, :clean_gitlab_redis_cache do
   let_it_be(:user)    { create(:user) }
   let_it_be(:project) { create(:project, :repository, namespace: user.namespace) }
 
@@ -282,61 +282,72 @@ RSpec.describe Issuable::BulkUpdateService do
     end
 
     context 'when project belongs to a group' do
-      let_it_be(:project2) { create(:project, :repository, group: create(:group)) }
-      let_it_be(:open_issues) { create_list(:issue, 2, project: project2) }
+      let_it_be(:group) { create(:group) }
+      let_it_be(:project2) { create(:project, :repository, group: group) }
+      let_it_be(:issues) { create_list(:issue, 2, :opened, project: project2) }
       let(:parent) { project2 }
-      let(:count_service) { Groups::OpenIssuesCountService }
+      let(:count_service_class) { Groups::OpenIssuesCountService }
+      let(:count_service) { count_service_class.new(group, user) }
 
       before do
         project2.add_reporter(user)
-        allow(Rails.cache).to receive(:delete).and_call_original
-        allow_next_instance_of(count_service) do |instance|
-          allow(instance).to receive(:update_cache_for_key)
-        end
       end
 
       shared_examples 'refreshing cached open issues count with state updates' do |state|
-        context 'when issues count is over cache threshold' do
+        let(:public_count_key) { count_service.cache_key(count_service_class::PUBLIC_COUNT_KEY) }
+        let(:existing_cache) { 5 }
+
+        context 'when cache is empty' do
           before do
-            stub_const("#{count_service}::CACHED_COUNT_THRESHOLD", (issues.size - 1))
+            stub_const("#{count_service_class}::CACHED_COUNT_THRESHOLD", 1)
+            Rails.cache.delete(public_count_key)
           end
 
-          it 'updates issues counts cache' do
-            expect_next_instance_of(count_service) do |service|
-              expect(service).to receive(:update_cache_for_key).and_return(true)
-            end
-            expect(Rails.cache).not_to receive(:delete)
-
+          it 'does not change the counts cache' do
             bulk_update(issues, state_event: state)
+            expect(Rails.cache.read(public_count_key)).to be_nil
           end
         end
 
-        context 'when issues count is under cache threshold' do
+        context 'when new issues count is over cache threshold' do
           before do
-            stub_const("#{count_service}::CACHED_COUNT_THRESHOLD", (issues.size + 2))
+            stub_const("#{count_service_class}::CACHED_COUNT_THRESHOLD", 1)
           end
 
-          it 'does not update issues counts cache and delete cache' do
-            expect_next_instance_of(count_service) do |service|
-              expect(service).not_to receive(:update_cache_for_key)
-            end
-            expect(Rails.cache).to receive(:delete)
-
+          it 'updates existing issues counts cache' do
+            Rails.cache.write(public_count_key, existing_cache)
             bulk_update(issues, state_event: state)
+            expect(Rails.cache.read(public_count_key)).to eq(adjusted_count)
+          end
+        end
+
+        context 'when new issues count is under cache threshold' do
+          before do
+            stub_const("#{count_service_class}::CACHED_COUNT_THRESHOLD", 10)
+          end
+
+          it 'deletes existing cache' do
+            Rails.cache.write(public_count_key, existing_cache)
+            bulk_update(issues, state_event: state)
+            expect(Rails.cache.read(public_count_key)).to be_nil
           end
         end
       end
 
-      context 'when closing issues' do
-        let_it_be(:issues) { create_list(:issue, 2, project: project2) }
-
-        it_behaves_like 'refreshing cached open issues count with state updates', 'closed'
+      context 'when closing issues', :use_clean_rails_memory_store_caching do
+        it_behaves_like 'refreshing cached open issues count with state updates', 'closed' do
+          let(:adjusted_count) { existing_cache - issues.size }
+        end
       end
 
-      context 'when reopening issues' do
-        let_it_be(:issues) { create_list(:issue, 2, :closed, project: project2) }
+      context 'when reopening issues', :use_clean_rails_memory_store_caching do
+        before do
+          issues.map { |issue| issue.update!(state: 'closed') }
+        end
 
-        it_behaves_like 'refreshing cached open issues count with state updates', 'reopened'
+        it_behaves_like 'refreshing cached open issues count with state updates', 'reopened' do
+          let(:adjusted_count) { existing_cache + issues.size }
+        end
       end
     end
   end
