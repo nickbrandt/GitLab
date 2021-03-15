@@ -7,6 +7,7 @@ module Gitlab
         include ActiveModel::Model
         include ActiveModel::Validations
         include ActiveModel::Attributes
+        include Gitlab::Utils::StrongMemoize
 
         MAX_RANGE_DAYS = 180.days.freeze
         DEFAULT_DATE_RANGE = 29.days # 30 including Date.today
@@ -87,7 +88,7 @@ module Gitlab
             attrs[:milestone] = milestone_title if milestone_title.present?
             attrs[:sort] = sort if sort.present?
             attrs[:direction] = direction if direction.present?
-            attrs[:stage_id] = stage_id if stage_id.present?
+            attrs[:stage] = stage_data_attributes.to_json if stage_id.present?
           end
         end
 
@@ -154,6 +155,23 @@ module Gitlab
             DEFAULT_DATE_RANGE.ago
           end
         end
+
+        def stage_data_attributes
+          return unless stage
+        
+          {
+            id: stage.id,
+            slug: stage.slug,
+            title: stage.title
+          }
+        end
+        
+        def stage
+          return unless value_stream
+          strong_memoize(:stage) do
+            value_stream.stages.find(stage_id) if stage_id
+          end
+        end        
       end
     end
   end
