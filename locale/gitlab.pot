@@ -8023,7 +8023,7 @@ msgstr ""
 msgid "Container does not exist"
 msgstr ""
 
-msgid "Container must be a project."
+msgid "Container must be a project or a group."
 msgstr ""
 
 msgid "Container registry images"
