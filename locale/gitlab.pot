@@ -409,6 +409,11 @@ msgstr ""
 msgid "%{completedCount} completed weight"
 msgstr ""
 
+msgid "%{completedCount} of %{count} task completed"
+msgid_plural "%{completedCount} of %{count} tasks completed"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "%{completedWeight} of %{totalWeight} weight completed"
 msgstr ""
 
@@ -1151,6 +1156,11 @@ msgid_plural "%d days"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "1 day remaining"
+msgid_plural "%d days remaining"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "1 deploy key"
 msgid_plural "%d deploy keys"
 msgstr[0] ""
@@ -1191,6 +1201,11 @@ msgid_plural "%d minutes"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "1 month remaining"
+msgid_plural "%d months remaining"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "1 open issue"
 msgid_plural "%{issues} open issues"
 msgstr[0] ""
@@ -1213,6 +1228,16 @@ msgstr[1] ""
 
 msgid "1 user"
 msgid_plural "%{num} users"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "1 week remaining"
+msgid_plural "%d weeks remaining"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "1 year remaining"
+msgid_plural "%d years remaining"
 msgstr[0] ""
 msgstr[1] ""
 
