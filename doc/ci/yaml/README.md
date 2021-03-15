@@ -2632,6 +2632,23 @@ that are [managed by GitLab](../../user/project/clusters/index.md#gitlab-managed
 To follow progress on support for GitLab-managed clusters, see the
 [relevant issue](https://gitlab.com/gitlab-org/gitlab/-/issues/38054).
 
+#### `environment:deployment_tier`
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/27630) in GitLab 13.10.
+
+Use the `deployment_tier` keyword to specify the tier of the deployment environment:
+
+```yaml
+deploy:
+  script: echo
+  environment:
+    name: customer-portal
+    deployment_tier: production
+```
+
+For more information,
+see [Deployment tier of environments](../environments/index.md#deployment-tier-of-environments).
+
 #### Dynamic environments
 
 Use CI/CD [variables](../variables/README.md) to dynamically name environments.
