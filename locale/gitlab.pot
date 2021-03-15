@@ -10649,10 +10649,7 @@ msgstr ""
 msgid "DevOps Report"
 msgstr ""
 
-msgid "DevopsAdoption|%{selectedCount} group selected"
-msgstr ""
-
-msgid "DevopsAdoption|%{selectedCount} groups selected"
+msgid "DevopsAdoption|Add / remove groups"
 msgstr ""
 
 msgid "DevopsAdoption|Add Group"
@@ -10667,7 +10664,7 @@ msgstr ""
 msgid "DevopsAdoption|An error occurred while removing the group. Please try again."
 msgstr ""
 
-msgid "DevopsAdoption|An error occurred while saving the group. Please try again."
+msgid "DevopsAdoption|An error occurred while saving changes. Please try again."
 msgstr ""
 
 msgid "DevopsAdoption|Approvals"
