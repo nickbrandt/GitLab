@@ -4,9 +4,9 @@ class License < ApplicationRecord
   include ActionView::Helpers::NumberHelper
   include Gitlab::Utils::StrongMemoize
 
-  STARTER_PLAN = 'starter'.freeze
-  PREMIUM_PLAN = 'premium'.freeze
-  ULTIMATE_PLAN = 'ultimate'.freeze
+  STARTER_PLAN = 'starter'
+  PREMIUM_PLAN = 'premium'
+  ULTIMATE_PLAN = 'ultimate'
   CLOUD_LICENSE_TYPE = 'cloud'
   ALLOWED_PERCENTAGE_OF_USERS_OVERAGE = (10 / 100.0).freeze
 
