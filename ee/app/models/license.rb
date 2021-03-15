@@ -7,6 +7,7 @@ class License < ApplicationRecord
   STARTER_PLAN = 'starter'.freeze
   PREMIUM_PLAN = 'premium'.freeze
   ULTIMATE_PLAN = 'ultimate'.freeze
+  CLOUD_LICENSE_TYPE = 'cloud'
   ALLOWED_PERCENTAGE_OF_USERS_OVERAGE = (10 / 100.0).freeze
 
   EE_ALL_PLANS = [STARTER_PLAN, PREMIUM_PLAN, ULTIMATE_PLAN].freeze
@@ -545,6 +546,10 @@ class License < ApplicationRecord
     starts_at > Date.current
   end
 
+  def cloud?
+    license&.type == CLOUD_LICENSE_TYPE
+  end
+
   def auto_renew
     false
   end
@@ -615,6 +620,7 @@ class License < ApplicationRecord
   end
 
   def check_users_limit
+    return if cloud?
     return unless restricted_user_count
 
     if previous_user_count && (prior_historical_max <= previous_user_count)
