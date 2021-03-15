@@ -3,26 +3,21 @@
 module Mutations
   module IncidentManagement
     module OncallRotation
-      class Create < Base
+      class Update < Base
         include ResolvesProject
 
-        graphql_name 'OncallRotationCreate'
+        graphql_name 'OncallRotationUpdate'
 
-        argument :project_path, GraphQL::ID_TYPE,
+        argument :id, ::Types::GlobalIDType[::IncidentManagement::OncallRotation],
                  required: true,
-                 description: 'The project to create the on-call schedule in.'
-
-        argument :schedule_iid, GraphQL::STRING_TYPE,
-                 required: true,
-                 description: 'The IID of the on-call schedule to create the on-call rotation in.',
-                 as: :iid
+                 description: 'The ID of the on-call schedule to create the on-call rotation in.'
 
         argument :name, GraphQL::STRING_TYPE,
-                 required: true,
+                 required: false,
                  description: 'The name of the on-call rotation.'
 
         argument :starts_at, Types::IncidentManagement::OncallRotationDateInputType,
-                 required: true,
+                 required: false,
                  description: 'The start date and time of the on-call rotation, in the timezone of the on-call schedule.'
 
         argument :ends_at, Types::IncidentManagement::OncallRotationDateInputType,
@@ -30,7 +25,7 @@ module Mutations
                  description: 'The end date and time of the on-call rotation, in the timezone of the on-call schedule.'
 
         argument :rotation_length, Types::IncidentManagement::OncallRotationLengthInputType,
-                 required: true,
+                 required: false,
                  description: 'The rotation length of the on-call rotation.'
 
         argument :active_period, Types::IncidentManagement::OncallRotationActivePeriodInputType,
@@ -39,31 +34,29 @@ module Mutations
 
         argument :participants,
                  [Types::IncidentManagement::OncallUserInputType],
-                 required: true,
+                 required: false,
                  description: 'The usernames of users participating in the on-call rotation. A maximum limit of 100 participants applies.'
 
-        def resolve(iid:, project_path:, participants:, **args)
-          project = Project.find_by_full_path(project_path)
+        def resolve(id:, **args)
+          rotation = authorized_find!(id: id)
 
-          raise_project_not_found unless project
-
-          schedule = ::IncidentManagement::OncallSchedulesFinder.new(current_user, project, iid: iid)
-                                                                .execute
-                                                                .first
-
-          raise_schedule_not_found unless schedule
-
-          result = ::IncidentManagement::OncallRotations::CreateService.new(
-            schedule,
-            project,
+          result = ::IncidentManagement::OncallRotations::EditService.new(
+            rotation,
             current_user,
-            parsed_params(schedule, participants, args)
+            parsed_params(rotation.schedule, args[:participants], args)
           ).execute
 
           response(result)
+        end
 
-        rescue ActiveRecord::RecordInvalid => e
-          raise Gitlab::Graphql::Errors::ArgumentError, e.message
+        private
+
+        def find_object(id:)
+          GitlabSchema.object_from_id(id, expected_type: ::IncidentManagement::OncallRotation)
+        end
+
+        def raise_rotation_not_found
+          raise Gitlab::Graphql::Errors::ArgumentError, 'The rotation could not be found'
         end
       end
     end

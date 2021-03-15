@@ -97,12 +97,6 @@ export default {
       default: () => ({}),
     },
   },
-  data() {
-    return {
-      participantsArr: [],
-      endDateEnabled: false,
-    };
-  },
   methods: {
     format24HourTimeStringFromInt,
   },
@@ -121,7 +115,8 @@ export default {
       >
         <gl-form-input
           id="rotation-name"
-          @blur="$emit('update-rotation-form', { type: 'name', value: $event.target.value })"
+          :value="form.name"
+          @change="$emit('update-rotation-form', { type: 'name', value: $event })"
         />
       </gl-form-group>
 
@@ -133,14 +128,14 @@ export default {
         :state="validationState.participants"
       >
         <gl-token-selector
-          v-model="participantsArr"
+          :selected-tokens="form.participants"
           :dropdown-items="participants"
           :loading="isLoading"
           container-class="gl-h-13! gl-overflow-y-auto"
           menu-class="gl-overflow-y-auto"
           @text-input="$emit('filter-participants', $event)"
-          @blur="$emit('update-rotation-form', { type: 'participants', value: participantsArr })"
-          @input="$emit('update-rotation-form', { type: 'participants', value: participantsArr })"
+          @blur="$emit('update-rotation-form', { type: 'participants', value: form.participants })"
+          @input="$emit('update-rotation-form', { type: 'participants', value: $event })"
         >
           <template #token-content="{ token }">
             <gl-avatar v-if="token.avatarUrl" :src="token.avatarUrl" :size="16" />
@@ -169,7 +164,7 @@ export default {
             type="number"
             class="gl-w-12 gl-mr-3"
             min="1"
-            :value="1"
+            :value="form.rotationLength.length"
             @input="$emit('update-rotation-form', { type: 'rotationLength.length', value: $event })"
           />
           <gl-dropdown :text="form.rotationLength.unit.toLowerCase()">
@@ -195,6 +190,7 @@ export default {
         <div class="gl-display-flex gl-align-items-center">
           <gl-datepicker
             class="gl-mr-3"
+            :value="form.startsAt.date"
             @input="$emit('update-rotation-form', { type: 'startsAt.date', value: $event })"
           >
             <template #default="{ formattedDate }">
@@ -233,14 +229,17 @@ export default {
     </div>
     <div class="gl-display-inline-block">
       <gl-toggle
-        v-model="endDateEnabled"
+        :value="form.isEndDateEnabled"
         :label="$options.i18n.fields.endsAt.enableToggle"
         label-position="left"
         class="gl-mb-5"
+        @change="
+          $emit('update-rotation-form', { type: 'isEndDateEnabled', value: !form.isEndDateEnabled })
+        "
       />
 
       <gl-card
-        v-if="endDateEnabled"
+        v-if="form.isEndDateEnabled"
         data-testid="rotation-ends-on"
         class="gl-border-gray-400 gl-bg-gray-10"
       >
@@ -254,6 +253,7 @@ export default {
           <div class="gl-display-flex gl-align-items-center">
             <gl-datepicker
               class="gl-mr-3"
+              :value="form.endsAt.date"
               @input="$emit('update-rotation-form', { type: 'endsAt.date', value: $event })"
             >
               <template #default="{ formattedDate }">
