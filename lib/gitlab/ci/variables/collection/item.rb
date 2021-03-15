@@ -63,6 +63,12 @@ module Gitlab
               raise ArgumentError, "Unknown `#{resource.class}` variable resource!"
             end
           end
+
+          def to_s
+            return to_runner_variable.to_s unless depends_on
+
+            "#{to_runner_variable}, depends_on=#{depends_on}"
+          end
         end
       end
     end

@@ -95,6 +95,10 @@ module Gitlab
           new_collection
         end
 
+        def to_s
+          "#{@variables_by_key.keys}, @errors='#{@errors}'"
+        end
+
         protected
 
         attr_reader :variables
