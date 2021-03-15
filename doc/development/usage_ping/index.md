@@ -957,7 +957,10 @@ Example aggregated metric entries:
 ```yaml
 - name: example_metrics_union
   operator: OR
-  events: ['i_search_total', 'i_search_advanced', 'i_search_paid']
+  events: 
+    - 'i_search_total'
+    - 'i_search_advanced'
+    - 'i_search_paid'
   source: redis
   time_frame:
     - 7d
