@@ -70,6 +70,57 @@ GitLab 14.0 will require that you place API fuzzing configuration files (for exa
 repository's root. You can continue using your existing configuration files as they are, but
 starting in GitLab 14.0, GitLab will not check your repository's root for configuration files.
 
+### Configuration form
+
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/299234) in GitLab 13.10.
+> - It's [deployed behind a feature flag](../../../user/feature_flags.md), enabled by default.
+> - It's enabled on GitLab.com.
+> - It's recommended for production use.
+> - For GitLab self-managed instances, GitLab administrators can opt to [disable it](#enable-or-disable-api-fuzzing-configuration-form). **(ULTIMATE)**
+
+WARNING:
+This feature might not be available to you. Check the **version history** note above for details.
+
+The API fuzzing configuration form helps you create or modify your project's API fuzzing
+configuration. The form lets you choose values for the most common API fuzzing options and builds
+a YAML snippet that you can paste in your GitLab CI/CD configuration.
+
+To generate an API Fuzzing configuration snippet:
+
+1. From your project's home page, go to **Security & Compliance > Configuration** in the left
+   sidebar.
+1. Select **Configure** in the **API Fuzzing** row.
+1. Complete the form as needed. Read below for more information on available configuration options.
+1. Select **Generate code snippet**.
+
+A modal opens with the YAML snippet corresponding to the options you've selected in the form.
+
+![API Fuzzing configuration snippet](img/api_fuzzing_configuration_snippet_v13.10.png)
+
+Select **Copy code and open `.gitlab-ci.yml` file** to copy the snippet to your clipboard and be redirected
+to your project's `.gitlab-ci.yml` file where you can paste the YAML configuration.
+
+Select **Copy code only** to copy the snippet to your clipboard and close the modal.
+
+#### Enable or disable API Fuzzing configuration form **(ULTIMATE)**
+
+The API Fuzzing configuration form is under development but ready for production use.
+It is deployed behind a feature flag that is **enabled by default**.
+[GitLab administrators with access to the GitLab Rails console](../../../administration/feature_flags.md)
+can opt to disable it.
+
+To enable it:
+
+```ruby
+Feature.enable(:api_fuzzing_configuration_ui)
+```
+
+To disable it:
+
+```ruby
+Feature.disable(:api_fuzzing_configuration_ui)
+```
+
 ### OpenAPI Specification
 
 > Support for OpenAPI Specification v3 was
