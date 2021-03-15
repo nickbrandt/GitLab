@@ -1,6 +1,6 @@
 <script>
-import { isEmpty } from 'lodash';
 import { GlAlert } from '@gitlab/ui';
+import { isEmpty } from 'lodash';
 import { __ } from '~/locale';
 import {
   PIPELINES_DETAIL_LINKS_MARK_CALCULATE_START,
@@ -12,9 +12,9 @@ import {
 } from '~/performance/constants';
 import { performanceMarkAndMeasure } from '~/performance/utils';
 import { reportToSentry } from '../graph/utils';
-import LinksInner from './links_inner.vue';
 import { parseData } from '../parsing_utils';
 import { reportPerformance } from './api';
+import LinksInner from './links_inner.vue';
 
 export default {
   name: 'LinksLayer',
@@ -40,7 +40,7 @@ export default {
     neverShowLinks: {
       type: Boolean,
       required: false,
-      default: false
+      default: false,
     },
   },
   data() {
@@ -73,7 +73,7 @@ export default {
         needing to remove the component entirely for iteration or based on graph type.
       */
       if (this.neverShowLinks) {
-          return false;
+        return false;
       }
 
       return !this.containerZero && !this.showLinkedLayers && !this.alertDismissed;
@@ -95,7 +95,7 @@ export default {
   errorCaptured(err, _vm, info) {
     reportToSentry(this.$options.name, `error: ${err}, info: ${info}`);
   },
-  mounted(){
+  mounted() {
     /*
       This is code to get metrics for the graph (to observe links performance).
       It is currently here because we want values for links without drawing them.
@@ -106,9 +106,8 @@ export default {
     if (this.neverShowLinks && !isEmpty(this.pipelineData)) {
       window.requestAnimationFrame(() => {
         this.prepareLinkData();
-      })
+      });
     }
-
   },
   methods: {
     beginPerfMeasure() {
@@ -117,7 +116,6 @@ export default {
       }
     },
     finishPerfMeasureAndSend(numLinks) {
-
       if (this.shouldCollectMetrics) {
         performanceMarkAndMeasure({
           mark: PIPELINES_DETAIL_LINKS_MARK_CALCULATE_END,
