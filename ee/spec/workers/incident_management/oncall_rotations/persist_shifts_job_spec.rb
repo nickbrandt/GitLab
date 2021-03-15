@@ -48,7 +48,7 @@ RSpec.describe IncidentManagement::OncallRotations::PersistShiftsJob do
     end
 
     context 'when rotation has saved shifts' do
-      let_it_be(:existing_shift) { create(:incident_management_oncall_shift) }
+      let_it_be(:existing_shift) { create(:incident_management_oncall_shift, :utc) }
       let_it_be(:rotation) { existing_shift.rotation }
 
       context 'when current time is during a saved shift' do
