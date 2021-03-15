@@ -2,7 +2,9 @@ import MockAdapter from 'axios-mock-adapter';
 import { useMockLocationHelper } from 'helpers/mock_window_location_helper';
 import testAction from 'helpers/vuex_action_helper';
 import api from '~/api';
+import { deprecatedCreateFlash as createFlash } from '~/flash';
 import service from '~/ide/services';
+import { query } from '~/ide/services/gql';
 import { createStore } from '~/ide/stores';
 import {
   refreshLastCommitData,
@@ -12,8 +14,12 @@ import {
   openBranch,
   loadFile,
   loadBranch,
+  initProject,
 } from '~/ide/stores/actions';
 import axios from '~/lib/utils/axios_utils';
+
+jest.mock('~/ide/services/gql');
+jest.mock('~/flash');
 
 const TEST_PROJECT_ID = 'abc/def';
 
@@ -32,6 +38,68 @@ describe('IDE store project actions', () => {
 
   afterEach(() => {
     mock.restore();
+  });
+
+  describe('initProject', () => {
+    const gqlProjectData = {
+      userPermissions: {
+        bogus: true,
+      },
+    };
+    const project = { id: 'foo', path_with_namespace: TEST_PROJECT_ID, foo: 'bar' };
+    const projectToString = JSON.stringify(project);
+    const baseMutations = [
+      {
+        type: 'SET_PROJECT',
+        payload: {
+          projectPath: TEST_PROJECT_ID,
+          project,
+        },
+      },
+      {
+        type: 'SET_CURRENT_PROJECT',
+        payload: TEST_PROJECT_ID,
+      },
+    ];
+    const permissionsMutations = [
+      {
+        type: 'UPDATE_PROJECT',
+        payload: {
+          projectPath: TEST_PROJECT_ID,
+          props: {
+            ...gqlProjectData,
+          },
+        },
+      },
+    ];
+
+    afterEach(() => {
+      query.mockRestore();
+      createFlash.mockRestore();
+    });
+
+    it.each`
+      desc                                                         | payload                | expectedMutations                              | gqlResponseSuccess
+      ${'does not commit any action if project is not passed'}     | ${undefined}           | ${[]}                                          | ${true}
+      ${'flashes an error if the GraphQL query fails'}             | ${{ projectToString }} | ${baseMutations}                               | ${false}
+      ${'commits correct actions in the correct order by default'} | ${{ projectToString }} | ${[...baseMutations, ...permissionsMutations]} | ${true}
+    `('$desc', async ({ payload, expectedMutations, gqlResponseSuccess } = {}) => {
+      if (gqlResponseSuccess) {
+        query.mockReturnValue(Promise.resolve({ data: { project: gqlProjectData } }));
+      } else {
+        query.mockReturnValue(Promise.reject());
+      }
+      await testAction({
+        action: initProject,
+        payload,
+        state: store.state,
+        expectedMutations,
+        expectedActions: [],
+      });
+      if (!gqlResponseSuccess) {
+        expect(createFlash).toHaveBeenCalled();
+      }
+    });
   });
 
   describe('refreshLastCommitData', () => {

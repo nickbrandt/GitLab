@@ -21,7 +21,7 @@ const errorFetchingData = () => {
   });
 };
 
-export const initProject = ({ commit }, { projectToString = '' }) => {
+export const initProject = ({ commit }, { projectToString = '' } = {}) => {
   if (!projectToString) {
     return;
   }
