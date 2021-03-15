@@ -45,5 +45,5 @@ export default class UserInternalRegexHandler {
   }
 }
 
-// eslint-disable-next-line
+// eslint-disable-next-line no-new
 new UserInternalRegexHandler();
