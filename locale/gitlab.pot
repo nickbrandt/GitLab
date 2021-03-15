@@ -208,6 +208,11 @@ msgid_plural "%d failed security jobs"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "%d file"
+msgid_plural "%d files"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "%d fixed test result"
 msgid_plural "%d fixed test results"
 msgstr[0] ""
