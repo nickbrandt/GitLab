@@ -263,6 +263,7 @@ describe('EE - ApiFuzzingConfigurationForm', () => {
       await waitForPromises();
 
       expect(findAlert().exists()).toBe(true);
+      expect(window.scrollTo).toHaveBeenCalledWith({ top: 0 });
     });
 
     it('shows an error on error-as-data', async () => {
@@ -287,6 +288,7 @@ describe('EE - ApiFuzzingConfigurationForm', () => {
       await waitForPromises();
 
       expect(findAlert().exists()).toBe(true);
+      expect(window.scrollTo).toHaveBeenCalledWith({ top: 0 });
     });
   });
 });
