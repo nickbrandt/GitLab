@@ -1569,7 +1569,7 @@ RSpec.describe GroupPolicy do
   end
 
   describe 'compliance framework permissions' do
-    shared_context 'compliance framework permissions' do
+    shared_examples 'compliance framework permissions' do
       using RSpec::Parameterized::TableSyntax
 
       where(:role, :licensed, :feature_flag, :admin_mode, :allowed) do
@@ -1590,7 +1590,7 @@ RSpec.describe GroupPolicy do
 
         before do
           stub_licensed_features(licensed_feature => licensed)
-          stub_feature_flags(ff_custom_compliance_frameworks: feature_flag)
+          stub_feature_flags(feature_flag_name => feature_flag)
           enable_admin_mode!(current_user) if admin_mode
         end
 
@@ -1601,15 +1601,17 @@ RSpec.describe GroupPolicy do
     context ':admin_compliance_framework' do
       let(:policy) { :admin_compliance_framework }
       let(:licensed_feature) { :custom_compliance_frameworks }
+      let(:feature_flag_name) { :ff_custom_compliance_frameworks }
 
-      include_context 'compliance framework permissions'
+      include_examples 'compliance framework permissions'
     end
 
     context ':admin_compliance_pipeline_configuration' do
       let(:policy) { :admin_compliance_pipeline_configuration }
       let(:licensed_feature) { :evaluate_group_level_compliance_pipeline }
+      let(:feature_flag_name) { :ff_evaluate_group_level_compliance_pipeline }
 
-      include_context 'compliance framework permissions'
+      include_examples 'compliance framework permissions'
     end
   end
 
