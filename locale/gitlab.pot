@@ -5642,6 +5642,9 @@ msgstr ""
 msgid "ChangeTypeAction|Pick into branch"
 msgstr ""
 
+msgid "ChangeTypeAction|Pick into project"
+msgstr ""
+
 msgid "ChangeTypeAction|Revert"
 msgstr ""
 
@@ -5651,10 +5654,16 @@ msgstr ""
 msgid "ChangeTypeAction|Search branches"
 msgstr ""
 
+msgid "ChangeTypeAction|Search projects"
+msgstr ""
+
 msgid "ChangeTypeAction|Start a %{newMergeRequest} with these changes"
 msgstr ""
 
 msgid "ChangeTypeAction|Switch branch"
+msgstr ""
+
+msgid "ChangeTypeAction|Switch project"
 msgstr ""
 
 msgid "ChangeTypeAction|This will create a new commit in order to revert the existing changes."
