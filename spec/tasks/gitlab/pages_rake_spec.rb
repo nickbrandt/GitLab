@@ -12,11 +12,9 @@ RSpec.describe 'gitlab:pages' do
 
     it 'calls migration service' do
       expect_next_instance_of(::Pages::MigrateFromLegacyStorageService, anything,
-                              migration_threads: 3,
-                              batch_size: 10,
                               ignore_invalid_entries: false,
                               mark_projects_as_not_deployed: false) do |service|
-        expect(service).to receive(:execute).and_call_original
+        expect(service).to receive(:execute_with_threads).with(threads: 3, batch_size: 10).and_call_original
       end
 
       subject
@@ -26,11 +24,9 @@ RSpec.describe 'gitlab:pages' do
       stub_env('PAGES_MIGRATION_THREADS', '5')
 
       expect_next_instance_of(::Pages::MigrateFromLegacyStorageService, anything,
-                              migration_threads: 5,
-                              batch_size: 10,
                               ignore_invalid_entries: false,
                               mark_projects_as_not_deployed: false) do |service|
-        expect(service).to receive(:execute).and_call_original
+        expect(service).to receive(:execute_with_threads).with(threads: 5, batch_size: 10).and_call_original
       end
 
       subject
@@ -40,11 +36,9 @@ RSpec.describe 'gitlab:pages' do
       stub_env('PAGES_MIGRATION_BATCH_SIZE', '100')
 
       expect_next_instance_of(::Pages::MigrateFromLegacyStorageService, anything,
-                              migration_threads: 3,
-                              batch_size: 100,
                               ignore_invalid_entries: false,
                               mark_projects_as_not_deployed: false) do |service|
-        expect(service).to receive(:execute).and_call_original
+        expect(service).to receive(:execute_with_threads).with(threads: 3, batch_size: 100).and_call_original
       end
 
       subject
@@ -54,11 +48,9 @@ RSpec.describe 'gitlab:pages' do
       stub_env('PAGES_MIGRATION_IGNORE_INVALID_ENTRIES', 'true')
 
       expect_next_instance_of(::Pages::MigrateFromLegacyStorageService, anything,
-                              migration_threads: 3,
-                              batch_size: 10,
                               ignore_invalid_entries: true,
                               mark_projects_as_not_deployed: false) do |service|
-        expect(service).to receive(:execute).and_call_original
+        expect(service).to receive(:execute_with_threads).with(threads: 3, batch_size: 10).and_call_original
       end
 
       subject
@@ -68,11 +60,9 @@ RSpec.describe 'gitlab:pages' do
       stub_env('PAGES_MIGRATION_MARK_PROJECTS_AS_NOT_DEPLOYED', 'true')
 
       expect_next_instance_of(::Pages::MigrateFromLegacyStorageService, anything,
-                              migration_threads: 3,
-                              batch_size: 10,
                               ignore_invalid_entries: false,
                               mark_projects_as_not_deployed: true) do |service|
-        expect(service).to receive(:execute).and_call_original
+        expect(service).to receive(:execute_with_threads).with(threads: 3, batch_size: 10).and_call_original
       end
 
       subject

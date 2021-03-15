@@ -2,10 +2,8 @@
 
 module Pages
   class MigrateFromLegacyStorageService
-    def initialize(logger, migration_threads:, batch_size:, ignore_invalid_entries:, mark_projects_as_not_deployed:)
+    def initialize(logger, ignore_invalid_entries:, mark_projects_as_not_deployed:)
       @logger = logger
-      @migration_threads = migration_threads
-      @batch_size = batch_size
       @ignore_invalid_entries = ignore_invalid_entries
       @mark_projects_as_not_deployed = mark_projects_as_not_deployed
 
@@ -14,25 +12,35 @@ module Pages
       @counters_lock = Mutex.new
     end
 
-    def execute
+    def execute_with_threads(threads:, batch_size:)
       @queue = SizedQueue.new(1)
 
-      threads = start_migration_threads
+      migration_threads = start_migration_threads(threads)
 
-      ProjectPagesMetadatum.only_on_legacy_storage.each_batch(of: @batch_size) do |batch|
+      ProjectPagesMetadatum.only_on_legacy_storage.each_batch(of: batch_size) do |batch|
         @queue.push(batch)
       end
 
       @queue.close
 
       @logger.info("Waiting for threads to finish...")
-      threads.each(&:join)
+      migration_threads.each(&:join)
 
       { migrated: @migrated, errored: @errored }
     end
 
-    def start_migration_threads
-      Array.new(@migration_threads) do
+    def execute_for_batch(project_ids)
+      batch = ProjectPagesMetadatum.only_on_legacy_storage.where(project_id: project_ids) # rubocop: disable CodeReuse/ActiveRecord
+
+      process_batch(batch)
+
+      { migrated: @migrated, errored: @errored }
+    end
+
+    private
+
+    def start_migration_threads(count)
+      Array.new(count) do
         Thread.new do
           while batch = @queue.pop
             Rails.application.executor.wrap do

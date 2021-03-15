@@ -9,10 +9,9 @@ namespace :gitlab do
       logger.info('Starting to migrate legacy pages storage to zip deployments')
 
       result = ::Pages::MigrateFromLegacyStorageService.new(logger,
-                                                            migration_threads: migration_threads,
-                                                            batch_size: batch_size,
                                                             ignore_invalid_entries: ignore_invalid_entries,
-                                                            mark_projects_as_not_deployed: mark_projects_as_not_deployed).execute
+                                                            mark_projects_as_not_deployed: mark_projects_as_not_deployed)
+                 .execute_with_threads(threads: migration_threads, batch_size: batch_size)
 
       logger.info("A total of #{result[:migrated] + result[:errored]} projects were processed.")
       logger.info("- The #{result[:migrated]} projects migrated successfully")
