@@ -76,7 +76,7 @@ starting in GitLab 14.0, GitLab will not check your repository's root for config
 > - It's [deployed behind a feature flag](../../../user/feature_flags.md), enabled by default.
 > - It's enabled on GitLab.com.
 > - It's recommended for production use.
-> - For GitLab self-managed instances, GitLab administrators can opt to [disable it](#enable-or-disable-api-fuzzing-configuration-form-ultimate). **(ULTIMATE)**
+> - For GitLab self-managed instances, GitLab administrators can opt to [disable it](#enable-or-disable-api-fuzzing-configuration-form). **(ULTIMATE)**
 
 WARNING:
 This feature might not be available to you. Check the **version history** note above for details.
