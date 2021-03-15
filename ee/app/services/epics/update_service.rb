@@ -94,13 +94,11 @@ module Epics
     end
 
     def track_changes(epic)
-      changes = epic.saved_changes.keys.map(&:to_sym)
-
-      if changes.include?(:title)
+      if epic.saved_changes.key?('title')
         ::Gitlab::UsageDataCounters::EpicActivityUniqueCounter.track_epic_title_changed_action(author: current_user)
       end
 
-      if changes.include?(:description)
+      if epic.saved_changes.key?('description')
         ::Gitlab::UsageDataCounters::EpicActivityUniqueCounter.track_epic_description_changed_action(author: current_user)
       end
     end
