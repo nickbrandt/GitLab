@@ -197,6 +197,7 @@ module EE
       end
 
       rule { reporter & group_devops_adoption_available }.policy do
+        enable :manage_devops_adoption_segments
         enable :view_group_devops_adoption
       end
 

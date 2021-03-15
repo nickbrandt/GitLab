@@ -2,12 +2,14 @@
 
 require 'spec_helper'
 
-RSpec.describe Mutations::Admin::Analytics::DevopsAdoption::Segments::Delete do
+RSpec.describe Mutations::Analytics::DevopsAdoption::Segments::Delete do
   include GraphqlHelpers
 
-  let_it_be(:admin) { create(:admin) }
+  let_it_be(:group) { create :group }
+  let_it_be(:reporter) { create(:user).tap { |u| group.add_reporter(u) } }
+  let(:current_user) { reporter }
+  let!(:segment) { create(:devops_adoption_segment, namespace: group) }
 
-  let!(:segment) { create(:devops_adoption_segment) }
   let(:variables) { { id: segment.to_gid.to_s } }
 
   let(:mutation) do
@@ -20,17 +22,29 @@ RSpec.describe Mutations::Admin::Analytics::DevopsAdoption::Segments::Delete do
   end
 
   before do
-    stub_licensed_features(instance_level_devops_adoption: true)
+    stub_licensed_features(group_level_devops_adoption: true)
   end
 
   def mutation_response
     graphql_mutation_response(:delete_devops_adoption_segment)
   end
 
-  it_behaves_like 'DevOps Adoption top level errors'
+  context 'when the user cannot manage segments' do
+    let(:current_user) { create(:user) }
+
+    it_behaves_like 'a mutation that returns a top-level access error'
+  end
+
+  context 'when the feature is not available' do
+    before do
+      stub_licensed_features(group_level_devops_adoption: false)
+    end
+
+    it_behaves_like 'a mutation that returns a top-level access error'
+  end
 
   it 'deletes the segment' do
-    post_graphql_mutation(mutation, current_user: admin)
+    post_graphql_mutation(mutation, current_user: current_user)
 
     expect(mutation_response['errors']).to be_empty
     expect(::Analytics::DevopsAdoption::Segment.find_by_id(segment.id)).to eq(nil)
@@ -42,8 +56,13 @@ RSpec.describe Mutations::Admin::Analytics::DevopsAdoption::Segments::Delete do
 
     let(:variables) { { id: [segment.to_gid.to_s, segment2.to_gid.to_s] } }
 
+    before do
+      segment2.namespace.add_reporter(current_user)
+      segment3.namespace.add_reporter(current_user)
+    end
+
     it 'deletes the segments specified for deletion' do
-      post_graphql_mutation(mutation, current_user: admin)
+      post_graphql_mutation(mutation, current_user: current_user)
 
       expect(mutation_response['errors']).to be_empty
       expect(::Analytics::DevopsAdoption::Segment.where(id: [segment.id, segment2.id, segment3.id]))
