@@ -968,7 +968,9 @@ Example aggregated metric entries:
   time_frame:
     - 28d
     - all
-  events: ['dependency_scanning_pipeline_all_time', 'container_scanning_pipeline_all_time']
+  events:
+    - 'dependency_scanning_pipeline_all_time'
+    - 'container_scanning_pipeline_all_time'
   feature_flag: example_aggregated_metric
 ```
 
