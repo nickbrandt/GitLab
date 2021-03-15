@@ -24,7 +24,9 @@ export default {
       empty_repo: value,
     });
   },
-  [types.UPDATE_PROJECT](state, { projectPath, props }) {
-    Object.assign(state.projects[projectPath], props);
+  [types.UPDATE_PROJECT](state, { projectPath = '', props = {} }) {
+    if (projectPath && state.projects[projectPath] && Object.keys(props).length) {
+      Object.assign(state.projects[projectPath], props);
+    }
   },
 };
