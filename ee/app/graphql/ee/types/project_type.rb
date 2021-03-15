@@ -129,8 +129,8 @@ module EE
         field :api_fuzzing_ci_configuration,
               ::Types::AppSec::Fuzzing::Api::CiConfigurationType,
               null: true,
-              description: 'API fuzzing configuration for the project.',
-              feature_flag: :api_fuzzing_configuration_ui
+              description: 'API fuzzing configuration for the project. '\
+                           'Null unless feature flag `api_fuzzing_configuration_ui` is enabled.'
 
         field :push_rules,
               ::Types::PushRulesType,
@@ -140,7 +140,8 @@ module EE
       end
 
       def api_fuzzing_ci_configuration
-        return unless Ability.allowed?(current_user, :read_vulnerability, object)
+        return unless ::Feature.enabled?(:api_fuzzing_configuration_ui, object, default_enabled: :yaml) && \
+                      Ability.allowed?(current_user, :read_vulnerability, object)
 
         configuration = ::AppSec::Fuzzing::Api::CiConfiguration.new(project: object)
 
