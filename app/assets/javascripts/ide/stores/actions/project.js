@@ -1,6 +1,6 @@
 import { escape } from 'lodash';
 import createFlash from '~/flash';
-import getUserPermissions from '~/ide/queries/getUserPermissions.query.graphql';
+import getIdeProject from '~/ide/queries/get_ide_project.query.graphql';
 import { query } from '~/ide/services/gql';
 import { __, sprintf } from '~/locale';
 import api from '../../../api';
@@ -9,7 +9,7 @@ import * as types from '../mutation_types';
 
 const fetchProjectPermissionsData = (projectPath) =>
   query({
-    query: getUserPermissions,
+    query: getIdeProject,
     variables: { projectPath },
   }).then(({ data }) => data.project);
 
@@ -21,7 +21,14 @@ const errorFetchingData = () => {
   });
 };
 
-export const initProject = ({ commit }, { projectPath = '' }) => {
+export const initProject = ({ commit }, { projectToString = '' }) => {
+  if (!projectToString) {
+    return;
+  }
+  const project = JSON.parse(projectToString);
+  const projectPath = project.path_with_namespace;
+  commit(types.SET_PROJECT, { projectPath, project });
+  commit(types.SET_CURRENT_PROJECT, projectPath);
   fetchProjectPermissionsData(projectPath)
     .then((permissions) => {
       commit(types.UPDATE_PROJECT, { projectPath, props: permissions });

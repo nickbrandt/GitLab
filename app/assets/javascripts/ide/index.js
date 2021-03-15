@@ -39,17 +39,8 @@ export function initIde(el, options = {}) {
   if (!el) return null;
 
   const { rootComponent = ide, extendStore = identity } = options;
-  const { project: projectDataStr } = el.dataset;
   const store = createStore();
   const router = createRouter(store, el.dataset.defaultBranch || DEFAULT_BRANCH);
-  let project;
-
-  if (projectDataStr) {
-    project = JSON.parse(projectDataStr);
-    const projectPath = project.path_with_namespace;
-    store.commit(types.SET_PROJECT, { projectPath, project });
-    store.commit(types.SET_CURRENT_PROJECT, projectPath);
-  }
 
   return new Vue({
     el,
@@ -74,9 +65,7 @@ export function initIde(el, options = {}) {
         codesandboxBundlerUrl: el.dataset.codesandboxBundlerUrl,
         environmentsGuidanceAlertDismissed: !parseBoolean(el.dataset.enableEnvironmentsGuidance),
       });
-      if (projectDataStr) {
-        this.initProject({ projectPath: project.path_with_namespace });
-      }
+      this.initProject({ projectToString: el.dataset.project });
     },
     beforeDestroy() {
       // This helps tests do Singleton cleanups which we don't really have responsibility to know about here.

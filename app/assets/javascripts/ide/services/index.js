@@ -1,4 +1,3 @@
-import getIdeProject from 'ee_else_ce/ide/queries/get_ide_project.query.graphql';
 import Api from '~/api';
 import dismissUserCallout from '~/graphql_shared/mutations/dismiss_user_callout.mutation.graphql';
 import axios from '~/lib/utils/axios_utils';
