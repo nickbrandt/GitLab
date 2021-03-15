@@ -24386,7 +24386,11 @@ CREATE UNIQUE INDEX uniq_pkgs_debian_project_distributions_project_id_and_codena
 
 CREATE UNIQUE INDEX uniq_pkgs_debian_project_distributions_project_id_and_suite ON packages_debian_project_distributions USING btree (project_id, suite);
 
+CREATE UNIQUE INDEX unique_jobs_per_batched_migration_and_starting_value ON batched_background_migration_jobs USING btree (batched_background_migration_id, min_value);
+
 CREATE UNIQUE INDEX unique_merge_request_metrics_by_merge_request_id ON merge_request_metrics USING btree (merge_request_id);
+
+CREATE UNIQUE INDEX unique_nonaborted_background_migrations_on_job_table_and_args ON batched_background_migrations USING btree (job_class_name, table_name, column_name, job_arguments) WHERE (status <> 2);
 
 CREATE INDEX user_follow_users_followee_id_idx ON user_follow_users USING btree (followee_id);
 

@@ -941,22 +941,11 @@ module Gitlab
       # column - The name of the column that we want to convert to bigint.
       # primary_key - The name of the primary key column (most often :id)
       def initialize_conversion_of_integer_to_bigint(table, column, primary_key: :id)
-        unless table_exists?(table)
-          raise "Table #{table} does not exist"
-        end
-
-        unless column_exists?(table, primary_key)
-          raise "Column #{primary_key} does not exist on #{table}"
-        end
-
-        unless column_exists?(table, column)
-          raise "Column #{column} does not exist on #{table}"
-        end
-
+        check_conversion_preconditions!(table, column, primary_key)
         check_trigger_permissions!(table)
 
         old_column = column_for(table, column)
-        tmp_column = "#{column}_convert_to_bigint"
+        tmp_column = conversion_column_name(column)
 
         with_lock_retries do
           if (column.to_s == primary_key.to_s) || !old_column.null
@@ -1018,39 +1007,40 @@ module Gitlab
         interval: 2.minutes
       )
 
-        unless table_exists?(table)
-          raise "Table #{table} does not exist"
+        check_conversion_preconditions!(table, column, primary_key)
+
+        tmp_column = conversion_column_name(column, validate_in_table: table)
+
+        batched_migration = transaction do
+          initial_status = perform_background_migration_inline? ? :cleaning_up : :active
+
+          queue_batched_background_migration(
+            'CopyColumnUsingBackgroundMigrationJob',
+            table,
+            primary_key,
+            column,
+            tmp_column,
+            job_interval: interval,
+            batch_size: batch_size,
+            sub_batch_size: sub_batch_size,
+            initial_status: initial_status)
         end
-
-        unless column_exists?(table, primary_key)
-          raise "Column #{primary_key} does not exist on #{table}"
-        end
-
-        unless column_exists?(table, column)
-          raise "Column #{column} does not exist on #{table}"
-        end
-
-        tmp_column = "#{column}_convert_to_bigint"
-
-        unless column_exists?(table, tmp_column)
-          raise 'The temporary column does not exist, initialize it with `initialize_conversion_of_integer_to_bigint`'
-        end
-
-        batched_migration = queue_batched_background_migration(
-          'CopyColumnUsingBackgroundMigrationJob',
-          table,
-          primary_key,
-          column,
-          tmp_column,
-          job_interval: interval,
-          batch_size: batch_size,
-          sub_batch_size: sub_batch_size)
 
         if perform_background_migration_inline?
           # To ensure the schema is up to date immediately we perform the
           # migration inline in dev / test environments.
-          Gitlab::Database::BackgroundMigration::BatchedMigrationRunner.new.run_entire_migration(batched_migration)
+          Gitlab::Database::BackgroundMigration::BatchedMigrationRunner.new
+            .run_remaining_migration_jobs(batched_migration)
         end
+      end
+
+      def finish_backfill_conversion_of_integer_to_bigint(table, column, primary_key: :id)
+        check_conversion_preconditions!(table, column, primary_key)
+
+        tmp_column = conversion_column_name(column, validate_in_table: table)
+
+        Gitlab::Database::BackgroundMigration::BatchedMigrationRunner.new
+          .run_migration_cleanup('CopyColumnUsingBackgroundMigrationJob', table, primary_key, [column, tmp_column])
       end
 
       # Performs a concurrent column rename when using PostgreSQL.
@@ -1733,6 +1723,30 @@ into similar problems in the future (e.g. when new tables are created).
           You can disable transactions by calling `disable_ddl_transaction!` in the body of
           your migration class
         ERROR
+      end
+
+      def check_conversion_preconditions!(table, column, primary_key)
+        unless table_exists?(table)
+          raise "Table #{table} does not exist"
+        end
+
+        unless column_exists?(table, primary_key)
+          raise "Column #{primary_key} does not exist on #{table}"
+        end
+
+        unless column_exists?(table, column)
+          raise "Column #{column} does not exist on #{table}"
+        end
+      end
+
+      def conversion_column_name(original_name, validate_in_table: nil)
+        temporary_name = "#{original_name}_convert_to_bigint"
+
+        unless validate_in_table.nil? || column_exists?(validate_in_table, temporary_name)
+          raise 'The temporary column does not exist, initialize it with `initialize_conversion_of_integer_to_bigint`'
+        end
+
+        temporary_name
       end
     end
   end

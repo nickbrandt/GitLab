@@ -39,6 +39,23 @@ RSpec.describe Gitlab::Database::BackgroundMigration::BatchedMigration, type: :m
     end
   end
 
+  describe '.for_configuration' do
+    let!(:migration) { create(:batched_background_migration) }
+
+    before do
+      create(:batched_background_migration, job_class_name: 'OtherClass')
+      create(:batched_background_migration, table_name: 'other_table')
+      create(:batched_background_migration, column_name: 'other_column')
+      create(:batched_background_migration, job_arguments: %w[other arguments])
+    end
+
+    it 'finds the migration matching the given configuration parameters' do
+      relation = described_class.for_configuration('CopyColumnUsingBackgroundMigrationJob', 'events', 'id', [])
+
+      expect(relation.all).to eq([migration])
+    end
+  end
+
   describe '#interval_elapsed?' do
     context 'when the migration has no last_job' do
       let(:batched_migration) { build(:batched_background_migration) }
@@ -118,17 +135,34 @@ RSpec.describe Gitlab::Database::BackgroundMigration::BatchedMigration, type: :m
     end
   end
 
-  describe '#create_batched_job!' do
+  describe '#create_batched_job' do
     let(:batched_migration) { create(:batched_background_migration) }
+    let(:job_relation) do
+      Gitlab::Database::BackgroundMigration::BatchedJob.where(batched_background_migration_id: batched_migration)
+    end
 
     it 'creates a batched_job with the correct batch configuration' do
-      batched_job = batched_migration.create_batched_job!(1, 5)
+      batched_job = nil
+
+      expect do
+        batched_job = batched_migration.create_batched_job(1, 5)
+      end.to change { job_relation.count }.by(1)
 
       expect(batched_job).to have_attributes(
         min_value: 1,
         max_value: 5,
         batch_size: batched_migration.batch_size,
         sub_batch_size: batched_migration.sub_batch_size)
+    end
+
+    context 'when the batched job is a duplicate' do
+      it 'does not create the record in the db' do
+
+      end
+
+      it 'returns nil' do
+
+      end
     end
   end
 

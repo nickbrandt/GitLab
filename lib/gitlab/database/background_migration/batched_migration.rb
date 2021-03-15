@@ -15,12 +15,17 @@ module Gitlab
           foreign_key: :batched_background_migration_id
 
         scope :queue_order, -> { order(id: :asc) }
+        scope :for_configuration, -> (job_class_name, table_name, column_name, job_arguments) do
+          where(job_class_name: job_class_name, table_name: table_name, column_name: column_name)
+          .where('job_arguments = ?', job_arguments.to_json)
+        end
 
         enum status: {
           paused: 0,
           active: 1,
           aborted: 2,
-          finished: 3
+          finished: 3,
+          cleaning_up: 4
         }
 
         def self.active_migration
@@ -34,8 +39,25 @@ module Gitlab
           last_job.created_at <= Time.current - interval_with_variance
         end
 
-        def create_batched_job!(min, max)
-          batched_jobs.create!(min_value: min, max_value: max, batch_size: batch_size, sub_batch_size: sub_batch_size)
+        def create_batched_job(min_value, max_value)
+          current_time = Time.current
+
+          result = batched_jobs.insert(
+            batched_background_migration_id: id,
+            min_value: min_value,
+            max_value: max_value,
+            batch_size: batch_size,
+            sub_batch_size: sub_batch_size,
+            created_at: current_time,
+            updated_at: current_time)
+
+          return if result.empty?
+
+          batched_jobs.find(result.rows.first.first)
+        end
+
+        def first_failed_job
+          batched_jobs.failed.first
         end
 
         def next_min_value
