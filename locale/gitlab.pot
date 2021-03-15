@@ -6956,6 +6956,9 @@ msgstr ""
 msgid "ClusterIntegration|Manage your Kubernetes cluster by visiting %{provider_link}"
 msgstr ""
 
+msgid "ClusterIntegration|ModSecurity enabled"
+msgstr ""
+
 msgid "ClusterIntegration|Namespace per environment"
 msgstr ""
 
@@ -8124,6 +8127,9 @@ msgid "ContainerRegistry|Digest: %{imageId}"
 msgstr ""
 
 msgid "ContainerRegistry|Docker connection error"
+msgstr ""
+
+msgid "ContainerRegistry|Enable expiration policy"
 msgstr ""
 
 msgid "ContainerRegistry|Expiration policy is disabled"
