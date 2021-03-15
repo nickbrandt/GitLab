@@ -377,17 +377,16 @@ describe('Value Stream Analytics actions', () => {
     beforeEach(() => {});
 
     it(`commits the ${types.RECEIVE_GROUP_STAGES_SUCCESS} mutation and dispatches 'setDefaultSelectedStage'`, () => {
-      const stages = { ...customizableStagesAndEvents.stages };
       const stageId = null;
 
       return testAction(
         actions.receiveGroupStagesSuccess,
-        { stages, stageId },
+        { stages: { ...customizableStagesAndEvents.stages }, stageId },
         state,
         [
           {
             type: types.RECEIVE_GROUP_STAGES_SUCCESS,
-            payload: stages,
+            payload: { ...customizableStagesAndEvents.stages },
           },
         ],
         [{ type: 'setDefaultSelectedStage', payload: stageId }],
