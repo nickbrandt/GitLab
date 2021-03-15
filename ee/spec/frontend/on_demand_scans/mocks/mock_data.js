@@ -81,6 +81,6 @@ export const policySiteProfile = {
   auth: {
     enabled: false,
   },
-  excludedUrls: 'https://bar.com/logout',
+  excludedUrls: ['https://bar.com/logout'],
   referencedInSecurityPolicies: ['some_policy'],
 };
