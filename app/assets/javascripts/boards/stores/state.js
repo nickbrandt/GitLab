@@ -34,5 +34,4 @@ export default () => ({
   },
   // TODO: remove after ce/ee split of board_content.vue
   isShowingEpicsSwimlanes: false,
-  activeBlockingIssuables: [],
 });

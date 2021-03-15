@@ -116,13 +116,7 @@ export default {
     },
   },
   methods: {
-    ...mapActions([
-      'performSearch',
-      'setError',
-      'setBlockingIssuables',
-      'unsetBlockingIssuables',
-      'toggleBlockedPopover',
-    ]),
+    ...mapActions(['performSearch', 'setError']),
     isIndexLessThanlimit(index) {
       return index < this.limitBeforeCounter;
     },
@@ -178,8 +172,6 @@ export default {
           :unique-id="`${item.id}${list.id}`"
           :issuable-type="issuableType"
           @blocking-issuables-error="setError"
-          @blocking-issuables="setBlockingIssuables"
-          @hidden="unsetBlockingIssuables"
         />
         <gl-icon
           v-if="item.confidential"
