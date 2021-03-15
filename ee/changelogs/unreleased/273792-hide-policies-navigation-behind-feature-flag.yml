@@ -1,0 +1,5 @@
+---
+title: Hide scan policies navigation behind feature flag
+merge_request: 56701
+author:
+type: fixed

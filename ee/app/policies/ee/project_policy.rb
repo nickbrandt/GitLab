@@ -117,6 +117,7 @@ module EE
 
       with_scope :subject
       condition(:security_orchestration_policies_enabled) do
+        ::Feature.enabled?(:security_orchestration_policies_configuration) &&
         @subject.feature_available?(:security_orchestration_policies)
       end
 
