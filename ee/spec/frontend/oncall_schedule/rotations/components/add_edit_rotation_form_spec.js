@@ -56,6 +56,7 @@ describe('AddEditRotationForm', () => {
   const findStartsOnTimeOptions = () => findRotationStartTime().findAllComponents(GlDropdownItem);
   const findEndsOnTimeOptions = () => findRotationEndTime().findAllComponents(GlDropdownItem);
   const findRestrictedToToggle = () => wrapper.find('[data-testid="restricted-to-toggle"]');
+  const findRestrictedToContainer = () => wrapper.find('[data-testid="restricted-to-time"]');
   const findRestrictedFromOptions = () =>
     wrapper.find('[data-testid="restricted-from"]').findAllComponents(GlDropdownItem);
   const findRestrictedToOptions = () =>
@@ -126,20 +127,35 @@ describe('AddEditRotationForm', () => {
   });
 
   describe('Rotation end time', () => {
-    it('toggles end time visibility', async () => {
+    it('toggle state depends on isEndDateEnabled', async () => {
       createComponent();
-      const toggle = findEndDateToggle().vm;
-      toggle.$emit('change', false);
+      expect(findEndDateToggle().props('value')).toBe(false);
       expect(findRotationEndsContainer().exists()).toBe(false);
-      toggle.$emit('change', true);
-      await wrapper.vm.$nextTick();
+
+      createComponent({ props: { form: { isEndDateEnabled: true } } });
       expect(findRotationEndsContainer().exists()).toBe(true);
     });
 
-    it('should emit an event with selected value on time selection', async () => {
+    it('toggles end time visibility on', async () => {
       createComponent();
-      findEndDateToggle().vm.$emit('change', true);
-      await wrapper.vm.$nextTick();
+      const toggle = findEndDateToggle().vm;
+      toggle.$emit('change', true);
+      const emittedEvent = wrapper.emitted('update-rotation-form');
+      expect(emittedEvent).toHaveLength(1);
+      expect(emittedEvent[0][0]).toEqual({ type: 'isEndDateEnabled', value: true });
+    });
+
+    it('toggles end time visibility off', async () => {
+      createComponent({ props: { form: { isEndDateEnabled: true } } });
+      const toggle = findEndDateToggle().vm;
+      toggle.$emit('change', false);
+      const emittedEvent = wrapper.emitted('update-rotation-form');
+      expect(emittedEvent).toHaveLength(1);
+      expect(emittedEvent[0][0]).toEqual({ type: 'isEndDateEnabled', value: false });
+    });
+
+    it('should emit an event with selected value on time selection', async () => {
+      createComponent({ props: { form: { isEndDateEnabled: true } } });
       const option = 3;
       findEndsOnTimeOptions().at(option).vm.$emit('click');
       const emittedEvent = wrapper.emitted('update-rotation-form');
@@ -152,6 +168,7 @@ describe('AddEditRotationForm', () => {
       createComponent({
         props: {
           form: {
+            isEndDateEnabled: true,
             endsAt: {
               time,
             },
@@ -175,9 +192,11 @@ describe('AddEditRotationForm', () => {
     it('toggle state depends on isRestrictedToTime', async () => {
       createComponent();
       expect(findRestrictedToToggle().props('value')).toBe(false);
+      expect(findRestrictedToContainer().exists()).toBe(false);
 
       createComponent({ props: { form: { ...formEmptyState, isRestrictedToTime: true } } });
       expect(findRestrictedToToggle().props('value')).toBe(true);
+      expect(findRestrictedToContainer().exists()).toBe(true);
     });
 
     it('toggles end time visibility on', async () => {
