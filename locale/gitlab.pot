@@ -1373,9 +1373,6 @@ msgstr ""
 msgid "A limit of %{ci_project_subscriptions_limit} subscriptions to or from a project applies."
 msgstr ""
 
-msgid "A maximum of %{count} participants can be added"
-msgstr ""
-
 msgid "A member of the abuse team will review your report as soon as possible."
 msgstr ""
 
@@ -1449,9 +1446,6 @@ msgid "A string appended to the project path to form the Service Desk email addr
 msgstr ""
 
 msgid "A title is required"
-msgstr ""
-
-msgid "A user can only participate in a rotation once"
 msgstr ""
 
 msgid "A user with write access to the source branch selected this option"
@@ -34619,9 +34613,6 @@ msgid "You have insufficient permissions to create a Todo for this alert"
 msgstr ""
 
 msgid "You have insufficient permissions to create an HTTP integration for this project"
-msgstr ""
-
-msgid "You have insufficient permissions to create an on-call rotation for this project"
 msgstr ""
 
 msgid "You have insufficient permissions to create an on-call schedule for this project"
