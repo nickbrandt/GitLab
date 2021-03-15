@@ -27845,7 +27845,13 @@ msgstr[1] ""
 msgid "Showing %{limit} of %{total_count} issues. "
 msgstr ""
 
+msgid "Showing %{pageSize} of %{total} %{issuableType}"
+msgstr ""
+
 msgid "Showing %{pageSize} of %{total} issues"
+msgstr ""
+
+msgid "Showing all epics"
 msgstr ""
 
 msgid "Showing all issues"
