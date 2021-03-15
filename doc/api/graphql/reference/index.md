@@ -4647,6 +4647,7 @@ An edge in a connection.
 | `alertManagementAlert` | [`AlertManagementAlert`](#alertmanagementalert) | A single Alert Management alert of the project. |
 | `alertManagementAlertStatusCounts` | [`AlertManagementAlertStatusCountsType`](#alertmanagementalertstatuscountstype) | Counts of alerts by status for the project. |
 | `alertManagementAlerts` | [`AlertManagementAlertConnection`](#alertmanagementalertconnection) | Alert Management alerts of the project. |
+| `alertManagementHttpIntegration` | [`AlertManagementHttpIntegration`](#alertmanagementhttpintegration) | A single HTTP integration which can receive alerts for the project. |
 | `alertManagementHttpIntegrations` | [`AlertManagementHttpIntegrationConnection`](#alertmanagementhttpintegrationconnection) | HTTP Integrations which can receive alerts for the project. |
 | `alertManagementIntegrations` | [`AlertManagementIntegrationConnection`](#alertmanagementintegrationconnection) | Integrations which can receive alerts for the project. |
 | `alertManagementPayloadFields` | [`[AlertManagementPayloadAlertField!]`](#alertmanagementpayloadalertfield) | Extract alert fields from payload for custom mapping. |

@@ -279,6 +279,12 @@ module Types
           description: 'HTTP Integrations which can receive alerts for the project.',
           resolver: Resolvers::AlertManagement::HttpIntegrationsResolver
 
+    field :alert_management_http_integration,
+          Types::AlertManagement::HttpIntegrationType,
+          null: true,
+          description: 'A single HTTP integration which can receive alerts for the project.',
+          resolver: Resolvers::AlertManagement::HttpIntegrationResolver
+
     field :releases,
           Types::ReleaseType.connection_type,
           null: true,
