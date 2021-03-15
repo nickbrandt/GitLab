@@ -73,6 +73,13 @@ starting in GitLab 14.0, GitLab will not check your repository's root for config
 ### Configuration form
 
 > - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/299234) in GitLab 13.10.
+> - It's [deployed behind a feature flag](../../../user/feature_flags.md), enabled by default.
+> - It's enabled on GitLab.com.
+> - It's recommended for production use.
+> - For GitLab self-managed instances, GitLab administrators can opt to [disable it](#enable-or-disable-api-fuzzing-configuration-form-ultimate). **(ULTIMATE)**
+
+WARNING:
+This feature might not be available to you. Check the **version history** note above for details.
 
 The API fuzzing configuration form helps you create or modify your project's API fuzzing
 configuration. The form lets you choose values for the most common API fuzzing options and builds
