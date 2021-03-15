@@ -95,6 +95,25 @@ to your project's `.gitlab-ci.yml` file where you can paste the YAML configurati
 
 Select **Copy code only** to copy the snippet to your clipboard and close the modal.
 
+#### Enable or disable API Fuzzing configuration form **(ULTIMATE)**
+
+The API Fuzzing configuration form is under development but ready for production use.
+It is deployed behind a feature flag that is **enabled by default**.
+[GitLab administrators with access to the GitLab Rails console](../../../administration/feature_flags.md)
+can opt to disable it.
+
+To enable it:
+
+```ruby
+Feature.enable(:api_fuzzing_configuration_ui)
+```
+
+To disable it:
+
+```ruby
+Feature.disable(:api_fuzzing_configuration_ui)
+```
+
 ### OpenAPI Specification
 
 > Support for OpenAPI Specification v3 was
