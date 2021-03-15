@@ -1,13 +1,11 @@
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
-import getIdeProject from 'ee_else_ce/ide/queries/get_ide_project.query.graphql';
 import Api from '~/api';
 import dismissUserCallout from '~/graphql_shared/mutations/dismiss_user_callout.mutation.graphql';
 import services from '~/ide/services';
 import { query, mutate } from '~/ide/services/gql';
 import { escapeFileUrl } from '~/lib/utils/url_utility';
 import ciConfig from '~/pipeline_editor/graphql/queries/ci_config.graphql';
-import { projectData } from '../mock_data';
 
 jest.mock('~/api');
 jest.mock('~/ide/services/gql');
@@ -214,29 +212,6 @@ describe('IDE services', () => {
           }));
       },
     );
-  });
-
-  describe('getProjectData', () => {
-    it('combines gql and API requests', () => {
-      const gqlProjectData = {
-        userPermissions: {
-          bogus: true,
-        },
-      };
-      Api.project.mockReturnValue(Promise.resolve({ data: { ...projectData } }));
-      query.mockReturnValue(Promise.resolve({ data: { project: gqlProjectData } }));
-
-      return services.getProjectData(TEST_NAMESPACE, TEST_PROJECT).then((response) => {
-        expect(response).toEqual({ data: { ...projectData, ...gqlProjectData } });
-        expect(Api.project).toHaveBeenCalledWith(TEST_PROJECT_ID);
-        expect(query).toHaveBeenCalledWith({
-          query: getIdeProject,
-          variables: {
-            projectPath: TEST_PROJECT_ID,
-          },
-        });
-      });
-    });
   });
 
   describe('getFiles', () => {
