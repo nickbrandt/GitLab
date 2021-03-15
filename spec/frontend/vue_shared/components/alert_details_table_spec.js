@@ -1,5 +1,6 @@
 import { GlLoadingIcon, GlTable } from '@gitlab/ui';
 import { mount } from '@vue/test-utils';
+import { PAGE_CONFIG } from '~/vue_shared/alert_details/constants';
 import AlertDetailsTable from '~/vue_shared/components/alert_details_table.vue';
 
 const mockAlert = {
@@ -114,6 +115,15 @@ describe('AlertDetails', () => {
         mountComponent();
 
         expect(findTableFieldValueByKey('Environment').text()).toBeFalsy();
+      });
+
+      it('should show the provided status if statuses prop is not provided', () => {
+        expect(findTableFieldValueByKey('Status').text()).toBe('TRIGGERED');
+      });
+
+      it('should show the translated status if statuses prop is provided', () => {
+        mountComponent({ statuses: PAGE_CONFIG.OPERATIONS.STATUSES });
+        expect(findTableFieldValueByKey('Status').text()).toBe('Triggered');
       });
     });
   });

@@ -42,6 +42,11 @@ export default {
       type: Boolean,
       required: true,
     },
+    statuses: {
+      type: Object,
+      required: false,
+      default: () => ({}),
+    },
   },
   fields: [
     {
@@ -71,6 +76,8 @@ export default {
             let value;
             if (fieldName === 'environment') {
               value = fieldValue?.name;
+            } else if (fieldName === 'status') {
+              value = this.statuses[fieldValue] || fieldValue;
             } else {
               value = fieldValue;
             }
