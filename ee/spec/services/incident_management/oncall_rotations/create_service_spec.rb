@@ -186,6 +186,18 @@ RSpec.describe IncidentManagement::OncallRotations::CreateService do
           it_behaves_like 'error response', "Active period end must be later than active period start"
         end
       end
+
+      context 'for an in-progress rotation' do
+        it 'trims & saves the current shift' do
+          oncall_rotation = execute.payload[:oncall_rotation]
+
+          expect(oncall_rotation.shifts.length).to eq(1)
+          expect(oncall_rotation.shifts.first).to have_attributes(
+            starts_at: oncall_rotation.reload.created_at,
+            ends_at: oncall_rotation.starts_at.next_day
+          )
+        end
+      end
     end
   end
 end
