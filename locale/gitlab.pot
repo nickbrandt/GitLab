@@ -3396,6 +3396,9 @@ msgstr ""
 msgid "An error occurred while fetching projects autocomplete."
 msgstr ""
 
+msgid "An error occurred while fetching reference"
+msgstr ""
+
 msgid "An error occurred while fetching sidebar data"
 msgstr ""
 
@@ -25029,6 +25032,9 @@ msgid "Reduce project visibility"
 msgstr ""
 
 msgid "Reduce this project’s visibility?"
+msgstr ""
+
+msgid "Reference"
 msgstr ""
 
 msgid "Reference:"
