@@ -10,7 +10,11 @@ module Ci
 
     Result = Struct.new(:build, :build_json, :valid?)
 
-    MAX_QUEUE_DEPTH = 50
+    ##
+    # The queue depth limit number has been determined by observing 95
+    # percentile of effective queue depth on gitlab.com. This is only likely to
+    # affect 5% of the worst case scenarios.
+    MAX_QUEUE_DEPTH = 45
 
     def initialize(runner)
       @runner = runner
