@@ -135,7 +135,7 @@ module EE
 
       condition(:group_level_compliance_pipeline_available) do
         @subject.feature_available?(:evaluate_group_level_compliance_pipeline) &&
-          ::Feature.enabled?(:ff_custom_compliance_frameworks, @subject, default_enabled: :yaml)
+          ::Feature.enabled?(:ff_evaluate_group_level_compliance_pipeline, @subject, default_enabled: :yaml)
       end
 
       rule { public_group | logged_in_viewable }.policy do
