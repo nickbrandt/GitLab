@@ -340,6 +340,9 @@ RSpec.configure do |config|
 
     # Reset all feature flag stubs to default for testing
     stub_all_feature_flags
+
+    # Re-enable query limiting in case it was disabled
+    Gitlab::QueryLimiting.enable!
   end
 
   config.before(:example, :mailer) do
