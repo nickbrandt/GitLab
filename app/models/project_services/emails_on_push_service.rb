@@ -3,6 +3,8 @@
 class EmailsOnPushService < Service
   include NotificationBranchSelection
 
+  RECIPIENTS_LIMIT = 750
+
   boolean_accessor :send_from_committer_email
   boolean_accessor :disable_diffs
   prop_accessor :recipients, :branches_to_be_notified
@@ -70,7 +72,12 @@ class EmailsOnPushService < Service
       { type: 'checkbox', name: 'disable_diffs', title: s_("EmailsOnPushService|Disable code diffs"),
         help: s_("EmailsOnPushService|Don't include possibly sensitive code diffs in notification body.") },
       { type: 'select', name: 'branches_to_be_notified', choices: branch_choices },
-      { type: 'textarea', name: 'recipients', placeholder: s_('EmailsOnPushService|Emails separated by whitespace') }
+      {
+        type: 'textarea',
+        name: 'recipients',
+        placeholder: s_('EmailsOnPushService|Emails separated by whitespace'),
+        help: s_('EmailsOnPushService|Invalid email addresses and duplicates will be removed.')
+      }
     ]
   end
 
@@ -86,9 +93,9 @@ class EmailsOnPushService < Service
     self.recipients = valid_recipients.join(' ')
   end
 
-  RECIPIENTS_LIMIT = 750
   def number_of_receipients_within_limit
-    # TODO translate the error
-    errors.add(:recipients, "max number is #{RECIPIENTS_LIMIT}") if valid_recipients.size > RECIPIENTS_LIMIT
+    if valid_recipients.size > RECIPIENTS_LIMIT
+      errors.add(:recipients, s_("EmailsOnPushService|max number is %{recipients_limit}") % { recipients_limit: RECIPIENTS_LIMIT })
+    end
   end
 end
