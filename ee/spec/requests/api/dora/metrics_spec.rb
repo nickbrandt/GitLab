@@ -49,18 +49,6 @@ RSpec.describe API::Dora::Metrics do
         expect(json_response['message']).to eq('You do not have permission to access dora metrics.')
       end
     end
-
-    context 'when dora_daily_metrics feature flag is disabled' do
-      before do
-        stub_feature_flags(dora_daily_metrics: false)
-      end
-
-      it 'returns not found' do
-        subject
-
-        expect(response).to have_gitlab_http_status(:not_found)
-      end
-    end
   end
 
   describe 'GET /groups/:id/dora/metrics' do
@@ -108,18 +96,6 @@ RSpec.describe API::Dora::Metrics do
 
         expect(response).to have_gitlab_http_status(:unauthorized)
         expect(json_response['message']).to eq('You do not have permission to access dora metrics.')
-      end
-    end
-
-    context 'when dora_daily_metrics feature flag is disabled' do
-      before do
-        stub_feature_flags(dora_daily_metrics: false)
-      end
-
-      it 'returns not found' do
-        subject
-
-        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
   end
