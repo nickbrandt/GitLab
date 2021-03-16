@@ -356,7 +356,7 @@ RSpec.describe GroupsController, factory_default: :keep do
 
       context 'with feature flag switched off' do
         before do
-          stub_feature_flags(recaptcha_on_group_creation: false)
+          stub_feature_flags(recaptcha_on_top_level_group_creation: false)
         end
 
         it 'allows creating a group without the reCAPTCHA' do
