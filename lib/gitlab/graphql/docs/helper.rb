@@ -63,7 +63,7 @@ module Gitlab
 
         def render_full_field(field, heading_level: 3, owner: nil)
           conn = connection?(field)
-          args = field[:arguments].reject { |f| conn && CONNECTION_ARGS.include?(f[:name]) }
+          args = field[:arguments].reject { |arg| conn && CONNECTION_ARGS.include?(arg[:name]) }
           arg_owner = [owner, field[:name]]
 
           chunks = [
@@ -370,7 +370,7 @@ module Gitlab
           input_field = query[:input_fields]&.first
           return unless input_field
 
-          "Input type: `#{input_field[:type][:name]}`."
+          "Input type: `#{input_field[:type][:name]}`"
         end
 
         def deprecations

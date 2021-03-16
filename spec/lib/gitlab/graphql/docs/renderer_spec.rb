@@ -414,7 +414,7 @@ RSpec.describe Gitlab::Graphql::Docs::Renderer do
 
             Make everything very pretty.
 
-            Input type: `MakeItPrettyInput`.
+            Input type: `MakeItPrettyInput`
 
             #### Arguments
 
