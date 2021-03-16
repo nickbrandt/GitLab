@@ -37,7 +37,7 @@ module Gitlab
               Metric file: #{path}
             ERROR_MSG
 
-            Gitlab::ErrorTracking.track_and_raise_for_dev_exception(Metric::InvalidMetricError.new(error_message))
+            Gitlab::ErrorTracking.track_and_raise_for_dev_exception(Gitlab::Usage::Metric::InvalidMetricError.new(error_message))
           end
         end
       end
