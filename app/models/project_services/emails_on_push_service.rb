@@ -13,6 +13,12 @@ class EmailsOnPushService < Service
 
   before_validation :cleanup_recipients
 
+  def self.valid_recipients(recipients)
+    recipients.to_s.split.select do |recipient|
+      recipient.include?('@')
+    end.uniq(&:downcase)
+  end
+
   def title
     s_('EmailsOnPushService|Emails on push')
   end
@@ -84,9 +90,7 @@ class EmailsOnPushService < Service
   private
 
   def valid_recipients
-    recipients.to_s.split.select do |recipient|
-      recipient.include?('@')
-    end.uniq
+    self.class.valid_recipients(recipients)
   end
 
   def cleanup_recipients

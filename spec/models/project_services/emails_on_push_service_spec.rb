@@ -59,10 +59,10 @@ RSpec.describe EmailsOnPushService do
 
   describe 'callbacks' do
     describe 'before_validation' do
-      let(:service) { described_class.new(project: create(:project), recipients: '<invalid> foobar valid@recipient.com dup@lica.te dup@lica.te') }
+      let(:service) { described_class.new(project: create(:project), recipients: '<invalid> foobar Valid@recipient.com Dup@lica.te dup@lica.te Dup@Lica.te') }
 
-      it 'removes invalid email addresses and removes duplicates' do
-        expect { service.valid? }.to change { service.recipients }.to('valid@recipient.com dup@lica.te')
+      it 'removes invalid email addresses and removes duplicates by keeping the original capitalization' do
+        expect { service.valid? }.to change { service.recipients }.to('Valid@recipient.com Dup@lica.te')
       end
     end
   end
@@ -82,6 +82,14 @@ RSpec.describe EmailsOnPushService do
       it 'does not overwrite it with the default value' do
         expect(subject.branches_to_be_notified).to eq('protected')
       end
+    end
+  end
+
+  describe '.valid_recipients' do
+    let(:recipients) { '<invalid> foobar Valid@recipient.com Dup@lica.te dup@lica.te Dup@Lica.te' }
+
+    it 'removes invalid email addresses and removes duplicates by keeping the original capitalization' do
+      expect(described_class.valid_recipients(recipients)).to contain_exactly('Valid@recipient.com', 'Dup@lica.te')
     end
   end
 
