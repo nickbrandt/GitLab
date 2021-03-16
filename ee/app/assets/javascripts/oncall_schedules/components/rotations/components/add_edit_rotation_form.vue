@@ -198,12 +198,6 @@ export default {
                 class="gl-w-full"
                 :value="formattedDate"
                 :placeholder="__(`YYYY-MM-DD`)"
-                @blur="
-                  $emit('update-rotation-form', {
-                    type: 'startsAt.date',
-                    value: $event.target.value,
-                  })
-                "
               />
             </template>
           </gl-datepicker>
@@ -261,12 +255,6 @@ export default {
                   class="gl-w-full"
                   :value="formattedDate"
                   :placeholder="__(`YYYY-MM-DD`)"
-                  @blur="
-                    $emit('update-rotation-form', {
-                      type: 'endsAt.date',
-                      value: $event.target.value,
-                    })
-                  "
                 />
               </template>
             </gl-datepicker>
@@ -326,7 +314,7 @@ export default {
               class="gl-px-3"
             >
               <gl-dropdown-item
-                v-for="time in $options.HOURS_IN_DAY"
+                v-for="(_, time) in $options.HOURS_IN_DAY"
                 :key="time"
                 :is-checked="form.restrictedTo.startTime === time"
                 is-check-item
@@ -346,7 +334,7 @@ export default {
               class="gl-px-3"
             >
               <gl-dropdown-item
-                v-for="time in $options.HOURS_IN_DAY"
+                v-for="(_, time) in $options.HOURS_IN_DAY"
                 :key="time"
                 :is-checked="form.restrictedTo.endTime === time"
                 is-check-item
