@@ -41,7 +41,7 @@ func testArtifactsUpload(t *testing.T, uploadArtifacts uploadArtifactsFunction) 
 	reqBody, contentType, err := multipartBodyWithFile()
 	require.NoError(t, err)
 
-	ts := signedUploadTestServer(t, nil)
+	ts := signedUploadTestServer(t, nil, nil)
 	defer ts.Close()
 
 	ws := startWorkhorseServer(ts.URL)
@@ -66,7 +66,7 @@ func expectSignedRequest(t *testing.T, r *http.Request) {
 	require.NoError(t, err)
 }
 
-func uploadTestServer(t *testing.T, extraTests func(r *http.Request)) *httptest.Server {
+func uploadTestServer(t *testing.T, authorizeTests func(r *http.Request), extraTests func(r *http.Request)) *httptest.Server {
 	return testhelper.TestServerWithHandler(regexp.MustCompile(`.`), func(w http.ResponseWriter, r *http.Request) {
 		if strings.HasSuffix(r.URL.Path, "/authorize") {
 			expectSignedRequest(t, r)
@@ -74,6 +74,10 @@ func uploadTestServer(t *testing.T, extraTests func(r *http.Request)) *httptest.
 			w.Header().Set("Content-Type", api.ResponseContentType)
 			_, err := fmt.Fprintf(w, `{"TempPath":"%s"}`, scratchDir)
 			require.NoError(t, err)
+
+			if authorizeTests != nil {
+				authorizeTests(r)
+			}
 			return
 		}
 
@@ -91,10 +95,10 @@ func uploadTestServer(t *testing.T, extraTests func(r *http.Request)) *httptest.
 	})
 }
 
-func signedUploadTestServer(t *testing.T, extraTests func(r *http.Request)) *httptest.Server {
+func signedUploadTestServer(t *testing.T, authorizeTests func(r *http.Request), extraTests func(r *http.Request)) *httptest.Server {
 	t.Helper()
 
-	return uploadTestServer(t, func(r *http.Request) {
+	return uploadTestServer(t, authorizeTests, func(r *http.Request) {
 		expectSignedRequest(t, r)
 
 		if extraTests != nil {
@@ -113,20 +117,28 @@ func TestAcceleratedUpload(t *testing.T) {
 		{"POST", `/uploads/personal_snippet`, true},
 		{"POST", `/uploads/user`, true},
 		{"POST", `/api/v4/projects/1/wikis/attachments`, false},
+		{"POST", `/api/v4/projects/group%2Fproject/wikis/attachments`, false},
 		{"POST", `/api/graphql`, false},
 		{"PUT", "/api/v4/projects/9001/packages/nuget/v1/files", true},
+		{"PUT", "/api/v4/projects/group%2Fproject/packages/nuget/v1/files", true},
 		{"POST", `/api/v4/groups/import`, true},
 		{"POST", `/api/v4/projects/import`, true},
 		{"POST", `/import/gitlab_project`, true},
 		{"POST", `/import/gitlab_group`, true},
 		{"POST", `/api/v4/projects/9001/packages/pypi`, true},
+		{"POST", `/api/v4/projects/group%2Fproject/packages/pypi`, true},
 		{"POST", `/api/v4/projects/9001/issues/30/metric_images`, true},
+		{"POST", `/api/v4/projects/project%2Fgroup/issues/30/metric_images`, true},
 		{"POST", `/my/project/-/requirements_management/requirements/import_csv`, true},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.resource, func(t *testing.T) {
 			ts := uploadTestServer(t,
+				func(r *http.Request) {
+					// Validate %2F characters haven't been unescaped
+					require.Equal(t, tt.resource+"/authorize", r.URL.String())
+				},
 				func(r *http.Request) {
 					if tt.signedFinalization {
 						expectSignedRequest(t, r)
@@ -433,6 +445,11 @@ func TestPackageFilesUpload(t *testing.T) {
 		{"PUT", "/api/v4/projects/2412/packages/generic/mypackage/0.0.1/myfile.tar.gz"},
 		{"PUT", "/api/v4/projects/2412/packages/debian/libsample0_1.2.3~alpha2-1_amd64.deb"},
 		{"POST", "/api/v4/projects/2412/packages/rubygems/api/v1/gems/sample.gem"},
+		{"PUT", "/api/v4/projects/group%2Fproject/packages/conan/v1/files"},
+		{"PUT", "/api/v4/projects/group%2Fproject/packages/maven/v1/files"},
+		{"PUT", "/api/v4/projects/group%2Fproject/packages/generic/mypackage/0.0.1/myfile.tar.gz"},
+		{"PUT", "/api/v4/projects/group%2Fproject/packages/debian/libsample0_1.2.3~alpha2-1_amd64.deb"},
+		{"POST", "/api/v4/projects/group%2Fproject/packages/rubygems/api/v1/gems/sample.gem"},
 	}
 
 	for _, r := range routes {
