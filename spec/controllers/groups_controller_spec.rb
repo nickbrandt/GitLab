@@ -343,6 +343,22 @@ RSpec.describe GroupsController, factory_default: :keep do
 
         expect(response).to have_gitlab_http_status(:found)
       end
+
+      context 'with feature flag switched off' do
+        before do
+          stub_feature_flags(recaptcha_on_group_creation: false)
+        end
+
+        it 'allows creating a group without the reCAPTCHA' do
+          expect(described_class).not_to receive(:verify_recaptcha)
+
+          expect do
+            post :create, params: { group: { name: 'new_group', path: "new_group" } }
+          end.to change { Group.count }.by(1)
+
+          expect(response).to have_gitlab_http_status(:found)
+        end
+      end
     end
   end
 
