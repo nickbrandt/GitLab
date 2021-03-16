@@ -94,11 +94,7 @@ export default {
         >
       </div>
     </div>
-    <gl-popover
-      :target="rotationAssigneeUniqueID"
-      :title="assignee.user.username"
-      placement="top"
-    >
+    <gl-popover :target="rotationAssigneeUniqueID" :title="assignee.user.username" placement="top">
       <p class="gl-m-0" data-testid="rotation-assignee-starts-at">
         {{ startsAt }}
       </p>

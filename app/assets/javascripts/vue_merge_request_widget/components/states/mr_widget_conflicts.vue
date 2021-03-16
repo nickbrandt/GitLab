@@ -149,11 +149,7 @@ export default {
           >
             {{ s__('mrWidget|Resolve conflicts') }}
           </gl-button>
-          <gl-popover
-            v-if="showPopover"
-            :target="() => $refs.popover"
-            placement="top"
-          >
+          <gl-popover v-if="showPopover" :target="() => $refs.popover" placement="top">
             <template #title>
               <div class="gl-font-weight-normal gl-font-base">
                 {{ $options.i18n.title }}
