@@ -44,10 +44,11 @@ describe('Vulnerability Report', () => {
 
   it("displays the vulnerability's severity", () => {
     const severitySection = screen.getByTestId('severity');
+    const severityValue = within(severitySection).getByTestId('value');
 
-    expect(
-      within(severitySection).getByText(new RegExp(mockVulnerability.severity, 'i')),
-    ).toBeInstanceOf(HTMLElement);
+    expect(severityValue.textContent.toLowerCase()).toContain(
+      mockVulnerability.severity.toLowerCase(),
+    );
   });
 
   it("displays a heading containing the vulnerability's title", () => {
