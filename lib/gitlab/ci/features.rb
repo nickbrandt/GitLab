@@ -71,6 +71,10 @@ module Gitlab
       def self.ci_commit_pipeline_mini_graph_vue_enabled?(project)
         ::Feature.enabled?(:ci_commit_pipeline_mini_graph_vue, project, default_enabled: :yaml)
       end
+
+      def self.remove_duplicate_artifact_exposure_paths?(project)
+        ::Feature.enabled?(:remove_duplicate_artifact_exposure_paths, project, default_enabled: :yaml)
+      end
     end
   end
 end
