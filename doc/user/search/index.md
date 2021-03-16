@@ -302,9 +302,9 @@ GitLab instance.
 
 ## Search settings
 
-> - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/292941) in GitLab 13.8.
-> - [Added to Group, Admin, and User settings](https://gitlab.com/groups/gitlab-org/-/epics/4842) in GitLab 13.9
-> - [Feature flag removed](https://gitlab.com/gitlab-org/gitlab/-/issues/294025) in GitLab 13.10.
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/292941) in GitLab 13.8 behind a feature flag, disabled by default.
+> - [Added to Group, Admin, and User settings](https://gitlab.com/groups/gitlab-org/-/epics/4842) in GitLab 13.9.
+> - [Enabled by default](https://gitlab.com/gitlab-org/gitlab/-/issues/294025) in GitLab 13.11.
 
 You can search inside a Project, Group, Admin, or User's settings by entering
 a search term in the search box located at the top of the page. The search results
