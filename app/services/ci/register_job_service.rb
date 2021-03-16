@@ -105,7 +105,7 @@ module Ci
         builds = builds.queued_before(params[:job_age].seconds.ago)
       end
 
-      if Feature.enabled?(:ci_register_job_service_one_by_one, runner)
+      if Feature.enabled?(:ci_register_job_service_one_by_one, runner, default_enabled: true)
         build_ids = builds.pluck(:id)
 
         @metrics.observe_queue_size(-> { build_ids.size })
