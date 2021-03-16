@@ -13026,7 +13026,8 @@ CREATE TABLE gitlab_subscription_histories (
     gitlab_subscription_id bigint NOT NULL,
     created_at timestamp with time zone,
     trial_starts_on date,
-    auto_renew boolean
+    auto_renew boolean,
+    trial_extension_type smallint
 );
 
 CREATE SEQUENCE gitlab_subscription_histories_id_seq
@@ -13053,7 +13054,8 @@ CREATE TABLE gitlab_subscriptions (
     trial_starts_on date,
     auto_renew boolean,
     seats_in_use integer DEFAULT 0 NOT NULL,
-    seats_owed integer DEFAULT 0 NOT NULL
+    seats_owed integer DEFAULT 0 NOT NULL,
+    trial_extension_type smallint
 );
 
 CREATE SEQUENCE gitlab_subscriptions_id_seq
