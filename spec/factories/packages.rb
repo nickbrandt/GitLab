@@ -98,6 +98,16 @@ FactoryBot.define do
       sequence(:name) { |n| "package-#{n}" }
       sequence(:version) { |n| "v1.0.#{n}" }
       package_type { :helm }
+
+      transient do
+        without_package_files { false }
+      end
+
+      after :create do |package, evaluator|
+        unless evaluator.without_package_files
+          create :helm_package_file, package: package
+        end
+      end
     end
 
     factory :npm_package do
