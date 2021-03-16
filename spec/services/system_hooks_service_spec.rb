@@ -140,10 +140,6 @@ RSpec.describe SystemHooksService do
   end
 
   context 'event names' do
-    it { expect(event_name(user, :create)).to eq "user_create" }
-    it { expect(event_name(user, :destroy)).to eq "user_destroy" }
-    it { expect(event_name(user, :rename)).to eq 'user_rename' }
-    it { expect(event_name(user, :failed_login)).to eq 'user_failed_login' }
     it { expect(event_name(project, :create)).to eq "project_create" }
     it { expect(event_name(project, :destroy)).to eq "project_destroy" }
     it { expect(event_name(project, :rename)).to eq "project_rename" }
