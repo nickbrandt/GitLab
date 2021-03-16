@@ -328,7 +328,7 @@ RSpec.describe GroupsController, factory_default: :keep do
       end
 
       it 'displays an error when the reCAPTCHA is not solved' do
-        allow_any_instance_of(described_class).to receive(:verify_recaptcha).and_return(false)
+        allow(controller).to receive(:verify_recaptcha).and_return(false)
 
         post :create, params: { group: { name: 'new_group', path: "new_group" } }
 
@@ -344,13 +344,23 @@ RSpec.describe GroupsController, factory_default: :keep do
         expect(response).to have_gitlab_http_status(:found)
       end
 
+      it 'allows creating a sub-group without checking the captcha' do
+        expect(controller).not_to receive(:verify_recaptcha)
+
+        expect do
+          post :create, params: { group: { name: 'new_group', path: "new_group", parent_id: group.id } }
+        end.to change { Group.count }.by(1)
+
+        expect(response).to have_gitlab_http_status(:found)
+      end
+
       context 'with feature flag switched off' do
         before do
           stub_feature_flags(recaptcha_on_group_creation: false)
         end
 
         it 'allows creating a group without the reCAPTCHA' do
-          expect(described_class).not_to receive(:verify_recaptcha)
+          expect(controller).not_to receive(:verify_recaptcha)
 
           expect do
             post :create, params: { group: { name: 'new_group', path: "new_group" } }

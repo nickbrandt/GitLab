@@ -17,7 +17,7 @@
   .col-sm-4
     = render_if_exists 'shared/groups/invite_members'
 
-- if captcha_enabled? && captcha_required?
+- if captcha_required?
   .row.recaptcha
     .col-sm-4
       = recaptcha_tags

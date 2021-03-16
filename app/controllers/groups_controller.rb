@@ -16,7 +16,7 @@ class GroupsController < Groups::ApplicationController
   prepend_before_action(only: [:show, :issues]) { authenticate_sessionless_user!(:rss) }
   prepend_before_action(only: [:issues_calendar]) { authenticate_sessionless_user!(:ics) }
   prepend_before_action :ensure_export_enabled, only: [:export, :download_export]
-  prepend_before_action :check_captcha, only: :create, if: -> { recaptcha_on_group_creation_enabled? }
+  prepend_before_action :check_captcha, only: :create, if: -> { captcha_enabled? }
 
   before_action :authenticate_user!, only: [:new, :create]
   before_action :group, except: [:index, :new, :create]
@@ -24,7 +24,7 @@ class GroupsController < Groups::ApplicationController
   # Authorize
   before_action :authorize_admin_group!, only: [:edit, :update, :destroy, :projects, :transfer, :export, :download_export]
   before_action :authorize_create_group!, only: [:new]
-  before_action :load_recaptcha, only: [:new], if: -> { recaptcha_on_group_creation_enabled? }
+  before_action :load_recaptcha, only: [:new, :create], if: -> { captcha_required? }
 
   before_action :group_projects, only: [:projects, :activity, :issues, :merge_requests]
   before_action :event_filter, only: [:activity]
@@ -41,7 +41,7 @@ class GroupsController < Groups::ApplicationController
 
   before_action :export_rate_limit, only: [:export, :download_export]
 
-  helper_method :captcha_enabled?, :captcha_required?
+  helper_method :captcha_required?
 
   skip_cross_project_access_check :index, :new, :create, :edit, :update,
                                   :destroy, :projects
@@ -322,13 +322,14 @@ class GroupsController < Groups::ApplicationController
     render_404 unless Feature.enabled?(:group_import_export, @group, default_enabled: true)
   end
 
+  private
+
   def load_recaptcha
     Gitlab::Recaptcha.load_configurations!
   end
 
   def check_captcha
     return if group_params[:parent_id].present? # Only require for top-level groups
-    return unless captcha_enabled? && load_recaptcha
 
     return if verify_recaptcha
 
@@ -337,8 +338,6 @@ class GroupsController < Groups::ApplicationController
     @group = Group.new(group_params)
     render action: 'new'
   end
-
-  private
 
   def successful_creation_hooks; end
 
@@ -359,15 +358,11 @@ class GroupsController < Groups::ApplicationController
   end
 
   def captcha_enabled?
-    Gitlab::Recaptcha.enabled?
+    Gitlab::Recaptcha.enabled? && Feature.enabled?(:recaptcha_on_group_creation, type: :ops)
   end
 
   def captcha_required?
-    recaptcha_on_group_creation_enabled? && !params[:parent_id]
-  end
-
-  def recaptcha_on_group_creation_enabled?
-    Feature.enabled?(:recaptcha_on_group_creation, type: :ops)
+    captcha_enabled? && !params[:parent_id]
   end
 end
 
