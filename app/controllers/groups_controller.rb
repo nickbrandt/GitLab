@@ -16,7 +16,7 @@ class GroupsController < Groups::ApplicationController
   prepend_before_action(only: [:show, :issues]) { authenticate_sessionless_user!(:rss) }
   prepend_before_action(only: [:issues_calendar]) { authenticate_sessionless_user!(:ics) }
   prepend_before_action :ensure_export_enabled, only: [:export, :download_export]
-  prepend_before_action :check_captcha, only: :create
+  prepend_before_action :check_captcha, only: :create, if: -> { recaptcha_on_group_creation_enabled? }
 
   before_action :authenticate_user!, only: [:new, :create]
   before_action :group, except: [:index, :new, :create]
@@ -24,7 +24,7 @@ class GroupsController < Groups::ApplicationController
   # Authorize
   before_action :authorize_admin_group!, only: [:edit, :update, :destroy, :projects, :transfer, :export, :download_export]
   before_action :authorize_create_group!, only: [:new]
-  before_action :load_recaptcha, only: [:new]
+  before_action :load_recaptcha, only: [:new], if: -> { recaptcha_on_group_creation_enabled? }
 
   before_action :group_projects, only: [:projects, :activity, :issues, :merge_requests]
   before_action :event_filter, only: [:activity]
@@ -327,8 +327,8 @@ class GroupsController < Groups::ApplicationController
   end
 
   def check_captcha
-    return unless captcha_enabled? && load_recaptcha
     return if group_params[:parent_id].present? # Only require for top-level groups
+    return unless captcha_enabled? && load_recaptcha
 
     return if verify_recaptcha
 
@@ -363,7 +363,11 @@ class GroupsController < Groups::ApplicationController
   end
 
   def captcha_required?
-    !params[:parent_id]
+    recaptcha_on_group_creation_enabled? && !params[:parent_id]
+  end
+
+  def recaptcha_on_group_creation_enabled?
+    Feature.enabled?(:recaptcha_on_group_creation, type: :ops)
   end
 end
 

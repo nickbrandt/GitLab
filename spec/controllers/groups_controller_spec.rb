@@ -312,6 +312,38 @@ RSpec.describe GroupsController, factory_default: :keep do
         end
       end
     end
+
+    context 'when creating a group with captcha protection' do
+      before do
+        sign_in(user)
+
+        stub_application_setting(recaptcha_enabled: true)
+      end
+
+      after do
+        # Avoid test ordering issue and ensure `verify_recaptcha` returns true
+        unless Recaptcha.configuration.skip_verify_env.include?('test')
+          Recaptcha.configuration.skip_verify_env << 'test'
+        end
+      end
+
+      it 'displays an error when the reCAPTCHA is not solved' do
+        allow_any_instance_of(described_class).to receive(:verify_recaptcha).and_return(false)
+
+        post :create, params: { group: { name: 'new_group', path: "new_group" } }
+
+        expect(response).to render_template(:new)
+        expect(flash[:alert]).to eq(_('There was an error with the reCAPTCHA. Please solve the reCAPTCHA again.'))
+      end
+
+      it 'allows creating a group when the reCAPTCHA is solved' do
+        expect do
+          post :create, params: { group: { name: 'new_group', path: "new_group" } }
+        end.to change { Group.count }.by(1)
+
+        expect(response).to have_gitlab_http_status(:found)
+      end
+    end
   end
 
   describe 'GET #index' do
