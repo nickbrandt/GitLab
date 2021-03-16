@@ -220,6 +220,7 @@ module EE
         enable :create_iteration
         enable :admin_iteration
         enable :create_iteration_cadence
+        enable :admin_iteration_cadence
       end
 
       rule { reporter & epics_available }.policy do
