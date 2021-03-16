@@ -341,7 +341,7 @@ export default () => {
       },
       computed: {
         disabled() {
-          if (!this.store) {
+          if (!this.store || !this.store.lists) {
             return true;
           }
           return !this.store.lists.filter((list) => !list.preset).length;
