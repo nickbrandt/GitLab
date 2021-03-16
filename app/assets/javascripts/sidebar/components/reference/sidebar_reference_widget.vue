@@ -66,7 +66,7 @@ export default {
       tooltip-placement="left"
     />
     <div
-      class="gl-display-flex gl-align-items-center gl-justify-content-between gl-mb-2 hide-collapsed"
+      class="gl-display-flex gl-align-items-center gl-justify-content-space-between gl-mb-2 hide-collapsed"
     >
       <span class="gl-overflow-hidden gl-text-overflow-ellipsis gl-white-space-nowrap">
         {{ $options.i18n.text }}: {{ reference }}
