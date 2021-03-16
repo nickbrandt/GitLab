@@ -13930,6 +13930,7 @@ Values for sorting package.
 | <a id="packagetypeenumdebian"></a>`DEBIAN` | Packages from the Debian package manager. |
 | <a id="packagetypeenumgeneric"></a>`GENERIC` | Packages from the Generic package manager. |
 | <a id="packagetypeenumgolang"></a>`GOLANG` | Packages from the Golang package manager. |
+| <a id="packagetypeenumhelm"></a>`HELM` | Packages from the Helm package manager. |
 | <a id="packagetypeenummaven"></a>`MAVEN` | Packages from the Maven package manager. |
 | <a id="packagetypeenumnpm"></a>`NPM` | Packages from the npm package manager. |
 | <a id="packagetypeenumnuget"></a>`NUGET` | Packages from the Nuget package manager. |

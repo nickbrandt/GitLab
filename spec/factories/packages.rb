@@ -94,6 +94,12 @@ FactoryBot.define do
       end
     end
 
+    factory :helm_package do
+      sequence(:name) { |n| "package-#{n}" }
+      sequence(:version) { |n| "v1.0.#{n}" }
+      package_type { :helm }
+    end
+
     factory :npm_package do
       sequence(:name) { |n| "@#{project.root_namespace.path}/package-#{n}"}
       version { '1.0.0' }
