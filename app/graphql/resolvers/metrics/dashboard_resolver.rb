@@ -9,7 +9,7 @@ module Resolvers
       argument :path, GraphQL::STRING_TYPE,
                required: true,
                description: <<~MD
-                 Path to a file which defines metrics dashboard eg: `"config/prometheus/common_metrics.yml"`.
+                 Path to a file which defines a metrics dashboard eg: `"config/prometheus/common_metrics.yml"`.
                MD
 
       alias_method :environment, :object
