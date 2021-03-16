@@ -62,15 +62,11 @@ module Gitlab
         # - The current session already performed writes
         # - It prefers to use primary, aka, use_primary or use_primary! were called
         def use_replica_if_possible(&blk)
-          return yield if use_primary? || performed_write?
-
-          begin
-            used_replica = @use_replica
-            @use_replica = true
-            yield
-          ensure
-            @use_replica = used_replica && !use_primary? && !performed_write?
-          end
+          used_replica = @use_replica
+          @use_replica = true
+          yield
+        ensure
+          @use_replica = used_replica
         end
 
         def use_replica?

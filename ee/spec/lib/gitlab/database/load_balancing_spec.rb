@@ -409,14 +409,27 @@ RSpec.describe Gitlab::Database::LoadBalancing do
   # of the load balancer.
   # - A real model with a table backed behind is defined
   # - The load balancing module is set up for this module only, as to prevent
-  # breaking other tests. The replica configuraiton is cloned from the test
+  # breaking other tests. The replica configuration is cloned from the test
   # configuraiton.
   # - In each test, we listen to the SQL queries (via sql.active_record
-  # instrumentaiton) while triggering real queries from the defined model.
+  # instrumentation) while triggering real queries from the defined model.
   # - We assert the desinations (replica/primary) of the queries in order.
   describe 'LoadBalancing integration tests', :delete do
+    before(:all) do
+      ActiveRecord::Schema.define do
+        create_table :load_balancing_test, force: true do |t|
+          t.string :name, null: true
+        end
+      end
+    end
+
+    after(:all) do
+      ActiveRecord::Schema.define do
+        drop_table :load_balancing_test, force: true
+      end
+    end
+
     shared_context 'LoadBalancing setup' do
-      let!(:license) { create(:license, plan: ::License::PREMIUM_PLAN) }
       let(:hosts) { [ActiveRecord::Base.configurations["development"]['host']] }
       let(:model) do
         Class.new(ApplicationRecord) do
@@ -425,11 +438,7 @@ RSpec.describe Gitlab::Database::LoadBalancing do
       end
 
       before do
-        ActiveRecord::Schema.define do
-          create_table :load_balancing_test, force: true do |t|
-            t.string :name, null: true
-          end
-        end
+        stub_licensed_features(db_load_balancing: true)
         # Preloading testing class
         model.singleton_class.prepend ::Gitlab::Database::LoadBalancing::ActiveRecordProxy
 
@@ -446,9 +455,6 @@ RSpec.describe Gitlab::Database::LoadBalancing do
 
       after do
         subject.clear_configuration
-        ActiveRecord::Schema.define do
-          drop_table :load_balancing_test, force: true
-        end
       end
     end
 
@@ -518,17 +524,6 @@ RSpec.describe Gitlab::Database::LoadBalancing do
             model.find_by(name: 'test1')
           },
           true, [:primary, :primary, :primary, :primary, :primary]
-        ],
-
-        # Read-only transaction
-        [
-          -> {
-            model.transaction do
-              model.first
-              model.where(name: 'test1').to_a
-            end
-          },
-          true, [:primary, :primary, :primary, :primary]
         ],
 
         # Read-only transaction
