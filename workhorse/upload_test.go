@@ -118,17 +118,21 @@ func TestAcceleratedUpload(t *testing.T) {
 		{"POST", `/uploads/user`, true},
 		{"POST", `/api/v4/projects/1/wikis/attachments`, false},
 		{"POST", `/api/v4/projects/group%2Fproject/wikis/attachments`, false},
+		{"POST", `/api/v4/projects/group%2Fsubgroup%2Fproject/wikis/attachments`, false},
 		{"POST", `/api/graphql`, false},
 		{"PUT", "/api/v4/projects/9001/packages/nuget/v1/files", true},
 		{"PUT", "/api/v4/projects/group%2Fproject/packages/nuget/v1/files", true},
+		{"PUT", "/api/v4/projects/group%2Fsubgroup%2Fproject/packages/nuget/v1/files", true},
 		{"POST", `/api/v4/groups/import`, true},
 		{"POST", `/api/v4/projects/import`, true},
 		{"POST", `/import/gitlab_project`, true},
 		{"POST", `/import/gitlab_group`, true},
 		{"POST", `/api/v4/projects/9001/packages/pypi`, true},
 		{"POST", `/api/v4/projects/group%2Fproject/packages/pypi`, true},
+		{"POST", `/api/v4/projects/group%2Fsubgroup%2Fproject/packages/pypi`, true},
 		{"POST", `/api/v4/projects/9001/issues/30/metric_images`, true},
-		{"POST", `/api/v4/projects/project%2Fgroup/issues/30/metric_images`, true},
+		{"POST", `/api/v4/projects/group%2Fproject/issues/30/metric_images`, true},
+		{"POST", `/api/v4/projects/group%2Fsubgroup%2Fproject/issues/30/metric_images`, true},
 		{"POST", `/my/project/-/requirements_management/requirements/import_csv`, true},
 	}
 
@@ -196,6 +200,55 @@ func multipartBodyWithFile() (io.Reader, string, error) {
 	}
 	fmt.Fprint(file, "SHOULD BE ON DISK, NOT IN MULTIPART")
 	return result, writer.FormDataContentType(), writer.Close()
+}
+
+func unacceleratedUploadTestServer(t *testing.T) *httptest.Server {
+	return testhelper.TestServerWithHandler(regexp.MustCompile(`.`), func(w http.ResponseWriter, r *http.Request) {
+		require.False(t, strings.HasSuffix(r.URL.Path, "/authorize"))
+		require.Empty(t, r.Header.Get(upload.RewrittenFieldsHeader))
+
+		w.WriteHeader(200)
+	})
+}
+
+func TestUnacceleratedUploads(t *testing.T) {
+	tests := []struct {
+		method   string
+		resource string
+	}{
+		{"POST", `/api/v4/projects/group/subgroup/project/wikis/attachments`},
+		{"POST", `/api/v4/projects/group/project/wikis/attachments`},
+		{"PUT", "/api/v4/projects/group/subgroup/project/packages/nuget/v1/files"},
+		{"PUT", "/api/v4/projects/group/project/packages/nuget/v1/files"},
+		{"POST", `/api/v4/projects/group/subgroup/project/packages/pypi`},
+		{"POST", `/api/v4/projects/group/project/packages/pypi`},
+		{"POST", `/api/v4/projects/group/subgroup/project/packages/pypi`},
+		{"POST", `/api/v4/projects/group/project/issues/30/metric_images`},
+		{"POST", `/api/v4/projects/group/subgroup/project/issues/30/metric_images`},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.resource, func(t *testing.T) {
+			ts := unacceleratedUploadTestServer(t)
+
+			defer ts.Close()
+			ws := startWorkhorseServer(ts.URL)
+			defer ws.Close()
+
+			reqBody, contentType, err := multipartBodyWithFile()
+			require.NoError(t, err)
+
+			req, err := http.NewRequest(tt.method, ws.URL+tt.resource, reqBody)
+			require.NoError(t, err)
+
+			req.Header.Set("Content-Type", contentType)
+			resp, err := http.DefaultClient.Do(req)
+			require.NoError(t, err)
+			require.Equal(t, 200, resp.StatusCode)
+
+			resp.Body.Close()
+		})
+	}
 }
 
 func TestBlockingRewrittenFieldsHeader(t *testing.T) {
