@@ -74,11 +74,7 @@ export default {
       </span>
 
       <span v-if="showSkipped" data-testid="pipeline-skipped">
-        <gl-icon
-          name="status_skipped_borderless"
-          class="gl-vertical-align-baseline! gl-mr-2"
-          :size="12"
-        />
+        <gl-icon name="status_skipped_borderless" class="gl-mr-2" :size="16" />
         {{ s__('Pipeline|Skipped') }}
       </span>
 
