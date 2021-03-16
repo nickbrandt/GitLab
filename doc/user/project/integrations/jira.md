@@ -262,10 +262,10 @@ Issues are grouped into tabs based on their [Jira status](https://confluence.atl
 #### View a Jira issue
 
 > - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/299832) in [GitLab Premium](https://about.gitlab.com/pricing/) 13.10.
-> - It's [deployed behind a feature flag](../../feature_flags.md), enabled by default.
+> - It's [deployed behind a feature flag](../../feature_flags.md), disabled by default.
 > - It's enabled on GitLab.com.
 > - It's recommended for production use.
-> - For GitLab self-managed instances, GitLab administrators can opt to [disable it](#enable-or-disable-jira-issue-detail-view). **(PREMIUM)**
+> - For GitLab self-managed instances, GitLab administrators can opt to [enable it](#enable-or-disable-jira-issue-detail-view). **(PREMIUM)**
 
 WARNING:
 This feature might not be available to you. Check the **version history** note above for details.
@@ -327,9 +327,9 @@ and complete the CAPTCHA.
 ## Enable or disable Jira issue detail view
 
 Jira issue detail view is under development but ready for production use. It is
-deployed behind a feature flag that is **enabled by default**.
+deployed behind a feature flag that is **disabled by default**.
 [GitLab administrators with access to the GitLab Rails console](../../../administration/feature_flags.md)
-can disabled it.
+can enable it.
 
 To enable it:
 
