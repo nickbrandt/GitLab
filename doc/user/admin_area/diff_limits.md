@@ -11,17 +11,25 @@ You can set a maximum size for display of diff files (patches).
 
 For details about diff files, [view changes between files](../project/merge_requests/changes.md).
 
-## Maximum diff patch size
+## Changable Sizes
 
-Diff files which exceed this value are presented as 'too large' and cannot
+There are three different sizes that are manageable on an instance level:
+
+- Maximum diff patch size
+- Maximum diff files
+- Maximum diff lines
+
+Diff files which exceed the set values are presented as 'too large' and cannot
 be expandable. Instead of an expandable view, a link to the blob view is
 shown.
 
-Patches greater than 10% of this size are automatically collapsed, and a
+Patches greater than 10% of the set values are automatically collapsed, and a
 link to expand the diff is presented.
 This affects merge requests and branch comparison views.
 
-To set the maximum diff patch size:
+## Changing the settings
+
+To set the maximum sizes:
 
 1. Go to the Admin Area (**{admin}**) and select **Settings > General**.
 1. Expand **Diff limits**.
@@ -29,7 +37,7 @@ To set the maximum diff patch size:
 1. Select **Save changes**.
 
 WARNING:
-This setting is experimental. An increased maximum increases resource
+These settings are experimental. An increased maximum increases resource
 consumption of your instance. Keep this in mind when adjusting the maximum.
 
 <!-- ## Troubleshooting

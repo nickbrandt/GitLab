@@ -113,6 +113,8 @@ RSpec.describe API::Settings, 'Settings', :do_not_mock_admin_mode_setting do
             terms: 'Hello world!',
             performance_bar_allowed_group_path: group.full_path,
             diff_max_patch_bytes: 300_000,
+            diff_max_files: 2000,
+            diff_max_lines: 30000,
             default_branch_protection: ::Gitlab::Access::PROTECTION_DEV_CAN_MERGE,
             local_markdown_version: 3,
             allow_local_requests_from_web_hooks_and_services: true,

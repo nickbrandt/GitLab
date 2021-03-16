@@ -9544,6 +9544,8 @@ CREATE TABLE application_settings (
     kroki_formats jsonb DEFAULT '{}'::jsonb NOT NULL,
     in_product_marketing_emails_enabled boolean DEFAULT true NOT NULL,
     asset_proxy_whitelist text,
+    diff_max_files integer DEFAULT 1000,
+    diff_max_lines integer DEFAULT 50000,
     admin_mode boolean DEFAULT false NOT NULL,
     delayed_project_removal boolean DEFAULT false NOT NULL,
     lock_delayed_project_removal boolean DEFAULT false NOT NULL,
