@@ -54,11 +54,6 @@ export default {
     GlTooltip: GlTooltipDirective,
   },
   inject: ['projectPath', 'timezones'],
-  provide() {
-    return {
-      selectedTimezone: this.selectedTimezone,
-    };
-  },
   props: {
     schedule: {
       type: Object,
