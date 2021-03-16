@@ -15639,6 +15639,15 @@ CREATE SEQUENCE packages_events_id_seq
 
 ALTER SEQUENCE packages_events_id_seq OWNED BY packages_events.id;
 
+CREATE TABLE packages_helm_file_metadata (
+    created_at timestamp with time zone NOT NULL,
+    updated_at timestamp with time zone NOT NULL,
+    package_file_id bigint NOT NULL,
+    channel text NOT NULL,
+    metadata jsonb,
+    CONSTRAINT check_c34067922d CHECK ((char_length(channel) <= 63))
+);
+
 CREATE TABLE packages_maven_metadata (
     id bigint NOT NULL,
     package_id bigint NOT NULL,
@@ -21274,6 +21283,9 @@ ALTER TABLE ONLY packages_dependency_links
 ALTER TABLE ONLY packages_events
     ADD CONSTRAINT packages_events_pkey PRIMARY KEY (id);
 
+ALTER TABLE ONLY packages_helm_file_metadata
+    ADD CONSTRAINT packages_helm_file_metadata_pkey PRIMARY KEY (package_file_id);
+
 ALTER TABLE ONLY packages_maven_metadata
     ADD CONSTRAINT packages_maven_metadata_pkey PRIMARY KEY (id);
 
@@ -23608,6 +23620,8 @@ CREATE UNIQUE INDEX index_packages_dependencies_on_name_and_version_pattern ON p
 CREATE INDEX index_packages_dependency_links_on_dependency_id ON packages_dependency_links USING btree (dependency_id);
 
 CREATE INDEX index_packages_events_on_package_id ON packages_events USING btree (package_id);
+
+CREATE INDEX index_packages_helm_file_metadata_on_channel ON packages_helm_file_metadata USING btree (channel);
 
 CREATE INDEX index_packages_maven_metadata_on_package_id_and_path ON packages_maven_metadata USING btree (package_id, path);
 
@@ -26646,6 +26660,9 @@ ALTER TABLE ONLY fork_network_members
 
 ALTER TABLE ONLY operations_feature_flag_scopes
     ADD CONSTRAINT fk_rails_a50a04d0a4 FOREIGN KEY (feature_flag_id) REFERENCES operations_feature_flags(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY packages_helm_file_metadata
+    ADD CONSTRAINT fk_rails_a559865345 FOREIGN KEY (package_file_id) REFERENCES packages_package_files(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY cluster_projects
     ADD CONSTRAINT fk_rails_a5a958bca1 FOREIGN KEY (cluster_id) REFERENCES clusters(id) ON DELETE CASCADE;
