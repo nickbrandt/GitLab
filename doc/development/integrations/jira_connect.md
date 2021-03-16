@@ -29,6 +29,9 @@ The following are required to install and test the app:
 
 ## Install the app in Jira
 
+NOTE:
+If you make any changes to the app descriptor, you need to uninstall then reinstall the app.
+
 To install the app in Jira:
 
 1. Enable Jira development mode to install apps that are not from the Atlassian
@@ -55,8 +58,6 @@ To install the app in Jira:
    If the install was successful, you should see the **GitLab for Jira** app under **Manage apps**.
    You can also click **Getting Started** to open the configuration page rendered from your GitLab instance.
 
-   _Note that any changes to the app descriptor requires you to uninstall then reinstall the app._
-
 ### Troubleshooting
 
 If the app install failed, you might need to delete `jira_connect_installations` from your database.
@@ -66,13 +67,19 @@ If the app install failed, you might need to delete `jira_connect_installations`
 
 ## Add a namespace
 
+WARNING:
+Your browser needs to allow third-party cookies for the embedded iframe. In Firefox you can either disable tracking protection for the Jira site, or add an exception for your Gitpod site in the cookie settings. See [issue #284211](https://gitlab.com/gitlab-org/gitlab/-/issues/284211).
+
 To add a [namespace](../../user/group/index.md#namespaces) to Jira:
 
 1. Make sure you are logged in on your GitLab development instance.
 1. On the GitLab app page in Jira, click **Get started**.
 1. Open your browser's developer tools and navigate to the **Network** tab.
 1. Try to add the namespace in Jira.
-1. If the request fails with 401 "not authorized", copy the request as a cURL command
+
+If the request fails with 401 "not authorized", you can try this workaround:
+
+1. Copy the request as a cURL command
    and paste it in your terminal.
 
    ![Example Vulnerability](img/copy_curl.png)
