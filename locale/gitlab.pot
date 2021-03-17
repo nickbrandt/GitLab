@@ -17073,6 +17073,9 @@ msgstr ""
 msgid "Issue weight"
 msgstr ""
 
+msgid "Issue(s) already assigned"
+msgstr ""
+
 msgid "IssueAnalytics|Age"
 msgstr ""
 
@@ -20766,6 +20769,9 @@ msgid "No license. All rights reserved"
 msgstr ""
 
 msgid "No matches found"
+msgstr ""
+
+msgid "No matching issue found. Make sure that you are adding a valid issue URL."
 msgstr ""
 
 msgid "No matching labels"
