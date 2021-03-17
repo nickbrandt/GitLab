@@ -203,8 +203,8 @@ module Gitlab
         end
 
         def self.queue_retrieval_duration_seconds
-          strong_memoize(:queue_retrival_duration_seconds) do
-            name = :gitlab_ci_queue_retrival_duration_seconds
+          strong_memoize(:queue_retrieval_duration_seconds) do
+            name = :gitlab_ci_queue_retrieval_duration_seconds
             comment = 'Time it takes to execute a SQL query to retrieve builds queue'
             buckets = QUEUE_PROCESSING_DURATION_SECONDS_BUCKETS
             labels = {}
