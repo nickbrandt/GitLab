@@ -108,7 +108,8 @@ class ProjectPolicy < BasePolicy
   condition(:service_desk_enabled) { @subject.service_desk_enabled? }
 
   with_scope :subject
-  condition(:resource_access_token_available) { resource_access_token_available? }
+  condition(:resource_access_token_feature_available) { resource_access_token_feature_available? }
+  condition(:resource_access_token_creation_allowed) { resource_access_token_creation_allowed? }
 
   # We aren't checking `:read_issue` or `:read_merge_request` in this case
   # because it could be possible for a user to see an issuable-iid
@@ -632,15 +633,12 @@ class ProjectPolicy < BasePolicy
 
   rule { project_bot }.enable :project_bot_access
 
-  rule { can?(:admin_project) }.policy do
+  rule { can?(:admin_project) & resource_access_token_feature_available }.policy do
     enable :read_resource_access_tokens
-  end
-
-  rule { can?(:admin_project) }.policy do
     enable :destroy_resource_access_tokens
   end
 
-  rule { resource_access_token_available & can?(:read_resource_access_tokens) }.policy do
+  rule { can?(:read_resource_access_tokens) & resource_access_token_creation_allowed }.policy do
     enable :create_resource_access_tokens
   end
 
@@ -730,12 +728,16 @@ class ProjectPolicy < BasePolicy
     end
   end
 
-  def resource_access_token_available?
+  def resource_access_token_feature_available?
+    true
+  end
+
+  def resource_access_token_creation_allowed?
     group = project.group
 
     return true unless group # always enable for projects in personal namespaces
 
-    group.root_ancestor.resource_access_token_creation_allowed?
+    group.resource_access_token_creation_allowed
   end
 
   def project

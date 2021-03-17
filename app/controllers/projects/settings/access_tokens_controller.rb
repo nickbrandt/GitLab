@@ -6,7 +6,9 @@ module Projects
       include ProjectsHelper
 
       layout 'project_settings'
-      before_action :check_feature_availability
+      before_action :check_read, only: [:index]
+      before_action :check_destroy, only: [:revoke]
+      before_action :check_create, only: [:create]
 
       feature_category :authentication_and_authorization
 
@@ -43,8 +45,16 @@ module Projects
 
       private
 
-      def check_feature_availability
-        render_404 unless project_access_token_available?(@project)
+      def check_read
+        render_404 unless can?(current_user, :read_resource_access_tokens, @project)
+      end
+
+      def check_destroy
+        render_404 unless can?(current_user, :destroy_resource_access_tokens, @project)
+      end
+
+      def check_create
+        render_404 unless can?(current_user, :create_resource_access_tokens, @project)
       end
 
       def create_params
