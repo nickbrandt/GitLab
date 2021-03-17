@@ -47,68 +47,6 @@ RSpec.describe Users::ProjectAuthorizations::FindRecordsDueForRefreshService do
       end
     end
 
-    context 'logging' do
-      let(:source) { :foo }
-      let(:service) { described_class.new(user, source: :foo, log_details_of_find: log_details_of_find) }
-
-      context 'when logging is turned on' do
-        let(:log_details_of_find) { true }
-
-        context 'when at least 1 entry needs to be refreshed' do
-          before do
-            user.project_authorizations.delete_all
-          end
-
-          it 'logs the entries that needs to be added or removed' do
-            project2 = create(:project)
-            user.project_authorizations
-              .create!(project: project2, access_level: Gitlab::Access::MAINTAINER)
-
-            expect(Gitlab::AppJsonLogger).to(
-              receive(:info)
-                .with(event: 'authorized_projects_due_for_refresh',
-                      user_id: user.id,
-                      'authorized_projects_due_for_refresh.source': source,
-                      'authorized_projects_due_for_refresh.rows_deleted_count': 1,
-                      'authorized_projects_due_for_refresh.rows_added_count': 1,
-                      'authorized_projects_due_for_refresh.rows_deleted_slice': [project2.id],
-                      'authorized_projects_due_for_refresh.rows_added_slice': [[user.id, project.id, Gitlab::Access::MAINTAINER]])
-            )
-
-            service.execute
-          end
-        end
-
-        context 'when no entries needs to be refreshed' do
-          it 'does not log anything' do
-            expect(Gitlab::AppJsonLogger).not_to receive(:info)
-
-            service.execute
-          end
-        end
-      end
-
-      context 'when logging is turned off' do
-        let(:log_details_of_find) { false }
-
-        context 'when at least 1 entry needs to be refreshed' do
-          before do
-            user.project_authorizations.delete_all
-          end
-
-          it 'does not log anything' do
-            project2 = create(:project)
-            user.project_authorizations
-              .create!(project: project2, access_level: Gitlab::Access::MAINTAINER)
-
-            expect(Gitlab::AppJsonLogger).not_to receive(:info)
-
-            service.execute
-          end
-        end
-      end
-    end
-
     context 'finding project authorizations due for refresh' do
       context 'when there are changes to be made' do
         before do

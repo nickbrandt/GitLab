@@ -50,8 +50,7 @@ module Users
         user,
         source: source,
         incorrect_auth_found_callback: incorrect_auth_found_callback,
-        missing_auth_found_callback: missing_auth_found_callback,
-        log_details_of_find: false
+        missing_auth_found_callback: missing_auth_found_callback
       ).execute
 
       update_authorizations(remove, add)

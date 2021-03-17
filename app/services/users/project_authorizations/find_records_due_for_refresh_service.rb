@@ -10,12 +10,11 @@ module Users
     #     service = Users::ProjectAuthorizations::FindRecordsDueForRefreshService.new(some_user)
     #     service.execute
     class FindRecordsDueForRefreshService
-      def initialize(user, source: nil, incorrect_auth_found_callback: nil, missing_auth_found_callback: nil, log_details_of_find: true)
+      def initialize(user, source: nil, incorrect_auth_found_callback: nil, missing_auth_found_callback: nil)
         @user = user
         @source = source
         @incorrect_auth_found_callback = incorrect_auth_found_callback
         @missing_auth_found_callback = missing_auth_found_callback
-        @log_details_of_find = log_details_of_find
 
         # We need an up to date User object that has access to all relations that
         # may have been created earlier. The only way to ensure this is to reload
@@ -58,8 +57,6 @@ module Users
           end
         end
 
-        log_details(remove, add)
-
         [remove, add]
       end
 
@@ -83,36 +80,13 @@ module Users
 
       private
 
-      attr_reader :user, :source, :incorrect_auth_found_callback, :missing_auth_found_callback, :log_details_of_find
+      attr_reader :user, :source, :incorrect_auth_found_callback, :missing_auth_found_callback
 
       def projects_with_duplicates
         @projects_with_duplicates ||= current_authorizations
                                         .group_by(&:project_id)
                                         .select { |project_id, authorizations| authorizations.count > 1 }
                                         .keys
-      end
-
-      def log_details(remove, add)
-        return unless should_be_logged?
-        return unless any_detail_present_for_logging?(remove, add)
-
-        Gitlab::AppJsonLogger.info(event: 'authorized_projects_due_for_refresh',
-                                   user_id: user.id,
-                                   'authorized_projects_due_for_refresh.source': source,
-                                   'authorized_projects_due_for_refresh.rows_deleted_count': remove.length,
-                                   'authorized_projects_due_for_refresh.rows_added_count': add.length,
-                                   # most often there's only a few entries in remove and add, but limit it to the first 5
-                                   # entries to avoid flooding the logs
-                                   'authorized_projects_due_for_refresh.rows_deleted_slice': remove.first(5),
-                                   'authorized_projects_due_for_refresh.rows_added_slice': add.first(5))
-      end
-
-      def should_be_logged?
-        log_details_of_find
-      end
-
-      def any_detail_present_for_logging?(remove, add)
-        remove.present? || add.present?
       end
     end
   end
