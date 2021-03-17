@@ -9,8 +9,7 @@ describe('MR Notes Mutations', () => {
 
       mutations[mutationTypes.SET_ENDPOINTS](state, endpoints);
 
-      expect(state.endpoints.endpointA).toBe('A');
-      expect(state.endpoints.endpointB).toBe('B');
+      expect(state.endpoints).toEqual(endpoints);
     });
   });
 });
