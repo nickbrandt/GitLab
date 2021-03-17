@@ -3,8 +3,6 @@
 require 'generator_helper'
 
 RSpec.describe Gitlab::UsageMetricDefinitionGenerator do
-  include UsageDataHelpers
-
   let(:key_path) { 'counts_weekly.test_metric' }
   let(:dir) { '7d' }
   let(:temp_dir) { Dir.mktmpdir }
@@ -74,10 +72,6 @@ RSpec.describe Gitlab::UsageMetricDefinitionGenerator do
   end
 
   describe 'Name suggestions' do
-    before do
-      stub_usage_data_connections
-    end
-
     context 'with product_intelligence_metrics_names_suggestions feature ON' do
       it 'adds name key to metric definition' do
         stub_feature_flags(product_intelligence_metrics_names_suggestions: true)
