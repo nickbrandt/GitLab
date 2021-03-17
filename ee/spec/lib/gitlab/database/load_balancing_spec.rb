@@ -583,6 +583,29 @@ RSpec.describe Gitlab::Database::LoadBalancing do
           false, [:replica, :replica]
         ],
 
+        # A custom read query inside use_replica_if_possible
+        [
+          -> {
+            ::Gitlab::Database::LoadBalancing::Session.current.use_replica_if_possible do
+              model.connection.exec_query("SELECT 1")
+            end
+          },
+          false, [:replica]
+        ],
+
+        # A custom read query inside a transaction use_replica_if_possible
+        [
+          -> {
+            ::Gitlab::Database::LoadBalancing::Session.current.use_replica_if_possible do
+              model.transaction do
+                model.connection.exec_query("SET LOCAL statement_timeout = 5000")
+                model.count
+              end
+            end
+          },
+          true, [:replica, :replica, :replica, :replica]
+        ],
+
         # use_replica_if_possible after a write
         [
           -> {

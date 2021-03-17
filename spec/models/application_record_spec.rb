@@ -120,7 +120,7 @@ RSpec.describe ApplicationRecord do
     # other way to test the timeout for sure, 10ms of waiting seems to be
     # reasonable!
     context 'when the query runs longer than configured timeout' do
-      it 'cancels the query and raiss an exception' do
+      it 'cancels the query and raises an exception' do
         expect do
           described_class.with_fast_read_statement_timeout(10) do
             described_class.connection.exec_query('SELECT pg_sleep(0.1)')
