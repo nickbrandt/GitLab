@@ -6,7 +6,9 @@ module EE
       extend ActiveSupport::Concern
 
       def tick_runner_queue
-        ::Gitlab::Database::LoadBalancing::Sticking.stick(:runner, id)
+        unless Feature.enabled?(:ci_runner_builds_queue_on_replicas, runner, default_enabled: :yaml)
+          ::Gitlab::Database::LoadBalancing::Sticking.stick(:runner, id)
+        end
 
         super
       end
