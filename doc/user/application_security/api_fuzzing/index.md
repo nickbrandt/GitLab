@@ -220,11 +220,12 @@ uses them to perform testing.
 
 You can use various tools to generate HAR files:
 
-- [Fiddler](https://www.telerik.com/fiddler): Web debugging proxy
-- [Insomnia Core](https://insomnia.rest/): API client
-- [Chrome](https://www.google.com/chrome/): Browser
-- [Firefox](https://www.mozilla.org/en-US/firefox/): Browser
-- [GitLab HAR Recorder](https://gitlab.com/gitlab-org/security-products/har-recorder): Command line
+- [Fiddler](https://www.telerik.com/fiddler): Web debugging proxy. Checkout [how to create HAR files with Fiddler](create_har_files.md#fiddler-debugging-proxy).
+- [Insomnia Core](https://insomnia.rest/): API client. Checkout [how to create HAR files with Insomnia](create_har_files.md#insomnia-api-client).
+- [Chrome](https://www.google.com/chrome/): Browser. Checkout [how to create HAR files with Chrome](create_har_files.md#chrome).
+- [Firefox](https://www.mozilla.org/en-US/firefox/): Browser. Checkout [how to create HAR files with Firefox](create_har_files.md#firefox).
+- [Safari](https://www.apple.com/safari/): Browser. Checkout [how to create HAR files with Firefox](create_har_files.md#)safari.
+- [GitLab HAR Recorder](https://gitlab.com/gitlab-org/security-products/har-recorder): Command line. Checkout [how to create HAR files with GitLab HAR Recorder](create_har_files.md#gitLab-har-recorder).
 
 WARNING:
 HAR files may contain sensitive information such as authentication tokens, API keys, and session

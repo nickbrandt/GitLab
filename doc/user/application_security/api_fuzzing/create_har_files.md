@@ -16,6 +16,7 @@ HAR files may contain sensitive information such as authentication tokens, API k
 1. [Insomnia API Client](#insomnia-api-client)
 1. [Safari](#safari)
 1. [Chrome](#chrome)
+1. [Firefox](#firefox)
 1. [Fiddler debugging proxy](#fiddler-debugging-proxy)
 
 ### GitLab HAR Recorder
@@ -89,7 +90,7 @@ Safari will require you to enable `Develop menu` before being able to export HAR
 1. Right click Inspect.
 ![Chrome Inspect Menu Item](img/chrome_inspector_menu_highlighted.png)
 
-1. Network tab.
+1. Select Network tab.
 ![Chrome DevTools Network](img/chrome_network_tab_highlighted.png)
 
 1. Check `Preserve log`.
@@ -102,6 +103,27 @@ Safari will require you to enable `Develop menu` before being able to export HAR
 
 1. Profile filename and hit `Save`.
 ![Chrome Save dialog](img/chrome_save_requests_har_dialog.png)
+
+1. Repeat using same filename to append additional requests.
+
+### Firefox
+
+1. Right click Inspect.
+![Firefox Inspect Menu Item](img/firefox_inspector_menu_highlighed.png)
+
+1. Select Network tab.
+![Firefox DevTools Network](img/firefox_network_tab_highlighted.png)
+
+1. Browse a page that calls API.
+1. Check the Network tab and check if it is recording requests. If there is a message `Perform a request or Reload the page to see detailed information about network activity`, then click on `Reload` button to start recording requests.
+![Firefox DevTools Network Reload](img/firefox_network_tab_reload_highlighted.png)
+
+1. Select one or more requests.
+1. Right click `Save All As HAR`.
+![Firefox DevTools Save All As HAR](img/firefox_save_requests_har.png)
+
+1. Profile filename and hit `Save`.
+![Firefox Save dialog](img/firefox_save_requests_har_dialog.png)
 
 1. Repeat using same filename to append additional requests.
 
