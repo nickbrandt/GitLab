@@ -129,7 +129,7 @@ Safari will require you to enable `Develop menu` before being able to export HAR
 
 ### Fiddler debugging proxy
 
-1. Star Fiddler (latest version of Fiddler will require to create an account).
+1. Star Fiddler (latest version of Fiddler will require you to create a free account).
 ![Fiddler Choose Format](img/fiddler_login.png)
 
 1. Browse pages that call API. Fiddler automatically will capture requests.
