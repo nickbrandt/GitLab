@@ -110,7 +110,7 @@ module Ci
       end
 
       if Feature.enabled?(:ci_register_job_service_one_by_one, runner, default_enabled: true)
-        build_ids = builds.pluck(:id)
+        build_ids = process_queue(-> { builds.pluck(:id) })
 
         @metrics.observe_queue_size(-> { build_ids.size })
 
@@ -118,12 +118,18 @@ module Ci
           yield Ci::Build.find(build_id)
         end
       else
-        @metrics.observe_queue_size(-> { builds.to_a.size })
+        builds = process_queue(-> { builds.to_a })
+
+        @metrics.observe_queue_size(-> { builds.size })
 
         builds.each(&blk)
       end
     end
     # rubocop: enable CodeReuse/ActiveRecord
+
+    def process_queue(queue_query_proc)
+      queue_query_proc.call
+    end
 
     def process_build(build, params)
       unless build.pending?
