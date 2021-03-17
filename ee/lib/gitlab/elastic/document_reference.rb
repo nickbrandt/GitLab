@@ -112,7 +112,6 @@ module Gitlab
         klass.to_s
       end
 
-      # TODO: return a promise for batch loading: https://gitlab.com/gitlab-org/gitlab/issues/207280
       def database_record
         strong_memoize(:database_record) { klass.find_by_id(db_id) }
       end
