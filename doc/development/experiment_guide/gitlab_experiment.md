@@ -501,6 +501,64 @@ Any experiment that's been run in the request lifecycle surfaces in `window.gon.
 and matches [this schema](https://gitlab.com/gitlab-org/iglu/-/blob/master/public/schemas/com.gitlab/gitlab_experiment/jsonschema/1-0-0)
 so you can use it when resolving some concepts around experimentation in the client layer.
 
+### Using experiments in Vue
+
+With the `experiment` component, you can define slots that match the name of the variants pushed to `window.gon.experiment`. For example an experiment with the default variants `control` and `candidate` could be implemented the following:
+
+```ruby
+def show
+  experiment(:button_color) do |e|
+    e.use { } # control
+    e.try { } # candidate
+  end.run
+end
+```
+
+```vue
+<script>
+import Experiment from '~/experimentation/components/experiment.vue';
+
+export default {
+  components: { Experiment }
+}
+</script>
+
+<template>
+  <experiment name="button_name">
+    <template #control>
+      <button>Click me</button>
+    </template>
+
+    <template #candidate>
+      <button>You will not believe what happens when you click this button</button>
+    </template>
+  </experiment>
+</template>
+```
+
+When using a multivariate experiment, the names of the variant names can be used, e.g. with the `pill_color` experiment from before, the Vue component would look like this:
+
+```vue
+<template>
+  <experiment name="pill_color">
+    <template #control>
+      <button class="bg-default">Click default button</button>
+    </template>
+
+    <template #red>
+      <button class="bg-red">Click red button</button>
+    </template>
+
+    <template #blue>
+      <button class="bg-blue">Click blue button</button>
+    </template>
+  </experiment>
+</template>
+```
+
+NOTE:
+When there is no experiment defined in the frontend via `experiment(:experiment_name)`, then `control` will be rendered if it exists.
+
 ## Notes on feature flags
 
 NOTE:
