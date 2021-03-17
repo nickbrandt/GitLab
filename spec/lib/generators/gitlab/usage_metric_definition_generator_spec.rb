@@ -3,6 +3,8 @@
 require 'generator_helper'
 
 RSpec.describe Gitlab::UsageMetricDefinitionGenerator do
+  include UsageDataHelpers
+
   let(:key_path) { 'counts_weekly.test_metric' }
   let(:dir) { '7d' }
   let(:temp_dir) { Dir.mktmpdir }
@@ -26,12 +28,38 @@ RSpec.describe Gitlab::UsageMetricDefinitionGenerator do
   end
 
   describe 'Creating metric definition file' do
-    it 'creates a metric definition file with correct key_path' do
-      described_class.new([key_path], { 'dir' => dir }).invoke_all
+    let(:sample_metric) { load_sample_metric_definition }
 
-      metric_definition_path = Dir.glob(File.join(temp_dir, 'metrics/counts_7d/*_test_metric.yml')).first
+    # Stub version so that `milestone` key remains constant between releases to prevent flakiness.
+    before do
+      stub_const('Gitlab::VERSION', '13.9.0')
+      allow(::Gitlab::Usage::Metrics::NamesSuggestions::Generator).to receive(:generate).and_return('test metric name')
+    end
 
-      expect(YAML.safe_load(File.read(metric_definition_path))).to include("key_path" => key_path)
+    context 'with product_intelligence_metrics_names_suggestions feature ON' do
+      let(:sample_metric) { load_sample_metric_definition(filename: 'sample_metric_with_name_suggestions.yml') }
+
+      it 'creates a metric definition file using the template' do
+        stub_feature_flags(product_intelligence_metrics_names_suggestions: true)
+
+        described_class.new([key_path], { 'dir' => dir }).invoke_all
+
+        metric_definition_path = Dir.glob(File.join(temp_dir, 'metrics/counts_7d/*_test_metric.yml')).first
+
+        expect(YAML.safe_load(File.read(metric_definition_path))).to eq(sample_metric)
+      end
+    end
+
+    context 'with product_intelligence_metrics_names_suggestions feature OFF' do
+      it 'creates a metric definition file using the template' do
+        stub_feature_flags(product_intelligence_metrics_names_suggestions: false)
+
+        described_class.new([key_path], { 'dir' => dir }).invoke_all
+
+        metric_definition_path = Dir.glob(File.join(temp_dir, 'metrics/counts_7d/*_test_metric.yml')).first
+
+        expect(YAML.safe_load(File.read(metric_definition_path))).to eq(sample_metric)
+      end
     end
   end
 
