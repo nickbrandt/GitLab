@@ -6,9 +6,13 @@ module EE
       extend ActiveSupport::Concern
 
       def tick_runner_queue
-        unless Feature.enabled?(:ci_runner_builds_queue_on_replicas, runner, default_enabled: :yaml)
-          ::Gitlab::Database::LoadBalancing::Sticking.stick(:runner, id)
-        end
+        ##
+        # We only stick a runner to primary database to be able to detect the
+        # replication lag in `EE::Ci::RegisterJobService#execute`. The
+        # intention here is not execute `Ci::RegisterJobService#execute` on the
+        # primary database.
+        #
+        ::Gitlab::Database::LoadBalancing::Sticking.stick(:runner, id)
 
         super
       end
