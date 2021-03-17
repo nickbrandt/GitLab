@@ -24,7 +24,7 @@ class GroupsController < Groups::ApplicationController
   # Authorize
   before_action :authorize_admin_group!, only: [:edit, :update, :destroy, :projects, :transfer, :export, :download_export]
   before_action :authorize_create_group!, only: [:new]
-  before_action :load_recaptcha, only: [:new, :create], if: -> { captcha_required? }
+  before_action :load_recaptcha, only: [:new], if: -> { captcha_required? }
 
   before_action :group_projects, only: [:projects, :activity, :issues, :merge_requests]
   before_action :event_filter, only: [:activity]
@@ -330,6 +330,8 @@ class GroupsController < Groups::ApplicationController
 
   def check_captcha
     return if group_params[:parent_id].present? # Only require for top-level groups
+
+    load_recaptcha
 
     return if verify_recaptcha
 
