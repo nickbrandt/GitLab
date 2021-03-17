@@ -617,6 +617,13 @@ entry.
 - Apply new GitLab UI for buttons in pipeline schedules.
 
 
+## 13.8.6 (2021-03-17)
+
+### Security (1 change)
+
+- Patch Kramdown syntax highlighter gem.
+
+
 ## 13.8.5 (2021-03-04)
 
 ### Security (6 changes)
