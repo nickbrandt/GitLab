@@ -17,6 +17,17 @@ module EE
         super
       end
 
+      def heartbeat(values)
+        return super unless ::Feature.enabled?(:ci_runner_builds_queue_on_replicas, self, default_enabled: :yaml)
+
+        ##
+        # We can safely ignore writes performed by a runner heartbeat. We do
+        # not want to upgrade database connection proxy to use the primary
+        # database after heartbeat write happens.
+        #
+        ::Gitlab::Database::LoadBalancing::Session.without_sticky_writes { super }
+      end
+
       def minutes_cost_factor(access_level)
         return 0.0 unless instance_type?
 
