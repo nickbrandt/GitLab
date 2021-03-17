@@ -1036,6 +1036,13 @@ entry.
 - Add verbiage + link sast to show it's in core. !51935
 
 
+## 13.7.9 (2021-03-17)
+
+### Security (1 change)
+
+- Patch Kramdown syntax highlighter gem.
+
+
 ## 13.7.8 (2021-03-04)
 
 ### Security (5 changes)
