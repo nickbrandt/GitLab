@@ -187,7 +187,7 @@ export default {
     >
       <gl-sprintf :message="$options.autodevopsNoticeDescription">
         <template #monospaced="{ content }">
-          <span class="monospace">{{ content }}</span>
+          <span class="gl-font-monospace">{{ content }}</span>
         </template>
         <template #link="{ content }">
           <gl-link :href="documentationFullPath">{{ content }}</gl-link>

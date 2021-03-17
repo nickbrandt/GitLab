@@ -1,9 +1,10 @@
 <script>
 import { GlFormCheckbox, GlFormGroup, GlSearchBoxByType } from '@gitlab/ui';
 import { s__ } from '~/locale';
-import { DEFAULT_FILTERS } from './constants';
+import { DEBOUNCE, DEFAULT_FILTERS } from './constants';
 
 export default {
+  DEBOUNCE,
   DEFAULT_DISMISSED_FILTER: true,
   components: { GlFormCheckbox, GlFormGroup, GlSearchBoxByType },
   props: {
@@ -46,7 +47,7 @@ export default {
     <div>
       <h5 class="gl-mt-0">{{ $options.i18n.POLICY_NAME_FILTER_TITLE }}</h5>
       <gl-search-box-by-type
-        debounce="250"
+        :debounce="$options.DEBOUNCE"
         :placeholder="$options.i18n.POLICY_NAME_FILTER_PLACEHOLDER"
         @input="handleSearch"
       />

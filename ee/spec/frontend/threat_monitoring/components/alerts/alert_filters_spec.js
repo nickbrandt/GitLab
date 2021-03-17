@@ -31,12 +31,12 @@ describe('AlertFilters component', () => {
       });
 
       it('does emit an event with a user-defined string', async () => {
-        const term = 'abc';
+        const searchTerm = 'abc';
         const search = findGlSearch();
-        search.vm.$emit('input', term);
+        search.vm.$emit('input', searchTerm);
         await wrapper.vm.$nextTick();
         expect(wrapper.emitted('filter-change')).toStrictEqual([
-          [{ ...DEFAULT_FILTERS, searchTerm: 'abc' }],
+          [{ ...DEFAULT_FILTERS, searchTerm }],
         ]);
       });
     });
