@@ -57,7 +57,7 @@ const (
 	ciAPIPattern         = `^/ci/api/`
 	gitProjectPattern    = `^/.+\.git/`
 	projectPattern       = `^/([^/]+/){1,}[^/]+/`
-	apiProjectPattern    = apiPattern + `v4/projects/([^/]+){1,}/` // API: Projects can be encoded via group%2Fsubgroup%2Fproject
+	apiProjectPattern    = apiPattern + `v4/projects/[^/]+/` // API: Projects can be encoded via group%2Fsubgroup%2Fproject
 	snippetUploadPattern = `^/uploads/personal_snippet`
 	userUploadPattern    = `^/uploads/user`
 	importPattern        = `^/import/`
