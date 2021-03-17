@@ -157,7 +157,6 @@ module BillingPlansHelper
 
   def billable_seats_href(namespace)
     return unless namespace.group?
-    return if namespace.actual_plan_name == Plan::FREE || namespace.trial_active?
 
     group_seat_usage_path(namespace)
   end
