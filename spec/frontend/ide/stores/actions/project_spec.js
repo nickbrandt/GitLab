@@ -2,7 +2,7 @@ import MockAdapter from 'axios-mock-adapter';
 import { useMockLocationHelper } from 'helpers/mock_window_location_helper';
 import testAction from 'helpers/vuex_action_helper';
 import api from '~/api';
-import { deprecatedCreateFlash as createFlash } from '~/flash';
+import createFlash from '~/flash';
 import service from '~/ide/services';
 import { query } from '~/ide/services/gql';
 import { createStore } from '~/ide/stores';
@@ -377,8 +377,8 @@ describe('IDE store project actions', () => {
         .then(() => {
           expect(store.dispatch.mock.calls).toEqual([
             ['getBranchData', { projectId, branchId }],
-            ['getMergeRequestsForBranch', { projectId, branchId }],
             ['getFiles', { projectId, branchId, ref }],
+            ['getMergeRequestsForBranch', { projectId, branchId }],
           ]);
         })
         .then(done)
