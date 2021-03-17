@@ -39,6 +39,7 @@ export const initTrialStatusPopover = () => {
 
   const {
     containerId,
+    daysRemaining,
     groupName,
     planName,
     plansHref,
@@ -53,6 +54,7 @@ export const initTrialStatusPopover = () => {
       createElement(TrialStatusPopover, {
         props: {
           containerId,
+          daysRemaining: Number(daysRemaining),
           groupName,
           planName,
           plansHref,
