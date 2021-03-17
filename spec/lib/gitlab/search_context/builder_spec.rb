@@ -144,7 +144,7 @@ RSpec.describe Gitlab::SearchContext::Builder, type: :controller do
           let(:action_name) { 'issues' }
 
           it 'search context returns issues scope' do
-            expect(subject.scope).to be(action_name)
+            expect(subject.scope).to be('issues')
           end
         end
 
@@ -152,7 +152,7 @@ RSpec.describe Gitlab::SearchContext::Builder, type: :controller do
           let(:action_name) { 'merge_requests' }
 
           it 'search context returns issues scope' do
-            expect(subject.scope).to be(action_name)
+            expect(subject.scope).to be('merge_requests')
           end
         end
       end
