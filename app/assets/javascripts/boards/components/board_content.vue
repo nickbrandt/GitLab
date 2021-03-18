@@ -19,6 +19,8 @@ export default {
         : BoardColumnDeprecated,
     BoardContentSidebar: () => import('~/boards/components/board_content_sidebar.vue'),
     EpicsSwimlanes: () => import('ee_component/boards/components/epics_swimlanes.vue'),
+    SwimlanesLoadingSkeleton: () =>
+      import('ee_component/boards/components/swimlanes_loading_skeleton.vue'),
     GlAlert,
   },
   mixins: [glFeatureFlagMixin()],
@@ -38,7 +40,7 @@ export default {
     },
   },
   computed: {
-    ...mapState(['boardLists', 'error', 'addColumnForm']),
+    ...mapState(['boardLists', 'error', 'addColumnForm', 'epicsSwimlanesFetchInProgress']),
     ...mapGetters(['isSwimlanesOn', 'isEpicBoard']),
     addColumnFormVisible() {
       return this.addColumnForm?.visible;
@@ -127,12 +129,14 @@ export default {
     </component>
 
     <epics-swimlanes
-      v-else
+      v-else-if="boardListsToUse.length > 0"
       ref="swimlanes"
       :lists="boardListsToUse"
       :can-admin-list="canAdminList"
       :disabled="disabled"
     />
+
+    <swimlanes-loading-skeleton v-else-if="epicsSwimlanesFetchInProgress" />
 
     <board-content-sidebar
       v-if="isSwimlanesOn || glFeatures.graphqlBoardLists"

@@ -100,7 +100,7 @@ export default {
     },
   },
   mounted() {
-    this.fetchIssuesForEpic(this.epic.id);
+    // this.fetchIssuesForEpic(this.epic.id);
   },
   methods: {
     ...mapActions(['fetchIssuesForEpic', 'updateBoardEpicUserPreferences']),

@@ -78,6 +78,11 @@ export default {
       );
     },
   },
+  mounted() {
+    this.lists.forEach((list) => {
+      this.fetchItemsForList({ listId: list.id });
+    });
+  },
   methods: {
     ...mapActions(['moveList', 'fetchItemsForList']),
     handleDragOnEnd(params) {
