@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'fast_spec_helper'
+require 'spec_helper'
 
 RSpec.describe Gitlab::Graphql::Docs::Renderer do
   describe '#contents' do
@@ -14,6 +14,7 @@ RSpec.describe Gitlab::Graphql::Docs::Renderer do
 
     let(:template) { Rails.root.join('lib/gitlab/graphql/docs/templates/default.md.haml') }
     let(:field_description) { 'List of objects.' }
+    let(:type) { ::GraphQL::INT_TYPE }
 
     let(:query_type) do
       Class.new(Types::BaseObject) { graphql_name 'Query' }.tap do |t|
@@ -21,6 +22,13 @@ RSpec.describe Gitlab::Graphql::Docs::Renderer do
         t.field :foo, type, null: true, description: field_description do
           argument :id, GraphQL::ID_TYPE, required: false, description: 'ID of the object.'
         end
+      end
+    end
+
+    let(:mutation_root) do
+      Class.new(::Types::BaseObject) do
+        include ::Gitlab::Graphql::MountMutation
+        graphql_name 'Mutation'
       end
     end
 
@@ -34,6 +42,7 @@ RSpec.describe Gitlab::Graphql::Docs::Renderer do
 
     subject(:contents) do
       mock_schema.query(query_type)
+      mock_schema.mutation(mutation_root) if mutation_root.fields.any?
 
       described_class.new(
         mock_schema,
@@ -43,8 +52,6 @@ RSpec.describe Gitlab::Graphql::Docs::Renderer do
     end
 
     describe 'headings' do
-      let(:type) { ::GraphQL::INT_TYPE }
-
       it 'contains the expected sections' do
         expect(contents.lines.map(&:chomp)).to include(
           '## `Query` type',
@@ -56,7 +63,7 @@ RSpec.describe Gitlab::Graphql::Docs::Renderer do
           '## Abstract types',
           '### Unions',
           '### Interfaces',
-          '### Input types'
+          '## Input types'
         )
       end
     end
@@ -317,6 +324,97 @@ RSpec.describe Gitlab::Graphql::Docs::Renderer do
 
         it_behaves_like 'renders correctly as GraphQL documentation'
       end
+    end
+
+    context 'when there is a mutation' do
+      let(:mutation) do
+        mutation = Class.new(::Mutations::BaseMutation)
+
+        mutation.graphql_name 'MakeItPretty'
+        mutation.description 'Make everything very pretty.'
+
+        mutation.argument :prettiness_factor,
+                          type: GraphQL::FLOAT_TYPE,
+                          required: true,
+                          description: 'How much prettier?'
+
+        mutation.field :everything,
+                       type: GraphQL::STRING_TYPE,
+                       null: true,
+                       description: 'What we made prettier.'
+
+        mutation
+      end
+
+      before do
+        mutation_root.mount_mutation mutation
+      end
+
+      it_behaves_like 'renders correctly as GraphQL documentation' do
+        let(:section) do
+          <<~DOC
+            ### `Mutation.makeItPretty`
+
+            Make everything very pretty.
+
+            Input type: `MakeItPrettyInput`.
+
+            #### arguments
+
+            | Name | Type | Description |
+            | ---- | ---- | ----------- |
+            | <a id="mutationmakeitprettyclientmutationid"></a>`clientMutationId` | [`String`](#string) | A unique identifier for the client performing the mutation. |
+            | <a id="mutationmakeitprettyprettinessfactor"></a>`prettinessFactor` | [`Float!`](#float) | How much prettier?. |
+
+            #### fields
+
+            | Name | Type | Description |
+            | ---- | ---- | ----------- |
+            | <a id="mutationmakeitprettyclientmutationid"></a>`clientMutationId` | [`String`](#string) | A unique identifier for the client performing the mutation. |
+            | <a id="mutationmakeitprettyerrors"></a>`errors` | [`[String!]!`](#string) | Errors encountered during execution of the mutation. |
+            | <a id="mutationmakeitprettyeverything"></a>`everything` | [`String`](#string) | What we made prettier. |
+          DOC
+        end
+      end
+
+      it 'does not render the automatically generated payload type' do
+        expect(contents).not_to include('MakeItPrettyPayload')
+      end
+
+      it 'does not render the automatically generated input type as its own section' do
+        expect(contents).not_to include('# `MakeItPrettyInput`')
+      end
+    end
+
+    context 'when there is an input type' do
+      let(:type) do
+        Class.new(::Types::BaseObject) do
+          graphql_name 'Foo'
+          field :wibble, type: ::GraphQL::INT_TYPE, null: true do
+            argument :date_range,
+                     type: ::Types::TimeframeInputType,
+                     required: true,
+                     description: 'When the foo happened.'
+          end
+        end
+      end
+
+      let(:section) do
+        <<~DOC
+          ### `Timeframe`
+
+          A time-frame defined as a closed inclusive range of two dates.
+
+          #### arguments
+
+          | Name | Type | Description |
+          | ---- | ---- | ----------- |
+          | <a id="timeframeend"></a>`end` | [`Date!`](#date) | The end of the range. |
+          | <a id="timeframestart"></a>`start` | [`Date!`](#date) | The start of the range. |
+        DOC
+      end
+
+      it_behaves_like 'renders correctly as GraphQL documentation'
     end
 
     context 'when there is an interface and a union' do

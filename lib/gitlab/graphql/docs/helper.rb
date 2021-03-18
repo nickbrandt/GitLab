@@ -28,6 +28,7 @@ module Gitlab
       # You can check the included module on: https://github.com/gjtorikian/graphql-docs/blob/v1.6.0/lib/graphql-docs/helpers.rb
       module Helper
         include GraphQLDocs::Helpers
+        include Gitlab::Utils::StrongMemoize
 
         def auto_generated_comment
           <<-MD.strip_heredoc
@@ -58,7 +59,8 @@ module Gitlab
             render_return_type(field),
             render_input_type(field),
             render_connection_note(field),
-            render_argument_table(heading_level, args, arg_owner)
+            render_argument_table(heading_level, args, arg_owner),
+            render_return_fields(field, owner: owner)
           ].compact.join("\n\n")
         end
 
@@ -87,7 +89,7 @@ module Gitlab
         end
 
         def render_object_fields(fields, owner:, level_bump: 0)
-          return if fields.empty?
+          return if fields.blank?
 
           (with_args, no_args) = fields.partition { |f| args?(f) }
           type_name = owner[:name] if owner
@@ -124,6 +126,8 @@ module Gitlab
         end
 
         def render_return_type(query)
+          return unless query[:type] # for example, mutations
+
           "Returns #{render_field_type(query[:type])}."
         end
 
@@ -158,7 +162,7 @@ module Gitlab
         end
 
         def object_types
-          objects.reject { |t| t[:edge] || t[:connection] }
+          objects.reject { |t| t[:edge] || t[:connection] || t[:payload] }
         end
 
         def interfaces
@@ -191,7 +195,7 @@ module Gitlab
 
             arguments = input_type[:input_fields]
             seen_type(input_type_name)
-            t.merge(arguments: arguments, fields: t[:return_fields])
+            t.merge(arguments: arguments)
           end
         end
 
@@ -213,20 +217,34 @@ module Gitlab
         # We are ignoring connections and built in types for now,
         # they should be added when queries are generated.
         def objects
-          @objects ||= graphql_object_types
-            .reject { |object_type| object_type[:name]["__"] } # We ignore introspection types.
-            .map do |type|
-              type.merge(
-                edge: type[:name].ends_with?('Edge'),
-                connection: type[:name].ends_with?('Connection'),
-                fields: type[:fields] + type[:connections]
-              )
-            end
+          strong_memoize(:objects) do
+            mutations = schema.mutation&.fields&.keys&.to_set || []
+
+            graphql_object_types
+              .reject { |object_type| object_type[:name]["__"] } # We ignore introspection types.
+              .map do |type|
+                name = type[:name]
+                type.merge(
+                  edge: name.ends_with?('Edge'),
+                  connection: name.ends_with?('Connection'),
+                  payload: name.ends_with?('Payload') && mutations.include?(name.chomp('Payload').camelcase(:lower)),
+                  fields: type[:fields] + type[:connections]
+                )
+              end
+          end
         end
 
         private # DO NOT CALL THESE METHODS IN TEMPLATES
 
         # Template methods
+
+        def render_return_fields(mutation, owner:)
+          fields = mutation[:return_fields]
+          return if fields.blank?
+
+          name = owner.to_s + mutation[:name]
+          render_object_fields(fields, owner: { name: name })
+        end
 
         def render_connection_note(field)
           return unless connection?(field)
