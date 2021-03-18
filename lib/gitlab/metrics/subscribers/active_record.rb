@@ -17,7 +17,9 @@ module Gitlab
         # used to record a database transaction duration when calling
         # ActiveRecord::Base.transaction {} block.
         def transaction(event)
-          observe(:gitlab_database_transaction_seconds, event)
+          current_transaction&.observe(:gitlab_database_transaction_seconds, event.duration / 1000.0) do
+            buckets [0.05, 0.25, 1, 5]
+          end
         end
 
         def sql(event)
