@@ -110,7 +110,7 @@ module Gitlab
         # Template methods
 
         def render_row(*values)
-          "| #{values.map { |val| val.to_s.gsub(/\n+/, ' ') }.join(' | ')} |"
+          "| #{values.map { |val| val.to_s.squish }.join(' | ')} |"
         end
 
         def render_name(object, owner = nil)
