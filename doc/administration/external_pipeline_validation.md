@@ -27,7 +27,7 @@ Response Code Legend:
 
 ## Configuration
 
-Set the `EXTERNAL_VALIDATION_SERVICE_URL` to the external service URL.
+Set the `EXTERNAL_VALIDATION_SERVICE_URL` to the external service URL and enable `ci_external_validation_service` feature flag.
 
 ## Payload Schema
 
