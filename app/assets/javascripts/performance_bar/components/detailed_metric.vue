@@ -48,6 +48,17 @@ export default {
     metricDetails() {
       return this.currentRequest.details[this.metric];
     },
+    metricDetailsSummary() {
+      let summary = {
+        [s__('PerformanceBar|Total')]: this.metricDetails.calls,
+        [s__('PerformanceBar|Total duration')]: this.metricDetails.duration,
+      };
+      if (this.metricDetails.summary) {
+        summary = { ...summary, ...this.metricDetails.summary };
+      }
+
+      return summary;
+    },
     metricDetailsLabel() {
       return this.metricDetails.duration
         ? `${this.metricDetails.duration} / ${this.metricDetails.calls}`
@@ -96,6 +107,21 @@ export default {
       <span class="gl-text-blue-300 gl-font-weight-bold">{{ metricDetailsLabel }}</span>
     </gl-button>
     <gl-modal :modal-id="modalId" :title="header" size="lg" footer-class="d-none" scrollable>
+      <div class="gl-display-flex gl-align-items-center gl-justify-content-space-between">
+        <div class="gl-display-flex gl-align-items-center" data-testid="performance-bar-summary">
+          <div
+            v-for="(value, name) in metricDetailsSummary"
+            v-if="value"
+            :key="name"
+            class="gl-pr-8"
+            data-testid="performance-bar-summary-item"
+          >
+            <div>{{ name }}</div>
+            <div class="gl-font-size-h1 gl-font-weight-bold">{{ value }}</div>
+          </div>
+        </div>
+      </div>
+      <hr />
       <table class="table gl-table">
         <template v-if="detailsList.length">
           <tr v-for="(item, index) in detailsList" :key="index">
