@@ -944,3 +944,10 @@ sudo gitlab-rake gitlab:elastic:index
 cd /home/git/gitlab
 sudo -u git -H bundle exec rake gitlab:elastic:index
 ```
+
+### How does Advanced Search handle private projects?
+
+Advanced Search will store all the projects in the same Elasticsearch indexes,
+however searches will only surface results that can be viewed by the user.
+Advanced Search will honor all permission checks in the application by
+filtering out projects that a user does not have access to at search time.
