@@ -55,7 +55,6 @@ module Gitlab
           @ignore_writes = false
         end
 
-
         def write!
           @performed_write = true
 

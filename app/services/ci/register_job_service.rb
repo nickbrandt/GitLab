@@ -118,11 +118,11 @@ module Ci
           yield Ci::Build.find(build_id)
         end
       else
-        builds = retrieve_queue(-> { builds.to_a })
+        builds_array = retrieve_queue(-> { builds.to_a })
 
-        @metrics.observe_queue_size(-> { builds.size })
+        @metrics.observe_queue_size(-> { builds_array.size })
 
-        builds.each(&blk)
+        builds_array.each(&blk)
       end
     end
     # rubocop: enable CodeReuse/ActiveRecord
