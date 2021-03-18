@@ -6,7 +6,7 @@ RSpec.describe 'Upload a RubyGems package', :api, :js do
   include_context 'file upload requests helpers'
 
   let_it_be(:project) { create(:project) }
-  let_it_be(:user) { create(:user) }
+  let_it_be(:user) { project.owner }
   let_it_be(:personal_access_token) { create(:personal_access_token, user: user) }
 
   let(:api_path) { "/projects/#{project_id}/packages/rubygems/api/v1/gems" }
@@ -21,11 +21,7 @@ RSpec.describe 'Upload a RubyGems package', :api, :js do
     )
   end
 
-  before do
-    project.add_maintainer(user)
-  end
-
-  RSpec.shared_examples 'for a Rubygems package' do
+  shared_examples 'for a Rubygems package' do
     it 'creates package files' do
       expect { subject }
         .to change { Packages::Package.rubygems.count }.by(1)
