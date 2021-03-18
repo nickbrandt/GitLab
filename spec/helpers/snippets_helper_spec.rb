@@ -32,7 +32,7 @@ RSpec.describe SnippetsHelper do
     end
 
     def download_link(url)
-      "<a class=\"btn\" target=\"_blank\" rel=\"noopener noreferrer\" title=\"Open raw\" href=\"#{url}\">#{external_snippet_icon('doc-code')}</a>"
+      "<a class=\"gl-button btn btn-default\" target=\"_blank\" rel=\"noopener noreferrer\" title=\"Open raw\" href=\"#{url}\">#{external_snippet_icon('doc-code')}</a>"
     end
   end
 
@@ -59,7 +59,7 @@ RSpec.describe SnippetsHelper do
     end
 
     def download_link(url)
-      "<a class=\"btn\" target=\"_blank\" title=\"Download\" rel=\"noopener noreferrer\" href=\"#{url}?inline=false\">#{external_snippet_icon('download')}</a>"
+      "<a class=\"gl-button btn btn-default\" target=\"_blank\" title=\"Download\" rel=\"noopener noreferrer\" href=\"#{url}?inline=false\">#{external_snippet_icon('download')}</a>"
     end
   end
 
@@ -83,7 +83,7 @@ RSpec.describe SnippetsHelper do
     end
 
     def download_link(url)
-      "<a target=\"_blank\" rel=\"noopener noreferrer\" class=\"btn btn-sm has-tooltip\" title=\"Download\" data-container=\"body\" href=\"#{url}?inline=false\">#{sprite_icon('download')}</a>"
+      "<a target=\"_blank\" rel=\"noopener noreferrer\" class=\"gl-button btn btn-default btn-sm has-tooltip\" title=\"Download\" data-container=\"body\" href=\"#{url}?inline=false\">#{sprite_icon('download')}</a>"
     end
   end
 
