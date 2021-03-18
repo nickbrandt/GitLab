@@ -5,7 +5,7 @@ module Packages
     class PackagesPresenter
       include API::Helpers::RelatedResourcesHelpers
 
-      def initialize(group, packages, is_v2)
+      def initialize(group, packages, is_v2 = false)
         @group = group
         @packages = packages
         @is_v2 = is_v2
