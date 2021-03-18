@@ -376,7 +376,8 @@
       }
 
       > a,
-      > button {
+      > button,
+      > .gl-button {
         display: flex;
         margin: 0;
         text-overflow: inherit;
