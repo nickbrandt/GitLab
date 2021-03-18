@@ -30,6 +30,9 @@ using the GitLab default only if no customizations are set:
    - `main`: Projects created with GitLab 14.0 or later.
    - `master`: Projects created before GitLab 14.0.
 
+New GitLab installations from 13.11 will set a custom default branch name of
+`main` at the instance level.
+
 In the GitLab UI, you can change the defaults at any level. GitLab also provides
 the [Git commands you need](#update-the-default-branch-name-in-your-repository) to update your copy of the repository.
 
