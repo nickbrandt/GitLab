@@ -83,13 +83,6 @@ module Gitlab
           render_field_table(arg_header, args, owner)
         end
 
-        def render_field_table(header, fields, owner)
-          return if fields.empty?
-
-          fields = sorted_by_name(fields)
-          header + join(:table, fields.map { |f| render_field(f, owner) })
-        end
-
         def render_name_and_description(object, owner: nil, level: 3)
           content = []
 
@@ -109,55 +102,11 @@ module Gitlab
           type_name = owner[:name] if owner
           header_prefix = '#' * level_bump
           sections = [
-            simple_fields(no_args, type_name, header_prefix),
-            fields_with_arguments(with_args, type_name, header_prefix)
+            render_simple_fields(no_args, type_name, header_prefix),
+            render_fields_with_arguments(with_args, type_name, header_prefix)
           ]
 
           join(:block, sections)
-        end
-
-        def connection?(field)
-          type_name = field.dig(:type, :name)
-          type_name.present? && type_name.ends_with?('Connection')
-        end
-
-        def simple_fields(fields, type_name, header_prefix)
-          render_field_table(header_prefix + FIELD_HEADER, fields, type_name)
-        end
-
-        def fields_with_arguments(fields, type_name, header_prefix)
-          return if fields.empty?
-
-          level = 5 + header_prefix.length
-          sections = sorted_by_name(fields).map do |f|
-            render_full_field(f, heading_level: level, owner: type_name)
-          end
-
-          <<~MD.chomp
-            #{header_prefix}#### fields with arguments
-
-            #{join(:block, sections)}
-          MD
-        end
-
-        def render_return_type(query)
-          return unless query[:type] # for example, mutations
-
-          "Returns #{render_field_type(query[:type])}."
-        end
-
-        def sorted_by_name(objects)
-          return [] unless objects.present?
-
-          objects.sort_by { |o| o[:name] }
-        end
-
-        def render_field(field, owner)
-          render_row(
-            render_name(field, owner),
-            render_field_type(field[:type]),
-            render_description(field, owner, :inline)
-          )
         end
 
         def render_enum_value(enum, value)
@@ -229,29 +178,49 @@ module Gitlab
             .map { |type| type.merge(values: sorted_by_name(type[:values])) }
         end
 
-        # We are ignoring connections and built in types for now,
-        # they should be added when queries are generated.
-        def objects
-          strong_memoize(:objects) do
-            mutations = schema.mutation&.fields&.keys&.to_set || []
-
-            graphql_object_types
-              .reject { |object_type| object_type[:name]["__"] } # We ignore introspection types.
-              .map do |type|
-                name = type[:name]
-                type.merge(
-                  edge: name.ends_with?('Edge'),
-                  connection: name.ends_with?('Connection'),
-                  payload: name.ends_with?('Payload') && mutations.include?(name.chomp('Payload').camelcase(:lower)),
-                  fields: type[:fields] + type[:connections]
-                )
-              end
-          end
-        end
-
         private # DO NOT CALL THESE METHODS IN TEMPLATES
 
         # Template methods
+
+        def render_return_type(query)
+          return unless query[:type] # for example, mutations
+
+          "Returns #{render_field_type(query[:type])}."
+        end
+
+        def render_simple_fields(fields, type_name, header_prefix)
+          render_field_table(header_prefix + FIELD_HEADER, fields, type_name)
+        end
+
+        def render_fields_with_arguments(fields, type_name, header_prefix)
+          return if fields.empty?
+
+          level = 5 + header_prefix.length
+          sections = sorted_by_name(fields).map do |f|
+            render_full_field(f, heading_level: level, owner: type_name)
+          end
+
+          <<~MD.chomp
+            #{header_prefix}#### fields with arguments
+
+            #{join(:block, sections)}
+          MD
+        end
+
+        def render_field_table(header, fields, owner)
+          return if fields.empty?
+
+          fields = sorted_by_name(fields)
+          header + join(:table, fields.map { |f| render_field(f, owner) })
+        end
+
+        def render_field(field, owner)
+          render_row(
+            render_name(field, owner),
+            render_field_type(field[:type]),
+            render_description(field, owner, :inline)
+          )
+        end
 
         def render_return_fields(mutation, owner:)
           fields = mutation[:return_fields]
@@ -347,6 +316,37 @@ module Gitlab
         end
 
         # Queries
+
+        def sorted_by_name(objects)
+          return [] unless objects.present?
+
+          objects.sort_by { |o| o[:name] }
+        end
+
+        def connection?(field)
+          type_name = field.dig(:type, :name)
+          type_name.present? && type_name.ends_with?('Connection')
+        end
+
+        # We are ignoring connections and built in types for now,
+        # they should be added when queries are generated.
+        def objects
+          strong_memoize(:objects) do
+            mutations = schema.mutation&.fields&.keys&.to_set || []
+
+            graphql_object_types
+              .reject { |object_type| object_type[:name]["__"] } # We ignore introspection types.
+              .map do |type|
+                name = type[:name]
+                type.merge(
+                  edge: name.ends_with?('Edge'),
+                  connection: name.ends_with?('Connection'),
+                  payload: name.ends_with?('Payload') && mutations.include?(name.chomp('Payload').camelcase(:lower)),
+                  fields: type[:fields] + type[:connections]
+                )
+              end
+          end
+        end
 
         def args?(field)
           args = field[:arguments]
