@@ -18,7 +18,7 @@ module Gitlab
         # ActiveRecord::Base.transaction {} block.
         def transaction(event)
           current_transaction&.observe(:gitlab_database_transaction_seconds, event.duration / 1000.0) do
-            buckets [0.05, 0.25, 1, 5]
+            buckets [0.05, 0.25, 1, 2.5, 5, 10]
           end
         end
 
