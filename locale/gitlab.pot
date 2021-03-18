@@ -3844,6 +3844,9 @@ msgstr ""
 msgid "Approval rules reset to project defaults"
 msgstr ""
 
+msgid "Approval settings"
+msgstr ""
+
 msgid "ApprovalRuleRemove|%d member"
 msgid_plural "ApprovalRuleRemove|%d members"
 msgstr[0] ""
