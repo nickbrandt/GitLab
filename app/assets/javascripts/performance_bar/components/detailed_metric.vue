@@ -1,12 +1,18 @@
 <script>
-import { GlButton, GlModal, GlModalDirective } from '@gitlab/ui';
+import { GlButton, GlModal, GlModalDirective, GlSegmentedControl } from '@gitlab/ui';
+
+import { s__ } from '~/locale';
 import RequestWarning from './request_warning.vue';
+
+export const SortOrderDuration = 'SortOrderDuration';
+export const SortOrderChronological = 'SortOrderChronological';
 
 export default {
   components: {
     RequestWarning,
     GlButton,
     GlModal,
+    GlSegmentedControl,
   },
   directives: {
     'gl-modal': GlModalDirective,
@@ -39,6 +45,7 @@ export default {
   data() {
     return {
       openedBacktraces: [],
+      sortOrder: SortOrderDuration,
     };
   },
   computed: {
@@ -60,12 +67,32 @@ export default {
       return summary;
     },
     metricDetailsLabel() {
-      return this.metricDetails.duration
-        ? `${this.metricDetails.duration} / ${this.metricDetails.calls}`
-        : this.metricDetails.calls;
+      if (this.metricDetails.duration && this.metricDetails.calls) {
+        return `${this.metricDetails.duration} / ${this.metricDetails.calls}`;
+      } else if (this.metricDetails.calls) {
+        return this.metricDetails.calls;
+      }
+
+      return '0';
+    },
+    displaySortOrder() {
+      return (
+        this.metricDetails.details.length !== 0 &&
+        this.metricDetails.details.every((item) => item.start)
+      );
     },
     detailsList() {
-      return this.metricDetails.details;
+      const list = this.metricDetails.details
+        .slice()
+        .map((item, index) => ({ ...item, id: index }));
+
+      if (this.sortOrder === SortOrderDuration) {
+        return list.sort((a, b) => (a.duration < b.duration ? 1 : -1));
+      } else if (this.sortOrder === SortOrderChronological) {
+        return list.sort((a, b) => (a.start < b.start ? -1 : 1));
+      }
+
+      return list;
     },
     warnings() {
       return this.metricDetails.warnings || [];
@@ -93,7 +120,14 @@ export default {
     itemHasOpenedBacktrace(toggledIndex) {
       return this.openedBacktraces.find((openedIndex) => openedIndex === toggledIndex) >= 0;
     },
+    changeSortOrder(order) {
+      this.sortOrder = order;
+    },
   },
+  sortOrders: [
+    { value: SortOrderDuration, text: s__('PerformanceBar|Sort by duration') },
+    { value: SortOrderChronological, text: s__('PerformanceBar|Sort chronologically') },
+  ],
 };
 </script>
 <template>
@@ -104,7 +138,12 @@ export default {
     data-qa-selector="detailed_metric_content"
   >
     <gl-button v-gl-modal="modalId" class="gl-mr-2" type="button" variant="link">
-      <span class="gl-text-blue-300 gl-font-weight-bold">{{ metricDetailsLabel }}</span>
+      <span
+        class="gl-text-blue-300 gl-font-weight-bold"
+        data-testid="performance-bar-details-label"
+      >
+        {{ metricDetailsLabel }}
+      </span>
     </gl-button>
     <gl-modal :modal-id="modalId" :title="header" size="lg" footer-class="d-none" scrollable>
       <div class="gl-display-flex gl-align-items-center gl-justify-content-space-between">
@@ -120,17 +159,24 @@ export default {
             <div class="gl-font-size-h1 gl-font-weight-bold">{{ value }}</div>
           </div>
         </div>
+        <gl-segmented-control
+          v-if="displaySortOrder"
+          data-testid="performance-bar-sort-order"
+          :options="$options.sortOrders"
+          :checked="sortOrder"
+          @input="changeSortOrder"
+        />
       </div>
       <hr />
       <table class="table gl-table">
         <template v-if="detailsList.length">
-          <tr v-for="(item, index) in detailsList" :key="index">
-            <td>
+          <tr v-for="item in detailsList" :key="item.id">
+            <td data-testid="performance-item-duration">
               <span v-if="item.duration">{{
                 sprintf(__('%{duration}ms'), { duration: item.duration })
               }}</span>
             </td>
-            <td>
+            <td data-testid="performance-item-content">
               <div>
                 <div
                   v-for="(key, keyIndex) in keys"
@@ -147,12 +193,12 @@ export default {
                     variant="default"
                     icon="ellipsis_h"
                     size="small"
-                    :selected="itemHasOpenedBacktrace(index)"
+                    :selected="itemHasOpenedBacktrace(item.id)"
                     :aria-label="__('Toggle backtrace')"
-                    @click="toggleBacktrace(index)"
+                    @click="toggleBacktrace(item.id)"
                   />
                 </div>
-                <pre v-if="itemHasOpenedBacktrace(index)" class="backtrace-row mt-2">{{
+                <pre v-if="itemHasOpenedBacktrace(item.id)" class="backtrace-row mt-2">{{
                   item.backtrace
                 }}</pre>
               </div>
