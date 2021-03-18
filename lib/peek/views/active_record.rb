@@ -29,15 +29,19 @@ module Peek
 
       def summary
         detail_store.each_with_object({}) do |item, count|
-          if item[:cached].present?
-            count[item[:cached]] ||= 0
-            count[item[:cached]] += 1
-          end
+          count_summary(item, count)
+        end
+      end
 
-          if item[:transaction].present?
-            count[item[:transaction]] ||= 0
-            count[item[:transaction]] += 1
-          end
+      def count_summary(item, count)
+        if item[:cached].present?
+          count[item[:cached]] ||= 0
+          count[item[:cached]] += 1
+        end
+
+        if item[:transaction].present?
+          count[item[:transaction]] ||= 0
+          count[item[:transaction]] += 1
         end
       end
 

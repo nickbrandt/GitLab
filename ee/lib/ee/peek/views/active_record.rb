@@ -17,15 +17,13 @@ module EE
           detail
         end
 
-        override :summary
-        def summary
+        override :count_summary
+        def count_summary(item, count)
+          super
+
           if ::Gitlab::Database::LoadBalancing.enable?
-            detail_store.each_with_object(super) do |item, count|
-              count[item[:db_role]] ||= 0
-              count[item[:db_role]] += 1
-            end
-          else
-            super
+            count[item[:db_role]] ||= 0
+            count[item[:db_role]] += 1
           end
         end
       end
