@@ -5,6 +5,12 @@ return if Rails.env.production?
 module Gitlab
   module Graphql
     module Docs
+      # We assume a few things about the schema. We use the graphql-ruby gem, which enforces:
+      # - All mutations have a single input field named 'input'
+      # - All mutations have a payload type, named after themselves
+      # - All mutations have an input type, named after themselves
+      # If these things change, then some of this code will break. Such places
+      # are guarded with an assertion that our assumptions are not violated.
       ViolatedAssumption = Class.new(StandardError)
 
       CONNECTION_ARGS = %w[after before first last].to_set
@@ -21,6 +27,12 @@ module Gitlab
 
         | Name | Type | Description |
         | ---- | ---- | ----------- |
+      MD
+
+      CONNECTION_NOTE = <<~MD
+        This field returns a [connection](#connections). It accepts the
+        four standard [pagination arguments](#connection-pagination-arguments):
+        `before: String`, `after: String`, `first: Int`, `last: Int`.
       MD
 
       # Helper with functions to be used by HAML templates
@@ -54,14 +66,16 @@ module Gitlab
           args = field[:arguments].reject { |f| conn && CONNECTION_ARGS.include?(f[:name]) }
           arg_owner = [owner, field[:name]]
 
-          [
+          chunks = [
             render_name_and_description(field, level: heading_level, owner: owner),
             render_return_type(field),
             render_input_type(field),
             render_connection_note(field),
             render_argument_table(heading_level, args, arg_owner),
             render_return_fields(field, owner: owner)
-          ].compact.join("\n\n")
+          ]
+
+          join(:block, chunks)
         end
 
         def render_argument_table(level, args, owner)
@@ -73,7 +87,7 @@ module Gitlab
           return if fields.empty?
 
           fields = sorted_by_name(fields)
-          header + fields.map { |f| render_field(f, owner) }.join("\n")
+          header + join(:table, fields.map { |f| render_field(f, owner) })
         end
 
         def render_name_and_description(object, owner: nil, level: 3)
@@ -85,7 +99,7 @@ module Gitlab
           content << "#{heading} `#{name}`"
           content << render_description(object, owner, :block)
 
-          content.compact.join("\n\n")
+          join(:block, content)
         end
 
         def render_object_fields(fields, owner:, level_bump: 0)
@@ -94,11 +108,12 @@ module Gitlab
           (with_args, no_args) = fields.partition { |f| args?(f) }
           type_name = owner[:name] if owner
           header_prefix = '#' * level_bump
-
-          [
+          sections = [
             simple_fields(no_args, type_name, header_prefix),
             fields_with_arguments(with_args, type_name, header_prefix)
-          ].compact.join("\n\n")
+          ]
+
+          join(:block, sections)
         end
 
         def connection?(field)
@@ -121,7 +136,7 @@ module Gitlab
           <<~MD.chomp
             #{header_prefix}#### fields with arguments
 
-            #{sections.join("\n\n")}
+            #{join(:block, sections)}
           MD
         end
 
@@ -179,31 +194,31 @@ module Gitlab
         end
 
         # Place the arguments of the input types on the mutation itself.
-        # see: `#input_types` - this method must not call `#input_types` to
-        #                       avoid mutual recursion
+        # see: `#input_types` - this method must not call `#input_types` to avoid mutual recursion
         def mutations
           @mutations ||= sorted_by_name(graphql_mutation_types).map do |t|
-            fields = t[:input_fields]
-            field = fields.first
+            inputs = t[:input_fields]
+            input = inputs.first
+            name = t[:name]
 
-            raise ViolatedAssumption, "Expected one input field to #{t[:name]}" if fields.size != 1
-            raise ViolatedAssumption, "Expected the input of #{t[:name]} to be named 'input'" if field[:name] != 'input'
+            raise ViolatedAssumption, "Expected one input field to #{name}" unless inputs.one?
+            raise ViolatedAssumption, "Expected the input of #{name} to be named 'input'" if input[:name] != 'input'
 
-            input_type_name = field[:type][:name]
+            input_type_name = input[:type][:name]
             input_type = graphql_input_object_types.find { |t| t[:name] == input_type_name }
             raise ViolatedAssumption, "Cannot find #{input_type_name}" unless input_type
 
             arguments = input_type[:input_fields]
-            seen_type(input_type_name)
+            seen_type!(input_type_name)
             t.merge(arguments: arguments)
           end
         end
 
         # We assume that the mutations have been processed first, marking their
-        # inputs as `seen?`
+        # inputs as `seen_type?`
         def input_types
           mutations # ensure that mutations have seen their inputs first
-          graphql_input_object_types.reject { |t| seen?(t[:name]) }
+          graphql_input_object_types.reject { |t| seen_type?(t[:name]) }
         end
 
         # We ignore the built-in enum types, and sort values by name
@@ -249,11 +264,7 @@ module Gitlab
         def render_connection_note(field)
           return unless connection?(field)
 
-          <<~MD.chomp
-          This field returns a [connection](#connections). It accepts the
-          four standard [pagination arguments](#connection-pagination-arguments):
-          `before: String`, `after: String`, `first: Int`, `last: Int`.
-          MD
+          CONNECTION_NOTE.chomp
         end
 
         def render_row(*values)
@@ -278,20 +289,18 @@ module Gitlab
           owner = Array.wrap(owner)
           content = []
 
-          if object[:is_deprecated] && context == :block
-            owner = Array.wrap(owner)
-            deprecation = schema_deprecation(owner, object[:name])
-            content << (deprecation&.original_description || render_description_of(object))
-            content << render_deprecation(object, owner, :block)
-          elsif object[:is_deprecated]
+          if object[:is_deprecated]
+            if context == :block
+              deprecation = schema_deprecation(owner, object[:name])
+              content << (deprecation&.original_description || render_description_of(object))
+            end
+
             content << render_deprecation(object, owner, context)
           else
             content << render_description_of(object)
           end
 
-          sep = context == :block ? "\n\n" : ' '
-
-          content.compact.join(sep).presence
+          join(context, content)
         end
 
         def render_description_of(object)
@@ -321,6 +330,20 @@ module Gitlab
 
         def render_field_type(type)
           "[`#{type[:info]}`](##{type[:name].downcase})"
+        end
+
+        def join(context, chunks)
+          chunks.compact!
+          return if chunks.blank?
+
+          case context
+          when :block
+            chunks.join("\n\n")
+          when :inline
+            chunks.join(" ").squish.presence
+          when :table
+            chunks.join("\n")
+          end
         end
 
         # Queries

@@ -39,11 +39,13 @@ module Gitlab
           File.write(filename, contents)
         end
 
-        def seen?(name)
+        private
+
+        def seen_type?(name)
           @seen.include?(name)
         end
 
-        def seen_type(name)
+        def seen_type!(name)
           @seen << name
         end
       end
