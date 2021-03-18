@@ -46,7 +46,7 @@ module Users
 
     # This method returns the updated User object.
     def execute_without_lease
-      remove, add = Users::ProjectAuthorizations::FindRecordsDueForRefreshService.new(
+      remove, add = AuthorizedProjectUpdate::FindRecordsDueForRefreshService.new(
         user,
         source: source,
         incorrect_auth_found_callback: incorrect_auth_found_callback,

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe Users::ProjectAuthorizations::FindRecordsDueForRefreshService do
+RSpec.describe AuthorizedProjectUpdate::FindRecordsDueForRefreshService do
   # We're using let! here so that any expectations for the service class are not
   # triggered twice.
   let!(:project) { create(:project) }
