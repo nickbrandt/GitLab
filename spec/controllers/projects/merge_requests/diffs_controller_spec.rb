@@ -448,11 +448,11 @@ RSpec.describe Projects::MergeRequests::DiffsController do
       end
     end
 
-    def collection_arguments(pagination_data = {})
+    def collection_arguments(diff_view: :inline, pagination_data: {})
       {
         environment: nil,
         merge_request: merge_request,
-        diff_view: :inline,
+        diff_view: diff_view,
         merge_ref_head_diff: nil,
         pagination_data: {
           current_page: nil,
@@ -496,7 +496,7 @@ RSpec.describe Projects::MergeRequests::DiffsController do
 
       it_behaves_like 'serializes diffs with expected arguments' do
         let(:collection) { Gitlab::Diff::FileCollection::MergeRequestDiffBatch }
-        let(:expected_options) { collection_arguments(current_page: 1, total_pages: 1) }
+        let(:expected_options) { collection_arguments(pagination_data: { current_page: 1, total_pages: 1 }) }
       end
 
       it_behaves_like 'successful request'
@@ -536,7 +536,7 @@ RSpec.describe Projects::MergeRequests::DiffsController do
       it_behaves_like 'serializes diffs with expected arguments' do
         let(:collection) { Gitlab::Diff::FileCollection::MergeRequestDiffBatch }
         let(:expected_options) do
-          collection_arguments(current_page: 1, total_pages: 1)
+          collection_arguments(pagination_data: { current_page: 1, total_pages: 1 })
         end
       end
 
@@ -550,12 +550,23 @@ RSpec.describe Projects::MergeRequests::DiffsController do
       end
     end
 
+    context 'with word-diff mode enabled' do
+      subject { go(view: 'word') }
+
+      it_behaves_like 'serializes diffs with expected arguments' do
+        let(:collection) { Gitlab::Diff::FileCollection::Compare }
+        let(:expected_options) { collection_arguments(diff_view: :word) }
+      end
+
+      it_behaves_like 'successful request'
+    end
+
     context 'with default params' do
       subject { go }
 
       it_behaves_like 'serializes diffs with expected arguments' do
         let(:collection) { Gitlab::Diff::FileCollection::MergeRequestDiffBatch }
-        let(:expected_options) { collection_arguments(current_page: 1, total_pages: 1) }
+        let(:expected_options) { collection_arguments(pagination_data: { current_page: 1, total_pages: 1 }) }
       end
 
       it_behaves_like 'successful request'
@@ -566,7 +577,7 @@ RSpec.describe Projects::MergeRequests::DiffsController do
 
       it_behaves_like 'serializes diffs with expected arguments' do
         let(:collection) { Gitlab::Diff::FileCollection::MergeRequestDiffBatch }
-        let(:expected_options) { collection_arguments(current_page: 2, next_page: 3, total_pages: 4) }
+        let(:expected_options) { collection_arguments(pagination_data: { current_page: 2, next_page: 3, total_pages: 4 }) }
       end
 
       it_behaves_like 'successful request'

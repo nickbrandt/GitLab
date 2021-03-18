@@ -4,6 +4,7 @@ require 'spec_helper'
 
 RSpec.describe DiffHelper do
   include RepoHelpers
+  using RSpec::Parameterized::TableSyntax
 
   let(:project) { create(:project, :repository) }
   let(:repository) { project.repository }
@@ -14,35 +15,23 @@ RSpec.describe DiffHelper do
   let(:diff_file) { Gitlab::Diff::File.new(diff, diff_refs: diff_refs, repository: repository) }
 
   describe 'diff_view' do
-    it 'uses the view param over the cookie' do
-      controller.params[:view] = 'parallel'
-      helper.request.cookies[:diff_view] = 'inline'
-
-      expect(helper.diff_view).to eq :parallel
+    where(:view, :cookies, :expected) do
+      'word'     | 'parallel' | :word
+      'parallel' | 'inline'   | :parallel
+      'invalid'  | nil        | :inline
+      nil        | 'word'     | :word
+      nil        | 'parallel' | :parallel
+      nil        | 'invalid'  | :inline
+      nil        | nil        | :inline
     end
 
-    it 'returns the default value when the view param is invalid' do
-      controller.params[:view] = 'invalid'
+    with_them do
+      before do
+        controller.params[:view] = view
+        helper.request.cookies[:diff_view] = cookies
+      end
 
-      expect(helper.diff_view).to eq :inline
-    end
-
-    it 'returns a valid value when cookie is set' do
-      helper.request.cookies[:diff_view] = 'parallel'
-
-      expect(helper.diff_view).to eq :parallel
-    end
-
-    it 'returns the default value when cookie is invalid' do
-      helper.request.cookies[:diff_view] = 'invalid'
-
-      expect(helper.diff_view).to eq :inline
-    end
-
-    it 'returns the default value when cookie is nil' do
-      expect(helper.request.cookies).to be_empty
-
-      expect(helper.diff_view).to eq :inline
+      it { expect(helper.diff_view).to eq(expected) }
     end
   end
 
