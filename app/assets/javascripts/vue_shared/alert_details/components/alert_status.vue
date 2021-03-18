@@ -20,9 +20,6 @@ export default {
     trackAlertStatusUpdateOptions: {
       default: null,
     },
-    statuses: {
-      default: PAGE_CONFIG.OPERATIONS.STATUSES,
-    },
   },
   props: {
     projectPath: {
@@ -40,6 +37,11 @@ export default {
     isSidebar: {
       type: Boolean,
       required: true,
+    },
+    statuses: {
+      type: Object,
+      required: false,
+      default: () => PAGE_CONFIG.OPERATIONS.STATUSES,
     },
   },
   computed: {

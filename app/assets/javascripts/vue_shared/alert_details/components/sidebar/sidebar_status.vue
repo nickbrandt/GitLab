@@ -94,6 +94,7 @@ export default {
         :project-path="projectPath"
         :is-dropdown-showing="isDropdownShowing"
         :is-sidebar="true"
+        :statuses="statuses"
         @alert-error="$emit('alert-error', $event)"
         @hide-dropdown="hideDropdown"
         @handle-updating="handleUpdating"
