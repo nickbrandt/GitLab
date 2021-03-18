@@ -125,8 +125,8 @@
   \
   One of:
   \
-  - type[:possible_types].each do |type_name|
-    ~ "- [`#{type_name}`](##{type_name.downcase})"
+  - type[:possible_types].each do |member|
+    = render_union_member(type, member)
   \
 
 :plain

@@ -27,6 +27,9 @@ module Gitlab
           MD
         end
 
+        # Template methods:
+        # Methods that return chunks of Markdown for insertion into the document
+
         def render_name_and_description(object, owner: nil, level: 3)
           content = []
 
@@ -49,6 +52,10 @@ module Gitlab
           content.compact.join("\n\n")
         end
 
+        def render_return_type(query)
+          "Returns #{render_field_type(query[:type])}.\n"
+        end
+
         def sorted_by_name(objects)
           return [] unless objects.present?
 
@@ -56,7 +63,7 @@ module Gitlab
         end
 
         def render_field(field, owner)
-          row(
+          render_row(
             render_name(field, owner),
             render_field_type(field[:type]),
             render_description(field, owner, :inline)
@@ -64,10 +71,45 @@ module Gitlab
         end
 
         def render_enum_value(enum, value)
-          row(render_name(value, enum[:name]), render_description(value, enum[:name], :inline))
+          render_row(render_name(value, enum[:name]), render_description(value, enum[:name], :inline))
         end
 
-        def row(*values)
+        def render_union_member(union, member)
+          "- [`#{member}`](##{member.downcase})"
+        end
+
+        # QUERIES:
+
+        # Methods that return parts of the schema, or related information:
+
+        # We are ignoring connections and built in types for now,
+        # they should be added when queries are generated.
+        def objects
+          object_types = graphql_object_types.select do |object_type|
+            !object_type[:name]["__"]
+          end
+
+          object_types.each do |type|
+            type[:fields] += type[:connections]
+          end
+        end
+
+        def queries
+          graphql_operation_types.find { |type| type[:name] == 'Query' }.to_h.values_at(:fields, :connections).flatten
+        end
+
+        # We ignore the built-in enum types.
+        def enums
+          graphql_enum_types.select do |enum_type|
+            !enum_type[:name].in?(%w[__DirectiveLocation __TypeKind])
+          end
+        end
+
+        private # DO NOT CALL THESE METHODS IN TEMPLATES
+
+        # Template methods
+
+        def render_row(*values)
           "| #{values.map { |val| val.to_s.gsub(/\n+/, ' ') }.join(' | ')} |"
         end
 
@@ -97,11 +139,25 @@ module Gitlab
           "**Deprecated:** #{reason}"
         end
 
-        def schema_deprecation(type_name, field_name)
-          schema_field(type_name, field_name)&.deprecation
+        def render_field_type(type)
+          "[`#{type[:info]}`](##{type[:name].downcase})"
         end
 
-        def schema_field(type_name, field_name)
+        # Queries
+
+        # returns the deprecation information for a field or argument
+        # See: Gitlab::Graphql::Deprecation
+        def schema_deprecation(type_name, field_name)
+          schema_member(type_name, field_name)&.deprecation
+        end
+
+        # Return a part of the schema.
+        #
+        # This queries the Schema by owner and name to find:
+        #
+        # - fields (e.g. `schema_member('Query', 'currentUser')`)
+        # - arguments (e.g. `schema_member(['Query', 'project], 'fullPath')`)
+        def schema_member(type_name, field_name)
           type_name = Array.wrap(type_name)
           if type_name.size == 2
             arg_name = field_name
@@ -124,37 +180,6 @@ module Gitlab
           args = args['input'].type.unwrap.arguments if is_mutation
 
           args[arg_name]
-        end
-
-        def render_field_type(type)
-          "[`#{type[:info]}`](##{type[:name].downcase})"
-        end
-
-        def render_return_type(query)
-          "Returns #{render_field_type(query[:type])}.\n"
-        end
-
-        # We are ignoring connections and built in types for now,
-        # they should be added when queries are generated.
-        def objects
-          object_types = graphql_object_types.select do |object_type|
-            !object_type[:name]["__"]
-          end
-
-          object_types.each do |type|
-            type[:fields] += type[:connections]
-          end
-        end
-
-        def queries
-          graphql_operation_types.find { |type| type[:name] == 'Query' }.to_h.values_at(:fields, :connections).flatten
-        end
-
-        # We ignore the built-in enum types.
-        def enums
-          graphql_enum_types.select do |enum_type|
-            !enum_type[:name].in?(%w[__DirectiveLocation __TypeKind])
-          end
         end
       end
     end

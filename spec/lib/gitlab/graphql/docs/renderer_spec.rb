@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require 'spec_helper'
+require 'fast_spec_helper'
 
 RSpec.describe Gitlab::Graphql::Docs::Renderer do
   describe '#contents' do
-    let_it_be(:template) { Rails.root.join('lib/gitlab/graphql/docs/templates/default.md.haml') }
+    let(:template) { Rails.root.join('lib/gitlab/graphql/docs/templates/default.md.haml') }
 
     let(:query_type) do
       Class.new(Types::BaseObject) { graphql_name 'Query' }.tap do |t|
