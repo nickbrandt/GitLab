@@ -477,7 +477,7 @@
   :urgency: :low
   :resource_boundary: :unknown
   :weight: 1
-  :idempotent:
+  :idempotent: true
   :tags: []
 - :name: cronjob:repository_archive_cache
   :worker_name: RepositoryArchiveCacheWorker
