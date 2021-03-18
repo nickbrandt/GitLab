@@ -25,9 +25,6 @@
         .dropdown
           %button{ type: 'button', class: 'btn gl-button btn-default-tertiary btn-sm js-label-options-dropdown', data: { toggle: 'dropdown' }, aria_label: _('Label actions dropdown') }
             = sprite_icon('ellipsis_v')
-          .dropdown-menu.dropdown-open-left
-            %ul
-              - if label.project_label? && label.project.group && can?(current_user, :admin_label, label.project.group)
                 %li
                   %button.js-promote-project-label-button.gl-button.btn.btn-default.btn-transparent{ disabled: true, type: 'button',
                     data: { url: promote_project_label_path(label.project, label),
