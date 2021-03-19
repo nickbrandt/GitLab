@@ -112,7 +112,7 @@ export default {
     this.fetchSubscription();
   },
   methods: {
-    ...mapActions(['fetchSubscription', 'fetchHasBillableGroupMembers']),
+    ...mapActions(['fetchSubscription']),
     isLast(index) {
       return index === this.visibleRows.length - 1;
     },
