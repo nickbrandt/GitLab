@@ -30,7 +30,7 @@
       .gl-button.btn.btn-default.btn-sm.disabled
         Submitted as ham
     - else
-      = link_to 'Submit as ham', mark_as_ham_admin_spam_log_path(spam_log), method: :post, class: 'gl-button btn btn-default btn-sm btn-warning'
+      = link_to 'Submit as ham', mark_as_ham_admin_spam_log_path(spam_log), method: :post, class: 'gl-button btn btn-default btn-sm'
     - if user && !user.blocked?
       = link_to 'Block user', block_admin_user_path(user), data: {confirm: 'USER WILL BE BLOCKED! Are you sure?'}, method: :put, class: "gl-button btn btn-default btn-sm"
     - else
