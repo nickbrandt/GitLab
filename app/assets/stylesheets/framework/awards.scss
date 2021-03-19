@@ -122,12 +122,8 @@
   }
 }
 
-.award-control {
+.gl-button.btn.award-control {
   margin: 4px 8px 4px 0;
-  outline: 0;
-  position: relative;
-  display: block;
-  float: left;
 
   &.disabled {
     cursor: default;
@@ -145,11 +141,6 @@
   &:hover,
   &:active,
   &.is-active {
-    background-color: $blue-50;
-    border-color: $blue-200;
-    box-shadow: none;
-    outline: 0;
-
     .award-control-icon svg {
       fill: $blue-500;
     }
@@ -162,6 +153,14 @@
       opacity: 1;
       transform: scale(1.15);
     }
+  }
+
+  &.active,
+  &.is-active,
+  &:active {
+    background-color: $blue-50;
+    border-color: $blue-200;
+    box-shadow: inset 0 0 2px $blue-200;
   }
 
   &.is-active {
@@ -191,10 +190,6 @@
   &.btn {
     &:focus {
       outline: 0;
-    }
-
-    .award-control-icon {
-      margin: 0;
     }
   }
 
@@ -239,10 +234,8 @@
   .award-control-icon-positive,
   .award-control-icon-super-positive {
     @include transition(opacity, transform);
-    position: absolute;
-    left: 10px;
-    bottom: 6px;
     opacity: 0;
+    position: absolute;
 
     path {
       fill: $award-emoji-positive-add-lines;
