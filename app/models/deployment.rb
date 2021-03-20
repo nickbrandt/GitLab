@@ -251,11 +251,8 @@ class Deployment < ApplicationRecord
   end
 
   def previous_environment_deployment
-    project
-      .deployments
+    self.class.for_environment(environment_id)
       .success
-      .joins(:environment)
-      .where(environments: { name: environment.name })
       .where.not(id: self.id)
       .order(id: :desc)
       .take
