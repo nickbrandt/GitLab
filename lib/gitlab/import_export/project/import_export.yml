@@ -132,6 +132,7 @@ excluded_attributes:
     - :avatar
     - :import_type
     - :import_source
+    - :integrations
     - :mirror
     - :runners_token
     - :runners_token_encrypted
@@ -168,7 +169,6 @@ excluded_attributes:
     - :marked_for_deletion_by_user_id
     - :compliance_framework_setting
     - :show_default_award_emojis
-    - :services
     - :exported_protected_branches
   namespaces:
     - :runners_token
