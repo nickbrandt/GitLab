@@ -70,7 +70,7 @@ end
 context_paths = ['', 'ee/']
 
 context_paths.each do |context_path|
-  guard :rspec, cmd: cmd, spec_paths: ["#{context_path}spec/"] do
+  guard :rspec, cmd: cmd, spec_paths: ["#{context_path}spec/"], all_after_pass: false do
     guard_setup.call(context_path)
   end
 end
