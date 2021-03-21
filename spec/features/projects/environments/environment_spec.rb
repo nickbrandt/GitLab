@@ -25,6 +25,7 @@ RSpec.describe 'Environment' do
 
     before do
       visit_environment(environment)
+      stub_feature_flags(migrate_environment_details_to_vue: false)
     end
 
     it 'shows environment name' do
@@ -236,6 +237,8 @@ RSpec.describe 'Environment' do
           end
 
           context 'when environment is available' do
+            stub_feature_flags(migrate_environment_details_to_vue: false)
+
             context 'with stop action' do
               let(:action) do
                 create(:ci_build, :manual, pipeline: pipeline,
