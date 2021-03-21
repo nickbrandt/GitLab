@@ -16,7 +16,7 @@ export default {
     boardsStore: {
       type: Object,
       required: false,
-      default: undefined,
+      default: null,
     },
     canAdminList: {
       type: Boolean,
@@ -26,11 +26,6 @@ export default {
       type: Boolean,
       required: true,
     },
-  },
-  data() {
-    return {
-      state: this.boardsStore ? this.boardsStore.state : {},
-    };
   },
   computed: {
     buttonText() {
@@ -43,7 +38,9 @@ export default {
   methods: {
     showPage() {
       eventHub.$emit('showBoardModal', formType.edit);
-      return this.boardsStore ? this.boardsStore.showPage(formType.edit) : null;
+      if (this.boardsStore) {
+        this.boardsStore.showPage(formType.edit);
+      }
     },
   },
 };

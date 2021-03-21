@@ -9,7 +9,8 @@ export default (boardsStore = undefined) => {
     return;
   }
 
-  gl.boardConfigToggle = new Vue({
+  // eslint-disable-next-line no-new
+  new Vue({
     el,
     render(h) {
       return h(ConfigToggle, {

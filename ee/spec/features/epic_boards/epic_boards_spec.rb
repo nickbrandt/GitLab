@@ -118,10 +118,12 @@ RSpec.describe 'epic boards', :js do
 
       update_board_label(label_title)
 
-      expect(page).to have_selector('.board-card', count: 1)
-      expect(page).to have_content('Epic1')
-      expect(page).not_to have_content('Epic2')
-      expect(page).not_to have_content('Epic3')
+      aggregate_failures do
+        expect(page).to have_selector('.board-card', count: 1)
+        expect(page).to have_content('Epic1')
+        expect(page).not_to have_content('Epic2')
+        expect(page).not_to have_content('Epic3')
+      end
     end
   end
 
@@ -141,12 +143,14 @@ RSpec.describe 'epic boards', :js do
       view_scope.click
 
       page.within('.modal') do
-        expect(find('.modal-header')).to have_content('Board scope')
-        expect(page).not_to have_content('Board name')
-        expect(page).not_to have_link('Edit')
-        expect(page).not_to have_button('Edit')
-        expect(page).not_to have_button('Save')
-        expect(page).not_to have_button('Cancel')
+        aggregate_failures do
+          expect(find('.modal-header')).to have_content('Board scope')
+          expect(page).not_to have_content('Board name')
+          expect(page).not_to have_link('Edit')
+          expect(page).not_to have_button('Edit')
+          expect(page).not_to have_button('Save')
+          expect(page).not_to have_button('Cancel')
+        end
       end
     end
   end

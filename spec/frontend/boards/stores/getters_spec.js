@@ -179,21 +179,20 @@ describe('Boards - Getters', () => {
   });
 
   describe('isIssueBoard', () => {
-    it('returns true when issuableType on state is issue', () => {
-      const state = {
-        issuableType: 'issue',
-      };
+    it.each`
+      issuableType | expected
+      ${'issue'}   | ${true}
+      ${'epic'}    | ${false}
+    `(
+      'returns $expected when issuableType on state is $issuableType',
+      ({ issuableType, expected }) => {
+        const state = {
+          issuableType,
+        };
 
-      expect(getters.isIssueBoard(state)).toBe(true);
-    });
-
-    it('returns false when issuableType on state is not issue', () => {
-      const state = {
-        issuableType: 'epic',
-      };
-
-      expect(getters.isIssueBoard(state)).toBe(false);
-    });
+        expect(getters.isIssueBoard(state)).toBe(expected);
+      },
+    );
   });
 
   describe('isEpicBoard', () => {
