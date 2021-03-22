@@ -45,6 +45,7 @@ module Namespaces
         after_update :sync_traversal_ids, if: -> { sync_traversal_ids? && saved_change_to_parent_id? }
 
         scope :traversal_ids_contains, ->(ids) { where("traversal_ids @> (?)", ids) }
+        scope :traversal_ids_contained_by, ->(ids) { where("traversal_ids <@ (?)", ids) }
       end
 
       def sync_traversal_ids?
@@ -58,11 +59,15 @@ module Namespaces
       end
 
       def self_and_descendants
-        if use_traversal_ids?
-          lineage(self)
-        else
-          super
-        end
+        return super unless use_traversal_ids?
+
+        lineage(top: self)
+      end
+
+      def ancestors(hierarchy_order: nil)
+        return super() unless use_traversal_ids?
+
+        lineage(bottom: latest_parent_id, hierarchy_order: hierarchy_order)
       end
 
       private
@@ -84,11 +89,51 @@ module Namespaces
       end
 
       # Search this namespace's lineage. Bound inclusively by top node.
-      def lineage(top)
-        raise UnboundedSearch, 'Must bound search by a top' unless top
+      def lineage(top: nil, bottom: nil, hierarchy_order: nil)
+        raise UnboundedSearch, 'Must bound search by either top or bottom' unless top || bottom
 
-        without_sti_condition
-          .traversal_ids_contains("{#{top.id}}")
+        skope = without_sti_condition
+
+        if top
+          skope = skope.traversal_ids_contains("{#{top.id}}")
+        end
+
+        if bottom
+          skope = skope.traversal_ids_contained_by(latest_traversal_ids(bottom))
+        end
+
+        # The original `with_depth` attribute in ObjectHierarchy increments as you
+        # walk away from the "base" namespace. This direction changes depending on
+        # if you are walking up the ancestors or down the descendants.
+        if hierarchy_order
+          depth_sql = "ABS(array_length((#{latest_traversal_ids.to_sql}), 1) - array_length(traversal_ids, 1))"
+          skope = skope.select(skope.arel_table[Arel.star], "#{depth_sql} as depth")
+                       .order(depth: hierarchy_order)
+        end
+
+        skope
+      end
+
+      # traversal_ids are a cached value.
+      #
+      # The traversal_ids value in a loaded object can become stale when compared
+      # to the database value. For example, if you load a hierarchy and then move
+      # a group, any previously loaded descendant objects will have out of date
+      # traversal_ids.
+      #
+      # To solve this problem, we never depend on the object's traversal_ids
+      # value. We always query the database first with a sub-select for the
+      # latest traversal_ids.
+      #
+      # Note that ActiveRecord will cache query results. You can avoid this by
+      # using `Model.uncached { ... }`
+      def latest_traversal_ids(namespace = self)
+        without_sti_condition.where('id = (?)', namespace)
+                .select('traversal_ids as latest_traversal_ids')
+      end
+
+      def latest_parent_id(namespace = self)
+        without_sti_condition.where(id: namespace).select(:parent_id)
       end
     end
   end

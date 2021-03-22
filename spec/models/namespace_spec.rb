@@ -936,29 +936,39 @@ RSpec.describe Namespace do
     end
   end
 
-  context 'when use_traversal_ids feature flag is true' do
+  context 'traversal queries' do
     let_it_be(:namespace, reload: true) { create(:namespace) }
 
-    it_behaves_like 'namespace traversal'
+    context 'recursive' do
+      before do
+        stub_feature_flags(use_traversal_ids: false)
+      end
 
-    describe '#self_and_descendants' do
-      subject { namespace.self_and_descendants }
+      it_behaves_like 'namespace traversal'
 
-      it { expect(subject.to_sql).to include 'traversal_ids @>' }
+      describe '#self_and_descendants' do
+        it { expect(namespace.self_and_descendants.to_sql).not_to include 'traversal_ids @>' }
+      end
+
+      describe '#ancestors' do
+        it { expect(namespace.ancestors.to_sql).not_to include 'traversal_ids <@' }
+      end
     end
-  end
 
-  context 'when use_traversal_ids feature flag is false' do
-    before do
-      stub_feature_flags(use_traversal_ids: false)
-    end
+    context 'linear' do
+      it_behaves_like 'namespace traversal'
 
-    it_behaves_like 'namespace traversal'
+      describe '#self_and_descendants' do
+        it { expect(namespace.self_and_descendants.to_sql).to include 'traversal_ids @>' }
+      end
 
-    describe '#self_and_descendants' do
-      subject { namespace.self_and_descendants }
+      describe '#ancestors' do
+        it { expect(namespace.ancestors.to_sql).to include 'traversal_ids <@' }
 
-      it { expect(subject.to_sql).not_to include 'traversal_ids @>' }
+        it 'hierarchy order' do
+          expect(namespace.ancestors(hierarchy_order: :asc).to_sql).to include 'ORDER BY "depth" ASC'
+        end
+      end
     end
   end
 
