@@ -1596,32 +1596,40 @@ class User < ApplicationRecord
     @global_notification_setting
   end
 
+  def count_cache_validity_period
+    if Feature.enabled?(:longer_count_cache_validity, self, default_enabled: :yaml)
+      24.hours
+    else
+      20.minutes
+    end
+  end
+
   def assigned_open_merge_requests_count(force: false)
-    Rails.cache.fetch(['users', id, 'assigned_open_merge_requests_count'], force: force, expires_in: 20.minutes) do
+    Rails.cache.fetch(['users', id, 'assigned_open_merge_requests_count'], force: force, expires_in: count_cache_validity_period) do
       MergeRequestsFinder.new(self, assignee_id: self.id, state: 'opened', non_archived: true).execute.count
     end
   end
 
   def review_requested_open_merge_requests_count(force: false)
-    Rails.cache.fetch(['users', id, 'review_requested_open_merge_requests_count'], force: force, expires_in: 20.minutes) do
+    Rails.cache.fetch(['users', id, 'review_requested_open_merge_requests_count'], force: force, expires_in: count_cache_validity_period) do
       MergeRequestsFinder.new(self, reviewer_id: id, state: 'opened', non_archived: true).execute.count
     end
   end
 
   def assigned_open_issues_count(force: false)
-    Rails.cache.fetch(['users', id, 'assigned_open_issues_count'], force: force, expires_in: 20.minutes) do
+    Rails.cache.fetch(['users', id, 'assigned_open_issues_count'], force: force, expires_in: count_cache_validity_period) do
       IssuesFinder.new(self, assignee_id: self.id, state: 'opened', non_archived: true).execute.count
     end
   end
 
   def todos_done_count(force: false)
-    Rails.cache.fetch(['users', id, 'todos_done_count'], force: force, expires_in: 20.minutes) do
+    Rails.cache.fetch(['users', id, 'todos_done_count'], force: force, expires_in: count_cache_validity_period) do
       TodosFinder.new(self, state: :done).execute.count
     end
   end
 
   def todos_pending_count(force: false)
-    Rails.cache.fetch(['users', id, 'todos_pending_count'], force: force, expires_in: 20.minutes) do
+    Rails.cache.fetch(['users', id, 'todos_pending_count'], force: force, expires_in: count_cache_validity_period) do
       TodosFinder.new(self, state: :pending).execute.count
     end
   end
