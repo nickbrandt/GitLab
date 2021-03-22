@@ -74,7 +74,7 @@ module Gitlab
           render_row(render_name(value, enum[:name]), render_description(value, enum[:name], :inline))
         end
 
-        def render_union_member(union, member)
+        def render_union_member(member)
           "- [`#{member}`](##{member.downcase})"
         end
 
