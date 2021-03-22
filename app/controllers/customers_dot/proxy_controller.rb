@@ -5,6 +5,8 @@ module CustomersDot
     skip_before_action :authenticate_user!
     skip_before_action :verify_authenticity_token
 
+    feature_category :purchase
+
     BASE_URL = Gitlab::SubscriptionPortal::SUBSCRIPTIONS_URL
 
     def graphql
