@@ -278,6 +278,7 @@ export default {
       <gl-form-group :label="s__('DastProfiles|Profile name')">
         <gl-form-input
           v-model="form.profileName.value"
+          name="profile_name"
           class="mw-460"
           data-testid="profile-name-input"
           type="text"
@@ -311,6 +312,7 @@ export default {
           </template>
           <gl-form-input-group
             v-model.number="form.spiderTimeout.value"
+            name="spider_timeout"
             class="mw-460"
             data-testid="spider-timeout-input"
             type="number"
@@ -338,6 +340,7 @@ export default {
           </template>
           <gl-form-input-group
             v-model.number="form.targetTimeout.value"
+            name="target_timeout"
             class="mw-460"
             data-testid="target-timeout-input"
             type="number"
