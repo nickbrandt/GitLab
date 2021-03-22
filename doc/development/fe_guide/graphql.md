@@ -1448,23 +1448,16 @@ const defaultCacheOptions = {
 ```
 
 ```javascript
-function createMockApolloProvider() {
+function createMockApolloProvider({ props = {}, requestHandlers } = {}) {
   Vue.use(VueApollo);
-
-  const requestHandlers = [
-    projectIssueQuery,
-    jest.fn().mockResolvedValue(projectIssueQueryResponse),
-  ];
 
   const mockApollo = createMockApollo(
     requestHandlers,
     {},
     {
-      typePolicies: {
-        Issue: {
-          keyFields: ['title', 'fullPath'],
-        },
-      },
+      dataIdFromObject: (object) =>
+        // eslint-disable-next-line no-underscore-dangle
+        object.__typename === 'Requirement' ? object.iid : defaultDataIdFromObject(object),
     },
   );
 
