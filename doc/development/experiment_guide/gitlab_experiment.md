@@ -501,9 +501,11 @@ Any experiment that's been run in the request lifecycle surfaces in `window.gon.
 and matches [this schema](https://gitlab.com/gitlab-org/iglu/-/blob/master/public/schemas/com.gitlab/gitlab_experiment/jsonschema/1-0-0)
 so you can use it when resolving some concepts around experimentation in the client layer.
 
-### Using experiments in Vue
+### Use experiments in Vue
 
-With the `experiment` component, you can define slots that match the name of the variants pushed to `window.gon.experiment`. For example an experiment with the default variants `control` and `candidate` could be implemented the following:
+With the `experiment` component, you can define slots that match the name of the
+variants pushed to `window.gon.experiment`. For example, an experiment with the
+default variants `control` and `candidate` could be implemented like this:
 
 ```ruby
 def show
@@ -536,7 +538,8 @@ export default {
 </template>
 ```
 
-When using a multivariate experiment, the names of the variant names can be used, e.g. with the `pill_color` experiment from before, the Vue component would look like this:
+When you use a multivariate experiment, you can use the variant names. For example,
+the Vue component for the `pill_color` experiment would look like this:
 
 ```vue
 <template>
