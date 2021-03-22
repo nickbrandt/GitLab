@@ -125,11 +125,16 @@ A single snippet can support up to 10 files, which helps keep related files toge
 - A `gulpfile.js` file and a `package.json` file, which together can be
   used to bootstrap a project and manage its dependencies.
 
+If you need more than 10 files for your snippet, we recommend you a create a
+[wiki](project/wiki/index.md) instead. Wikis are available for projects at all
+subscription levels, and [groups](group/index.md#group-wikis) for
+[GitLab Premium](https://about.gitlab.com/pricing).
+
 Snippets with multiple files display a file count in the [snippet list](http://snippets.gitlab.com/):
 
 ![Example of snippet](img/snippet_tooltip_v13_10.png)
 
-You can manage these by using Git (because they're [versioned](#versioned-snippets)
+You can manage snippets with Git (because they're [versioned](#versioned-snippets)
 by a Git repository), through the [Snippets API](../api/snippets.md), and in the GitLab UI.
 
 To add a new file to your snippet through the GitLab UI:
