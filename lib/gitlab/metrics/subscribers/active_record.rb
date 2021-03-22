@@ -12,13 +12,14 @@ module Gitlab
         SQL_COMMANDS_WITH_COMMENTS_REGEX = /\A(\/\*.*\*\/\s)?((?!(.*[^\w'"](DELETE|UPDATE|INSERT INTO)[^\w'"])))(WITH.*)?(SELECT)((?!(FOR UPDATE|FOR SHARE)).)*$/i.freeze
 
         DURATION_BUCKET = [0.05, 0.1, 0.25].freeze
+        TRANSACTION_DURATION_BUCKET = [0.1, 0.25, 1].freeze
 
         # This event is published from ActiveRecordBaseTransactionMetrics and
         # used to record a database transaction duration when calling
         # ActiveRecord::Base.transaction {} block.
         def transaction(event)
           current_transaction&.observe(:gitlab_database_transaction_seconds, event.duration / 1000.0) do
-            buckets [0.1, 0.25, 1]
+            buckets TRANSACTION_DURATION_BUCKET
           end
         end
 
