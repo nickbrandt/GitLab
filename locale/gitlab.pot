@@ -8497,6 +8497,9 @@ msgstr ""
 msgid "Copy %{http_label} clone URL"
 msgstr ""
 
+msgid "Copy %{name}"
+msgstr ""
+
 msgid "Copy %{protocol} clone URL"
 msgstr ""
 
@@ -18428,6 +18431,9 @@ msgstr ""
 msgid "Loading"
 msgstr ""
 
+msgid "Loading %{name}"
+msgstr ""
+
 msgid "Loading contribution stats for group members"
 msgstr ""
 
@@ -25189,9 +25195,6 @@ msgstr ""
 msgid "Reference"
 msgstr ""
 
-msgid "Reference:"
-msgstr ""
-
 msgid "References"
 msgstr ""
 
@@ -28089,6 +28092,9 @@ msgid "Showing version #%{versionNumber}"
 msgstr ""
 
 msgid "Side-by-side"
+msgstr ""
+
+msgid "Sidebar|%{name}: %{value}"
 msgstr ""
 
 msgid "Sidebar|Assign health status"

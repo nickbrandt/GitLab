@@ -1,5 +1,4 @@
 <script>
-import { GlSprintf } from '@gitlab/ui';
 import { labelsFilterParam } from 'ee/integrations/jira/issues_show/constants';
 import { __ } from '~/locale';
 import CopyableField from '~/vue_shared/components/sidebar/copyable_field.vue';
@@ -11,7 +10,6 @@ import IssueField from './issue_field.vue';
 export default {
   name: 'JiraIssuesSidebar',
   components: {
-    GlSprintf,
     Assignee,
     IssueDueDate,
     IssueField,
@@ -46,7 +44,6 @@ export default {
   i18n: {
     statusTitle: __('Status'),
     referenceName: __('Reference'),
-    referenceText: __('Reference: %{reference}'),
   },
 };
 </script>
@@ -70,14 +67,6 @@ export default {
       class="block"
       :name="$options.i18n.referenceName"
       :value="reference"
-    >
-      <span class="cross-project-reference">
-        <gl-sprintf :message="$options.i18n.referenceText">
-          <template #reference>
-            <cite>{{ reference }}</cite>
-          </template>
-        </gl-sprintf>
-      </span>
-    </copyable-field>
+    />
   </div>
 </template>

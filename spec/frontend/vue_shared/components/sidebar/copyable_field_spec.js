@@ -14,9 +14,6 @@ describe('SidebarCopyableField', () => {
   const createComponent = (propsData = defaultProps) => {
     wrapper = shallowMount(CopyableField, {
       propsData,
-      slots: {
-        default: 'Reference: Gl-1',
-      },
     });
   };
 
@@ -51,11 +48,17 @@ describe('SidebarCopyableField', () => {
     });
 
     describe('when `isLoading` prop is `true`', () => {
-      it('renders loading icon', () => {
+      beforeEach(() => {
         createComponent({ ...defaultProps, isLoading: true });
+      });
 
+      it('renders loading icon', () => {
         expect(findLoadingIcon().exists()).toBe(true);
         expect(findLoadingIcon().props('label')).toBe('Loading Reference');
+      });
+
+      it('does not render clipboard button', () => {
+        expect(findClipboardButton().exists()).toBe(false);
       });
     });
   });

@@ -1,6 +1,6 @@
 <script>
 import { GlLoadingIcon } from '@gitlab/ui';
-import { __, sprintf } from '~/locale';
+import { s__, __, sprintf } from '~/locale';
 import ClipboardButton from '~/vue_shared/components/clipboard_button.vue';
 
 /**
@@ -35,12 +35,23 @@ export default {
         tooltipBoundary: 'viewport',
         tooltipPlacement: 'left',
         text: this.value,
-        title: sprintf(__('Copy %{name}'), { name: this.name }),
+        title: sprintf(this.$options.i18n.clipboardTooltip, { name: this.name }),
       };
     },
     loadingIconLabel() {
-      return sprintf(__('Loading %{name}'), { name: this.name });
+      return sprintf(this.$options.i18n.loadingIconLabel, { name: this.name });
     },
+    templateText() {
+      return sprintf(this.$options.i18n.templateText, {
+        name: this.name,
+        value: this.value,
+      });
+    },
+  },
+  i18n: {
+    loadingIconLabel: __('Loading %{name}'),
+    clipboardTooltip: __('Copy %{name}'),
+    templateText: s__('Sidebar|%{name}: %{value}'),
   },
 };
 </script>
@@ -56,14 +67,12 @@ export default {
     <div
       class="gl-display-flex gl-align-items-center gl-justify-content-space-between hide-collapsed"
     >
-      <gl-loading-icon v-if="isLoading" inline :label="loadingIconLabel" />
-      <template v-else>
-        <span class="gl-overflow-hidden gl-text-overflow-ellipsis gl-white-space-nowrap">
-          <slot></slot>
-        </span>
+      <span class="gl-overflow-hidden gl-text-overflow-ellipsis gl-white-space-nowrap">
+        {{ templateText }}
+      </span>
 
-        <clipboard-button size="small" v-bind="clipboardProps" />
-      </template>
+      <gl-loading-icon v-if="isLoading" inline :label="loadingIconLabel" />
+      <clipboard-button v-else size="small" v-bind="clipboardProps" />
     </div>
   </div>
 </template>
