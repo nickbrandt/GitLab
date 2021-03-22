@@ -79,6 +79,11 @@ module EE
       def with_api_entity_associations
         super.preload(:epic)
       end
+
+      # override
+      def use_separate_indices?
+        Elastic::DataMigrationService.migration_has_finished?(:migrate_issues_to_separate_index)
+      end
     end
 
     # override
