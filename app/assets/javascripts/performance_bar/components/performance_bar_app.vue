@@ -166,9 +166,9 @@ export default {
           s__('PerformanceBar|Download')
         }}</a>
       </div>
-      <div v-if="statsUrl" id="peek-stats" class="view">
-        <a class="gl-text-blue-300" :href="statsUrl">{{ s__('PerformanceBar|Stats') }}</a>
-      </div>
+      <a v-if="statsUrl" class="gl-text-blue-300 view" :href="statsUrl">{{
+        s__('PerformanceBar|Stats')
+      }}</a>
       <request-selector
         v-if="currentRequest"
         :current-request="currentRequest"

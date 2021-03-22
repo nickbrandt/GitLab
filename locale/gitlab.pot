@@ -22213,9 +22213,6 @@ msgstr ""
 msgid "PerformanceBar|Stats"
 msgstr ""
 
-msgid "PerformanceBar|Total"
-msgstr ""
-
 msgid "PerformanceBar|Total duration"
 msgstr ""
 

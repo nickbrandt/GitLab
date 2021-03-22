@@ -2,10 +2,8 @@
 import { GlButton, GlModal, GlModalDirective, GlSegmentedControl } from '@gitlab/ui';
 
 import { s__ } from '~/locale';
+import { sortOrders, sortOrderOptions } from '../constants';
 import RequestWarning from './request_warning.vue';
-
-export const SortOrderDuration = 'SortOrderDuration';
-export const SortOrderChronological = 'SortOrderChronological';
 
 export default {
   components: {
@@ -45,7 +43,7 @@ export default {
   data() {
     return {
       openedBacktraces: [],
-      sortOrder: SortOrderDuration,
+      sortOrder: sortOrders.DURATION,
     };
   },
   computed: {
@@ -56,15 +54,11 @@ export default {
       return this.currentRequest.details[this.metric];
     },
     metricDetailsSummary() {
-      let summary = {
-        [s__('PerformanceBar|Total')]: this.metricDetails.calls,
+      return {
+        [s__('Total')]: this.metricDetails.calls,
         [s__('PerformanceBar|Total duration')]: this.metricDetails.duration,
+        ...(this.metricDetails.summary || {}),
       };
-      if (this.metricDetails.summary) {
-        summary = { ...summary, ...this.metricDetails.summary };
-      }
-
-      return summary;
     },
     metricDetailsLabel() {
       if (this.metricDetails.duration && this.metricDetails.calls) {
@@ -82,17 +76,14 @@ export default {
       );
     },
     detailsList() {
-      const list = this.metricDetails.details
-        .slice()
-        .map((item, index) => ({ ...item, id: index }));
-
-      if (this.sortOrder === SortOrderDuration) {
-        return list.sort((a, b) => (a.duration < b.duration ? 1 : -1));
-      } else if (this.sortOrder === SortOrderChronological) {
-        return list.sort((a, b) => (a.start < b.start ? -1 : 1));
+      return this.metricDetails.details.map((item, index) => ({ ...item, id: index }));
+    },
+    sortedList() {
+      if (this.sortOrder === sortOrders.CHRONOLOGICAL) {
+        return this.detailsList.slice().sort(this.sortDetailChronologically);
       }
 
-      return list;
+      return this.detailsList.slice().sort(this.sortDetailByDuration);
     },
     warnings() {
       return this.metricDetails.warnings || [];
@@ -123,11 +114,14 @@ export default {
     changeSortOrder(order) {
       this.sortOrder = order;
     },
+    sortDetailByDuration(a, b) {
+      return a.duration < b.duration ? 1 : -1;
+    },
+    sortDetailChronologically(a, b) {
+      return a.start < b.start ? -1 : 1;
+    },
   },
-  sortOrders: [
-    { value: SortOrderDuration, text: s__('PerformanceBar|Sort by duration') },
-    { value: SortOrderChronological, text: s__('PerformanceBar|Sort chronologically') },
-  ],
+  sortOrderOptions,
 };
 </script>
 <template>
@@ -148,29 +142,25 @@ export default {
     <gl-modal :modal-id="modalId" :title="header" size="lg" footer-class="d-none" scrollable>
       <div class="gl-display-flex gl-align-items-center gl-justify-content-space-between">
         <div class="gl-display-flex gl-align-items-center" data-testid="performance-bar-summary">
-          <div
-            v-for="(value, name) in metricDetailsSummary"
-            v-if="value"
-            :key="name"
-            class="gl-pr-8"
-            data-testid="performance-bar-summary-item"
-          >
-            <div>{{ name }}</div>
-            <div class="gl-font-size-h1 gl-font-weight-bold">{{ value }}</div>
+          <div v-for="(value, name) in metricDetailsSummary" :key="name" class="gl-pr-8">
+            <div v-if="value" data-testid="performance-bar-summary-item">
+              <div>{{ name }}</div>
+              <div class="gl-font-size-h1 gl-font-weight-bold">{{ value }}</div>
+            </div>
           </div>
         </div>
         <gl-segmented-control
           v-if="displaySortOrder"
           data-testid="performance-bar-sort-order"
-          :options="$options.sortOrders"
+          :options="$options.sortOrderOptions"
           :checked="sortOrder"
           @input="changeSortOrder"
         />
       </div>
       <hr />
       <table class="table gl-table">
-        <template v-if="detailsList.length">
-          <tr v-for="item in detailsList" :key="item.id">
+        <template v-if="sortedList.length">
+          <tr v-for="item in sortedList" :key="item.id">
             <td data-testid="performance-item-duration">
               <span v-if="item.duration">{{
                 sprintf(__('%{duration}ms'), { duration: item.duration })
@@ -198,7 +188,7 @@ export default {
                     @click="toggleBacktrace(item.id)"
                   />
                 </div>
-                <pre v-if="itemHasOpenedBacktrace(item.id)" class="backtrace-row mt-2">{{
+                <pre v-if="itemHasOpenedBacktrace(item.id)" class="backtrace-row gl-mt-3">{{
                   item.backtrace
                 }}</pre>
               </div>
@@ -207,7 +197,7 @@ export default {
         </template>
         <template v-else>
           <tr>
-            <td>
+            <td data-testid="performance-bar-empty-detail-notice">
               {{ sprintf(__('No %{header} for this request.'), { header: header.toLowerCase() }) }}
             </td>
           </tr>

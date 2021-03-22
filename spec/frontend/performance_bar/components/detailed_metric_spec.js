@@ -2,35 +2,39 @@ import { shallowMount } from '@vue/test-utils';
 import { nextTick } from 'vue';
 import { trimText } from 'helpers/text_helper';
 import { extendedWrapper } from 'helpers/vue_test_utils_helper';
-import DetailedMetric, {
-  SortOrderDuration,
-  SortOrderChronological,
-} from '~/performance_bar/components/detailed_metric.vue';
+import DetailedMetric from '~/performance_bar/components/detailed_metric.vue';
 import RequestWarning from '~/performance_bar/components/request_warning.vue';
+import { sortOrders } from '~/performance_bar/constants';
 
 describe('detailedMetric', () => {
   let wrapper;
 
-  const createComponent = (props) => {
+  const defaultProps = {
+    currentRequest: {},
+    metric: 'gitaly',
+    header: 'Gitaly calls',
+    keys: ['feature', 'request'],
+  };
+
+  const createComponent = (props = {}) => {
     wrapper = extendedWrapper(
       shallowMount(DetailedMetric, {
-        propsData: {
-          ...props,
-        },
+        propsData: { ...defaultProps, ...props },
       }),
     );
   };
 
   const findAllTraceBlocks = () => wrapper.findAll('pre');
   const findTraceBlockAtIndex = (index) => findAllTraceBlocks().at(index);
-  const findExpandBacktraceBtns = () => wrapper.findAll('[data-testid="backtrace-expand-btn"]');
+  const findExpandBacktraceBtns = () => wrapper.findAllByTestId('backtrace-expand-btn');
   const findExpandedBacktraceBtnAtIndex = (index) => findExpandBacktraceBtns().at(index);
   const findDetailsLabel = () => wrapper.findByTestId('performance-bar-details-label');
   const findSortOrderSwitcher = () => wrapper.findByTestId('performance-bar-sort-order');
+  const findEmptyDetailNotice = () => wrapper.findByTestId('performance-bar-empty-detail-notice');
   const findAllDetailDurations = () =>
-    wrapper.findAll('[data-testid="performance-item-duration"]').wrappers.map((w) => w.text());
+    wrapper.findAllByTestId('performance-item-duration').wrappers.map((w) => w.text());
   const findAllSummaryItems = () =>
-    wrapper.findAll('[data-testid="performance-bar-summary-item"]').wrappers.map((w) => w.text());
+    wrapper.findAllByTestId('performance-bar-summary-item').wrappers.map((w) => w.text());
 
   afterEach(() => {
     wrapper.destroy();
@@ -38,13 +42,7 @@ describe('detailedMetric', () => {
 
   describe('when the current request has no details', () => {
     beforeEach(() => {
-      createComponent({
-        currentRequest: {},
-        metric: 'gitaly',
-        header: 'Gitaly calls',
-        details: 'details',
-        keys: ['feature', 'request'],
-      });
+      createComponent();
     });
 
     it('does not render the element', () => {
@@ -76,18 +74,15 @@ describe('detailedMetric', () => {
               },
             },
           },
-          metric: 'gitaly',
-          header: 'Gitaly calls',
-          keys: ['feature', 'request'],
         });
       });
 
       it('displays an empty title', () => {
-        expect(findDetailsLabel().text()).toContain('0');
+        expect(findDetailsLabel().text()).toBe('0');
       });
 
       it('displays an empty modal', () => {
-        expect(wrapper.text().replace(/\s+/g, ' ')).toContain('No gitaly calls for this request');
+        expect(findEmptyDetailNotice().text()).toContain('No gitaly calls for this request');
       });
 
       it('does not display sort by switcher', () => {
@@ -112,9 +107,6 @@ describe('detailedMetric', () => {
               },
             },
           },
-          metric: 'gitaly',
-          header: 'Gitaly calls',
-          keys: ['feature', 'request'],
         });
       });
 
@@ -141,14 +133,11 @@ describe('detailedMetric', () => {
               },
             },
           },
-          metric: 'gitaly',
-          header: 'Gitaly calls',
-          keys: ['feature', 'request'],
         });
       });
 
       it('displays details header', () => {
-        expect(findDetailsLabel().text()).toContain('123ms / 456');
+        expect(findDetailsLabel().text()).toBe('123ms / 456');
       });
 
       it('displays a basic summary section', () => {
@@ -156,11 +145,7 @@ describe('detailedMetric', () => {
       });
 
       it('sorts the details by descending duration order', () => {
-        expect(
-          wrapper
-            .findAll('[data-testid="performance-item-duration"]')
-            .wrappers.map((w) => w.text()),
-        ).toEqual(['100ms', '23ms']);
+        expect(findAllDetailDurations()).toEqual(['100ms', '23ms']);
       });
 
       it('does not display sort by switcher', () => {
@@ -275,10 +260,10 @@ describe('detailedMetric', () => {
       });
 
       it('allows switch sorting orders', async () => {
-        findSortOrderSwitcher().vm.$emit('input', SortOrderChronological);
+        findSortOrderSwitcher().vm.$emit('input', sortOrders.CHRONOLOGICAL);
         await nextTick();
         expect(findAllDetailDurations()).toEqual(['23ms', '100ms', '75ms']);
-        findSortOrderSwitcher().vm.$emit('input', SortOrderDuration);
+        findSortOrderSwitcher().vm.$emit('input', sortOrders.DURATION);
         await nextTick();
         expect(findAllDetailDurations()).toEqual(['100ms', '75ms', '23ms']);
       });
@@ -296,10 +281,7 @@ describe('detailedMetric', () => {
               },
             },
           },
-          metric: 'gitaly',
           title: 'custom',
-          header: 'Gitaly calls',
-          keys: ['feature', 'request'],
         });
       });
 
@@ -326,7 +308,7 @@ describe('detailedMetric', () => {
       });
 
       it('displays calls in the label', () => {
-        expect(findDetailsLabel().text()).toContain('456');
+        expect(findDetailsLabel().text()).toBe('456');
       });
 
       it('displays a basic summary section', () => {
