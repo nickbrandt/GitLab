@@ -3,8 +3,16 @@
 require 'spec_helper'
 
 RSpec.describe DashboardController do
+  shared_examples 'does not recalculate assigned open issue counts' do |params|
+    it 'does not recalculate' do
+      expect(Users::UpdateAssignedOpenIssueCountService).not_to receive(:execute)
+
+      get :issues, params: params || {}
+    end
+  end
+
   context 'signed in' do
-    let(:user) { create(:user) }
+    let(:user) { create(:user, username: 'testuser') }
     let(:project) { create(:project) }
 
     before do
@@ -15,12 +23,40 @@ RSpec.describe DashboardController do
     describe 'GET issues' do
       it_behaves_like 'issuables list meta-data', :issue, :issues
       it_behaves_like 'issuables requiring filter', :issues
+
+      describe 'recalculation of open assigned issue count' do
+        context 'if the user is viewing only their open assigned issues' do
+          it 'recalculates in case the cache is stale' do
+            fake_service = double
+            expect(fake_service).to receive(:execute)
+            expect(Users::UpdateAssignedOpenIssueCountService).to receive(:new).with(current_user: user, target_user: user).and_return(fake_service)
+
+            get :issues, params: { assignee_username: user.username }
+          end
+        end
+
+        context "if the user is viewing someone else's assigned issues" do
+          let_it_be(:other_user) { create(:user, username: 'niceperson123') }
+
+          it_behaves_like 'does not recalculate assigned open issue counts', { assignee_username: 'niceperson123' }
+        end
+
+        context 'no assignee filtering' do
+          let_it_be(:other_user) { create(:user, username: 'niceperson123') }
+
+          it_behaves_like 'does not recalculate assigned open issue counts'
+        end
+      end
     end
 
     describe 'GET merge requests' do
       it_behaves_like 'issuables list meta-data', :merge_request, :merge_requests
       it_behaves_like 'issuables requiring filter', :merge_requests
     end
+  end
+
+  context 'not signed in' do
+    it_behaves_like 'does not recalculate assigned open issue counts', { assignee_username: 'testuser' }
   end
 
   describe "GET activity as JSON" do

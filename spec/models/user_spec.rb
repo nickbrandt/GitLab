@@ -4214,17 +4214,54 @@ RSpec.describe User do
     end
   end
 
-  describe '#invalidate_issue_cache_counts' do
-    let(:user) { build_stubbed(:user) }
+  describe 'open issue counts by user' do
+    shared_examples 'invalidates the cached value' do
+      it 'invalidates cache for issue counter' do
+        cache_mock = double
 
-    it 'invalidates cache for issue counter' do
-      cache_mock = double
+        expect(cache_mock).to receive(:delete).with(['users', user.id, 'assigned_open_issues_count'])
 
-      expect(cache_mock).to receive(:delete).with(['users', user.id, 'assigned_open_issues_count'])
+        allow(Rails).to receive(:cache).and_return(cache_mock)
 
-      allow(Rails).to receive(:cache).and_return(cache_mock)
+        user.recalculate_assigned_open_issue_counts
+      end
+    end
 
-      user.invalidate_issue_cache_counts
+    describe '#recalculate_assigned_open_issue_counts' do
+      let(:user) { create(:user) }
+
+      subject do
+        user.recalculate_assigned_open_issue_counts
+        user.save!
+      end
+
+      context 'if feature flag assigned_open_issues_database_cache is disabled' do
+        before do
+          stub_feature_flags(assigned_open_issues_database_cache: false)
+        end
+
+        it 'does not call the recalculate worker' do
+          expect(Users::UpdateOpenIssueCountWorker).not_to receive(:perform_async)
+
+          subject
+        end
+
+        it_behaves_like 'invalidates the cached value'
+      end
+
+      context 'if feature flag assigned_open_issues_database_cache is enabled' do
+        before do
+          stub_feature_flags(assigned_open_issues_database_cache: true)
+        end
+
+        it 'calls the recalculate worker' do
+          expect(Users::UpdateOpenIssueCountWorker).to receive(:perform_async).with(user.id, user.id)
+
+          subject
+        end
+
+        it_behaves_like 'invalidates the cached value'
+      end
     end
   end
 

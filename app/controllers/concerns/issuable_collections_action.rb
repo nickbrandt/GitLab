@@ -13,6 +13,12 @@ module IssuableCollectionsAction
 
     @issuable_meta_data = Gitlab::IssuableMetadata.new(current_user, @issues).data
 
+    if current_user && params[:assignee_username] == current_user.username
+      # this means that the user is looking in more detail about their own issues
+      # so the count had better be up-to-date just in case there's a caching blip
+      Users::UpdateAssignedOpenIssueCountService.new(current_user: current_user, target_user: current_user).execute
+    end
+
     respond_to do |format|
       format.html
       format.atom { render layout: 'xml.atom' }

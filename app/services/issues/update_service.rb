@@ -65,6 +65,7 @@ module Issues
         create_assignee_note(issue, old_assignees)
         notification_service.async.reassigned_issue(issue, current_user, old_assignees)
         todo_service.reassigned_assignable(issue, current_user, old_assignees)
+        update_assigned_issue_counts(issue.assignees, old_assignees)
         track_incident_action(current_user, issue, :incident_assigned)
       end
 
@@ -197,6 +198,13 @@ module Issues
 
     def create_confidentiality_note(issue)
       SystemNoteService.change_issue_confidentiality(issue, issue.project, current_user)
+    end
+
+    def update_assigned_issue_counts(current_assignees, old_assignees)
+      # union minus intersection gives us all assignees that are being either assigned or unassigned.
+      changed_assignees = (current_assignees | old_assignees) - (current_assignees & old_assignees)
+
+      Users::UpdateOpenIssueCountWorker.perform_async(current_user.id, changed_assignees.map(&:id))
     end
   end
 end

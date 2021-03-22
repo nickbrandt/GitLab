@@ -1,0 +1,5 @@
+---
+title: Cache user assigned open issues count to database
+merge_request: 57108
+author:
+type: performance

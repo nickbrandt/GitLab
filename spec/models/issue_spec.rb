@@ -663,7 +663,7 @@ RSpec.describe Issue do
     end
   end
 
-  describe 'cached counts' do
+  describe 'cached counts', :clean_gitlab_redis_cache do
     it 'updates when assignees change' do
       user1 = create(:user)
       user2 = create(:user)

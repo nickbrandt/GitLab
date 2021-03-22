@@ -1636,9 +1636,26 @@ class User < ApplicationRecord
   end
 
   def assigned_open_issues_count(force: false)
-    Rails.cache.fetch(['users', id, 'assigned_open_issues_count'], force: force, expires_in: count_cache_validity_period) do
-      IssuesFinder.new(self, assignee_id: self.id, state: 'opened', non_archived: true).execute.count
+    cached_count = Rails.cache.fetch(['users', id, 'assigned_open_issues_count'], force: force, expires_in: count_cache_validity_period) do
+      update_assigned_open_issues_count
     end
+
+    if Feature.enabled?(:assigned_open_issues_database_cache, default_enabled: :yaml)
+      # save to db column if different
+      if attributes['assigned_open_issues_count'] != cached_count
+        update_assigned_open_issues_count(count_to_persist: cached_count)
+        cached_count
+      end
+    end
+
+    cached_count
+  end
+
+  def update_assigned_open_issues_count(count_to_persist: nil)
+    # rubocop: disable CodeReuse/ServiceClass
+    response = Users::UpdateAssignedOpenIssueCountService.new(target_user: self, current_user: self, params: { count_to_persist: count_to_persist }).execute
+    # rubocop: enable CodeReuse/ServiceClass
+    response.payload[:count]
   end
 
   def todos_done_count(force: false)
@@ -1665,15 +1682,25 @@ class User < ApplicationRecord
   end
 
   def invalidate_cache_counts
+    # in the case of issue counts, they are stored in the DB for easy-read-expensive-write
     invalidate_issue_cache_counts
     invalidate_merge_request_cache_counts
     invalidate_todos_cache_counts
     invalidate_personal_projects_count
   end
 
-  def invalidate_issue_cache_counts
+  def recalculate_assigned_open_issue_counts
     Rails.cache.delete(['users', id, 'assigned_open_issues_count'])
+
+    if Feature.enabled?(:assigned_open_issues_database_cache, default_enabled: :yaml)
+      run_after_commit do
+        Users::UpdateOpenIssueCountWorker.perform_async(self.id, self.id)
+      end
+    end
   end
+
+  # we use some metaprogramming so we need to preserve the method name
+  alias_method :invalidate_issue_cache_counts, :recalculate_assigned_open_issue_counts
 
   def invalidate_merge_request_cache_counts
     Rails.cache.delete(['users', id, 'assigned_open_merge_requests_count'])
