@@ -414,6 +414,7 @@ group :development, :test, :omnibus do
 end
 
 group :test do
+  gem 'json-schema', '~> 2.8.0'
   gem 'fuubar', '~> 2.2.0'
   gem 'rspec-retry', '~> 0.6.1'
   gem 'rspec_profiling', '~> 0.0.6'
@@ -520,7 +521,6 @@ gem 'valid_email', '~> 0.1'
 
 # JSON
 gem 'json', '~> 2.3.0'
-gem 'json-schema', '~> 2.8.0'
 gem 'json_schemer', '~> 0.2.12'
 gem 'oj', '~> 3.10.6'
 gem 'multi_json', '~> 1.14.1'

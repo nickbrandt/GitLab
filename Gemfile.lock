@@ -643,7 +643,7 @@ GEM
       activesupport (>= 4.2)
       aes_key_wrap
       bindata
-    json-schema (2.8.0)
+    json-schema (2.8.1)
       addressable (>= 2.4)
     json_schemer (0.2.12)
       ecma-re-validator (~> 0.2)
