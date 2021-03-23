@@ -116,10 +116,13 @@ module API
       params do
         requires :from, type: String, desc: 'The commit, branch name, or tag name to start comparison'
         requires :to, type: String, desc: 'The commit, branch name, or tag name to stop comparison'
+        optional :from_project_id, type: String, desc: 'The project to compare from'
         optional :straight, type: Boolean, desc: 'Comparison method, `true` for direct comparison between `from` and `to` (`from`..`to`), `false` to compare using merge base (`from`...`to`)', default: false
       end
       get ':id/repository/compare' do
-        compare = CompareService.new(user_project, params[:to]).execute(user_project, params[:from], straight: params[:straight])
+        from_project = params[:from_project_id].present? ? find_project!(params[:from_project_id]) : user_project
+
+        compare = CompareService.new(user_project, params[:to]).execute(from_project, params[:from], straight: params[:straight])
 
         if compare
           present compare, with: Entities::Compare
