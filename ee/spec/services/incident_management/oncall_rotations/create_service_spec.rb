@@ -163,6 +163,14 @@ RSpec.describe IncidentManagement::OncallRotations::CreateService do
         it_behaves_like 'successfully creates rotation'
         it_behaves_like 'saved the active period times'
 
+        context 'when end active time is before start active time' do
+          let(:active_period_start) { '17:00' }
+          let(:active_period_end) { '08:00' }
+
+          it_behaves_like 'successfully creates rotation'
+          it_behaves_like 'saved the active period times'
+        end
+
         context 'when only active period end time is set' do
           let(:active_period_start) { nil }
 
@@ -173,13 +181,6 @@ RSpec.describe IncidentManagement::OncallRotations::CreateService do
           let(:active_period_end) { nil }
 
           it_behaves_like 'error response', "Active period end can't be blank"
-        end
-
-        context 'when end active time is before start active time' do
-          let(:active_period_start) { '17:00' }
-          let(:active_period_end) { '08:00' }
-
-          it_behaves_like 'error response', "Active period end must be later than active period start"
         end
       end
 
