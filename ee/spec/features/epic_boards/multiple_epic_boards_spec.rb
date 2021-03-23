@@ -57,8 +57,11 @@ RSpec.describe 'epic boards', :js do
 
     it 'deletes an epic board' do
       in_boards_switcher_dropdown do
-        expect(page).to have_content(epic_board.name)
-        expect(page).to have_content(epic_board2.name)
+        aggregate_failures do
+          expect(page).to have_content(epic_board.name)
+          expect(page).to have_content(epic_board2.name)
+        end
+
         click_button 'Delete board'
       end
 
@@ -66,8 +69,10 @@ RSpec.describe 'epic boards', :js do
       wait_for_requests
 
       in_boards_switcher_dropdown do
-        expect(page).not_to have_content(epic_board.name)
-        expect(page).to have_content(epic_board2.name)
+        aggregate_failures do
+          expect(page).not_to have_content(epic_board.name)
+          expect(page).to have_content(epic_board2.name)
+        end
       end
     end
   end
