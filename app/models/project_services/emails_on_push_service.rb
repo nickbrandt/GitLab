@@ -81,8 +81,8 @@ class EmailsOnPushService < Service
       {
         type: 'textarea',
         name: 'recipients',
-        placeholder: s_('EmailsOnPushService|Emails separated by whitespace'),
-        help: s_('EmailsOnPushService|Invalid email addresses and duplicates will be removed.')
+        placeholder: s_('EmailsOnPushService|tanuki@example.com gitlab@example.com'),
+        help: s_('EmailsOnPushService|Emails separated by whitespace.')
       }
     ]
   end
@@ -99,7 +99,7 @@ class EmailsOnPushService < Service
 
   def number_of_receipients_within_limit
     if valid_recipients.size > RECIPIENTS_LIMIT
-      errors.add(:recipients, s_("EmailsOnPushService|max number is %{recipients_limit}") % { recipients_limit: RECIPIENTS_LIMIT })
+      errors.add(:recipients, s_("EmailsOnPushService|can't exceed %{recipients_limit}") % { recipients_limit: RECIPIENTS_LIMIT })
     end
   end
 end

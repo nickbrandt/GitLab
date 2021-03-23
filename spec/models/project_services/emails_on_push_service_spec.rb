@@ -43,7 +43,7 @@ RSpec.describe EmailsOnPushService do
         it 'adds an error message' do
           service.valid?
 
-          expect(service.errors).to contain_exactly('Recipients max number is 2')
+          expect(service.errors).to contain_exactly('Recipients can\'t exceed 2')
         end
 
         context 'when service is not active' do
