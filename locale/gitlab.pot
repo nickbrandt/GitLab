@@ -17074,6 +17074,12 @@ msgstr ""
 msgid "Integrations|%{integration} settings saved, but not active."
 msgstr ""
 
+msgid "Integrations|Active integrations"
+msgstr ""
+
+msgid "Integrations|Add an integration"
+msgstr ""
+
 msgid "Integrations|Add namespace"
 msgstr ""
 
