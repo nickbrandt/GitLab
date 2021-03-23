@@ -124,9 +124,13 @@ func TestAcceleratedUpload(t *testing.T) {
 		{"PUT", "/api/v4/projects/group%2Fproject/packages/nuget/v1/files", true},
 		{"PUT", "/api/v4/projects/group%2Fsubgroup%2Fproject/packages/nuget/v1/files", true},
 		{"POST", `/api/v4/groups/import`, true},
+		{"POST", `/api/v4/groups/import/`, true},
 		{"POST", `/api/v4/projects/import`, true},
+		{"POST", `/api/v4/projects/import/`, true},
 		{"POST", `/import/gitlab_project`, true},
+		{"POST", `/import/gitlab_project/`, true},
 		{"POST", `/import/gitlab_group`, true},
+		{"POST", `/import/gitlab_group/`, true},
 		{"POST", `/api/v4/projects/9001/packages/pypi`, true},
 		{"POST", `/api/v4/projects/group%2Fproject/packages/pypi`, true},
 		{"POST", `/api/v4/projects/group%2Fsubgroup%2Fproject/packages/pypi`, true},
@@ -134,14 +138,16 @@ func TestAcceleratedUpload(t *testing.T) {
 		{"POST", `/api/v4/projects/group%2Fproject/issues/30/metric_images`, true},
 		{"POST", `/api/v4/projects/group%2Fsubgroup%2Fproject/issues/30/metric_images`, true},
 		{"POST", `/my/project/-/requirements_management/requirements/import_csv`, true},
+		{"POST", `/my/project/-/requirements_management/requirements/import_csv/`, true},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.resource, func(t *testing.T) {
 			ts := uploadTestServer(t,
 				func(r *http.Request) {
+					resource := strings.TrimRight(tt.resource, "/")
 					// Validate %2F characters haven't been unescaped
-					require.Equal(t, tt.resource+"/authorize", r.URL.String())
+					require.Equal(t, resource+"/authorize", r.URL.String())
 				},
 				func(r *http.Request) {
 					if tt.signedFinalization {
