@@ -34,17 +34,10 @@ RSpec.describe HasTimelogsReport do
   describe '#user_can_access_group_timelogs?' do
     before do
       group.add_developer(user)
-      stub_licensed_features(group_timelogs: true)
     end
 
     it 'returns true if user can access group timelogs' do
       expect(group.user_can_access_group_timelogs?(user)).to be_truthy
-    end
-
-    it 'returns false if feature group_timelogs is disabled' do
-      stub_licensed_features(group_timelogs: false)
-
-      expect(group.user_can_access_group_timelogs?(user)).to be_falsey
     end
 
     it 'returns false if user has insufficient permissions' do
