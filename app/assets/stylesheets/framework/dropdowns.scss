@@ -133,7 +133,8 @@
   }
 }
 
-.dropdown-menu-toggle {
+// This is double classed to solve a specificity issue with the gitlab ui buttons
+.dropdown-menu-toggle.dropdown-menu-toggle {
   @extend .dropdown-toggle;
   justify-content: flex-start;
   overflow: hidden;

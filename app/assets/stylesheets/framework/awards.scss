@@ -208,9 +208,8 @@
   gl-emoji,
   .award-control-icon {
     vertical-align: middle;
-    margin-right: 0.15em;
-    font-size: 1.5em;
-    line-height: 1;
+    font-size: 1.4em;
+    line-height: 0.5em;
   }
 
   .award-control-icon-loading {
@@ -219,11 +218,8 @@
 
   .award-control-icon {
     color: $border-gray-normal;
-    margin-top: 1px;
-    padding: 0 2px;
 
     svg {
-      margin-bottom: 3px;
       height: $default-icon-size;
       width: $default-icon-size;
       border-radius: 50%;
