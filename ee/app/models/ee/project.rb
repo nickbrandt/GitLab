@@ -12,7 +12,7 @@ module EE
     include ::Gitlab::Utils::StrongMemoize
     include IgnorableColumns
 
-    GIT_LFS_DOWNLOAD_OPERATION = 'download'.freeze
+    GIT_LFS_DOWNLOAD_OPERATION = 'download'
 
     prepended do
       include Elastic::ProjectsSearch
