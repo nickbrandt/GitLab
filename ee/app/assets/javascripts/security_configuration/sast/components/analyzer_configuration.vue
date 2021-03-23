@@ -54,7 +54,7 @@ export default {
     <dynamic-fields
       v-if="hasVariables"
       :disabled="!entity.enabled"
-      class="gl-ml-6 gl-mb-0"
+      class="gl-mt-3 gl-ml-6 gl-mb-0"
       :entities="variables"
       @input="onVariablesUpdate"
     />
