@@ -6,9 +6,9 @@ module Projects
       include ProjectsHelper
 
       layout 'project_settings'
-      before_action -> { check_permission(:read) }, only: [:index]
-      before_action -> { check_permission(:destroy) }, only: [:revoke]
-      before_action -> { check_permission(:create) }, only: [:create]
+      before_action -> { check_permission(:read_resource_access_tokens) }, only: [:index]
+      before_action -> { check_permission(:destroy_resource_access_tokens) }, only: [:revoke]
+      before_action -> { check_permission(:create_resource_access_tokens) }, only: [:create]
 
       feature_category :authentication_and_authorization
 
@@ -46,14 +46,7 @@ module Projects
       private
 
       def check_permission(action)
-        case action
-        when :read
-          render_404 unless can?(current_user, :read_resource_access_tokens, @project)
-        when :destroy
-          access_denied! unless can?(current_user, :destroy_resource_access_tokens, @project)
-        when :create
-          access_denied! unless can?(current_user, :create_resource_access_tokens, @project)
-        end
+        render_404 unless can?(current_user, action, @project)
       end
 
       def create_params
