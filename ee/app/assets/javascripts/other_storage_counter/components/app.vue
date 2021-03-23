@@ -19,7 +19,7 @@ import UsageGraph from './usage_graph.vue';
 import UsageStatistics from './usage_statistics.vue';
 
 export default {
-  name: 'StorageCounterApp',
+  name: 'OtherStorageCounterApp',
   components: {
     GlLink,
     GlIcon,
