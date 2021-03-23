@@ -8722,11 +8722,6 @@ msgstr ""
 msgid "Coverage Fuzzing"
 msgstr ""
 
-msgid "Coverage value for this pipeline was calculated by the coverage value of %d job."
-msgid_plural "Coverage value for this pipeline was calculated by averaging the resulting coverage values of %d jobs."
-msgstr[0] ""
-msgstr[1] ""
-
 msgid "Create"
 msgstr ""
 
@@ -22653,9 +22648,6 @@ msgstr ""
 msgid "Pipeline|Could not retrieve the pipeline status. For troubleshooting steps, read the %{linkStart}documentation%{linkEnd}."
 msgstr ""
 
-msgid "Pipeline|Coverage"
-msgstr ""
-
 msgid "Pipeline|Created"
 msgstr ""
 
@@ -22750,6 +22742,18 @@ msgid "Pipeline|Stop pipeline #%{pipelineId}?"
 msgstr ""
 
 msgid "Pipeline|Tag name"
+msgstr ""
+
+msgid "Pipeline|Test coverage"
+msgstr ""
+
+msgid "Pipeline|This change will decrease the overall test coverage if merged."
+msgstr ""
+
+msgid "Pipeline|This change will increase the overall test coverage if merged."
+msgstr ""
+
+msgid "Pipeline|This change will not change the overall test coverage if merged."
 msgstr ""
 
 msgid "Pipeline|Trigger author"
@@ -29818,6 +29822,11 @@ msgstr ""
 
 msgid "Test coverage parsing"
 msgstr ""
+
+msgid "Test coverage value for this pipeline was calculated by the coverage value of %d job."
+msgid_plural "Test coverage value for this pipeline was calculated by averaging the resulting coverage values of %d jobs."
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "Test coverage: %d hit"
 msgid_plural "Test coverage: %d hits"
