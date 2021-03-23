@@ -5,10 +5,10 @@ require 'spec_helper'
 RSpec.describe 'epics list', :js do
   include FilteredSearchHelpers
 
-  let(:user) { create(:user) }
-  let(:group) { create(:group, :public) }
-  let(:label) { create(:group_label, group: group, title: 'bug') }
-  let!(:epic) { create(:epic, group: group, start_date: 10.days.ago, due_date: 5.days.ago) }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:group) { create(:group, :public) }
+  let_it_be(:label) { create(:group_label, group: group, title: 'bug') }
+  let_it_be(:epic) { create(:epic, group: group, start_date: 10.days.ago, due_date: 5.days.ago) }
 
   let(:filtered_search) { find('.filtered-search') }
   let(:filter_author_dropdown) { find("#js-dropdown-author .filter-dropdown") }
@@ -16,7 +16,7 @@ RSpec.describe 'epics list', :js do
   let(:js_dropdown_my_reaction) { '#js-dropdown-my-reaction' }
   let(:filter_emoji_dropdown) { find("#js-dropdown-my-reaction .filter-dropdown") }
 
-  let!(:award_emoji_star) { create(:award_emoji, name: 'star', user: user, awardable: epic) }
+  let_it_be(:award_emoji_star) { create(:award_emoji, name: 'star', user: user, awardable: epic) }
 
   before do
     stub_licensed_features(epics: true)
@@ -89,29 +89,42 @@ RSpec.describe 'epics list', :js do
   end
 
   context 'editing reaction emoji token' do
-    before do
-      group.add_maintainer(user)
+    before_all do
       create_list(:award_emoji, 2, user: user, name: 'thumbsup')
       create_list(:award_emoji, 1, user: user, name: 'thumbsdown')
       create_list(:award_emoji, 3, user: user, name: 'star')
     end
 
-    it 'opens when the search bar has my-reaction=' do
-      filtered_search.set('my-reaction:=')
+    context 'when user is not logged in' do
+      it 'does not open when the search bar has my-reaction=' do
+        filtered_search.set('my-reaction=')
 
-      expect(page).to have_css(js_dropdown_my_reaction, visible: true)
+        expect(page).not_to have_css(js_dropdown_my_reaction)
+      end
     end
 
-    it 'loads all the emojis when opened' do
-      input_filtered_search('my-reaction:=', submit: false, extra_space: false)
+    context 'when user is logged in' do
+      before_all do
+        group.add_maintainer(user)
+      end
 
-      expect_filtered_search_dropdown_results(filter_emoji_dropdown, 3)
-    end
+      it 'opens when the search bar has my-reaction=' do
+        filtered_search.set('my-reaction:=')
 
-    it 'shows the most populated emoji at top of dropdown' do
-      input_filtered_search('my-reaction:=', submit: false, extra_space: false)
+        expect(page).to have_css(js_dropdown_my_reaction, visible: true)
+      end
 
-      expect(first("#{js_dropdown_my_reaction} .filter-dropdown li")).to have_content(award_emoji_star.name)
+      it 'loads all the emojis when opened' do
+        input_filtered_search('my-reaction:=', submit: false, extra_space: false)
+
+        expect_filtered_search_dropdown_results(filter_emoji_dropdown, 3)
+      end
+
+      it 'shows the most populated emoji at top of dropdown' do
+        input_filtered_search('my-reaction:=', submit: false, extra_space: false)
+
+        expect(first("#{js_dropdown_my_reaction} .filter-dropdown li")).to have_content(award_emoji_star.name)
+      end
     end
   end
 end
