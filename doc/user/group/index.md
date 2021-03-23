@@ -454,9 +454,10 @@ API requests to add a new user to a project are not possible.
 > - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/1985) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 12.0.
 > - [Moved](https://gitlab.com/gitlab-org/gitlab/-/issues/215410) to [GitLab Premium](https://about.gitlab.com/pricing/) in 13.1.
 
-NOTE:
-IP access restrictions are not functioning as expected on GitLab.com. If enabled,
-users cannot perform Git operations through SSH, or access projects in the UI.
+WARNING:
+Currently IP access restrictions work only for HTTP requests on GitLab.com.
+SSH requests will fail and 
+users will not be able to perform Git operations over SSH.
 For more information, [see this issue](https://gitlab.com/gitlab-org/gitlab/-/issues/271673).
 
 To ensure only people from your organization can access particular
@@ -469,9 +470,10 @@ This restriction applies to:
 
 - The GitLab UI.
 - [In GitLab 12.3 and later](https://gitlab.com/gitlab-org/gitlab/-/issues/12874), the API.
-- [In GitLab 12.4 and later](https://gitlab.com/gitlab-org/gitlab/-/issues/32113), Git actions via SSH.
 
-Administrators and group owners are able to access the group regardless of the IP restriction.
+NOTE:
+Administrators and group owners are **always** able to access the group settings regardless of IP restriction,
+however, they cannot access projects belonging to the group when access via a non-allowed IP address.
 
 To restrict group access by IP address:
 
