@@ -27,6 +27,10 @@ RSpec.describe Gitlab::UsageMetricDefinitionGenerator do
       )
   end
 
+  after do
+    FileUtils.rm_rf(temp_dir)
+  end
+
   describe 'Creating metric definition file' do
     let(:sample_metric) { load_sample_metric_definition }
 
