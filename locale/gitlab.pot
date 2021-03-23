@@ -3208,6 +3208,9 @@ msgstr ""
 msgid "Also called \"Relying party service URL\" or \"Reply URL\""
 msgstr ""
 
+msgid "Also remove direct user membership from subgroups and projects"
+msgstr ""
+
 msgid "Also unassign this user from related issues and merge requests"
 msgstr ""
 
@@ -33011,7 +33014,10 @@ msgstr ""
 msgid "User was successfully created."
 msgstr ""
 
-msgid "User was successfully removed from group and any subresources."
+msgid "User was successfully removed from group and any subgroups and projects."
+msgstr ""
+
+msgid "User was successfully removed from group."
 msgstr ""
 
 msgid "User was successfully removed from project."
