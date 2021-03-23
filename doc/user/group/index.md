@@ -473,7 +473,7 @@ This restriction applies to:
 
 NOTE:
 Administrators and group owners are **always** able to access the group settings regardless of IP restriction,
-however, they cannot access projects belonging to the group when access via a non-allowed IP address.
+however, they cannot access projects belonging to the group when accessing via a non-allowed IP address.
 
 To restrict group access by IP address:
 
