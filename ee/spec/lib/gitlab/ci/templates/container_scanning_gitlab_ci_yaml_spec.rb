@@ -34,6 +34,16 @@ RSpec.describe 'Container-Scanning.gitlab-ci.yml' do
 
       context 'by default' do
         it 'includes job' do
+          expect(build_names).to match_array(%w[container_scanning_deprecated])
+        end
+      end
+
+      context 'with CS_MAJOR_VERSION greater than 3' do
+        before do
+          create(:ci_variable, project: project, key: 'CS_MAJOR_VERSION', value: '4')
+        end
+
+        it 'includes job' do
           expect(build_names).to match_array(%w[container_scanning])
         end
       end
