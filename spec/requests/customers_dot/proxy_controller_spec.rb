@@ -2,24 +2,24 @@
 
 require 'spec_helper'
 
-RSpec.describe CustomersDot::ProxyController do
+RSpec.describe CustomersDot::ProxyController, type: :request do
   describe 'POST graphql' do
     let_it_be(:customers_dot) { "#{Gitlab::SubscriptionPortal::SUBSCRIPTIONS_URL}/graphql" }
 
     it 'forwards request body to customers dot' do
-      request_body = '{ "foo" => "bar" }'
+      request_params = '{ "foo" => "bar" }'
 
       stub_request(:post, customers_dot)
 
-      post :graphql, body: request_body
+      post customers_dot_proxy_graphql_path, params: request_params
 
-      expect(WebMock).to have_requested(:post, customers_dot).with(body: request_body)
+      expect(WebMock).to have_requested(:post, customers_dot).with(body: request_params)
     end
 
     it 'responds with customers dot status' do
       stub_request(:post, customers_dot).to_return(status: 500)
 
-      post :graphql
+      post customers_dot_proxy_graphql_path
 
       expect(response).to have_gitlab_http_status(:internal_server_error)
     end
@@ -29,7 +29,7 @@ RSpec.describe CustomersDot::ProxyController do
 
       stub_request(:post, customers_dot).to_return(body: customers_dot_response)
 
-      post :graphql
+      post customers_dot_proxy_graphql_path
 
       expect(response.body).to eq(customers_dot_response)
     end
