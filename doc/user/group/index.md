@@ -454,26 +454,21 @@ API requests to add a new user to a project are not possible.
 > - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/1985) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 12.0.
 > - [Moved](https://gitlab.com/gitlab-org/gitlab/-/issues/215410) to [GitLab Premium](https://about.gitlab.com/pricing/) in 13.1.
 
-WARNING:
-Currently IP access restrictions work only for HTTP requests on GitLab.com.
-SSH requests will fail and 
-users will not be able to perform Git operations over SSH.
-For more information, [see this issue](https://gitlab.com/gitlab-org/gitlab/-/issues/271673).
-
 To ensure only people from your organization can access particular
-resources, you can restrict access to groups by IP address. This setting applies to all subgroups,
-projects, issues, and so on.
+resources, you can restrict access to groups by IP address. This group-level setting
+applies to:
 
-IP access restrictions can be configured at the group level only.
-
-This restriction applies to:
-
-- The GitLab UI.
+- The GitLab UI, including subgroups, projects, and issues.
 - [In GitLab 12.3 and later](https://gitlab.com/gitlab-org/gitlab/-/issues/12874), the API.
 
-NOTE:
-Administrators and group owners are **always** able to access the group settings regardless of IP restriction,
-however, they cannot access projects belonging to the group when accessing via a non-allowed IP address.
+You should consider these security implications before configuring IP address restrictions:
+
+- **SSH requests**: While you can restrict HTTP traffic on GitLab.com with IP address restrictions,
+  they cause SSH requests, including Git operations over SSH, to fail. For more information,
+  read [issue 271673](https://gitlab.com/gitlab-org/gitlab/-/issues/271673).
+- **Administrators and group owners**: Users with these permission levels can always
+  access the group settings, regardless of IP restriction, but the can't access projects
+  belonging to the group when accessing from a disallowed IP address.
 
 To restrict group access by IP address:
 
@@ -482,7 +477,7 @@ To restrict group access by IP address:
 1. In the **Allow access to the following IP addresses** field, enter IP address ranges in CIDR notation.
 1. Select **Save changes**.
 
-![Domain restriction by IP address](img/restrict-by-ip.gif)
+   ![Domain restriction by IP address](img/restrict-by-ip.gif)
 
 ## Restrict group access by domain **(PREMIUM)**
 
