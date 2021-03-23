@@ -7,17 +7,23 @@ RSpec.describe 'Project > User views empty wiki' do
   let_it_be(:project) { create(:project, :private) }
   let_it_be(:wiki) { create(:project_wiki, project: project) }
 
-  context 'when signed in user is an Auditor' do
-    before do
-      sign_in(auditor)
-    end
+  it_behaves_like 'User views empty wiki' do
+    context 'when signed in user is an Auditor' do
+      before do
+        sign_in(auditor)
+      end
 
-    it 'shows empty state without "Suggest wiki improvement" button' do
-      visit wiki_path(wiki)
+      context 'when user is not a member of the project' do
+        it_behaves_like 'empty wiki message', issuable: true, expect_button: false
+      end
 
-      expect(page).to have_content('This project has no wiki pages')
-      expect(page).to have_content('You must be a project member in order to add wiki pages. If you have suggestions for how to improve the wiki for this project, consider opening an issue in the issue tracker.')
-      expect(page).not_to have_link('Suggest wiki improvement')
+      context 'when user is a member of the project' do
+        before do
+          project.add_guest(auditor)
+        end
+
+        it_behaves_like 'empty wiki message', issuable: true, expect_button: true
+      end
     end
   end
 end
