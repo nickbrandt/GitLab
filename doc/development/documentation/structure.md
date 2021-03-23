@@ -152,6 +152,8 @@ This issue occurs when...
 
 The workaround is...
 ```
+Troubleshooting topics that describe an error message should include at least a partial error message in the heading, with a limimtation of 70 characters. Aim for much fewer than 70 characters. Error message troubleshooting topics should list the complete error message within the topic text, too, so people can search and find a specific error.  
+
 
 ## Other information on a topic
 
