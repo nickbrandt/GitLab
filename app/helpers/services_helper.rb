@@ -115,6 +115,12 @@ module ServicesHelper
     form_data
   end
 
+  def integration_list_data(integrations)
+    {
+      integrations: integrations.map { |i| serialize_integration(i) }.to_json
+    }
+  end
+
   def trigger_events_for_service(integration)
     ServiceEventSerializer.new(service: integration).represent(integration.configurable_events).to_json
   end
@@ -154,6 +160,15 @@ module ServicesHelper
     else
       'project'
     end
+  end
+
+  def serialize_integration(integration)
+    {
+      active: integration.activated?,
+      name: integration.title,
+      description: integration.description,
+      updated_at: integration.updated_at
+    }
   end
 end
 
