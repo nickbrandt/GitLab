@@ -24,20 +24,15 @@ module EE
             set_next_epic
           end
 
-          def after_run(extracted_data)
-            tracker.update(
-              has_next_page: extracted_data.has_next_page?,
-              next_page: extracted_data.next_page
-            )
+          private
 
+          def after_run(extracted_data)
             set_next_epic unless extracted_data.has_next_page?
 
             if extracted_data.has_next_page? || context.extra[:epic_iid]
               run
             end
           end
-
-          private
 
           def set_next_epic
             context.extra[:epic_iid] = @epic_iids.pop
