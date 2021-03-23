@@ -563,6 +563,9 @@ RSpec.shared_examples 'a verifiable replicator' do
 
     context 'on a secondary' do
       before do
+        # Set the primary checksum
+        replicator.verify
+
         stub_secondary_node
       end
 
