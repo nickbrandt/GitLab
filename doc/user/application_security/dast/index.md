@@ -536,7 +536,8 @@ variables:
 
 ### URL scan
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/214120) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 13.4.
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/214120) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 13.4.
+> - [Improved](https://gitlab.com/gitlab-org/gitlab/-/issues/273141) in GitLab 13.11.
 
 A URL scan allows you to specify which parts of a website are scanned by DAST.
 
@@ -560,26 +561,19 @@ category/shoes/page1.html
 ```
 
 To scan the URLs in that file, set the CI/CD variable `DAST_PATHS_FILE` to the path of that file.
+The file can be checked into the project repository or generated as an artifact by a job that
+runs before DAST.
+
+By default, DAST scans do not clone the project repository. Instruct the DAST job to clone
+the project by setting `GIT_STRATEGY` to fetch. Give a file path relative to `CI_PROJECT_DIR` to `DAST_PATHS_FILE`.
 
 ```yaml
 include:
   - template: DAST.gitlab-ci.yml
 
 variables:
-  DAST_PATHS_FILE: url_file.txt
-```
-
-By default, DAST scans do not clone the project repository. If the file is checked in to the project, instruct the DAST job to clone the project by setting GIT_STRATEGY to fetch. The file is expected to be in the `/zap/wrk` directory.
-
-```yaml
-dast:
-  script:
-    - mkdir -p /zap/wrk
-    - cp url_file.txt /zap/wrk/url_file.txt
-    - /analyze -t $DAST_WEBSITE
-  variables:
-    GIT_STRATEGY: fetch
-    DAST_PATHS_FILE: url_file.txt
+  GIT_STRATEGY: fetch
+  DAST_PATHS_FILE: url_file.txt  # url_file.txt lives in the root directory of the project
 ```
 
 ##### Use `DAST_PATHS` CI/CD variable
@@ -666,7 +660,7 @@ DAST can be [configured](#customizing-the-dast-settings) using CI/CD variables.
 | `DAST_INCLUDE_ALPHA_VULNERABILITIES` | boolean | Set to `true` to include alpha passive and active scan rules. Default: `false`. [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/12652) in GitLab 13.1. |
 | `DAST_USE_AJAX_SPIDER`       | boolean | Set to `true` to use the AJAX spider in addition to the traditional spider, useful for crawling sites that require JavaScript. Default: `false`. [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/12652) in GitLab 13.1. |
 | `DAST_PATHS`                 | string  | Set to a comma-separated list of URLs for DAST to scan. For example, `/page1.html,/category1/page3.html,/page2.html`. [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/214120) in GitLab 13.4. |
-| `DAST_PATHS_FILE`            | string  | The file path containing the paths within `DAST_WEBSITE` to scan. The file must be plain text with one path per line and be in `/zap/wrk`. [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/258825) in GitLab 13.6. |
+| `DAST_PATHS_FILE`            | string  | The file path containing the paths within `DAST_WEBSITE` to scan. The file must be plain text with one path per line. [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/258825) in GitLab 13.6. |
 | `DAST_SUBMIT_FIELD`          | string  | The `id` or `name` of the element that when clicked submits the login form or the password form of a multi-page login process. [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/9894) in GitLab 12.4. |
 | `DAST_FIRST_SUBMIT_FIELD`    | string  | The `id` or `name` of the element that when clicked submits the username form of a multi-page login process. [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/9894) in GitLab 12.4. |
 | `DAST_ZAP_CLI_OPTIONS`       | string  | ZAP server command-line options. For example, `-Xmx3072m` would set the Java maximum memory allocation pool size. [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/12652) in GitLab 13.1. |
