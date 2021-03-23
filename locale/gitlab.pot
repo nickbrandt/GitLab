@@ -21798,6 +21798,9 @@ msgstr ""
 msgid "PackageRegistry|Add composer registry"
 msgstr ""
 
+msgid "PackageRegistry|Allow duplicates"
+msgstr ""
+
 msgid "PackageRegistry|An error occurred while saving the settings"
 msgstr ""
 
