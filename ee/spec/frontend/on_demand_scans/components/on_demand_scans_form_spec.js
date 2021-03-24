@@ -23,11 +23,11 @@ const URL_HOST = 'https://localhost/';
 const helpPagePath = '/application_security/dast/index#on-demand-scans';
 const projectPath = 'group/project';
 const defaultBranch = 'master';
-const profilesLibraryPath = '/security/configuration/dast_profiles';
-const scannerProfilesLibraryPath = '/security/configuration/dast_profiles#scanner-profiles';
-const siteProfilesLibraryPath = '/security/configuration/dast_profiles#site-profiles';
-const newScannerProfilePath = '/security/configuration/dast_profiles/dast_scanner_profile/new';
-const newSiteProfilePath = `/${projectPath}/-/security/configuration/dast_profiles`;
+const profilesLibraryPath = '/security/configuration/dast_scans';
+const scannerProfilesLibraryPath = '/security/configuration/dast_scans#scanner-profiles';
+const siteProfilesLibraryPath = '/security/configuration/dast_scans#site-profiles';
+const newScannerProfilePath = '/security/configuration/dast_scans/dast_scanner_profile/new';
+const newSiteProfilePath = `/${projectPath}/-/security/configuration/dast_scans`;
 
 const defaultProps = {
   helpPagePath,
