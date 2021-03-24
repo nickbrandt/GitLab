@@ -1216,6 +1216,7 @@ An edge in a connection.
 | `pipeline` | [`Pipeline`](#pipeline) | Pipeline the job belongs to. |
 | `queuedAt` | [`Time`](#time) | When the job was enqueued and marked as pending. |
 | `scheduledAt` | [`Time`](#time) | Schedule for the build. |
+| `schedulingType` | [`String`](#string) | Type of pipeline scheduling. Value is `dag` if the pipeline uses the `needs` keyword, and `stage` otherwise. |
 | `shortSha` | [`String!`](#string) | Short SHA1 ID of the commit. |
 | `stage` | [`CiStage`](#cistage) | Stage of the job. |
 | `startedAt` | [`Time`](#time) | When the job was started. |
@@ -4618,6 +4619,7 @@ Information about pagination in a connection.
 | `upstream` | [`Pipeline`](#pipeline) | Pipeline that triggered the pipeline. |
 | `user` | [`User`](#user) | Pipeline user. |
 | `userPermissions` | [`PipelinePermissions!`](#pipelinepermissions) | Permissions for the current user on the resource. |
+| `usesNeeds` | [`Boolean`](#boolean) | Indicates if the pipeline has jobs with `needs` dependencies. |
 | `warnings` | [`Boolean!`](#boolean) | Indicates if a pipeline has warnings. |
 
 ### `PipelineAnalytics`
