@@ -10,8 +10,8 @@ RSpec.describe Gitlab::Utils::MimeType do
     context "input isn't an IO" do
       let(:io) { "test" }
 
-      it "raises an error" do
-        expect { subject }.to raise_error(Gitlab::Utils::MimeType::Error)
+      it "returns nil" do
+        expect(subject).to be_nil
       end
     end
 
@@ -42,8 +42,8 @@ RSpec.describe Gitlab::Utils::MimeType do
     context "input isn't a string" do
       let(:str) { nil }
 
-      it "raises an error" do
-        expect { subject }.to raise_error(Gitlab::Utils::MimeType::Error)
+      it "returns nil" do
+        expect(subject).to be_nil
       end
     end
 
