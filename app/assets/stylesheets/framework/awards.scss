@@ -141,10 +141,6 @@
   &:hover,
   &:active,
   &.is-active {
-    .award-control-icon svg {
-      fill: $blue-500;
-    }
-
     .award-control-icon-neutral {
       opacity: 0;
     }
