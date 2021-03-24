@@ -165,7 +165,7 @@ RSpec.describe Issue do
       describe '.not_in_iterations' do
         it 'returns issues not in selected iterations' do
           expect(described_class.count).to eq 3
-          expect(described_class.not_in_iterations([iteration1])).to eq [iteration2_issue, issue_no_iteration]
+          expect(described_class.not_in_iterations([iteration1])).to contain_exactly(iteration2_issue, issue_no_iteration)
         end
       end
 
