@@ -22327,10 +22327,19 @@ msgstr ""
 msgid "PerformanceBar|SQL queries"
 msgstr ""
 
+msgid "PerformanceBar|Sort by duration"
+msgstr ""
+
+msgid "PerformanceBar|Sort chronologically"
+msgstr ""
+
 msgid "PerformanceBar|Stats"
 msgstr ""
 
-msgid "PerformanceBar|trace"
+msgid "PerformanceBar|Total duration"
+msgstr ""
+
+msgid "PerformanceBar|Trace"
 msgstr ""
 
 msgid "Permissions"
