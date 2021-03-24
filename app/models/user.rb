@@ -1655,9 +1655,13 @@ class User < ApplicationRecord
   def invalidate_cache_counts
     invalidate_issue_cache_counts
     invalidate_merge_request_cache_counts
-    invalidate_todos_done_count
-    invalidate_todos_pending_count
+    invalidate_todos_count
     invalidate_personal_projects_count
+  end
+
+  def invalidate_todos_count
+    Rails.cache.delete(['users', id, 'todos_done_count'])
+    Rails.cache.delete(['users', id, 'todos_pending_count'])
   end
 
   def invalidate_issue_cache_counts
@@ -1667,14 +1671,6 @@ class User < ApplicationRecord
   def invalidate_merge_request_cache_counts
     Rails.cache.delete(['users', id, 'assigned_open_merge_requests_count'])
     Rails.cache.delete(['users', id, 'review_requested_open_merge_requests_count'])
-  end
-
-  def invalidate_todos_done_count
-    Rails.cache.delete(['users', id, 'todos_done_count'])
-  end
-
-  def invalidate_todos_pending_count
-    Rails.cache.delete(['users', id, 'todos_pending_count'])
   end
 
   def invalidate_personal_projects_count
