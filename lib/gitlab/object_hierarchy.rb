@@ -191,7 +191,7 @@ module Gitlab
     def skip_ordering?
       return options[:skip_ordering] if options.key?(:skip_ordering)
 
-      true
+      false
     end
 
     # Remove the extra `depth` field using an INNER JOIN to avoid breaking UNION queries
