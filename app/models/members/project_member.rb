@@ -86,10 +86,6 @@ class ProjectMember < Member
     end
   end
 
-  def project
-    source
-  end
-
   def owner?
     project.owner == user
   end

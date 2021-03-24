@@ -34,10 +34,6 @@ class GroupMember < Member
     Gitlab::Access.sym_options_with_owner
   end
 
-  def group
-    source
-  end
-
   # Because source_type is `Namespace`...
   def real_source_type
     'Group'
