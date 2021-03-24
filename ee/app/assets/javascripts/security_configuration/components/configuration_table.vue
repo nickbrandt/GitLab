@@ -89,6 +89,7 @@ export default {
         :gitlab-ci-present="gitlabCiPresent"
         :gitlab-ci-history-path="gitlabCiHistoryPath"
         :auto-devops-enabled="autoDevopsEnabled"
+        :data-qa-selector="`${item.type}_status`"
       />
     </template>
 
