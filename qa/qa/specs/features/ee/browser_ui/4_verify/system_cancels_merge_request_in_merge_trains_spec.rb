@@ -94,7 +94,7 @@ module QA
       end
 
       context 'when system cancels a merge request' do
-        it 'creates a TODO task', testcase: 'https://gitlab.com/gitlab-org/quality/testcases/-/issues/927' do
+        it 'creates a TODO task', testcase: 'https://gitlab.com/gitlab-org/quality/testcases/-/issues/1741' do
           # Create a merge conflict
           Resource::Repository::Commit.fabricate_via_api! do |commit|
             commit.api_client = user_api_client
