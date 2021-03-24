@@ -20,12 +20,12 @@ class ProjectFeatureUsage < ApplicationRecord
   end
 
   def log_jira_dvcs_integration_usage(cloud: true)
-    transaction(requires_new: true) do
-      save unless persisted?
-      touch(self.class.jira_dvcs_integration_field(cloud: cloud))
-    end
+    assign_attributes(self.class.jira_dvcs_integration_field(cloud: cloud) => Time.current)
+    save
   rescue ActiveRecord::RecordNotUnique
     reset
     retry
   end
 end
+
+ProjectFeatureUsage.prepend_if_ee('EE::ProjectFeatureUsage')
