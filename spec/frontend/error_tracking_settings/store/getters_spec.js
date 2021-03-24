@@ -86,7 +86,7 @@ describe('Error Tracking Settings - Getters', () => {
       state.token = 'test-token';
 
       expect(getters.projectSelectionLabel(state)).toEqual(
-        "Click Connect to reestablish the connection to Sentry and activate the dropdown.",
+        'Click Connect to reestablish the connection to Sentry and activate the dropdown.',
       );
     });
   });

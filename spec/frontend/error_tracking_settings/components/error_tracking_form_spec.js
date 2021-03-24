@@ -47,7 +47,7 @@ describe('error tracking settings form', () => {
         "If you self-host Sentry, enter your Sentry instance's full URL. If you use Sentry's hosted solution, enter https://sentry.io",
       );
       expect(pageText).toContain(
-        "After adding your Auth Token, select the Connect button to load projects.",
+        'After adding your Auth Token, select the Connect button to load projects.',
       );
 
       expect(pageText).not.toContain('Connection failed. Check Auth Token and try again.');
@@ -80,9 +80,7 @@ describe('error tracking settings form', () => {
     });
 
     it('does not show an error', () => {
-      expect(wrapper.text()).not.toContain(
-        'Connection failed. Check Auth Token and try again.',
-      );
+      expect(wrapper.text()).not.toContain('Connection failed. Check Auth Token and try again.');
     });
   });
 
