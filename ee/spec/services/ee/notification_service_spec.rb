@@ -562,7 +562,7 @@ RSpec.describe EE::NotificationService, :mailer do
         specify do
           reset_delivered_emails!
 
-          expect(SentNotification).to receive(:record).with(epic, any_args).exactly(9).times
+          expect(SentNotification).to receive(:record).with(epic, any_args).exactly(8).times
 
           subject.new_note(note)
 
@@ -573,8 +573,8 @@ RSpec.describe EE::NotificationService, :mailer do
           should_email(@subscriber)
           should_email(@watcher_and_subscriber)
           should_email(@subscribed_participant)
-          should_email(@u_custom_off)
           should_email(@unsubscribed_mentioned)
+          should_not_email(@u_custom_off)
           should_not_email(@u_guest_custom)
           should_not_email(@u_guest_watcher)
           should_not_email(note.author)

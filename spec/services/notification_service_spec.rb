@@ -416,7 +416,7 @@ RSpec.describe NotificationService, :mailer do
           it 'sends emails to recipients', :aggregate_failures do
             subject
 
-            expect_delivery_jobs_count(10)
+            expect_delivery_jobs_count(9)
             expect_enqueud_email(@u_watcher.id, note.id, nil, mail: "note_issue_email")
             expect_enqueud_email(note.noteable.author.id, note.id, nil, mail: "note_issue_email")
             expect_enqueud_email(note.noteable.assignees.first.id, note.id, nil, mail: "note_issue_email")
@@ -425,7 +425,6 @@ RSpec.describe NotificationService, :mailer do
             expect_enqueud_email(@subscriber.id, note.id, "subscribed", mail: "note_issue_email")
             expect_enqueud_email(@watcher_and_subscriber.id, note.id, "subscribed", mail: "note_issue_email")
             expect_enqueud_email(@subscribed_participant.id, note.id, "subscribed", mail: "note_issue_email")
-            expect_enqueud_email(@u_custom_off.id, note.id, nil, mail: "note_issue_email")
             expect_enqueud_email(@unsubscribed_mentioned.id, note.id, "mentioned", mail: "note_issue_email")
           end
 
@@ -1633,11 +1632,13 @@ RSpec.describe NotificationService, :mailer do
     end
 
     describe '#issue_due' do
+      let(:issue_due_enabled) { true }
+
       before do
         issue.update!(due_date: Date.today)
 
-        update_custom_notification(:issue_due, @u_guest_custom, resource: project)
-        update_custom_notification(:issue_due, @u_custom_global)
+        update_custom_notification(:issue_due, @u_guest_custom, resource: project, value: issue_due_enabled)
+        update_custom_notification(:issue_due, @u_custom_global, value: issue_due_enabled)
       end
 
       it 'sends email to issue notification recipients, excluding watchers' do
@@ -1674,6 +1675,27 @@ RSpec.describe NotificationService, :mailer do
       it_behaves_like 'project emails are disabled' do
         let(:notification_target)  { issue }
         let(:notification_trigger) { notification.issue_due(issue) }
+      end
+
+      context 'when user has custom due_date notifications disabled' do
+        let(:issue_due_enabled) { false }
+
+        context 'when the user is a participant of the issue' do
+          before do
+            issue.update!(assignee_ids: issue.assignee_ids + [@u_custom_global.id])
+            notification.issue_due(issue)
+          end
+
+          it 'does not send a notification' do
+            should_not_email(@u_custom_global)
+          end
+        end
+
+        context 'when the user is not a participant of the issue' do
+          it 'does not send a notification' do
+            should_not_email(@u_custom_global)
+          end
+        end
       end
     end
   end

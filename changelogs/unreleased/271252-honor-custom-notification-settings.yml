@@ -1,0 +1,5 @@
+---
+title: Honor custom notification settings when participating on a notifiable target
+merge_request: 57436
+author:
+type: fixed
