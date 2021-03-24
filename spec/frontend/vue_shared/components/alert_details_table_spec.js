@@ -88,22 +88,16 @@ describe('AlertDetails', () => {
 
         it('should show allowed alert fields', () => {
           const fields = findTableKeys();
-
-          expect(findTableField(fields, 'Iid').exists()).toBe(true);
-          expect(findTableField(fields, 'Title').exists()).toBe(true);
-          expect(findTableField(fields, 'Severity').exists()).toBe(true);
-          expect(findTableField(fields, 'Status').exists()).toBe(true);
-          expect(findTableField(fields, 'Hosts').exists()).toBe(true);
-          expect(findTableField(fields, 'Environment').exists()).toBe(true);
+          ['Iid', 'Title', 'Severity', 'Status', 'Hosts', 'Environment'].forEach((field) => {
+            expect(findTableField(fields, field).exists()).toBe(true);
+          });
         });
 
         it('should not show disallowed alert fields', () => {
           const fields = findTableKeys();
-
-          expect(findTableField(fields, 'Typename').exists()).toBe(false);
-          expect(findTableField(fields, 'Todos').exists()).toBe(false);
-          expect(findTableField(fields, 'Notes').exists()).toBe(false);
-          expect(findTableField(fields, 'Assignees').exists()).toBe(false);
+          ['Typename', 'Todos', 'Notes', 'Assignees'].forEach((field) => {
+            expect(findTableField(fields, field).exists()).toBe(false);
+          });
         });
       });
 
