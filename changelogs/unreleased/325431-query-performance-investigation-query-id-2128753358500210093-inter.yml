@@ -1,0 +1,5 @@
+---
+title: Reduce the time that we hold the update lock for internal id
+merge_request: 57303
+author:
+type: performance

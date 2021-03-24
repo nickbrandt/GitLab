@@ -75,6 +75,8 @@ RSpec.describe InternalId do
           expect(described_class).to receive(:find_by).with(args).and_return(record) # second call, record was created by another process
           expect(described_class).to receive(:create!).and_raise(ActiveRecord::RecordNotUnique, 'record not unique')
           expect(record).to receive(:increment_and_save!)
+          expect(record).to receive(:update_and_save_counter)
+          expect(record).to receive(:last_value)
 
           subject
         end
