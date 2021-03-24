@@ -79,10 +79,8 @@ export default {
       return this.timeframe;
     },
     timelineStyles() {
-      const length = this.presetIsDay ? 1 : 2;
-
       return {
-        width: `calc((${100}% - ${TIMELINE_CELL_WIDTH}px) / ${length})`,
+        width: `calc(${100}% - ${TIMELINE_CELL_WIDTH}px)`,
       };
     },
   },
@@ -111,13 +109,12 @@ export default {
         <span class="gl-text-truncate">{{ $options.i18n.addRotationLabel }}</span>
       </span>
       <span
-        v-for="(timeframeItem, index) in timeframeToDraw"
         :key="index"
         class="timeline-cell gl-border-b-solid gl-border-b-gray-100 gl-border-b-1"
         :style="timelineStyles"
         data-testid="empty-timeline-cell"
       >
-        <current-day-indicator :preset-type="presetType" :timeframe-item="timeframeItem" />
+        <current-day-indicator :preset-type="presetType" :timeframe-item="timeframe[0]" />
       </span>
     </div>
     <div v-else>
@@ -154,18 +151,15 @@ export default {
           </gl-button-group>
         </span>
         <span
-          v-for="(timeframeItem, index) in timeframeToDraw"
-          :key="timeframeItemUniqueKey(timeframeItem)"
           class="timeline-cell gl-border-b-solid gl-border-b-gray-100 gl-border-b-1"
-          :class="{ 'gl-overflow-hidden': cellShouldHideOverflow(index) }"
           :style="timelineStyles"
           data-testid="timeline-cell"
         >
-          <current-day-indicator :preset-type="presetType" :timeframe-item="timeframeItem" />
+          <current-day-indicator :preset-type="presetType" :timeframe-item="timeframe[0]" />
           <schedule-shift-wrapper
             v-if="rotation.shifts"
             :preset-type="presetType"
-            :timeframe-item="timeframeItem"
+            :timeframe-item="timeframe[0]"
             :timeframe="timeframe"
             :rotation="rotation"
           />
