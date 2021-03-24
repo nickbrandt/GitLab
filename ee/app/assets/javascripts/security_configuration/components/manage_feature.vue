@@ -47,6 +47,7 @@ export default {
     category="primary"
     :href="feature.configuration_path"
     data-testid="enableButton"
+    :data-qa-selector="`${feature.type}_enable_button`"
     >{{ s__('SecurityConfiguration|Enable') }}</gl-button
   >
 </template>
