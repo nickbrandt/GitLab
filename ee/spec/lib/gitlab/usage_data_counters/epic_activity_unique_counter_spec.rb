@@ -28,8 +28,6 @@ RSpec.describe Gitlab::UsageDataCounters::EpicActivityUniqueCounter, :clean_gitl
     it_behaves_like 'a daily tracked issuable event' do
       let(:action) { described_class::EPIC_NOTE_UPDATED }
     end
-
-    it_behaves_like 'does not track when feature flag is disabled', :track_epics_activity
   end
 
   context 'for epic note destroyed event' do
@@ -39,6 +37,28 @@ RSpec.describe Gitlab::UsageDataCounters::EpicActivityUniqueCounter, :clean_gitl
 
     it_behaves_like 'a daily tracked issuable event' do
       let(:action) { described_class::EPIC_NOTE_DESTROYED }
+    end
+  end
+
+  context 'for epic closing event' do
+    def track_action(params)
+      described_class.track_epic_closed_action(**params)
+    end
+
+    it_behaves_like 'a daily tracked issuable event' do
+      let(:action) { described_class::EPIC_CLOSED }
+    end
+
+    it_behaves_like 'does not track when feature flag is disabled', :track_epics_activity
+  end
+
+  context 'for epic reopening event' do
+    def track_action(params)
+      described_class.track_epic_reopened_action(**params)
+    end
+
+    it_behaves_like 'a daily tracked issuable event' do
+      let(:action) { described_class::EPIC_REOPENED }
     end
 
     it_behaves_like 'does not track when feature flag is disabled', :track_epics_activity
