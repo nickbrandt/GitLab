@@ -28,10 +28,10 @@ describe('MR Notes Mutator Actions', () => {
   });
 
   describe('setMrMetadata', () => {
-    it('should trigger the SET_MR_METADATA state mutation', (done) => {
+    it('should trigger the SET_MR_METADATA state mutation', async () => {
       const mrMetadata = { propA: 'a', propB: 'b' };
 
-      testAction(
+      await testAction(
         setMrMetadata,
         mrMetadata,
         {},
@@ -42,7 +42,6 @@ describe('MR Notes Mutator Actions', () => {
           },
         ],
         [],
-        done,
       );
     });
   });
@@ -54,25 +53,25 @@ describe('MR Notes Mutator Actions', () => {
         metadata: 'metadata',
       },
     };
-    let getSpy;
     let mock;
 
     beforeEach(() => {
-      getSpy = jest.spyOn(axios, 'get');
       mock = new MockAdapter(axios);
 
       mock.onGet(state.endpoints.metadata).reply(200, mrMetadata);
     });
 
     afterEach(() => {
-      getSpy.mockRestore();
       mock.restore();
     });
 
     it('should fetch the data from the API', async () => {
       await fetchMrMetadata({ state, dispatch: () => {} });
 
-      expect(axios.get).toHaveBeenCalledWith(state.endpoints.metadata);
+      await axios.waitForAll();
+
+      expect(mock.history.get).toHaveLength(1);
+      expect(mock.history.get[0].url).toBe(state.endpoints.metadata);
     });
 
     it('should set the fetched data into state', () => {
