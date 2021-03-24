@@ -26,4 +26,12 @@ RSpec.describe Plan do
       expect(plan.actual_limits.update!(ci_instance_level_variables: 100)).to be_truthy
     end
   end
+
+  describe '#customersdot_name' do
+    it 'returns name' do
+      plan = described_class.default
+
+      expect(plan.customersdot_name).to eq(plan.name)
+    end
+  end
 end

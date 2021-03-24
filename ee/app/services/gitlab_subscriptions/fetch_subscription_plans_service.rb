@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 module GitlabSubscriptions
   class FetchSubscriptionPlansService
+    include Gitlab::Utils::StrongMemoize
+
     URL = "#{EE::SUBSCRIPTIONS_URL}/gitlab_plans".freeze
 
     def initialize(plan:, namespace_id: nil)
@@ -18,7 +20,7 @@ module GitlabSubscriptions
       response = Gitlab::HTTP.get(
         URL,
         allow_local_requests: true,
-        query: { plan: @plan, namespace_id: @namespace_id },
+        query: { plan: customersdot_plan, namespace_id: @namespace_id },
         headers: { 'Accept' => 'application/json' }
       )
 
@@ -27,6 +29,15 @@ module GitlabSubscriptions
       Gitlab::AppLogger.info "Unable to connect to GitLab Customers App #{e}"
 
       nil
+    end
+
+    def customersdot_plan
+      strong_memoize(:customersdot_plan) do
+        gitlab_plan = Plan.find_by_name(@plan.to_s)
+        next @plan unless gitlab_plan
+
+        gitlab_plan.customersdot_name
+      end
     end
 
     def cached

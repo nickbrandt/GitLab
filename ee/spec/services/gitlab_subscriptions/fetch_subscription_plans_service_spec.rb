@@ -32,6 +32,24 @@ RSpec.describe GitlabSubscriptions::FetchSubscriptionPlansService do
         execute_service
       end
 
+      context 'when passed plan is ultimate' do
+        let(:plan) { 'ultimate' }
+
+        it 'sends a request with the CustomersDot plan name' do
+          allow(Plan).to receive(:find_by_name).with(plan).and_return(Plan.new(name: plan))
+
+          expect(Gitlab::HTTP).to receive(:get)
+            .with(
+              endpoint_url,
+              allow_local_requests: true,
+              query: { plan: 'ultimate_saas', namespace_id: nil },
+              headers: { 'Accept' => 'application/json' }
+            )
+
+          execute_service
+        end
+      end
+
       context 'with pnp_subscription_plan_cache_key flag disabled' do
         before do
           stub_feature_flags(pnp_subscription_plan_cache_key: false, subscription_plan_cache_key: true)
