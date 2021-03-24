@@ -1,5 +1,5 @@
-import initVulnerabilityReport from 'ee/security_dashboard/first_class_init';
 import { DASHBOARD_TYPES } from 'ee/security_dashboard/store/constants';
+import initVulnerabilityReport from 'ee/security_dashboard/vulnerability_report_init';
 import { TEST_HOST } from 'helpers/test_constants';
 
 const EMPTY_DIV = document.createElement('div');
