@@ -15490,7 +15490,7 @@ Tiers: `free`
 
 ### `usage_activity_by_stage.secure.user_container_scanning_jobs`
 
-no idea, Count of Container Scanning jobs run, it implies user but AFAIK we don't track per user
+Distinct count per user of Container Scanning jobs run
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_all/20210216175501_user_container_scanning_jobs.yml)
 
@@ -17326,7 +17326,7 @@ Tiers: `free`
 
 ### `usage_activity_by_stage_monthly.secure.container_scanning_pipeline`
 
-no idea, what is this when did it get added? guess pipelines containing a CS job
+Pipelines containing a Container Scanning job
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_28d/20210216175507_container_scanning_pipeline.yml)
 
@@ -17494,7 +17494,7 @@ Tiers: `free`
 
 ### `usage_activity_by_stage_monthly.secure.user_container_scanning_jobs`
 
-no idea, Count of Container Scanning jobs run, it implies user and monthly, but AFAIK we don't track per user
+Distinct count per user of Container Scanning jobs run monthly
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_28d/20210216175505_user_container_scanning_jobs.yml)
 
