@@ -42,7 +42,7 @@ module QA
           Support::Retrier.retry_until(max_attempts: 5, sleep_interval: 5) do
             mr_widget.has_pipeline_status?(/Pipeline #\d+ passed/)
           end
-          expect(mr_widget).to have_content('Coverage 66.67%')
+          expect(mr_widget).to have_content('Test coverage 66.67%')
         end
       end
     end
