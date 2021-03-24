@@ -56,7 +56,7 @@ jest.mock('~/lib/utils/url_utility', () => ({
   redirectTo: jest.fn(),
 }));
 
-const LOCAL_STORAGE_KEY = 'on-demand-scans-new-form';
+const LOCAL_STORAGE_KEY = 'group/project/on-demand-scans-new-form';
 
 describe('OnDemandScansForm', () => {
   let localVue;
@@ -268,6 +268,7 @@ describe('OnDemandScansForm', () => {
             name: 'My daily scan',
             selectedScannerProfileId: 'gid://gitlab/DastScannerProfile/1',
             selectedSiteProfileId: 'gid://gitlab/DastSiteProfile/1',
+            selectedBranch: 'some-other-branch',
           }),
         ],
       ]);
