@@ -116,7 +116,6 @@ RSpec.describe SystemHooksService do
   end
 
   context 'event names' do
-
     it { expect(event_name(project, :create)).to eq "project_create" }
     it { expect(event_name(project, :destroy)).to eq "project_destroy" }
     it { expect(event_name(project, :rename)).to eq "project_rename" }
