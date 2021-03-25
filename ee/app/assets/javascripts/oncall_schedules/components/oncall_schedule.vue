@@ -3,6 +3,7 @@ import { GlCard, GlButtonGroup, GlButton, GlModalDirective, GlTooltipDirective }
 import * as Sentry from '@sentry/browser';
 import { capitalize } from 'lodash';
 import {
+  getStartOfWeek,
   formatDate,
   nWeeksBefore,
   nWeeksAfter,
@@ -87,7 +88,7 @@ export default {
   data() {
     return {
       presetType: this.$options.PRESET_TYPES.WEEKS,
-      timeframeStartDate: new Date(),
+      timeframeStartDate: getStartOfWeek(new Date()),
       rotations: this.schedule.rotations.nodes,
       rotationToUpdate: {},
     };
@@ -127,7 +128,8 @@ export default {
   methods: {
     switchPresetType(type) {
       this.presetType = type;
-      this.timeframeStartDate = new Date();
+      this.timeframeStartDate =
+        type === PRESET_TYPES.WEEKS ? getStartOfWeek(new Date()) : new Date();
     },
     formatPresetType(type) {
       return capitalize(type);
