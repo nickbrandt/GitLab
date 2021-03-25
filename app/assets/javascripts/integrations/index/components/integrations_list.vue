@@ -1,4 +1,5 @@
 <script>
+import { s__ } from '~/locale';
 import IntegrationsTable from './integrations_table.vue';
 
 export default {
@@ -13,20 +14,44 @@ export default {
     },
   },
   computed: {
-    activeIntegrations() {
-      return this.integrations.filter((integration) => integration.active);
+    integrationsGrouped() {
+      return this.integrations.reduce(
+        (integrations, integration) => {
+          if (integration.active) {
+            integrations.active.push(integration);
+          } else {
+            integrations.inactive.push(integration);
+          }
+
+          return integrations;
+        },
+        { active: [], inactive: [] },
+      );
     },
-    inactiveIntegrations() {
-      return this.integrations.filter((integration) => !integration.active);
-    },
+  },
+  i18n: {
+    activeTableEmptyText: s__("Integrations|You haven't activated any integrations yet."),
+    inactiveTableEmptyText: s__("Integrations|You've activated every integration 🎉"),
   },
 };
 </script>
 
 <template>
   <div>
-    <integrations-table :active="true" :integrations="activeIntegrations" />
-    <h5>{{ s__('Integrations|Add an integration') }}</h5>
-    <integrations-table :active="false" :integrations="inactiveIntegrations" />
+    <h4>{{ s__('Integrations|Active integrations') }}</h4>
+    <integrations-table
+      class="gl-mb-7!"
+      :integrations="integrationsGrouped.active"
+      :empty-text="$options.i18n.activeTableEmptyText"
+      show-updated-at
+      data-testid="active-integrations-table"
+    />
+
+    <h4>{{ s__('Integrations|Add an integration') }}</h4>
+    <integrations-table
+      :integrations="integrationsGrouped.inactive"
+      :empty-text="$options.i18n.inactiveTableEmptyText"
+      data-testid="inactive-integrations-table"
+    />
   </div>
 </template>
