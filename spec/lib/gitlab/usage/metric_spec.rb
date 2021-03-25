@@ -5,7 +5,7 @@ require 'spec_helper'
 RSpec.describe Gitlab::Usage::Metric do
   describe '#definition' do
     it 'returns key_path metric definiton' do
-      expect(described_class.new(key_path: 'counts.issues').definition).to be_an(Gitlab::Usage::MetricDefinition)
+      expect(described_class.new(key_path: 'uuid').definition).to be_an(Gitlab::Usage::MetricDefinition)
     end
   end
 
