@@ -16932,7 +16932,8 @@ CREATE TABLE raw_usage_data (
     updated_at timestamp with time zone NOT NULL,
     recorded_at timestamp with time zone NOT NULL,
     sent_at timestamp with time zone,
-    payload jsonb NOT NULL
+    payload jsonb NOT NULL,
+    version_usage_data_id_value bigint
 );
 
 CREATE SEQUENCE raw_usage_data_id_seq
