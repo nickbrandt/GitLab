@@ -8,6 +8,7 @@ Gem::Specification.new do |spec|
 
   spec.summary       = %q{MimeMagic shim}
   spec.description   = %q{A shim for mimemagic}
+  spec.homepage      = "https://gitlab.com/gitlab-org/gitlab/-/tree/master/vendor/shims/mimemagic"
   spec.license       = "MIT"
   spec.required_ruby_version = Gem::Requirement.new(">= 2.3.0")
 
