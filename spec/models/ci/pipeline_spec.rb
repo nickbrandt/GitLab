@@ -78,6 +78,18 @@ RSpec.describe Ci::Pipeline, :mailer, factory_default: :keep do
         expect(pipeline.downloadable_artifacts).to contain_exactly(downloadable_artifact)
       end
     end
+
+    describe '#downloadable_artifacts_new' do
+      let(:build) { create(:ci_build, pipeline: pipeline) }
+
+      it 'returns downloadable artifacts that have not expired' do
+        downloadable_artifact = create(:ci_job_artifact, :codequality, job: build)
+        _expired_artifact = create(:ci_job_artifact, :junit, :expired, job: build)
+        _undownloadable_artifact = create(:ci_job_artifact, :trace, job: build)
+
+        expect(pipeline.downloadable_artifacts_new).to contain_exactly(downloadable_artifact)
+      end
+    end
   end
 
   describe '#set_status' do

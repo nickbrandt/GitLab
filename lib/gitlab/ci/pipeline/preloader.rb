@@ -20,6 +20,7 @@ module Gitlab
               preloader.preload_ref_commits
               preloader.preload_pipeline_warnings
               preloader.preload_stages_warnings
+              preloader.preload_downloadable_artifacts
             end
           end
         end
@@ -53,6 +54,10 @@ module Gitlab
         # queries.
         def preload_stages_warnings
           @pipeline.stages.each { |stage| stage.number_of_warnings }
+        end
+
+        def preload_downloadable_artifacts
+          @pipeline.downloadable_artifacts_new
         end
       end
     end
