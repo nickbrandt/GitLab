@@ -3,6 +3,8 @@
 require 'spec_helper'
 
 RSpec.describe EmailsOnPushService do
+  let_it_be(:project) { create_default(:project).freeze }
+
   describe 'Validations' do
     context 'when service is active' do
       before do
@@ -25,14 +27,14 @@ RSpec.describe EmailsOnPushService do
         stub_const("#{described_class}::RECIPIENTS_LIMIT", 2)
       end
 
-      let_it_be(:project) { create_default(:project).freeze }
-
       subject(:service) { described_class.new(project: project, recipients: recipients, active: true) }
 
       context 'valid number of recipients' do
-        let(:recipients) { 'foo@bar.com' }
+        let(:recipients) { 'duplicate@example.com Duplicate@example.com invalid-email' }
 
-        it { is_expected.to be_valid }
+        it 'does not count duplicates and invalid emails' do
+          is_expected.to be_valid
+        end
       end
 
       context 'invalid number of recipients' do
@@ -59,7 +61,7 @@ RSpec.describe EmailsOnPushService do
 
   describe 'callbacks' do
     describe 'before_validation' do
-      let(:service) { described_class.new(project: create(:project), recipients: '<invalid> foobar Valid@recipient.com Dup@lica.te dup@lica.te Dup@Lica.te') }
+      let(:service) { described_class.new(project: project, recipients: '<invalid> foobar Valid@recipient.com Dup@lica.te dup@lica.te Dup@Lica.te') }
 
       it 'removes invalid email addresses and removes duplicates by keeping the original capitalization' do
         expect { service.valid? }.to change { service.recipients }.to('Valid@recipient.com Dup@lica.te')

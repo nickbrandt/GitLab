@@ -9,7 +9,7 @@ class EmailsOnPushService < Service
   boolean_accessor :disable_diffs
   prop_accessor :recipients, :branches_to_be_notified
   validates :recipients, presence: true, if: :validate_recipients?
-  validate :number_of_receipients_within_limit, if: :validate_recipients?
+  validate :number_of_recipients_within_limit, if: :validate_recipients?
 
   before_validation :cleanup_recipients
 
@@ -89,16 +89,12 @@ class EmailsOnPushService < Service
 
   private
 
-  def valid_recipients
-    self.class.valid_recipients(recipients)
-  end
-
   def cleanup_recipients
-    self.recipients = valid_recipients.join(' ')
+    self.recipients = self.class.valid_recipients(recipients).join(' ')
   end
 
-  def number_of_receipients_within_limit
-    if valid_recipients.size > RECIPIENTS_LIMIT
+  def number_of_recipients_within_limit
+    if self.class.valid_recipients(recipients).size > RECIPIENTS_LIMIT
       errors.add(:recipients, s_("EmailsOnPushService|can't exceed %{recipients_limit}") % { recipients_limit: RECIPIENTS_LIMIT })
     end
   end
