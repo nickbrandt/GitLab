@@ -67,7 +67,10 @@ export default {
     <div
       class="gl-display-flex gl-align-items-center gl-justify-content-space-between hide-collapsed"
     >
-      <span class="gl-overflow-hidden gl-text-overflow-ellipsis gl-white-space-nowrap">
+      <span
+        class="gl-overflow-hidden gl-text-overflow-ellipsis gl-white-space-nowrap"
+        :title="value"
+      >
         {{ templateText }}
       </span>
 
