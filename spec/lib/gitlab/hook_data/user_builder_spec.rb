@@ -68,7 +68,7 @@ RSpec.describe Gitlab::HookData::UserBuilder do
         it 'includes old username details' do
           allow(user).to receive(:username_before_last_save).and_return('old-username')
 
-          expect(data[:rename]).to eq(user.username_before_last_save)
+          expect(data[:old_username]).to eq(user.username_before_last_save)
         end
       end
 
