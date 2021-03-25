@@ -61,10 +61,22 @@ RSpec.describe EmailsOnPushService do
 
   describe 'callbacks' do
     describe 'before_validation' do
-      let(:service) { described_class.new(project: project, recipients: '<invalid> foobar Valid@recipient.com Dup@lica.te dup@lica.te Dup@Lica.te') }
+      let(:service) { described_class.new(project: project, active: active, recipients: '<invalid> foobar Valid@recipient.com Dup@lica.te dup@lica.te Dup@Lica.te') }
 
-      it 'removes invalid email addresses and removes duplicates by keeping the original capitalization' do
-        expect { service.valid? }.to change { service.recipients }.to('Valid@recipient.com Dup@lica.te')
+      context 'is active' do
+        let(:active) { true }
+
+        it 'removes invalid email addresses and removes duplicates by keeping the original capitalization' do
+          expect { service.valid? }.to change { service.recipients }.to('Valid@recipient.com Dup@lica.te')
+        end
+      end
+
+      context 'is not active' do
+        let(:active) { false }
+
+        it 'does not clean up recipients' do
+          expect { service.valid? }.not_to change { service.recipients }
+        end
       end
     end
   end

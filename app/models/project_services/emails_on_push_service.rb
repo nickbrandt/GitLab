@@ -11,7 +11,7 @@ class EmailsOnPushService < Service
   validates :recipients, presence: true, if: :validate_recipients?
   validate :number_of_recipients_within_limit, if: :validate_recipients?
 
-  before_validation :cleanup_recipients
+  before_validation :cleanup_recipients, if: :validate_recipients?
 
   def self.valid_recipients(recipients)
     recipients.to_s.split.select do |recipient|
