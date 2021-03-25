@@ -269,7 +269,7 @@ gem 'licensee', '~> 8.9'
 gem 'charlock_holmes', '~> 0.7.7'
 
 # Detect mime content type from content
-gem 'mimemagic', '~> 0.3.2'
+gem 'ruby-magic-static'
 
 # Faster blank
 gem 'fast_blank'
