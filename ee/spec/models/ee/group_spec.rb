@@ -170,7 +170,7 @@ RSpec.describe Group do
 
     context 'after the start transition' do
       it 'sets the last sync timestamp' do
-        expect { group.start_ldap_sync }.to change { group.ldap_sync_last_sync_at }
+        expect { group.start_ldap_sync }.to change(group, :ldap_sync_last_sync_at)
       end
     end
 
@@ -388,7 +388,7 @@ RSpec.describe Group do
     let(:group) { build(:group) }
 
     before do
-      allow_any_instance_of(ApplicationSetting).to receive(:repository_size_limit).and_return(50)
+      allow(::Gitlab::CurrentSettings).to receive(:repository_size_limit).and_return(50)
     end
 
     it 'returns the value set globally' do
@@ -535,7 +535,7 @@ RSpec.describe Group do
         let(:push_rule) { create(:push_rule) }
 
         it 'returns its own push rule' do
-          group.update(push_rule: push_rule)
+          group.update!(push_rule: push_rule)
 
           expect(group.predefined_push_rule).to eq(push_rule)
         end
@@ -647,7 +647,7 @@ RSpec.describe Group do
       context 'when in need of checking plan' do
         before do
           allow(Gitlab::CurrentSettings.current_application_settings)
-            .to receive(:should_check_namespace_plan?) { true }
+            .to receive(:should_check_namespace_plan?).and_return(true)
         end
 
         it 'returns true for groups in proper plan' do
@@ -918,6 +918,7 @@ RSpec.describe Group do
       let_it_be(:group) { create(:group, parent: parent_group) }
       let_it_be(:group_hook) { create(:group_hook, group: group, member_events: true) }
       let_it_be(:parent_group_hook) { create(:group_hook, group: parent_group, member_events: true) }
+
       let(:data) { { some: 'info' } }
 
       before do
