@@ -20,7 +20,7 @@ RSpec.describe EE::IpRestrictions::UpdateService do
         end
 
         it 'builds new ip_restriction records with the provided ranges' do
-          expect(group.ip_restrictions.map(&:range)).to be_empty
+          expect(group.ip_restrictions).to be_empty
 
           subject
 
