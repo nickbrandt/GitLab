@@ -388,7 +388,7 @@ RSpec.describe Group do
     let(:group) { build(:group) }
 
     before do
-      allow_any_instance_of(ApplicationSetting).to receive(:repository_size_limit).and_return(50) # rubocop:disable RSpec/AnyInstanceOf
+      allow(::Gitlab::CurrentSettings).to receive(:repository_size_limit).and_return(50)
     end
 
     it 'returns the value set globally' do
