@@ -281,72 +281,69 @@ RSpec.describe Issuable::BulkUpdateService, :clean_gitlab_redis_cache do
       end
     end
 
-    context 'when project belongs to a group' do
-      let_it_be(:group) { create(:group) }
-      let_it_be(:project2) { create(:project, :repository, group: group) }
-      let_it_be(:issues) { create_list(:issue, 2, :opened, project: project2) }
-      let(:parent) { project2 }
-      let(:count_service_class) { Groups::OpenIssuesCountService }
-      let(:count_service) { count_service_class.new(group, user) }
+    describe 'updating issuables cached count' do
+      shared_examples 'scheduling cached group count refresh' do
+        it 'schedules worker' do
+          expect(Issuables::RefreshGroupsCounterWorker).to receive(:perform_async)
 
-      before do
-        project2.add_reporter(user)
-      end
-
-      shared_examples 'refreshing cached open issues count with state updates' do |state|
-        let(:public_count_key) { count_service.cache_key(count_service_class::PUBLIC_COUNT_KEY) }
-        let(:existing_cache) { 5 }
-
-        context 'when cache is empty' do
-          before do
-            stub_const("#{count_service_class}::CACHED_COUNT_THRESHOLD", 1)
-            Rails.cache.delete(public_count_key)
-          end
-
-          it 'does not change the counts cache' do
-            bulk_update(issues, state_event: state)
-            expect(Rails.cache.read(public_count_key)).to be_nil
-          end
-        end
-
-        context 'when new issues count is over cache threshold' do
-          before do
-            stub_const("#{count_service_class}::CACHED_COUNT_THRESHOLD", 1)
-          end
-
-          it 'updates existing issues counts cache' do
-            Rails.cache.write(public_count_key, existing_cache)
-            bulk_update(issues, state_event: state)
-            expect(Rails.cache.read(public_count_key)).to eq(adjusted_count)
-          end
-        end
-
-        context 'when new issues count is under cache threshold' do
-          before do
-            stub_const("#{count_service_class}::CACHED_COUNT_THRESHOLD", 10)
-          end
-
-          it 'deletes existing cache' do
-            Rails.cache.write(public_count_key, existing_cache)
-            bulk_update(issues, state_event: state)
-            expect(Rails.cache.read(public_count_key)).to be_nil
-          end
+          bulk_update(issuables, params)
         end
       end
 
-      context 'when closing issues', :use_clean_rails_memory_store_caching do
-        it_behaves_like 'refreshing cached open issues count with state updates', 'closed' do
-          let(:adjusted_count) { existing_cache - issues.size }
+      shared_examples 'not scheduling cached group count refresh' do
+        it 'does not schedule worker' do
+          expect(Issuables::RefreshGroupsCounterWorker).not_to receive(:perform_async)
+
+          bulk_update(issuables, params)
         end
       end
 
-      context 'when reopening issues', :use_clean_rails_memory_store_caching do
+      context 'when project belongs to a group' do
+        let_it_be(:group_project) { create(:project, :repository, group: create(:group)) }
+        let_it_be(:issues) { create_list(:issue, 2, :opened, project: group_project) }
+        let_it_be(:milestone) { create(:milestone, project: project) }
+        let(:parent) { group_project }
+        let(:issuables) { issues }
+
         before do
-          issues.map { |issue| issue.update!(state: 'closed') }
+          group_project.add_reporter(user)
         end
 
-        it_behaves_like 'refreshing cached open issues count with state updates', 'reopened' do
-          let(:adjusted_count) { existing_cache + issues.size }
+        context 'when updating issues state' do
+          it_behaves_like 'scheduling cached group count refresh' do
+            let(:params) { { state_event: 'closed' } }
+          end
+
+          it_behaves_like 'scheduling cached group count refresh' do
+            let(:params) { { state_event: 'reopened' } }
+          end
+        end
+
+        context 'when state is not updated' do
+          it_behaves_like 'not scheduling cached group count refresh' do
+            let(:params) { { milestone_id: milestone.id } }
+          end
+        end
+
+        context 'when issuable type is not :issue' do
+          it_behaves_like 'not scheduling cached group count refresh' do
+            let(:params) { { state_event: 'closed' } }
+            let(:issuables) { [create(:merge_request, source_project: project, source_branch: 'branch-1')] }
+          end
+        end
+      end
+
+      context 'when project belongs to a user namespace' do
+        let(:issuables) { create_list(:issue, 2, :opened, project: project) }
+
+        context 'when updating issues state' do
+          it_behaves_like 'not scheduling cached group count refresh' do
+            let(:params) { { state_event: 'closed' } }
+          end
+
+          it_behaves_like 'not scheduling cached group count refresh' do
+            let(:params) { { state_event: 'reopened' } }
+          end
         end
       end
     end

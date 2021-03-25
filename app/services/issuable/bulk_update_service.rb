@@ -15,13 +15,13 @@ module Issuable
     def execute(type)
       ids = params.delete(:issuable_ids).split(",")
       set_update_params(type)
-      updated_issues_count = update_issuables(type, ids)
+      updated_issuables = update_issuables(type, ids)
 
-      if updated_issues_count > 0 && requires_issues_count_cache_refresh?(type)
-        update_group_cached_counts(updated_issues_count)
+      if !updated_issuables.empty? && requires_count_cache_refresh?(type)
+        schedule_group_count_refresh(type, updated_issuables)
       end
 
-      response_success(payload: { count: updated_issues_count })
+      response_success(payload: { count: updated_issuables.size })
     rescue ArgumentError => e
       response_error(e.message, 422)
     end
@@ -60,7 +60,7 @@ module Issuable
         update_class.new(issuable.issuing_parent, current_user, params).execute(issuable)
       end
 
-      items.size
+      items
     end
 
     def find_issuables(parent, model_class, ids)
@@ -86,26 +86,15 @@ module Issuable
       ServiceResponse.error(message: message, http_status: http_status)
     end
 
-    def requires_issues_count_cache_refresh?(type)
-      type == 'issue' && params.include?(:state_event) && group.present?
+    def requires_count_cache_refresh?(type)
+      type.to_sym == :issue && params.include?(:state_event)
     end
 
-    def update_group_cached_counts(updated_issues_count)
-      count_service = Groups::OpenIssuesCountService.new(group, current_user)
-      cached_count = count_service.cached_count
-      return if cached_count.blank?
+    def schedule_group_count_refresh(issuable_type, updated_issuables)
+      group_ids = updated_issuables.map(&:project).map { |project| project.group&.id }.uniq
+      return unless group_ids.any?
 
-      new_count = compute_new_cached_count(cached_count, updated_issues_count)
-      count_service.refresh_cache_over_threshold(new_count)
-    end
-
-    def group
-      parent.is_a?(Group) ? parent : parent&.group
-    end
-
-    def compute_new_cached_count(cached_count, updated_issues_count)
-      operation = params[:state_event] == 'closed' ? :- : :+
-      [cached_count.to_i, updated_issues_count.to_i].inject(operation)
+      Issuables::RefreshGroupsCounterWorker.perform_async(issuable_type, current_user.id, group_ids)
     end
   end
 end
