@@ -1,12 +1,31 @@
 <script>
-import { GlFormCheckbox, GlFormGroup, GlSearchBoxByType } from '@gitlab/ui';
+import {
+  GlDropdown,
+  GlDropdownDivider,
+  GlDropdownItem,
+  GlFormGroup,
+  GlIcon,
+  GlSearchBoxByType,
+  GlSprintf,
+  GlTruncate,
+} from '@gitlab/ui';
 import { s__ } from '~/locale';
-import { DEBOUNCE, DEFAULT_FILTERS } from './constants';
+import { ALL, DEBOUNCE, STATUSES } from './constants';
 
 export default {
+  ALL,
   DEBOUNCE,
   DEFAULT_DISMISSED_FILTER: true,
-  components: { GlFormCheckbox, GlFormGroup, GlSearchBoxByType },
+  components: {
+    GlDropdown,
+    GlDropdownDivider,
+    GlDropdownItem,
+    GlFormGroup,
+    GlIcon,
+    GlSearchBoxByType,
+    GlSprintf,
+    GlTruncate,
+  },
   props: {
     filters: {
       type: Object,
@@ -20,46 +39,95 @@ export default {
     };
   },
   i18n: {
+    STATUSES,
     HIDE_DISMISSED_TITLE: s__('ThreatMonitoring|Hide dismissed alerts'),
     POLICY_NAME_FILTER_PLACEHOLDER: s__('NetworkPolicy|Search by policy name'),
     POLICY_NAME_FILTER_TITLE: s__('NetworkPolicy|Policy'),
+    POLICY_STATUS_FILTER_TITLE: s__('NetworkPolicy|Status'),
+  },
+  computed: {
+    extraOptionCount() {
+      const numOfStatuses = this.filters.statuses.length;
+      return numOfStatuses > 0 ? numOfStatuses - 1 : 0;
+    },
+    firstSelectedOption() {
+      return this.$options.i18n.STATUSES[this.filters.statuses[0]] || this.$options.ALL.value;
+    },
   },
   methods: {
-    changeDismissedFilter(filtered) {
-      const newFilters = filtered ? DEFAULT_FILTERS : { statuses: [] };
-      this.handleFilterChange(newFilters);
+    handleFilterChange(newFilters) {
+      this.$emit('filter-change', { ...this.filters, ...newFilters });
     },
-    handleSearch(searchTerm) {
+    handleNameFilter(searchTerm) {
       const newFilters = { searchTerm };
       this.handleFilterChange(newFilters);
     },
-    handleFilterChange(newFilters) {
-      this.$emit('filter-change', { ...this.filters, ...newFilters });
+    handleStatusFilter(status) {
+      let newFilters;
+      if (status === this.$options.ALL.key) {
+        newFilters = { statuses: [] };
+      } else {
+        newFilters = this.isChecked(status)
+          ? { statuses: [...this.filters.statuses.filter((s) => s !== status)] }
+          : { statuses: [...this.filters.statuses, status] };
+      }
+      this.handleFilterChange(newFilters);
+    },
+    isChecked(status) {
+      if (status === this.$options.ALL.key) {
+        return !this.filters.statuses.length;
+      }
+      return this.filters.statuses.includes(status);
     },
   },
 };
 </script>
 
 <template>
-  <div
-    class="gl-p-4 gl-bg-gray-10 gl-display-flex gl-justify-content-space-between gl-align-items-center"
-  >
-    <div>
-      <h5 class="gl-mt-0">{{ $options.i18n.POLICY_NAME_FILTER_TITLE }}</h5>
+  <div class="gl-p-4 gl-bg-gray-10 gl-display-flex gl-align-items-center">
+    <gl-form-group :label="$options.i18n.POLICY_NAME_FILTER_TITLE" label-size="sm" class="gl-mb-0">
       <gl-search-box-by-type
         :debounce="$options.DEBOUNCE"
         :placeholder="$options.i18n.POLICY_NAME_FILTER_PLACEHOLDER"
-        @input="handleSearch"
+        @input="handleNameFilter"
       />
-    </div>
-    <gl-form-group label-size="sm" class="gl-mb-0">
-      <gl-form-checkbox
-        class="gl-mt-3"
-        :checked="$options.DEFAULT_DISMISSED_FILTER"
-        @change="changeDismissedFilter"
-      >
-        {{ $options.i18n.HIDE_DISMISSED_TITLE }}
-      </gl-form-checkbox>
+    </gl-form-group>
+    <gl-form-group
+      :label="$options.i18n.POLICY_STATUS_FILTER_TITLE"
+      label-size="sm"
+      class="gl-mb-0 col-sm-6 col-md-4 col-lg-2"
+    >
+      <gl-dropdown toggle-class="gl-inset-border-1-gray-400!" class="gl-w-full">
+        <template #button-content>
+          <gl-truncate :text="firstSelectedOption" class="gl-min-w-0 gl-mr-2" />
+          <gl-sprintf v-if="extraOptionCount > 0" class="gl-mr-2" :message="__('+%{extra} more')">
+            <template #extra>{{ extraOptionCount }}</template>
+          </gl-sprintf>
+          <gl-icon name="chevron-down" class="gl-flex-shrink-0 gl-ml-auto" />
+        </template>
+
+        <gl-dropdown-item
+          key="All"
+          data-testid="ALL"
+          :is-checked="isChecked($options.ALL.key)"
+          is-check-item
+          @click="handleStatusFilter($options.ALL.key)"
+        >
+          {{ $options.ALL.value }}
+        </gl-dropdown-item>
+        <gl-dropdown-divider />
+        <template v-for="[status, translated] in Object.entries($options.i18n.STATUSES)">
+          <gl-dropdown-item
+            :key="status"
+            :data-testid="status"
+            :is-checked="isChecked(status)"
+            is-check-item
+            @click="handleStatusFilter(status)"
+          >
+            {{ translated }}
+          </gl-dropdown-item>
+        </template>
+      </gl-dropdown>
     </gl-form-group>
   </div>
 </template>

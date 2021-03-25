@@ -1074,6 +1074,9 @@ msgstr[1] ""
 msgid "+%{approvers} more approvers"
 msgstr ""
 
+msgid "+%{extra} more"
+msgstr ""
+
 msgid "+%{more_assignees_count}"
 msgstr ""
 
@@ -20496,6 +20499,9 @@ msgid "NetworkPolicy|Policy"
 msgstr ""
 
 msgid "NetworkPolicy|Search by policy name"
+msgstr ""
+
+msgid "NetworkPolicy|Status"
 msgstr ""
 
 msgid "Never"
