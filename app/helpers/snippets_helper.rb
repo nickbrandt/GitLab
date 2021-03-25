@@ -11,16 +11,6 @@ module SnippetsHelper
     end
   end
 
-  def download_raw_snippet_button(snippet)
-    link_to(sprite_icon('download'),
-            gitlab_raw_snippet_path(snippet, inline: false),
-            target: '_blank',
-            rel: 'noopener noreferrer',
-            class: "gl-button btn btn-default btn-sm has-tooltip",
-            title: 'Download',
-            data: { container: 'body' })
-  end
-
   # Return the path of a snippets index for a user or for a project
   #
   # @returns String, path to snippet index

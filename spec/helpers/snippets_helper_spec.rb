@@ -63,30 +63,6 @@ RSpec.describe SnippetsHelper do
     end
   end
 
-  describe '#download_raw_snippet_button' do
-    subject { download_raw_snippet_button(snippet) }
-
-    context 'with personal snippet' do
-      let(:snippet) { public_personal_snippet }
-
-      it 'returns the download button' do
-        expect(subject).to eq(download_link("/-/snippets/#{snippet.id}/raw"))
-      end
-    end
-
-    context 'with project snippet' do
-      let(:snippet) { public_project_snippet }
-
-      it 'returns the download button' do
-        expect(subject).to eq(download_link("/#{snippet.project.path_with_namespace}/-/snippets/#{snippet.id}/raw"))
-      end
-    end
-
-    def download_link(url)
-      "<a target=\"_blank\" rel=\"noopener noreferrer\" class=\"gl-button btn btn-default btn-sm has-tooltip\" title=\"Download\" data-container=\"body\" href=\"#{url}?inline=false\">#{sprite_icon('download')}</a>"
-    end
-  end
-
   describe '#snippet_badge' do
     let(:snippet) { build(:personal_snippet, visibility) }
 
