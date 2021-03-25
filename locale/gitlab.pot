@@ -13960,6 +13960,12 @@ msgstr ""
 msgid "Geo|Not synced yet"
 msgstr ""
 
+msgid "Geo|Nothing to synchronize"
+msgstr ""
+
+msgid "Geo|Number of %{title}"
+msgstr ""
+
 msgid "Geo|Pending synchronization"
 msgstr ""
 
@@ -13975,9 +13981,6 @@ msgstr ""
 msgid "Geo|Primary site"
 msgstr ""
 
-msgid "Geo|Progress Bar Placeholder"
-msgstr ""
-
 msgid "Geo|Project"
 msgstr ""
 
@@ -13988,6 +13991,9 @@ msgid "Geo|Projects in certain groups"
 msgstr ""
 
 msgid "Geo|Projects in certain storage shards"
+msgstr ""
+
+msgid "Geo|Queued"
 msgstr ""
 
 msgid "Geo|Redownload"
