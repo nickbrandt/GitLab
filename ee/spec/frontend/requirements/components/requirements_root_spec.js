@@ -21,6 +21,7 @@ import createMockApollo from 'helpers/mock_apollo_helper';
 
 import { TEST_HOST } from 'helpers/test_constants';
 import { mockTracking, unmockTracking } from 'helpers/tracking_helper';
+import { extendedWrapper } from 'helpers/vue_test_utils_helper';
 import waitForPromises from 'helpers/wait_for_promises';
 import createFlash from '~/flash';
 import FilteredSearchBarRoot from '~/vue_shared/components/filtered_search_bar/filtered_search_bar_root.vue';
@@ -69,36 +70,42 @@ const defaultProps = {
 };
 
 const createComponent = ({ props = {}, loading = false } = {}) =>
-  shallowMount(RequirementsRoot, {
-    propsData: {
-      ...defaultProps,
-      ...props,
-    },
-    mocks: {
-      $apollo: {
-        queries: {
-          requirements: {
-            loading,
-            list: [],
-            pageInfo: {},
-            refetch: jest.fn(),
-          },
-          requirementsCount: {
-            ...defaultProps.initialRequirementsCount,
-            refetch: jest.fn(),
-          },
-        },
-        mutate: jest.fn(),
+  extendedWrapper(
+    shallowMount(RequirementsRoot, {
+      propsData: {
+        ...defaultProps,
+        ...props,
       },
-      $toast,
-    },
-  });
+      mocks: {
+        $apollo: {
+          queries: {
+            requirements: {
+              loading,
+              list: [],
+              pageInfo: {},
+              refetch: jest.fn(),
+            },
+            requirementsCount: {
+              ...defaultProps.initialRequirementsCount,
+              refetch: jest.fn(),
+            },
+          },
+          mutate: jest.fn(),
+        },
+        $toast,
+      },
+    }),
+  );
 
-const createComponentWithApollo = ({ props = {}, requestHandlers } = {}) => {
+const createComponentWithApollo = ({ props = {}, requestHandlers = [] } = {}) => {
   localVue.use(VueApollo);
 
   const mockApollo = createMockApollo(
-    requestHandlers,
+    [
+      [projectRequirements, jest.fn().mockResolvedValue(mockProjectRequirements)],
+      [projectRequirementsCount, jest.fn().mockResolvedValue(mockProjectRequirementCounts)],
+      ...requestHandlers,
+    ],
     {},
     {
       dataIdFromObject: (object) =>
@@ -107,30 +114,33 @@ const createComponentWithApollo = ({ props = {}, requestHandlers } = {}) => {
     },
   );
 
-  return shallowMount(RequirementsRoot, {
-    localVue,
-    apolloProvider: mockApollo,
-    propsData: {
-      ...defaultProps,
-      ...props,
-    },
-    mocks: {
-      $toast,
-    },
-    stubs: {
-      RequirementItem,
-      RequirementStatusBadge,
-      GlIcon,
-    },
-  });
+  return extendedWrapper(
+    shallowMount(RequirementsRoot, {
+      localVue,
+      apolloProvider: mockApollo,
+      propsData: {
+        ...defaultProps,
+        initialRequirementsCount: mockInitialRequirementCounts,
+        ...props,
+      },
+      mocks: {
+        $toast,
+      },
+      stubs: {
+        RequirementItem,
+        RequirementStatusBadge,
+        GlIcon,
+      },
+    }),
+  );
 };
 
 describe('RequirementsRoot', () => {
   let wrapper;
   let trackingSpy;
 
-  const findRequirementEditForm = () => wrapper.find("[data-testid='edit-form']");
-  const findFailedStatusIcon = () => wrapper.find("[data-testid='status_failed-icon']");
+  const findRequirementEditForm = () => wrapper.findByTestId('edit-form');
+  const findFailedStatusIcon = () => wrapper.findByTestId('status_failed-icon');
 
   beforeEach(() => {
     wrapper = createComponent();
@@ -1044,15 +1054,8 @@ describe('RequirementsRoot', () => {
         beforeEach(() => {
           updateRequirementSpy = jest.fn().mockResolvedValue(mockUpdateRequirementToFailed);
 
-          const requestHandlers = [
-            [projectRequirements, jest.fn().mockResolvedValue(mockProjectRequirements)],
-            [projectRequirementsCount, jest.fn().mockResolvedValue(mockProjectRequirementCounts)],
-            [updateRequirement, updateRequirementSpy],
-          ];
-
           wrapper = createComponentWithApollo({
-            props: { initialRequirementsCount: mockInitialRequirementCounts },
-            requestHandlers,
+            requestHandlers: [[updateRequirement, updateRequirementSpy]],
           });
         });
 
@@ -1092,15 +1095,8 @@ describe('RequirementsRoot', () => {
         beforeEach(async () => {
           updateRequirementSpy = jest.fn().mockResolvedValue(mockUpdateRequirementTitle);
 
-          const requestHandlers = [
-            [projectRequirements, jest.fn().mockResolvedValueOnce(mockProjectRequirements)],
-            [projectRequirementsCount, jest.fn().mockResolvedValue(mockProjectRequirementCounts)],
-            [updateRequirement, updateRequirementSpy],
-          ];
-
           wrapper = createComponentWithApollo({
-            props: { initialRequirementsCount: mockInitialRequirementCounts },
-            requestHandlers,
+            requestHandlers: [[updateRequirement, updateRequirementSpy]],
           });
         });
 
