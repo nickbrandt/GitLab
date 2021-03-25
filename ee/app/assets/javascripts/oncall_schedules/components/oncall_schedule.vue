@@ -93,14 +93,11 @@ export default {
     };
   },
   computed: {
-    selectedTimezone() {
-      return this.timezones.find((tz) => tz.identifier === this.schedule.timezone);
+    loading() {
+      return this.$apollo.queries.rotations.loading;
     },
     offset() {
       return selectedTimezoneFormattedOffset(this.selectedTimezone.formatted_offset);
-    },
-    timeframe() {
-      return getTimeframeForWeeksView(this.timeframeStartDate);
     },
     scheduleRange() {
       switch (this.presetType) {
@@ -120,8 +117,17 @@ export default {
           return '';
       }
     },
-    loading() {
-      return this.$apollo.queries.rotations.loading;
+    scheduleInfo() {
+      if (this.schedule.description) {
+        return `${this.schedule.description} | ${this.offset} ${this.schedule.timezone}`;
+      }
+      return `${this.schedule.timezone} | ${this.offset}`;
+    },
+    selectedTimezone() {
+      return this.timezones.find((tz) => tz.identifier === this.schedule.timezone);
+    },
+    timeframe() {
+      return getTimeframeForWeeksView(this.timeframeStartDate);
     },
   },
   methods: {
@@ -194,7 +200,7 @@ export default {
         </div>
       </template>
       <p class="gl-text-gray-500 gl-mb-5" data-testid="scheduleBody">
-        {{ schedule.timezone }} | {{ offset }}
+        {{ scheduleInfo }}
       </p>
       <div class="gl-display-flex gl-justify-content-space-between gl-mb-3">
         <div class="gl-display-flex gl-align-items-center">
