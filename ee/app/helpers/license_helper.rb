@@ -50,7 +50,7 @@ module LicenseHelper
 
   def cloud_license_view_data
     {
-      current_plan_title: current_license_title
+      plan_name: current_license_title
     }
   end
 
