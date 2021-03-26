@@ -30,7 +30,7 @@ export default {
     filters: {
       type: Object,
       required: false,
-      default: () => {},
+      default: () => ({}),
     },
   },
   data() {
@@ -47,11 +47,12 @@ export default {
   },
   computed: {
     extraOptionCount() {
-      const numOfStatuses = this.filters.statuses.length;
+      const numOfStatuses = this.filters.statuses?.length || 0;
       return numOfStatuses > 0 ? numOfStatuses - 1 : 0;
     },
     firstSelectedOption() {
-      return this.$options.i18n.STATUSES[this.filters.statuses[0]] || this.$options.ALL.value;
+      const firstOption = this.filters.statuses?.length ? this.filters.statuses[0] : undefined;
+      return this.$options.i18n.STATUSES[firstOption] || this.$options.ALL.value;
     },
   },
   methods: {
@@ -75,9 +76,9 @@ export default {
     },
     isChecked(status) {
       if (status === this.$options.ALL.key) {
-        return !this.filters.statuses.length;
+        return !this.filters.statuses?.length;
       }
-      return this.filters.statuses.includes(status);
+      return this.filters.statuses?.includes(status);
     },
   },
 };
@@ -96,11 +97,17 @@ export default {
       :label="$options.i18n.POLICY_STATUS_FILTER_TITLE"
       label-size="sm"
       class="gl-mb-0 col-sm-6 col-md-4 col-lg-2"
+      data-testid="policy-alert-status-filter"
     >
       <gl-dropdown toggle-class="gl-inset-border-1-gray-400!" class="gl-w-full">
         <template #button-content>
           <gl-truncate :text="firstSelectedOption" class="gl-min-w-0 gl-mr-2" />
-          <gl-sprintf v-if="extraOptionCount > 0" class="gl-mr-2" :message="__('+%{extra} more')">
+          <gl-sprintf
+            v-if="extraOptionCount > 0"
+            class="gl-mr-2"
+            :message="__('+%{extra} more')"
+            data-testid="dropdown-message"
+          >
             <template #extra>{{ extraOptionCount }}</template>
           </gl-sprintf>
           <gl-icon name="chevron-down" class="gl-flex-shrink-0 gl-ml-auto" />
