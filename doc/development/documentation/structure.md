@@ -158,7 +158,7 @@ For the topic title:
 - Consider including at least a partial error message in the title.
 - Use fewer than 70 characters.
 
-List the complete error message within the topic text, too.
+Remember to include the complete error message in the topic's content.
 
 ## Other information on a topic
 
