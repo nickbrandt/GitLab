@@ -33,7 +33,7 @@ GitLab is already installed in a pre-configured image, and all you have to do is
 create a new VM:
 
 1. [Visit the GitLab offering in the marketplace](https://azuremarketplace.microsoft.com/en-us/marketplace/apps/gitlabinc1586447921813.gitlabee?tab=Overview)
-1. Select **Get it now** and you will be presented with the "Create this app in Azure" pop-up.
+1. Select **Get it now** and you will be presented with the **Create this app in Azure** window.
    Select **Continue** to get onto the next step.
 1. In the Azure portal, you are presented with two options:
    - You can either select **Create** to create a VM from scratch.
@@ -43,14 +43,15 @@ create a new VM:
    and select **Create**.
 
 NOTE:
-Be aware that while your VM is active (known as "allocated"), it will incur
-"compute charges" which, ultimately, you will be billed for. So, even if you're using the
-free trial credits, you'll likely want to learn
+Be aware that while your VM is active (known as "allocated"), it incurs
+compute charges for which you'll be billed. Even if you're using the
+free trial credits, you'll want to know
 [how to properly shutdown an Azure VM to save money](https://build5nines.com/properly-shutdown-azure-vm-to-save-money/).
 See the [Azure pricing calculator](https://azure.microsoft.com/en-us/pricing/calculator/)
-to learn how much the resources will cost you.
+to learn how much resources can cost.
 
-In the next steps, we will configure the virtual machine.
+After you create the virtual machine, use the information in the following
+sections to configure it.
 
 ### Configure the Basics tab
 
@@ -58,15 +59,15 @@ The first items you need to configure are the basic settings of the underlying v
 
 1. Select the subscription model and a resource group (create a new one if it
    doesn't exist).
-1. Enter a name for the VM, for example "GitLab".
+1. Enter a name for the VM, for example `GitLab`.
 1. Select a region.
 1. In the **Availability options**, select **Availability zone** and set it to `1`.
    Read more about the [availability zones](https://docs.microsoft.com/en-us/azure/virtual-machines/availability).
-1. Make sure the selected image is set to **GitLab - Gen1**.
+1. Ensure the selected image is set to **GitLab - Gen1**.
 1. Select the VM size based on the [hardware requirements](../requirements.md#hardware-requirements).
    The minimum system requirements to run a GitLab environment for up to 500 users
    is covered by the `D4s_v3` size, so we'll choose that.
-1. Set the authentication type to "SSH public key".
+1. Set the authentication type to **SSH public key**.
 1. Enter a user name or leave the one that is automatically created. This will
    be the user that you will use to connect to the VM through SSH. It has root access
    by default.
@@ -74,63 +75,64 @@ The first items you need to configure are the basic settings of the underlying v
    Read the [SSH documentation](../../ssh/README.md) to learn more about how to set up SSH
    public keys.
 
-Check the settings you have entered, and then proceed onto the disks section.
+Review your entered settings, and then proceed to the Disks tab.
 
 ### Configure the Disks tab
 
 For the disks:
 
-1. Choose "Premium SSD" for the OS disk type.
-1. Choose the default encryption.
+1. For the OS disk type, select **Premium SSD**.
+1. Select the default encryption.
 
 [Read more about the types of disks](https://docs.microsoft.com/en-us/azure/virtual-machines/managed-disks-overview) that Azure provides.
 
-Check the settings you have entered, and then proceed onto the networking section.
+Review your settings, and then proceed to the Networking tab.
 
 ### Configure the Networking tab
 
-In the networking section, you can define the network connectivity for your
-virtual machine by configuring network interface card (NIC) settings.
+Use this tab to define the network connectivity for your
+virtual machine, by configuring network interface card (NIC) settings.
 You can leave them at their default settings.
 
 Azure creates a security group by default and the VM is assigned to it.
 The GitLab image in the marketplace has the following ports open by default:
 
-- **80**: Enable the VM to respond to HTTP requests, allowing public access.
-- **443**: Enable our VM to respond to HTTPS requests, allowing public access.
-- **22**: Enable our VM to respond to SSH connection requests,
-  allowing public access (with authentication) to remote terminal sessions.
+| Port | Description |
+|------|-------------|
+| 80   | Enable the VM to respond to HTTP requests, allowing public access. |
+| 443  | Enable our VM to respond to HTTPS requests, allowing public access. |
+| 22   | Enable our VM to respond to SSH connection requests, allowing public access (with authentication) to remote terminal sessions. |
 
-If you wish to change any of the above, or add your own rules, you can do it
-after the VM is created by going to the Networking settings in the left sidebar
+If you want to change the ports or add any rules, you can do it
+after the VM is created by going to the Networking settings in the left sidebar,
 while in the VM dashboard.
 
 ### Configure the Management tab
 
-In the management section, you can configure monitoring and management options
+Use this tab to configure monitoring and management options
 for your VM. You can leave them at their default settings.
 
 ### Configure the Advanced tab
 
-In the advanced section, you can add additional configuration, agents, scripts
+Use this tab to add additional configuration, agents, scripts
 or applications through virtual machine extensions or cloud-init. You can leave them
 at their default settings.
 
 ### Configure the Tags tab
 
-In the tags section, you can add name/value pairs that enable you to categorize
+Use this tab to add name/value pairs that enable you to categorize
 resources. You can leave them at their default settings.
 
 ### Review and create the VM
 
-In this last tab, you are presented with all the options you have selected
-so far, where you can review and modify any of the settings you have made during
-all previous steps. Azure will runs some validation tests in the background,
-and if you have filled all the required settings, you will be able to finally
+In the final tab, you are presented with all the options you have selected,
+where you can review and modify your choices from the
+previous steps. Azure will run validation tests in the background,
+and if you have provided all of the required settings, you can
 create the VM.
 
-Once you select **Create**, if you had opted for Azure to create an SSH key pair
-for you, you will be asked to download the private SSH key. Download it as you'll
+After you select **Create**, if you had opted for Azure to create an SSH key pair
+for you, you will be asked to download the private SSH key. Download the key, as you'll
 need it to SSH into the VM.
 
 After you download the key, the deployment will begin.
@@ -138,34 +140,34 @@ After you download the key, the deployment will begin.
 ### Finish deployment
 
 At this point, Azure will begin deploying your new VM. The deployment process
-will take a few minutes to complete. Once it's complete, the new VM and its
-associated resources will be displayed on the Azure Dashboard.
+takes a few minutes to complete. After it's complete, the new VM and its
+associated resources are displayed on the Azure Dashboard.
 Select **Go to resource** to visit the dashboard of the VM.
 
-At this point, GitLab is deployed and ready to be used, but before you do that,
+GitLab is now deployed and ready to be used. Before doing so, however,
 you need to set up the domain name and configure GitLab to use it.
 
 ### Set up a domain name
 
 The VM will have a public IP address (static by default), but Azure allows you
-to assign a friendly DNS name to the VM:
+to assign a descriptive DNS name to the VM:
 
 1. From the VM dashboard, select **Configure** under **DNS name**.
-1. Enter a friendly DNS name for your instance in the **DNS name label** field,
+1. Enter a descriptive DNS name for your instance in the **DNS name label** field,
    for example `gitlab-prod`. This will make the VM accessible at
    `gitlab-prod.eastus.cloudapp.azure.com`.
-1. Select **"Save"** for the changes to take effect.
+1. Select **Save** for the changes to take effect.
 
 Eventually, you'll want to use your own domain name. You will need to add a DNS `A` record
-at your domain registrar which points to the public IP address of your Azure VM.
+with your domain registrar that points to the public IP address of your Azure VM.
 You can use [Azure's DNS](https://docs.microsoft.com/en-us/azure/dns/dns-delegate-domain-azure-dns)
 or some [other registrar](https://docs.gitlab.com/omnibus/settings/dns.html).
 
 ### Change the GitLab external URL
 
 GitLab uses `external_url` in its configuration file to set up the domain name.
-If you don't set this up, then when you visit the Azure friendly name, you'll
-be redirected to the public IP instead.
+If you don't set this up, when you visit the Azure friendly name, you'll
+instead be redirected to the public IP.
 
 To set up the GitLab external URL:
 
@@ -219,30 +221,30 @@ You can now visit GitLab with your browser at the external URL you defined.
 
 Use the domain name you set up earlier to visit your new GitLab instance
 in your browser. In this example, it's `https://gitlab-prod.eastus.cloudapp.azure.com`.
-The first thing you see is the login page:
 
-1. GitLab creates an admin user by default. The credentials are:
+The first thing you see is the sign-in page. GitLab creates an admin user by default. The credentials are:
+
    - Username: `root`
    - Password: the password is automatically created, and there are [two ways to
      find it](https://docs.bitnami.com/azure/faq/get-started/find-credentials).
-1. Once logged in, make sure to immediately
-   [change the password](../../user/profile/index.md#change-your-password).
+
+After signing in, be sure to immediately [change the password](../../user/profile/index.md#change-your-password).
 
 ## Maintain your GitLab instance
 
 It's important to keep your GitLab environment up-to-date. The GitLab team is constantly making
-enhancements and occasionally you may need to update for security reasons. So let's review how to
-update GitLab.
+enhancements and occasionally you may need to update for security reasons. Use the information
+in this section whenever you need to update GitLab.
 
 ### Check the current version
 
-To check which version of GitLab you're currently running,
+To determine the version of GitLab you're currently running,
 go to the **{admin}** **Admin Area**, and you will find the version
-under the "Components" table.
+under the **Components** table.
 
-If there is a newer version of GitLab available which contains one or more
-security fixes, you will see an **Update asap** notification message urging
-you to [update](#update-gitlab).
+If there's a newer available version of GitLab that contains one or more
+security fixes, GitLab displays an **Update asap** notification message that
+encourages you to [update](#update-gitlab).
 
 ### Update GitLab
 
@@ -257,7 +259,7 @@ To update GitLab to the latest version:
    ```
 
    This command updates GitLab and its associated components to the latest versions,
-   so it will take a little time to complete. You'll see various update tasks being
+   and can take time to complete. You'll see various update tasks being
    completed in your terminal.
 
    NOTE:
@@ -287,7 +289,7 @@ new installation.
 
 ## Troubleshooting
 
-This section describes common errors you might encounter.
+This section describes common errors you can encounter.
 
 ### Update the GPG key for the GitLab repositories
 
