@@ -439,6 +439,13 @@ export default {
             searchPlaceholder: __('Search'),
           }"
         />
+        <div v-if="!defaultBranch" class="gl-text-red-500 gl-mt-3">
+          {{
+            s__(
+              'OnDemandScans|You must create a repository within your project to run an on-demand scan.',
+            )
+          }}
+        </div>
       </gl-form-group>
 
       <scanner-profile-selector
