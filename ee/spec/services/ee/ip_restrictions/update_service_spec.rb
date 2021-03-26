@@ -20,11 +20,9 @@ RSpec.describe EE::IpRestrictions::UpdateService do
         end
 
         it 'builds new ip_restriction records with the provided ranges' do
-          expect(group.ip_restrictions).to be_empty
-
-          subject
-
-          expect(group.ip_restrictions.map(&:range)).to contain_exactly(*comma_separated_ranges.split(','))
+          expect { subject }
+            .to(change { group.ip_restrictions.map(&:range) }
+            .from([]).to(contain_exactly(*comma_separated_ranges.split(","))))
         end
       end
     end
