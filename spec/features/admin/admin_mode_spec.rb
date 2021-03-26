@@ -118,12 +118,12 @@ RSpec.describe 'Admin mode' do
           visit root_dashboard_path
 
           page.within '.navbar' do
-            expect(page).to have_link(text: 'Admin Area', href: admin_root_path, visible: true)
+            expect(page).not_to have_link(text: 'Admin Area', href: admin_root_path, visible: true)
             expect(page).to have_link(text: 'Leave Admin Mode', href: destroy_admin_session_path, visible: true)
           end
         end
 
-        it 'relocates admin dashboard links to dropdown list on smaller screen', :js do
+        it 'does not relocate admin dashboard links to dropdown list on smaller screen', :js do
           resize_screen_xs
           visit root_dashboard_path
 
@@ -135,7 +135,7 @@ RSpec.describe 'Admin mode' do
           find('.header-more').click
 
           page.within '.navbar' do
-            expect(page).to have_link(text: 'Admin Area', href: admin_root_path, visible: true)
+            expect(page).not_to have_link(text: 'Admin Area', href: admin_root_path, visible: true)
             expect(page).to have_link(text: 'Leave Admin Mode', href: destroy_admin_session_path, visible: true)
           end
         end

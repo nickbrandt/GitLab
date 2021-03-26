@@ -3,7 +3,7 @@
     = nav_link(controller: 'admin/dashboard') do
       = link_to admin_root_path, class: 'admin-icon qa-admin-area-link', title: _('Admin Area'), aria: { label: _('Admin Area') }, data: {toggle: 'tooltip', placement: 'bottom', container: 'body'} do
         = sprite_icon('admin', size: 18)
-        
+
   - if dashboard_nav_link?(:projects)
     = nav_link(path: ['root#index', 'projects#trending', 'projects#starred', 'dashboard/projects#index'], html_options: { id: 'nav-projects-dropdown', class: "home dropdown header-projects qa-projects-dropdown", data: { track_label: "projects_dropdown", track_event: "click_dropdown" } }) do
       %button{ type: 'button', data: { toggle: "dropdown" } }
