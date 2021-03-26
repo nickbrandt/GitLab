@@ -6,8 +6,6 @@ import { sprintf } from '~/locale';
 import { reportToSentry } from '../../utils';
 import ActionComponent from '../jobs_shared/action_component.vue';
 import JobNameComponent from '../jobs_shared/job_name_component.vue';
-import { accessValue } from './accessors';
-import { REST } from './constants';
 
 /**
  * Renders the badge for the pipeline graph and the job's dropdown.
@@ -45,11 +43,6 @@ export default {
     GlTooltip: GlTooltipDirective,
   },
   mixins: [delayedJobMixin],
-  inject: {
-    dataMethod: {
-      default: REST,
-    },
-  },
   props: {
     job: {
       type: Object,
@@ -86,13 +79,10 @@ export default {
       return this.dropdownLength === 1 ? 'viewport' : 'scrollParent';
     },
     detailsPath() {
-      return accessValue(this.dataMethod, 'detailsPath', this.status);
+      return this.status.details_path;
     },
     hasDetails() {
-      return accessValue(this.dataMethod, 'hasDetails', this.status);
-    },
-    computedJobId() {
-      return this.pipelineId > -1 ? `${this.job.name}-${this.pipelineId}` : '';
+      return this.status.has_details;
     },
     status() {
       return this.job && this.job.status ? this.job.status : {};
@@ -141,7 +131,7 @@ export default {
     },
   },
   errorCaptured(err, _vm, info) {
-    reportToSentry('job_item', `error: ${err}, info: ${info}`);
+    reportToSentry('pipelines_job_item', `pipelines_job_item error: ${err}, info: ${info}`);
   },
   methods: {
     hideTooltips() {
@@ -155,7 +145,6 @@ export default {
 </script>
 <template>
   <div
-    :id="computedJobId"
     class="ci-job-component gl-display-flex gl-align-items-center gl-justify-content-space-between"
     data-qa-selector="job_item_container"
   >
