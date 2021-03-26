@@ -20769,6 +20769,9 @@ msgstr ""
 msgid "No authentication methods configured."
 msgstr ""
 
+msgid "No available branches"
+msgstr ""
+
 msgid "No available groups to fork the project."
 msgstr ""
 
