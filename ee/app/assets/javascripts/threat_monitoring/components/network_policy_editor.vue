@@ -22,6 +22,7 @@ export default {
         lineNumbers: 'off',
         minimap: { enabled: false },
         folding: false,
+        glyphMargin: false,
         renderIndentGuides: false,
         renderWhitespace: 'boundary',
         renderLineHighlight: 'none',

@@ -5,6 +5,8 @@ import EditorLite from '~/vue_shared/components/editor_lite.vue';
 describe('NetworkPolicyEditor component', () => {
   let wrapper;
 
+  const findEditor = () => wrapper.findComponent(EditorLite);
+
   const factory = ({ propsData } = {}) => {
     wrapper = shallowMount(NetworkPolicyEditor, {
       propsData: {
@@ -27,17 +29,18 @@ describe('NetworkPolicyEditor component', () => {
   });
 
   it('renders container element', () => {
-    expect(wrapper.findComponent(EditorLite).exists()).toBe(true);
+    expect(findEditor().exists()).toBe(true);
   });
 
   it('initializes monaco editor with yaml language and provided value', () => {
-    const editor = wrapper.findComponent(EditorLite).vm.getEditor();
+    const editorComponent = findEditor();
+    expect(editorComponent.props('value')).toBe('foo');
+    const editor = editorComponent.vm.getEditor();
     expect(editor.getModel().getModeId()).toBe('yaml');
-    expect(editor.getValue()).toBe('foo');
   });
 
   it("emits input event on editor's input", async () => {
-    const editor = wrapper.findComponent(EditorLite);
+    const editor = findEditor();
     editor.vm.$emit('input');
     await wrapper.vm.$nextTick();
     expect(wrapper.emitted().input).toBeTruthy();

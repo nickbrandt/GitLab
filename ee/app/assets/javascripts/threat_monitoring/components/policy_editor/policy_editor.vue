@@ -365,13 +365,14 @@ export default {
           >
             {{ s__('NetworkPolicies|YAML editor') }}
           </h5>
-          <network-policy-editor
-            data-testid="network-policy-editor"
-            :value="yamlEditorValue"
-            :height="400"
-            :read-only="false"
-            @input="loadYaml"
-          />
+          <div class="gl-p-4">
+            <network-policy-editor
+              data-testid="network-policy-editor"
+              :value="yamlEditorValue"
+              :read-only="false"
+              @input="loadYaml"
+            />
+          </div>
         </div>
       </div>
     </div>
