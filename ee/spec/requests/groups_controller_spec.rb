@@ -31,11 +31,9 @@ RSpec.describe GroupsController, type: :request do
           context 'valid param' do
             shared_examples 'creates ip restrictions' do
               it 'creates ip restrictions' do
-                expect(group.ip_restrictions).to be_empty
-
-                subject
-
-                expect(group.reload.ip_restrictions.map(&:range)).to contain_exactly(*range.split(','))
+                expect { subject }
+                  .to change { group.reload.ip_restrictions.map(&:range) }
+                    .from([]).to(contain_exactly(*range.split(',')))
                 expect(response).to have_gitlab_http_status(:found)
               end
             end
@@ -73,11 +71,9 @@ RSpec.describe GroupsController, type: :request do
             context 'valid param' do
               shared_examples 'updates ip restrictions' do
                 it 'updates ip restrictions' do
-                  expect(group.ip_restrictions.map(&:range)).to eq(['10.0.0.0/8'])
-
-                  subject
-
-                  expect(group.reload.ip_restrictions.map(&:range)).to contain_exactly(*range.split(','))
+                  expect { subject }
+                    .to change { group.reload.ip_restrictions.map(&:range) }
+                      .from(['10.0.0.0/8']).to(contain_exactly(*range.split(',')))
                   expect(response).to have_gitlab_http_status(:found)
                 end
               end
