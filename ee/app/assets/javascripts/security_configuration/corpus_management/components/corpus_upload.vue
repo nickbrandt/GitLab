@@ -1,11 +1,12 @@
 <script>
-import { GlButton } from '@gitlab/ui';
+import { GlButton, GlSprintf } from '@gitlab/ui';
 import { numberToHumanSize } from '~/lib/utils/number_utils';
 import { s__ } from '~/locale';
 
 export default {
   components: {
     GlButton,
+    GlSprintf,
   },
   props: {
     totalSize: {
@@ -14,7 +15,7 @@ export default {
     },
   },
   i18n: {
-    totalSize: s__('CorpusManagement|Total Size:'),
+    totalSize: s__('CorpusManagement|Total Size: %{totalSize}'),
     newCorpus: s__('CorpusManagement|New corpus'),
   },
   computed: {
@@ -35,7 +36,12 @@ export default {
   >
     <div class="gl-ml-5">
       {{ this.$options.i18n.totalSize }}
-      <span class="gl-font-weight-bold">{{ formattedFileSize }}</span>
+
+      <gl-sprintf :message="$options.i18n.totalSize">
+        <template #totalSize>
+          <span class="gl-font-weight-bold">{{ formattedFileSize }}</span>
+        </template>
+      </gl-sprintf>
     </div>
 
     <gl-button class="gl-mr-5" category="primary" variant="confirm" @click="newCorpus">

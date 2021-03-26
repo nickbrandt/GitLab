@@ -30,7 +30,7 @@ describe('Corpus Upload', () => {
       createComponent({ stubs: { GlButton } });
       await wrapper.findComponent(GlButton).trigger('click');
 
-      expect(wrapper.emitted().newcorpus).toBeTruthy();
+      expect(wrapper.emitted().newcorpus).toEqual([[]]);
     });
   });
 });
