@@ -155,7 +155,7 @@ The workaround is...
 
 For the topic title:
 
-- Include at least a partial error message in the title.
+- Consider including at least a partial error message in the title.
 - Use fewer than 70 characters.
 
 List the complete error message within the topic text, too.
