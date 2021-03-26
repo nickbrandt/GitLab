@@ -23,7 +23,7 @@ exports[`Corpus Upload component renders header 1`] = `
     class="gl-mr-5"
     icon=""
     size="medium"
-    variant="success"
+    variant="confirm"
   >
     
     New corpus

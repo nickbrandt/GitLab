@@ -38,7 +38,7 @@ export default {
       <span class="gl-font-weight-bold">{{ formattedFileSize }}</span>
     </div>
 
-    <gl-button class="gl-mr-5" variant="success" @click="newCorpus">
+    <gl-button class="gl-mr-5" category="primary" variant="confirm" @click="newCorpus">
       {{ this.$options.i18n.newCorpus }}
     </gl-button>
   </div>
