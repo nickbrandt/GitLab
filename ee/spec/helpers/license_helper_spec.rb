@@ -86,7 +86,7 @@ RSpec.describe LicenseHelper do
         license = double('License', plan: custom_plan)
         allow(License).to receive(:current).and_return(license)
 
-        expect(cloud_license_view_data).to eq({ current_plan_title: 'Custom Plan' })
+        expect(cloud_license_view_data).to eq({ plan_name: 'Custom Plan' })
       end
     end
 
@@ -94,7 +94,7 @@ RSpec.describe LicenseHelper do
       it 'returns the data for the view' do
         allow(License).to receive(:current).and_return(nil)
 
-        expect(cloud_license_view_data).to eq({ current_plan_title: 'Core' })
+        expect(cloud_license_view_data).to eq({ plan_name: 'Core' })
       end
     end
   end
