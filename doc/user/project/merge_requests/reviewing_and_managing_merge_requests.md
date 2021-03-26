@@ -30,11 +30,11 @@ You can [search and filter the results](../../search/index.md#filtering-issue-an
 
 ## Cached merge request count **(FREE SELF)**
 
-> - [Introduced]([link-to-issue](https://gitlab.com/gitlab-org/gitlab/-/issues/299542)) in GitLab 13.11.
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/299542) in GitLab 13.11.
 > - It's [deployed behind a feature flag](../../feature_flags.md), enabled by default.
 > - It's enabled on GitLab.com.
 > - It's recommended for production use.
-> - For GitLab self-managed instances, GitLab administrators can opt to disable it.
+> - For GitLab self-managed instances, GitLab administrators can opt to [disable it](#enable-or-disable-cached-merge-request-count).
 
 WARNING:
 This feature might not be available to you. Check the **version history** note above for details.
