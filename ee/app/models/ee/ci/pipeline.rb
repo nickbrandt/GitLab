@@ -24,7 +24,7 @@ module EE
 
         # Legacy way to fetch security reports based on job name. This has been replaced by the reports feature.
         scope :with_legacy_security_reports, -> do
-          joins(:downloadable_artifacts).where(ci_builds: { name: %w[sast secret_detection dependency_scanning container_scanning dast] })
+          joins(:downloadable_artifacts_new).where(ci_builds: { name: %w[sast secret_detection dependency_scanning container_scanning dast] })
         end
 
         scope :with_vulnerabilities, -> do
