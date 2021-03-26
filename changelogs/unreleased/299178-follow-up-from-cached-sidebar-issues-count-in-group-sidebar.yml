@@ -2,4 +2,4 @@
 title: Cache open merge requests count in group sidebar
 merge_request: 55971
 author:
-type: added
+type: performance

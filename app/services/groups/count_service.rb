@@ -30,20 +30,20 @@ module Groups
 
     private
 
+    def relation_for_count
+      raise NotImplementedError
+    end
+
     def cache_options
       super.merge({ expires_in: EXPIRATION_TIME })
     end
 
     def cache_key_name
-      raise NotImplementedError
-    end
-
-    def relation_for_count
-      raise NotImplementedError
+      raise NotImplementedError, 'cache_key_name must be implemented and return a String'
     end
 
     def issuable_key
-      ''
+      raise NotImplementedError, 'issuable_key must be implemented and return a String'
     end
   end
 end

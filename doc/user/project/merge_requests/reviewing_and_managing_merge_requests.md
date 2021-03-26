@@ -28,7 +28,7 @@ You can [search and filter the results](../../search/index.md#filtering-issue-an
 
 ![Group Issues list view](img/group_merge_requests_list_view.png)
 
-## Cached merge request count **(FREE SELF)**
+## Cached merge request count
 
 > - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/299542) in GitLab 13.11.
 > - It's [deployed behind a feature flag](../../feature_flags.md), enabled by default.
