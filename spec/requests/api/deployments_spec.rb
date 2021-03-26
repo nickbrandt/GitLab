@@ -89,7 +89,7 @@ RSpec.describe API::Deployments do
       end
 
       it 'returns multiple deployments without N + 1' do
-        perform_request
+        perform_request # warm up the cache
 
         control_count = ActiveRecord::QueryRecorder.new { perform_request }.count
 
