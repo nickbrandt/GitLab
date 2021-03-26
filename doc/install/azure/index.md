@@ -8,16 +8,14 @@ type: howto
 
 # Install GitLab on Microsoft Azure **(FREE SELF)**
 
-Azure is Microsoft's business cloud, and GitLab is a pre-configured offering on
+For users of the Microsoft Azure business cloud, GitLab has a pre-configured offering in
 the [Azure Marketplace](https://azuremarketplace.microsoft.com/en-us/marketplace/).
-The Azure Marketplace is an online store for pre-configured applications and
-services which have been optimized for the cloud by software vendors like GitLab,
-available as pre-configured solutions. In this tutorial we will install GitLab
+This tutorial describes installing GitLab
 Enterprise Edition in a single Virtual Machine (VM).
 
 ## Prerequisite
 
-You'll need an account on Azure. There are two ways to do this:
+You'll need an account on Azure. Use of the following methods to obtain an account:
 
 - If you or your company already have an account with a subscription, use that account.
   If not, you can [open your own Azure account for free](https://azure.microsoft.com/en-us/free/).
@@ -29,18 +27,19 @@ You'll need an account on Azure. There are two ways to do this:
 
 ## Deploy and configure GitLab
 
-GitLab is already installed in a pre-configured image, and all you have to do is
+Because GitLab is already installed in a pre-configured image, all you have to do is
 create a new VM:
 
 1. [Visit the GitLab offering in the marketplace](https://azuremarketplace.microsoft.com/en-us/marketplace/apps/gitlabinc1586447921813.gitlabee?tab=Overview)
 1. Select **Get it now** and you will be presented with the **Create this app in Azure** window.
-   Select **Continue** to get onto the next step.
-1. In the Azure portal, you are presented with two options:
-   - You can either select **Create** to create a VM from scratch.
-   - Or select **Start with a pre-set configuration** to get started with some
+   Select **Continue**.
+1. Select one of the following options from the Azure portal:
+   - Select **Create** to create a VM from scratch.
+   - Select **Start with a pre-set configuration** to get started with some
      pre-configured options. You can modify these configurations at any time.
-1. For the sake of this guide, we'll create the VM from scratch, so go ahead
-   and select **Create**.
+
+For the sake of this guide, we'll create the VM from scratch, so
+select **Create**.
 
 NOTE:
 Be aware that while your VM is active (known as "allocated"), it incurs
@@ -61,17 +60,17 @@ The first items you need to configure are the basic settings of the underlying v
    doesn't exist).
 1. Enter a name for the VM, for example `GitLab`.
 1. Select a region.
-1. In the **Availability options**, select **Availability zone** and set it to `1`.
+1. In **Availability options**, select **Availability zone** and set it to `1`.
    Read more about the [availability zones](https://docs.microsoft.com/en-us/azure/virtual-machines/availability).
 1. Ensure the selected image is set to **GitLab - Gen1**.
 1. Select the VM size based on the [hardware requirements](../requirements.md#hardware-requirements).
-   The minimum system requirements to run a GitLab environment for up to 500 users
-   is covered by the `D4s_v3` size, so we'll choose that.
+   Because the minimum system requirements to run a GitLab environment for up to 500 users
+   is covered by the `D4s_v3` size, select that option.
 1. Set the authentication type to **SSH public key**.
-1. Enter a user name or leave the one that is automatically created. This will
-   be the user that you will use to connect to the VM through SSH. It has root access
-   by default.
-1. Choose if you want to provide your own SSH key or let Azure create one for you.
+1. Enter a user name or leave the one that is automatically created. This is
+   the user you'll use to connect to the VM through SSH. By default, the user
+   has root access.
+1. Determine if you want to provide your own SSH key or let Azure create one for you.
    Read the [SSH documentation](../../ssh/README.md) to learn more about how to set up SSH
    public keys.
 
@@ -110,36 +109,36 @@ while in the VM dashboard.
 ### Configure the Management tab
 
 Use this tab to configure monitoring and management options
-for your VM. You can leave them at their default settings.
+for your VM. You don't need to change the default settings.
 
 ### Configure the Advanced tab
 
 Use this tab to add additional configuration, agents, scripts
-or applications through virtual machine extensions or cloud-init. You can leave them
-at their default settings.
+or applications through virtual machine extensions or `cloud-init`. You don't
+need to change the default settings.
 
 ### Configure the Tags tab
 
 Use this tab to add name/value pairs that enable you to categorize
-resources. You can leave them at their default settings.
+resources. You don't need to change the default settings.
 
 ### Review and create the VM
 
-In the final tab, you are presented with all the options you have selected,
+The final tab presents you with all of your selected options,
 where you can review and modify your choices from the
 previous steps. Azure will run validation tests in the background,
-and if you have provided all of the required settings, you can
+and if you provided all of the required settings, you can
 create the VM.
 
 After you select **Create**, if you had opted for Azure to create an SSH key pair
-for you, you will be asked to download the private SSH key. Download the key, as you'll
+for you, you'll be asked to download the private SSH key. Download the key, as you'll
 need it to SSH into the VM.
 
-After you download the key, the deployment will begin.
+After you download the key, the deployment begins.
 
 ### Finish deployment
 
-At this point, Azure will begin deploying your new VM. The deployment process
+At this point, Azure begins to deploy your new VM. The deployment process
 takes a few minutes to complete. After it's complete, the new VM and its
 associated resources are displayed on the Azure Dashboard.
 Select **Go to resource** to visit the dashboard of the VM.
@@ -149,7 +148,7 @@ you need to set up the domain name and configure GitLab to use it.
 
 ### Set up a domain name
 
-The VM will have a public IP address (static by default), but Azure allows you
+The VM has a public IP address (static by default), but Azure allows you
 to assign a descriptive DNS name to the VM:
 
 1. From the VM dashboard, select **Configure** under **DNS name**.
@@ -158,7 +157,7 @@ to assign a descriptive DNS name to the VM:
    `gitlab-prod.eastus.cloudapp.azure.com`.
 1. Select **Save** for the changes to take effect.
 
-Eventually, you'll want to use your own domain name. You will need to add a DNS `A` record
+Eventually, you'll want to use your own domain name. To do this, you need to add a DNS `A` record
 with your domain registrar that points to the public IP address of your Azure VM.
 You can use [Azure's DNS](https://docs.microsoft.com/en-us/azure/dns/dns-delegate-domain-azure-dns)
 or some [other registrar](https://docs.gitlab.com/omnibus/settings/dns.html).
@@ -208,21 +207,22 @@ To set up the GitLab external URL:
    # nginx['ssl_certificate_key'] = "/etc/gitlab/ssl/server.key"
    ```
 
-1. Reconfigure GitLab for the changes to take effect. You need to run the
+1. Reconfigure GitLab for the changes to take effect. Run the
    following command every time you make changes to `/etc/gitlab/gitlab.rb`:
 
    ```shell
    sudo gitlab-ctl reconfigure
    ```
 
-You can now visit GitLab with your browser at the external URL you defined.
+You can now visit GitLab with your browser at the new external URL.
 
 ### Visit GitLab for the first time
 
 Use the domain name you set up earlier to visit your new GitLab instance
 in your browser. In this example, it's `https://gitlab-prod.eastus.cloudapp.azure.com`.
 
-The first thing you see is the sign-in page. GitLab creates an admin user by default. The credentials are:
+The first thing you'll see is the sign-in page. GitLab creates an admin user by default.
+The credentials are:
 
    - Username: `root`
    - Password: the password is automatically created, and there are [two ways to
