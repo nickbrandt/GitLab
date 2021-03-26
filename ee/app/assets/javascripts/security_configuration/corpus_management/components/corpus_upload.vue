@@ -13,15 +13,18 @@ export default {
       required: true,
     },
   },
+  i18n: {
+    totalSize: s__('CorpusManagement|Total Size:'),
+    newCorpus: s__('CorpusManagement|New corpus'),
+  },
   computed: {
     formattedFileSize() {
       return numberToHumanSize(this.totalSize);
     },
   },
   methods: {
-    uploadCorpus() {
-      /* eslint-disable no-alert */
-      alert(s__('CorpusManagement|New corpus'));
+    newCorpus() {
+      this.$emit('newcorpus');
     },
   },
 };
@@ -31,12 +34,12 @@ export default {
     class="gl-h-11 gl-bg-gray-10 gl-display-flex gl-justify-content-space-between gl-align-items-center"
   >
     <div class="gl-ml-5">
-      {{ s__('CorpusManagement|Total Size:') }}
+      {{ this.$options.i18n.totalSize }}
       <span class="gl-font-weight-bold">{{ formattedFileSize }}</span>
     </div>
 
-    <gl-button class="gl-mr-5" variant="success" @click="uploadCorpus">
-      {{ s__('CorpusManagement|New corpus') }}
+    <gl-button class="gl-mr-5" variant="success" @click="newCorpus">
+      {{ this.$options.i18n.newCorpus }}
     </gl-button>
   </div>
 </template>
