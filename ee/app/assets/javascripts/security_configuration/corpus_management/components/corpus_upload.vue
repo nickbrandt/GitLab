@@ -35,8 +35,6 @@ export default {
     class="gl-h-11 gl-bg-gray-10 gl-display-flex gl-justify-content-space-between gl-align-items-center"
   >
     <div class="gl-ml-5">
-      {{ this.$options.i18n.totalSize }}
-
       <gl-sprintf :message="$options.i18n.totalSize">
         <template #totalSize>
           <span class="gl-font-weight-bold">{{ formattedFileSize }}</span>

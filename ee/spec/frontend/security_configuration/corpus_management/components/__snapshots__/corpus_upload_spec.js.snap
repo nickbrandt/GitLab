@@ -7,10 +7,6 @@ exports[`Corpus Upload component renders header 1`] = `
   <div
     class="gl-ml-5"
   >
-    
-    Total Size: %{totalSize}
-
-    
     <gl-sprintf-stub
       message="Total Size: %{totalSize}"
     />
