@@ -11,7 +11,9 @@ module IncidentManagement
         end_time > start_time if present?
       end
 
-      def for_dates(start_date, end_date)
+      def for_date(start_date)
+        end_date = end_after_start? ? start_date : start_date.next_day
+
         [
           start_date.change(hour: start_time.hour, min: start_time.min),
           end_date.change(hour: end_time.hour, min: end_time.min)
