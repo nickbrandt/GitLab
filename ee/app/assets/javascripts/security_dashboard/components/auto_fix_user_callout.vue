@@ -6,12 +6,7 @@ export default {
   components: {
     GlBanner,
   },
-  props: {
-    helpPagePath: {
-      type: String,
-      required: true,
-    },
-  },
+  inject: ['autoFixDocumentation'],
 };
 </script>
 
@@ -19,7 +14,7 @@ export default {
   <gl-banner
     :title="s__('AutoRemediation|Introducing GitLab auto-fix')"
     :button-text="__('Learn more')"
-    :button-link="helpPagePath"
+    :button-link="autoFixDocumentation"
     variant="introduction"
     v-on="$listeners"
   >

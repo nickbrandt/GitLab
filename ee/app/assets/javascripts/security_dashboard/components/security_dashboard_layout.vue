@@ -1,41 +1,53 @@
 <script>
+import CsvExportButton from './csv_export_button.vue';
+import Filters from './first_class_vulnerability_filters.vue';
+import VulnerabilitiesCountList from './vulnerability_count_list.vue';
+
 export default {
-  computed: {
-    hasHeaderSlot() {
-      return Boolean(this.$slots.header);
+  components: { CsvExportButton, VulnerabilitiesCountList, Filters },
+  props: {
+    fullPath: {
+      type: String,
+      required: false,
+      default: '',
     },
-    hasStickySlot() {
-      return Boolean(this.$slots.sticky);
+    projects: {
+      type: Array,
+      required: false,
+      default: () => [],
     },
-    hasAsideSlot() {
-      return Boolean(this.$slots.aside);
+  },
+  data: () => ({
+    filters: {},
+  }),
+  methods: {
+    handleFilterChange(filters) {
+      this.filters = filters;
+      this.$emit('filter-change', filters);
     },
   },
 };
 </script>
 
 <template>
-  <section>
-    <header v-if="hasHeaderSlot">
-      <slot name="header"></slot>
-    </header>
+  <section class="gl-mt-4">
+    <slot name="banner"></slot>
 
-    <section
-      v-if="hasStickySlot"
-      data-testid="sticky-section"
+    <h2 class="gl-my-6 gl-display-flex gl-align-items-center">
+      {{ s__('SecurityReports|Vulnerability Report') }}
+      <csv-export-button class="gl-ml-auto" />
+    </h2>
+
+    <slot name="pipeline"></slot>
+
+    <vulnerabilities-count-list :filters="filters" />
+
+    <filters
       class="position-sticky gl-z-index-3 security-dashboard-filters"
-    >
-      <slot name="sticky"></slot>
-    </section>
+      :projects="projects"
+      @filter-change="handleFilterChange"
+    />
 
-    <div class="row mt-4">
-      <article class="col" :class="{ 'col-xl-7': hasAsideSlot }">
-        <slot></slot>
-      </article>
-
-      <aside v-if="hasAsideSlot" class="col-xl-5">
-        <slot name="aside"></slot>
-      </aside>
-    </div>
+    <slot></slot>
   </section>
 </template>

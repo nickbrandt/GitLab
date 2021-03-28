@@ -9,8 +9,8 @@ import VulnerabilityList from './vulnerability_list.vue';
 export default {
   components: {
     GlAlert,
-    GlLoadingIcon,
     GlIntersectionObserver,
+    GlLoadingIcon,
     VulnerabilityList,
   },
   inject: ['groupFullPath'],

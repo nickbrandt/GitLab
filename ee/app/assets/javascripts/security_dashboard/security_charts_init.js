@@ -34,6 +34,7 @@ export default (el, dashboardType) => {
     emptyStateSvgPath: el.dataset.emptyStateSvgPath,
     groupFullPath: el.dataset.groupFullPath,
     securityConfigurationPath: el.dataset.securityConfigurationPath,
+    securityDashboardHelpPath: el.dataset.securityDashboardHelpPath,
     surveyRequestSvgPath: el.dataset.surveyRequestSvgPath,
   };
 
@@ -49,7 +50,6 @@ export default (el, dashboardType) => {
     component = ProjectSecurityCharts;
     props.projectFullPath = el.dataset.projectFullPath;
     props.hasVulnerabilities = parseBoolean(el.dataset.hasVulnerabilities);
-    props.helpPath = el.dataset.securityDashboardHelpPath;
   }
 
   const router = createRouter();

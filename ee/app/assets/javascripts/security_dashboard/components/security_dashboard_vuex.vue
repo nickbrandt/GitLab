@@ -5,14 +5,12 @@ import { vulnerabilityModalMixin } from 'ee/vue_shared/security_reports/mixins/v
 import Filters from './filters.vue';
 import FuzzingArtifactsDownload from './fuzzing_artifacts_download.vue';
 import LoadingError from './loading_error.vue';
-import SecurityDashboardLayout from './security_dashboard_layout.vue';
 import SecurityDashboardTable from './security_dashboard_table.vue';
 
 export default {
   components: {
     Filters,
     IssueModal,
-    SecurityDashboardLayout,
     SecurityDashboardTable,
     FuzzingArtifactsDownload,
     LoadingError,
@@ -94,25 +92,21 @@ export default {
       :illustrations="loadingErrorIllustrations"
     />
     <template v-else>
-      <security-dashboard-layout>
-        <template #header>
-          <filters>
-            <template v-if="hasFuzzingArtifacts" #buttons>
-              <fuzzing-artifacts-download :jobs="fuzzingJobsWithArtifact" :project-id="projectId">
-                <template #label>
-                  <strong>{{ s__('SecurityReports|Download Report') }}</strong>
-                </template>
-              </fuzzing-artifacts-download>
+      <filters>
+        <template v-if="hasFuzzingArtifacts" #buttons>
+          <fuzzing-artifacts-download :jobs="fuzzingJobsWithArtifact" :project-id="projectId">
+            <template #label>
+              <strong>{{ s__('SecurityReports|Download Report') }}</strong>
             </template>
-          </filters>
+          </fuzzing-artifacts-download>
         </template>
+      </filters>
 
-        <security-dashboard-table>
-          <template #empty-state>
-            <slot name="empty-state"></slot>
-          </template>
-        </security-dashboard-table>
-      </security-dashboard-layout>
+      <security-dashboard-table class="gl-mt-6">
+        <template #empty-state>
+          <slot name="empty-state"></slot>
+        </template>
+      </security-dashboard-table>
 
       <issue-modal
         :modal="modal"
