@@ -7,7 +7,6 @@ export const selectedTargetIndex = (state) =>
 
 export const selectedSourceIndex = (state) => state.mergeRequestDiff.version_index;
 
-
 export const selectedContextCommitsDiffs = (state) =>
   state.contextCommitsDiff && state.contextCommitsDiff.showing_context_commits_diff;
 
@@ -73,7 +72,8 @@ export const diffCompareDropdownSourceVersions = (state, getters) => {
       versionName: isLatestVersion
         ? __('latest version')
         : sprintf(__(`version %{versionIndex}`), { versionIndex: v.version_index }),
-      selected: v.version_index === getters.selectedSourceIndex && !getters.selectedContextCommitsDiffs,
+      selected:
+        v.version_index === getters.selectedSourceIndex && !getters.selectedContextCommitsDiffs,
     };
   });
 

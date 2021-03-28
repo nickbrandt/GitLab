@@ -1904,6 +1904,7 @@ class MergeRequest < ApplicationRecord
       ContextCommitsDiff.new(self)
     end
   end
+
   private
 
   def missing_report_error(report_type)

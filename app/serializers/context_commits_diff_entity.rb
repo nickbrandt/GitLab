@@ -5,7 +5,7 @@ class ContextCommitsDiffEntity < Grape::Entity
 
   expose :commits_count
 
-  expose :showing_context_commits_diff do |_,  options|
+  expose :showing_context_commits_diff do |_, options|
     options[:only_context_commits]
   end
 

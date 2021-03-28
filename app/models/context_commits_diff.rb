@@ -43,8 +43,8 @@ class ContextCommitsDiff
     @compare ||=
       Gitlab::Git::Compare.new(
         merge_request.project.repository.raw_repository,
-        commits.last.diff_refs.base_sha,
-        commits.first.diff_refs.head_sha
+        commits.last&.diff_refs&.base_sha,
+        commits.first&.diff_refs&.head_sha
       )
   end
 

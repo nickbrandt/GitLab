@@ -40,7 +40,9 @@ export default {
           <strong>
             {{ version.versionName }}
             <template v-if="version.isHead">{{ s__('DiffsCompareBaseBranch|(HEAD)') }}</template>
-            <template v-else-if="version.isBase">{{ s__('DiffsCompareBaseBranch|(base)') }}</template>
+            <template v-else-if="version.isBase">{{
+              s__('DiffsCompareBaseBranch|(base)')
+            }}</template>
           </strong>
         </div>
         <div>
