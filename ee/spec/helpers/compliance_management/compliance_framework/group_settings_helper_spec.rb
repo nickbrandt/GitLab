@@ -4,6 +4,7 @@ require 'spec_helper'
 
 RSpec.describe ComplianceManagement::ComplianceFramework::GroupSettingsHelper do
   let_it_be_with_refind(:group) { create(:group) }
+  let_it_be(:subgroup) { create(:group, :nested) }
   let_it_be(:current_user) { build(:admin) }
 
   before do
@@ -30,14 +31,53 @@ RSpec.describe ComplianceManagement::ComplianceFramework::GroupSettingsHelper do
     end
   end
 
+  describe '#manage_compliance_frameworks?' do
+    subject { helper.manage_compliance_frameworks?(subgroup) }
+
+    context 'the user has permission' do
+      before do
+        allow(helper).to receive(:can?).with(current_user, :admin_compliance_framework, subgroup.root_ancestor).and_return(true)
+      end
+
+      it { is_expected.to be true }
+    end
+
+    context 'the user does not have permission' do
+      before do
+        allow(helper).to receive(:can?).with(current_user, :admin_compliance_framework, subgroup.root_ancestor).and_return(false)
+      end
+
+      it { is_expected.to be false }
+    end
+  end
+
   describe '#compliance_frameworks_list_data' do
-    it 'returns the correct data' do
-      expect(helper.compliance_frameworks_list_data(group)).to contain_exactly(
-        [:empty_state_svg_path, ActionController::Base.helpers.image_path('illustrations/welcome/ee_trial.svg')],
-        [:group_path, group.full_path],
-        [:add_framework_path, new_group_compliance_framework_path(group)],
-        [:edit_framework_path, edit_group_compliance_framework_path(group, :id)]
-      )
+    context 'when current user can administer compliance frameworks' do
+      before do
+        allow(helper).to receive(:can?).with(current_user, :admin_compliance_framework, group).and_return(true)
+      end
+
+      it 'returns the correct data' do
+        expect(helper.compliance_frameworks_list_data(group)).to contain_exactly(
+         [:empty_state_svg_path, ActionController::Base.helpers.image_path('illustrations/welcome/ee_trial.svg')],
+         [:group_path, group.root_ancestor.full_path],
+         [:add_framework_path, new_group_compliance_framework_path(group)],
+         [:edit_framework_path, edit_group_compliance_framework_path(group, :id)]
+       )
+      end
+    end
+
+    context 'when current user cannot administer compliance frameworks' do
+      before do
+        allow(helper).to receive(:can?).with(current_user, :admin_compliance_framework, group).and_return(false)
+      end
+
+      it 'returns the correct data' do
+        expect(helper.compliance_frameworks_list_data(group)).to contain_exactly(
+         [:empty_state_svg_path, ActionController::Base.helpers.image_path('illustrations/welcome/ee_trial.svg')],
+         [:group_path, group.root_ancestor.full_path]
+       )
+      end
     end
   end
 
@@ -54,7 +94,7 @@ RSpec.describe ComplianceManagement::ComplianceFramework::GroupSettingsHelper do
       it 'does not contain a framework ID' do
         is_expected.to contain_exactly(
           [:framework_id, nil],
-          [:group_path, group.full_path],
+          [:group_path, group.root_ancestor.full_path],
           [:group_edit_path, edit_group_path(group, anchor: 'js-compliance-frameworks-settings')],
           [:graphql_field_name, ComplianceManagement::Framework.name],
           [:pipeline_configuration_full_path_enabled, pipeline_configuration_enabled.to_s]

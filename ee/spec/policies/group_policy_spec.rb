@@ -1546,6 +1546,23 @@ RSpec.describe GroupPolicy do
   end
 
   describe 'compliance framework permissions' do
+    context 'user is subgroup owner but developer of parent group' do
+      let_it_be(:current_user) { create(:user) }
+      let_it_be(:subgroup) { create(:group, :nested) }
+
+      subject { described_class.new(current_user, subgroup) }
+
+      before do
+        stub_licensed_features(custom_compliance_frameworks: true)
+        stub_feature_flags(ff_custom_compliance_frameworks: true)
+        subgroup.add_owner(current_user)
+        subgroup.root_ancestor.add_developer(current_user)
+      end
+
+      it { is_expected.to be_allowed(:read_compliance_framework) }
+      it { is_expected.to be_disallowed(:manage_compliance_framework) }
+    end
+
     shared_examples 'compliance framework permissions' do
       using RSpec::Parameterized::TableSyntax
 

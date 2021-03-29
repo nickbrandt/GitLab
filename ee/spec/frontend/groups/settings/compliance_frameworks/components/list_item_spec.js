@@ -12,19 +12,25 @@ import { extendedWrapper } from 'helpers/vue_test_utils_helper';
 describe('ListItem', () => {
   let wrapper;
 
-  const framework = {
+  const editableFramework = {
     parsedId: 1,
     name: 'framework',
     description: 'a framework',
     color: '#112233',
     editPath: 'group/framework/1/edit',
   };
+
+  const nonEditableFramework = {
+    ...editableFramework,
+    editPath: null
+  };
+
   const findLabel = () => wrapper.findComponent(GlLabel);
   const findDescription = () => wrapper.findByTestId('compliance-framework-description');
   const findEditButton = () => wrapper.findByTestId('compliance-framework-edit-button');
   const findDeleteButton = () => wrapper.findByTestId('compliance-framework-delete-button');
 
-  const createComponent = (props = {}) => {
+  const createComponent = (framework, props = {}) => {
     wrapper = extendedWrapper(
       shallowMount(ListItem, {
         propsData: {
@@ -50,31 +56,38 @@ describe('ListItem', () => {
     expect(button.attributes('aria-label')).toBe(ariaLabel);
   };
 
+  it('does not show modification buttons when framework is missing paths', () => {
+    createComponent(nonEditableFramework);
+
+    expect(findEditButton().exists()).toBe(false);
+    expect(findDeleteButton().exists()).toBe(false);
+  });
+
   it('displays the description defined by the framework', () => {
-    createComponent();
+    createComponent(editableFramework);
 
     expect(findDescription().text()).toBe('a framework');
   });
 
   it('displays the label as unscoped', () => {
-    createComponent();
+    createComponent(editableFramework);
 
     expect(findLabel().props('title')).toBe('framework');
-    expect(findLabel().props('target')).toBe(framework.editPath);
+    expect(findLabel().props('target')).toBe(editableFramework.editPath);
     expect(findLabel().props('scoped')).toBe(false);
   });
 
   it('displays the label as scoped', () => {
-    createComponent({ framework: { ...framework, name: 'scoped::framework' } });
+    createComponent(editableFramework, { framework: { ...editableFramework, name: 'scoped::framework' } });
 
     expect(findLabel().props('title')).toBe('scoped::framework');
-    expect(findLabel().props('target')).toBe(framework.editPath);
+    expect(findLabel().props('target')).toBe(editableFramework.editPath);
     expect(findLabel().props('scoped')).toBe(true);
     expect(findLabel().props('disabled')).toBe(false);
   });
 
   it('displays the edit button', () => {
-    createComponent();
+    createComponent(editableFramework);
 
     const button = findEditButton();
 
@@ -83,7 +96,7 @@ describe('ListItem', () => {
   });
 
   it('displays a delete button', () => {
-    createComponent();
+    createComponent(editableFramework);
 
     const button = findDeleteButton();
     const tooltip = getBinding(button.element, 'gl-tooltip');
@@ -93,16 +106,16 @@ describe('ListItem', () => {
   });
 
   it('emits "delete" event when the delete button is clicked', async () => {
-    createComponent();
+    createComponent(editableFramework);
 
     findDeleteButton().vm.$emit('click');
 
-    expect(wrapper.emitted('delete')[0]).toStrictEqual([framework]);
+    expect(wrapper.emitted('delete')[0]).toStrictEqual([editableFramework]);
   });
 
   describe('when loading', () => {
     beforeEach(() => {
-      createComponent({ loading: true });
+      createComponent(editableFramework, { loading: true });
     });
 
     it('disables the label', () => {
