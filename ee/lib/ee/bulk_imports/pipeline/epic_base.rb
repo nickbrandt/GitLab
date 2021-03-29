@@ -6,8 +6,8 @@ module EE
       class EpicBase
         include ::BulkImports::Pipeline
 
-        def initialize(...)
-          super
+        def initialize(context)
+          super(context)
 
           @epic_iids = context.group.epics.order(iid: :desc).pluck(:iid) # rubocop: disable CodeReuse/ActiveRecord
 
