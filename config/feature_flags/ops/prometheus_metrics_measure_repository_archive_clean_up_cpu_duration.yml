@@ -1,0 +1,8 @@
+---
+name: prometheus_metrics_measure_repository_archive_clean_up_cpu_duration
+introduced_by_url: https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/16443
+rollout_issue_url: https://gitlab.com/gitlab-org/gitlab/-/issues/326202
+milestone: '10.5'
+type: ops
+group: group::monitor
+default_enabled: false
