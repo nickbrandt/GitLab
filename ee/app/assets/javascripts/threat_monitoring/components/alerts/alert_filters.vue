@@ -6,10 +6,9 @@ import {
   GlFormGroup,
   GlIcon,
   GlSearchBoxByType,
-  GlSprintf,
   GlTruncate,
 } from '@gitlab/ui';
-import { s__ } from '~/locale';
+import { sprintf, s__, __ } from '~/locale';
 import { ALL, DEBOUNCE, STATUSES } from './constants';
 
 export default {
@@ -23,7 +22,6 @@ export default {
     GlFormGroup,
     GlIcon,
     GlSearchBoxByType,
-    GlSprintf,
     GlTruncate,
   },
   props: {
@@ -53,6 +51,9 @@ export default {
     firstSelectedOption() {
       const firstOption = this.filters.statuses?.length ? this.filters.statuses[0] : undefined;
       return this.$options.i18n.STATUSES[firstOption] || this.$options.ALL.value;
+    },
+    extraOptionText() {
+      return sprintf(__('+%{extra} more'), { extra: this.extraOptionCount });
     },
   },
   methods: {
@@ -109,14 +110,9 @@ export default {
       <gl-dropdown toggle-class="gl-inset-border-1-gray-400!" class="gl-w-full">
         <template #button-content>
           <gl-truncate :text="firstSelectedOption" class="gl-min-w-0 gl-mr-2" />
-          <gl-sprintf
-            v-if="extraOptionCount > 0"
-            class="gl-mr-2"
-            :message="__('+%{extra} more')"
-            data-testid="dropdown-message"
-          >
-            <template #extra>{{ extraOptionCount }}</template>
-          </gl-sprintf>
+          <span v-if="extraOptionCount > 0" class="gl-mr-2">
+            {{ extraOptionText }}
+          </span>
           <gl-icon name="chevron-down" class="gl-flex-shrink-0 gl-ml-auto" />
         </template>
 

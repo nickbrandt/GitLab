@@ -2,6 +2,7 @@ import { GlDropdownItem, GlSearchBoxByType } from '@gitlab/ui';
 import { mount, shallowMount } from '@vue/test-utils';
 import AlertFilters from 'ee/threat_monitoring/components/alerts/alert_filters.vue';
 import { ALL, DEFAULT_FILTERS, STATUSES } from 'ee/threat_monitoring/components/alerts/constants';
+import { trimText } from 'helpers/text_helper';
 
 describe('AlertFilters component', () => {
   let wrapper;
@@ -62,7 +63,7 @@ describe('AlertFilters component', () => {
       const status = 'TRIGGERED';
       const translated = STATUSES[status];
       createWrapper({ method: mount });
-      expect(findDropdownMessage()).toBe(`${translated} +1 more`);
+      expect(trimText(findDropdownMessage())).toBe(`${translated} +1 more`);
     });
 
     it('Emits an event with the new filters on deselect', async () => {
