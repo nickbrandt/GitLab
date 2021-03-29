@@ -297,8 +297,8 @@ NOTE:
 This is a temporary fix until the GitLab image is updated with the new
 GPG key.
 
-The pre-configured GitLab image in Azure is provided by Bitnami, and it uses
-an old GPG key that was [deprecated in April 2020](https://about.gitlab.com/blog/2020/03/30/gpg-key-for-gitlab-package-repositories-metadata-changing/).
+The pre-configured GitLab image in Azure (provided by Bitnami) uses
+a GPG key [deprecated in April 2020](https://about.gitlab.com/blog/2020/03/30/gpg-key-for-gitlab-package-repositories-metadata-changing/).
 
 If you try to update the repositories, you'll get the following error:
 
@@ -311,7 +311,7 @@ If you try to update the repositories, you'll get the following error:
 
 <!-- vale gitlab.ReferenceLinks = YES -->
 
-To fix this, you need to fetch the new GPG key:
+To fix this, fetch the new GPG key:
 
 ```shell
 sudo apt install gpg-agent
@@ -319,5 +319,5 @@ curl "https://gitlab-org.gitlab.io/omnibus-gitlab/gitlab_new_gpg.key" --output /
 sudo apt-key add /tmp/omnibus_gitlab_gpg.key
 ```
 
-You can now proceed to [updating GitLab](#update-gitlab). For more information, read about the
+You can now [update GitLab](#update-gitlab). For more information, read about the
 [packages signatures](https://docs.gitlab.com/omnibus/update/package_signatures.html).
