@@ -146,8 +146,8 @@ module EE
     # Checks features (i.e. https://about.gitlab.com/pricing/) availabily
     # for a given Namespace plan. This method should consider ancestor groups
     # being licensed.
-    override :feature_available?
-    def feature_available?(feature)
+    override :licensed_feature_available?
+    def licensed_feature_available?(feature)
       available_features = strong_memoize(:feature_available) do
         Hash.new do |h, f|
           h[f] = load_feature_available(f)
