@@ -11,8 +11,6 @@ class EmailsOnPushService < Service
   validates :recipients, presence: true, if: :validate_recipients?
   validate :number_of_recipients_within_limit, if: :validate_recipients?
 
-  before_validation :cleanup_recipients, if: :validate_recipients?
-
   def self.valid_recipients(recipients)
     recipients.to_s.split.select do |recipient|
       recipient.include?('@')
@@ -88,10 +86,6 @@ class EmailsOnPushService < Service
   end
 
   private
-
-  def cleanup_recipients
-    self.recipients = self.class.valid_recipients(recipients).join(' ')
-  end
 
   def number_of_recipients_within_limit
     if self.class.valid_recipients(recipients).size > RECIPIENTS_LIMIT
