@@ -65,6 +65,7 @@ export default {
     },
     handleStatusFilter(status) {
       let newFilters;
+
       if (status === this.$options.ALL.key) {
         newFilters = { statuses: [] };
       } else {
@@ -72,6 +73,12 @@ export default {
           ? { statuses: [...this.filters.statuses.filter((s) => s !== status)] }
           : { statuses: [...this.filters.statuses, status] };
       }
+
+      // If all statuses are selected, select the 'All' option
+      if (newFilters.statuses.length === Object.entries(STATUSES).length) {
+        newFilters = { statuses: [] };
+      }
+
       this.handleFilterChange(newFilters);
     },
     isChecked(status) {

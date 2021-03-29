@@ -81,6 +81,14 @@ describe('AlertFilters component', () => {
       });
     });
 
+    it('Emits an event with no filters on a select of all the filters', () => {
+      const MOST_STATUSES = [...Object.keys(STATUSES)].slice(1);
+      createWrapper({ filters: { statuses: MOST_STATUSES } });
+      clickDropdownItemAtIndex(1);
+      expect(wrapper.emitted('filter-change')).toHaveLength(1);
+      expect(wrapper.emitted('filter-change')[0][0]).toStrictEqual({ statuses: [] });
+    });
+
     it('Checks "All" filter if no statuses are selected', () => {
       createWrapper({ filters: { statuses: [] } });
       expect(findDropdownItemAtIndex(0).props('isChecked')).toBe(true);
