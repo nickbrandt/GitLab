@@ -36543,9 +36543,6 @@ msgstr ""
 msgid "must be greater than start date"
 msgstr ""
 
-msgid "must be later than active period start"
-msgstr ""
-
 msgid "must contain only valid frameworks"
 msgstr ""
 
