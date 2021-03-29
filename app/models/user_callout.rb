@@ -35,8 +35,9 @@ class UserCallout < ApplicationRecord
   validates :user, presence: true
   validates :feature_name,
     presence: true,
-    uniqueness: { scope: :user_id },
+    uniqueness: { scope: [:user_id, :callout_scope], message: _('has already been dismissed by this user for the same scope') },
     inclusion: { in: UserCallout.feature_names.keys }
+  validates :callout_scope, exclusion: { in: [nil], message: _('cannot be nil') }
 
   def dismissed_after?(dismissed_after)
     dismissed_at > dismissed_after

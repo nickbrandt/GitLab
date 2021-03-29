@@ -1861,8 +1861,9 @@ class User < ApplicationRecord
     update_column(:role, REQUIRES_ROLE_VALUE)
   end
 
-  def dismissed_callout?(feature_name:, ignore_dismissal_earlier_than: nil)
-    callout = callouts_by_feature_name[feature_name]
+  def dismissed_callout?(feature_name:, scope: nil, ignore_dismissal_earlier_than: nil)
+    callout_key = "#{feature_name}:#{scope}"
+    callout = callouts_by_feature_name_and_callout_scope[callout_key]
 
     return false unless callout
     return callout.dismissed_after?(ignore_dismissal_earlier_than) if ignore_dismissal_earlier_than
@@ -1930,8 +1931,10 @@ class User < ApplicationRecord
 
   private
 
-  def callouts_by_feature_name
-    @callouts_by_feature_name ||= callouts.index_by(&:feature_name)
+  def callouts_by_feature_name_and_callout_scope
+    @callouts_by_feature_name_and_callout_scope ||= callouts.index_by do |callout|
+      "#{callout.feature_name}:#{callout.callout_scope}"
+    end
   end
 
   def authorized_groups_without_shared_membership

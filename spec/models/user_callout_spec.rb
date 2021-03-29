@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 RSpec.describe UserCallout do
-  let!(:callout) { create(:user_callout) }
+  let_it_be(:callout) { create(:user_callout, dismissed_at: 1.year.ago) }
 
   it_behaves_like 'having unique enum values'
 
@@ -15,7 +15,9 @@ RSpec.describe UserCallout do
     it { is_expected.to validate_presence_of(:user) }
 
     it { is_expected.to validate_presence_of(:feature_name) }
-    it { is_expected.to validate_uniqueness_of(:feature_name).scoped_to(:user_id).ignoring_case_sensitivity }
+    it { is_expected.to validate_uniqueness_of(:feature_name).scoped_to([:user_id, :callout_scope]).ignoring_case_sensitivity.with_message('has already been dismissed by this user for the same scope') }
+
+    it { is_expected.to validate_exclusion_of(:callout_scope).in_array([nil]).with_message('cannot be nil') }
   end
 
   describe '#dismissed_after?' do

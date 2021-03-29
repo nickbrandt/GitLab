@@ -36210,6 +36210,9 @@ msgstr ""
 msgid "cannot be modified"
 msgstr ""
 
+msgid "cannot be nil"
+msgstr ""
+
 msgid "cannot block others"
 msgstr ""
 
@@ -36661,6 +36664,9 @@ msgid "group's CI/CD settings."
 msgstr ""
 
 msgid "groups"
+msgstr ""
+
+msgid "has already been dismissed by this user for the same scope"
 msgstr ""
 
 msgid "has already been linked to another vulnerability"
