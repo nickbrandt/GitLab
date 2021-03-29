@@ -8645,6 +8645,12 @@ msgstr ""
 msgid "CorpusManagement|Fuzz testing corpus management"
 msgstr ""
 
+msgid "CorpusManagement|New corpus"
+msgstr ""
+
+msgid "CorpusManagement|Total Size: %{totalSize}"
+msgstr ""
+
 msgid "Could not add admins as members"
 msgstr ""
 
