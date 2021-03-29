@@ -220,7 +220,9 @@ module Gitlab
           ConnectionAdapters::
           ConnectionSpecification::Resolver.new(config).spec(env.to_sym)
 
-      ActiveRecord::ConnectionAdapters::ConnectionPool.new(spec)
+      ActiveRecord::ConnectionAdapters::ConnectionPool.new(spec).tap do |pool|
+        pool.set_schema_cache(ActiveRecord::Base.retrieve_connection.schema_cache)
+      end
     end
 
     def self.connection

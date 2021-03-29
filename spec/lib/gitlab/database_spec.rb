@@ -313,6 +313,19 @@ RSpec.describe Gitlab::Database do
         pool.disconnect!
       end
     end
+
+    it 'shares schema_cache to save loading columns multiple times' do
+      pool1 = described_class.create_connection_pool(5)
+      pool2 = described_class.create_connection_pool(5)
+
+      count = ActiveRecord::QueryRecorder
+        .new do
+          pool1.connections.schema_cache.columns_hash('licenses')
+          pool2.connections.schema_cache.columns_hash('licenses')
+        end.count
+
+      expect(count).to eq(1)
+    end
   end
 
   describe '.cached_column_exists?' do
