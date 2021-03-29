@@ -2,7 +2,7 @@ import Api from 'ee/api';
 import { deprecatedCreateFlash as createFlash } from '~/flash';
 import httpStatus from '~/lib/utils/http_status';
 import { __, sprintf } from '~/locale';
-import { FETCH_VALUE_STREAM_DATA } from '../constants';
+import { FETCH_VALUE_STREAM_DATA, OVERVIEW_STAGE_CONFIG } from '../constants';
 import {
   removeFlash,
   throwIfUserForbidden,
@@ -151,7 +151,11 @@ export const receiveGroupStagesError = ({ commit }, error) => {
   createFlash(__('There was an error fetching value stream analytics stages.'));
 };
 
-export const setDefaultSelectedStage = ({ dispatch, getters }) => {
+export const setDefaultSelectedStage = ({ dispatch, getters, state: { featureFlags } = {} }) => {
+  if (featureFlags?.hasPathNavigation) {
+    return dispatch('setSelectedStage', OVERVIEW_STAGE_CONFIG);
+  }
+
   const { activeStages = [] } = getters;
 
   if (activeStages?.length) {
