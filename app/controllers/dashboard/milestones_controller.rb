@@ -21,7 +21,7 @@ class Dashboard::MilestonesController < Dashboard::ApplicationController
   private
 
   def milestones
-    MilestonesFinder.new(search_params).execute
+    MilestonesFinder.new(search_params.merge(with_merge_request_counts: true)).execute
   end
 
   def groups

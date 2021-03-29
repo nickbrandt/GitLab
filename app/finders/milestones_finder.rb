@@ -31,6 +31,7 @@ class MilestonesFinder
     items = by_state(items)
     items = by_timeframe(items)
     items = containing_date(items)
+    items = with_merge_request_counts(items)
 
     order(items)
   end
@@ -67,6 +68,14 @@ class MilestonesFinder
 
   def by_state(items)
     Milestone.filter_by_state(items, params[:state])
+  end
+
+  def with_merge_request_counts(items)
+    if params[:with_merge_request_counts].present?
+      items.joins(:merge_requests).select("milestones.*, COUNT(merge_requests.id) as mr_cnt").group('milestones.id')
+    else
+      items
+    end
   end
 
   def order(items)

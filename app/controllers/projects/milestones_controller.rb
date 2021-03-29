@@ -119,7 +119,7 @@ class Projects::MilestonesController < Projects::ApplicationController
 
   def milestones
     strong_memoize(:milestones) do
-      MilestonesFinder.new(search_params).execute
+      MilestonesFinder.new(search_params.merge(with_merge_request_counts: true)).execute
     end
   end
 

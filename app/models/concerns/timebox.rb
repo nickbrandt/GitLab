@@ -72,7 +72,7 @@ module Timebox
       groups = groups.compact if groups.is_a? Array
       groups = [] if groups.nil?
 
-      if Feature.enabled?(:optimized_timebox_queries, default_enabled: true)
+      if false#Feature.enabled?(:optimized_timebox_queries, default_enabled: true)
         from_union([where(project_id: projects), where(group_id: groups)], remove_duplicates: false)
       else
         where(project_id: projects).or(where(group_id: groups))
