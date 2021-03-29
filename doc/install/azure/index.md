@@ -223,10 +223,9 @@ in your browser. In this example, it's `https://gitlab-prod.eastus.cloudapp.azur
 
 The first thing you'll see is the sign-in page. GitLab creates an admin user by default.
 The credentials are:
-
-   - Username: `root`
-   - Password: the password is automatically created, and there are [two ways to
-     find it](https://docs.bitnami.com/azure/faq/get-started/find-credentials).
+- Username: `root`
+- Password: the password is automatically created, and there are [two ways to
+  find it](https://docs.bitnami.com/azure/faq/get-started/find-credentials).
 
 After signing in, be sure to immediately [change the password](../../user/profile/index.md#change-your-password).
 
