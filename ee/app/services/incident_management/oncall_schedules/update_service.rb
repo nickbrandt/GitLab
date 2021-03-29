@@ -19,12 +19,16 @@ module IncidentManagement
         return error_no_license unless available?
         return error_no_permissions unless allowed?
 
-        if oncall_schedule.update(params)
-          update_rotation_active_periods
-          success(oncall_schedule)
-        else
-          error(oncall_schedule.errors.full_messages.to_sentence)
+        oncall_schedule.update!(params)
+        update_rotation_result = update_rotation_active_periods
+
+        if update_rotation_result.respond_to?(:error?) && update_rotation_result.error?
+          return error(update_rotation_result.message)
         end
+
+        success(oncall_schedule)
+      rescue ActiveRecord::RecordInvalid => e
+        error(e.record.errors.full_messages.to_sentence)
       end
 
       private
@@ -33,14 +37,19 @@ module IncidentManagement
 
       def update_rotation_active_periods
         oncall_schedule.rotations.select(&:has_shift_active_period?).each do |rotation|
-          rotation.update!(
-            active_period_start: new_rotation_active_period(rotation.active_period_start).strftime('%H:%M'),
-            active_period_end: new_rotation_active_period(rotation.active_period_end).strftime('%H:%M')
+          service = IncidentManagement::OncallRotations::EditService.new(
+            rotation,
+            user,
+            {
+              active_period_start: new_rotation_active_period(rotation.active_period_start).strftime('%H:%M'),
+              active_period_end: new_rotation_active_period(rotation.active_period_end).strftime('%H:%M')
+            }
           )
-        end
 
-        # TODO do we need to handle run update rotation job?
-        # Should the above be moved to update rotation job?
+          response = service.execute
+
+          break(response) if response.error?
+        end
       end
 
       def new_rotation_active_period(time_string)

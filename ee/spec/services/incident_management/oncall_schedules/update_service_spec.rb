@@ -73,7 +73,7 @@ RSpec.describe IncidentManagement::OncallSchedules::UpdateService do
         # Setting fixed timezone for rotation active period updates
         around do |example|
           freeze_time do
-            travel_to Time.utc(2021, 03, 22)
+            travel_to Time.utc(2021, 03, 22, 0, 0)
 
             example.run
           end
@@ -84,6 +84,16 @@ RSpec.describe IncidentManagement::OncallSchedules::UpdateService do
         it 'updates the rotation active periods with new timezone' do
           expect { execute }.to change { time_from_time_column(oncall_rotation.reload.active_period_start) }.from('08:00').to('03:00')
            .and change { time_from_time_column(oncall_rotation.active_period_end) }.from('17:00').to('12:00')
+        end
+
+        context 'error updating' do
+          before do
+            allow_next_instance_of(IncidentManagement::OncallRotations::EditService) do |edit_service|
+              allow(edit_service).to receive(:execute).and_return(double(error?: true, message: 'Test something went wrong'))
+            end
+          end
+
+          it_behaves_like 'error response', 'Test something went wrong'
         end
       end
 
