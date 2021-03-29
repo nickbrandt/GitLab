@@ -42,7 +42,7 @@ RSpec.describe API::Services do
     end
   end
 
-  (Service.available_services_names - Project.new.disabled_services).each do |service|
+  Service.available_services_names.each do |service|
     describe "PUT /projects/:id/services/#{service.dasherize}" do
       include_context service
 
