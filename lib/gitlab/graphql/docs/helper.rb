@@ -255,21 +255,11 @@ module Gitlab
         # Returns the object description. If the object has been deprecated,
         # the deprecation reason will be returned in place of the description.
         def render_description(object, owner = nil, context = :block)
-          owner = Array.wrap(owner)
-          content = []
-
           if object[:is_deprecated]
-            if context == :block
-              deprecation = schema_deprecation(owner, object[:name])
-              content << (deprecation&.original_description || render_description_of(object))
-            end
-
-            content << render_deprecation(object, owner, context)
+            render_deprecation(object, owner, context)
           else
-            content << render_description_of(object)
+            render_description_of(object)
           end
-
-          join(context, content)
         end
 
         def render_description_of(object)
@@ -290,11 +280,18 @@ module Gitlab
         end
 
         def render_deprecation(object, owner, context)
+          owner = Array.wrap(owner)
+          buff = []
           deprecation = schema_deprecation(owner, object[:name])
-          return deprecation.markdown(context: context) if deprecation
 
-          reason = object[:deprecation_reason] || 'Use of this is deprecated.'
-          "**Deprecated:** #{reason}"
+          buff << (deprecation&.original_description || render_description_of(object)) if context == :block
+          buff << if deprecation
+                    deprecation.markdown(context: context)
+                  else
+                    "**Deprecated:** #{object[:deprecation_reason]}"
+                  end
+
+          join(context, buff)
         end
 
         def render_field_type(type)
