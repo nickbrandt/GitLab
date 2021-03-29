@@ -83,7 +83,7 @@ RSpec.describe Gitlab::Graphql::Docs::Renderer do
         expectation = <<~DOC
           ### `ArrayTest`
 
-          #### fields
+          #### Fields
 
           | Name | Type | Description |
           | ---- | ---- | ----------- |
@@ -102,7 +102,7 @@ RSpec.describe Gitlab::Graphql::Docs::Renderer do
 
             Returns [`ArrayTest`](#arraytest).
 
-            #### arguments
+            #### Arguments
 
             | Name | Type | Description |
             | ---- | ---- | ----------- |
@@ -138,7 +138,7 @@ RSpec.describe Gitlab::Graphql::Docs::Renderer do
         expectation = <<~DOC
           ### `OrderingTest`
 
-          #### fields
+          #### Fields
 
           | Name | Type | Description |
           | ---- | ---- | ----------- |
@@ -186,14 +186,14 @@ RSpec.describe Gitlab::Graphql::Docs::Renderer do
 
           A thing we used to use, but no longer support.
 
-          #### fields
+          #### Fields
 
           | Name | Type | Description |
           | ---- | ---- | ----------- |
           | <a id="deprecatedtestbar"></a>`bar` **{warning-solid}** | [`String!`](#string) | **Deprecated** in 1.10. This was renamed. Use: [`Query.boom`](#queryboom). |
           | <a id="deprecatedtestfoo"></a>`foo` **{warning-solid}** | [`String!`](#string) | **Deprecated** in 1.10. This is deprecated. |
 
-          #### fields with arguments
+          #### Fields with arguments
 
           ##### `DeprecatedTest.fooWithArgs`
 
@@ -206,7 +206,7 @@ RSpec.describe Gitlab::Graphql::Docs::Renderer do
 
           Returns [`String!`](#string).
 
-          ###### arguments
+          ###### Arguments
 
           | Name | Type | Description |
           | ---- | ---- | ----------- |
@@ -300,7 +300,7 @@ RSpec.describe Gitlab::Graphql::Docs::Renderer do
 
             A test for rendering IDs.
 
-            #### fields
+            #### Fields
 
             | Name | Type | Description |
             | ---- | ---- | ----------- |
@@ -359,14 +359,14 @@ RSpec.describe Gitlab::Graphql::Docs::Renderer do
 
             Input type: `MakeItPrettyInput`.
 
-            #### arguments
+            #### Arguments
 
             | Name | Type | Description |
             | ---- | ---- | ----------- |
             | <a id="mutationmakeitprettyclientmutationid"></a>`clientMutationId` | [`String`](#string) | A unique identifier for the client performing the mutation. |
             | <a id="mutationmakeitprettyprettinessfactor"></a>`prettinessFactor` | [`Float!`](#float) | How much prettier?. |
 
-            #### fields
+            #### Fields
 
             | Name | Type | Description |
             | ---- | ---- | ----------- |
@@ -405,7 +405,7 @@ RSpec.describe Gitlab::Graphql::Docs::Renderer do
 
           A time-frame defined as a closed inclusive range of two dates.
 
-          #### arguments
+          #### Arguments
 
           | Name | Type | Description |
           | ---- | ---- | ----------- |
@@ -458,7 +458,7 @@ RSpec.describe Gitlab::Graphql::Docs::Renderer do
 
           A test for abstract types.
 
-          #### fields
+          #### Fields
 
           | Name | Type | Description |
           | ---- | ---- | ----------- |
@@ -486,7 +486,7 @@ RSpec.describe Gitlab::Graphql::Docs::Renderer do
 
           - [`AfricanSwallow`](#africanswallow)
 
-          ##### fields
+          ##### Fields
 
           | Name | Type | Description |
           | ---- | ---- | ----------- |
@@ -498,7 +498,7 @@ RSpec.describe Gitlab::Graphql::Docs::Renderer do
 
           A swallow from Africa.
 
-          #### fields
+          #### Fields
 
           | Name | Type | Description |
           | ---- | ---- | ----------- |

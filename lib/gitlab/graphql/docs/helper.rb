@@ -16,14 +16,14 @@ module Gitlab
       CONNECTION_ARGS = %w[after before first last].to_set
 
       FIELD_HEADER = <<~MD
-        #### fields
+        #### Fields
 
         | Name | Type | Description |
         | ---- | ---- | ----------- |
       MD
 
       ARG_HEADER = <<~MD
-        # arguments
+        # Arguments
 
         | Name | Type | Description |
         | ---- | ---- | ----------- |
@@ -201,7 +201,7 @@ module Gitlab
           end
 
           <<~MD.chomp
-            #{header_prefix}#### fields with arguments
+            #{header_prefix}#### Fields with arguments
 
             #{join(:block, sections)}
           MD
