@@ -1111,7 +1111,7 @@ end
 #### Add new aggregated metric definition
 
 After all metrics are persisted, you can add an aggregated metric definition at
-[`aggregated_metrics/`](https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/usage_data_counters/aggregated_metrics/).
+[`aggregated_metrics/`](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/aggregates/).
 
 To declare the aggregate of metrics collected with [Estimated Batch Counters](#estimated-batch-counters),
 you must fulfill the following requirements:
