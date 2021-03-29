@@ -7,8 +7,8 @@ import { __, sprintf } from '~/locale';
 
 export const SHIFT_WIDTHS = {
   md: 100,
-  sm: 50,
-  xs: 25,
+  sm: 75,
+  xs: 20,
 };
 
 const ROTATION_CENTER_CLASS = 'gl-display-flex gl-justify-content-center gl-align-items-center';

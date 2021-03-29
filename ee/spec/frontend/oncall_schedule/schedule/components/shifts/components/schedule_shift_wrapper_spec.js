@@ -85,7 +85,7 @@ describe('ee/oncall_schedules/components/schedule/components/shifts/components/s
   describe('when the preset type is DAYS', () => {
     it('should render a selection of day grid shifts inside the rotation', () => {
       createComponent({ props: { presetType: PRESET_TYPES.DAYS } });
-      expect(findDaysScheduleShifts()).toHaveLength(1);
+      expect(findDaysScheduleShifts()).toHaveLength(2);
     });
 
     it.each`

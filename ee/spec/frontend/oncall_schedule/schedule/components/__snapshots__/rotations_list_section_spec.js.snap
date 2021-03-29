@@ -68,8 +68,9 @@ exports[`RotationsListSectionComponent when the timeframe includes today renders
       </span>
        
       <span
-        class="timeline-cell gl-border-b-solid gl-border-b-gray-100 gl-border-b-1"
+        class="timeline-cell gl-border-b-solid gl-border-b-gray-100 gl-border-b-1 gl-overflow-hidden"
         data-testid="timeline-cell"
+        style="width: calc(100% - 180px);"
       >
         <span
           class="current-day-indicator"
@@ -159,14 +160,6 @@ exports[`RotationsListSectionComponent when the timeframe includes today renders
             </div>
           </div>
         </div>
-      </span>
-      <span
-        class="timeline-cell gl-border-b-solid gl-border-b-gray-100 gl-border-b-1 gl-overflow-hidden"
-        data-testid="timeline-cell"
-      >
-        <!---->
-         
-        <div />
       </span>
     </div>
   </div>

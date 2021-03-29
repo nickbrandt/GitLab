@@ -11,7 +11,6 @@ import ScheduleShiftWrapper from 'ee/oncall_schedules/components/schedule/compon
 import {
   editRotationModalId,
   deleteRotationModalId,
-  PRESET_TYPES,
   TIMELINE_CELL_WIDTH,
 } from 'ee/oncall_schedules/constants';
 import { s__ } from '~/locale';
@@ -68,16 +67,6 @@ export default {
     };
   },
   computed: {
-    presetIsDay() {
-      return this.presetType === PRESET_TYPES.DAYS;
-    },
-    timeframeToDraw() {
-      if (this.presetIsDay) {
-        return [this.timeframe[0]];
-      }
-
-      return this.timeframe;
-    },
     timelineStyles() {
       return {
         width: `calc(${100}% - ${TIMELINE_CELL_WIDTH}px)`,
@@ -88,12 +77,6 @@ export default {
     setRotationToUpdate(rotation) {
       this.rotationToUpdate = rotation;
       this.$emit('set-rotation-to-update', rotation);
-    },
-    cellShouldHideOverflow(index) {
-      return index + 1 === this.timeframe.length || this.presetIsDay;
-    },
-    timeframeItemUniqueKey(timeframeItem) {
-      return timeframeItem.valueOf();
     },
   },
 };
@@ -109,8 +92,7 @@ export default {
         <span class="gl-text-truncate">{{ $options.i18n.addRotationLabel }}</span>
       </span>
       <span
-        :key="index"
-        class="timeline-cell gl-border-b-solid gl-border-b-gray-100 gl-border-b-1"
+        class="timeline-cell gl-border-b-solid gl-border-b-gray-100 gl-border-b-1 gl-overflow-hidden"
         :style="timelineStyles"
         data-testid="empty-timeline-cell"
       >
@@ -151,7 +133,7 @@ export default {
           </gl-button-group>
         </span>
         <span
-          class="timeline-cell gl-border-b-solid gl-border-b-gray-100 gl-border-b-1"
+          class="timeline-cell gl-border-b-solid gl-border-b-gray-100 gl-border-b-1 gl-overflow-hidden"
           :style="timelineStyles"
           data-testid="timeline-cell"
         >

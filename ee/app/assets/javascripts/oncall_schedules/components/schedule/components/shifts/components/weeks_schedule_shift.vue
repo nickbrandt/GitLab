@@ -37,6 +37,13 @@ export default {
     },
   },
   computed: {
+    rotationAssigneeStyle() {
+      const { left, width } = this.shiftStyles;
+      return {
+        left: `${left}px`,
+        width: `${width}px`,
+      };
+    },
     shiftStyles() {
       const { timeframe, presetType, shift, timelineWidth } = this;
 
@@ -52,13 +59,6 @@ export default {
           timelineWidth,
           presetType,
         }),
-      };
-    },
-    rotationAssigneeStyle() {
-      const { left, width } = this.shiftStyles;
-      return {
-        left: `${left}px`,
-        width: `${width}px`,
       };
     },
   },

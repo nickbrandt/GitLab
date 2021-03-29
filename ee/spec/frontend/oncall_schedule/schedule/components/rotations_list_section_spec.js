@@ -69,8 +69,8 @@ describe('RotationsListSectionComponent', () => {
       expect(findCurrentDayIndicatorContent().exists()).toBe(true);
     });
 
-    it('renders timeline cell items based on timeframe data', () => {
-      expect(findTimelineCells().length).toBe(mockTimeframeWeeks.length);
+    it('renders a single timeline cell regardless timeframe data length', () => {
+      expect(findTimelineCells().length).toBe(1);
     });
 
     it('renders current day indicator in the first timeline cell', () => {

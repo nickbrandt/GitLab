@@ -947,49 +947,6 @@ export const format24HourTimeStringFromInt = (time) => {
 };
 
 /**
- * A utility function which checks if two date ranges overlap.
- *
- * @param {Object} givenPeriodLeft - the first period to compare.
- * @param {Object} givenPeriodRight - the second period to compare.
- * @returns {Object} { daysOverlap: number of days the overlap is present, hoursOverlap: number of hours the overlap is present, overlapStartDate: the start date of the overlap in time format, overlapEndDate: the end date of the overlap in time format }
- * @throws {Error} Uncaught Error: Invalid period
- *
- * @example
- * getOverlapDateInPeriods(
- *   { start: new Date(2021, 0, 11), end: new Date(2021, 0, 13) },
- *   { start: new Date(2021, 0, 11), end: new Date(2021, 0, 14) }
- * ) => { daysOverlap: 2, hoursOverlap: 48, overlapStartDate: 1610323200000, overlapEndDate: 1610496000000 }
- *
- */
-export const getOverlapDateInPeriods = (givenPeriodLeft = {}, givenPeriodRight = {}) => {
-  const leftStartTime = new Date(givenPeriodLeft.start).getTime();
-  const leftEndTime = new Date(givenPeriodLeft.end).getTime();
-  const rightStartTime = new Date(givenPeriodRight.start).getTime();
-  const rightEndTime = new Date(givenPeriodRight.end).getTime();
-
-  if (!(leftStartTime <= leftEndTime && rightStartTime <= rightEndTime)) {
-    throw new Error(__('Invalid period'));
-  }
-
-  const isOverlapping = leftStartTime < rightEndTime && rightStartTime < leftEndTime;
-
-  if (!isOverlapping) {
-    return { daysOverlap: 0 };
-  }
-
-  const overlapStartDate = Math.max(leftStartTime, rightStartTime);
-  const overlapEndDate = rightEndTime > leftEndTime ? leftEndTime : rightEndTime;
-  const differenceInMs = overlapEndDate - overlapStartDate;
-
-  return {
-    hoursOverlap: Math.ceil(differenceInMs / MILLISECONDS_IN_HOUR),
-    daysOverlap: Math.ceil(differenceInMs / MILLISECONDS_IN_DAY),
-    overlapStartDate,
-    overlapEndDate,
-  };
-};
-
-/**
  * A utility function that checks that the date is today
  *
  * @param {Date} date
