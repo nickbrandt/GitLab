@@ -1,6 +1,7 @@
 import { GlDropdown, GlLink } from '@gitlab/ui';
 import { mount } from '@vue/test-utils';
 import GlDropdownInput from 'ee/security_configuration/components/dropdown_input.vue';
+import { extendedWrapper } from 'helpers/vue_test_utils_helper';
 
 describe('DropdownInput component', () => {
   let wrapper;
@@ -26,17 +27,20 @@ describe('DropdownInput component', () => {
   const newValue = 'foo';
 
   const createComponent = ({ props = {} } = {}) => {
-    wrapper = mount(GlDropdownInput, {
-      propsData: {
-        ...props,
-      },
-    });
+    wrapper = extendedWrapper(
+      mount(GlDropdownInput, {
+        propsData: {
+          ...props,
+        },
+      }),
+    );
   };
 
   const findToggle = () => wrapper.find('button');
   const findLabel = () => wrapper.find('label');
   const findInputComponent = () => wrapper.find(GlDropdown);
   const findRestoreDefaultLink = () => wrapper.find(GlLink);
+  const findSectionHeader = () => wrapper.findByTestId('dropdown-input-section-header');
 
   afterEach(() => {
     wrapper.destroy();
@@ -56,6 +60,26 @@ describe('DropdownInput component', () => {
 
     it('renders the description', () => {
       expect(findLabel().text()).toContain(testProps.description);
+    });
+  });
+
+  describe('section header', () => {
+    it('does not render a section header by default', () => {
+      createComponent({
+        props: testProps,
+      });
+
+      expect(findSectionHeader().exists()).toBe(false);
+    });
+
+    it('renders a section header when passed a sectionHeader prop', () => {
+      const sectionHeader = 'Section header';
+      createComponent({
+        props: { ...testProps, sectionHeader },
+      });
+
+      expect(findSectionHeader().exists()).toBe(true);
+      expect(findSectionHeader().text()).toBe(sectionHeader);
     });
   });
 
