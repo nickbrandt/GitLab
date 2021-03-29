@@ -122,11 +122,11 @@ module Gitlab
         # Methods that return parts of the schema, or related information:
 
         def connection_object_types
-          objects.select { |t| t[:edge] || t[:connection] }
+          objects.select { |t| t[:is_edge] || t[:is_connection] }
         end
 
         def object_types
-          objects.reject { |t| t[:edge] || t[:connection] || t[:payload] }
+          objects.reject { |t| t[:is_edge] || t[:is_connection] || t[:is_payload] }
         end
 
         def interfaces
@@ -273,10 +273,10 @@ module Gitlab
         end
 
         def render_description_of(object)
-          desc = if object[:edge]
+          desc = if object[:is_edge]
                    base = object[:name].chomp('Edge')
                    "The edge type for [`#{base}`](##{base.downcase})."
-                 elsif object[:connection]
+                 elsif object[:is_connection]
                    base = object[:name].chomp('Connection')
                    "The connection type for [`#{base}`](##{base.downcase})."
                  else
@@ -339,9 +339,9 @@ module Gitlab
               .map do |type|
                 name = type[:name]
                 type.merge(
-                  edge: name.ends_with?('Edge'),
-                  connection: name.ends_with?('Connection'),
-                  payload: name.ends_with?('Payload') && mutations.include?(name.chomp('Payload').camelcase(:lower)),
+                  is_edge: name.ends_with?('Edge'),
+                  is_connection: name.ends_with?('Connection'),
+                  is_payload: name.ends_with?('Payload') && mutations.include?(name.chomp('Payload').camelcase(:lower)),
                   fields: type[:fields] + type[:connections]
                 )
               end
