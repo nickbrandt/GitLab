@@ -136,6 +136,17 @@ RSpec.describe Security::MergeReportsService, '#execute' do
 
   subject(:merged_report) { merge_service.execute }
 
+  describe 'errors on target report' do
+    subject { merged_report.errors }
+
+    before do
+      report_1.add_error('foo', 'bar')
+      report_2.add_error('zoo', 'baz')
+    end
+
+    it { is_expected.to eq([{ type: 'foo', message: 'bar' }, { type: 'zoo', message: 'baz' }]) }
+  end
+
   it 'copies scanners into target report and eliminates duplicates' do
     expect(merged_report.scanners.values).to contain_exactly(scanner_1, scanner_2, scanner_3)
   end

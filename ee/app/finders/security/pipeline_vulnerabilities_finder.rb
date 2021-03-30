@@ -25,7 +25,7 @@ module Security
 
     def execute
       findings = requested_reports.each_with_object([]) do |(type, report), findings|
-        raise ParseError, 'JSON parsing failed' if report.error.is_a?(Gitlab::Ci::Parsers::Security::Common::SecurityReportParserError)
+        raise ParseError, 'JSON parsing failed' if report.errored?
 
         normalized_findings = normalize_report_findings(
           report.findings,

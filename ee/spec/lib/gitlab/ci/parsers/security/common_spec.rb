@@ -22,6 +22,77 @@ RSpec.describe Gitlab::Ci::Parsers::Security::Common do
         artifact.each_blob { |blob| described_class.parse!(blob, report, vulnerability_finding_signatures_enabled) }
       end
 
+      describe 'schema validation' do
+        let(:validator_class) { Gitlab::Ci::Parsers::Security::Validators::SchemaValidator }
+        let(:parser) { described_class.new('{}', report, vulnerability_finding_signatures_enabled, validate: validate) }
+
+        subject(:parse_report) { parser.parse! }
+
+        before do
+          allow(validator_class).to receive(:new).and_call_original
+        end
+
+        context 'when the validate flag is set as `false`' do
+          let(:validate) { false }
+
+          it 'does not run the validation logic' do
+            parse_report
+
+            expect(validator_class).not_to have_received(:new)
+          end
+        end
+
+        context 'when the validate flag is set as `true`' do
+          let(:validate) { true }
+          let(:valid?) { false }
+
+          before do
+            allow_next_instance_of(validator_class) do |instance|
+              allow(instance).to receive(:valid?).and_return(valid?)
+              allow(instance).to receive(:errors).and_return(['foo'])
+            end
+
+            allow(parser).to receive_messages(create_scanner: true, create_scan: true, collate_remediations: [])
+          end
+
+          it 'instantiates the validator with correct params' do
+            parse_report
+
+            expect(validator_class).to have_received(:new).with(report.type, {})
+          end
+
+          context 'when the report data is not valid according to the schema' do
+            it 'adds errors to the report' do
+              expect { parse_report }.to change { report.errors }.from([]).to([{ message: 'foo', type: 'Schema' }])
+            end
+
+            it 'does not try to create report entities' do
+              parse_report
+
+              expect(parser).not_to have_received(:create_scanner)
+              expect(parser).not_to have_received(:create_scan)
+              expect(parser).not_to have_received(:collate_remediations)
+            end
+          end
+
+          context 'when the report data is valid according to the schema' do
+            let(:valid?) { true }
+
+            it 'does not add errors to the report' do
+              expect { parse_report }.not_to change { report.errors }.from([])
+            end
+
+            it 'keeps the execution flow as normal' do
+              parse_report
+
+              expect(parser).to have_received(:create_scanner)
+              expect(parser).to have_received(:create_scan)
+              expect(parser).to have_received(:collate_remediations)
+            end
+          end
+        end
+      end
+
       describe 'parsing finding.name' do
         let(:artifact) { build(:ee_ci_job_artifact, :common_security_report_with_blank_names) }
 

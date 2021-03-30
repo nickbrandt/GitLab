@@ -60,6 +60,25 @@ RSpec.describe Security::StoreGroupedScansService do
         allow(Security::StoreScanService).to receive(:execute).and_return(true)
       end
 
+      context 'schema validation' do
+        let(:mock_scanner) { instance_double(::Gitlab::Ci::Reports::Security::Scanner, external_id: 'unknown') }
+        let(:mock_report) { instance_double(::Gitlab::Ci::Reports::Security::Report, primary_scanner: mock_scanner) }
+
+        before do
+          allow(artifact_1).to receive(:security_report).and_return(mock_report)
+          allow(artifact_2).to receive(:security_report).and_return(mock_report)
+          allow(artifact_3).to receive(:security_report).and_return(mock_report)
+        end
+
+        it 'accesses the validated security reports' do
+          store_scan_group
+
+          expect(artifact_1).to have_received(:security_report).with(validate: true)
+          expect(artifact_2).to have_received(:security_report).with(validate: true)
+          expect(artifact_3).to have_received(:security_report).with(validate: true)
+        end
+      end
+
       context 'when the artifacts are not dependency_scanning' do
         it 'calls the Security::StoreScanService with ordered artifacts' do
           store_scan_group
