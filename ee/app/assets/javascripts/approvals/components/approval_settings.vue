@@ -35,11 +35,13 @@ export default {
   links: {
     preventAuthorApprovalDocsAnchor:
       'allowing-merge-request-authors-to-approve-their-own-merge-requests',
+    preventMrApprovalRuleEditDocsAnchor: 'editing--overriding-approval-rules-per-merge-request',
     requireUserPasswordDocsAnchor: 'require-authentication-when-approving-a-merge-request',
     removeApprovalsOnPushDocsAnchor: 'resetting-approvals-on-push',
   },
   i18n: {
     authorApprovalLabel: __('Prevent MR approvals by the author.'),
+    preventMrApprovalRuleEditLabel: __('Prevent users from modifying MR approval rules.'),
     requireUserPasswordLabel: __('Require user password for approvals.'),
     removeApprovalsOnPushLabel: __(
       'Remove all approvals in a merge request when new commits are pushed to its source branch.',
@@ -57,6 +59,12 @@ export default {
         :label="$options.i18n.authorApprovalLabel"
         :anchor="$options.links.preventAuthorApprovalDocsAnchor"
         data-testid="prevent-author-approval"
+      />
+      <approval-settings-checkbox
+        v-model="settings.preventMrApprovalRuleEdit"
+        :label="$options.i18n.preventMrApprovalRuleEditLabel"
+        :anchor="$options.links.preventMrApprovalRuleEditDocsAnchor"
+        data-testid="prevent-mr-approval-rule-edit"
       />
       <approval-settings-checkbox
         v-model="settings.requireUserPassword"
