@@ -393,8 +393,8 @@ RSpec.describe API::Repositories do
         expect(json_response['diffs']).to be_present
       end
 
-      it "Compare commits between different projects" do
-          get api(route, current_user), params: { from: sample_commit.parent_id, to: sample_commit.id, from_project_id: public_project.id }
+      it "compare commits between different projects" do
+        get api(route, current_user), params: { from: sample_commit.parent_id, to: sample_commit.id, from_project_id: public_project.id }
 
         expect(response).to have_gitlab_http_status(:ok)
         expect(json_response['commits']).to be_present
