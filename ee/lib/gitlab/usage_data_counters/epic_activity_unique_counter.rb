@@ -22,65 +22,65 @@ module Gitlab
       EPIC_REOPENED = 'g_project_management_epic_reopened'
 
       class << self
-        def track_epic_created_action(author:, time: Time.zone.now)
-          track_unique_action(EPIC_CREATED, author, time)
+        def track_epic_created_action(author:)
+          track_unique_action(EPIC_CREATED, author)
         end
 
-        def track_epic_title_changed_action(author:, time: Time.zone.now)
-          track_unique_action(EPIC_TITLE_CHANGED, author, time)
+        def track_epic_title_changed_action(author:)
+          track_unique_action(EPIC_TITLE_CHANGED, author)
         end
 
-        def track_epic_description_changed_action(author:, time: Time.zone.now)
-          track_unique_action(EPIC_DESCRIPTION_CHANGED, author, time)
+        def track_epic_description_changed_action(author:)
+          track_unique_action(EPIC_DESCRIPTION_CHANGED, author)
         end
 
-        def track_epic_note_created_action(author:, time: Time.zone.now)
-          track_unique_action(EPIC_NOTE_CREATED, author, time)
+        def track_epic_note_created_action(author:)
+          track_unique_action(EPIC_NOTE_CREATED, author)
         end
 
-        def track_epic_note_updated_action(author:, time: Time.zone.now)
-          track_unique_action(EPIC_NOTE_UPDATED, author, time)
+        def track_epic_note_updated_action(author:)
+          track_unique_action(EPIC_NOTE_UPDATED, author)
         end
 
-        def track_epic_note_destroyed_action(author:, time: Time.zone.now)
-          track_unique_action(EPIC_NOTE_DESTROYED, author, time)
+        def track_epic_note_destroyed_action(author:)
+          track_unique_action(EPIC_NOTE_DESTROYED, author)
         end
 
-        def track_epic_start_date_set_as_fixed_action(author:, time: Time.zone.now)
-          track_unique_action(EPIC_START_DATE_SET_AS_FIXED, author, time)
+        def track_epic_start_date_set_as_fixed_action(author:)
+          track_unique_action(EPIC_START_DATE_SET_AS_FIXED, author)
         end
 
-        def track_epic_start_date_set_as_inherited_action(author:, time: Time.zone.now)
-          track_unique_action(EPIC_START_DATE_SET_AS_INHERITED, author, time)
+        def track_epic_start_date_set_as_inherited_action(author:)
+          track_unique_action(EPIC_START_DATE_SET_AS_INHERITED, author)
         end
 
-        def track_epic_due_date_set_as_fixed_action(author:, time: Time.zone.now)
-          track_unique_action(EPIC_DUE_DATE_SET_AS_FIXED, author, time)
+        def track_epic_due_date_set_as_fixed_action(author:)
+          track_unique_action(EPIC_DUE_DATE_SET_AS_FIXED, author)
         end
 
-        def track_epic_due_date_set_as_inherited_action(author:, time: Time.zone.now)
-          track_unique_action(EPIC_DUE_DATE_SET_AS_INHERITED, author, time)
+        def track_epic_due_date_set_as_inherited_action(author:)
+          track_unique_action(EPIC_DUE_DATE_SET_AS_INHERITED, author)
         end
 
-        def track_epic_issue_added(author:, time: Time.zone.now)
-          track_unique_action(EPIC_ISSUE_ADDED, author, time)
+        def track_epic_issue_added(author:)
+          track_unique_action(EPIC_ISSUE_ADDED, author)
         end
 
-        def track_epic_closed_action(author:, time: Time.zone.now)
-          track_unique_action(EPIC_CLOSED, author, time)
+        def track_epic_closed_action(author:)
+          track_unique_action(EPIC_CLOSED, author)
         end
 
-        def track_epic_reopened_action(author:, time: Time.zone.now)
-          track_unique_action(EPIC_REOPENED, author, time)
+        def track_epic_reopened_action(author:)
+          track_unique_action(EPIC_REOPENED, author)
         end
 
         private
 
-        def track_unique_action(action, author, time)
+        def track_unique_action(action, author)
           return unless Feature.enabled?(:track_epics_activity, default_enabled: true)
           return unless author
 
-          Gitlab::UsageDataCounters::HLLRedisCounter.track_event(action, values: author.id, time: time)
+          Gitlab::UsageDataCounters::HLLRedisCounter.track_event(action, values: author.id)
         end
       end
     end
