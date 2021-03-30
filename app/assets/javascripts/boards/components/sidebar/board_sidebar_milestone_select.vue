@@ -114,7 +114,7 @@ export default {
     :title="$options.i18n.milestone"
     :loading="loading"
     data-testid="sidebar-milestones"
-    @open="handleOpen()"
+    @open="handleOpen"
     @close="handleClose"
   >
     <template v-if="hasMilestone" #collapsed>
