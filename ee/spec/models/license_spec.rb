@@ -1295,6 +1295,7 @@ RSpec.describe License do
       future_license = create(:license, created_at: now, data: build(:gitlab_license, starts_at: today + 1.month, expires_at: today + 13.months).export)
       another_license = create(:license, created_at: now, data: build(:gitlab_license, starts_at: today - 1.month, expires_at: today + 1.year).export)
       current_license = create(:license, created_at: now, data: build(:gitlab_license, starts_at: today - 15.days, expires_at: today + 11.months).export)
+      create(:license, created_at: now, data: build(:gitlab_license, starts_at: today - 1.month, expires_at: today + 1.year, type: described_class::CLOUD_LICENSE_TYPE).export)
 
       expect(described_class.history.map(&:id)).to eq(
         [
@@ -1305,6 +1306,15 @@ RSpec.describe License do
           expired_license.id
         ]
       )
+    end
+
+    context 'when cloud param is set to true' do
+      it 'only returns cloud licenses' do
+        create(:license, data: build(:gitlab_license).export)
+        cloud_license = create(:license, data: build(:gitlab_license, type: described_class::CLOUD_LICENSE_TYPE).export)
+
+        expect(described_class.history(cloud: true).map(&:id)).to eq([cloud_license.id])
+      end
     end
   end
 

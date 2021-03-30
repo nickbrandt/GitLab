@@ -331,8 +331,8 @@ class License < ApplicationRecord
       Gitlab::CurrentSettings.license_trial_ends_on
     end
 
-    def history
-      decryptable_licenses = all.select { |license| license.license.present? }
+    def history(cloud: false)
+      decryptable_licenses = all.select { |license| license.license.present? && license.cloud? == cloud }
       decryptable_licenses.sort_by { |license| [license.starts_at, license.created_at, license.expires_at] }.reverse
     end
 
