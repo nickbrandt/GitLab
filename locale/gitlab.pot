@@ -36674,6 +36674,9 @@ msgstr ""
 msgid "and"
 msgstr ""
 
+msgid "any-approver for the group already exists"
+msgstr ""
+
 msgid "any-approver for the merge request already exists"
 msgstr ""
 

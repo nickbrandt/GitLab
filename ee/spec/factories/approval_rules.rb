@@ -62,4 +62,10 @@ FactoryBot.define do
       rule_type { :report_approver }
     end
   end
+
+  factory :approval_group_rule, class: 'ApprovalRules::ApprovalGroupRule' do
+    group
+    sequence(:name) { |n| "#{ApprovalRuleLike::DEFAULT_NAME}-#{n}" }
+    rule_type { :regular }
+  end
 end

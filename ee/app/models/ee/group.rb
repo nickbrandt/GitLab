@@ -58,6 +58,7 @@ module EE
       belongs_to :file_template_project, class_name: "Project"
 
       belongs_to :push_rule, inverse_of: :group
+      has_many :approval_rules, class_name: 'ApprovalRules::ApprovalGroupRule', inverse_of: :group
 
       # Use +checked_file_template_project+ instead, which implements important
       # visibility checks
