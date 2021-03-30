@@ -1,6 +1,7 @@
 <script>
 import { GlPopover, GlIcon, GlLink, GlButton, GlTooltipDirective } from '@gitlab/ui';
 import { deprecatedCreateFlash as createFlash } from '~/flash';
+import AccessorUtils from '~/lib/utils/accessor';
 import axios from '~/lib/utils/axios_utils';
 import { formatDate } from '~/lib/utils/datetime_utility';
 import download from '~/lib/utils/downloader';
@@ -19,12 +20,7 @@ export default {
   directives: {
     GlTooltip: GlTooltipDirective,
   },
-  props: {
-    vulnerabilitiesExportEndpoint: {
-      type: String,
-      required: true,
-    },
-  },
+  inject: ['vulnerabilitiesExportEndpoint'],
   data() {
     return {
       isPreparingCsvExport: false,
@@ -45,10 +41,8 @@ export default {
     closePopover() {
       this.showPopover = false;
 
-      try {
+      if (AccessorUtils.isLocalStorageAccessSafe()) {
         localStorage.setItem(STORAGE_KEY, 'true');
-      } catch (e) {
-        // Ignore the error - this is just a safety measure.
       }
     },
     initiateCsvExport() {
@@ -87,9 +81,10 @@ export default {
   >
     {{ __('Export') }}
     <gl-popover
+      v-if="showPopover"
       ref="popover"
       :target="() => $refs.csvExportButton.$el"
-      :show="showPopover"
+      show
       placement="left"
       triggers="manual"
     >
