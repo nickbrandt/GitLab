@@ -115,7 +115,7 @@ func (rew *rewriter) handleFilePart(ctx context.Context, name string, p *multipa
 
 	filename := p.FileName()
 
-	if opts.ExtractBase {
+	if opts.FeatureFlagExtractBase {
 		filename = filepath.Base(filename)
 	}
 

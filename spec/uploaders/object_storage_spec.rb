@@ -443,7 +443,7 @@ RSpec.describe ObjectStorage do
 
     shared_examples 'extracts base filename' do
       it "returns true for ExtractsBase" do
-        expect(subject[:ExtractBase]).to be true
+        expect(subject[:FeatureFlagExtractBase]).to be true
       end
 
       context 'when workhorse_extract_filename_base is disabled' do
@@ -452,7 +452,7 @@ RSpec.describe ObjectStorage do
         end
 
         it "returns false for ExtractsBase" do
-          expect(subject[:ExtractBase]).to be false
+          expect(subject[:FeatureFlagExtractBase]).to be false
         end
       end
     end

@@ -325,10 +325,10 @@ func TestInvalidFileNames(t *testing.T) {
 	defer os.RemoveAll(tempPath)
 
 	for _, testCase := range []struct {
-		filename       string
-		code           int
-		extractBase    bool
-		expectedPrefix string
+		filename               string
+		code                   int
+		FeatureFlagExtractBase bool
+		expectedPrefix         string
 	}{
 		{"foobar", 200, false, "foobar"}, // sanity check for test setup below
 		{"foo/bar", 500, false, ""},
@@ -356,7 +356,7 @@ func TestInvalidFileNames(t *testing.T) {
 		apiResponse := &api.Response{TempPath: tempPath}
 		preparer := &DefaultPreparer{}
 		opts, _, err := preparer.Prepare(apiResponse)
-		opts.ExtractBase = testCase.extractBase
+		opts.FeatureFlagExtractBase = testCase.FeatureFlagExtractBase
 		require.NoError(t, err)
 
 		HandleFileUploads(response, httpRequest, nilHandler, apiResponse, &SavedFileTracker{Request: httpRequest}, opts)
