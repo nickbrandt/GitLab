@@ -33,8 +33,12 @@ module Gitlab
           { old_username: user.username_before_last_save }
         when :failed_login
           { state: user.state }
+        else
+          {}
         end
       end
     end
   end
 end
+
+Gitlab::HookData::UserBuilder.prepend_if_ee('EE::Gitlab::HookData::UserBuilder')
