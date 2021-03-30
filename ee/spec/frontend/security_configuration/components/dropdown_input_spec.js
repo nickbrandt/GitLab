@@ -76,9 +76,7 @@ describe('DropdownInput component', () => {
       });
 
       it('does not render the description', () => {
-        const description = findDescription();
-
-        expect(description.exists()).toBe(false);
+        expect(findDescription().exists()).toBe(false);
       });
     });
   });
