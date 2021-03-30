@@ -332,6 +332,7 @@ RSpec.describe API::Repositories do
 
   describe 'GET /projects/:id/repository/compare' do
     let(:route) { "/projects/#{project.id}/repository/compare" }
+    let!(:public_project) { create(:project, :repository, :public) }
 
     shared_examples_for 'repository compare' do
       it "compares branches" do
@@ -386,6 +387,14 @@ RSpec.describe API::Repositories do
 
       it "compares commits in reverse order" do
         get api(route, current_user), params: { from: sample_commit.parent_id, to: sample_commit.id }
+
+        expect(response).to have_gitlab_http_status(:ok)
+        expect(json_response['commits']).to be_present
+        expect(json_response['diffs']).to be_present
+      end
+
+      it "Compare commits between different projects" do
+          get api(route, current_user), params: { from: sample_commit.parent_id, to: sample_commit.id, from_project_id: public_project.id }
 
         expect(response).to have_gitlab_http_status(:ok)
         expect(json_response['commits']).to be_present
