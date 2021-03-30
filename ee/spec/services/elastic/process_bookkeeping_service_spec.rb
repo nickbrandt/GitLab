@@ -209,6 +209,20 @@ RSpec.describe Elastic::ProcessBookkeepingService, :clean_gitlab_redis_shared_st
     end
 
     context 'N+1 queries' do
+      it 'does not have N+1 queries for projects' do
+        projects = create_list(:project, 2)
+
+        described_class.track!(*projects)
+
+        control = ActiveRecord::QueryRecorder.new(skip_cached: false) { described_class.new.execute }
+
+        projects += create_list(:project, 3)
+
+        described_class.track!(*projects)
+
+        expect { described_class.new.execute }.not_to exceed_all_query_limit(control)
+      end
+
       it 'does not have N+1 queries for notes' do
         notes = []
 
