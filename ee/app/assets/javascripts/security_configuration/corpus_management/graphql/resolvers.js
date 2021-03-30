@@ -29,6 +29,14 @@ export default {
         __typename: 'MockedPackages',
       };
     },
+    /* eslint-disable no-unused-vars */
+    uploadState(_, { projectPath }) {
+      return {
+        isUploading: false,
+        progress: 0,
+        __typename: 'UploadState',
+      }
+    },
   },
   Mutation: {
     deleteCorpus: (_, { name, projectPath }, { cache }) => {
@@ -73,15 +81,20 @@ export default {
       });
 
       const data = produce(sourceData, (draftState) => {
-        const mockedCorpuses = draftState.mockedPackages;
-        // Filter out deleted corpus
-        mockedCorpuses.data = mockedCorpuses.data.filter((corpus) => {
-          return corpus.name !== name;
-        });
-        // Re-compute total file size
-        mockedCorpuses.totalSize = mockedCorpuses.data.reduce((totalSize, corpus) => {
-          return totalSize + corpus.size;
-        }, 0);
+        const { uploadState }  = draftState;
+        uploadState.isUploading = true;
+        // Simulate incrementing file upload progress
+        if(uploadState.progress < 100){
+          
+          uploadState.progress += 25;
+          setTimeout(()=>{
+            debugger;
+            client.mutate({
+              mutation: uploadCorpus,
+              variables: { name: this.corpusName, projectPath: this.projectFullPath },
+            });
+          },500)
+        }
       });
 
       cache.writeQuery({ query: getCorpusesQuery, data, variables: { projectPath, ...cursor } });

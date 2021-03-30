@@ -22,21 +22,24 @@ export default () => {
     },
   });
 
-  const {
+  let {
     dataset: { projectFullPath, corpusHelpPath },
   } = el;
 
-  const props = {
+  //TODO: Remove when we ship, this is for high fidelity mocks demo.
+  corpusHelpPath = 'https://docs.gitlab.com/ee/user/application_security/coverage_fuzzing/';
+
+  const provide = {
     projectFullPath,
     corpusHelpPath,
   };
 
   return new Vue({
     el,
+    provide,
     apolloProvider: new VueApollo({ defaultClient }),
     render(h) {
-      return h(CorpusManagement, {
-        props,
+      return h(CorpusManagement, {     
       });
     },
   });

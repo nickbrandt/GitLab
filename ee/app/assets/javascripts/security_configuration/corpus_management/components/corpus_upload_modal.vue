@@ -12,6 +12,7 @@ export default {
     GlButton,
     GlIcon,
   },
+  inject: ['projectFullPath','corpusHelpPath'],
   i18n: {
     uploadButtonText: __('Choose File...'),
     uploadMessage: s__('CorpusManagement|New corpus needs to be a upload in *.zip format. Maximum 10Gib')
@@ -28,6 +29,7 @@ export default {
       isStagedForUpload: false,
       isUploading: false,
       attachmentName: '',
+      corpusName: '',
       files: [],
     }
   },
@@ -38,7 +40,7 @@ export default {
     beginFileUpload() {
       this.$apollo.mutate({
         mutation: uploadCorpus,
-        variables: { name, projectPath: this.projectFullPath },
+        variables: { name: this.corpusName, projectPath: this.projectFullPath },
       });
     },
     onFileUploadChange(e) {
@@ -55,6 +57,7 @@ export default {
       <slot name="input">
         <gl-form-input
           ref="input"
+          v-model="corpusName"
         />
       </slot>
 

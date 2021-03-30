@@ -20,4 +20,8 @@ query getCorpuses($projectPath: ID!, $first: Int, $last: Int, $before: String, $
     data
     totalSize
   }
+  uploadState(projectPath: $projectPath) @client {
+    isUploading
+    progress
+  }
 }

@@ -30,18 +30,7 @@ export default {
       },
     },
   },
-  props: {
-    projectFullPath: {
-      type: String,
-      required: true,
-    },
-    corpusHelpPath: {
-      type: String,
-      required: true,
-      // TODO: Remove mocked out docs path used for demo
-      default: 'https://docs.gitlab.com/ee/user/application_security/coverage_fuzzing/',
-    },
-  },
+  inject: ['projectFullPath','corpusHelpPath'],
   i18n: {
     header: s__('CorpusManagement|Fuzz testing corpus management'),
     subHeader: s__(
