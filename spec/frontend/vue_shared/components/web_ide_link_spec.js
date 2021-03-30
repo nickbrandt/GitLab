@@ -15,7 +15,7 @@ const ACTION_EDIT = {
   tooltip: '',
   attrs: {
     'data-qa-selector': 'edit_button',
-    'data-track-event': 'click_edit',
+    'data-track-action': 'click_edit',
     'data-track-label': 'Edit',
   },
 };
@@ -32,7 +32,7 @@ const ACTION_WEB_IDE = {
   text: 'Web IDE',
   attrs: {
     'data-qa-selector': 'web_ide_button',
-    'data-track-event': 'click_edit_ide',
+    'data-track-action': 'click_edit_ide',
     'data-track-label': 'Web IDE',
   },
 };

@@ -122,7 +122,7 @@ export default {
           icon="close"
           :data-track-property="humanAccess"
           :data-track-value="$options.dismissTrackValue"
-          :data-track-event="$options.clickTrackValue"
+          :data-track-action="$options.clickTrackValue"
           :data-track-label="trackLabel"
           @click="onDismiss"
         />

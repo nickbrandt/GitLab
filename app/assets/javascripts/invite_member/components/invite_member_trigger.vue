@@ -29,7 +29,7 @@ export default {
 <template>
   <gl-link
     data-is-link="true"
-    :data-track-event="event"
+    :data-track-action="event"
     :data-track-label="label"
     @click="openModal"
     >{{ displayText }}

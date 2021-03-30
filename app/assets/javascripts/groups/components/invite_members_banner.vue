@@ -45,7 +45,7 @@ export default {
       const button = this.$refs.banner.$el.querySelector(`[href='${this.inviteMembersPath}']`);
 
       if (button) {
-        button.setAttribute('data-track-event', this.$options.buttonClickEvent);
+        button.setAttribute('data-track-action', this.$options.buttonClickEvent);
         button.setAttribute('data-track-label', this.trackLabel);
       }
     },

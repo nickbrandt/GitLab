@@ -93,7 +93,7 @@ export default {
         tooltip: '',
         attrs: {
           'data-qa-selector': 'edit_button',
-          'data-track-event': 'click_edit',
+          'data-track-action': 'click_edit',
           // eslint-disable-next-line @gitlab/require-i18n-strings
           'data-track-label': 'Edit',
         },
@@ -127,7 +127,7 @@ export default {
         tooltip: '',
         attrs: {
           'data-qa-selector': 'web_ide_button',
-          'data-track-event': 'click_edit_ide',
+          'data-track-action': 'click_edit_ide',
           // eslint-disable-next-line @gitlab/require-i18n-strings
           'data-track-label': 'Web IDE',
         },

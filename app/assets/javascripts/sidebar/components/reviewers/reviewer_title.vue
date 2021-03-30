@@ -40,7 +40,7 @@ export default {
       v-if="editable"
       class="js-sidebar-dropdown-toggle edit-link float-right"
       href="#"
-      data-track-event="click_edit_button"
+      data-track-action="click_edit_button"
       data-track-label="right_sidebar"
       data-track-property="reviewer"
     >

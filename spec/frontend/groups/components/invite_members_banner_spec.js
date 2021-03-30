@@ -62,7 +62,7 @@ describe('InviteMembersBanner', () => {
       const button = wrapper.find(`[href='${wrapper.vm.inviteMembersPath}']`);
 
       expect(button.attributes()).toMatchObject({
-        'data-track-event': buttonClickEvent,
+        'data-track-action': buttonClickEvent,
         'data-track-label': trackLabel,
       });
     });

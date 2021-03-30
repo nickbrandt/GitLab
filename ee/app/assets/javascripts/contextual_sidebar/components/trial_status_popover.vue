@@ -129,7 +129,7 @@ export default {
         class="gl-mb-0"
         block
         data-testid="upgradeBtn"
-        :data-track-event="$options.tracking.event"
+        :data-track-action="$options.tracking.event"
         :data-track-label="$options.tracking.labels.upgrade"
         :data-track-property="$options.tracking.property"
       >
@@ -149,7 +149,7 @@ export default {
         block
         data-testid="compareBtn"
         :title="$options.i18n.compareAllButtonTitle"
-        :data-track-event="$options.tracking.event"
+        :data-track-action="$options.tracking.event"
         :data-track-label="$options.tracking.labels.compare"
         :data-track-property="$options.tracking.property"
       >

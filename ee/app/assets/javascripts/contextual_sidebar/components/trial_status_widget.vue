@@ -62,7 +62,7 @@ export default {
     :id="containerId"
     :title="widgetTitle"
     :href="plansHref"
-    :data-track-event="$options.tracking.event"
+    :data-track-action="$options.tracking.event"
     :data-track-label="$options.tracking.label"
     :data-track-property="$options.tracking.property"
   >

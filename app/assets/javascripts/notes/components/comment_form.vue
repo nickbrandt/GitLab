@@ -417,7 +417,7 @@ export default {
                 data-testid="comment-button"
                 data-qa-selector="comment_button"
                 :data-track-label="trackingLabel"
-                data-track-event="click_button"
+                data-track-action="click_button"
                 @click="handleSave()"
               >
                 <gl-dropdown-item

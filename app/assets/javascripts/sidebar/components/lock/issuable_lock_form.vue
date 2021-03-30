@@ -93,7 +93,7 @@ export default {
         class="float-right lock-edit"
         href="#"
         data-testid="edit-link"
-        data-track-event="click_edit_button"
+        data-track-action="click_edit_button"
         data-track-label="right_sidebar"
         data-track-property="lock_issue"
         @click.prevent="toggleForm"

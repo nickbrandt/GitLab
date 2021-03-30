@@ -210,7 +210,7 @@ export default {
           right
           split
           :split-href="link"
-          data-track-event="open_review_app"
+          data-track-action="open_review_app"
           data-track-label="review_app"
           @click="ok"
         >
@@ -219,7 +219,7 @@ export default {
             v-for="change in filteredChanges"
             :key="change.path"
             :href="change.external_url"
-            data-track-event="open_review_app"
+            data-track-action="open_review_app"
             data-track-label="review_app"
             >{{ change.path }}</gl-dropdown-item
           >

@@ -42,14 +42,14 @@ describe('TrialStatusPopover component', () => {
 
   it('renders the upgrade button with correct tracking data attrs', () => {
     const attrs = getGlButton('upgradeBtn').attributes();
-    expect(attrs['data-track-event']).toBe('click_button');
+    expect(attrs['data-track-action']).toBe('click_button');
     expect(attrs['data-track-label']).toBe('upgrade_to_ultimate');
     expect(attrs['data-track-property']).toBe('experiment:show_trial_status_in_sidebar');
   });
 
   it('renders the compare plans button with correct tracking data attrs', () => {
     const attrs = getGlButton('compareBtn').attributes();
-    expect(attrs['data-track-event']).toBe('click_button');
+    expect(attrs['data-track-action']).toBe('click_button');
     expect(attrs['data-track-label']).toBe('compare_all_plans');
     expect(attrs['data-track-property']).toBe('experiment:show_trial_status_in_sidebar');
   });

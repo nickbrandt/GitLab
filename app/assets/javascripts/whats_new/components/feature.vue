@@ -25,7 +25,7 @@ export default {
       :href="feature.url"
       target="_blank"
       class="whats-new-item-title-link"
-      data-track-event="click_whats_new_item"
+      data-track-action="click_whats_new_item"
       :data-track-label="feature.title"
       :data-track-property="feature.url"
     >
@@ -44,7 +44,7 @@ export default {
     <gl-link
       :href="feature.url"
       target="_blank"
-      data-track-event="click_whats_new_item"
+      data-track-action="click_whats_new_item"
       :data-track-label="feature.title"
       :data-track-property="feature.url"
     >
@@ -58,7 +58,7 @@ export default {
     <gl-link
       :href="feature.url"
       target="_blank"
-      data-track-event="click_whats_new_item"
+      data-track-action="click_whats_new_item"
       :data-track-label="feature.title"
       :data-track-property="feature.url"
       >{{ __('Learn more') }}</gl-link

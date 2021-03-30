@@ -53,7 +53,7 @@ export default {
       class="js-sidebar-dropdown-toggle edit-link float-right"
       href="#"
       data-test-id="edit-link"
-      data-track-event="click_edit_button"
+      data-track-action="click_edit_button"
       data-track-label="right_sidebar"
       data-track-property="assignee"
     >

@@ -98,7 +98,7 @@ export default {
         variant="link"
         class="gl-text-gray-900! gl-hover-text-blue-800! gl-ml-auto hide-collapsed"
         data-testid="edit-button"
-        :data-track-event="tracking.event"
+        :data-track-action="tracking.event"
         :data-track-label="tracking.label"
         :data-track-property="tracking.property"
         data-qa-selector="edit_link"

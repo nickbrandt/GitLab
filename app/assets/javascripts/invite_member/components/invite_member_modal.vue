@@ -57,7 +57,7 @@ export default {
     <p>{{ $options.i18n.bodyMiddleMessage }}</p>
     <gl-link
       :href="membersPath"
-      data-track-event="click_who_can_invite_link"
+      data-track-action="click_who_can_invite_link"
       data-track-label="invite_members_message"
       >{{ $options.i18n.linkText }}</gl-link
     >

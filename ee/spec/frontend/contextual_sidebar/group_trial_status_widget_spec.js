@@ -41,7 +41,7 @@ describe('TrialStatusWidget component', () => {
 
     it('renders with the correct tracking data attributes', () => {
       const attrs = getGlLink().attributes();
-      expect(attrs['data-track-event']).toBe('click_link');
+      expect(attrs['data-track-action']).toBe('click_link');
       expect(attrs['data-track-label']).toBe('trial_status_widget');
       expect(attrs['data-track-property']).toBe('experiment:show_trial_status_in_sidebar');
     });
