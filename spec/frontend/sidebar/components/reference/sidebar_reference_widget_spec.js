@@ -45,7 +45,7 @@ describe('Sidebar Reference Widget', () => {
 
   describe('when reference is loading', () => {
     it('sets CopyableField `is-loading` prop to `true`', () => {
-      createComponent();
+      createComponent({ referenceQueryHandler: jest.fn().mockReturnValue(new Promise(() => {})) });
       expect(findCopyableField().props('isLoading')).toBe(true);
     });
   });
