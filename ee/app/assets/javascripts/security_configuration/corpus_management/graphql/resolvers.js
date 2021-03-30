@@ -58,5 +58,33 @@ export default {
 
       cache.writeQuery({ query: getCorpusesQuery, data, variables: { projectPath, ...cursor } });
     },
+    uploadCorpus: (_, { name, projectPath }, {cache, client}) => {
+      debugger;
+      const cursor = {
+        first: 25,
+        after: null,
+        last: null,
+        before: null,
+      };
+
+      const sourceData = cache.readQuery({
+        query: getCorpusesQuery,
+        variables: { projectPath, ...cursor },
+      });
+
+      const data = produce(sourceData, (draftState) => {
+        const mockedCorpuses = draftState.mockedPackages;
+        // Filter out deleted corpus
+        mockedCorpuses.data = mockedCorpuses.data.filter((corpus) => {
+          return corpus.name !== name;
+        });
+        // Re-compute total file size
+        mockedCorpuses.totalSize = mockedCorpuses.data.reduce((totalSize, corpus) => {
+          return totalSize + corpus.size;
+        }, 0);
+      });
+
+      cache.writeQuery({ query: getCorpusesQuery, data, variables: { projectPath, ...cursor } });
+    }
   },
 };
