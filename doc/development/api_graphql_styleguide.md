@@ -393,7 +393,7 @@ field :blob, type: Types::Snippets::BlobType,
 This will increment the [`complexity` score](#field-complexity) of the field by `1`.
 
 If a resolver calls Gitaly, it can be annotated with
-`BaseResolver.calls_gitaly!`. Doing this will pass `calls_gitaly: true` to any
+`BaseResolver.calls_gitaly!`. This passes `calls_gitaly: true` to any
 field that uses this resolver.
 
 For example:
@@ -411,7 +411,7 @@ class BranchResolver < BaseResolver
 end
 ```
 
-Then when we use it, any field that uses `BranchResolver` will have the correct
+Then when we use it, any field that uses `BranchResolver` has the correct
 value for `calls_gitaly:`.
 
 ### Exposing permissions for a type
@@ -1159,7 +1159,7 @@ When using resolvers, they can and should serve as the SSoT for field metadata.
 All field options (apart from the field name) can be declared on the resolver.
 These include:
 
-- `type` (this is required - all resolvers must include a type annotation)
+- `type` (required - all resolvers must include a type annotation)
 - `extras`
 - `description`
 - Gitaly annotations (with `calls_gitaly!`)
