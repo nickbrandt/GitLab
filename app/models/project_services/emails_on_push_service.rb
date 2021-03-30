@@ -12,7 +12,7 @@ class EmailsOnPushService < Service
   validate :number_of_recipients_within_limit, if: :validate_recipients?
 
   def self.valid_recipients(recipients)
-    recipients.to_s.split.select do |recipient|
+    recipients.split.select do |recipient|
       recipient.include?('@')
     end.uniq(&:downcase)
   end
