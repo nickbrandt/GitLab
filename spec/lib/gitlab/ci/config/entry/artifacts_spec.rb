@@ -44,6 +44,14 @@ RSpec.describe Gitlab::Ci::Config::Entry::Artifacts do
           expect(entry.value).to eq config
         end
       end
+
+      context "when value includes 'validate_schema' keyword" do
+        let(:config) { { paths: %w[results.txt], validate_schema: true } }
+
+        it 'returns general artifact and report-type artifacts configuration' do
+          expect(entry.value).to eq config
+        end
+      end
     end
 
     context 'when entry value is not correct' do
@@ -81,6 +89,15 @@ RSpec.describe Gitlab::Ci::Config::Entry::Artifacts do
           it 'reports error' do
             expect(entry.errors)
               .to include 'artifacts public should be a boolean value'
+          end
+        end
+
+        context "when 'validate_schema' is not a boolean" do
+          let(:config) { { paths: %w[results.txt], validate_schema: 'false' } }
+
+          it 'reports error' do
+            expect(entry.errors)
+              .to include 'artifacts validate schema should be a boolean value'
           end
         end
 

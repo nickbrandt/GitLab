@@ -12,7 +12,7 @@ module Gitlab
           include ::Gitlab::Config::Entry::Validatable
           include ::Gitlab::Config::Entry::Attributable
 
-          ALLOWED_KEYS = %i[name untracked paths reports when expire_in expose_as exclude public].freeze
+          ALLOWED_KEYS = %i[name untracked paths reports when expire_in expose_as exclude public validate_schema].freeze
           EXPOSE_AS_REGEX = /\A\w[-\w ]*\z/.freeze
           EXPOSE_AS_ERROR_MESSAGE = "can contain only letters, digits, '-', '_' and spaces"
 
@@ -29,6 +29,7 @@ module Gitlab
               validates :name, type: String
               validates :public, boolean: true
               validates :untracked, boolean: true
+              validates :validate_schema, boolean: true
               validates :paths, array_of_strings: true
               validates :paths, array_of_strings: {
                 with: /\A[^*]*\z/,
