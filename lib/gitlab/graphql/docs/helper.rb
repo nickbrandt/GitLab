@@ -242,7 +242,7 @@ module Gitlab
 
         def render_name(object, owner = nil)
           rendered_name = "`#{object[:name]}`"
-          rendered_name += ' **{warning-solid}**' if object[:is_deprecated]
+          rendered_name += ' **{warning-solid}**' if deprecated?(object, owner)
 
           return rendered_name unless owner
 
@@ -255,11 +255,18 @@ module Gitlab
         # Returns the object description. If the object has been deprecated,
         # the deprecation reason will be returned in place of the description.
         def render_description(object, owner = nil, context = :block)
-          if object[:is_deprecated]
+          if deprecated?(object, owner)
             render_deprecation(object, owner, context)
           else
             render_description_of(object)
           end
+        end
+
+        def deprecated?(object, owner)
+          return true if object[:is_deprecated] # only populated for fields, not arguments!
+
+          key = [*Array.wrap(owner), object[:name]].join('.')
+          deprecations.key?(key)
         end
 
         def render_description_of(object)
@@ -280,7 +287,6 @@ module Gitlab
         end
 
         def render_deprecation(object, owner, context)
-          owner = Array.wrap(owner)
           buff = []
           deprecation = schema_deprecation(owner, object[:name])
 
@@ -356,38 +362,8 @@ module Gitlab
         # returns the deprecation information for a field or argument
         # See: Gitlab::Graphql::Deprecation
         def schema_deprecation(type_name, field_name)
-          schema_member(type_name, field_name)&.deprecation
-        end
-
-        # Return a part of the schema.
-        #
-        # This queries the Schema by owner and name to find:
-        #
-        # - fields (e.g. `schema_member('Query', 'currentUser')`)
-        # - arguments (e.g. `schema_member(['Query', 'project], 'fullPath')`)
-        def schema_member(type_name, field_name)
-          type_name = Array.wrap(type_name)
-          if type_name.size == 2
-            arg_name = field_name
-            type_name, field_name = type_name
-          else
-            type_name = type_name.first
-            arg_name = nil
-          end
-
-          return if type_name.nil? || field_name.nil?
-
-          type = schema.types[type_name]
-          return unless type && type.kind.fields?
-
-          field = type.fields[field_name]
-          return field if arg_name.nil?
-
-          args = field.arguments
-          is_mutation = field.mutation && field.mutation <= ::Mutations::BaseMutation
-          args = args['input'].type.unwrap.arguments if is_mutation
-
-          args[arg_name]
+          key = [*Array.wrap(type_name), field_name].join('.')
+          deprecations[key]
         end
 
         def render_input_type(query)
@@ -395,6 +371,25 @@ module Gitlab
           return unless input_field
 
           "Input type: `#{input_field[:type][:name]}`."
+        end
+
+        def deprecations
+          strong_memoize(:deprecations) do
+            mapping = {}
+
+            schema.types.each do |type_name, type|
+              next unless type.kind.fields?
+
+              type.fields.each do |field_name, field|
+                mapping["#{type_name}.#{field_name}"] = field.try(:deprecation)
+                field.arguments.each do |arg_name, arg|
+                  mapping["#{type_name}.#{field_name}.#{arg_name}"] = arg.try(:deprecation)
+                end
+              end
+            end
+
+            mapping.compact
+          end
         end
       end
     end

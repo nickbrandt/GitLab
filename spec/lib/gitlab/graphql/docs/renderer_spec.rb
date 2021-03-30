@@ -150,6 +150,43 @@ RSpec.describe Gitlab::Graphql::Docs::Renderer do
       end
     end
 
+    context 'when an argument is deprecated' do
+      let(:type) do
+        Class.new(Types::BaseObject) do
+          graphql_name 'DeprecatedTest'
+          description 'A thing we used to use, but no longer support'
+
+          field :foo,
+                type: GraphQL::STRING_TYPE,
+                null: false,
+                description: 'A description.' do
+                  argument :foo_arg, GraphQL::STRING_TYPE,
+                           required: false,
+                           description: 'The argument.',
+                           deprecated: { reason: 'Bad argument', milestone: '101.2' }
+                end
+        end
+      end
+
+      let(:section) do
+        <<~DOC
+         ##### `DeprecatedTest.foo`
+
+         A description.
+
+         Returns [`String!`](#string).
+
+         ###### Arguments
+
+         | Name | Type | Description |
+         | ---- | ---- | ----------- |
+         | <a id="deprecatedtestfoofooarg"></a>`fooArg` **{warning-solid}** | [`String`](#string) | **Deprecated** in 101.2. Bad argument. |
+        DOC
+      end
+
+      it_behaves_like 'renders correctly as GraphQL documentation'
+    end
+
     context 'when a field is deprecated' do
       let(:type) do
         Class.new(Types::BaseObject) do
@@ -338,10 +375,30 @@ RSpec.describe Gitlab::Graphql::Docs::Renderer do
                           required: true,
                           description: 'How much prettier?'
 
+        mutation.argument :pulchritude,
+                          type: GraphQL::FLOAT_TYPE,
+                          required: false,
+                          description: 'How much prettier?',
+                          deprecated: {
+                            reason: :renamed,
+                            replacement: 'prettinessFactor',
+                            milestone: '72.34'
+                          }
+
         mutation.field :everything,
                        type: GraphQL::STRING_TYPE,
                        null: true,
                        description: 'What we made prettier.'
+
+        mutation.field :omnis,
+                       type: GraphQL::STRING_TYPE,
+                       null: true,
+                       description: 'What we made prettier.',
+                       deprecated: {
+                         reason: :renamed,
+                         replacement: 'everything',
+                         milestone: '72.34'
+                       }
 
         mutation
       end
@@ -365,6 +422,7 @@ RSpec.describe Gitlab::Graphql::Docs::Renderer do
             | ---- | ---- | ----------- |
             | <a id="mutationmakeitprettyclientmutationid"></a>`clientMutationId` | [`String`](#string) | A unique identifier for the client performing the mutation. |
             | <a id="mutationmakeitprettyprettinessfactor"></a>`prettinessFactor` | [`Float!`](#float) | How much prettier?. |
+            | <a id="mutationmakeitprettypulchritude"></a>`pulchritude` **{warning-solid}** | [`Float`](#float) | **Deprecated:** This was renamed. Please use `prettinessFactor`. Deprecated in 72.34. |
 
             #### Fields
 
@@ -373,6 +431,7 @@ RSpec.describe Gitlab::Graphql::Docs::Renderer do
             | <a id="mutationmakeitprettyclientmutationid"></a>`clientMutationId` | [`String`](#string) | A unique identifier for the client performing the mutation. |
             | <a id="mutationmakeitprettyerrors"></a>`errors` | [`[String!]!`](#string) | Errors encountered during execution of the mutation. |
             | <a id="mutationmakeitprettyeverything"></a>`everything` | [`String`](#string) | What we made prettier. |
+            | <a id="mutationmakeitprettyomnis"></a>`omnis` **{warning-solid}** | [`String`](#string) | **Deprecated:** This was renamed. Please use `everything`. Deprecated in 72.34. |
           DOC
         end
       end
