@@ -23,6 +23,8 @@ describe('Manual Variables Form', () => {
     });
   };
 
+  const findTriggerBtn = () => wrapper.find('[data-testid="trigger-manual-job-btn"]');
+
   beforeEach(() => {
     factory(requiredProps);
   });
@@ -51,6 +53,10 @@ describe('Manual Variables Form', () => {
     );
 
     expect(wrapper.find('a').attributes('href')).toBe(requiredProps.variablesSettingsUrl);
+  });
+
+  it('trigger button is not disabled on mount', () => {
+    expect(findTriggerBtn().props('disabled')).toBe(false);
   });
 
   describe('when adding a new variable', () => {
