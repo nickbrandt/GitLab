@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_03_13_051642) do
+ActiveRecord::Schema.define(version: 2021_03_25_150435) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -160,7 +160,7 @@ ActiveRecord::Schema.define(version: 2021_03_13_051642) do
     t.integer "verification_state", limit: 2, default: 0, null: false
     t.integer "retry_count", limit: 2, default: 0
     t.integer "verification_retry_count", limit: 2, default: 0
-    t.boolean "checksum_mismatch"
+    t.boolean "checksum_mismatch", default: false, null: false
     t.binary "verification_checksum"
     t.binary "verification_checksum_mismatched"
     t.string "verification_failure", limit: 255
