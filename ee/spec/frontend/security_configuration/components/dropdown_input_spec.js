@@ -38,6 +38,8 @@ describe('DropdownInput component', () => {
 
   const findToggle = () => wrapper.find('button');
   const findLabel = () => wrapper.find('label');
+  const findDescription = () =>
+    wrapper.find('label').find('[data-testid="dropdown-input-description"]');
   const findInputComponent = () => wrapper.find(GlDropdown);
   const findRestoreDefaultLink = () => wrapper.find(GlLink);
   const findSectionHeader = () => wrapper.findByTestId('dropdown-input-section-header');
@@ -48,18 +50,37 @@ describe('DropdownInput component', () => {
   });
 
   describe('label', () => {
-    beforeEach(() => {
-      createComponent({
-        props: testProps,
+    describe('with a description', () => {
+      beforeEach(() => {
+        createComponent({
+          props: testProps,
+        });
+      });
+
+      it('renders the label', () => {
+        expect(findLabel().text()).toContain(testProps.label);
+      });
+
+      it('renders the description', () => {
+        const description = findDescription();
+
+        expect(description.exists()).toBe(true);
+        expect(description.text()).toBe(testProps.description);
       });
     });
 
-    it('renders the label', () => {
-      expect(findLabel().text()).toContain(testProps.label);
-    });
+    describe('without a description', () => {
+      beforeEach(() => {
+        createComponent({
+          props: { ...testProps, description: '' },
+        });
+      });
 
-    it('renders the description', () => {
-      expect(findLabel().text()).toContain(testProps.description);
+      it('does not render the description', () => {
+        const description = findDescription();
+
+        expect(description.exists()).toBe(false);
+      });
     });
   });
 

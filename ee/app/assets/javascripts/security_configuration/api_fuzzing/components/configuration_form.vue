@@ -105,7 +105,6 @@ export default {
       scanProfile: {
         field: 'scanProfile',
         label: s__('APIFuzzing|Scan profile'),
-        description: 'Pre-defined profiles by GitLab.',
         value: '',
         defaultText: s__('APIFuzzing|Choose a profile'),
         sectionHeader: s__('APIFuzzing|Predefined profiles'),

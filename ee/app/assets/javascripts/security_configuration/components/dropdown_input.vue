@@ -52,7 +52,8 @@ export default {
     },
     description: {
       type: String,
-      required: true,
+      required: false,
+      default: '',
     },
     disabled: {
       type: Boolean,
@@ -97,7 +98,9 @@ export default {
   <gl-form-group :label-for="field">
     <template #label>
       {{ label }}
-      <gl-form-text class="gl-mt-3">{{ description }}</gl-form-text>
+      <gl-form-text v-if="description" class="gl-mt-3" data-testid="dropdown-input-description">{{
+        description
+      }}</gl-form-text>
     </template>
 
     <gl-dropdown :id="field" :text="text" :disabled="disabled">
