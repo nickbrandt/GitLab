@@ -46,12 +46,12 @@ export default {
           shift,
           timelineWidth,
           presetType,
+          shiftDLSOffset:
+            new Date(shift.startsAt).getTimezoneOffset() -
+            new Date(shift.endsAt).getTimezoneOffset(),
         }),
       };
     },
-  },
-  shiftOffset() {
-    return (this.shiftStartsAt.getTimezoneOffset() - this.shiftEndsAt.getTimezoneOffset()) / 60;
   },
 };
 </script>

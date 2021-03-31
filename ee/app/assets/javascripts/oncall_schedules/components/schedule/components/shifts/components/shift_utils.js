@@ -1,6 +1,12 @@
 import { PRESET_TYPES } from 'ee/oncall_schedules/constants';
 
 /**
+ *
+ * @param {Object} input data
+ */
+export const milliseconds = ({ h = 0, m = 0, s = 0 }) => (h * 60 * 60 + m * 60 + s) * 1000;
+
+/**
  * @param {IncidentManagementOncallShift} shift
  * @return {Number} start date in milliseconds
  */
@@ -58,9 +64,10 @@ export const getPixelOffset = ({ timeframe, shift, timelineWidth, presetType }) 
  *
  * @param {Object} input data
  */
-export const getPixelWidth = ({ shift, timelineWidth, presetType }) => {
+export const getPixelWidth = ({ shift, timelineWidth, presetType, shiftDLSOffset }) => {
   const totalTime = getTotalTime(presetType);
   const durationMillis = getDuration(shift);
+  const DLS = milliseconds({ m: shiftDLSOffset });
   // shift width (px) = shift time (ms) * total width (px) / total time (ms)
-  return (durationMillis * timelineWidth) / totalTime;
+  return ((durationMillis + DLS) * timelineWidth) / totalTime;
 };
