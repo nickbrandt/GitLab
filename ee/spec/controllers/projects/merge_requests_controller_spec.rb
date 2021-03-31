@@ -68,7 +68,7 @@ RSpec.describe Projects::MergeRequestsController do
     end
 
     before do
-      project.update(approvals_before_merge: 2)
+      project.update!(approvals_before_merge: 2)
     end
 
     def update_merge_request(params = {})
@@ -173,7 +173,7 @@ RSpec.describe Projects::MergeRequestsController do
 
     shared_examples 'approvals_before_merge param' do
       before do
-        project.update(approvals_before_merge: 2)
+        project.update!(approvals_before_merge: 2)
       end
 
       context 'approvals_before_merge not set for the existing MR' do
@@ -314,7 +314,7 @@ RSpec.describe Projects::MergeRequestsController do
 
         before do
           project.add_developer(user)
-          project.update(approvals_before_merge: 0)
+          project.update!(approvals_before_merge: 0)
         end
 
         it_behaves_like 'approvals_before_merge param'
