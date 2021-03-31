@@ -1,5 +1,12 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 13.10.1 (2021-03-31)
+
+### Security (1 change)
+
+- Escape HTML on scoped labels tooltip.
+
+
 ## 13.10.0 (2021-03-22)
 
 ### Removed (1 change)
