@@ -5,7 +5,6 @@ import axios from '~/lib/utils/axios_utils';
 import { __ } from '~/locale';
 
 import AuthorToken from '~/vue_shared/components/filtered_search_bar/tokens/author_token.vue';
-import EmojiToken from '~/vue_shared/components/filtered_search_bar/tokens/emoji_token.vue';
 import LabelToken from '~/vue_shared/components/filtered_search_bar/tokens/label_token.vue';
 import MilestoneToken from '~/vue_shared/components/filtered_search_bar/tokens/milestone_token.vue';
 
@@ -15,7 +14,7 @@ export default {
   inject: ['groupFullPath', 'groupMilestonesPath'],
   computed: {
     urlParams() {
-      const { search, authorUsername, labelName, milestoneTitle, confidential, myReactionEmoji } =
+      const { search, authorUsername, labelName, milestoneTitle, confidential } =
         this.filterParams || {};
 
       return {
@@ -28,14 +27,13 @@ export default {
         'label_name[]': labelName,
         milestone_title: milestoneTitle,
         confidential,
-        my_reaction_emoji: myReactionEmoji,
         search,
       };
     },
   },
   methods: {
     getFilteredSearchTokens() {
-      const tokens = [
+      return [
         {
           type: 'author_username',
           icon: 'user',
@@ -105,35 +103,9 @@ export default {
           ],
         },
       ];
-
-      if (gon.current_user_id) {
-        // Appending to tokens only when logged-in
-        tokens.push({
-          type: 'my_reaction_emoji',
-          icon: 'thumb-up',
-          title: __('My-Reaction'),
-          unique: true,
-          token: EmojiToken,
-          operators: FilterTokenOperators,
-          fetchEmojis: (search = '') => {
-            return axios
-              .get(`${gon.relative_url_root || ''}/-/autocomplete/award_emojis`)
-              .then(({ data }) => {
-                if (search) {
-                  return {
-                    data: data.filter((e) => e.name.toLowerCase().includes(search.toLowerCase())),
-                  };
-                }
-                return { data };
-              });
-          },
-        });
-      }
-
-      return tokens;
     },
     getFilteredSearchValue() {
-      const { authorUsername, labelName, milestoneTitle, confidential, myReactionEmoji, search } =
+      const { authorUsername, labelName, milestoneTitle, confidential, search } =
         this.filterParams || {};
       const filteredSearchValue = [];
 
@@ -167,13 +139,6 @@ export default {
         });
       }
 
-      if (myReactionEmoji) {
-        filteredSearchValue.push({
-          type: 'my_reaction_emoji',
-          value: { data: myReactionEmoji },
-        });
-      }
-
       if (search) {
         filteredSearchValue.push(search);
       }
@@ -198,9 +163,6 @@ export default {
             break;
           case 'confidential':
             filterParams.confidential = filter.value.data;
-            break;
-          case 'my_reaction_emoji':
-            filterParams.myReactionEmoji = filter.value.data;
             break;
           case 'filtered-search-term':
             if (filter.value.data) plainText.push(filter.value.data);
