@@ -17,6 +17,8 @@ module Gitlab
       EPIC_START_DATE_SET_AS_INHERITED = 'g_project_management_users_setting_epic_start_date_as_inherited'
       EPIC_DUE_DATE_SET_AS_FIXED = 'g_project_management_users_setting_epic_due_date_as_fixed'
       EPIC_DUE_DATE_SET_AS_INHERITED = 'g_project_management_users_setting_epic_due_date_as_inherited'
+      EPIC_FIXED_START_DATE_UPDATED = 'g_project_management_users_updating_fixed_epic_start_date'
+      EPIC_FIXED_DUE_DATE_UPDATED = 'g_project_management_users_updating_fixed_epic_due_date'
       EPIC_ISSUE_ADDED = 'g_project_management_epic_issue_added'
       EPIC_CLOSED = 'g_project_management_epic_closed'
       EPIC_REOPENED = 'g_project_management_epic_reopened'
@@ -60,6 +62,14 @@ module Gitlab
 
         def track_epic_due_date_set_as_inherited_action(author:)
           track_unique_action(EPIC_DUE_DATE_SET_AS_INHERITED, author)
+        end
+
+        def track_epic_fixed_start_date_updated_action(author:)
+          track_unique_action(EPIC_FIXED_START_DATE_UPDATED, author)
+        end
+
+        def track_epic_fixed_due_date_updated_action(author:)
+          track_unique_action(EPIC_FIXED_DUE_DATE_UPDATED, author)
         end
 
         def track_epic_issue_added(author:)
