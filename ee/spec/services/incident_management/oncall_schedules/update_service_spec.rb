@@ -6,7 +6,7 @@ RSpec.describe IncidentManagement::OncallSchedules::UpdateService do
   let_it_be(:user_with_permissions) { create(:user) }
   let_it_be(:user_without_permissions) { create(:user) }
   let_it_be_with_refind(:project) { create(:project) }
-  let_it_be_with_reload(:oncall_schedule) { create(:incident_management_oncall_schedule, project: project) }
+  let_it_be_with_reload(:oncall_schedule) { create(:incident_management_oncall_schedule, :utc, project: project) }
 
   let(:current_user) { user_with_permissions }
   let(:params) { { name: 'Updated name', description: 'Updated description', timezone: 'America/New_York' } }
@@ -81,9 +81,10 @@ RSpec.describe IncidentManagement::OncallSchedules::UpdateService do
 
         let_it_be_with_reload(:oncall_rotation) { create(:incident_management_oncall_rotation, :with_active_period, schedule: oncall_schedule) }
 
+        # This expects the active periods are updated according to the date above (22nd March, 2021 in the new timezone).
         it 'updates the rotation active periods with new timezone' do
-          expect { execute }.to change { time_from_time_column(oncall_rotation.reload.active_period_start) }.from('08:00').to('03:00')
-           .and change { time_from_time_column(oncall_rotation.active_period_end) }.from('17:00').to('12:00')
+          expect { execute }.to change { time_from_time_column(oncall_rotation.reload.active_period_start) }.from('08:00').to('04:00')
+           .and change { time_from_time_column(oncall_rotation.active_period_end) }.from('17:00').to('13:00')
         end
 
         context 'error updating' do

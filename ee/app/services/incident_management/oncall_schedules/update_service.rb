@@ -41,8 +41,8 @@ module IncidentManagement
             rotation,
             user,
             {
-              active_period_start: new_rotation_active_period(rotation.active_period_start).strftime('%H:%M'),
-              active_period_end: new_rotation_active_period(rotation.active_period_end).strftime('%H:%M')
+              active_period_start: new_rotation_active_period(rotation.active_period_start),
+              active_period_end: new_rotation_active_period(rotation.active_period_end)
             }
           )
 
@@ -52,8 +52,12 @@ module IncidentManagement
         end
       end
 
-      def new_rotation_active_period(time_string)
-        time_string.in_time_zone(original_schedule_timezone).in_time_zone(oncall_schedule.timezone)
+      def new_rotation_active_period(existing_time)
+        existing_timezone_time = Time.find_zone!(original_schedule_timezone)
+                                  .now
+                                  .change(hour: existing_time.hour, min: existing_time.min)
+
+        existing_timezone_time.in_time_zone(oncall_schedule.timezone).strftime('%H:%M')
       end
 
       def error_no_permissions
