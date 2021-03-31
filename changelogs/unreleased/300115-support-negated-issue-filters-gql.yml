@@ -1,0 +1,5 @@
+---
+title: Support negated filtering by iids, label_name, milestone_title, assignee_username, assignee_usernames and assignee_id in IssueResolvers, GQL API
+merge_request: 58154
+author:
+type: added

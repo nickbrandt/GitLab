@@ -1,0 +1,5 @@
+---
+title: Support negated filtering by epic_id  and weight in IssueResolvers, GQL API
+merge_request: 58154
+author:
+type: added
