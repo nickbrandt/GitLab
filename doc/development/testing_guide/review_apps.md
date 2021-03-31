@@ -154,7 +154,7 @@ due to this [known issue on GitLab Runner Kubernetes executor](https://gitlab.co
 ### Helm
 
 The Helm version used is defined in the
-[`registry.gitlab.com/gitlab-org/gitlab-build-images:gitlab-helm3-kubectl1.14` image](https://gitlab.com/gitlab-org/gitlab-build-images/-/blob/master/Dockerfile.gitlab-helm3-kubectl1.14#L7)
+[`registry.gitlab.com/gitlab-org/gitlab-build-images:gitlab-helm3.5-kubectl1.17` image](https://gitlab.com/gitlab-org/gitlab-build-images/-/blob/master/Dockerfile.gitlab-helm3.5-kubectl1.17#L6)
 used by the `review-deploy` and `review-stop` jobs.
 
 ## How to
