@@ -283,14 +283,19 @@ RSpec.describe Gitlab::SidekiqLogging::StructuredLogger do
         end_payload.merge(timing_data.stringify_keys)
       end
 
-      it 'logs with Gitaly and Rugged timing data' do
+      before do
+        allow(::Gitlab::InstrumentationHelper).to receive(:add_instrumentation_data).and_wrap_original do |method, values|
+          method.call(values)
+          values.merge!(timing_data)
+        end
+      end
+
+      it 'logs with Gitaly and Rugged timing data', :aggregate_failures do
         Timecop.freeze(timestamp) do
           expect(logger).to receive(:info).with(start_payload).ordered
           expect(logger).to receive(:info).with(expected_end_payload).ordered
 
-          call_subject(job, 'test_queue') do
-            job.merge!(timing_data)
-          end
+          call_subject(job, 'test_queue') { }
         end
       end
     end
