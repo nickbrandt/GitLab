@@ -376,6 +376,7 @@ Returns [`VulnerabilityConnection`](#vulnerabilityconnection).
 | `projectId` | [`[ID!]`](#id) | Filter vulnerabilities by project. |
 | `reportType` | [`[VulnerabilityReportType!]`](#vulnerabilityreporttype) | Filter vulnerabilities by report type. |
 | `scanner` | [`[String!]`](#string) | Filter vulnerabilities by VulnerabilityScanner.externalId. |
+| `scannerId` | [`[Int!]`](#int) | Filter vulnerabilities by scanner ID. |
 | `severity` | [`[VulnerabilitySeverity!]`](#vulnerabilityseverity) | Filter vulnerabilities by severity. |
 | `sort` | [`VulnerabilitySort`](#vulnerabilitysort) | List vulnerabilities by sort order. |
 | `state` | [`[VulnerabilityState!]`](#vulnerabilitystate) | Filter vulnerabilities by state. |
