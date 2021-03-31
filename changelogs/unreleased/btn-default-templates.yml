@@ -1,5 +1,5 @@
 ---
 title: Add btn-default class for toggle button in admin templates
-merge_request:
+merge_request: 58041
 author: Yogi (@yo)
 type: changed
