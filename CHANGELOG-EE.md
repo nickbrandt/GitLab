@@ -351,6 +351,13 @@ Please view this file on the master branch, on stable branches it's out of date.
 - Review UI text - repo push rules settings. !52797
 
 
+## 13.8.7 (2021-03-31)
+
+### Security (1 change)
+
+- Escape HTML on scoped labels tooltip.
+
+
 ## 13.8.6 (2021-03-17)
 
 - No changes.
