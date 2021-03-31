@@ -13529,7 +13529,13 @@ msgstr ""
 msgid "For each job, re-use the project workspace. If the workspace doesn't exist, use %{code_open}git clone%{code_close}."
 msgstr ""
 
+msgid "For general work"
+msgstr ""
+
 msgid "For individual use, create a separate account under your personal email address, not tied to the Enterprise email domain or group."
+msgstr ""
+
+msgid "For investigating IT service disruptions or outages"
 msgstr ""
 
 msgid "For more info, read the documentation."
@@ -17199,6 +17205,9 @@ msgid "Issue published on status page."
 msgstr ""
 
 msgid "Issue title"
+msgstr ""
+
+msgid "Issue types"
 msgstr ""
 
 msgid "Issue update failed"
