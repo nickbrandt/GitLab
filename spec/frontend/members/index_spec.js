@@ -1,5 +1,4 @@
 import { createWrapper } from '@vue/test-utils';
-import { extendedWrapper } from 'helpers/vue_test_utils_helper';
 import MembersApp from '~/members/components/app.vue';
 import { initMembersApp } from '~/members/index';
 import { membersJsonString, members } from './mock_data';
@@ -17,7 +16,7 @@ describe('initMembersApp', () => {
       requestFormatter: () => ({}),
       filteredSearchBar: { show: false },
     });
-    wrapper = extendedWrapper(createWrapper(vm));
+    wrapper = createWrapper(vm);
   };
 
   beforeEach(() => {
@@ -41,33 +40,6 @@ describe('initMembersApp', () => {
     setup();
 
     expect(wrapper.find(MembersApp).exists()).toBe(true);
-  });
-
-  it('sets `currentUserId` in provide/inject', () => {
-    setup();
-
-    expect(vm.$options.provide().currentUserId).toBe(123);
-  });
-
-  describe('when `gon.current_user_id` is not set (user is not logged in)', () => {
-    it('sets `currentUserId` as `null` in provide/inject', () => {
-      window.gon = {};
-      setup();
-
-      expect(vm.$options.provide().currentUserId).toBeNull();
-    });
-  });
-
-  it('parses and sets `data-source-id` as `sourceId` in provide/inject', () => {
-    setup();
-
-    expect(vm.$options.provide().sourceId).toBe(234);
-  });
-
-  it('parses and sets `data-can-manage-members` as `canManageMembers` in Vuex store', () => {
-    setup();
-
-    expect(vm.$options.provide().canManageMembers).toBe(true);
   });
 
   it('parses and sets `members` in Vuex store', () => {
