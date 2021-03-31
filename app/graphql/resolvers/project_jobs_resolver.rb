@@ -2,15 +2,18 @@
 
 module Resolvers
   class ProjectJobsResolver < BaseResolver
+    include Gitlab::Graphql::Authorize::AuthorizeResource
     include LooksAhead
 
     type ::Types::Ci::JobType.connection_type, null: true
-
-    alias_method :project, :object
+    authorize :read_build
+    authorizes_object!
 
     argument :statuses, [::Types::Ci::JobStatusEnum],
               required: false,
               description: 'Filter jobs by status.'
+
+    alias_method :project, :object
 
     def ready?(**args)
       context[self.class] ||= { executions: 0 }
@@ -29,10 +32,10 @@ module Resolvers
     private
 
     def preloads
-      [
-        { artifacts: :job_artifacts },
-        { pipeline: :user }
-      ]
+      {
+        artifacts: [:job_artifacts],
+        pipeline: [:user]
+      }
     end
   end
 end

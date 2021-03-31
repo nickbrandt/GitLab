@@ -186,10 +186,8 @@ module Types
     field :jobs,
          Types::Ci::JobType.connection_type,
          null: true,
-         description: 'Jobs of a project, only jobs of a single project can be requested at a time.',
-         extras: [:lookahead],
-         resolver: Resolvers::ProjectJobsResolver,
-         authorize: :read_build
+         description: 'Jobs of a single project.',
+         resolver: Resolvers::ProjectJobsResolver
 
     field :pipelines,
           null: true,

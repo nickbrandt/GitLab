@@ -21,7 +21,7 @@ RSpec.describe Resolvers::ProjectJobsResolver do
 
   describe '#resolve' do
     context 'with statuses argument' do
-      let(:args) { { statuses: [Types::Ci::JobStatusEnum.values['SUCCESS'].value] } }
+      let(:args) { { statuses: [Types::Ci::JobStatusEnum.coerce_isolated_input('SUCCESS')] } }
 
       it { is_expected.to contain_exactly(build_one, build_two) }
     end
