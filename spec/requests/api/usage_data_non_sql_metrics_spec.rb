@@ -27,7 +27,7 @@ RSpec.describe API::UsageDataNonSqlMetrics do
         expect(json_response['counts']).to be_a(Hash)
       end
 
-      it 'returns forbidden is user is not admin' do
+      it 'returns forbidden if user is not admin' do
         get api(endpoint, user)
 
         expect(response).to have_gitlab_http_status(:forbidden)
