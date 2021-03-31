@@ -7,14 +7,15 @@ type: reference, api
 
 # UsageData API
 
+This API for [Usage Ping](../development/usage_ping/index.md) is only available to
+GitLab instance [Administrator](../user/permissions.md) users.
+
 ## UsageDataQueries API
 
 > - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/57016) in GitLab 13.11.
 > - It's [deployed behind a feature flag](../user/feature_flags.md), disabled by default.
 
-Only available to GitLab instance Admin users.
-
-Get all the raw sql queries used to compute usage ping.
+Get all the raw SQL queries used to compute usage ping.
 
 Example request:
 
