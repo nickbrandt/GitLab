@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
 module Mutations
-  module Security
+  module AppSec
     module CiConfiguration
       class ConfigureDependencyScanning < BaseMutation
         include FindsProject
 
-        graphql_name 'ConfigureDependencyScannig'
+        graphql_name 'ConfigureDependencyScanning'
 
         argument :project_path, GraphQL::ID_TYPE,
                  required: true,
