@@ -23297,6 +23297,9 @@ msgstr ""
 msgid "Prevent users from modifying MR approval rules in projects and merge requests."
 msgstr ""
 
+msgid "Prevent users from modifying MR approval rules."
+msgstr ""
+
 msgid "Prevent users from performing write operations on GitLab while performing maintenance."
 msgstr ""
 
