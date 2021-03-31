@@ -34818,6 +34818,12 @@ msgstr ""
 msgid "You can create a new one or check them in your %{pat_link_start}personal access tokens%{pat_link_end} settings"
 msgstr ""
 
+msgid "You can create a new one or check them in your %{ssh_key_link_start}SSH keys%{ssh_key_link_end} settings."
+msgstr ""
+
+msgid "You can create a new one or check them in your SSH keys settings %{ssh_key_link}."
+msgstr ""
+
 msgid "You can create a new one or check them in your personal access tokens settings %{pat_link}"
 msgstr ""
 
@@ -35313,10 +35319,16 @@ msgstr ""
 msgid "Your Public Email will be displayed on your public profile."
 msgstr ""
 
+msgid "Your SSH key has expired"
+msgstr ""
+
 msgid "Your SSH key was deleted"
 msgstr ""
 
 msgid "Your SSH keys (%{count})"
+msgstr ""
+
+msgid "Your SSH keys with the following fingerprints has expired:"
 msgstr ""
 
 msgid "Your To-Do List"
