@@ -89,5 +89,3 @@ class SystemHooksService
     builder_class.new(model).build(event)
   end
 end
-
-SystemHooksService.prepend_if_ee('EE::SystemHooksService')
