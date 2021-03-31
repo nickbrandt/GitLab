@@ -94,7 +94,7 @@ RSpec.describe Gitlab::SidekiqMiddleware::InstrumentationLogger do
     it 'merges correct instrumentation data in the job' do
       expect { |b| subject.call(worker, job, queue, &b) }.to yield_control
 
-      expected_values = instrumentation_values.except(:unknown_attribute).stringify_keys
+      expected_values = instrumentation_values.except(:unknown_attribute)
 
       expect(job[:instrumentation]).to eq(expected_values)
     end

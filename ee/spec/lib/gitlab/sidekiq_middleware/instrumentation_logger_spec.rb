@@ -3,7 +3,6 @@
 require 'spec_helper'
 
 RSpec.describe Gitlab::SidekiqMiddleware::InstrumentationLogger do
-
   describe '.keys' do
     it 'contains load balancer keys' do
       expected_keys = [

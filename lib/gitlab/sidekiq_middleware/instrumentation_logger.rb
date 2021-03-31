@@ -39,7 +39,6 @@ module Gitlab
         job[:instrumentation] = {}.tap do |instrumentation_values|
           ::Gitlab::InstrumentationHelper.add_instrumentation_data(instrumentation_values)
           instrumentation_values.slice!(*self.class.keys)
-          instrumentation_values.stringify_keys!
         end
       end
     end
