@@ -58,12 +58,13 @@ RSpec.describe ComplianceManagement::ComplianceFramework::GroupSettingsHelper do
       end
 
       it 'returns the correct data' do
-        expect(helper.compliance_frameworks_list_data(group)).to contain_exactly(
-         [:empty_state_svg_path, ActionController::Base.helpers.image_path('illustrations/welcome/ee_trial.svg')],
-         [:group_path, group.root_ancestor.full_path],
-         [:add_framework_path, new_group_compliance_framework_path(group)],
-         [:edit_framework_path, edit_group_compliance_framework_path(group, :id)]
-       )
+        expect(helper.compliance_frameworks_list_data(group))
+          .to contain_exactly(
+            [:empty_state_svg_path, ActionController::Base.helpers.image_path('illustrations/welcome/ee_trial.svg')],
+            [:group_path, group.root_ancestor.full_path],
+            [:add_framework_path, new_group_compliance_framework_path(group)],
+            [:edit_framework_path, edit_group_compliance_framework_path(group, :id)]
+          )
       end
     end
 
@@ -73,10 +74,7 @@ RSpec.describe ComplianceManagement::ComplianceFramework::GroupSettingsHelper do
       end
 
       it 'returns the correct data' do
-        expect(helper.compliance_frameworks_list_data(group)).to contain_exactly(
-         [:empty_state_svg_path, ActionController::Base.helpers.image_path('illustrations/welcome/ee_trial.svg')],
-         [:group_path, group.root_ancestor.full_path]
-       )
+        expect(helper.compliance_frameworks_list_data(group)).to contain_exactly([:empty_state_svg_path, ActionController::Base.helpers.image_path('illustrations/welcome/ee_trial.svg')], [:group_path, group.root_ancestor.full_path])
       end
     end
   end

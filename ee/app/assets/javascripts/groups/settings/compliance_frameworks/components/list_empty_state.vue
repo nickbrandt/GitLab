@@ -14,8 +14,8 @@ export default {
     addFrameworkPath: {
       type: String,
       required: false,
-      default: null
-    }
+      default: null,
+    },
   },
   i18n: {
     heading: s__('ComplianceFrameworks|There are no compliance frameworks set up yet'),

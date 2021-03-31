@@ -11,7 +11,6 @@ import ListItem from 'ee/groups/settings/compliance_frameworks/components/list_i
 import { PIPELINE_CONFIGURATION_PATH_FORMAT } from 'ee/groups/settings/compliance_frameworks/constants';
 import getComplianceFrameworkQuery from 'ee/groups/settings/compliance_frameworks/graphql/queries/get_compliance_framework.query.graphql';
 import createMockApollo from 'helpers/mock_apollo_helper';
-import { extendedWrapper } from 'helpers/vue_test_utils_helper';
 import waitForPromises from 'helpers/wait_for_promises';
 import { validFetchResponse, emptyFetchResponse } from '../mock_data';
 
@@ -35,22 +34,6 @@ describe('List', () => {
   const findAddBtn = () => wrapper.findComponent(GlButton);
   const findTabsContainer = () => wrapper.findComponent(GlTabs);
   const findListItems = () => wrapper.findAllComponents(ListItem);
-  const createComponent = (props = {}) => {
-    wrapper = extendedWrapper(
-      shallowMount(List, {
-        localVue,
-        propsData: {
-          ...props,
-          emptyStateSvgPath: 'dir/image.svg',
-          groupPath: 'group-1',
-        },
-        stubs: {
-          GlLoadingIcon,
-          GlTab,
-          GlTabs,
-        },
-      })
-    )};
 
   function createMockApolloProvider(resolverMock) {
     localVue.use(VueApollo);
@@ -60,7 +43,7 @@ describe('List', () => {
     return createMockApollo(requestHandlers);
   }
 
-  function createComponentWithApollo(resolverMock) {
+  function createComponentWithApollo(resolverMock, props = {}) {
     return shallowMount(List, {
       localVue,
       apolloProvider: createMockApolloProvider(resolverMock),
@@ -69,6 +52,7 @@ describe('List', () => {
         editFrameworkPath: 'group/framework/id/edit',
         emptyStateSvgPath: 'dir/image.svg',
         groupPath: 'group-1',
+        ...props,
       },
       stubs: {
         GlLoadingIcon,
@@ -149,16 +133,6 @@ describe('List', () => {
     });
   });
 
-  describe('contentWithoutManagePermission', () => {
-    beforeEach(() => {
-      createComponent({ addFrameworkPath: null, editFrameworkPath: null });
-    });
-
-    it('does not show the add framework button', () => {
-      expect(findAddBtn().exists()).toBe(false);
-    });
-  });
-
   describe('content', () => {
     beforeEach(() => {
       wrapper = createComponentWithApollo(fetch);
@@ -218,6 +192,19 @@ describe('List', () => {
 
     it('renders the delete modal', () => {
       expect(findDeleteModal().exists()).toBe(true);
+    });
+
+    describe('when no paths are provided', () => {
+      beforeEach(() => {
+        wrapper = createComponentWithApollo(fetch, {
+          addFrameworkPath: null,
+          editFrameworkPath: null,
+        });
+      });
+
+      it('does not show the add framework button', () => {
+        expect(findAddBtn().exists()).toBe(false);
+      });
     });
   });
 

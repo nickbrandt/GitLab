@@ -12,19 +12,19 @@ module ComplianceManagement
       end
 
       def compliance_frameworks_list_data(group)
-        o = {
+        data = {
           empty_state_svg_path: image_path('illustrations/welcome/ee_trial.svg'),
           group_path: group.root_ancestor.full_path
         }
 
         if manage_compliance_frameworks?(group)
-          o.merge!(
+          data.merge!(
             add_framework_path: new_group_compliance_framework_path(group),
             edit_framework_path: edit_group_compliance_framework_path(group, :id)
           )
         end
 
-        o
+        data
       end
 
       def compliance_frameworks_form_data(group, framework_id = nil)
