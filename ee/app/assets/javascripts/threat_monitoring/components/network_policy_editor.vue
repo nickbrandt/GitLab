@@ -36,7 +36,7 @@ export default {
     },
   },
   methods: {
-    notifyAboutUpdates(val) {
+    onInput(val) {
       this.$emit('input', val);
     },
   },
@@ -44,10 +44,5 @@ export default {
 </script>
 
 <template>
-  <editor-lite
-    :value="value"
-    file-name="*.yaml"
-    :editor-options="editorOptions"
-    @input="notifyAboutUpdates"
-  />
+  <editor-lite :value="value" file-name="*.yaml" :editor-options="editorOptions" @input="onInput" />
 </template>
