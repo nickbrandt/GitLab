@@ -97,7 +97,7 @@ class Projects::PipelinesController < Projects::ApplicationController
     Gitlab::QueryLimiting.disable!('https://gitlab.com/gitlab-org/gitlab/-/issues/26657')
 
     respond_to do |format|
-      format.html
+      format.html { render_show }
       format.json do
         Gitlab::PollingInterval.set_header(response, interval: POLLING_INTERVAL)
 
@@ -187,10 +187,7 @@ class Projects::PipelinesController < Projects::ApplicationController
 
   def test_report
     respond_to do |format|
-      format.html do
-        render 'show'
-      end
-
+      format.html { render_show }
       format.json do
         render json: TestReportSerializer
           .new(current_user: @current_user)
@@ -219,6 +216,8 @@ class Projects::PipelinesController < Projects::ApplicationController
   end
 
   def render_show
+    @stages = @pipeline.stages.with_latest_and_retried_statuses
+
     respond_to do |format|
       format.html do
         render 'show'

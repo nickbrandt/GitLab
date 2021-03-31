@@ -376,6 +376,7 @@ Returns [`VulnerabilityConnection`](#vulnerabilityconnection).
 | `projectId` | [`[ID!]`](#id) | Filter vulnerabilities by project. |
 | `reportType` | [`[VulnerabilityReportType!]`](#vulnerabilityreporttype) | Filter vulnerabilities by report type. |
 | `scanner` | [`[String!]`](#string) | Filter vulnerabilities by VulnerabilityScanner.externalId. |
+| `scannerId` | [`[Int!]`](#int) | Filter vulnerabilities by scanner ID. |
 | `severity` | [`[VulnerabilitySeverity!]`](#vulnerabilityseverity) | Filter vulnerabilities by severity. |
 | `sort` | [`VulnerabilitySort`](#vulnerabilitysort) | List vulnerabilities by sort order. |
 | `state` | [`[VulnerabilityState!]`](#vulnerabilitystate) | Filter vulnerabilities by state. |
@@ -4745,7 +4746,7 @@ An edge in a connection.
 | `alertManagementIntegrations` | [`AlertManagementIntegrationConnection`](#alertmanagementintegrationconnection) | Integrations which can receive alerts for the project. |
 | `alertManagementPayloadFields` | [`[AlertManagementPayloadAlertField!]`](#alertmanagementpayloadalertfield) | Extract alert fields from payload for custom mapping. |
 | `allowMergeOnSkippedPipeline` | [`Boolean`](#boolean) | If `only_allow_merge_if_pipeline_succeeds` is true, indicates if merge requests of the project can also be merged with skipped jobs. |
-| `apiFuzzingCiConfiguration` | [`ApiFuzzingCiConfiguration`](#apifuzzingciconfiguration) | API fuzzing configuration for the project. Null unless feature flag `api_fuzzing_configuration_ui` is enabled. |
+| `apiFuzzingCiConfiguration` | [`ApiFuzzingCiConfiguration`](#apifuzzingciconfiguration) | API fuzzing configuration for the project. |
 | `archived` | [`Boolean`](#boolean) | Indicates the archived status of the project. |
 | `autocloseReferencedIssues` | [`Boolean`](#boolean) | Indicates if issues referenced by merge requests and commits within the default branch are closed automatically. |
 | `avatarUrl` | [`String`](#string) | URL to avatar image file of the project. |
