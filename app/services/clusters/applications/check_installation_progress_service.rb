@@ -19,9 +19,9 @@ module Clusters
 
       def check_timeout
         if timed_out?
-          begin
+          
             app.make_errored!("Operation timed out. Check pod logs for #{pod_name} for more details.")
-          end
+          
         else
           ClusterWaitForAppInstallationWorker.perform_in(
             ClusterWaitForAppInstallationWorker::INTERVAL, app.name, app.id)
