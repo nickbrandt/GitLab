@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import { updateActiveTabContent } from '~/lib/utils/tabs_utils';
 
 const mountVueTabs = ({
   rootSelector,
@@ -11,20 +12,15 @@ const mountVueTabs = ({
     return null;
   }
 
+  const theme = window.gon?.user_application_theme;
+
   return new Vue({
     el,
     render: (h) =>
       h(component, {
+        props: { theme },
         on: {
-          input: (current) => {
-            document.querySelectorAll(contentSelector).forEach((tab, index) => {
-              if (current === index) {
-                tab.classList.add('active');
-              } else {
-                tab.classList.remove('active');
-              }
-            });
-          },
+          input: (current) => updateActiveTabContent(contentSelector, current),
         },
       }),
   });

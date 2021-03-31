@@ -21,7 +21,7 @@
         = _('Projects that belong to a group are prefixed with the group namespace. Existing projects may be moved into a group.')
 
     .col-lg-9.js-toggle-container
-      .js-group-tabs
+      #js-groups-tabs
       .tab-content.gitlab-tab-content.gl-border-none
         .tab-pane.js-toggle-container{ id: 'create-group-pane', class: active_when(active_tab == 'create'), role: 'tabpanel' }
           = form_for @group, html: { class: 'group-form gl-show-field-errors' } do |f|

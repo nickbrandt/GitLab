@@ -6,11 +6,18 @@ export default {
     GlTabs,
     GlTab,
   },
+  props: {
+    theme: {
+      type: String,
+      required: false,
+      default: 'indigo',
+    },
+  },
 };
 </script>
 
 <template>
-  <gl-tabs content-class="gl-display-none" justified v-on="$listeners">
+  <gl-tabs content-class="gl-display-none" :theme="theme" justified v-on="$listeners">
     <gl-tab no-body>
       <template #title>
         <span class="d-none d-sm-block">{{ s__('GroupsNew|Create group') }}</span>

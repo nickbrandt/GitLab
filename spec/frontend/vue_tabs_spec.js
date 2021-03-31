@@ -1,9 +1,9 @@
 import initVueTabs from '~/vue_tabs';
 
 const createComponent = (className) => {
-  const div = document.createElement('div');
-  div.classList += className;
-  document.body.appendChild(div);
+  const tabs = document.createElement('div');
+  tabs.classList += className;
+  document.body.appendChild(tabs);
 };
 
 describe('InitVueTab', () => {

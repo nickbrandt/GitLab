@@ -4,14 +4,9 @@ import GroupTabs from '~/pages/groups/new/group_tabs.vue';
 
 describe('GroupTabs', () => {
   let wrapper;
-  const spyClick = jest.fn();
 
-  const createComponent = () => {
-    wrapper = shallowMount(GroupTabs, {
-      listeners: {
-        click: spyClick,
-      },
-    });
+  const createComponent = (theme = undefined) => {
+    wrapper = shallowMount(GroupTabs, { propsData: { theme } });
   };
 
   afterEach(() => {
@@ -20,16 +15,18 @@ describe('GroupTabs', () => {
   });
 
   describe('default', () => {
-    beforeEach(() => createComponent());
-
-    it('renders tabs', () => {
+    it('renders tabs with default theme', () => {
+      const THEME = 'indigo';
+      createComponent();
       expect(wrapper.findComponent(GlTabs).exists()).toBe(true);
+      expect(wrapper.findComponent(GlTabs).props('theme')).toBe(THEME);
     });
 
-    // TODO fix
-    // it('emits click event when clicked', async () => {
-    //   wrapper.findComponent(GlTab).trigger('click');
-    //   expect(spyClick).toHaveBeenCalled();
-    // });
+    it('renders tabs with chosen theme', () => {
+      const THEME = 'blue';
+      createComponent(THEME);
+      expect(wrapper.findComponent(GlTabs).exists()).toBe(true);
+      expect(wrapper.findComponent(GlTabs).props('theme')).toBe(THEME);
+    });
   });
 });

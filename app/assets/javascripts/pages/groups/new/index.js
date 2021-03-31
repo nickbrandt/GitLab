@@ -14,7 +14,8 @@ initFilePickers();
 
 new Group(); // eslint-disable-line no-new
 
-initVueTabs({ rootSelector: '.js-group-tabs', component: GroupTabs });
+initVueTabs({ rootSelector: '#js-groups-tabs', component: GroupTabs });
+
 const CONTAINER_SELECTOR = '.group-edit-container .nav-tabs';
 const DEFAULT_ACTION = '#create-group-pane';
 // eslint-disable-next-line no-new
