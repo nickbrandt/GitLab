@@ -1,5 +1,5 @@
 ---
 title: Fixes rubocop offenses Style/RedundantSelfAssignment
-merge_request:
+merge_request: 57920
 author: Shubham Kumar (@imskr)
 type: fixed
