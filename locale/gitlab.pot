@@ -8726,6 +8726,12 @@ msgstr ""
 msgid "Could not load usage counts. Please refresh the page to try again."
 msgstr ""
 
+msgid "Could not remove %{user} from %{group}. Cannot remove last group owner."
+msgstr ""
+
+msgid "Could not remove %{user} from %{group}. User is not a group member."
+msgstr ""
+
 msgid "Could not remove the trigger."
 msgstr ""
 
@@ -33163,6 +33169,9 @@ msgid "User %{current_user_username} has started impersonating %{username}"
 msgstr ""
 
 msgid "User %{username} was successfully removed."
+msgstr ""
+
+msgid "User %{user} was removed from %{group}."
 msgstr ""
 
 msgid "User ID"
