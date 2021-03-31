@@ -71,14 +71,7 @@ RSpec.describe Gitlab::Database::LoadBalancing::HostList do
 
   describe '#manage_pool?' do
     before do
-      allow(Gitlab::Database)
-        .to receive(:create_connection_pool)
-        .and_return(
-          double(:connection),
-          double(:connection),
-          double(:connection),
-          double(:connection)
-        )
+      allow(Gitlab::Database).to receive(:create_connection_pool) { double(:connection) }
     end
 
     context 'when the testing pool belongs to one host of the host list' do
