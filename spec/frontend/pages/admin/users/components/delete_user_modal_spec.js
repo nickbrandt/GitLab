@@ -11,15 +11,15 @@ describe('User Operation confirmation modal', () => {
   let wrapper;
   let formSubmitSpy;
 
-  const findButton = (category) =>
+  const findButton = (variant, category) =>
     wrapper
       .findAll(GlButton)
-      .filter((w) => w.attributes('category') === category)
+      .filter((w) => w.attributes('variant') === variant && w.attributes('category') === category)
       .at(0);
   const findForm = () => wrapper.find('form');
   const findUsernameInput = () => wrapper.find(GlFormInput);
-  const findPrimaryButton = () => findButton('primary');
-  const findSecondaryButton = () => findButton('secondary');
+  const findPrimaryButton = () => findButton('danger', 'primary');
+  const findSecondaryButton = () => findButton('danger', 'secondary');
   const findAuthenticityToken = () => new FormData(findForm().element).get('authenticity_token');
   const getUsername = () => findUsernameInput().attributes('value');
   const getMethodParam = () => new FormData(findForm().element).get('_method');
