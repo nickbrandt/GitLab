@@ -623,9 +623,6 @@ msgstr ""
 msgid "%{label_for_message} unavailable"
 msgstr ""
 
-msgid "%{label_name} %{span_open}will be permanently deleted from %{subject_name}. This cannot be undone.%{span_close}"
-msgstr ""
-
 msgid "%{lets_encrypt_link_start}Let's Encrypt%{lets_encrypt_link_end} is a free, automated, and open certificate authority (CA), that give digital certificates in order to enable HTTPS (SSL/TLS) for websites."
 msgstr ""
 
@@ -10229,7 +10226,7 @@ msgstr ""
 msgid "Delete label"
 msgstr ""
 
-msgid "Delete label: %{label_name} ?"
+msgid "Delete label: %{labelName}"
 msgstr ""
 
 msgid "Delete pipeline"
