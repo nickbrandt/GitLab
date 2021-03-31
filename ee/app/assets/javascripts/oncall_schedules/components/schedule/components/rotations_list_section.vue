@@ -96,7 +96,11 @@ export default {
         :style="timelineStyles"
         data-testid="empty-timeline-cell"
       >
-        <current-day-indicator :preset-type="presetType" :timeframe-item="timeframe[0]" />
+        <current-day-indicator
+          :preset-type="presetType"
+          :timeframe-item="timeframe[0]"
+          :timeline-width="2"
+        />
       </span>
     </div>
     <div v-else>
@@ -137,11 +141,14 @@ export default {
           :style="timelineStyles"
           data-testid="timeline-cell"
         >
-          <current-day-indicator :preset-type="presetType" :timeframe-item="timeframe[0]" />
+          <current-day-indicator
+            :preset-type="presetType"
+            :timeframe-item="timeframe[0]"
+            :timeline-width="2"
+          />
           <schedule-shift-wrapper
             v-if="rotation.shifts"
             :preset-type="presetType"
-            :timeframe-item="timeframe[0]"
             :timeframe="timeframe"
             :rotation="rotation"
           />

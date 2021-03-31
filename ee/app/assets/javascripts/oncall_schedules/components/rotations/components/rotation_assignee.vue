@@ -77,7 +77,7 @@ export default {
 </script>
 
 <template>
-  <div class="gl-absolute gl-h-7 gl-mt-3 gl-px-1" :style="rotationAssigneeStyle">
+  <div class="gl-absolute gl-h-7 gl-mt-3 gl-pr-1" :style="rotationAssigneeStyle">
     <div
       :id="rotationAssigneeUniqueID"
       class="gl-h-6"

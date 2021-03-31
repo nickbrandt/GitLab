@@ -1,6 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
 import RotationsAssignee from 'ee/oncall_schedules/components/rotations/components/rotation_assignee.vue';
-import WeeksScheduleShift from 'ee/oncall_schedules/components/schedule/components/shifts/components/weeks_schedule_shift.vue';
+import ShiftItem from 'ee/oncall_schedules/components/schedule/components/shifts/components/shift_item.vue';
 import { PRESET_TYPES, DAYS_IN_WEEK } from 'ee/oncall_schedules/constants';
 import { nDaysAfter } from '~/lib/utils/datetime_utility';
 
@@ -23,15 +23,12 @@ describe('ee/oncall_schedules/components/schedule/components/shifts/components/w
   let wrapper;
 
   function createComponent({ props = {} } = {}) {
-    wrapper = shallowMount(WeeksScheduleShift, {
+    wrapper = shallowMount(ShiftItem, {
       propsData: {
         shift,
-        shiftIndex: 0,
-        timeframeItem,
         timeframe,
         presetType: PRESET_TYPES.WEEKS,
         timelineWidth: CELL_WIDTH,
-        rotationLength: { lengthUnit: 'DAYS' },
         ...props,
       },
     });

@@ -75,12 +75,12 @@ exports[`RotationsListSectionComponent when the timeframe includes today renders
         <span
           class="current-day-indicator"
           data-testid="current-day-indicator"
-          style="left: 29%;"
+          style="left: 14.285714285714286%;"
         />
          
         <div>
           <div
-            class="gl-absolute gl-h-7 gl-mt-3 gl-px-1"
+            class="gl-absolute gl-h-7 gl-mt-3 gl-pr-1"
             style="left: 0px; width: 0px;"
           >
             <div
@@ -120,7 +120,7 @@ exports[`RotationsListSectionComponent when the timeframe includes today renders
             </div>
           </div>
           <div
-            class="gl-absolute gl-h-7 gl-mt-3 gl-px-1"
+            class="gl-absolute gl-h-7 gl-mt-3 gl-pr-1"
             style="left: 0px; width: 0px;"
           >
             <div

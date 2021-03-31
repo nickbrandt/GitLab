@@ -11,14 +11,6 @@ export default {
       type: Object,
       required: true,
     },
-    shiftIndex: {
-      type: Number,
-      required: true,
-    },
-    timeframeItem: {
-      type: [Date, Object],
-      required: true,
-    },
     timeframe: {
       type: Array,
       required: true,
@@ -40,10 +32,6 @@ export default {
         width: `${width}px`,
       };
     },
-    shiftOffset() {
-      const { startsAt, endsAt } = this.shift;
-      return (new Date(startsAt).getTimezoneOffset() - new Date(endsAt).getTimezoneOffset()) / 60;
-    },
     shiftStyles() {
       const { timeframe, presetType, shift, timelineWidth } = this;
 
@@ -54,14 +42,16 @@ export default {
           timelineWidth,
           presetType,
         }),
-        width:
-          getPixelWidth({
-            shift,
-            timelineWidth,
-            presetType,
-          }) + this.shiftOffset,
+        width: getPixelWidth({
+          shift,
+          timelineWidth,
+          presetType,
+        }),
       };
     },
+  },
+  shiftOffset() {
+    return (this.shiftStartsAt.getTimezoneOffset() - this.shiftEndsAt.getTimezoneOffset()) / 60;
   },
 };
 </script>
