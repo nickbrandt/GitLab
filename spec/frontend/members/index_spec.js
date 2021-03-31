@@ -46,7 +46,7 @@ describe('initMembersApp', () => {
   it('sets `currentUserId` in provide/inject', () => {
     setup();
 
-    expect(wrapper.provided('currentUserId')).toBe(123);
+    expect(vm.$options.provide().currentUserId).toBe(123);
   });
 
   describe('when `gon.current_user_id` is not set (user is not logged in)', () => {
@@ -54,20 +54,20 @@ describe('initMembersApp', () => {
       window.gon = {};
       setup();
 
-      expect(wrapper.provided('currentUserId')).toBeNull();
+      expect(vm.$options.provide().currentUserId).toBeNull();
     });
   });
 
   it('parses and sets `data-source-id` as `sourceId` in provide/inject', () => {
     setup();
 
-    expect(wrapper.provided('sourceId')).toBe(234);
+    expect(vm.$options.provide().sourceId).toBe(234);
   });
 
   it('parses and sets `data-can-manage-members` as `canManageMembers` in Vuex store', () => {
     setup();
 
-    expect(wrapper.provided('canManageMembers')).toBe(true);
+    expect(vm.$options.provide().canManageMembers).toBe(true);
   });
 
   it('parses and sets `members` in Vuex store', () => {
