@@ -64,13 +64,13 @@ RSpec.describe Peek::Views::ActiveRecord, :request_store do
       end
 
       expect(subject.results).to match(
-        calls: 3,
+        calls: 4,
         summary: {
           "Cached" => 1,
           "In a transaction" => 1
         },
-        duration: '6000.00ms',
-        warnings: ["active-record duration: 6000.0 over 3000"],
+        duration: '10000.00ms',
+        warnings: ["active-record duration: 10000.0 over 3000"],
         details: contain_exactly(
           a_hash_including(
             start: be_a(Time),
@@ -123,15 +123,16 @@ RSpec.describe Peek::Views::ActiveRecord, :request_store do
       end
 
       expect(subject.results).to match(
-        calls: 3,
+        calls: 4,
         summary: {
           "Cached" => 1,
           "In a transaction" => 1,
           "Primary" => 2,
-          "Replica" => 1
+          "Replica" => 1,
+          "Unknown" => 1
         },
-        duration: '6000.00ms',
-        warnings: ["active-record duration: 6000.0 over 3000"],
+        duration: '10000.00ms',
+        warnings: ["active-record duration: 10000.0 over 3000"],
         details: contain_exactly(
           a_hash_including(
             start: be_a(Time),
