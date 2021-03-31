@@ -8,13 +8,13 @@ info: To determine the technical writer assigned to the Stage/Group associated w
 
 Notes are comments on:
 
-- Snippets
-- Issues
-- Merge requests
-- Epics **(PREMIUM)**
+- [Snippets](../user/snippets.md)
+- [Issues](../user/project/issues/index.md)
+- [Merge requests](../user/project/merge_requests/index.md)
+- [Epics](../user/group/epics/) **(PREMIUM)**
 
-This includes system notes, which are notes about changes to the object (for example, when an
-assignee changes, GitLab posts a system note).
+This includes system notes, which are notes about changes to the object. For example, when an
+assignee changes, GitLab posts a system note.
 
 ## Resource events
 
@@ -38,8 +38,12 @@ Read more on [pagination](README.md#pagination).
 
 ## Rate limits
 
-To help avoid abuse, you can limit your users to a specific number of `Create` request per minute.
+To help avoid abuse, you can limit your users to a specific number of `Create` requests per minute.
 See [Notes rate limits](../user/admin_area/settings/rate_limit_on_notes_creation.md).
+
+## Errors
+
+This API returns a `400 Bad Request` error for malformed queries it cannot interpret.
 
 ## Issues
 
