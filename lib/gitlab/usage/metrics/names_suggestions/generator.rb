@@ -48,6 +48,10 @@ module Gitlab
             end
 
             def name_suggestion(relation:, column: nil, prefix: nil, distinct: nil)
+              # rubocop: disable CodeReuse/ActiveRecord
+              relation = relation.unscope(where: :created_at)
+              # rubocop: enable CodeReuse/ActiveRecord
+
               parts = [prefix]
               arel_column = arelize_column(relation, column)
 
