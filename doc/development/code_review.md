@@ -409,6 +409,8 @@ When ready to merge:
 - **Start a new merge request pipeline with the `Run Pipeline` button in the merge
   request's "Pipelines" tab, and enable "Merge When Pipeline Succeeds" (MWPS).** Note that:
   - If **[master is broken](https://about.gitlab.com/handbook/engineering/workflow/#broken-master),
+    do not merge the merge request** except for
+    [very specific cases](https://about.gitlab.com/handbook/engineering/workflow/#criteria-for-merging-during-broken-master).
     For other cases, follow these [handbook instructions](https://about.gitlab.com/handbook/engineering/workflow/#merging-during-broken-master).
   - If the **latest [Pipeline for Merged Results](../ci/merge_request_pipelines/pipelines_for_merged_results/#pipelines-for-merged-results)** finished less than 2 hours ago, you
     might merge without starting a new pipeline as the merge request is close
