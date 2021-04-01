@@ -2076,6 +2076,9 @@ msgstr ""
 msgid "Additional text"
 msgstr ""
 
+msgid "Address"
+msgstr ""
+
 msgid "Adds"
 msgstr ""
 
@@ -6429,10 +6432,37 @@ msgstr ""
 msgid "CloudLicense|Activate"
 msgstr ""
 
+msgid "CloudLicense|ID"
+msgstr ""
+
+msgid "CloudLicense|Last Sync"
+msgstr ""
+
+msgid "CloudLicense|Licensed to"
+msgstr ""
+
+msgid "CloudLicense|Manage"
+msgstr ""
+
 msgid "CloudLicense|Paste your activation code"
 msgstr ""
 
 msgid "CloudLicense|Paste your activation code below"
+msgstr ""
+
+msgid "CloudLicense|Plan"
+msgstr ""
+
+msgid "CloudLicense|Renews"
+msgstr ""
+
+msgid "CloudLicense|Started"
+msgstr ""
+
+msgid "CloudLicense|Subscription details"
+msgstr ""
+
+msgid "CloudLicense|Sync Subscription details"
 msgstr ""
 
 msgid "CloudLicense|This instance is currently using the %{planName} plan."
@@ -7761,6 +7791,9 @@ msgid "Commit…"
 msgstr ""
 
 msgid "Community forum"
+msgstr ""
+
+msgid "Company"
 msgstr ""
 
 msgid "Company name"
