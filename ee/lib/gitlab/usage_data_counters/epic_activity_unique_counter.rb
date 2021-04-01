@@ -22,6 +22,7 @@ module Gitlab
       EPIC_ISSUE_ADDED = 'g_project_management_epic_issue_added'
       EPIC_CLOSED = 'g_project_management_epic_closed'
       EPIC_REOPENED = 'g_project_management_epic_reopened'
+      ISSUE_PROMOTED_TO_EPIC = 'g_project_management_issue_promoted_to_epic'
 
       class << self
         def track_epic_created_action(author:)
@@ -82,6 +83,10 @@ module Gitlab
 
         def track_epic_reopened_action(author:)
           track_unique_action(EPIC_REOPENED, author)
+        end
+
+        def track_issue_promoted_to_epic(author:)
+          track_unique_action(ISSUE_PROMOTED_TO_EPIC, author)
         end
 
         private
