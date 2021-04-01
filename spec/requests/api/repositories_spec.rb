@@ -332,7 +332,6 @@ RSpec.describe API::Repositories do
 
   describe 'GET /projects/:id/repository/compare' do
     let(:route) { "/projects/#{project.id}/repository/compare" }
-    let!(:public_project) { create(:project, :repository, :public) }
 
     shared_examples_for 'repository compare' do
       it "compares branches" do
@@ -394,6 +393,8 @@ RSpec.describe API::Repositories do
       end
 
       it "compare commits between different projects" do
+        public_project = create(:project, :repository, :public)
+
         get api(route, current_user), params: { from: sample_commit.parent_id, to: sample_commit.id, from_project_id: public_project.id }
 
         expect(response).to have_gitlab_http_status(:ok)
