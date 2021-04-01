@@ -384,10 +384,6 @@ RSpec/EmptyLineAfterFinalLetItBe:
   Exclude:
     - ee/spec/controllers/subscriptions_controller_spec.rb
     - ee/spec/features/ci_shared_runner_warnings_spec.rb
-    - ee/spec/features/groups/groups_security_credentials_spec.rb
-    - ee/spec/features/groups/hooks/user_edits_hooks_spec.rb
-    - ee/spec/features/groups/iterations/user_edits_iteration_spec.rb
-    - ee/spec/features/groups/usage_quotas_spec.rb
     - ee/spec/features/integrations/jira/jira_issues_list_spec.rb
     - ee/spec/features/issues/bulk_assignment_epic_spec.rb
     - ee/spec/features/issues/user_uses_quick_actions_spec.rb
