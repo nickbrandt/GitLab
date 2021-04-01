@@ -22,8 +22,8 @@ module Groups
       refresh_cache_over_threshold
     end
 
-    def refresh_cache_over_threshold(new_count = nil)
-      new_count ||= uncached_count
+    def refresh_cache_over_threshold
+      new_count = uncached_count
 
       if new_count > CACHED_COUNT_THRESHOLD
         update_cache_for_key(cache_key) { new_count }

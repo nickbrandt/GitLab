@@ -17,8 +17,8 @@ module Issuable
       set_update_params(type)
       updated_issuables = update_issuables(type, ids)
 
-      if !updated_issuables.empty? && requires_count_cache_refresh?(type)
-        schedule_group_count_refresh(type, updated_issuables)
+      if updated_issuables.present? && requires_count_cache_refresh?(type)
+        schedule_group_issues_count_refresh(updated_issuables)
       end
 
       response_success(payload: { count: updated_issuables.size })
@@ -90,11 +90,11 @@ module Issuable
       type.to_sym == :issue && params.include?(:state_event)
     end
 
-    def schedule_group_count_refresh(issuable_type, updated_issuables)
-      group_ids = updated_issuables.map(&:project).map { |project| project.group&.id }.uniq
-      return unless group_ids.any?
+    def schedule_group_issues_count_refresh(updated_issuables)
+      group_ids = updated_issuables.map(&:project).map { |project| project.namespace_id }
+      return if group_ids.empty?
 
-      Issuables::RefreshGroupsCounterWorker.perform_async(issuable_type, current_user.id, group_ids)
+      Issuables::RefreshGroupsIssueCounterWorker.perform_async(current_user.id, group_ids)
     end
   end
 end

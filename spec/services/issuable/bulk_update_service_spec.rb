@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe Issuable::BulkUpdateService, :clean_gitlab_redis_cache do
+RSpec.describe Issuable::BulkUpdateService do
   let_it_be(:user)    { create(:user) }
   let_it_be(:project) { create(:project, :repository, namespace: user.namespace) }
 
@@ -101,6 +101,22 @@ RSpec.describe Issuable::BulkUpdateService, :clean_gitlab_redis_cache do
     end
   end
 
+  shared_examples 'scheduling cached group count refresh' do
+    it 'schedules worker' do
+      expect(Issuables::RefreshGroupsIssueCounterWorker).to receive(:perform_async)
+
+      bulk_update(issuables, params)
+    end
+  end
+
+  shared_examples 'not scheduling cached group count refresh' do
+    it 'does not schedule worker' do
+      expect(Issuables::RefreshGroupsIssueCounterWorker).not_to receive(:perform_async)
+
+      bulk_update(issuables, params)
+    end
+  end
+
   context 'with issuables at a project level' do
     let(:parent) { project }
 
@@ -131,6 +147,11 @@ RSpec.describe Issuable::BulkUpdateService, :clean_gitlab_redis_cache do
         expect(project.issues.opened).to be_empty
         expect(project.issues.closed).not_to be_empty
       end
+
+      it_behaves_like 'scheduling cached group count refresh' do
+        let(:issuables) { issues }
+        let(:params) { { state_event: 'close' } }
+      end
     end
 
     describe 'reopen issues' do
@@ -148,6 +169,11 @@ RSpec.describe Issuable::BulkUpdateService, :clean_gitlab_redis_cache do
 
         expect(project.issues.closed).to be_empty
         expect(project.issues.opened).not_to be_empty
+      end
+
+      it_behaves_like 'scheduling cached group count refresh' do
+        let(:issuables) { issues }
+        let(:params) { { state_event: 'reopen' } }
       end
     end
 
@@ -231,6 +257,10 @@ RSpec.describe Issuable::BulkUpdateService, :clean_gitlab_redis_cache do
       let(:milestone) { create(:milestone, project: project) }
 
       it_behaves_like 'updates milestones'
+
+      it_behaves_like 'not scheduling cached group count refresh' do
+        let(:params) { { milestone_id: milestone.id } }
+      end
     end
 
     describe 'updating labels' do
@@ -278,73 +308,6 @@ RSpec.describe Issuable::BulkUpdateService, :clean_gitlab_redis_cache do
 
         expect(issue1.reload.assignees).to eq([user])
         expect(issue2.reload.assignees).to be_empty
-      end
-    end
-
-    describe 'updating issuables cached count' do
-      shared_examples 'scheduling cached group count refresh' do
-        it 'schedules worker' do
-          expect(Issuables::RefreshGroupsCounterWorker).to receive(:perform_async)
-
-          bulk_update(issuables, params)
-        end
-      end
-
-      shared_examples 'not scheduling cached group count refresh' do
-        it 'does not schedule worker' do
-          expect(Issuables::RefreshGroupsCounterWorker).not_to receive(:perform_async)
-
-          bulk_update(issuables, params)
-        end
-      end
-
-      context 'when project belongs to a group' do
-        let_it_be(:group_project) { create(:project, :repository, group: create(:group)) }
-        let_it_be(:issues) { create_list(:issue, 2, :opened, project: group_project) }
-        let_it_be(:milestone) { create(:milestone, project: project) }
-        let(:parent) { group_project }
-        let(:issuables) { issues }
-
-        before do
-          group_project.add_reporter(user)
-        end
-
-        context 'when updating issues state' do
-          it_behaves_like 'scheduling cached group count refresh' do
-            let(:params) { { state_event: 'closed' } }
-          end
-
-          it_behaves_like 'scheduling cached group count refresh' do
-            let(:params) { { state_event: 'reopened' } }
-          end
-        end
-
-        context 'when state is not updated' do
-          it_behaves_like 'not scheduling cached group count refresh' do
-            let(:params) { { milestone_id: milestone.id } }
-          end
-        end
-
-        context 'when issuable type is not :issue' do
-          it_behaves_like 'not scheduling cached group count refresh' do
-            let(:params) { { state_event: 'closed' } }
-            let(:issuables) { [create(:merge_request, source_project: project, source_branch: 'branch-1')] }
-          end
-        end
-      end
-
-      context 'when project belongs to a user namespace' do
-        let(:issuables) { create_list(:issue, 2, :opened, project: project) }
-
-        context 'when updating issues state' do
-          it_behaves_like 'not scheduling cached group count refresh' do
-            let(:params) { { state_event: 'closed' } }
-          end
-
-          it_behaves_like 'not scheduling cached group count refresh' do
-            let(:params) { { state_event: 'reopened' } }
-          end
-        end
       end
     end
   end
