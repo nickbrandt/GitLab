@@ -7,6 +7,7 @@ RSpec.describe Mutations::DastScannerProfiles::Delete do
   let_it_be(:user) { create(:user) }
   let_it_be(:full_path) { project.full_path }
   let_it_be(:dast_scanner_profile) { create(:dast_scanner_profile, project: project) }
+
   let(:dast_scanner_profile_id) { dast_scanner_profile.to_global_id }
 
   subject(:mutation) { described_class.new(object: nil, context: { current_user: user }, field: nil) }
