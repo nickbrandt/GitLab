@@ -1036,7 +1036,7 @@ class User < ApplicationRecord
       [
         Project.where(namespace: namespace),
         Project.joins(:project_authorizations)
-          .where("projects.namespace_id <> ?", namespace.id)
+          .where.not('projects.namespace_id' => namespace.id)
           .where(project_authorizations: { user_id: id, access_level: Gitlab::Access::OWNER })
       ],
       remove_duplicates: false
