@@ -10484,9 +10484,6 @@ msgstr ""
 msgid "DeployTokens|Revoke"
 msgstr ""
 
-msgid "DeployTokens|Revoke %{b_start}%{name}%{b_end}?"
-msgstr ""
-
 msgid "DeployTokens|Revoke %{name}"
 msgstr ""
 
@@ -10512,9 +10509,6 @@ msgid "DeployTokens|Use this token as a password. Save it. This password can %{i
 msgstr ""
 
 msgid "DeployTokens|Username"
-msgstr ""
-
-msgid "DeployTokens|You are about to revoke %{b_start}%{name}%{b_end}."
 msgstr ""
 
 msgid "DeployTokens|Your new Deploy Token username"
