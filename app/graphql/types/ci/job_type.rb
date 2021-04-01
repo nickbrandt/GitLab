@@ -71,7 +71,7 @@ module Types
       end
 
       def tags
-        object.tags.map { |tag| tag.name } if object.is_a?(::Ci::Build)
+        object.tags.map(&:name) if object.is_a?(::Ci::Build)
       end
 
       def detailed_status
