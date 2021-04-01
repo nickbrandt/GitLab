@@ -3,7 +3,7 @@ import { GlLink, GlSprintf } from '@gitlab/ui';
 import { bodyWithFallBack } from 'ee/vue_shared/security_reports/components/helpers';
 import SeverityBadge from 'ee/vue_shared/security_reports/components/severity_badge.vue';
 import { SUPPORTING_MESSAGE_TYPES } from 'ee/vulnerabilities/constants';
-import { __ } from '~/locale';
+import { s__, __ } from '~/locale';
 import CodeBlock from '~/vue_shared/components/code_block.vue';
 import DetailItem from './detail_item.vue';
 import VulnerabilityDetailSection from './vulnerability_detail_section.vue';
@@ -165,6 +165,15 @@ export default {
         : '';
     },
   },
+  i18n: {
+    requestResponse: s__('Vulnerability|Request/Response'),
+    unmodifiedResponse: s__(
+      'Vulnerability|The unmodified response is the original response that had no mutations done to the request',
+    ),
+    actualResponse: s__(
+      'Vulnerability|Actual received response is the one received when this fault was detected',
+    ),
+  },
 };
 </script>
 
@@ -302,7 +311,7 @@ export default {
       v-if="hasRequest"
       data-testid="request"
       :list-data="requestData"
-      :heading="s__('Vulnerability|Request/Response')"
+      :heading="$options.i18n.requestResponse"
     />
 
     <div v-if="hasResponses" class="row">
@@ -311,11 +320,7 @@ export default {
         data-testid="recorded-response"
         :class="hasResponse ? 'col-6' : 'col'"
         :list-data="recordedResponseData"
-        :icon-title="
-          s__(
-            'Vulnerability|The unmodified response is the original response that had no mutations done to the request',
-          )
-        "
+        :icon-title="$options.i18n.unmodifiedResponse"
       />
 
       <vulnerability-detail-section
@@ -323,11 +328,7 @@ export default {
         data-testid="response"
         :class="hasRecordedResponse ? 'col-6' : 'col'"
         :list-data="responseData"
-        :icon-title="
-          s__(
-            'Vulnerability|Actual received response is the one received when this fault was detected',
-          )
-        "
+        :icon-title="$options.i18n.actualResponse"
       />
     </div>
 
