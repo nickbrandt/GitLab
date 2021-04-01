@@ -22,6 +22,7 @@ export default {
         lineNumbers: 'off',
         minimap: { enabled: false },
         folding: false,
+        // Investigate the necessity of `glyphMargin` with #326746
         glyphMargin: false,
         renderIndentGuides: false,
         renderWhitespace: 'boundary',
