@@ -803,6 +803,7 @@ Represents a project or group issue board.
 | Field | Type | Description |
 | ----- | ---- | ----------- |
 | `assignee` | [`User`](#user) | The board assignee. |
+| `createdAt` | [`Time!`](#time) | Timestamp of when the board was created. |
 | `epics` | [`BoardEpicConnection`](#boardepicconnection) | Epics associated with board issues. |
 | `hideBacklogList` | [`Boolean`](#boolean) | Whether or not backlog list is hidden. |
 | `hideClosedList` | [`Boolean`](#boolean) | Whether or not closed list is hidden. |
@@ -812,6 +813,7 @@ Represents a project or group issue board.
 | `lists` | [`BoardListConnection`](#boardlistconnection) | Lists of the board. |
 | `milestone` | [`Milestone`](#milestone) | The board milestone. |
 | `name` | [`String`](#string) | Name of the board. |
+| `updatedAt` | [`Time!`](#time) | Timestamp of when the board was last updated. |
 | `webPath` | [`String!`](#string) | Web path of the board. |
 | `webUrl` | [`String!`](#string) | Web URL of the board. |
 | `weight` | [`Int`](#int) | Weight of the board. |
