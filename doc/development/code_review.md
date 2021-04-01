@@ -252,7 +252,7 @@ After merging, a maintainer should stay as the reviewer listed on the merge requ
 
 ### Dogfooding the Reviewers feature
 
-In March 18th 2021, an updated process was put in place aimed at efficiently and consistently dogfooding the Reviewers feature.
+On March 18th 2021, an updated process was put in place aimed at efficiently and consistently dogfooding the Reviewers feature.
 
 Here is a summary of the changes, also reflected in this section above.
 
