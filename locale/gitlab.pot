@@ -8825,9 +8825,6 @@ msgstr ""
 msgid "Create new file or directory"
 msgstr ""
 
-msgid "Create new issue in Jira"
-msgstr ""
-
 msgid "Create new label"
 msgstr ""
 
