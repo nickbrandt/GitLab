@@ -29319,9 +29319,6 @@ msgstr ""
 msgid "Submit feedback"
 msgstr ""
 
-msgid "Submit issue"
-msgstr ""
-
 msgid "Submit review"
 msgstr ""
 

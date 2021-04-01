@@ -137,7 +137,7 @@ RSpec.describe 'epics swimlanes', :js do
 
       page.within(first('.board-new-issue-form')) do
         find('.form-control').set('bug')
-        click_button 'Submit issue'
+        click_button 'Create issue'
       end
 
       wait_for_all_requests
