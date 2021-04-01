@@ -40,7 +40,6 @@ RSpec.describe Gitlab::InstrumentationHelper do
       end
     end
 
-
     # We don't want to interact with Elasticsearch in GitLab FOSS so we test
     # this in ee/ only. The code exists in FOSS and won't do anything.
     context 'when Elasticsearch calls are made', :elastic do

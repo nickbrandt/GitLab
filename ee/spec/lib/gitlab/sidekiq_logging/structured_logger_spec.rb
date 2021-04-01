@@ -67,7 +67,6 @@ RSpec.describe Gitlab::SidekiqLogging::StructuredLogger do
       end
 
       context 'when load balancing is enabled' do
-
         let(:expected_end_payload_with_db) do
           expected_end_payload.merge(
             'db_duration_s' => a_value >= 0.1,

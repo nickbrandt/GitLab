@@ -85,4 +85,3 @@ RSpec.shared_context 'structured_logger' do
     end
   end
 end
-
