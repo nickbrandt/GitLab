@@ -5697,6 +5697,9 @@ msgstr ""
 msgid "Change this value to influence how frequently the GitLab UI polls for updates."
 msgstr ""
 
+msgid "Change this value to influence how frequently the GitLab UI polls for updates. If you set the value to 2 all polling intervals are multiplied by 2, which means that polling happens half as frequently. The multiplier can also have a decimal value. The default value (1) is a reasonable choice for the majority of GitLab installations. Set to 0 to completely disable polling."
+msgstr ""
+
 msgid "Change title"
 msgstr ""
 
@@ -23217,6 +23220,9 @@ msgid "Point to any links you like: documentation, built binaries, or other rela
 msgstr ""
 
 msgid "Policy project doesn't exist"
+msgstr ""
+
+msgid "Polling interval multiplier"
 msgstr ""
 
 msgid "Popularity"
