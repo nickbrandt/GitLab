@@ -6,6 +6,7 @@ module Gitlab
       module NamesSuggestions
         class Generator < ::Gitlab::UsageData
           FREE_TEXT_METRIC_NAME = "<please fill metric name>"
+          REDIS_EVENT_METRIC_NAME = "<please fill metric name, suggested format is: who_is_doing_what eg: users_creating_epics>"
           CONSTRAINTS_PROMPT_TEMPLATE = "<adjective describing: '%{constraints}'>"
 
           class << self
@@ -24,7 +25,7 @@ module Gitlab
             end
 
             def redis_usage_counter
-              FREE_TEXT_METRIC_NAME
+              REDIS_EVENT_METRIC_NAME
             end
 
             def alt_usage_data(*)
@@ -32,7 +33,7 @@ module Gitlab
             end
 
             def redis_usage_data_totals(counter)
-              counter.fallback_totals.transform_values { |_| FREE_TEXT_METRIC_NAME}
+              counter.fallback_totals.transform_values { |_| REDIS_EVENT_METRIC_NAME }
             end
 
             def sum(relation, column, *rest)

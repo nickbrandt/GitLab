@@ -89,7 +89,7 @@ RSpec.describe Gitlab::Usage::Metrics::NamesSuggestions::Generator do
       it_behaves_like 'name suggestion' do
         # corresponding metric is collected with redis_usage_data { unique_visit_service.unique_visits_for(targets: :analytics) }
         let(:key_path) { 'analytics_unique_visits.analytics_unique_visits_for_any_target' }
-        let(:name_suggestion) { /<please fill metric name>/ }
+        let(:name_suggestion) { /<please fill metric name, suggested format is: who_is_doing_what eg: users_creating_epics>/ }
       end
     end
 
