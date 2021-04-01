@@ -18,6 +18,8 @@ export const mockParentItem = {
   title: 'Some sample epic',
   reference: 'gitlab-org&1',
   type: 'Epic',
+  hasChildren: true,
+  hasIssues: true,
   userPermissions: {
     adminEpic: true,
     createEpic: true,
