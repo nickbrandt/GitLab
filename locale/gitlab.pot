@@ -3221,6 +3221,9 @@ msgstr ""
 msgid "Allowed email domain restriction only permitted for top-level groups"
 msgstr ""
 
+msgid "Allowed group"
+msgstr ""
+
 msgid "Allowed to create:"
 msgstr ""
 
@@ -11581,6 +11584,9 @@ msgid "Enable Spam Check via external API endpoint"
 msgstr ""
 
 msgid "Enable access to Grafana"
+msgstr ""
+
+msgid "Enable access to the Performance Bar"
 msgstr ""
 
 msgid "Enable access to the Performance Bar for a given group."
