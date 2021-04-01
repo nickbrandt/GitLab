@@ -1,0 +1,5 @@
+---
+title: Reduce query count in Milestones::DestroyService
+merge_request: 58387
+author:
+type: performance
