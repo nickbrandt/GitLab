@@ -22,6 +22,7 @@ import {
   EndpointMatchModeAny,
   RuleTypeEndpoint,
   ProjectIdLabel,
+  PARSING_ERROR_MESSAGE,
 } from './constants';
 import DimDisableContainer from './dim_disable_container.vue';
 import fromYaml from './lib/from_yaml';
@@ -36,6 +37,7 @@ import PolicyRuleBuilder from './policy_rule_builder.vue';
 export default {
   i18n: {
     toggleLabel: s__('NetworkPolicies|Policy status'),
+    PARSING_ERROR_MESSAGE,
   },
   components: {
     GlFormGroup,
@@ -165,7 +167,11 @@ export default {
       this.yamlEditorError = null;
 
       try {
-        Object.assign(this.policy, fromYaml(manifest));
+        const newPolicy = fromYaml(manifest);
+        if (newPolicy.error) {
+          throw new Error(newPolicy.error);
+        }
+        Object.assign(this.policy, newPolicy);
       } catch (error) {
         this.yamlEditorError = error;
       }
@@ -203,9 +209,6 @@ export default {
     { value: EditorModeRule, text: s__('NetworkPolicies|Rule mode') },
     { value: EditorModeYAML, text: s__('NetworkPolicies|.yaml mode') },
   ],
-  parsingErrorMessage: s__(
-    'NetworkPolicies|Rule mode is unavailable for this policy. In some cases, we cannot parse the YAML file back into the rules editor.',
-  ),
   deleteModal: {
     id: 'delete-modal',
     secondary: {
@@ -281,7 +284,7 @@ export default {
           class="gl-z-index-1"
           data-testid="parsing-alert"
           :dismissible="false"
-          >{{ $options.parsingErrorMessage }}</gl-alert
+          >{{ $options.i18n.PARSING_ERROR_MESSAGE }}</gl-alert
         >
 
         <dim-disable-container data-testid="rule-builder-container" :disabled="hasParsingError">

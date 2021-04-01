@@ -16,16 +16,18 @@ exports[`PolicyDrawer component renders policy preview tabs 1`] = `
     Network Policy
   </p>
    
-  <h5
-    class="gl-mt-6"
-  >
-    Description
-  </h5>
-   
-  <gl-form-textarea-stub
-    noresize="true"
-    value="test description"
-  />
+  <div>
+    <h5
+      class="gl-mt-6"
+    >
+      Description
+    </h5>
+     
+    <gl-form-textarea-stub
+      noresize="true"
+      value="test description"
+    />
+  </div>
    
   <policy-preview-stub
     class="gl-mt-4"

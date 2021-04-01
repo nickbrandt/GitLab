@@ -1,7 +1,11 @@
 <script>
 import { GlAlert, GlTabs, GlTab, GlSafeHtmlDirective } from '@gitlab/ui';
+import { PARSING_ERROR_MESSAGE } from './constants';
 
 export default {
+  i18n: {
+    PARSING_ERROR_MESSAGE,
+  },
   components: {
     GlAlert,
     GlTabs,
@@ -48,7 +52,7 @@ export default {
       ></div>
       <div v-else>
         <gl-alert variant="info" :dismissible="false"
-          >{{ s__('NetworkPolicies|Unsupported attribute') }}
+          >{{ $options.i18n.PARSING_ERROR_MESSAGE }}
         </gl-alert>
       </div>
     </gl-tab>

@@ -20790,9 +20790,6 @@ msgstr ""
 msgid "NetworkPolicies|Unable to parse policy"
 msgstr ""
 
-msgid "NetworkPolicies|Unsupported attribute"
-msgstr ""
-
 msgid "NetworkPolicies|YAML editor"
 msgstr ""
 
