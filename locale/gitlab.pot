@@ -1749,6 +1749,9 @@ msgstr ""
 msgid "Account: %{account}"
 msgstr ""
 
+msgid "Action"
+msgstr ""
+
 msgid "Action to take when receiving an alert. %{docsLink}"
 msgstr ""
 
@@ -25917,6 +25920,9 @@ msgstr ""
 msgid "Reported %{timeAgo} by %{reportedBy}"
 msgstr ""
 
+msgid "Reported by"
+msgstr ""
+
 msgid "Reported by %{reporter}"
 msgstr ""
 
@@ -30703,6 +30709,9 @@ msgid "There are no SSH keys associated with this account."
 msgstr ""
 
 msgid "There are no SSH keys with access to your account."
+msgstr ""
+
+msgid "There are no abuse reports!"
 msgstr ""
 
 msgid "There are no archived projects yet"
