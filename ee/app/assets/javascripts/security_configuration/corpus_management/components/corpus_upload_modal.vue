@@ -38,9 +38,17 @@ export default {
       this.$refs.fileUpload.click();
     },
     beginFileUpload() {
+      const uploadCallback = this.beginFileUpload;
+      // Simulate incrementing file upload progress
       this.$apollo.mutate({
         mutation: uploadCorpus,
         variables: { name: this.corpusName, projectPath: this.projectFullPath },
+      }).then(({data})=>{
+        if(data.uploadCorpus<100){
+          setTimeout(()=>{
+              uploadCallback();
+            },500)
+        }
       });
     },
     onFileUploadChange(e) {

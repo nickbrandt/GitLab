@@ -84,20 +84,11 @@ export default {
         const { uploadState }  = draftState;
         uploadState.isUploading = true;
         // Simulate incrementing file upload progress
-        if(uploadState.progress < 100){
-          
-          uploadState.progress += 25;
-          setTimeout(()=>{
-            debugger;
-            client.mutate({
-              mutation: uploadCorpus,
-              variables: { name: this.corpusName, projectPath: this.projectFullPath },
-            });
-          },500)
-        }
+        uploadState.progress += 25;
       });
 
       cache.writeQuery({ query: getCorpusesQuery, data, variables: { projectPath, ...cursor } });
+      return data.uploadState.progress;
     }
   },
 };
