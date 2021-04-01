@@ -11,10 +11,9 @@ export default {
 
 <template>
   <div
-    class="gl-mb-3 gl-bg-white gl-rounded-base gl-p-5"
-    style="border: 1px solid #dfdfdf; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); height: 110px"
+    class="board-card-skeleton gl-mb-3 gl-bg-white gl-rounded-base gl-p-5 gl-border-1 gl-border-solid gl-border-gray-50"
   >
-    <div style="width: 340px; height: 100px">
+    <div class="board-card-skeleton-inner">
       <gl-skeleton-loader :width="340" :height="100">
         <rect width="340" height="16" rx="4" />
         <rect y="30" width="118" height="16" rx="8" />
