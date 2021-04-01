@@ -231,6 +231,7 @@ RSpec.describe EE::NotificationService, :mailer do
   describe 'mirror was disabled' do
     let_it_be(:user) { create(:user) }
     let_it_be(:project) { create(:project) }
+
     let(:deleted_username) { 'deleted_user_name' }
 
     context 'when the project has invited members' do
