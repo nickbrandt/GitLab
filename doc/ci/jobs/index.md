@@ -138,10 +138,13 @@ usually want the first number to be the index and the second number to be the to
 
 [This regular expression](https://gitlab.com/gitlab-org/gitlab/blob/2f3dc314f42dbd79813e6251792853bc231e69dd/app/models/commit_status.rb#L99)
 evaluates the job names: `([\b\s:]+((\[.*\])|(\d+[\s:\/\\]+\d+)))+\s*\z`.
+One or more `: [...]`, `X Y`, `X/Y`, or `X\Y` sequences are removed from the **end**
+of job names only. Matching substrings found at the beginning or in the middle of
+job names are not removed.
 
-It removes one or more `: [...]`, `X Y`, `X/Y`, or `X\Y` sequences
-from the **end** of job names only. Matching substrings occurring
-at the beginning or in the middle of build names are not removed.
+In [GitLab 13.8 and earlier](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/52644),
+the regular expression is `\d+[\s:\/\\]+\d+\s*`. [Feature flag](../../user/feature_flags.md)
+removed in [GitLab 13.11](https://gitlab.com/gitlab-org/gitlab/-/issues/322080).
 
 ## Specifying variables when running manual jobs
 
