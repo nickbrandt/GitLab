@@ -124,10 +124,6 @@ describe('Manual Variables Form', () => {
       createComponent(requiredProps, mount);
     });
 
-    it('trigger button is not disabled on mount', () => {
-      expect(findTriggerBtn().props('disabled')).toBe(false);
-    });
-
     it('trigger button is disabled after trigger action', async () => {
       expect(findTriggerBtn().props('disabled')).toBe(false);
 
