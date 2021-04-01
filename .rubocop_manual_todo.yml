@@ -820,9 +820,6 @@ RSpec/EmptyLineAfterFinalLetItBe:
     - spec/lib/gitlab/git_access_project_spec.rb
     - spec/lib/gitlab/git_access_wiki_spec.rb
     - spec/lib/gitlab/gitaly_client/operation_service_spec.rb
-    - spec/lib/gitlab/github_import/importer/pull_request_merged_by_importer_spec.rb
-    - spec/lib/gitlab/github_import/importer/pull_request_review_importer_spec.rb
-    - spec/lib/gitlab/github_import/milestone_finder_spec.rb
     - spec/lib/gitlab/gl_repository/repo_type_spec.rb
     - spec/lib/gitlab/group_search_results_spec.rb
     - spec/lib/gitlab/hook_data/issue_builder_spec.rb
