@@ -10,7 +10,7 @@ module Gitlab
       token_to_use = token || project.import_data&.credentials&.fetch(:user)
       Client.new(
         token_to_use,
-        host: host.presence || self.formatted_import_url(project),
+        host: self.formatted_import_url(project),
         parallel: parallel
       )
     end
