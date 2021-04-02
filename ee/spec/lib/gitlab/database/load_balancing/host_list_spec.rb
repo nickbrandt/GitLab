@@ -93,7 +93,7 @@ RSpec.describe Gitlab::Database::LoadBalancing::HostList do
       end
     end
 
-    context 'when the testing bool belongs to a new host of the host list' do
+    context 'when the testing pool belongs to a new host of the host list' do
       it 'returns true' do
         host = Gitlab::Database::LoadBalancing::Host.new('foo', load_balancer)
         host_list.hosts = [host]
