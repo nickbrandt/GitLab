@@ -9,7 +9,7 @@ RSpec.describe Gitlab::HookData::UserBuilder do
     let(:data) { described_class.new(user).build(event) }
 
     context 'data for Gitlab.com' do
-      context 'contains email_opted_in_data attributes' do
+      context 'contains `email_opted_in` attributes' do
         let(:user) { create(:user, name: 'John Doe', username: 'johndoe', email: 'john@example.com') }
 
         before do
