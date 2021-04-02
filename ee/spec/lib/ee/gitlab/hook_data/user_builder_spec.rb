@@ -24,7 +24,7 @@ RSpec.describe Gitlab::HookData::UserBuilder do
 
           expect(data[:email_opted_in]).to eq('john@example.com')
           expect(data[:email_opted_in_ip]).to eq('192.168.1.1')
-          expect(data[:email_opted_in_source]).to eq('GitLab.com')
+          expect(data[:email_opted_in_source]).to eq('Gitlab.com')
           expect(data[:email_opted_in_at]).to eq('2021-03-31T10:30:58Z')
         end
       end

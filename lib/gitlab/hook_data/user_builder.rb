@@ -7,17 +7,13 @@ module Gitlab
 
       # Sample data
       # {
-      # :created_at=>"2021-03-31T10:48:24Z",
-      # :updated_at=>"2021-03-31T10:48:24Z",
+      # :created_at=>"2021-04-02T10:00:26Z",
+      # :updated_at=>"2021-04-02T10:00:26Z",
       # :event_name=>"user_create",
       # :name=>"John Doe",
       # :email=>"john@example.com",
-      # :user_id=>2,
-      # :username=>"johndoe",
-      # :email_opted_in=>"john@example.com",
-      # :email_opted_in_ip=>"192.168.1.1",
-      # :email_opted_in_source=>"GitLab.com",
-      # :email_opted_in_at=>"2021-03-31T10:30:58Z"
+      # :user_id=>1,
+      # :username=>"johndoe"
       # }
 
       def build(event)

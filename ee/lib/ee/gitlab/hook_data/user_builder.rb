@@ -5,6 +5,21 @@ module EE
       module UserBuilder
         extend ::Gitlab::Utils::Override
 
+        # Sample data
+        # {
+        # :created_at=>"2021-04-02T09:56:49Z",
+        # :updated_at=>"2021-04-02T09:56:49Z",
+        # :event_name=>"user_create",
+        # :name=>"John Doe",
+        # :email=>"john@example.com",
+        # :user_id=>2,
+        # :username=>"johndoe",
+        # :email_opted_in=>"john@example.com",
+        # :email_opted_in_ip=>"192.168.1.1",
+        # :email_opted_in_source=>"Gitlab.com",
+        # :email_opted_in_at=>"2021-03-31T10:30:58Z"
+        # }
+
         private
 
         override :user_data
