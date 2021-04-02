@@ -16,7 +16,7 @@ RSpec.describe Gitlab::HookData::UserBuilder do
           expect(Gitlab).to receive(:com?).and_return(true)
         end
 
-        it 'returns correct email_opted_in_data' do
+        it 'returns correct email_opted_in data' do
           allow(user).to receive(:email_opted_in).and_return(user.email)
           allow(user).to receive(:email_opted_in_ip).and_return('192.168.1.1')
           allow(user).to receive(:email_opted_in_source).and_return('Gitlab.com')
