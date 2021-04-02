@@ -3,6 +3,7 @@ import { GlForm, GlFormInput, GlFormInputGroup, GlButton, GlIcon } from '@gitlab
 import { s__, __ } from '~/locale';
 import { VALID_CORPUS_MIMETYPE } from '../constants';
 import uploadCorpus from '../graphql/mutations/upload_corpus.mutation.graphql';
+import getCorpusesQuery from '../graphql/queries/get_corpuses.query.graphql';
 
 export default {
   components: {
@@ -19,15 +20,39 @@ export default {
   },
   props: {
   },
+  apollo: {
+    states: {
+      query: getCorpusesQuery,
+      variables() {
+        return {
+          projectPath: this.projectFullPath,
+          ...this.cursor,
+        };
+      },
+      update: (data) => {
+        return data;
+      },
+      error() {
+        this.states = null;
+      },
+    },
+  },  
   computed: {
     hasAttachment() {
       return Boolean(this.attachmentName);
-    }
+    },
+    isUploading() {
+      let foo = this.states;
+      debugger
+    },
+    isUploaded() {
+      let foo = this.states;
+      debugger;
+    },
   },
   data() {
     return {
       isStagedForUpload: false,
-      isUploading: false,
       attachmentName: '',
       corpusName: '',
       files: [],
@@ -112,7 +137,7 @@ export default {
       <span>{{ this.$options.i18n.uploadMessage }}</span>
 
       <gl-button 
-        v-if="hasAttachment" variant="success"
+        v-if="hasAttachment && !isUploading" variant="success"
         @click="beginFileUpload"
       >
         {{ __('Upload file') }}

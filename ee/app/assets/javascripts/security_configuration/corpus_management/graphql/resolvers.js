@@ -67,7 +67,6 @@ export default {
       cache.writeQuery({ query: getCorpusesQuery, data, variables: { projectPath, ...cursor } });
     },
     uploadCorpus: (_, { name, projectPath }, {cache, client}) => {
-      debugger;
       const cursor = {
         first: 25,
         after: null,
@@ -85,6 +84,11 @@ export default {
         uploadState.isUploading = true;
         // Simulate incrementing file upload progress
         uploadState.progress += 25;
+
+        if(uploadState.progress>=100){
+          uploadState.isUploading = false;
+        }
+
       });
 
       cache.writeQuery({ query: getCorpusesQuery, data, variables: { projectPath, ...cursor } });
