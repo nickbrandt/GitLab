@@ -79,6 +79,7 @@ module Gitlab
         def load_from_file(path)
           definition = File.read(path)
           definition = YAML.safe_load(definition)
+
           definition.deep_symbolize_keys!
 
           self.new(path, definition).tap(&:validate!)

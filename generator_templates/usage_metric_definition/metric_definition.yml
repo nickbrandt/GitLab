@@ -12,6 +12,7 @@ milestone: "<%= milestone %>"
 introduced_by_url:
 time_frame: <%= time_frame %>
 data_source:
+instrumentation_class: <%= instrumentation_class %>
 distribution:
 <%= distribution %>
 # Add here corresponding tiers
