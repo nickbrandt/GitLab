@@ -68,11 +68,12 @@ RSpec.shared_examples 'a Geo framework registry' do
   describe '.fail_sync_timeouts' do
     it 'marks started records as failed if they are expired' do
       record1 = create(registry_class_factory, :started, last_synced_at: 9.hours.ago)
-      create(registry_class_factory, :started, last_synced_at: 1.hour.ago) # not yet expired
+      record2 = create(registry_class_factory, :started, last_synced_at: 1.hour.ago) # not yet expired
 
       described_class.fail_sync_timeouts
 
       expect(record1.reload.state).to eq described_class::STATE_VALUES[:failed]
+      expect(record2.reload.state).to eq described_class::STATE_VALUES[:started]
     end
   end
 end
