@@ -6,7 +6,7 @@ module Gitlab
       module NamesSuggestions
         class Generator < ::Gitlab::UsageData
           FREE_TEXT_METRIC_NAME = "<please fill metric name>"
-          REDIS_EVENT_METRIC_NAME = "<please fill metric name, suggested format is: who_is_doing_what eg: users_creating_epics>"
+          REDIS_EVENT_METRIC_NAME = "<please fill metric name, suggested format is: {subject}_{verb}{ing|ed}_{object} eg: users_creating_epics or merge_requests_viewed_in_single_file_mode>"
           CONSTRAINTS_PROMPT_TEMPLATE = "<adjective describing: '%{constraints}'>"
 
           class << self
