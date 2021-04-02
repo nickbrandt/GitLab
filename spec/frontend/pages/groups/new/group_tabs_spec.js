@@ -16,17 +16,17 @@ describe('GroupTabs', () => {
 
   describe('default', () => {
     it('renders tabs with default theme', () => {
-      const THEME = 'indigo';
+      const theme = 'indigo';
       createComponent();
       expect(wrapper.findComponent(GlTabs).exists()).toBe(true);
-      expect(wrapper.findComponent(GlTabs).props('theme')).toBe(THEME);
+      expect(wrapper.findComponent(GlTabs).props('theme')).toBe(theme);
     });
 
     it('renders tabs with chosen theme', () => {
-      const THEME = 'blue';
-      createComponent(THEME);
+      const theme = 'blue';
+      createComponent(theme);
       expect(wrapper.findComponent(GlTabs).exists()).toBe(true);
-      expect(wrapper.findComponent(GlTabs).props('theme')).toBe(THEME);
+      expect(wrapper.findComponent(GlTabs).props('theme')).toBe(theme);
     });
   });
 });

@@ -18,7 +18,7 @@ const mountVueTabs = ({
     el,
     render: (h) =>
       h(component, {
-        props: { theme },
+        attrs: { theme },
         on: {
           input: (current) => updateActiveTabContent(contentSelector, current),
         },

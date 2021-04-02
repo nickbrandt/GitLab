@@ -7,6 +7,15 @@ const addContent = (customClass) => {
   div.classList += `${secondContentSelector} ${customClass}`;
   return div;
 };
+const findTabPanes = () => document.querySelectorAll('.gitlab-tab-content .tab-pane');
+const findTabPaneAt = (index) => [...findTabPanes()][index];
+
+const expectNoClassActive = (tabPane) => {
+  expect(tabPane.className).not.toContain('active');
+};
+const expectClassActive = (tabPane) => {
+  expect(tabPane.className).toContain('active');
+};
 
 const createComponent = (additionalClass) => {
   const tabContent = document.createElement('div');
@@ -23,54 +32,32 @@ afterEach(() => {
 describe('updateActiveTabContent', () => {
   it("adds the 'active' class to the selected tab's content", async () => {
     createComponent();
-    expect(
-      [...document.querySelectorAll('.gitlab-tab-content .tab-pane')][0].className,
-    ).not.toContain('active');
+    expectNoClassActive(findTabPaneAt(0));
     updateActiveTabContent('.gitlab-tab-content .tab-pane', 0);
-    expect([...document.querySelectorAll('.gitlab-tab-content .tab-pane')][0].className).toContain(
-      'active',
-    );
+    expectClassActive(findTabPaneAt(0));
   });
 
   it("removes the 'active' class to the unselected tab's content", async () => {
     createComponent('active');
-    expect([...document.querySelectorAll('.gitlab-tab-content .tab-pane')][0].className).toContain(
-      'active',
-    );
+    expectClassActive(findTabPaneAt(0));
     updateActiveTabContent('.gitlab-tab-content .tab-pane', 1);
-    expect(
-      [...document.querySelectorAll('.gitlab-tab-content .tab-pane')][0].className,
-    ).not.toContain('active');
-    expect([...document.querySelectorAll('.gitlab-tab-content .tab-pane')][1].className).toContain(
-      'active',
-    );
+    expectNoClassActive(findTabPaneAt(0));
+    expectClassActive(findTabPaneAt(1));
   });
 
   it('does not update any classes if the current content is reselected', async () => {
     createComponent('active');
-    expect([...document.querySelectorAll('.gitlab-tab-content .tab-pane')][0].className).toContain(
-      'active',
-    );
+    expectClassActive(findTabPaneAt(0));
     updateActiveTabContent('.gitlab-tab-content .tab-pane', 0);
-    expect([...document.querySelectorAll('.gitlab-tab-content .tab-pane')][0].className).toContain(
-      'active',
-    );
-    expect(
-      [...document.querySelectorAll('.gitlab-tab-content .tab-pane')][1].className,
-    ).not.toContain('active');
+    expectClassActive(findTabPaneAt(0));
+    expectNoClassActive(findTabPaneAt(1));
   });
 
   it('does not update any classes if the index is greater than the number of nodes', async () => {
     createComponent('active');
-    expect([...document.querySelectorAll('.gitlab-tab-content .tab-pane')][0].className).toContain(
-      'active',
-    );
+    expectClassActive(findTabPaneAt(0));
     updateActiveTabContent('.gitlab-tab-content .tab-pane', 2);
-    expect([...document.querySelectorAll('.gitlab-tab-content .tab-pane')][0].className).toContain(
-      'active',
-    );
-    expect(
-      [...document.querySelectorAll('.gitlab-tab-content .tab-pane')][1].className,
-    ).not.toContain('active');
+    expectClassActive(findTabPaneAt(0));
+    expectNoClassActive(findTabPaneAt(1));
   });
 });

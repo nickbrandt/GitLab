@@ -6,28 +6,25 @@ export default {
     GlTabs,
     GlTab,
   },
-  props: {
-    theme: {
-      type: String,
-      required: false,
-      default: 'indigo',
-    },
-  },
 };
 </script>
 
 <template>
-  <gl-tabs content-class="gl-display-none" :theme="theme" justified v-on="$listeners">
+  <gl-tabs content-class="gl-display-none" v-bind="$attrs" justified v-on="$listeners">
     <gl-tab no-body>
       <template #title>
-        <span class="d-none d-sm-block">{{ s__('GroupsNew|Create group') }}</span>
-        <span class="d-block d-sm-none">{{ s__('GroupsNew|Create') }}</span>
+        <span class="gl-display-none gl-sm-display-block!">{{
+          s__('GroupsNew|Create group')
+        }}</span>
+        <span class="gl-display-block gl-sm-display-none!">{{ s__('GroupsNew|Create') }}</span>
       </template>
     </gl-tab>
     <gl-tab no-body>
       <template #title>
-        <span class="d-none d-sm-block">{{ s__('GroupsNew|Import group') }}</span>
-        <span class="d-block d-sm-none">{{ s__('GroupsNew|Import') }}</span>
+        <span class="gl-display-none gl-sm-display-block!">{{
+          s__('GroupsNew|Import group')
+        }}</span>
+        <span class="gl-display-block gl-sm-display-none!">{{ s__('GroupsNew|Import') }}</span>
       </template>
     </gl-tab>
   </gl-tabs>
