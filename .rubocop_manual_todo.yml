@@ -354,8 +354,6 @@ Rails/SaveBang:
     - 'spec/requests/api/jobs_spec.rb'
     - 'spec/requests/api/labels_spec.rb'
     - 'spec/requests/api/project_import_spec.rb'
-    - 'spec/requests/projects/cycle_analytics_events_spec.rb'
-    - 'spec/requests/users_controller_spec.rb'
 
 Rails/TimeZone:
   Enabled: true
