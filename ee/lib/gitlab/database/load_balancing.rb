@@ -143,7 +143,8 @@ module Gitlab
 
       DB_ROLES = [
         ROLE_PRIMARY = :primary,
-        ROLE_REPLICA = :replica
+        ROLE_REPLICA = :replica,
+        ROLE_UNKNOWN = :unknown
       ].freeze
 
       # Returns the role (primary/replica) of the database the connection is

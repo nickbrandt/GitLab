@@ -11,7 +11,8 @@ module EE
           detail = super
 
           if ::Gitlab::Database::LoadBalancing.enable?
-            role = ::Gitlab::Database::LoadBalancing.db_role_for_connection(data[:connection]) || :unknown
+            role = ::Gitlab::Database::LoadBalancing.db_role_for_connection(data[:connection]) ||
+              ::Gitlab::Database::LoadBalancing::ROLE_UNKNOWN
             detail[:db_role] = role.to_s.capitalize
           end
 
