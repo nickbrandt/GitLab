@@ -3,6 +3,7 @@
 require 'spec_helper'
 
 RSpec.describe Gitlab::GithubImport do
+  include ImportSpecHelper
   context 'github.com' do
     let(:project) { double(:project, import_url: 'http://t0ken@github.com/user/repo.git') }
 
@@ -69,6 +70,15 @@ RSpec.describe Gitlab::GithubImport do
       described_class.new_client_for(project)
     end
 
+    it 'returns a new Client when GitHub omniauth is enabled' do
+      stub_omniauth_provider('github')
+      expect(described_class::Client)
+        .to receive(:new)
+        .with('123', host: 'http://github.another-domain.com/api/v3', parallel: true)
+
+      described_class.new_client_for(project, token: '123')
+    end
+
     it 'returns the ID of the ghost user', :clean_gitlab_redis_cache do
       expect(described_class.ghost_user_id).to eq(User.ghost.id)
     end
@@ -82,10 +92,6 @@ RSpec.describe Gitlab::GithubImport do
       2.times do
         described_class.ghost_user_id
       end
-    end
-
-    it 'formats the import url' do
-      expect(described_class.formatted_import_url(project)).to eq('http://github.another-domain.com/api/v3')
     end
   end
 end

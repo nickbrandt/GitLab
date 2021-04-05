@@ -22,7 +22,7 @@ before/after the brackets. Also, some shells (for example, `zsh`) can interpret 
 If the GitHub [rate limit](https://docs.github.com/en/rest/reference/rate-limit) is reached while
 importing, the importing process waits (`sleep()`) until it can continue importing.
 
-## Importing multiple projects
+## Importing multiple repositories
 
 To import a project from the list of your GitHub projects available:
 
@@ -34,18 +34,48 @@ sudo gitlab-rake "import:github[access_token,root,foo/bar]"
 bundle exec rake "import:github[access_token,root,foo/bar]" RAILS_ENV=production
 ```
 
-In this case, `access_token` is your GitHub personal access token, `root`
-is your GitLab username, and `foo/bar` is the new GitLab namespace/project
-created from your GitHub project. Subgroups are also possible: `foo/foo/bar`.
+For these commands:
 
-## Importing a single project
+- `access_token` is your GitHub personal access token.
+- `root` is your GitLab username.
+- `foo/bar` is the new GitLab namespace/project created from your GitHub project.
+  - Subgroups are also possible: `foo/foo/bar`.
+
+## Importing a single repository
 
 To import a specific GitHub project (named `foo/github_repo` here):
 
 ```shell
 # Omnibus installations
-sudo gitlab-rake "import:github[access_token,root,foo/bar,foo/github_repo]"
+sudo gitlab-rake "import:github[access_token,root,foo/bar,,foo/github_repo]"
 
 # Installations from source
-bundle exec rake "import:github[access_token,root,foo/bar,foo/github_repo]" RAILS_ENV=production
+bundle exec rake "import:github[access_token,root,foo/bar,,foo/github_repo]" RAILS_ENV=production
 ```
+
+For these commands:
+
+- `access_token` is your GitHub personal access token.
+- `root` is your GitLab username.
+- `foo/bar` is the new GitLab namespace/project created from your GitHub project.
+  - Subgroups are also possible: `foo/foo/bar`.
+- `foo/github_repo` is the GitHub repository path
+
+## Importing from GitHub Enterprise
+
+To import repositories from GitHub Enterprise, you will need to provide the URL to the GitHub Enterprise instance.
+
+```shell
+# Omnibus installations
+sudo gitlab-rake "import:github[access_token,root,foo/bar,https://github.company.com,foo/github_repo]"
+
+# Installations from source
+bundle exec rake "import:github[access_token,root,foo/bar,https://github.company.com,foo/github_repo]" RAILS_ENV=production
+```
+
+For these commands:
+
+- `access_token` is your GitHub personal access token.
+- `root` is your GitLab username.
+- `foo/bar` is the new GitLab namespace/project created from your GitHub project.
+- `https://github.company.com` is the URL to the GitHub Enterprise instance.

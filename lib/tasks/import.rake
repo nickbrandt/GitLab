@@ -8,8 +8,9 @@ class GithubImport
     new(*args).run!
   end
 
-  def initialize(token, gitlab_username, project_path, extras)
-    @options = { token: token }
+  def initialize(token, gitlab_username, project_path, host, extras)
+    host = host.present? ? host : nil
+    @options = { token: token, host: host }
     @project_path = project_path
     @current_user = UserFinder.new(gitlab_username).find_by_username
 
@@ -20,7 +21,7 @@ class GithubImport
 
   def run!
     @repo = GithubRepos
-      .new(@options[:token], @current_user, @github_repo)
+      .new(@options[:token], @options[:host], @current_user, @github_repo)
       .choose_one!
 
     raise 'No repo found!' unless @repo
@@ -47,7 +48,6 @@ class GithubImport
     @project.import_state.force_start
 
     import_success = false
-
     timings = Benchmark.measure do
       import_success = Gitlab::GithubImport::SequentialImporter
         .new(@project, token: @options[:token])
@@ -105,10 +105,9 @@ class GithubImport
 end
 
 class GithubRepos
-  def initialize(token, current_user, github_repo)
-    @client = Gitlab::GithubImport::Client.new(token)
+  def initialize(token, host, current_user, github_repo)
+    @client = Gitlab::GithubImport::Client.new(token, host: host)
     @client.octokit.auto_paginate = true
-
     @current_user = current_user
     @github_repo = github_repo
   end
@@ -141,9 +140,9 @@ end
 
 namespace :import do
   desc 'GitLab | Import | Import a GitHub project - Example: import:github[ToKeN,root,root/blah,my/github_repo] (optional my/github_repo)'
-  task :github, [:token, :gitlab_username, :project_path] => :environment do |_t, args|
+  task :github, [:token, :gitlab_username, :project_path, :host] => :environment do |_t, args|
     abort 'Project path must be: namespace(s)/project_name'.color(:red) unless args.project_path.include?('/')
 
-    GithubImport.run!(args.token, args.gitlab_username, args.project_path, args.extras)
+    GithubImport.run!(args.token, args.gitlab_username, args.project_path, args.host, args.extras)
   end
 end
