@@ -209,52 +209,18 @@ module Gitlab
         Gitlab::UsageDataCounters::HLLRedisCounter.track_event(event_name.to_s, values: values)
       end
 
-      def user_minimum_id
-        strong_memoize(:user_minimum_id) do
-          ::User.minimum(:id)
-        end
+      def maximum_id(relation)
+        key = :"#{relation.name.downcase}_maximum_id"
+        strong_memoize(key) do
+           relation.maximum(:id)
+         end
       end
 
-      def user_maximum_id
-        strong_memoize(:user_maximum_id) do
-          ::User.maximum(:id)
-        end
-      end
-
-      def issue_maximum_id
-        strong_memoize(:issue_maximum_id) do
-          ::Issue.maximum(:id)
-        end
-      end
-
-      def issue_minimum_id
-        strong_memoize(:issue_minimum_id) do
-          ::Issue.minimum(:id)
-        end
-      end
-
-      def deployment_minimum_id
-        strong_memoize(:deployment_minimum_id) do
-          ::Deployment.minimum(:id)
-        end
-      end
-
-      def deployment_maximum_id
-        strong_memoize(:deployment_maximum_id) do
-          ::Deployment.maximum(:id)
-        end
-      end
-
-      def project_minimum_id
-        strong_memoize(:project_minimum_id) do
-          ::Project.minimum(:id)
-        end
-      end
-
-      def project_maximum_id
-        strong_memoize(:project_maximum_id) do
-          ::Project.maximum(:id)
-        end
+      def minimum_id(relation)
+        key = :"#{relation.name.downcase}_minimum_id"
+        strong_memoize(key) do
+           relation.minimum(:id)
+         end
       end
 
       private
