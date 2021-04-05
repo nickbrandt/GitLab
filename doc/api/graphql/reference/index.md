@@ -7125,6 +7125,7 @@ Represents a vulnerability scanner.
 | Field | Type | Description |
 | ----- | ---- | ----------- |
 | `externalId` | [`String`](#string) | External ID of the vulnerability scanner. |
+| `id` | [`ID`](#id) | ID of the scanner. |
 | `name` | [`String`](#string) | Name of the vulnerability scanner. |
 | `reportType` | [`VulnerabilityReportType`](#vulnerabilityreporttype) | Type of the vulnerability report. |
 | `vendor` | [`String`](#string) | Vendor of the vulnerability scanner. |
