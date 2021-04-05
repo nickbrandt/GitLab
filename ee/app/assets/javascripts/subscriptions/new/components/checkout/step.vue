@@ -1,9 +1,6 @@
 <script>
 import { GlFormGroup, GlButton } from '@gitlab/ui';
-import activateNextStepMutation from 'ee/vue_shared/purchase_flow/graphql/mutations/activate_next_step.mutation.graphql';
-import updateStepMutation from 'ee/vue_shared/purchase_flow/graphql/mutations/update_active_step.mutation.graphql';
-import activeStepQuery from 'ee/vue_shared/purchase_flow/graphql/queries/active_step.query.graphql';
-import stepListQuery from 'ee/vue_shared/purchase_flow/graphql/queries/step_list.query.graphql';
+import { mapActions, mapGetters } from 'vuex';
 import { convertToSnakeCase, dasherize } from '~/lib/utils/text_utility';
 import StepHeader from './step_header.vue';
 import StepSummary from './step_summary.vue';
@@ -16,7 +13,7 @@ export default {
     StepSummary,
   },
   props: {
-    stepId: {
+    step: {
       type: String,
       required: true,
     },
@@ -34,61 +31,30 @@ export default {
       default: '',
     },
   },
-  data() {
-    return {
-      activeStep: {},
-      stepList: [],
-      loading: false,
-    };
-  },
-  apollo: {
-    activeStep: {
-      query: activeStepQuery,
-    },
-    stepList: {
-      query: stepListQuery,
-    },
-  },
   computed: {
     isActive() {
-      return this.activeStep.id === this.stepId;
+      return this.currentStep === this.step;
     },
     isFinished() {
       return this.isValid && !this.isActive;
     },
     isEditable() {
-      const index = this.stepList.findIndex(({ id }) => id === this.stepId);
-      const activeIndex = this.stepList.findIndex(({ id }) => id === this.activeStep.id);
-      return this.isFinished && index < activeIndex;
+      return this.isFinished && this.stepIndex(this.step) < this.currentStepIndex;
     },
     snakeCasedStep() {
-      return dasherize(convertToSnakeCase(this.stepId));
+      return dasherize(convertToSnakeCase(this.step));
     },
+    ...mapGetters(['currentStep', 'stepIndex', 'currentStepIndex']),
   },
   methods: {
-    async nextStep() {
-      if (!this.isValid) {
-        return;
+    ...mapActions(['activateStep', 'activateNextStep']),
+    nextStep() {
+      if (this.isValid) {
+        this.activateNextStep();
       }
-      this.loading = true;
-      await this.$apollo
-        .mutate({
-          mutation: activateNextStepMutation,
-        })
-        .finally(() => {
-          this.loading = false;
-        });
     },
-    async edit() {
-      this.loading = true;
-      await this.$apollo
-        .mutate({
-          mutation: updateStepMutation,
-          variables: { id: this.stepId },
-        })
-        .finally(() => {
-          this.loading = false;
-        });
+    edit() {
+      this.activateStep(this.step);
     },
   },
 };

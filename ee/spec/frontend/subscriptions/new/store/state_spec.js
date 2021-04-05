@@ -1,6 +1,7 @@
 import * as constants from 'ee/subscriptions/new/constants';
 import createState from 'ee/subscriptions/new/store/state';
 
+constants.STEPS = ['firstStep', 'secondStep'];
 constants.TAX_RATE = 0;
 
 describe('projectsSelector default state', () => {
@@ -29,6 +30,10 @@ describe('projectsSelector default state', () => {
   jest.spyOn(global.Date, 'now').mockImplementationOnce(() => currentDate.valueOf());
 
   const state = createState(initialData);
+
+  it('sets the currentStep to the first item of the STEPS constant', () => {
+    expect(state.currentStep).toEqual('firstStep');
+  });
 
   describe('availablePlans', () => {
     it('sets the availablePlans to the provided parsed availablePlans', () => {

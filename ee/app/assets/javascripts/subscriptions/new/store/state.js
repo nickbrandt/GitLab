@@ -1,6 +1,6 @@
 import { parseBoolean } from '~/lib/utils/common_utils';
 import { capitalizeFirstCharacter } from '~/lib/utils/text_utility';
-import { TAX_RATE } from '../constants';
+import { STEPS, TAX_RATE } from '../constants';
 
 const parsePlanData = (planData) =>
   JSON.parse(planData).map((plan) => ({
@@ -52,6 +52,7 @@ export default ({
   const groups = parseGroupData(groupData);
 
   return {
+    currentStep: STEPS[0],
     isSetupForCompany: parseBoolean(setupForCompany) || !isNewUser,
     availablePlans,
     selectedPlan: determineSelectedPlan(planId, availablePlans),

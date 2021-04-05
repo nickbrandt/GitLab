@@ -1,6 +1,10 @@
 import * as types from './mutation_types';
 
 export default {
+  [types.UPDATE_CURRENT_STEP](state, currentStep) {
+    state.currentStep = currentStep;
+  },
+
   [types.UPDATE_SELECTED_PLAN](state, selectedPlan) {
     state.selectedPlan = selectedPlan;
   },
