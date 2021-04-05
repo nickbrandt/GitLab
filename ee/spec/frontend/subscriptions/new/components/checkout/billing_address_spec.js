@@ -1,54 +1,36 @@
-import { mount, createLocalVue } from '@vue/test-utils';
-import { nextTick } from 'vue';
-import VueApollo from 'vue-apollo';
+import { mount } from '@vue/test-utils';
+import Vue, { nextTick } from 'vue';
 import Vuex from 'vuex';
-import BillingAddress from 'ee/subscriptions/new/components/checkout/billing_address.vue';
-import { STEPS } from 'ee/subscriptions/new/constants';
+import Component from 'ee/subscriptions/new/components/checkout/billing_address.vue';
+import Step from 'ee/subscriptions/new/components/checkout/step.vue';
 import { getStoreConfig } from 'ee/subscriptions/new/store';
 import * as types from 'ee/subscriptions/new/store/mutation_types';
-import Step from 'ee/vue_shared/purchase_flow/components/step.vue';
-import activateNextStepMutation from 'ee/vue_shared/purchase_flow/graphql/mutations/activate_next_step.mutation.graphql';
-import { createMockApolloProvider } from 'ee_jest/vue_shared/purchase_flow/spec_helper';
 
-const localVue = createLocalVue();
-localVue.use(Vuex);
-localVue.use(VueApollo);
+Vue.use(Vuex);
 
 describe('Billing Address', () => {
   let store;
   let wrapper;
-  let mockApolloProvider;
 
   const actionMocks = {
     fetchCountries: jest.fn(),
     fetchStates: jest.fn(),
   };
 
-  function activateNextStep() {
-    return mockApolloProvider.clients.defaultClient.mutate({
-      mutation: activateNextStepMutation,
-    });
-  }
-
-  function createStore() {
+  const createComponent = () => {
     const { actions, ...storeConfig } = getStoreConfig();
-    return new Vuex.Store({
+    store = new Vuex.Store({
       ...storeConfig,
       actions: { ...actions, ...actionMocks },
     });
-  }
 
-  function createComponent(options = {}) {
-    return mount(BillingAddress, {
-      localVue,
-      ...options,
+    wrapper = mount(Component, {
+      store,
     });
-  }
+  };
 
   beforeEach(() => {
-    store = createStore();
-    mockApolloProvider = createMockApolloProvider(STEPS);
-    wrapper = createComponent({ store, apolloProvider: mockApolloProvider });
+    createComponent();
   });
 
   afterEach(() => {
@@ -128,15 +110,14 @@ describe('Billing Address', () => {
   });
 
   describe('showing the summary', () => {
-    beforeEach(async () => {
+    beforeEach(() => {
       store.commit(types.UPDATE_COUNTRY, 'country');
       store.commit(types.UPDATE_STREET_ADDRESS_LINE_ONE, 'address line 1');
       store.commit(types.UPDATE_STREET_ADDRESS_LINE_TWO, 'address line 2');
       store.commit(types.UPDATE_COUNTRY_STATE, 'state');
       store.commit(types.UPDATE_CITY, 'city');
       store.commit(types.UPDATE_ZIP_CODE, 'zip');
-      await activateNextStep();
-      await activateNextStep();
+      store.commit(types.UPDATE_CURRENT_STEP, 'nextStep');
     });
 
     it('should show the entered address line 1', () => {
