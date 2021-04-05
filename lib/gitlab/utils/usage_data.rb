@@ -212,15 +212,15 @@ module Gitlab
       def maximum_id(relation)
         key = :"#{relation.name.downcase}_maximum_id"
         strong_memoize(key) do
-           relation.maximum(:id)
-         end
+          relation.maximum(:id)
+        end
       end
 
       def minimum_id(relation)
         key = :"#{relation.name.downcase}_minimum_id"
         strong_memoize(key) do
-           relation.minimum(:id)
-         end
+          relation.minimum(:id)
+        end
       end
 
       private
