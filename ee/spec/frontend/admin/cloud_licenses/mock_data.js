@@ -5,6 +5,9 @@ export const license = {
     lastSync: 'just now - actual date',
     startsAt: '22 February',
     renews: 'in 11 months',
+    name: 'Jane Doe',
+    email: 'user@acmecorp.com',
+    company: 'ACME Corp',
   },
 };
 
