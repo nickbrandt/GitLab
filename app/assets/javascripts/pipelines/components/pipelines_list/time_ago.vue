@@ -48,12 +48,6 @@ export default {
 
       return `${hh}:${mm}:${ss}`;
     },
-    legacySectionClass() {
-      return !this.glFeatures.newPipelinesTable ? 'table-section section-15' : '';
-    },
-    legacyTableMobileClass() {
-      return !this.glFeatures.newPipelinesTable ? 'table-mobile-content' : '';
-    },
     showInProgress() {
       return !this.duration && !this.finishedTime && !this.skipped;
     },
@@ -64,11 +58,8 @@ export default {
 };
 </script>
 <template>
-  <div :class="legacySectionClass">
-    <div v-if="!glFeatures.newPipelinesTable" class="table-mobile-header" role="rowheader">
-      {{ s__('Pipeline|Duration') }}
-    </div>
-    <div :class="legacyTableMobileClass">
+  <div>
+    <div>
       <span v-if="showInProgress" data-testid="pipeline-in-progress">
         <gl-icon
           v-if="stuck"
