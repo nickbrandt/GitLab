@@ -117,7 +117,12 @@ export default {
         <div class="table-section section-50" role="rowheader">{{ s__('CiVariables|Value') }}</div>
       </div>
 
-      <div v-for="variable in variables" :key="variable.id" class="gl-responsive-table-row">
+      <div
+        v-for="variable in variables"
+        :key="variable.id"
+        class="gl-responsive-table-row"
+        data-testid="ci-variable-row"
+      >
         <div class="table-section section-50">
           <div class="table-mobile-header" role="rowheader">{{ s__('Pipeline|Key') }}</div>
           <div class="table-mobile-content gl-mr-3">
@@ -126,6 +131,7 @@ export default {
               v-model="variable.key"
               :placeholder="$options.i18n.keyPlaceholder"
               class="ci-variable-body-item form-control"
+              data-testid="ci-variable-key"
             />
           </div>
         </div>
@@ -138,6 +144,7 @@ export default {
               v-model="variable.secret_value"
               :placeholder="$options.i18n.valuePlaceholder"
               class="ci-variable-body-item form-control"
+              data-testid="ci-variable-value"
             />
           </div>
         </div>

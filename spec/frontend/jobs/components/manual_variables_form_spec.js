@@ -21,7 +21,7 @@ describe('Manual Variables Form', () => {
     variablesSettingsUrl: '/settings',
   };
 
-  const createComponent = (props = {}, mountFn = shallowMount) => {
+  const createComponent = ({ props = {}, mountFn = shallowMount } = {}) => {
     store = new Vuex.Store({
       actions: {
         triggerManualJob: jest.fn(),
@@ -30,7 +30,7 @@ describe('Manual Variables Form', () => {
 
     wrapper = extendedWrapper(
       mountFn(localVue.extend(Form), {
-        propsData: props,
+        propsData: { ...requiredProps, ...props },
         localVue,
         store,
       }),
@@ -43,6 +43,9 @@ describe('Manual Variables Form', () => {
   const findTriggerBtn = () => wrapper.findByTestId('trigger-manual-job-btn');
   const findHelpText = () => wrapper.findByTestId('form-help-text');
   const findDeleteVarBtn = () => wrapper.findByTestId('delete-variable-btn');
+  const findCiVariableKey = () => wrapper.findByTestId('ci-variable-key');
+  const findCiVariableValue = () => wrapper.findByTestId('ci-variable-value');
+  const findAllVariables = () => wrapper.findAllByTestId('ci-variable-row');
 
   afterEach(() => {
     wrapper.destroy();
@@ -50,7 +53,7 @@ describe('Manual Variables Form', () => {
 
   describe('shallowMount', () => {
     beforeEach(() => {
-      createComponent(requiredProps);
+      createComponent();
     });
 
     it('renders empty form with correct placeholders', () => {
@@ -70,18 +73,24 @@ describe('Manual Variables Form', () => {
       it('creates a new variable when user types a new key and resets the form', async () => {
         await findInputKey().setValue('new key');
 
-        expect(wrapper.vm.variables).toHaveLength(1);
-        expect(wrapper.vm.variables[0].key).toBe('new key');
+        expect(findAllVariables()).toHaveLength(1);
+        expect(findCiVariableKey().element.value).toBe('new key');
         expect(findInputKey().attributes('value')).toBe(undefined);
       });
 
       it('creates a new variable when user types a new value and resets the form', async () => {
         await findInputValue().setValue('new value');
 
-        expect(wrapper.vm.variables).toHaveLength(1);
-        expect(wrapper.vm.variables[0].secret_value).toBe('new value');
+        expect(findAllVariables()).toHaveLength(1);
+        expect(findCiVariableValue().element.value).toBe('new value');
         expect(findInputValue().attributes('value')).toBe(undefined);
       });
+    });
+  });
+
+  describe('mount', () => {
+    beforeEach(() => {
+      createComponent({ mountFn: mount });
     });
 
     describe('when deleting a variable', () => {
@@ -96,17 +105,15 @@ describe('Manual Variables Form', () => {
           ],
         });
 
-        findDeleteVarBtn().vm.$emit('click');
+        findDeleteVarBtn().trigger('click');
 
-        expect(wrapper.vm.variables).toHaveLength(0);
+        await wrapper.vm.$nextTick();
+
+        expect(findAllVariables()).toHaveLength(0);
       });
     });
-  });
 
-  describe('mount', () => {
     it('trigger button is disabled after trigger action', async () => {
-      createComponent(requiredProps, mount);
-
       expect(findTriggerBtn().props('disabled')).toBe(false);
 
       await findTriggerBtn().trigger('click');
