@@ -34,13 +34,10 @@ module Milestones
     end
 
     def update_events(milestone)
-      # TODO: why don't we update events in case of group milestone?
+      # TODO: why don't we update events in case of group milestone? I kept the logic.
       return if milestone.group_milestone?
 
-      Event.for_milestone_id(milestone.id).each do |event|
-        event.target_id = nil
-        event.save
-      end
+      Event.for_milestone_id(milestone.id).update_all(target_id: nil)
     end
 
     def update_params
