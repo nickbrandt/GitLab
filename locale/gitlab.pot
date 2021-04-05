@@ -26246,6 +26246,9 @@ msgstr ""
 msgid "Require admin approval for new sign-ups"
 msgstr ""
 
+msgid "Require all users in this group to setup Two-factor authentication"
+msgstr ""
+
 msgid "Require all users in this group to setup two-factor authentication"
 msgstr ""
 
