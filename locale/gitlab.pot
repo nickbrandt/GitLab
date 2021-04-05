@@ -18969,6 +18969,12 @@ msgstr ""
 msgid "Match not found; try refining your search query."
 msgstr ""
 
+msgid "Mattermost"
+msgstr ""
+
+msgid "Mattermost URL:"
+msgstr ""
+
 msgid "MattermostService|Add to Mattermost"
 msgstr ""
 
