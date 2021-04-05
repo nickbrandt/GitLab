@@ -23,10 +23,17 @@ RSpec.describe Milestones::DestroyService do
     end
 
     it 'deletes milestone id from issuables' do
-      issue = create(:issue, project: project, milestone: milestone)
-      merge_request = create(:merge_request, source_project: project, milestone: milestone)
+      issue = merge_request = nil
+      10.times do |i|
+        issue = create(:issue, project: project, milestone: milestone)
+        merge_request = create(:merge_request, source_project: project, source_branch: "branch-#{i}", milestone: milestone)
+      end
 
-      service.execute(milestone)
+      control = ActiveRecord::QueryRecorder.new(skip_cached: false) do
+        service.execute(milestone)
+      end
+      puts control.count
+      # binding.pry
 
       expect(issue.reload.milestone).to be_nil
       expect(merge_request.reload.milestone).to be_nil
