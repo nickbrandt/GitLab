@@ -23,20 +23,30 @@ RSpec.describe Milestones::DestroyService do
     end
 
     it 'deletes milestone id from issuables' do
-      issue = merge_request = nil
-      10.times do |i|
-        issue = create(:issue, project: project, milestone: milestone)
-        merge_request = create(:merge_request, source_project: project, source_branch: "branch-#{i}", milestone: milestone)
-      end
+      issue = create(:issue, project: project, milestone: milestone)
+      merge_request = create(:merge_request, source_project: project, source_branch: 'branch-test', milestone: milestone)
 
-      control = ActiveRecord::QueryRecorder.new(skip_cached: false) do
-        service.execute(milestone)
-      end
-      puts control.count
-      # binding.pry
+      service.execute(milestone)
 
       expect(issue.reload.milestone).to be_nil
       expect(merge_request.reload.milestone).to be_nil
+    end
+
+    it "avoids N+1 database queries" do
+      # get control_count
+      milestone = create(:milestone, title: 'Milestone v1.0', project: project)
+      create(:issue, project: project, milestone: milestone)
+      create(:merge_request, source_project: project, source_branch: 'branch-test', milestone: milestone)
+      control_count = ActiveRecord::QueryRecorder.new(skip_cached: false) { service.execute(milestone) }.count
+
+      # repeat the operation with more entities
+      milestone = create(:milestone, title: 'Milestone v1.0', project: project)
+      10.times do |i|
+        create(:issue, project: project, milestone: milestone)
+        create(:merge_request, source_project: project, source_branch: "branch-#{i}", milestone: milestone)
+      end
+
+      expect { service.execute(milestone) }.not_to exceed_query_limit(control_count)
     end
 
     it 'logs destroy event' do
