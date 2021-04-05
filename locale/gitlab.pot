@@ -13085,10 +13085,10 @@ msgstr ""
 msgid "ExternalWikiService|External wiki URL"
 msgstr ""
 
-msgid "ExternalWikiService|Replaces the link to the internal wiki with a link to an external wiki."
+msgid "ExternalWikiService|Link to an external wiki from the sidebar."
 msgstr ""
 
-msgid "ExternalWikiService|The URL of the external wiki"
+msgid "ExternalWikiService|https://example.com/xxx/wiki/..."
 msgstr ""
 
 msgid "Externally installed"
@@ -19020,6 +19020,9 @@ msgid "Link"
 msgstr ""
 
 msgid "Link Prometheus monitoring to GitLab."
+msgstr ""
+
+msgid "Link an external wiki from the project's sidebar. %{docs_link}"
 msgstr ""
 
 msgid "Link copied"
