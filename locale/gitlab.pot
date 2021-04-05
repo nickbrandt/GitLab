@@ -25418,6 +25418,9 @@ msgstr ""
 msgid "Recent searches"
 msgstr ""
 
+msgid "Recently used"
+msgstr ""
+
 msgid "Reconfigure"
 msgstr ""
 
@@ -28687,6 +28690,9 @@ msgid "Something went wrong while fetching comments. Please try again."
 msgstr ""
 
 msgid "Something went wrong while fetching description changes. Please try again."
+msgstr ""
+
+msgid "Something went wrong while fetching details"
 msgstr ""
 
 msgid "Something went wrong while fetching group member contributions"
