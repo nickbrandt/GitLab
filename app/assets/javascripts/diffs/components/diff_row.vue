@@ -215,7 +215,8 @@ export default {
               class="add-diff-note tooltip-wrapper"
               :title="addCommentTooltipLeft"
             >
-              <button
+              <div
+                role="button"
                 :draggable="glFeatures.dragCommentSelection"
                 type="button"
                 class="add-diff-note unified-diff-components-diff-note-button note-button js-add-diff-note-button qa-diff-comment"
@@ -224,7 +225,7 @@ export default {
                 :disabled="line.left.commentsDisabled"
                 @click="handleCommentButton(line.left)"
                 @dragstart="onDragStart({ ...line.left, index })"
-              ></button>
+              ></div>
             </span>
           </template>
           <a
