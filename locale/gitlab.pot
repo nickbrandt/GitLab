@@ -23591,7 +23591,7 @@ msgstr ""
 msgid "Please enter a valid number"
 msgstr ""
 
-msgid "Please enter or upload a license."
+msgid "Please enter or upload a valid license."
 msgstr ""
 
 msgid "Please fill in a descriptive name for your group."
