@@ -805,9 +805,6 @@ RSpec/EmptyLineAfterFinalLetItBe:
     - spec/features/cycle_analytics_spec.rb
     - spec/features/dashboard/datetime_on_tooltips_spec.rb
     - spec/features/dashboard/merge_requests_spec.rb
-    - spec/features/error_tracking/user_filters_errors_by_status_spec.rb
-    - spec/features/error_tracking/user_searches_sentry_errors_spec.rb
-    - spec/features/error_tracking/user_sees_error_index_spec.rb
     - spec/features/file_uploads/group_import_spec.rb
     - spec/features/file_uploads/project_import_spec.rb
     - spec/features/file_uploads/user_avatar_spec.rb
