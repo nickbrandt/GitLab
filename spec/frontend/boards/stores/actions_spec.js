@@ -802,11 +802,11 @@ describe('setAssignees', () => {
       testAction(
         actions.setAssignees,
         [node],
-        { activeIssue: { iid, referencePath: refPath }, commit: () => {} },
+        { activeBoardItem: { iid, referencePath: refPath }, commit: () => {} },
         [
           {
-            type: 'UPDATE_ISSUE_BY_ID',
-            payload: { prop: 'assignees', issueId: undefined, value: [node] },
+            type: 'UPDATE_BOARD_ITEM_BY_ID',
+            payload: { prop: 'assignees', itemId: undefined, value: [node] },
           },
         ],
         [],
@@ -949,7 +949,7 @@ describe('addListIssue', () => {
 
 describe('setActiveIssueLabels', () => {
   const state = { boardItems: { [mockIssue.id]: mockIssue } };
-  const getters = { activeIssue: mockIssue };
+  const getters = { activeBoardItem: mockIssue };
   const testLabelIds = labels.map((label) => label.id);
   const input = {
     addLabelIds: testLabelIds,
@@ -963,7 +963,7 @@ describe('setActiveIssueLabels', () => {
       .mockResolvedValue({ data: { updateIssue: { issue: { labels: { nodes: labels } } } } });
 
     const payload = {
-      issueId: getters.activeIssue.id,
+      itemId: getters.activeBoardItem.id,
       prop: 'labels',
       value: labels,
     };
@@ -974,7 +974,7 @@ describe('setActiveIssueLabels', () => {
       { ...state, ...getters },
       [
         {
-          type: types.UPDATE_ISSUE_BY_ID,
+          type: types.UPDATE_BOARD_ITEM_BY_ID,
           payload,
         },
       ],
@@ -994,7 +994,7 @@ describe('setActiveIssueLabels', () => {
 
 describe('setActiveIssueDueDate', () => {
   const state = { boardItems: { [mockIssue.id]: mockIssue } };
-  const getters = { activeIssue: mockIssue };
+  const getters = { activeBoardItem: mockIssue };
   const testDueDate = '2020-02-20';
   const input = {
     dueDate: testDueDate,
@@ -1014,7 +1014,7 @@ describe('setActiveIssueDueDate', () => {
     });
 
     const payload = {
-      issueId: getters.activeIssue.id,
+      itemId: getters.activeBoardItem.id,
       prop: 'dueDate',
       value: testDueDate,
     };
@@ -1025,7 +1025,7 @@ describe('setActiveIssueDueDate', () => {
       { ...state, ...getters },
       [
         {
-          type: types.UPDATE_ISSUE_BY_ID,
+          type: types.UPDATE_BOARD_ITEM_BY_ID,
           payload,
         },
       ],
@@ -1045,7 +1045,7 @@ describe('setActiveIssueDueDate', () => {
 
 describe('setActiveIssueSubscribed', () => {
   const state = { boardItems: { [mockActiveIssue.id]: mockActiveIssue } };
-  const getters = { activeIssue: mockActiveIssue };
+  const getters = { activeBoardItem: mockActiveIssue };
   const subscribedState = true;
   const input = {
     subscribedState,
@@ -1065,7 +1065,7 @@ describe('setActiveIssueSubscribed', () => {
     });
 
     const payload = {
-      issueId: getters.activeIssue.id,
+      itemId: getters.activeBoardItem.id,
       prop: 'subscribed',
       value: subscribedState,
     };
@@ -1076,7 +1076,7 @@ describe('setActiveIssueSubscribed', () => {
       { ...state, ...getters },
       [
         {
-          type: types.UPDATE_ISSUE_BY_ID,
+          type: types.UPDATE_BOARD_ITEM_BY_ID,
           payload,
         },
       ],
@@ -1096,7 +1096,7 @@ describe('setActiveIssueSubscribed', () => {
 
 describe('setActiveIssueMilestone', () => {
   const state = { boardItems: { [mockIssue.id]: mockIssue } };
-  const getters = { activeIssue: mockIssue };
+  const getters = { activeBoardItem: mockIssue };
   const testMilestone = {
     ...mockMilestone,
     id: 'gid://gitlab/Milestone/1',
@@ -1119,7 +1119,7 @@ describe('setActiveIssueMilestone', () => {
     });
 
     const payload = {
-      issueId: getters.activeIssue.id,
+      itemId: getters.activeBoardItem.id,
       prop: 'milestone',
       value: testMilestone,
     };
@@ -1130,7 +1130,7 @@ describe('setActiveIssueMilestone', () => {
       { ...state, ...getters },
       [
         {
-          type: types.UPDATE_ISSUE_BY_ID,
+          type: types.UPDATE_BOARD_ITEM_BY_ID,
           payload,
         },
       ],
@@ -1150,7 +1150,7 @@ describe('setActiveIssueMilestone', () => {
 
 describe('setActiveIssueTitle', () => {
   const state = { boardItems: { [mockIssue.id]: mockIssue } };
-  const getters = { activeIssue: mockIssue };
+  const getters = { activeBoardItem: mockIssue };
   const testTitle = 'Test Title';
   const input = {
     title: testTitle,
@@ -1170,7 +1170,7 @@ describe('setActiveIssueTitle', () => {
     });
 
     const payload = {
-      issueId: getters.activeIssue.id,
+      itemId: getters.activeBoardItem.id,
       prop: 'title',
       value: testTitle,
     };
@@ -1181,7 +1181,7 @@ describe('setActiveIssueTitle', () => {
       { ...state, ...getters },
       [
         {
-          type: types.UPDATE_ISSUE_BY_ID,
+          type: types.UPDATE_BOARD_ITEM_BY_ID,
           payload,
         },
       ],
@@ -1325,7 +1325,7 @@ describe('toggleBoardItemMultiSelection', () => {
     testAction(
       actions.toggleBoardItemMultiSelection,
       boardItem2,
-      { activeId: mockActiveIssue.id, activeIssue: mockActiveIssue, selectedBoardItems: [] },
+      { activeId: mockActiveIssue.id, activeBoardItem: mockActiveIssue, selectedBoardItems: [] },
       [
         {
           type: types.ADD_BOARD_ITEM_TO_SELECTION,
