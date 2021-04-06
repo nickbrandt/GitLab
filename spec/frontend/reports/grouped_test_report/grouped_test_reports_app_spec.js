@@ -1,6 +1,5 @@
 import { mount, createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
-import { mockTracking } from 'helpers/tracking_helper';
 import Api from '~/api';
 import GroupedTestReportsApp from '~/reports/grouped_test_report/grouped_test_reports_app.vue';
 import { getStoreConfig } from '~/reports/grouped_test_report/store';
@@ -111,54 +110,33 @@ describe('Grouped test reports app', () => {
   });
 
   describe('`Expand` button', () => {
-    let trackingSpy;
-
-    it('tracks an event on click', () => {
+    beforeEach(() => {
       setReports(newFailedTestReports);
-      mountComponent();
-      trackingSpy = mockTracking('_category_', wrapper.element, jest.spyOn);
+    });
+
+    it('tracks usage ping metric when enabled', () => {
+      mountComponent({ glFeatures: { usageDataITestingSummaryWidgetTotal: true } });
       findExpandButton().trigger('click');
 
-      expect(trackingSpy).toHaveBeenCalledWith(undefined, 'expand_test_report_widget', {});
+      expect(Api.trackRedisHllUserEvent).toHaveBeenCalledTimes(1);
+      expect(Api.trackRedisHllUserEvent).toHaveBeenCalledWith(wrapper.vm.$options.expandEvent);
     });
 
     it('only tracks the first expansion', () => {
-      setReports(newFailedTestReports);
-      mountComponent();
-      trackingSpy = mockTracking('_category_', wrapper.element, jest.spyOn);
+      mountComponent({ glFeatures: { usageDataITestingSummaryWidgetTotal: true } });
+      const expandButton = findExpandButton();
+      expandButton.trigger('click');
+      expandButton.trigger('click');
+      expandButton.trigger('click');
 
-      expect(trackingSpy).not.toHaveBeenCalled();
-
-      const button = findExpandButton();
-
-      button.trigger('click');
-      button.trigger('click');
-      button.trigger('click');
-
-      expect(trackingSpy).toHaveBeenCalledTimes(1);
+      expect(Api.trackRedisHllUserEvent).toHaveBeenCalledTimes(1);
     });
 
-    describe('with :usage_data_i_testing_summary_widget_total enabled', () => {
-      it('does track usage ping metric', () => {
-        setReports(newFailedTestReports);
-        mountComponent({ glFeatures: { usageDataITestingSummaryWidgetTotal: true } });
-        findExpandButton().trigger('click');
+    it('does not track usage ping metric when disabled', () => {
+      mountComponent({ glFeatures: { usageDataITestingSummaryWidgetTotal: false } });
+      findExpandButton().trigger('click');
 
-        expect(Api.trackRedisHllUserEvent).toHaveBeenCalledTimes(1);
-        expect(Api.trackRedisHllUserEvent).toHaveBeenCalledWith(
-          wrapper.vm.$options.expandUsagePingEvent,
-        );
-      });
-    });
-
-    describe('with :usage_data_i_testing_summary_widget_total disabled', () => {
-      it('does not track usage ping metric', () => {
-        setReports(newFailedTestReports);
-        mountComponent({ glFeatures: { usageDataITestingSummaryWidgetTotal: false } });
-        findExpandButton().trigger('click');
-
-        expect(Api.trackRedisHllUserEvent).not.toHaveBeenCalled();
-      });
+      expect(Api.trackRedisHllUserEvent).not.toHaveBeenCalled();
     });
   });
 
