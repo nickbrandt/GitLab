@@ -566,9 +566,6 @@ RSpec/EmptyLineAfterFinalLetItBe:
     - ee/spec/lib/gitlab/graphql/aggregations/vulnerability_statistics/lazy_aggregate_spec.rb
     - ee/spec/lib/gitlab/insights/project_insights_config_spec.rb
     - ee/spec/lib/gitlab/sitemaps/url_extractor_spec.rb
-    - ee/spec/mailers/credentials_inventory_mailer_spec.rb
-    - ee/spec/mailers/ee/emails/profile_spec.rb
-    - ee/spec/mailers/notify_spec.rb
     - ee/spec/migrations/backfill_version_author_and_created_at_spec.rb
     - ee/spec/models/analytics/cycle_analytics/group_level_spec.rb
     - ee/spec/models/burndown_spec.rb
