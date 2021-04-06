@@ -80,7 +80,7 @@ module Gitlab
         end
 
         def update_pools
-          @pools = @hosts.each_with_object({}) do |host, flags|
+          @pools = @hosts.each_with_object({}.compare_by_identity) do |host, flags|
             flags[host.pool] = true
           end
         end
