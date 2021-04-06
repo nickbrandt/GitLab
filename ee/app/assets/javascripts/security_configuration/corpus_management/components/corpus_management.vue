@@ -23,6 +23,7 @@ export default {
         };
       },
       update: (data) => {
+        debugger;
         return data;
       },
       error() {
@@ -58,6 +59,7 @@ export default {
       return packages;
     },
     mockedData() {
+      debugger;
       const packages = this.states?.mockedPackages.data || [];
       return packages;
     },

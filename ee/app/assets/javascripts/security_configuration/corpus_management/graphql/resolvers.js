@@ -39,6 +39,51 @@ export default {
     },
   },
   Mutation: {
+    addCorpus: (_, { name, projectPath }, { cache }) => {
+      const cursor = {
+        first: 25,
+        after: null,
+        last: null,
+        before: null,
+      };
+
+      const sourceData = cache.readQuery({
+        query: getCorpusesQuery,
+        variables: { projectPath, ...cursor },
+      });
+
+      const data = produce(sourceData, (draftState) => {
+        let mockedCorpuses = draftState.mockedPackages.data;
+        let totalSize = draftState.mockedPackages.totalSize;
+
+        //Simulate adding a corpus
+        // mockedCorpuses.push({       
+        //   name,
+        //   lastUpdated: new Date(),
+        //   lastUsed: '',
+        //   latestJobPath: '',
+        //   target: '',
+        //   downloadPath: 'farias-gl/go-fuzzing-example/-/jobs/959593462/artifacts/download',
+        //   size: 4e8,            
+        // });
+        mockedCorpuses = [
+          ...mockedCorpuses,
+          {
+            name,
+            lastUpdated: new Date(),
+            lastUsed: '',
+            latestJobPath: '',
+            target: '',
+            downloadPath: 'farias-gl/go-fuzzing-example/-/jobs/959593462/artifacts/download',
+            size: 4e8,
+         }
+        ];
+
+        totalSize += 4e8;
+      });
+
+      cache.writeQuery({ query: getCorpusesQuery, data, variables: { projectPath, ...cursor } });
+    },    
     deleteCorpus: (_, { name, projectPath }, { cache }) => {
       const cursor = {
         first: 25,
@@ -66,7 +111,7 @@ export default {
 
       cache.writeQuery({ query: getCorpusesQuery, data, variables: { projectPath, ...cursor } });
     },
-    uploadCorpus: (_, { name, projectPath }, {cache, client}) => {
+    uploadCorpus: (_, { name, projectPath }, {cache}) => {
       const cursor = {
         first: 25,
         after: null,
@@ -83,7 +128,7 @@ export default {
         const { uploadState }  = draftState;
         uploadState.isUploading = true;
         // Simulate incrementing file upload progress
-        uploadState.progress += 25;
+        uploadState.progress += 10;
 
         if(uploadState.progress>=100){
           uploadState.isUploading = false;
@@ -93,6 +138,27 @@ export default {
 
       cache.writeQuery({ query: getCorpusesQuery, data, variables: { projectPath, ...cursor } });
       return data.uploadState.progress;
+    },
+    resetCorpus: (_, {name, projectPath }, {cache}) => {
+      const cursor = {
+        first: 25,
+        after: null,
+        last: null,
+        before: null,
+      };
+
+      const sourceData = cache.readQuery({
+        query: getCorpusesQuery,
+        variables: { projectPath, ...cursor },
+      })
+
+      const data = produce(sourceData, (draftState) => {
+        const { uploadState }  = draftState;
+        uploadState.isUploading = false;
+        uploadState.progress = 0
+      });      
+
+      cache.writeQuery({ query: getCorpusesQuery, data, variables: { projectPath, ...cursor } });
     }
   },
 };

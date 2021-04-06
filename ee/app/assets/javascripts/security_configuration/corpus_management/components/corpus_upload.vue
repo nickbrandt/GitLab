@@ -3,6 +3,8 @@ import { GlButton, GlModal, GlModalDirective } from '@gitlab/ui';
 import CorpusUploadModal from 'ee/security_configuration/corpus_management/components/corpus_upload_modal.vue';
 import { numberToHumanSize } from '~/lib/utils/number_utils';
 import { s__ } from '~/locale';
+import addCorpusMutation from '../graphql/mutations/add_corpus.mutation.graphql';
+import getCorpusesQuery from '../graphql/queries/get_corpuses.query.graphql';
 
 export default {
   components: {
@@ -13,14 +15,28 @@ export default {
   directives: {
     GlModalDirective,
   },
-  modal: {
-    actionPrimary: {
-      text: s__('Add'),
-      attributes: { variant: 'danger', 'data-testid': 'modal-confirm' },
+  inject: ['projectFullPath','corpusHelpPath'],
+  apollo: {
+    states: {
+      query: getCorpusesQuery,
+      variables() {
+        return {
+          projectPath: this.projectFullPath,
+          ...this.cursor,
+        };
+      },
+      update: (data) => {
+        return data;
+      },
+      error() {
+        this.states = null;
+      },
     },
+  },   
+  modal: {
     actionCancel: {
       text: s__('Cancel'),
-    },
+    },  
   },  
   props: {
     totalSize: {
@@ -28,11 +44,29 @@ export default {
       required: true,
     },
   },
+  methods: {
+    addCorpus() {
+      this.$apollo.mutate({
+        mutation: addCorpusMutation,
+        variables: { name: "New Upload", projectPath: this.projectFullPath },
+      })
+    },
+  },
   computed: {
     formattedFileSize() {
       return numberToHumanSize(this.totalSize);
     },
+    isUploaded() {
+      return this.states?.uploadState.progress === 100;
+    },  
+    actionPrimaryProps() {
+      return {
+        text: s__('Add'),
+        attributes: { 'data-testid': 'modal-confirm', disabled: !this.isUploaded},
+      }  
+    } 
   },
+
 };
 </script>
 <template>
@@ -52,7 +86,8 @@ export default {
       modal-id="corpus-upload-modal"
       title="New corpus"
       size="sm"
-      :action-primary="$options.modal.actionPrimary"
+      @primary="addCorpus"
+      :action-primary="actionPrimaryProps"
       :action-cancel="$options.modal.actionCancel"      
     >
       <corpus-upload-modal 

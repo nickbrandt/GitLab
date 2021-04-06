@@ -1,5 +1,5 @@
 <script>
-import { GlForm, GlFormInput, GlFormInputGroup, GlButton, GlIcon } from '@gitlab/ui';
+import { GlForm, GlFormInput, GlFormInputGroup, GlButton, GlIcon, GlLoadingIcon } from '@gitlab/ui';
 import { s__, __ } from '~/locale';
 import { VALID_CORPUS_MIMETYPE } from '../constants';
 import uploadCorpus from '../graphql/mutations/upload_corpus.mutation.graphql';
@@ -9,6 +9,7 @@ export default {
   components: {
     GlForm,
     GlFormInput,
+    GlLoadingIcon,
     GlFormInputGroup,
     GlButton,
     GlIcon,
@@ -41,13 +42,23 @@ export default {
     hasAttachment() {
       return Boolean(this.attachmentName);
     },
+    isShowingAttatchmentName() {
+      return this.hasAttachment && !this.isLoading
+    },
     isUploading() {
-      let foo = this.states;
-      debugger
+      return this.states?.uploadState.isUploading;
     },
     isUploaded() {
-      let foo = this.states;
-      debugger;
+      return this.states?.uploadState.progress === 100;
+    },
+    showUploadButton() {
+      return this.hasAttachment && !this.isUploading && !this.isUploaded
+    },
+    showFilePickerButton() {
+      return !this.isUploaded;
+    },
+    progress() {
+      return this.states?.uploadState.progress;
     },
   },
   data() {
@@ -112,17 +123,18 @@ export default {
       label-size="sm"
     >
   
-      <template v-if="hasAttachment">
-        {{ this.attachmentName }}
-        <gl-icon name="close" />
-      </template>
-
       <gl-button
-        v-else
+        v-if="showFilePickerButton"
         @click="openFileUpload"
+        :disabled="isUploading"
       >
         {{ this.$options.i18n.uploadButtonText }}
       </gl-button>
+
+      <template v-if="isShowingAttatchmentName">
+        {{ this.attachmentName }}
+        <gl-icon name="close" />
+      </template>
 
       <input
         ref="fileUpload"
@@ -137,11 +149,17 @@ export default {
       <span>{{ this.$options.i18n.uploadMessage }}</span>
 
       <gl-button 
-        v-if="hasAttachment && !isUploading" variant="success"
+        v-if="showUploadButton" variant="success"
         @click="beginFileUpload"
       >
         {{ __('Upload file') }}
       </gl-button>  
+
+      <div v-if="isUploading">
+        <gl-loading-icon inline size="sm" /> Attatching File - {{ progress }} %
+        <gl-button size="small"> {{ __('Cancel') }} </gl-button>
+      </div>
+
 
     </gl-form-input-group>
 
