@@ -23457,6 +23457,8 @@ CREATE INDEX index_packages_tags_on_package_id_and_updated_at ON packages_tags U
 
 CREATE INDEX index_pages_deployments_on_ci_build_id ON pages_deployments USING btree (ci_build_id);
 
+CREATE INDEX index_pages_deployments_on_file_store_and_id ON pages_deployments USING btree (file_store, id);
+
 CREATE INDEX index_pages_deployments_on_project_id ON pages_deployments USING btree (project_id);
 
 CREATE INDEX index_pages_domain_acme_orders_on_challenge_token ON pages_domain_acme_orders USING btree (challenge_token);
