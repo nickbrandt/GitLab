@@ -18,9 +18,7 @@ module EE
 
         merge_request = super(merge_request)
 
-        if should_remove_old_approvers && merge_request.valid?
-          cleanup_approvers(merge_request, reload: true)
-        end
+        cleanup_approvers(merge_request, reload: true) if should_remove_old_approvers && merge_request.valid?
 
         merge_request.reset_approval_cache!
 
