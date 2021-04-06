@@ -5,6 +5,7 @@ import {
   formatListIssues,
   formatBoardLists,
   formatIssueInput,
+  formatIssue,
 } from '~/boards/boards_util';
 import { inactiveId, ISSUABLE } from '~/boards/constants';
 import destroyBoardListMutation from '~/boards/graphql/board_list_destroy.mutation.graphql';
@@ -12,6 +13,7 @@ import issueCreateMutation from '~/boards/graphql/issue_create.mutation.graphql'
 import issueMoveListMutation from '~/boards/graphql/issue_move_list.mutation.graphql';
 import actions, { gqlClient } from '~/boards/stores/actions';
 import * as types from '~/boards/stores/mutation_types';
+import { getIdFromGraphQLId } from '~/graphql_shared/utils';
 import {
   mockLists,
   mockListsById,
@@ -816,7 +818,43 @@ describe('setAssignees', () => {
   });
 });
 
-describe('createNewIssue', () => {
+describe('addListItem', () => {
+  it('should commit ADD_BOARD_ITEM_TO_LIST and UPDATE_BOARD_ITEM mutations', () => {
+    const payload = {
+      list: mockLists[0],
+      item: mockIssue,
+      position: 0,
+    };
+
+    testAction(actions.addListItem, payload, {}, [
+      {
+        type: types.ADD_BOARD_ITEM_TO_LIST,
+        payload: {
+          listId: mockLists[0].id,
+          itemId: mockIssue.id,
+          atIndex: 0,
+        },
+      },
+      { type: types.UPDATE_BOARD_ITEM, payload: mockIssue },
+    ]);
+  });
+});
+
+describe('removeListItem', () => {
+  it('should commit REMOVE_BOARD_ITEM_FROM_LIST and REMOVE_BOARD_ITEM mutations', () => {
+    const payload = {
+      listId: mockLists[0].id,
+      itemId: mockIssue.id,
+    };
+
+    testAction(actions.removeListItem, payload, {}, [
+      { type: types.REMOVE_BOARD_ITEM_FROM_LIST, payload },
+      { type: types.REMOVE_BOARD_ITEM, payload: mockIssue.id },
+    ]);
+  });
+});
+
+describe('addListNewIssue', () => {
   const state = {
     boardType: 'group',
     fullPath: 'gitlab-org/gitlab',
@@ -843,19 +881,7 @@ describe('createNewIssue', () => {
     },
   };
 
-  it('should return issue from API on success', async () => {
-    jest.spyOn(gqlClient, 'mutate').mockResolvedValue({
-      data: {
-        createIssue: {
-          issue: mockIssue,
-          errors: [],
-        },
-      },
-    });
-
-    const result = await actions.createNewIssue({ state }, mockIssue);
-    expect(result).toEqual(mockIssue);
-  });
+  const fakeList = { id: 'gid://gitlab/List/123' };
 
   it('should add board scope to the issue being created', async () => {
     jest.spyOn(gqlClient, 'mutate').mockResolvedValue({
@@ -867,7 +893,11 @@ describe('createNewIssue', () => {
       },
     });
 
-    await actions.createNewIssue({ state: stateWithBoardConfig }, mockIssue);
+    await actions.addListNewIssue(
+      { dispatch: jest.fn(), commit: jest.fn(), state: stateWithBoardConfig },
+      { issueInput: mockIssue, list: fakeList },
+    );
+
     expect(gqlClient.mutate).toHaveBeenCalledWith({
       mutation: issueCreateMutation,
       variables: {
@@ -894,7 +924,11 @@ describe('createNewIssue', () => {
 
     const payload = formatIssueInput(issue, stateWithBoardConfig.boardConfig);
 
-    await actions.createNewIssue({ state: stateWithBoardConfig }, issue);
+    await actions.addListNewIssue(
+      { dispatch: jest.fn(), commit: jest.fn(), state: stateWithBoardConfig },
+      { issueInput: issue, list: fakeList },
+    );
+
     expect(gqlClient.mutate).toHaveBeenCalledWith({
       mutation: issueCreateMutation,
       variables: {
@@ -905,45 +939,86 @@ describe('createNewIssue', () => {
     expect(payload.assigneeIds).toEqual(['gid://gitlab/User/1', 'gid://gitlab/User/2']);
   });
 
-  it('should commit CREATE_ISSUE_FAILURE mutation when API returns an error', (done) => {
-    jest.spyOn(gqlClient, 'mutate').mockResolvedValue({
-      data: {
-        createIssue: {
-          issue: mockIssue,
-          errors: [{ foo: 'bar' }],
+  describe('when issue creation mutation request succeeds', () => {
+    it('dispatches a correct set of mutations', () => {
+      jest.spyOn(gqlClient, 'mutate').mockResolvedValue({
+        data: {
+          createIssue: {
+            issue: mockIssue,
+            errors: [],
+          },
         },
-      },
+      });
+
+      testAction({
+        action: actions.addListNewIssue,
+        payload: {
+          issueInput: mockIssue,
+          list: fakeList,
+          placeholderId: 'tmp',
+        },
+        state,
+        expectedActions: [
+          {
+            type: 'addListItem',
+            payload: {
+              list: fakeList,
+              item: formatIssue({ ...mockIssue, id: 'tmp' }),
+              position: 0,
+            },
+          },
+          { type: 'removeListItem', payload: { listId: fakeList.id, itemId: 'tmp' } },
+          {
+            type: 'addListItem',
+            payload: {
+              list: fakeList,
+              item: formatIssue({ ...mockIssue, id: getIdFromGraphQLId(mockIssue.id) }),
+              position: 0,
+            },
+          },
+        ],
+      });
     });
-
-    const payload = mockIssue;
-
-    testAction(
-      actions.createNewIssue,
-      payload,
-      state,
-      [{ type: types.CREATE_ISSUE_FAILURE }],
-      [],
-      done,
-    );
   });
-});
 
-describe('addListIssue', () => {
-  it('should commit ADD_ISSUE_TO_LIST mutation', (done) => {
-    const payload = {
-      list: mockLists[0],
-      issue: mockIssue,
-      position: 0,
-    };
+  describe('when issue creation mutation request fails', () => {
+    it('dispatches a correct set of mutations', () => {
+      jest.spyOn(gqlClient, 'mutate').mockResolvedValue({
+        data: {
+          createIssue: {
+            issue: mockIssue,
+            errors: [{ foo: 'bar' }],
+          },
+        },
+      });
 
-    testAction(
-      actions.addListIssue,
-      payload,
-      {},
-      [{ type: types.ADD_ISSUE_TO_LIST, payload }],
-      [],
-      done,
-    );
+      testAction({
+        action: actions.addListNewIssue,
+        payload: {
+          issueInput: mockIssue,
+          list: fakeList,
+          placeholderId: 'tmp',
+        },
+        state,
+        expectedActions: [
+          {
+            type: 'addListItem',
+            payload: {
+              list: fakeList,
+              item: formatIssue({ ...mockIssue, id: 'tmp' }),
+              position: 0,
+            },
+          },
+          { type: 'removeListItem', payload: { listId: fakeList.id, itemId: 'tmp' } },
+        ],
+        expectedMutations: [
+          {
+            type: types.SET_ERROR,
+            payload: 'An error occurred while creating the issue. Please try again.',
+          },
+        ],
+      });
+    });
   });
 });
 

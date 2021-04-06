@@ -12,6 +12,7 @@ import {
 import { getIdFromGraphQLId } from '~/graphql_shared/utils';
 import createGqClient, { fetchPolicies } from '~/lib/graphql';
 import { convertObjectPropsToCamelCase, urlParamsToObject } from '~/lib/utils/common_utils';
+import { s__ } from '~/locale';
 import {
   formatBoardLists,
   formatListIssues,
@@ -402,49 +403,51 @@ export default {
     });
   },
 
-  createNewIssue: ({ commit, state }, issueInput) => {
-    const { boardConfig } = state;
+  addListItem: ({ commit }, { list, item, position }) => {
+    commit(types.ADD_BOARD_ITEM_TO_LIST, { listId: list.id, itemId: item.id, atIndex: position });
+    commit(types.UPDATE_BOARD_ITEM, item);
+  },
 
+  removeListItem: ({ commit }, { listId, itemId }) => {
+    commit(types.REMOVE_BOARD_ITEM_FROM_LIST, { listId, itemId });
+    commit(types.REMOVE_BOARD_ITEM, itemId);
+  },
+
+  addListNewIssue: (
+    { state: { boardConfig, boardType, fullPath }, dispatch, commit },
+    { issueInput, list, placeholderId = `tmp-${new Date().getTime()}` },
+  ) => {
     const input = formatIssueInput(issueInput, boardConfig);
 
-    const { boardType, fullPath } = state;
     if (boardType === BoardType.project) {
       input.projectPath = fullPath;
     }
 
-    return gqlClient
+    const placeholderIssue = formatIssue({ ...issueInput, id: placeholderId });
+    dispatch('addListItem', { list, item: placeholderIssue, position: 0 });
+
+    gqlClient
       .mutate({
         mutation: issueCreateMutation,
         variables: { input },
       })
       .then(({ data }) => {
         if (data.createIssue.errors.length) {
-          commit(types.CREATE_ISSUE_FAILURE);
-        } else {
-          return data.createIssue?.issue;
+          throw new Error();
         }
-        return null;
+
+        const rawIssue = data.createIssue?.issue;
+        const formattedIssue = formatIssue({ ...rawIssue, id: getIdFromGraphQLId(rawIssue.id) });
+        dispatch('removeListItem', { listId: list.id, itemId: placeholderId });
+        dispatch('addListItem', { list, item: formattedIssue, position: 0 });
       })
-      .catch(() => commit(types.CREATE_ISSUE_FAILURE));
-  },
-
-  addListIssue: ({ commit }, { list, issue, position }) => {
-    commit(types.ADD_ISSUE_TO_LIST, { list, issue, position });
-  },
-
-  addListNewIssue: ({ commit, dispatch }, { issueInput, list }) => {
-    const issue = formatIssue({ ...issueInput, id: 'tmp' });
-    commit(types.ADD_ISSUE_TO_LIST, { list, issue, position: 0 });
-
-    dispatch('createNewIssue', issueInput)
-      .then((res) => {
-        commit(types.ADD_ISSUE_TO_LIST, {
-          list,
-          issue: formatIssue({ ...res, id: getIdFromGraphQLId(res.id) }),
-        });
-        commit(types.REMOVE_ISSUE_FROM_LIST, { list, issue });
-      })
-      .catch(() => commit(types.ADD_ISSUE_TO_LIST_FAILURE, { list, issueId: issueInput.id }));
+      .catch(() => {
+        dispatch('removeListItem', { listId: list.id, itemId: placeholderId });
+        commit(
+          types.SET_ERROR,
+          s__('Boards|An error occurred while creating the issue. Please try again.'),
+        );
+      });
   },
 
   setActiveBoardItemLabels: ({ dispatch }, params) => {
