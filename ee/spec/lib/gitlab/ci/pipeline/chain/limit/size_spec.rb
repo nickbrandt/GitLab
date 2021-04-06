@@ -83,8 +83,7 @@ RSpec.describe ::Gitlab::Ci::Pipeline::Chain::Limit::Size do
           project: project,
           current_user: user,
           save_incompleted: false,
-          pipeline_seed: double(:seed, size: 2),
-          increment_pipeline_failure_reason_counter: true)
+          pipeline_seed: double(:seed, size: 2))
       end
 
       it 'does not drop the pipeline' do
@@ -97,12 +96,6 @@ RSpec.describe ::Gitlab::Ci::Pipeline::Chain::Limit::Size do
         subject
 
         expect(step.break?).to be true
-      end
-
-      it 'increments the error metric' do
-        expect(command).to receive(:increment_pipeline_failure_reason_counter).with(:size_limit_exceeded)
-
-        subject
       end
     end
   end
