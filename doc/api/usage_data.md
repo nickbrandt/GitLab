@@ -5,17 +5,17 @@ info: To determine the technical writer assigned to the Stage/Group associated w
 type: reference, api
 ---
 
-# UsageData API
+# UsageData API **(FREE SELF)**
 
-This API for [Usage Ping](../development/usage_ping/index.md) is only available to
-GitLab instance [Administrator](../user/permissions.md) users.
+The UsageData API, associated with [Usage Ping](../development/usage_ping/index.md), is available only for
+the use of GitLab instance [Administrator](../user/permissions.md) users.
 
 ## UsageDataQueries API
 
 > - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/57016) in GitLab 13.11.
-> - It's [deployed behind a feature flag](../user/feature_flags.md), disabled by default.
+> - [Deployed behind a feature flag](../user/feature_flags.md), disabled by default.
 
-Get all the raw SQL queries used to compute usage ping.
+Return all of the raw SQL queries used to compute usage ping.
 
 Example request:
 
