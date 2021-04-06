@@ -23160,6 +23160,8 @@ CREATE UNIQUE INDEX index_namespace_root_storage_statistics_on_namespace_id ON n
 
 CREATE UNIQUE INDEX index_namespace_statistics_on_namespace_id ON namespace_statistics USING btree (namespace_id);
 
+CREATE INDEX index_namespaces_id_parent_id_is_null ON namespaces USING btree (id) WHERE (parent_id IS NULL);
+
 CREATE INDEX index_namespaces_on_created_at ON namespaces USING btree (created_at);
 
 CREATE INDEX index_namespaces_on_custom_project_templates_group_id_and_type ON namespaces USING btree (custom_project_templates_group_id, type) WHERE (custom_project_templates_group_id IS NOT NULL);
