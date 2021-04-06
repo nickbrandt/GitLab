@@ -158,13 +158,13 @@ export default {
     });
   },
 
-  [mutationTypes.UPDATE_ISSUE_BY_ID]: (state, { issueId, prop, value }) => {
-    if (!state.boardItems[issueId]) {
+  [mutationTypes.UPDATE_BOARD_ITEM_BY_ID]: (state, { itemId, prop, value }) => {
+    if (!state.boardItems[itemId]) {
       /* eslint-disable-next-line @gitlab/require-i18n-strings */
       throw new Error('No issue found.');
     }
 
-    Vue.set(state.boardItems[issueId], prop, value);
+    Vue.set(state.boardItems[itemId], prop, value);
   },
 
   [mutationTypes.SET_ASSIGNEE_LOADING](state, isLoading) {

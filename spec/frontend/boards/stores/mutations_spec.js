@@ -335,7 +335,7 @@ describe('Board Store Mutations', () => {
     expectNotImplemented(mutations.REQUEST_ADD_ISSUE);
   });
 
-  describe('UPDATE_ISSUE_BY_ID', () => {
+  describe('UPDATE_BOARD_ITEM_BY_ID', () => {
     const issueId = '1';
     const prop = 'id';
     const value = '2';
@@ -353,8 +353,8 @@ describe('Board Store Mutations', () => {
 
     describe('when the issue is in state', () => {
       it('updates the property of the correct issue', () => {
-        mutations.UPDATE_ISSUE_BY_ID(state, {
-          issueId,
+        mutations.UPDATE_BOARD_ITEM_BY_ID(state, {
+          itemId: issueId,
           prop,
           value,
         });
@@ -366,8 +366,8 @@ describe('Board Store Mutations', () => {
     describe('when the issue is not in state', () => {
       it('throws an error', () => {
         expect(() => {
-          mutations.UPDATE_ISSUE_BY_ID(state, {
-            issueId: '3',
+          mutations.UPDATE_BOARD_ITEM_BY_ID(state, {
+            itemId: '3',
             prop,
             value,
           });
