@@ -53,33 +53,20 @@ export default {
       });
 
       const data = produce(sourceData, (draftState) => {
-        let mockedCorpuses = draftState.mockedPackages.data;
-        let totalSize = draftState.mockedPackages.totalSize;
-
-        //Simulate adding a corpus
-        // mockedCorpuses.push({       
-        //   name,
-        //   lastUpdated: new Date(),
-        //   lastUsed: '',
-        //   latestJobPath: '',
-        //   target: '',
-        //   downloadPath: 'farias-gl/go-fuzzing-example/-/jobs/959593462/artifacts/download',
-        //   size: 4e8,            
-        // });
-        mockedCorpuses = [
-          ...mockedCorpuses,
+        draftState.mockedPackages.data = [
+          ...draftState.mockedPackages.data,
           {
+            __typename: 'Corpus',
             name,
             lastUpdated: new Date(),
-            lastUsed: '',
+            lastUsed: new Date(),
             latestJobPath: '',
             target: '',
             downloadPath: 'farias-gl/go-fuzzing-example/-/jobs/959593462/artifacts/download',
             size: 4e8,
-         }
+          },
         ];
-
-        totalSize += 4e8;
+        draftState.mockedPackages.totalSize += 4e8;
       });
 
       cache.writeQuery({ query: getCorpusesQuery, data, variables: { projectPath, ...cursor } });
