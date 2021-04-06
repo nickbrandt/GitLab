@@ -2327,6 +2327,9 @@ msgstr ""
 msgid "AdminSettings|Required pipeline configuration"
 msgstr ""
 
+msgid "AdminSettings|See affected service templates"
+msgstr ""
+
 msgid "AdminSettings|Select a pipeline configuration file"
 msgstr ""
 
@@ -2361,6 +2364,9 @@ msgid "AdminSettings|When creating a new environment variable it will be protect
 msgstr ""
 
 msgid "AdminSettings|You can't add new templates. To migrate or remove a Service template, create a new integration at %{settings_link_start}Settings &gt; Integrations%{link_end}. Learn more about %{doc_link_start}Project integration management%{link_end}."
+msgstr ""
+
+msgid "AdminSettings|You should migrate to %{doc_link_start}Project integration management%{link_end}, available at %{settings_link_start}Settings &gt; Integrations.%{link_end}"
 msgstr ""
 
 msgid "AdminStatistics|Active Users"
@@ -18670,6 +18676,9 @@ msgid "Leave blank for no limit. Once set, existing personal access tokens may b
 msgstr ""
 
 msgid "Leave edit mode? All unsaved changes will be lost."
+msgstr ""
+
+msgid "Leave feedback"
 msgstr ""
 
 msgid "Leave group"
