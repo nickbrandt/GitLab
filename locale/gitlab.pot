@@ -6438,10 +6438,22 @@ msgstr ""
 msgid "CloudLicense|Activate"
 msgstr ""
 
+msgid "CloudLicense|Activate subscription"
+msgstr ""
+
+msgid "CloudLicense|Activation code"
+msgstr ""
+
+msgid "CloudLicense|I agree that my use of the GitLab Software is subject to the Subscription Agreement located at the %{linkStart}Terms of Service%{linkEnd}, unless otherwise agreed to in writing with GitLab."
+msgstr ""
+
 msgid "CloudLicense|ID"
 msgstr ""
 
 msgid "CloudLicense|Last Sync"
+msgstr ""
+
+msgid "CloudLicense|Learn how to %{linkStart}activate your subscription%{linkEnd}."
 msgstr ""
 
 msgid "CloudLicense|Licensed to"
@@ -6451,9 +6463,6 @@ msgid "CloudLicense|Manage"
 msgstr ""
 
 msgid "CloudLicense|Paste your activation code"
-msgstr ""
-
-msgid "CloudLicense|Paste your activation code below"
 msgstr ""
 
 msgid "CloudLicense|Plan"
@@ -6472,6 +6481,9 @@ msgid "CloudLicense|Sync Subscription details"
 msgstr ""
 
 msgid "CloudLicense|This instance is currently using the %{planName} plan."
+msgstr ""
+
+msgid "CloudLicense|Your subscription"
 msgstr ""
 
 msgid "Cluster"
