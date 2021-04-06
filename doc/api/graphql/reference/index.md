@@ -4771,7 +4771,7 @@ An edge in a connection.
 | `iterations` | [`IterationConnection`](#iterationconnection) | Find iterations. |
 | `jiraImportStatus` | [`String`](#string) | Status of Jira import background job of the project. |
 | `jiraImports` | [`JiraImportConnection`](#jiraimportconnection) | Jira imports into the project. |
-| `jobs` | [`CiJobConnection`](#cijobconnection) | Jobs of a single project. |
+| `jobs` | [`CiJobConnection`](#cijobconnection) | Jobs of a project. This field can only be resolved for one project in any single request. |
 | `jobsEnabled` | [`Boolean`](#boolean) | Indicates if CI/CD pipeline jobs are enabled for the current user. |
 | `label` | [`Label`](#label) | A label available on this project. |
 | `labels` | [`LabelConnection`](#labelconnection) | Labels available on this project. |
