@@ -10,9 +10,11 @@ module MergeRequests
       return merge_request unless current_user&.can?(:update_merge_request, merge_request)
 
       old_ids = merge_request.assignees.map(&:id)
-      return merge_request if old_ids.to_set == update_attrs[:assignee_ids].to_set # no-change
+      new_ids = new_assignee_ids(merge_request)
+      return merge_request if old_ids.to_set == new_ids.to_set # no-change
 
-      merge_request.update!(**update_attrs)
+      attrs = update_attrs.merge(assignee_ids: new_ids)
+      merge_request.update!(**attrs)
 
       # Defer the more expensive operations (handle_assignee_changes) to the background
       MergeRequests::AssigneesChangeWorker.perform_async(merge_request.id, current_user.id, old_ids)
@@ -32,6 +34,12 @@ module MergeRequests
     end
 
     private
+
+    def new_assignee_ids(merge_request)
+      User.id_in(update_attrs[:assignee_ids]).map do |user|
+        user.id if user.can?(:read_merge_request, merge_request)
+      end.compact
+    end
 
     def assignee_ids
       params.fetch(:assignee_ids).first(1)
