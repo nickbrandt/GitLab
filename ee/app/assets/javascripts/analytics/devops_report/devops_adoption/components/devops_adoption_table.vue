@@ -244,6 +244,7 @@ export default {
             :disabled="isCurrentGroup(item)"
             category="tertiary"
             icon="remove"
+            :aria-label="$options.i18n.removeButton"
             @click="setSelectedSegment(item)"
           />
         </span>
