@@ -1,10 +1,7 @@
 import Vue from 'vue';
 import createFlash from '~/flash';
-import GlFeatureFlagsPlugin from '~/vue_shared/gl_feature_flags_plugin';
 import ProfilePreferences from './components/profile_preferences.vue';
 import { parseDataset } from './utils';
-
-Vue.use(GlFeatureFlagsPlugin);
 
 export default () => {
   const el = document.querySelector('#js-profile-preferences-app');

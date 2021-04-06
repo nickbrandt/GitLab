@@ -209,20 +209,28 @@ describe('ProfilePreferences component', () => {
   });
 
   describe('Integrations section', () => {
-    it('should not render', () => {
-      wrapper = createComponent();
+    describe('when views are not provided', () => {
+      beforeEach(() => {
+        wrapper = createComponent();
+      });
 
-      expect(findIntegrationsDivider().exists()).toBe(false);
-      expect(findIntegrationsHeading().exists()).toBe(false);
-      expect(findIntegrationViewList()).toHaveLength(0);
+      it('should not render', () => {
+        expect(findIntegrationsDivider().exists()).toBe(false);
+        expect(findIntegrationsHeading().exists()).toBe(false);
+        expect(findIntegrationViewList()).toHaveLength(0);
+      });
     });
 
-    it('should render', () => {
-      wrapper = createComponent({ provide: { integrationViews } });
+    describe('when views are provided', () => {
+      beforeEach(() => {
+        wrapper = createComponent({ provide: { integrationViews } });
+      });
 
-      expect(findIntegrationsDivider().exists()).toBe(true);
-      expect(findIntegrationsHeading().exists()).toBe(true);
-      expect(findIntegrationViewList()).toHaveLength(integrationViews.length);
+      it('should render', () => {
+        expect(findIntegrationsDivider().exists()).toBe(true);
+        expect(findIntegrationsHeading().exists()).toBe(true);
+        expect(findIntegrationViewList()).toHaveLength(integrationViews.length);
+      });
     });
   });
 
