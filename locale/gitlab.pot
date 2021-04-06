@@ -4768,6 +4768,9 @@ msgstr ""
 msgid "Be careful. Renaming a project's repository can have unintended side effects."
 msgstr ""
 
+msgid "Before inserting code, be sure to read the comment that separated each code group."
+msgstr ""
+
 msgid "Before this can be merged, a Jira issue must be linked in the title or description"
 msgstr ""
 
@@ -7687,6 +7690,9 @@ msgid "Code owner approval is required"
 msgstr ""
 
 msgid "Code owners"
+msgstr ""
+
+msgid "Code snippet copied. Insert it in the correct location in the YAML file."
 msgstr ""
 
 msgid "CodeIntelligence|This is the definition"
@@ -14694,6 +14700,9 @@ msgid "Go back"
 msgstr ""
 
 msgid "Go back (while searching for files)"
+msgstr ""
+
+msgid "Go back to configuration"
 msgstr ""
 
 msgid "Go full screen"
@@ -25557,6 +25566,9 @@ msgid "Re-request review"
 msgstr ""
 
 msgid "Re-verification interval"
+msgstr ""
+
+msgid "Read documentation"
 msgstr ""
 
 msgid "Read more"

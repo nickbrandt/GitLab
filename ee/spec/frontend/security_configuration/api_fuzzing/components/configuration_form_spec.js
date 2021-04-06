@@ -13,6 +13,7 @@ import FormInput from 'ee/security_configuration/components/form_input.vue';
 import { stripTypenames } from 'helpers/graphql_helpers';
 import { extendedWrapper } from 'helpers/vue_test_utils_helper';
 import waitForPromises from 'helpers/wait_for_promises';
+import { CODE_SNIPPET_SOURCE_API_FUZZING } from '~/pipeline_editor/components/code_snippet_alert/constants';
 import {
   apiFuzzingConfigurationQueryResponse,
   createApiFuzzingConfigurationMutationResponse,
@@ -251,6 +252,7 @@ include:
 # Tip: Insert the following variables anywhere below stages and include
 variables:
 - FOO: bar`,
+        redirectParam: CODE_SNIPPET_SOURCE_API_FUZZING,
       });
     });
 
