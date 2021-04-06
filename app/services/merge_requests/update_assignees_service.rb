@@ -37,6 +37,8 @@ module MergeRequests
     private
 
     def new_assignee_ids(merge_request)
+      # prime the cache - prevent N+1 lookup during authorization loop.
+      merge_request.project.team.max_member_access_for_user_ids(update_attrs[:assignee_ids])
       User.id_in(update_attrs[:assignee_ids]).map do |user|
         if user.can?(:read_merge_request, merge_request)
           user.id
