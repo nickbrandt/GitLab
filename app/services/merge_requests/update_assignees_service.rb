@@ -11,6 +11,7 @@ module MergeRequests
 
       old_ids = merge_request.assignees.map(&:id)
       new_ids = new_assignee_ids(merge_request)
+      return merge_request if new_ids.size != update_attrs[:assignee_ids].size
       return merge_request if old_ids.to_set == new_ids.to_set # no-change
 
       attrs = update_attrs.merge(assignee_ids: new_ids)
@@ -37,7 +38,12 @@ module MergeRequests
 
     def new_assignee_ids(merge_request)
       User.id_in(update_attrs[:assignee_ids]).map do |user|
-        user.id if user.can?(:read_merge_request, merge_request)
+        if user.can?(:read_merge_request, merge_request)
+          user.id
+        else
+          merge_request.errors.add(:assignee, "Cannot assign User #{user.id}")
+          nil
+        end
       end.compact
     end
 

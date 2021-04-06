@@ -32,6 +32,14 @@ RSpec.shared_examples 'an assignable resource' do
       expect { subject }.not_to change { resource.reload.assignee_ids }
     end
 
+    it 'returns an operational error if the resource is not accessible to the assignees' do
+      resource.project.add_developer(user)
+
+      result = subject
+
+      expect(result[:errors]).not_to be_blank
+    end
+
     context 'when the user can update the resource' do
       before do
         resource.project.add_developer(assignee)
