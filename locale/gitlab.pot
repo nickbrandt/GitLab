@@ -11487,13 +11487,19 @@ msgstr ""
 msgid "EmailsOnPushService|Emails on push"
 msgstr ""
 
-msgid "EmailsOnPushService|Emails separated by whitespace"
+msgid "EmailsOnPushService|Emails separated by whitespace."
 msgstr ""
 
 msgid "EmailsOnPushService|Send from committer"
 msgstr ""
 
 msgid "EmailsOnPushService|Send notifications from the committer's email address if the domain is part of the domain GitLab is running on (e.g. %{domains})."
+msgstr ""
+
+msgid "EmailsOnPushService|can't exceed %{recipients_limit}"
+msgstr ""
+
+msgid "EmailsOnPushService|tanuki@example.com gitlab@example.com"
 msgstr ""
 
 msgid "Embed"
