@@ -72,7 +72,7 @@ describe('EE - ApiFuzzingConfigurationSnippetModal', () => {
       text: expect.any(Function),
     });
     expect(redirectTo).toHaveBeenCalledWith(
-      `http://gitlab.local${gitlabCiYamlEditPath}?code_snippet_copied_from=foo`,
+      `http://gitlab.local${gitlabCiYamlEditPath}?code_snippet_copied_from=${redirectParam}`,
     );
   });
 
