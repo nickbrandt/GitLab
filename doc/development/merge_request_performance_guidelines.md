@@ -162,7 +162,7 @@ query. This in turn makes it much harder for this code to overload a database.
 
 In a DB cluster we have many read replicas and one primary.  A classic use of scaling the DB is to have read only actions be performed the replicas.  We use [load balancing](https://docs.gitlab.com/ee/administration/database_load_balancing.html)) to distribute this load.  This allows for the replics to grow as the pressure on the DB grows.
 
-< insert example here>
+By default queries use read-only replicas, but due to [primary sticking](https://docs.gitlab.com/ee/administration/database_load_balancing.html#primary-sticking) GitLab will stick to using the primary for a certain period of time and revert back to secondaries after they have either caught up or 30 seconds which can lead to a considerable amount of unnecessary load on the primary. In this [merge request](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/56849) we introduced the `without_sticky_writes` block to prevent switching to the primary. This [merge request example](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/57328) provides a good use case for when queries can stick to the primary and how to prevent this by using `without_sticky_writes`.
 
 ## Use CTEs wisely
 
