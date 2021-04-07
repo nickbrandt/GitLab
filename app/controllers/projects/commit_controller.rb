@@ -164,6 +164,7 @@ class Projects::CommitController < Projects::ApplicationController
 
     opts = diff_options
     opts[:ignore_whitespace_change] = true if params[:format] == 'diff'
+    opts[:word_diff] = true if diff_view == :word
 
     @diffs = commit.diffs(opts)
     @notes_count = commit.notes.count
