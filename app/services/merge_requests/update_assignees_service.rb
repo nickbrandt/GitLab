@@ -43,7 +43,10 @@ module MergeRequests
         if user.can?(:read_merge_request, merge_request)
           user.id
         else
-          merge_request.errors.add(:assignee, "Cannot assign User #{user.id}")
+          merge_request.errors.add(
+            :assignees,
+            "Cannot assign #{user.to_reference} to #{merge_request.to_reference}"
+          )
           nil
         end
       end.compact

@@ -37,7 +37,7 @@ RSpec.shared_examples 'an assignable resource' do
 
       result = subject
 
-      expect(result[:errors]).not_to be_blank
+      expect(result[:errors]).to include a_string_matching(/Cannot assign/)
     end
 
     context 'when the user can update the resource' do

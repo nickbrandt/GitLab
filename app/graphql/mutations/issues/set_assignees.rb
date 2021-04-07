@@ -13,7 +13,10 @@ module Mutations
         super(issue, permitted, mode)
 
         forbidden.each do |user|
-          issue.errors.add(:assignee, "Cannot assign #{user.to_reference} to #{issue.to_reference}")
+          issue.errors.add(
+            :assignees,
+            "Cannot assign #{user.to_reference} to #{issue.to_reference}"
+          )
         end
       end
 
