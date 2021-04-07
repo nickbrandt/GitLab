@@ -26755,16 +26755,19 @@ msgstr ""
 msgid "Runners|Can run untagged jobs"
 msgstr ""
 
+msgid "Runners|Command to register runner"
+msgstr ""
+
 msgid "Runners|Copy instructions"
 msgstr ""
 
 msgid "Runners|Description"
 msgstr ""
 
-msgid "Runners|Download Latest Binary"
+msgid "Runners|Download and install binary"
 msgstr ""
 
-msgid "Runners|Download and Install Binary"
+msgid "Runners|Download latest binary"
 msgstr ""
 
 msgid "Runners|Group"
@@ -26773,7 +26776,7 @@ msgstr ""
 msgid "Runners|IP Address"
 msgstr ""
 
-msgid "Runners|Install a Runner"
+msgid "Runners|Install a runner"
 msgstr ""
 
 msgid "Runners|Last contact"
@@ -26795,9 +26798,6 @@ msgid "Runners|Property Name"
 msgstr ""
 
 msgid "Runners|Protected"
-msgstr ""
-
-msgid "Runners|Register Runner"
 msgstr ""
 
 msgid "Runners|Revision"
