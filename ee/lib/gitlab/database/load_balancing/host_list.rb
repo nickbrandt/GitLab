@@ -8,7 +8,7 @@ module Gitlab
         # hosts - The list of secondary hosts to add.
         def initialize(hosts = [])
           @hosts = hosts.shuffle
-          @pools = {}.compare_by_identity
+          @pools = Set.new
           @index = 0
           @mutex = Mutex.new
           @hosts_gauge = Gitlab::Metrics.gauge(:db_load_balancing_hosts, 'Current number of load balancing hosts')
@@ -30,7 +30,7 @@ module Gitlab
         end
 
         def manage_pool?(pool)
-          @pools[pool] == true
+          @pools.include?(pool)
         end
 
         def hosts=(hosts)
@@ -80,9 +80,7 @@ module Gitlab
         end
 
         def update_pools
-          @pools = @hosts.each_with_object({}.compare_by_identity) do |host, flags|
-            flags[host.pool] = true
-          end
+          @pools = Set.new(@hosts.map(&:pool))
         end
       end
     end
