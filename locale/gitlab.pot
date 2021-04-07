@@ -35640,10 +35640,16 @@ msgstr ""
 msgid "Your SSH key has expired"
 msgstr ""
 
+msgid "Your SSH key is expiring soon."
+msgstr ""
+
 msgid "Your SSH key was deleted"
 msgstr ""
 
 msgid "Your SSH keys (%{count})"
+msgstr ""
+
+msgid "Your SSH keys with the following fingerprints are scheduled to expire soon:"
 msgstr ""
 
 msgid "Your SSH keys with the following fingerprints has expired:"
