@@ -3,6 +3,7 @@ import Vue from 'vue';
 import VueApollo from 'vue-apollo';
 import createDefaultClient from '~/lib/graphql';
 import { resetServiceWorkersPublicPath } from '../lib/utils/webpack';
+import { CODE_SNIPPET_SOURCE_SETTINGS } from './components/code_snippet_alert/constants';
 import getCommitSha from './graphql/queries/client/commit_sha.graphql';
 import getCurrentBranch from './graphql/queries/client/current_branch.graphql';
 import { resolvers } from './graphql/resolvers';
@@ -35,8 +36,14 @@ export const initPipelineEditor = (selector = '#js-pipeline-editor') => {
     projectPath,
     projectNamespace,
     ymlHelpPagePath,
-    apiFuzzingConfigurationPath,
   } = el?.dataset;
+
+  const provideCodeSnippetConfigurationPaths = Object.fromEntries(
+    Object.values(CODE_SNIPPET_SOURCE_SETTINGS).map(({ configurationPathInjectKey }) => [
+      configurationPathInjectKey,
+      el.dataset[configurationPathInjectKey],
+    ]),
+  );
 
   Vue.use(VueApollo);
 
@@ -72,7 +79,7 @@ export const initPipelineEditor = (selector = '#js-pipeline-editor') => {
       projectPath,
       projectNamespace,
       ymlHelpPagePath,
-      apiFuzzingConfigurationPath,
+      ...provideCodeSnippetConfigurationPaths,
     },
     render(h) {
       return h(PipelineEditorApp);
