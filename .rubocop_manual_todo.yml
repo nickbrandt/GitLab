@@ -162,8 +162,6 @@ Rails/SaveBang:
     - 'spec/graphql/mutations/merge_requests/set_locked_spec.rb'
     - 'spec/graphql/mutations/merge_requests/set_wip_spec.rb'
     - 'spec/graphql/resolvers/boards_resolver_spec.rb'
-    - 'spec/initializers/active_record_locking_spec.rb'
-    - 'spec/initializers/fog_google_https_private_urls_spec.rb'
     - 'spec/lib/after_commit_queue_spec.rb'
     - 'spec/lib/backup/manager_spec.rb'
     - 'spec/lib/gitlab/alerting/alert_spec.rb'
