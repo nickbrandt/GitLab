@@ -49,6 +49,32 @@ RSpec.describe 'Welcome screen', :js do
         expect(page).not_to have_content('Your profile')
       end
     end
+
+    context 'email opt in' do
+      it 'does not show the email opt in checkbox when setting up for a company' do
+        expect(page).not_to have_selector('input[name="user[email_opted_in]', visible: true)
+
+        choose 'user_setup_for_company_true'
+
+        expect(page).not_to have_selector('input[name="user[email_opted_in]', visible: true)
+
+        click_button 'Continue'
+
+        expect(user.reload.email_opted_in).to eq(true)
+      end
+
+      it 'shows the email opt checkbox in when setting up for just me' do
+        expect(page).not_to have_selector('input[name="user[email_opted_in]', visible: true)
+
+        choose 'user_setup_for_company_false'
+
+        expect(page).to have_selector('input[name="user[email_opted_in]', visible: true)
+
+        click_button 'Continue'
+
+        expect(user.reload.email_opted_in).to eq(false)
+      end
+    end
   end
 
   context 'when not on GitLab.com' do
