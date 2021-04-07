@@ -20,3 +20,7 @@ export function parseDataset(data) {
     return { ...memo, [key]: value };
   }, {});
 }
+
+export function mapChoicesToSelect2Options(choices) {
+  return choices.map(([text, id]) => ({ id, text }));
+}

@@ -5,6 +5,8 @@ import { extendedWrapper } from 'helpers/vue_test_utils_helper';
 import IntegrationView from '~/profile/preferences/components/integration_view.vue';
 import ProfilePreferences from '~/profile/preferences/components/profile_preferences.vue';
 import { i18n } from '~/profile/preferences/constants';
+import { mapChoicesToSelect2Options } from '~/profile/preferences/utils';
+import Select2Select from '~/vue_shared/components/select2_select.vue';
 import {
   bodyClasses,
   darkModeThemeId,
@@ -56,20 +58,16 @@ describe('ProfilePreferences component', () => {
     return wrapper.find('#localization');
   }
 
-  function findUserLanguageOptionList() {
-    return wrapper.findAll('[data-testid="user-preferred-language-option"]');
+  function findUserLanguageSelect() {
+    return wrapper
+      .find('[data-testid="user-preferred-language-select"]')
+      .findComponent(Select2Select);
   }
 
-  function findUserLanguageSelectedOption() {
-    return wrapper.find('[data-testid="user-preferred-language-option"]:checked');
-  }
-
-  function findUserFirstDayOfWeekOptionList() {
-    return wrapper.findAll('[data-testid="user-first-day-of-week-option"]');
-  }
-
-  function findUserFirstDayOfWeekSelectedOption() {
-    return wrapper.find('[data-testid="user-first-day-of-week-option"]:checked');
+  function findUserFirstDayOfWeekSelect() {
+    return wrapper
+      .find('[data-testid="user-first-day-of-week-select"]')
+      .findComponent(Select2Select);
   }
 
   function findUserTimeSettingsDivider() {
@@ -150,23 +148,17 @@ describe('ProfilePreferences component', () => {
       expect(findLocalizationAnchor().exists()).toBe(true);
     });
 
-    it('allows the user to change their language preferences', async () => {
-      const newChoice = 1;
-      const languageOptions = findUserLanguageOptionList();
-      expect(findUserLanguageSelectedOption().element.value).toBe(languageChoices[0][1]);
-      await languageOptions.at(newChoice).setSelected();
-      expect(findUserLanguageSelectedOption().element.value).toBe(languageChoices[newChoice][1]);
+    it('passes the correct language options to select', async () => {
+      const languageSelect = findUserLanguageSelect();
+      expect(languageSelect.props().options.data).toEqual(
+        mapChoicesToSelect2Options(languageChoices),
+      );
     });
 
-    it('allows the user to change their first day of the week preferences', async () => {
-      const newChoice = 1;
-      const languageOptions = findUserFirstDayOfWeekOptionList();
-      expect(findUserFirstDayOfWeekSelectedOption().element.value).toBe(
-        firstDayOfWeekChoicesWithDefault[0][1],
-      );
-      await languageOptions.at(newChoice).setSelected();
-      expect(findUserFirstDayOfWeekSelectedOption().element.value).toBe(
-        firstDayOfWeekChoicesWithDefault[newChoice][1],
+    it('passes the correct time settings options to select', async () => {
+      const firstDayOfTheWeekSelect = findUserFirstDayOfWeekSelect();
+      expect(firstDayOfTheWeekSelect.props().options.data).toEqual(
+        mapChoicesToSelect2Options(firstDayOfWeekChoicesWithDefault),
       );
     });
   });

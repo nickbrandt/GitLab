@@ -67,7 +67,7 @@ RSpec.describe 'User visits the profile preferences page', :js do
   describe 'User changes their language' do
     it 'creates a flash message' do
       wait_for_requests
-      select 'English', from: 'user_preferred_language'
+      select2('en', from: '#user_preferred_language')
       click_button 'Save changes'
 
       wait_for_requests
@@ -77,13 +77,36 @@ RSpec.describe 'User visits the profile preferences page', :js do
 
     it 'updates their preference' do
       wait_for_requests
-      select 'Portuguese (Brazil) - português (Brasil)', from: 'user_preferred_language'
+      select2('pt_BR', from: '#user_preferred_language')
       click_button 'Save changes'
 
       wait_for_requests
       refresh
 
       expect(page).to have_css('html[lang="pt-BR"]')
+    end
+  end
+
+  describe 'User changes their first day of week' do
+    it 'creates a flash message' do
+      wait_for_requests
+      select2('1', from: '#user_first_day_of_week')
+      click_button 'Save changes'
+
+      wait_for_requests
+
+      expect_preferences_saved_message
+    end
+
+    it 'updates their preference' do
+      wait_for_requests
+      select2('6', from: '#user_first_day_of_week')
+      click_button 'Save changes'
+
+      wait_for_requests
+      refresh
+
+      expect(find('[data-testid="user-first-day-of-week-select"] .select2-chosen')).to have_content('Saturday')
     end
   end
 

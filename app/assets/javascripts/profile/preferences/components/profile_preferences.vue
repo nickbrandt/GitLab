@@ -1,8 +1,10 @@
 <script>
-import { GlButton, GlFormGroup, GlFormText, GlIcon, GlLink } from '@gitlab/ui';
+import { GlButton, GlFormGroup, GlFormText, GlLink } from '@gitlab/ui';
 import createFlash, { FLASH_TYPES } from '~/flash';
+import Select2Select from '~/vue_shared/components/select2_select.vue';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import { INTEGRATION_VIEW_CONFIGS, i18n } from '../constants';
+import { mapChoicesToSelect2Options } from '../utils';
 import IntegrationView from './integration_view.vue';
 
 function updateClasses(bodyClasses = '', applicationTheme, layout) {
@@ -25,10 +27,10 @@ export default {
   components: {
     GlFormGroup,
     GlFormText,
-    GlIcon,
     GlLink,
     IntegrationView,
     GlButton,
+    Select2Select,
   },
   mixins: [glFeatureFlagsMixin()],
   inject: {
@@ -56,7 +58,7 @@ export default {
       darkModeOnCreate: null,
       darkModeOnSubmit: null,
       selectedPreferredLanguage: this.userFields.preferred_language,
-      selectedFirstDayOfWeek: this.userFields.first_day_of_week,
+      selectedFirstDayOfWeek: String(this.userFields.first_day_of_week),
       selectedTimeFormatIn24h: this.userFields.time_format_in_24h,
       selectedTimeDisplayRelative: this.userFields.time_display_relative,
     };
@@ -67,6 +69,16 @@ export default {
         const { id, ...rest } = theme;
         return { ...themes, [id]: rest };
       }, {});
+    },
+    selectLanguageChoices() {
+      return {
+        data: mapChoicesToSelect2Options(this.languageChoices),
+      };
+    },
+    selectFirstDayOfWeekChoicesWithDefault() {
+      return {
+        data: mapChoicesToSelect2Options(this.firstDayOfWeekChoicesWithDefault),
+      };
     },
   },
   created() {
@@ -138,48 +150,32 @@ export default {
       </p>
     </div>
     <div class="col-lg-8">
-      <gl-form-group :label="$options.i18n.language" label-for="user_preferred_language">
-        <div class="gl-relative">
-          <select
-            id="user_preferred_language"
-            v-model="selectedPreferredLanguage"
-            class="form-control select-control"
-            name="user[preferred_language]"
-          >
-            <option
-              v-for="[optionName, optionValue] in languageChoices"
-              :key="optionValue"
-              data-testid="user-preferred-language-option"
-              :value="optionValue"
-            >
-              {{ optionName }}
-            </option>
-          </select>
-          <gl-icon name="chevron-down" class="gl-absolute gl-top-4 gl-right-3 gl-text-gray-200" />
-        </div>
+      <gl-form-group
+        :label="$options.i18n.language"
+        label-for="user_preferred_language"
+        data-testid="user-preferred-language-select"
+      >
+        <select2-select
+          id="user_preferred_language"
+          v-model="selectedPreferredLanguage"
+          name="user[preferred_language]"
+          :options="selectLanguageChoices"
+        />
         <gl-form-text>
           {{ $options.i18n.experimentalDescription }}
         </gl-form-text>
       </gl-form-group>
-      <gl-form-group :label="$options.i18n.firstDayOfTheWeek" label-for="user_first_day_of_week">
-        <div class="gl-relative">
-          <select
-            id="user_first_day_of_week"
-            v-model="selectedFirstDayOfWeek"
-            class="form-control select-control"
-            name="user[first_day_of_week]"
-          >
-            <option
-              v-for="[optionName, optionValue] in firstDayOfWeekChoicesWithDefault"
-              :key="optionValue"
-              data-testid="user-first-day-of-week-option"
-              :value="optionValue"
-            >
-              {{ optionName }}
-            </option>
-          </select>
-          <gl-icon name="chevron-down" class="gl-absolute gl-top-4 gl-right-3 gl-text-gray-200" />
-        </div>
+      <gl-form-group
+        :label="$options.i18n.firstDayOfTheWeek"
+        label-for="user_first_day_of_week"
+        data-testid="user-first-day-of-week-select"
+      >
+        <select2-select
+          id="user_first_day_of_week"
+          v-model="selectedFirstDayOfWeek"
+          name="user[first_day_of_week]"
+          :options="selectFirstDayOfWeekChoicesWithDefault"
+        />
       </gl-form-group>
     </div>
 
