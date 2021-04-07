@@ -14,6 +14,8 @@ class MergeRequest::Metrics < ApplicationRecord
   scope :with_valid_time_to_merge, -> { where(arel_table[:merged_at].gt(arel_table[:created_at])) }
   scope :by_target_project, ->(project) { where(target_project_id: project) }
 
+  include Gitlab::Utils::StrongMemoize
+
   def self.time_to_merge_expression
     Arel.sql('EXTRACT(epoch FROM SUM(AGE(merge_request_metrics.merged_at, merge_request_metrics.created_at)))')
   end
@@ -21,7 +23,9 @@ class MergeRequest::Metrics < ApplicationRecord
   private
 
   def ensure_target_project_id
+    strong_memoize(:target_project_id) do
     self.target_project_id ||= merge_request.target_project_id
+    end
   end
 
   def self.total_time_to_merge

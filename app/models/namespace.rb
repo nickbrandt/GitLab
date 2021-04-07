@@ -275,7 +275,9 @@ class Namespace < ApplicationRecord
   end
 
   def has_parent?
-    parent_id.present? || parent.present?
+    strong_memoize(:has_parent) do
+      parent_id.present? || parent.present?
+    end
   end
 
   def subgroup?

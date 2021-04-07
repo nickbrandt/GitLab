@@ -333,11 +333,11 @@ class IssuableBaseService < BaseService
   end
 
   def change_additional_attributes(issuable)
-    change_state(issuable)
-    change_severity(issuable)
-    change_subscription(issuable)
-    change_todo(issuable)
-    toggle_award(issuable)
+    change_state(issuable) if params[:state_event]
+    change_severity(issuable) if params[:severity]
+    change_subscription(issuable) if params[:subscription_event]
+    change_todo(issuable) if params[:todo_event]
+    toggle_award(issuable) if params[:emoji_award]
   end
 
   def change_state(issuable)
