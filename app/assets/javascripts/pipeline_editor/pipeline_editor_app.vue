@@ -277,6 +277,9 @@ export default {
         );
       }
     },
+    dismissCodeSnippetAlert() {
+      this.codeSnippetCopiedFrom = '';
+    },
   },
 };
 </script>
@@ -293,7 +296,7 @@ export default {
         v-if="codeSnippetCopiedFrom"
         :source="codeSnippetCopiedFrom"
         class="gl-mb-5"
-        @dismiss="codeSnippetCopiedFrom = ''"
+        @dismiss="dismissCodeSnippetAlert"
       />
       <gl-alert
         v-if="showSuccessAlert"
