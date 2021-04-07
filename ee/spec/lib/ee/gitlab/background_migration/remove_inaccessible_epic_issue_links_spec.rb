@@ -12,30 +12,40 @@ RSpec.describe Gitlab::BackgroundMigration::RemoveInaccessibleEpicIssueLinks, sc
 
   let(:user) { users.create!(name: 'root', email: 'root@example.com', username: 'root', projects_limit: 0) }
   let(:group1) { namespaces.create!(name: 'group1', path: 'group1', type: 'Group') }
+  let(:group2) { namespaces.create!(name: 'group2', path: 'group2', type: 'Group') }
   let(:project_a) { projects.create!(name: 'project-a', path: 'project-a', namespace_id: group1.id, visibility_level: 0) }
   let(:project_b) { projects.create!(name: 'project-b', path: 'project-b', namespace_id: group1.id, visibility_level: 0) }
-
-  before do
-    epic = epics.create!(iid: 1, group_id: group1.id, author_id: user.id, title: 'any', title_html: 'any')
-    issue1, issue2, issue3 = (1..3).map { |i| issues.create!(issue_type: 0, project_id: project_a.id) }
-    issue4 = issues.create!(issue_type: 0, project_id: project_b.id)
-
-    [issue1, issue2, issue3, issue4].each do |issue|
-      epic_issues.create!(issue_id: issue.id, epic_id: epic.id)
-    end
-  end
+  let(:project_c) { projects.create!(name: 'project-c', path: 'project-c', namespace_id: group2.id, visibility_level: 0) }
+  let(:epic1) { epics.create!(iid: 1, group_id: group1.id, author_id: user.id, title: 'any', title_html: 'any') }
+  let(:epic2) { epics.create!(iid: 2, group_id: group2.id, author_id: user.id, title: 'any', title_html: 'any') }
 
   describe '#perform' do
-    subject(:perform) { described_class.new.perform([group1.id]) }
+    let!(:issue1) { issues.create!(issue_type: 0, project_id: project_a.id) }
+    let!(:issue2) { issues.create!(issue_type: 0, project_id: project_b.id) }
+    let!(:issue3) { issues.create!(issue_type: 0, project_id: project_c.id) }
+    let!(:epic_issue1) { epic_issues.create!(issue_id: issue1.id, epic_id: epic1.id) }
+    let!(:epic_issue2) { epic_issues.create!(issue_id: issue2.id, epic_id: epic1.id) }
+    let!(:epic_issue3) { epic_issues.create!(issue_id: issue3.id, epic_id: epic2.id) }
+
+    subject(:perform) { described_class.new.perform([group1.id, group2.id]) }
 
     context "when the issue's group is different to the epic's group" do
       before do
-        group2 = namespaces.create!(name: 'group2', path: 'group2', type: 'Group')
         project_a.update!(namespace_id: group2.id)
       end
 
       it 'deletes epic issue links' do
-        expect { subject }.to change { epic_issues.count }.by(-3)
+        expect { perform }.to change { epic_issues.count }.by(-1)
+      end
+
+      it 'writes log messages' do
+        expect_next_instance_of(Gitlab::BackgroundMigration::Logger) do |instance|
+          expect(instance).to receive(:info)
+          .with(message: "Deleting epic_issues", count: 1, epic_issue_ids: [epic_issue1.id])
+          .once
+        end
+
+        perform
       end
     end
 
@@ -46,7 +56,7 @@ RSpec.describe Gitlab::BackgroundMigration::RemoveInaccessibleEpicIssueLinks, sc
       end
 
       it 'does not delete epic issue links' do
-        expect { subject }.not_to change { epic_issues.count }
+        expect { perform }.not_to change { epic_issues.count }
       end
     end
 
@@ -58,7 +68,7 @@ RSpec.describe Gitlab::BackgroundMigration::RemoveInaccessibleEpicIssueLinks, sc
       end
 
       it 'deletes epic issue links' do
-        expect { subject }.to change { epic_issues.count }.by(-3)
+        expect { perform }.to change { epic_issues.count }.by(-1)
       end
     end
   end
