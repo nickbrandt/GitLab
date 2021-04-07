@@ -25,7 +25,7 @@ import {
   PARSING_ERROR_MESSAGE,
 } from './constants';
 import DimDisableContainer from './dim_disable_container.vue';
-import fromYaml from './lib/from_yaml';
+import fromYaml, { removeInitialDashes } from './lib/from_yaml';
 import humanizeNetworkPolicy from './lib/humanize';
 import { buildRule } from './lib/rules';
 import toYaml from './lib/to_yaml';
@@ -89,22 +89,23 @@ export default {
           labels: '',
         };
     policy.labels = { [ProjectIdLabel]: this.projectId };
+
     return {
       editorMode: EditorModeRule,
-      yamlEditorValue: '',
-      yamlEditorError: null,
+      yamlEditorValue: removeInitialDashes(this.existingPolicy?.manifest) || '',
+      yamlEditorError: policy.error ? true : null,
       policy,
     };
   },
   computed: {
     humanizedPolicy() {
-      return humanizeNetworkPolicy(this.policy);
+      return this.policy.error ? null : humanizeNetworkPolicy(this.policy);
     },
     policyAlert() {
       return Boolean(this.policy.annotations);
     },
     policyYaml() {
-      return toYaml(this.policy);
+      return this.hasParsingError ? '' : toYaml(this.policy);
     },
     ...mapState('threatMonitoring', ['currentEnvironmentId']),
     ...mapState('networkPolicies', [
@@ -232,25 +233,35 @@ export default {
 
     <div class="row">
       <div class="col-sm-6 col-md-4 col-lg-3 col-xl-2">
-        <gl-form-group :label="s__('NetworkPolicies|Policy type')" label-for="policyType">
-          <gl-form-select
-            id="policyType"
-            value="networkPolicy"
-            :options="$options.policyTypes"
-            disabled
-          />
+        <gl-form-group :disabled="hasParsingError">
+          <gl-form-group :label="s__('NetworkPolicies|Policy type')" label-for="policyType">
+            <gl-form-select
+              id="policyType"
+              value="networkPolicy"
+              :options="$options.policyTypes"
+              disabled
+            />
+          </gl-form-group>
         </gl-form-group>
       </div>
       <div class="col-sm-6 col-md-6 col-lg-5 col-xl-4">
-        <gl-form-group :label="s__('NetworkPolicies|Name')" label-for="policyName">
-          <gl-form-input id="policyName" v-model="policy.name" />
+        <gl-form-group :disabled="hasParsingError">
+          <gl-form-group
+            :disabled="hasParsingError"
+            :label="s__('NetworkPolicies|Name')"
+            label-for="policyName"
+          >
+            <gl-form-input id="policyName" v-model="policy.name" />
+          </gl-form-group>
         </gl-form-group>
       </div>
     </div>
     <div class="row">
       <div class="col-sm-12 col-md-10 col-lg-8 col-xl-6">
-        <gl-form-group :label="s__('NetworkPolicies|Description')" label-for="policyDescription">
-          <gl-form-textarea id="policyDescription" v-model="policy.description" />
+        <gl-form-group :disabled="hasParsingError">
+          <gl-form-group :label="s__('NetworkPolicies|Description')" label-for="policyDescription">
+            <gl-form-textarea id="policyDescription" v-model="policy.description" />
+          </gl-form-group>
         </gl-form-group>
       </div>
     </div>
@@ -259,7 +270,7 @@ export default {
     </div>
     <div class="row">
       <div class="col-md-auto">
-        <gl-form-group>
+        <gl-form-group :disabled="hasParsingError">
           <gl-toggle v-model="policy.isEnabled" :label="$options.i18n.toggleLabel" />
         </gl-form-group>
       </div>

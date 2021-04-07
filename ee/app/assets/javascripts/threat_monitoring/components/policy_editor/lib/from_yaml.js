@@ -111,7 +111,7 @@ function parseRule(item, direction) {
  * @param {String} manifest YAML of network policy
  * @returns {Boolean} whether the YAML is valid to be parsed into "Rule Mode"
  */
-const checkForUnsupportedAttributes = (manifest) => {
+const hasUnsupportedAttribute = (manifest) => {
   const primaryKeys = ['apiVersion', 'description', 'kind', 'metadata', 'spec'];
   const metadataKeys = ['annotations', 'labels', 'name', 'namespace', 'resourceVersion'];
   const specKeys = ['egress', 'endpointSelector', 'ingress'];
@@ -128,35 +128,35 @@ const checkForUnsupportedAttributes = (manifest) => {
   const toPortKeys = ['ports'];
   const portKeys = ['port', 'protocol'];
   let isUnsupported = false;
-  const hasInvalidKeys = (object, allowedValues) => {
+  const hasInvalidKey = (object, allowedValues) => {
     return !Object.keys(object).every((item) => allowedValues.includes(item));
   };
 
   const hasInvalidPolicy = (type) => {
-    let hasUnsupportedAttributes = false;
+    let isInvalidPolicy = false;
     manifest.spec[type].forEach((item) => {
-      hasUnsupportedAttributes = hasInvalidKeys(item, ruleKeys);
-      if (item.toPorts?.length && !hasUnsupportedAttributes) {
+      isInvalidPolicy = hasInvalidKey(item, ruleKeys);
+      if (item.toPorts?.length && !isInvalidPolicy) {
         item.toPorts.forEach((entry) => {
-          hasUnsupportedAttributes = hasInvalidKeys(entry, toPortKeys);
-          if (entry.ports?.length && !hasUnsupportedAttributes) {
+          isInvalidPolicy = hasInvalidKey(entry, toPortKeys);
+          if (entry.ports?.length && !isInvalidPolicy) {
             entry.ports.forEach((portEntry) => {
-              hasUnsupportedAttributes = hasInvalidKeys(portEntry, portKeys);
+              isInvalidPolicy = hasInvalidKey(portEntry, portKeys);
             });
           }
         });
       }
     });
-    return hasUnsupportedAttributes;
+    return isInvalidPolicy;
   };
 
-  isUnsupported = hasInvalidKeys(manifest, primaryKeys);
+  isUnsupported = hasInvalidKey(manifest, primaryKeys);
 
   if (manifest?.metadata && !isUnsupported) {
-    isUnsupported = hasInvalidKeys(manifest.metadata, metadataKeys);
+    isUnsupported = hasInvalidKey(manifest.metadata, metadataKeys);
   }
   if (manifest?.spec && !isUnsupported) {
-    isUnsupported = hasInvalidKeys(manifest.spec, specKeys);
+    isUnsupported = hasInvalidKey(manifest.spec, specKeys);
   }
   if (manifest?.spec?.ingress?.length && !isUnsupported) {
     isUnsupported = hasInvalidPolicy('ingress');
@@ -168,6 +168,16 @@ const checkForUnsupportedAttributes = (manifest) => {
   return isUnsupported;
 };
 
+/**
+ * Removes inital line dashes from a policy YAML that is received from the API, which
+ * is not required for the user.
+ * @param {String} manifest the policy from the API request
+ * @returns {String} the policy without the initial dashes or the initial string
+ */
+export const removeInitialDashes = (manifest) => {
+  return manifest.replace('---\n', '');
+};
+
 /*
   Construct a policy object expected by the policy editor from a yaml manifest.
   Expected yaml structure is defined in the official documentation:
@@ -176,7 +186,7 @@ const checkForUnsupportedAttributes = (manifest) => {
 export default function fromYaml(manifest) {
   const policy = safeLoad(manifest, { json: true });
 
-  const unsupportedAttribute = checkForUnsupportedAttributes(policy);
+  const unsupportedAttribute = hasUnsupportedAttribute(policy);
   if (unsupportedAttribute) return { error: unsupportedAttribute };
 
   const { description, metadata, spec } = policy;
