@@ -175,9 +175,9 @@ Worse, after the above queries are executed, GitLab will [stick to the primary](
 
 ## Use CTEs wisely
 
-See section https://docs.gitlab.com/ee/development/iterating_tables_in_batches.html#complex-queries-on-the-relation-object for considerations on how to use CTEs.  We have found in some situations CTEs can become problematic in use (similar to the n+1 problem above).  In particular, hierarchical recursive CTE queries <example link?> are very difficult to optimize and don't scale.  We should avoid them when implementing new fatures that require any kind of hierarchical structure.  
+See section https://docs.gitlab.com/ee/development/iterating_tables_in_batches.html#complex-queries-on-the-relation-object for considerations on how to use CTEs.  We have found in some situations CTEs can become problematic in use (similar to the n+1 problem above).  In particular, hierarchical recursive CTE queries such as the CTE in [AuthorizedProjectsWorker](https://gitlab.com/gitlab-org/gitlab/-/issues/325688) are very difficult to optimize and don't scale.  We should avoid them when implementing new features that require any kind of hierarchical structure.  
 
-<insert example/reference/fix up here>
+However, in many simpler cases, such as this [example](https://gitlab.com/gitlab-org/gitlab-foss/-/issues/43242#note_61416277) CTEs can be quite effective as an optimization fence.
 
 ## Cached Queries
 
