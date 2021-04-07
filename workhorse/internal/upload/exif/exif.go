@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"os"
 	"os/exec"
 	"regexp"
 
@@ -101,6 +102,9 @@ func (c *cleaner) startProcessing(stdin io.Reader) error {
 }
 
 func IsExifFile(filename string) bool {
+	if os.Getenv("SKIP_EXIFTOOL") == "1" {
+		return false
+	}
 	filenameMatch := regexp.MustCompile(`(?i)\.(jpg|jpeg|tiff)$`)
 
 	return filenameMatch.MatchString(filename)
