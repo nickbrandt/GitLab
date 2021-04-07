@@ -25785,6 +25785,9 @@ msgstr ""
 msgid "Remediations"
 msgstr ""
 
+msgid "Remember me"
+msgstr ""
+
 msgid "Remind later"
 msgstr ""
 
@@ -28570,6 +28573,9 @@ msgid "Sign in using smart card"
 msgstr ""
 
 msgid "Sign in via 2FA code"
+msgstr ""
+
+msgid "Sign in with"
 msgstr ""
 
 msgid "Sign in with Single Sign-On"
