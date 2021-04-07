@@ -2022,19 +2022,13 @@ msgstr ""
 msgid "AddContextCommits|Add/remove"
 msgstr ""
 
-msgid "AddMember|Already a member of %{source_name}"
+msgid "AddMember|Emails cannot be blank"
 msgstr ""
 
-msgid "AddMember|Email cannot be blank"
+msgid "AddMember|Invite email is invalid"
 msgstr ""
 
 msgid "AddMember|Invite limit of %{daily_invites} per day exceeded"
-msgstr ""
-
-msgid "AddMember|Member already invited to %{source_name}"
-msgstr ""
-
-msgid "AddMember|Member cannot be invited because they already requested to join %{source_name}"
 msgstr ""
 
 msgid "AddMember|No users specified."
