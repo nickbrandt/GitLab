@@ -5,7 +5,7 @@ export const CODE_SNIPPET_SOURCE_API_FUZZING = 'api_fuzzing';
 export const CODE_SNIPPET_SOURCES = [CODE_SNIPPET_SOURCE_API_FUZZING];
 export const CODE_SNIPPET_SOURCE_SETTINGS = {
   [CODE_SNIPPET_SOURCE_API_FUZZING]: {
-    configurationPathInjectKey: 'apiFuzzingConfigurationPath',
+    datasetKey: 'apiFuzzingConfigurationPath',
     docsPath: helpPagePath('user/application_security/api_fuzzing/index'),
   },
 };

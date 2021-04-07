@@ -7,9 +7,7 @@ export default {
   components: {
     GlAlert,
   },
-  inject: Object.values(CODE_SNIPPET_SOURCE_SETTINGS).map(
-    ({ configurationPathInjectKey }) => configurationPathInjectKey,
-  ),
+  inject: ['configurationPaths'],
   props: {
     source: {
       type: String,
@@ -22,8 +20,7 @@ export default {
       return CODE_SNIPPET_SOURCE_SETTINGS[this.source];
     },
     configurationPath() {
-      const injectKey = this.settings.configurationPathInjectKey;
-      return this[injectKey];
+      return this.configurationPaths[this.source];
     },
   },
 };

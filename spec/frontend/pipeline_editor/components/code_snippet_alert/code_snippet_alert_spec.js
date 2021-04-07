@@ -18,7 +18,9 @@ describe('EE - CodeSnippetAlert', () => {
         merge(
           {
             provide: {
-              apiFuzzingConfigurationPath,
+              configurationPaths: {
+                [CODE_SNIPPET_SOURCE_API_FUZZING]: apiFuzzingConfigurationPath,
+              },
             },
             propsData: {
               source: CODE_SNIPPET_SOURCE_API_FUZZING,

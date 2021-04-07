@@ -38,10 +38,10 @@ export const initPipelineEditor = (selector = '#js-pipeline-editor') => {
     ymlHelpPagePath,
   } = el?.dataset;
 
-  const provideCodeSnippetConfigurationPaths = Object.fromEntries(
-    Object.values(CODE_SNIPPET_SOURCE_SETTINGS).map(({ configurationPathInjectKey }) => [
-      configurationPathInjectKey,
-      el.dataset[configurationPathInjectKey],
+  const configurationPaths = Object.fromEntries(
+    Object.entries(CODE_SNIPPET_SOURCE_SETTINGS).map(([source, { datasetKey }]) => [
+      source,
+      el.dataset[datasetKey],
     ]),
   );
 
@@ -79,7 +79,7 @@ export const initPipelineEditor = (selector = '#js-pipeline-editor') => {
       projectPath,
       projectNamespace,
       ymlHelpPagePath,
-      ...provideCodeSnippetConfigurationPaths,
+      configurationPaths,
     },
     render(h) {
       return h(PipelineEditorApp);
