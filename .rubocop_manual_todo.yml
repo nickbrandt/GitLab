@@ -606,9 +606,6 @@ RSpec/EmptyLineAfterFinalLetItBe:
     - ee/spec/requests/api/wikis_spec.rb
     - ee/spec/requests/callout_spec.rb
     - ee/spec/requests/git_http_geo_spec.rb
-    - ee/spec/requests/projects/issues_controller_spec.rb
-    - ee/spec/requests/projects/on_demand_scans_controller_spec.rb
-    - ee/spec/requests/projects/security/scanned_resources_controller_spec.rb
     - ee/spec/requests/repositories/git_http_controller_spec.rb
     - ee/spec/serializers/clusters/environment_serializer_spec.rb
     - ee/spec/serializers/dependency_entity_spec.rb
