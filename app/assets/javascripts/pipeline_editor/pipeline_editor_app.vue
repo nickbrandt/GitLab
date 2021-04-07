@@ -59,7 +59,6 @@ export default {
       showSuccessAlert: false,
       successType: null,
       codeSnippetCopiedFrom: '',
-      codeSnippetAlertDismissed: false,
     };
   },
 
@@ -176,9 +175,6 @@ export default {
           return null;
       }
     },
-    showCodeSnippetAlert() {
-      return this.codeSnippetCopiedFrom && !this.codeSnippetAlertDismissed;
-    },
   },
   i18n: {
     tabEdit: s__('Pipelines|Write pipeline configuration'),
@@ -291,10 +287,10 @@ export default {
     />
     <div v-else>
       <code-snippet-alert
-        v-if="showCodeSnippetAlert"
+        v-if="codeSnippetCopiedFrom"
         :source="codeSnippetCopiedFrom"
         class="gl-mb-5"
-        @dismiss="codeSnippetAlertDismissed = true"
+        @dismiss="codeSnippetCopiedFrom = ''"
       />
       <gl-alert
         v-if="showSuccessAlert"
