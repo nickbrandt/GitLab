@@ -26,6 +26,7 @@ module Gitlab
       ISSUE_PROMOTED_TO_EPIC = 'g_project_management_issue_promoted_to_epic'
       EPIC_CONFIDENTIAL = 'g_project_management_users_setting_epic_confidential'
       EPIC_VISIBLE = 'g_project_management_users_setting_epic_visible'
+      EPIC_LABELS = 'g_project_management_epic_users_changing_labels'
 
       class << self
         def track_epic_created_action(author:)
@@ -102,6 +103,10 @@ module Gitlab
 
         def track_epic_visible_action(author:)
           track_unique_action(EPIC_VISIBLE, author)
+        end
+
+        def track_epic_labels_changed_action(author:)
+          track_unique_action(EPIC_LABELS, author)
         end
 
         private
