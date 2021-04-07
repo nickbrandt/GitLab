@@ -5871,6 +5871,9 @@ msgstr ""
 msgid "Check the %{docs_link_start}documentation%{docs_link_end}."
 msgstr ""
 
+msgid "Check the current instance configuration "
+msgstr ""
+
 msgid "Check the elasticsearch.log file to debug why the migration was halted and make any changes before retrying the migration. When you fix the cause of the failure, click \"Retry migration\", and the migration will be scheduled to be retried in the background."
 msgstr ""
 
@@ -7845,6 +7848,9 @@ msgid "Compare %{oldCommitId}...%{newCommitId}"
 msgstr ""
 
 msgid "Compare Git revisions"
+msgstr ""
+
+msgid "Compare GitLab editions"
 msgstr ""
 
 msgid "Compare Revisions"
@@ -11313,6 +11319,9 @@ msgstr ""
 msgid "Dynamic Application Security Testing (DAST)"
 msgstr ""
 
+msgid "Each project can also have an issue tracker and a wiki."
+msgstr ""
+
 msgid "Edit"
 msgstr ""
 
@@ -14291,6 +14300,9 @@ msgstr ""
 msgid "Get a free instance review"
 msgstr ""
 
+msgid "Get a support subscription"
+msgstr ""
+
 msgid "Get started"
 msgstr ""
 
@@ -14418,6 +14430,9 @@ msgid "GitLab is a single application for the entire software development lifecy
 msgstr ""
 
 msgid "GitLab is obtaining a Let's Encrypt SSL certificate for this domain. This process can take some time. Please try again later."
+msgstr ""
+
+msgid "GitLab is open source software to collaborate on code."
 msgstr ""
 
 msgid "GitLab is undergoing maintenance and is operating in a read-only mode."
@@ -18894,6 +18909,9 @@ msgstr ""
 msgid "Manage applications that you've authorized to use your account."
 msgstr ""
 
+msgid "Manage git repositories with fine-grained access controls that keep your code secure."
+msgstr ""
+
 msgid "Manage group labels"
 msgstr ""
 
@@ -22583,6 +22601,9 @@ msgstr ""
 msgid "Perform advanced options such as changing path, transferring, exporting, or removing the group."
 msgstr ""
 
+msgid "Perform code reviews and enhance collaboration with merge requests."
+msgstr ""
+
 msgid "Perform common operations on GitLab project"
 msgstr ""
 
@@ -25421,6 +25442,9 @@ msgstr ""
 msgid "Quick actions can be used in the issues description and comment boxes."
 msgstr ""
 
+msgid "Quick help"
+msgstr ""
+
 msgid "Quick range"
 msgstr ""
 
@@ -25455,6 +25479,9 @@ msgid "Re-verification interval"
 msgstr ""
 
 msgid "Read more"
+msgstr ""
+
+msgid "Read more about GitLab at %{link_to_promo}."
 msgstr ""
 
 msgid "Read more about project permissions %{help_link_open}here%{help_link_close}"
@@ -27624,6 +27651,9 @@ msgid "See GitLab's %{password_policy_guidelines}"
 msgstr ""
 
 msgid "See metrics"
+msgstr ""
+
+msgid "See our website for getting help"
 msgstr ""
 
 msgid "See the affected projects in the GitLab admin panel"
@@ -33396,7 +33426,13 @@ msgstr ""
 msgid "Use one line per URI"
 msgstr ""
 
+msgid "Use shortcuts"
+msgstr ""
+
 msgid "Use template"
+msgstr ""
+
+msgid "Use the search bar on the top of this page"
 msgstr ""
 
 msgid "Use this token to validate received payloads."
@@ -33412,6 +33448,9 @@ msgid "Use your smart card to authenticate with the LDAP server."
 msgstr ""
 
 msgid "Used by members to sign in to your group in GitLab"
+msgstr ""
+
+msgid "Used by more than 100,000 organizations, GitLab is the most popular solution to manage git repositories on-premises."
 msgstr ""
 
 msgid "Used programming language"
