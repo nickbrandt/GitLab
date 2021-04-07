@@ -663,6 +663,7 @@ end
 RSpec.shared_examples 'creates build_info when there is a job' do
   context 'with job token' do
     let(:jwt) { build_jwt_from_job(job) }
+    let(:headers_with_token) { build_token_auth_header(jwt.encoded).merge(workhorse_headers) }
 
     it 'creates a build_info record' do
       expect { subject }.to change { Packages::BuildInfo.count }.by(1)
