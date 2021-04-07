@@ -4,27 +4,27 @@ module Gitlab
   module Ci
     module Reports
       module Security
-        class FindingFingerprint
-          attr_accessor :algorithm_type, :fingerprint_value
+        class FindingSignature
+          attr_accessor :algorithm_type, :signature_value
 
           def initialize(params = {})
             @algorithm_type = params.dig(:algorithm_type)
-            @fingerprint_value = params.dig(:fingerprint_value)
+            @signature_value = params.dig(:signature_value)
           end
 
-          def fingerprint_sha256
-            Digest::SHA1.digest(fingerprint_value)
+          def signature_sha
+            Digest::SHA1.digest(signature_value)
           end
 
           def to_h
             {
               algorithm_type: algorithm_type,
-              fingerprint_sha256: fingerprint_sha256
+              signature_sha: signature_sha
             }
           end
 
           def valid?
-            ::Vulnerabilities::FindingFingerprint.algorithm_types.key?(algorithm_type)
+            ::Vulnerabilities::FindingSignature.algorithm_types.key?(algorithm_type)
           end
         end
       end
