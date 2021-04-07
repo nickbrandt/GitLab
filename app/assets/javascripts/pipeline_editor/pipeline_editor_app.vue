@@ -197,15 +197,7 @@ export default {
     },
   },
   created() {
-    const [codeSnippetCopiedFrom] = getParameterValues(CODE_SNIPPET_SOURCE_URL_PARAM);
-    if (codeSnippetCopiedFrom && CODE_SNIPPET_SOURCES.includes(codeSnippetCopiedFrom)) {
-      this.codeSnippetCopiedFrom = codeSnippetCopiedFrom;
-      window.history.replaceState(
-        {},
-        document.title,
-        removeParams([CODE_SNIPPET_SOURCE_URL_PARAM]),
-      );
-    }
+    this.parseCodeSnippetSourceParam();
   },
   methods: {
     handleBlobContentError(error = {}) {
@@ -273,6 +265,17 @@ export default {
       // Keep track of the latest commited content to know
       // if the user has made changes to the file that are unsaved.
       this.lastCommittedContent = this.currentCiFileContent;
+    },
+    parseCodeSnippetSourceParam() {
+      const [codeSnippetCopiedFrom] = getParameterValues(CODE_SNIPPET_SOURCE_URL_PARAM);
+      if (codeSnippetCopiedFrom && CODE_SNIPPET_SOURCES.includes(codeSnippetCopiedFrom)) {
+        this.codeSnippetCopiedFrom = codeSnippetCopiedFrom;
+        window.history.replaceState(
+          {},
+          document.title,
+          removeParams([CODE_SNIPPET_SOURCE_URL_PARAM]),
+        );
+      }
     },
   },
 };
