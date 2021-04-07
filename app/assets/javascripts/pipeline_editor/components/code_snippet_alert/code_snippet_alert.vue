@@ -1,13 +1,13 @@
 <script>
 import { GlAlert } from '@gitlab/ui';
-import { CODE_SNIPPET_SOURCES, CODE_SNIPPET_SOURCE_PATH } from './constants';
+import { CODE_SNIPPET_SOURCES, CODE_SNIPPET_SOURCE_SETTINGS } from './constants';
 
 export default {
   name: 'CodeSnippetAlert',
   components: {
     GlAlert,
   },
-  inject: Object.values(CODE_SNIPPET_SOURCE_PATH).map(
+  inject: Object.values(CODE_SNIPPET_SOURCE_SETTINGS).map(
     ({ configurationPathInjectKey }) => configurationPathInjectKey,
   ),
   props: {
@@ -18,11 +18,11 @@ export default {
     },
   },
   computed: {
-    pathsSettings() {
-      return CODE_SNIPPET_SOURCE_PATH[this.source];
+    settings() {
+      return CODE_SNIPPET_SOURCE_SETTINGS[this.source];
     },
     configurationPath() {
-      const injectKey = this.pathsSettings.configurationPathInjectKey;
+      const injectKey = this.settings.configurationPathInjectKey;
       return this[injectKey];
     },
   },
@@ -34,7 +34,7 @@ export default {
     variant="tip"
     :title="__('Code snippet copied. Insert it in the correct location in the YAML file.')"
     :dismiss-label="__('Dismiss')"
-    :primary-button-link="pathsSettings.docsPath"
+    :primary-button-link="settings.docsPath"
     :primary-button-text="__('Read documentation')"
     :secondary-button-link="configurationPath"
     :secondary-button-text="__('Go back to configuration')"
