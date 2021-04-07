@@ -107,7 +107,7 @@ describe('Pipeline editor app component', () => {
   const findEmptyState = () => wrapper.findComponent(PipelineEditorEmptyState);
   const findEmptyStateButton = () =>
     wrapper.findComponent(PipelineEditorEmptyState).findComponent(GlButton);
-  const findCodeSnippetAlert = () => wrapper.find(CodeSnippetAlert);
+  const findCodeSnippetAlert = () => wrapper.findComponent(CodeSnippetAlert);
 
   beforeEach(() => {
     mockBlobContentData = jest.fn();
