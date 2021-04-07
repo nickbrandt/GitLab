@@ -39,18 +39,18 @@ RSpec.describe "Admin::AbuseReports", :js do
           expect(page).to have_content('Abuse Reports')
 
           published_experiments = page.evaluate_script('window.gon.experiment')
-          expect(published_experiments).to eq(
-            null_hypothesis: {
-              experiment: 'null_hypothesis',
-              key: 'c934a2885104c464e13bfae61b7d9dc2',
-              variant: 'candidate'
-            }.as_json
-          )
+          expect(published_experiments).to include({
+            'null_hypothesis' => {
+              'experiment' => 'null_hypothesis',
+              'key' => anything,
+              'variant' => 'candidate'
+            }
+          })
         end
       end
 
       describe 'in the abuse report view' do
-        it 'presents information about abuse report', :experiment do
+        it 'presents information about abuse report' do
           visit admin_abuse_reports_path
 
           expect(page).to have_content('Abuse Reports')
@@ -90,7 +90,7 @@ RSpec.describe "Admin::AbuseReports", :js do
 
     describe 'filtering by user' do
       let!(:user2) { create(:user) }
-      let!(:abuse_report)   { create(:abuse_report, user: user) }
+      let!(:abuse_report) { create(:abuse_report, user: user) }
       let!(:abuse_report_2) { create(:abuse_report, user: user2) }
 
       it 'shows only single user report' do
