@@ -6,6 +6,7 @@ import { TEST_HOST } from 'helpers/test_constants';
 import waitForPromises from 'helpers/wait_for_promises';
 import httpStatusCodes from '~/lib/utils/http_status';
 import CodeSnippetAlert from '~/pipeline_editor/components/code_snippet_alert/code_snippet_alert.vue';
+import { CODE_SNIPPET_SOURCES } from '~/pipeline_editor/components/code_snippet_alert/constants';
 import CommitForm from '~/pipeline_editor/components/commit/commit_form.vue';
 import TextEditor from '~/pipeline_editor/components/editor/text_editor.vue';
 
@@ -143,9 +144,9 @@ describe('Pipeline editor app component', () => {
       expect(findCodeSnippetAlert().exists()).toBe(false);
     });
 
-    it('shows if URL param is set and supported, and cleans up URL', () => {
+    it.each(CODE_SNIPPET_SOURCES)('shows if URL param is %s, and cleans up URL', (source) => {
       jest.spyOn(window.history, 'replaceState');
-      setCodeSnippetUrlParam('api_fuzzing');
+      setCodeSnippetUrlParam(source);
       createComponent();
 
       expect(findCodeSnippetAlert().exists()).toBe(true);
