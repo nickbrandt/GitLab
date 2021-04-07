@@ -703,8 +703,6 @@ RSpec/EmptyLineAfterFinalLetItBe:
     - ee/spec/services/ide/schemas_config_service_spec.rb
     - ee/spec/services/incident_management/incidents/upload_metric_service_spec.rb
     - ee/spec/services/incident_management/oncall_rotations/edit_service_spec.rb
-    - ee/spec/services/issues/build_service_spec.rb
-    - ee/spec/services/issues/export_csv_service_spec.rb
     - ee/spec/services/merge_request_approval_settings/update_service_spec.rb
     - ee/spec/services/merge_trains/check_status_service_spec.rb
     - ee/spec/services/merge_trains/create_pipeline_service_spec.rb
