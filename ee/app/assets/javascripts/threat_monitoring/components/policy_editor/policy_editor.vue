@@ -25,7 +25,7 @@ import {
   PARSING_ERROR_MESSAGE,
 } from './constants';
 import DimDisableContainer from './dim_disable_container.vue';
-import fromYaml, { removeInitialDashes } from './lib/from_yaml';
+import fromYaml, { removeUnnecessaryDashes } from './lib/from_yaml';
 import humanizeNetworkPolicy from './lib/humanize';
 import { buildRule } from './lib/rules';
 import toYaml from './lib/to_yaml';
@@ -90,9 +90,13 @@ export default {
         };
     policy.labels = { [ProjectIdLabel]: this.projectId };
 
+    const yamlEditorValue = this.existingPolicy
+      ? removeUnnecessaryDashes(this.existingPolicy.manifest)
+      : '';
+
     return {
       editorMode: EditorModeRule,
-      yamlEditorValue: removeInitialDashes(this.existingPolicy?.manifest) || '',
+      yamlEditorValue,
       yamlEditorError: policy.error ? true : null,
       policy,
     };
@@ -245,7 +249,7 @@ export default {
         </gl-form-group>
       </div>
       <div class="col-sm-6 col-md-6 col-lg-5 col-xl-4">
-        <gl-form-group :disabled="hasParsingError">
+        <gl-form-group :disabled="hasParsingError" data-testid="policy-name">
           <gl-form-group
             :disabled="hasParsingError"
             :label="s__('NetworkPolicies|Name')"
@@ -258,7 +262,7 @@ export default {
     </div>
     <div class="row">
       <div class="col-sm-12 col-md-10 col-lg-8 col-xl-6">
-        <gl-form-group :disabled="hasParsingError">
+        <gl-form-group :disabled="hasParsingError" data-testid="policy-description">
           <gl-form-group :label="s__('NetworkPolicies|Description')" label-for="policyDescription">
             <gl-form-textarea id="policyDescription" v-model="policy.description" />
           </gl-form-group>
@@ -270,7 +274,7 @@ export default {
     </div>
     <div class="row">
       <div class="col-md-auto">
-        <gl-form-group :disabled="hasParsingError">
+        <gl-form-group :disabled="hasParsingError" data-testid="policy-enable">
           <gl-toggle v-model="policy.isEnabled" :label="$options.i18n.toggleLabel" />
         </gl-form-group>
       </div>

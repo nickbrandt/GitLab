@@ -1,6 +1,6 @@
 <script>
 import { GlFormTextarea } from '@gitlab/ui';
-import fromYaml, { removeInitialDashes } from './lib/from_yaml';
+import fromYaml, { removeUnnecessaryDashes } from './lib/from_yaml';
 import humanizeNetworkPolicy from './lib/humanize';
 import toYaml from './lib/to_yaml';
 import PolicyPreview from './policy_preview.vue';
@@ -28,7 +28,7 @@ export default {
       return this.policy ? humanizeNetworkPolicy(this.policy) : this.policy;
     },
     policyYaml() {
-      return removeInitialDashes(this.value);
+      return removeUnnecessaryDashes(this.value);
     },
   },
   methods: {
