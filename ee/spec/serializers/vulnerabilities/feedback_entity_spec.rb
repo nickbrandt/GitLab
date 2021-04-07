@@ -5,6 +5,7 @@ require 'spec_helper'
 RSpec.describe Vulnerabilities::FeedbackEntity do
   let_it_be(:user) { create(:user) }
   let_it_be(:project) { create(:project) }
+
   let(:request) { double('request') }
   let(:entity) { described_class.represent(feedback, request: request) }
 
