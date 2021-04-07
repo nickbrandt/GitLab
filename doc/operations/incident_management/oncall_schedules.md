@@ -46,7 +46,8 @@ Follow these steps to update a schedule:
 1. In the **Edit schedule** form, edit the information you wish to update.
 1. Click the **Edit schedule** button to save your changes.
 
-If you change the schedule's timezone, we will automatically update the rotation's restricted time interval - if one is set - to the relevant times in the new timezone.
+If you change the schedule's time zone, GitLab automatically updates the rotation's restricted time
+interval (if one is set) to the corresponding times in the new time zone.
 
 ### Delete a schedule
 
@@ -72,7 +73,8 @@ Follow these steps to create a rotation:
    - **Starts on:** The date and time the rotation begins.
    - **Enable end date:** With the toggle set to on, you can select the date and time your rotation
      ends.
-   - **Restrict to time intervals:** With the toggle set to on, you can restrict your rotation to the time period you select.
+   - **Restrict to time intervals:** With the toggle set to on, you can restrict your rotation to the
+     time period you select.
 
 ### Edit a rotation
 
