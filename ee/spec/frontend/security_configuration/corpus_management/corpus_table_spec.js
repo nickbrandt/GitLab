@@ -1,7 +1,7 @@
 import { shallowMount, mount } from '@vue/test-utils';
 import Actions from 'ee/security_configuration/corpus_management/components/columns/actions.vue';
 import CorpusTable from 'ee/security_configuration/corpus_management/components/corpus_table.vue';
-import { corpuses } from '../mock_data';
+import { corpuses } from './mock_data';
 
 const TEST_PROJECT_FULL_PATH = '/namespace/project';
 

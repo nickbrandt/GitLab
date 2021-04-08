@@ -1,10 +1,10 @@
 <script>
 import { GlTable } from '@gitlab/ui';
 import actions from 'ee/security_configuration/corpus_management/components/columns/actions.vue';
-import Date from 'ee/security_configuration/corpus_management/components/columns/date.vue';
 import Name from 'ee/security_configuration/corpus_management/components/columns/name.vue';
 import Target from 'ee/security_configuration/corpus_management/components/columns/target.vue';
 import { __ } from '~/locale';
+import UserDate from '~/vue_shared/components/user_date.vue';
 import deleteCorpus from '../graphql/mutations/delete_corpus.mutation.graphql';
 
 const css = {
@@ -16,7 +16,7 @@ export default {
     GlTable,
     Name,
     Target,
-    Date,
+    UserDate,
     actions,
   },
   props: {
@@ -77,11 +77,11 @@ export default {
     </template>
 
     <template #cell(lastUpdated)="{ item }">
-      <date :date="item.lastUpdated" />
+      <user-date :date="item.lastUpdated" />
     </template>
 
     <template #cell(lastUsed)="{ item }">
-      <date :date="item.lastUsed" />
+      <user-date :date="item.lastUsed" />
     </template>
 
     <template #cell(actions)="{ item }">

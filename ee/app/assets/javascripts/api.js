@@ -46,7 +46,6 @@ export default {
   descendantGroupsPath: '/api/:version/groups/:group_id/descendant_groups',
   projectDeploymentFrequencyAnalyticsPath:
     '/api/:version/projects/:id/analytics/deployment_frequency',
-  projectPackagesPath: '/api/:version/projects/:id/packages',
   issueMetricImagesPath: '/api/:version/projects/:id/issues/:issue_iid/metric_images',
   issueMetricSingleImagePath:
     '/api/:version/projects/:id/issues/:issue_iid/metric_images/:image_id',
@@ -310,7 +309,7 @@ export default {
       encodeURIComponent(projectId),
     );
 
-    return axios.get(url, { params });  
+    return axios.get(url, { params });
   },
 
   fetchPaymentFormParams(id) {

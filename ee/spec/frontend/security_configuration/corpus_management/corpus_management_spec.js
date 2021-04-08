@@ -11,11 +11,6 @@ describe('EE - CorpusManagement', () => {
   let wrapper;
 
   const createComponentFactory = (mountFn = shallowMount) => (options = {}) => {
-    const defaultProps = {
-      projectFullPath: TEST_PROJECT_FULL_PATH,
-      corpusHelpPath: TEST_CORPUS_HELP_PATH,
-    };
-
     const defaultMocks = {
       $apollo: {
         loading: false,
@@ -23,8 +18,11 @@ describe('EE - CorpusManagement', () => {
     };
 
     wrapper = mountFn(CorpusManagement, {
-      propsData: defaultProps,
       mocks: defaultMocks,
+      provide: {
+        projectFullPath: TEST_PROJECT_FULL_PATH,
+        corpusHelpPath: TEST_CORPUS_HELP_PATH,
+      },
       ...options,
     });
   };

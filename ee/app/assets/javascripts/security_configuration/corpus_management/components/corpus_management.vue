@@ -3,7 +3,6 @@ import { GlLoadingIcon, GlLink } from '@gitlab/ui';
 import CorpusTable from 'ee/security_configuration/corpus_management/components/corpus_table.vue';
 import CorpusUpload from 'ee/security_configuration/corpus_management/components/corpus_upload.vue';
 import { s__, __ } from '~/locale';
-import { MAX_LIST_COUNT } from '../constants';
 import getCorpusesQuery from '../graphql/queries/get_corpuses.query.graphql';
 
 export default {
@@ -19,7 +18,6 @@ export default {
       variables() {
         return {
           projectPath: this.projectFullPath,
-          ...this.cursor,
         };
       },
       update: (data) => {
@@ -30,18 +28,7 @@ export default {
       },
     },
   },
-  props: {
-    projectFullPath: {
-      type: String,
-      required: true,
-    },
-    corpusHelpPath: {
-      type: String,
-      required: true,
-      // TODO: Remove mocked out docs path used for demo
-      default: 'https://docs.gitlab.com/ee/user/application_security/coverage_fuzzing/',
-    },
-  },
+  inject: ['projectFullPath', 'corpusHelpPath'],
   i18n: {
     header: s__('CorpusManagement|Fuzz testing corpus management'),
     subHeader: s__(
@@ -49,25 +36,7 @@ export default {
     ),
     learnMore: __('Learn More'),
   },
-  data() {
-    return {
-      cursor: {
-        first: MAX_LIST_COUNT,
-        after: null,
-        last: null,
-        before: null,
-      },
-    };
-  },
   computed: {
-    graphQlData() {
-      const packages = this.states?.project.packages.nodes;
-      return packages;
-    },
-    restData() {
-      const packages = this.states?.restPackages.data;
-      return packages;
-    },
     mockedData() {
       const packages = this.states?.mockedPackages.data || [];
       return packages;
