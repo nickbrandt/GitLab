@@ -18,7 +18,7 @@ module Projects
       @params = params
     end
 
-    def execute
+    def groups
       return Group.none unless authorized?
 
       items = all_groups.map do |item|
@@ -27,6 +27,10 @@ module Projects
       end
 
       find_union(items, Group).with_route.order_id_desc
+    end
+
+    def visible_groups
+      @visible_groups ||= groups.public_or_visible_to_user(current_user)
     end
 
     private

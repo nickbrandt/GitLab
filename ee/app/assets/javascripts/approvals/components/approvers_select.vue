@@ -140,6 +140,8 @@ export default {
       const hasTerm = term.trim().length > 0;
 
       return Api.projectGroups(this.projectId, {
+        with_shared: true,
+        shared_min_access_level: DEVELOPER_ACCESS_LEVEL,
         skip_groups: this.skipGroupIds,
         ...(hasTerm ? { search: term } : {}),
       });

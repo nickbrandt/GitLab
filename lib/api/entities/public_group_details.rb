@@ -7,6 +7,9 @@ module API
         group.avatar_url(only_path: false)
       end
       expose :full_name, :full_path
+      expose :visible do |group, options|
+        options[:visible_group_ids].include?(group.id)
+      end
     end
   end
 end

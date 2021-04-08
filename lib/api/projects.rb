@@ -161,11 +161,11 @@ module API
         present records, options
       end
 
-      def present_groups(groups)
-        options = {
+      def present_groups(groups, options = {})
+        options = options.merge({
           with: Entities::PublicGroupDetails,
           current_user: current_user
-        }
+        })
 
         groups, options = with_custom_attributes(groups, options)
 
@@ -624,10 +624,11 @@ module API
         use :pagination
       end
       get ':id/groups', feature_category: :source_code_management do
-        groups = ::Projects::GroupsFinder.new(project: user_project, current_user: current_user, params: declared_params(include_missing: false)).execute
+        finder = ::Projects::GroupsFinder.new(project: user_project, current_user: current_user, params: declared_params(include_missing: false))
+        groups = finder.groups
         groups = groups.search(params[:search]) if params[:search].present?
 
-        present_groups groups
+        present_groups groups, visible_group_ids: finder.visible_groups.map(&:id)
       end
 
       desc 'Start the housekeeping task for a project' do
