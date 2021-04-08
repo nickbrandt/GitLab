@@ -3,6 +3,7 @@ import { shallowMount } from '@vue/test-utils';
 import axios from 'axios';
 import AxiosMockAdapter from 'axios-mock-adapter';
 import { kebabCase } from 'lodash';
+import waitForPromises from 'helpers/wait_for_promises';
 import createFlash from '~/flash';
 import httpStatus from '~/lib/utils/http_status';
 import * as urlUtility from '~/lib/utils/url_utility';
@@ -88,6 +89,7 @@ describe('ForkForm component', () => {
     wrapper.find('[data-testid="fork-description-textarea"]');
   const findVisibilityRadioGroup = () =>
     wrapper.find('[data-testid="fork-visibility-radio-group"]');
+  const findSubmitButton = () => wrapper.find('[data-testid="submit-button"]');
 
   it('will go to projectFullPath when click cancel button', () => {
     mockGetRequest();
@@ -251,7 +253,7 @@ describe('ForkForm component', () => {
 
     const submitForm = async () => {
       findForkUrlInput().vm.$emit('input', { id: namespaceId });
-      await wrapper.vm.onSubmit();
+      await findSubmitButton().vm.$emit('click');
     };
 
     it('make POST request with project param', async () => {
@@ -280,25 +282,41 @@ describe('ForkForm component', () => {
       expect(axios.post).toHaveBeenCalledWith(url, project);
     });
 
-    it('redirect to POST web_url response', async () => {
+    describe('when POST is successful', () => {
       const webUrl = `new/fork-project`;
-      jest.spyOn(axios, 'post').mockResolvedValue({ data: { web_url: webUrl } });
+      beforeEach(async () => {
+        jest.spyOn(axios, 'post').mockResolvedValue({ data: { web_url: webUrl } });
+        await submitForm();
+        await waitForPromises();
+      });
 
-      await submitForm();
+      it('disables submit button when POST is successful', async () => {
+        expect(findSubmitButton().props('loading')).toBe(true);
+      });
 
-      expect(urlUtility.redirectTo).toHaveBeenCalledWith(webUrl);
+      it('redirect to POST web_url response', () => {
+        expect(urlUtility.redirectTo).toHaveBeenCalledWith(webUrl);
+      });
     });
 
-    it('display flash when POST is unsuccessful', async () => {
+    describe('when POST is unsuccessful', () => {
       const dummyError = 'Fork project failed';
 
-      jest.spyOn(axios, 'post').mockRejectedValue(dummyError);
+      beforeEach(async () => {
+        jest.spyOn(axios, 'post').mockRejectedValue(dummyError);
+        await submitForm();
+        await waitForPromises();
+      });
 
-      await submitForm();
+      it('enables submit button', () => {
+        expect(findSubmitButton().props('loading')).toBe(false);
+      });
 
-      expect(urlUtility.redirectTo).not.toHaveBeenCalled();
-      expect(createFlash).toHaveBeenCalledWith({
-        message: dummyError,
+      it('display flash when POST is unsuccessful', () => {
+        expect(urlUtility.redirectTo).not.toHaveBeenCalled();
+        expect(createFlash).toHaveBeenCalledWith({
+          message: dummyError,
+        });
       });
     });
   });

@@ -221,6 +221,7 @@ export default {
         redirectTo(data.web_url);
         return;
       } catch (error) {
+        this.isSaving = false;
         createFlash({ message: error });
       }
     },
@@ -230,7 +231,7 @@ export default {
 </script>
 
 <template>
-  <gl-form novalidate method="POST" @submit.prevent="onSubmit">
+  <gl-form novalidate method="POST">
     <input type="hidden" name="authenticity_token" :value="$options.csrf.token" />
 
     <gl-form-group
@@ -355,11 +356,11 @@ export default {
 
     <div class="gl-display-flex gl-justify-content-space-between gl-mt-8">
       <gl-button
-        type="submit"
         category="primary"
         variant="confirm"
         data-testid="submit-button"
         :loading="isSaving"
+        @click="onSubmit"
       >
         {{ s__('ForkProject|Fork project') }}
       </gl-button>
