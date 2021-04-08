@@ -68,14 +68,10 @@ default:
 
 describe('insertTips', () => {
   const validTips = [
-    {
-      tip: 'Tip 1',
-      token: 'stages:',
-    },
-    {
-      tip: 'Tip 2',
-      token: 'variables:',
-    },
+    { tip: 'Tip 1', token: 'default:' },
+    { tip: 'Tip 2', token: 'artifacts:' },
+    { tip: 'Tip 3', token: 'expire_in:' },
+    { tip: 'Tip 4', token: 'tags:' },
   ];
 
   it.each(nonStringValues)('throws if snippet is not a string', (snippet) => {
@@ -103,24 +99,20 @@ describe('insertTips', () => {
   });
 
   it('returns the snippet with properly inserted tips', () => {
-    const snippet = `
----
-stages:
-- fuzz
-include:
-- template: template.gitlab-cy.yml
-variables:
-- FOO: bar`;
-    const expected = `
----
-# Tip 1
-stages:
-- fuzz
-include:
-- template: template.gitlab-cy.yml
-# Tip 2
-variables:
-- FOO: bar`;
+    const snippet = `default:
+  artifacts:
+    expire_in: 30 days
+  tags:
+    - gitlab-org`;
+    const expected = `# Tip 1
+default:
+  # Tip 2
+  artifacts:
+    # Tip 3
+    expire_in: 30 days
+  # Tip 4
+  tags:
+    - gitlab-org`;
     expect(insertTips(snippet, validTips)).toBe(expected);
   });
 });
