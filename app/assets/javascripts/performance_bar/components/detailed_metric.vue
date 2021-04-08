@@ -133,7 +133,7 @@ export default {
   >
     <gl-button v-gl-modal="modalId" class="gl-mr-2" type="button" variant="link">
       <span
-        class="gl-text-blue-300 gl-font-weight-bold"
+        class="gl-text-blue-200 gl-font-weight-bold"
         data-testid="performance-bar-details-label"
       >
         {{ metricDetailsLabel }}
@@ -208,7 +208,7 @@ export default {
         <div></div>
       </template>
     </gl-modal>
-    {{ title }}
+    <span class="gl-text-white">{{ title }}</span>
     <request-warning :html-id="htmlId" :warnings="warnings" />
   </div>
 </template>
