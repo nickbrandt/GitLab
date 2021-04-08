@@ -108,8 +108,8 @@ export const throughputChartQuery = `query ($fullPath: ID!, $labels: [String!], 
 `;
 
 export const throughputTableHeaders = [
-  'Merge Request',
-  'Date Merged',
+  'Merge request',
+  'Date merged',
   'Time to merge',
   'Milestone',
   'Commits',

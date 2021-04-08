@@ -9910,7 +9910,7 @@ four standard [pagination arguments](#connection-pagination-arguments):
 
 ### `MergeRequestDiffRegistry`
 
-Represents the Geo sync and verification state of a Merge Request diff.
+Represents the Geo sync and verification state of a merge request diff.
 
 #### Fields
 
@@ -9920,7 +9920,7 @@ Represents the Geo sync and verification state of a Merge Request diff.
 | <a id="mergerequestdiffregistryid"></a>`id` | [`ID!`](#id) | ID of the MergeRequestDiffRegistry. |
 | <a id="mergerequestdiffregistrylastsyncfailure"></a>`lastSyncFailure` | [`String`](#string) | Error message during sync of the MergeRequestDiffRegistry. |
 | <a id="mergerequestdiffregistrylastsyncedat"></a>`lastSyncedAt` | [`Time`](#time) | Timestamp of the most recent successful sync of the MergeRequestDiffRegistry. |
-| <a id="mergerequestdiffregistrymergerequestdiffid"></a>`mergeRequestDiffId` | [`ID!`](#id) | ID of the Merge Request diff. |
+| <a id="mergerequestdiffregistrymergerequestdiffid"></a>`mergeRequestDiffId` | [`ID!`](#id) | ID of the merge request diff. |
 | <a id="mergerequestdiffregistryretryat"></a>`retryAt` | [`Time`](#time) | Timestamp after which the MergeRequestDiffRegistry should be resynced. |
 | <a id="mergerequestdiffregistryretrycount"></a>`retryCount` | [`Int`](#int) | Number of consecutive failed sync attempts of the MergeRequestDiffRegistry. |
 | <a id="mergerequestdiffregistrystate"></a>`state` | [`RegistryState`](#registrystate) | Sync state of the MergeRequestDiffRegistry. |

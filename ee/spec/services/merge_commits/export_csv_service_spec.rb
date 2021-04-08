@@ -21,12 +21,12 @@ RSpec.describe MergeCommits::ExportCsvService do
   it { expect(service.csv_data).to be_success }
 
   it 'includes the appropriate headers' do
-    expect(csv.headers).to eq(['Merge Commit', 'Author', 'Merge Request', 'Merged By', 'Pipeline', 'Group', 'Project', 'Approver(s)'])
+    expect(csv.headers).to eq(['Merge commit', 'Author', 'Merge request', 'Merged by', 'Pipeline', 'Group', 'Project', 'Approver(s)'])
   end
 
   context 'data verification' do
     specify 'Merge Commit' do
-      expect(csv[0]['Merge Commit']).to eq '347yrv45'
+      expect(csv[0]['Merge commit']).to eq '347yrv45'
     end
 
     specify 'Author' do
@@ -34,11 +34,11 @@ RSpec.describe MergeCommits::ExportCsvService do
     end
 
     specify 'Merge Request' do
-      expect(csv[0]['Merge Request']).to eq merge_request.id.to_s
+      expect(csv[0]['Merge request']).to eq merge_request.id.to_s
     end
 
     specify 'Merged By' do
-      expect(csv[0]['Merged By']).to eq 'Brock Lesnar'
+      expect(csv[0]['Merged by']).to eq 'Brock Lesnar'
     end
 
     specify 'Pipeline' do
@@ -72,7 +72,7 @@ RSpec.describe MergeCommits::ExportCsvService do
         it { expect(csv.count).to eq 1 }
 
         it do
-          expect(csv[0]['Merge Commit']).to eq merge_request_2.merge_commit_sha
+          expect(csv[0]['Merge commit']).to eq merge_request_2.merge_commit_sha
         end
       end
 
@@ -85,7 +85,7 @@ RSpec.describe MergeCommits::ExportCsvService do
   end
 
   context 'possible merge commit SHA values' do
-    subject { csv[1]['Merge Commit'] }
+    subject { csv[1]['Merge commit'] }
 
     context 'when squash_commit_sha is present' do
       let_it_be(:squash_commit_merge_request) do

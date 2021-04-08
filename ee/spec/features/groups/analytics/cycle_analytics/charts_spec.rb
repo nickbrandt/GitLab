@@ -116,7 +116,7 @@ RSpec.describe 'Value stream analytics charts', :js do
         end
 
         it 'has 2 labels selected' do
-          expect(page).to have_text('Showing Issues and 2 labels')
+          expect(page).to have_text('Showing issues and 2 labels')
         end
 
         it 'has chart filters' do
@@ -130,14 +130,14 @@ RSpec.describe 'Value stream analytics charts', :js do
             first_selected_label.click
           end
 
-          expect(page).to have_text('Showing Issues and 1 label')
+          expect(page).to have_text('Showing issues and 1 label')
 
           page.within filters_selector do
             find('.dropdown-toggle').click
-            find('[data-testid="type-of-work-filters-subject"] label', text: 'Merge Requests').click
+            find('[data-testid="type-of-work-filters-subject"] label', text: 'merge requests').click
           end
 
-          expect(page).to have_text('Showing Merge Requests and 1 label')
+          expect(page).to have_text('Showing merge requests and 1 label')
         end
       end
 

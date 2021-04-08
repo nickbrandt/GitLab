@@ -22,13 +22,34 @@ module EE
 
       private
 
+      def project_issues_analytics_navbar_link(project, current_user)
+        return unless ::Feature.enabled?(:project_level_issues_analytics, project, default_enabled: true)
+        return unless project_nav_tab?(:issues_analytics)
+
+        navbar_sub_item(
+          title: _('Issue'),
+          path: 'issues_analytics#show',
+          link: project_analytics_issues_analytics_path(project)
+        )
+      end
+
+      def project_merge_request_analytics_navbar_link(project, current_user)
+        return unless project_nav_tab?(:merge_request_analytics)
+
+        navbar_sub_item(
+          title: _('Merge request'),
+          path: 'projects/analytics/merge_request_analytics#show',
+          link: project_analytics_merge_request_analytics_path(project)
+        )
+      end
+
       # Currently an empty page, so don't show it on the navbar for now
       def group_merge_request_analytics_navbar_link(group, current_user)
         return
         return unless group_sidebar_link?(:merge_request_analytics) # rubocop: disable Lint/UnreachableCode
 
         navbar_sub_item(
-          title: _('Merge Request'),
+          title: _('Merge request'),
           path: 'groups/analytics/merge_request_analytics#show',
           link: group_analytics_merge_request_analytics_path(group)
         )
@@ -38,7 +59,7 @@ module EE
         return unless group_sidebar_link?(:cycle_analytics)
 
         navbar_sub_item(
-          title: _('Value Stream'),
+          title: _('Value stream'),
           path: 'groups/analytics/cycle_analytics#show',
           link: group_analytics_cycle_analytics_path(group)
         )
@@ -48,7 +69,7 @@ module EE
         return unless group_sidebar_link?(:group_devops_adoption)
 
         navbar_sub_item(
-          title: _('DevOps Adoption'),
+          title: _('DevOps adoption'),
           path: 'groups/analytics/devops_adoption#show',
           link: group_analytics_devops_adoption_path(group)
         )
@@ -115,6 +136,27 @@ module EE
           title: _('Repositories'),
           path: 'groups/analytics/repository_analytics#show',
           link: group_analytics_repository_analytics_path(group)
+        )
+      end
+
+      def insights_navbar_link(project, current_user)
+        return unless project_nav_tab?(:project_insights)
+
+        navbar_sub_item(
+          title: _('Insights'),
+          path: 'insights#show',
+          link: project_insights_path(project),
+          link_to_options: { class: 'shortcuts-project-insights', data: { qa_selector: 'project_insights_link' } }
+        )
+      end
+
+      def code_review_analytics_navbar_link(project, current_user)
+        return unless project_nav_tab?(:code_review)
+
+        navbar_sub_item(
+          title: _('Code review'),
+          path: 'projects/analytics/code_reviews#index',
+          link: project_analytics_code_reviews_path(project)
         )
       end
     end

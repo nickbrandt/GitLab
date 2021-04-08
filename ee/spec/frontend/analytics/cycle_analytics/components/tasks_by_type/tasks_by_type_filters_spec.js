@@ -66,7 +66,7 @@ describe('TasksByTypeFilters', () => {
   let mock = null;
   const selectedFilterText = (count = 1) => {
     const affix = count > 1 ? 'labels' : 'label';
-    return `Showing Issues and ${count} ${affix}`;
+    return `Showing issues and ${count} ${affix}`;
   };
 
   beforeEach(() => {

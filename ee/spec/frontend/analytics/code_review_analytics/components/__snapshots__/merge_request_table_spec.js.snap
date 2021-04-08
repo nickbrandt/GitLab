@@ -26,9 +26,7 @@ exports[`MergeRequestTable component template matches the snapshot 1`] = `
         role="columnheader"
         scope="col"
       >
-        <div>
-          Merge Request
-        </div>
+        Merge request
       </th>
       <th
         aria-colindex="2"
@@ -103,7 +101,7 @@ exports[`MergeRequestTable component template matches the snapshot 1`] = `
       <td
         aria-colindex="1"
         class="table-col d-flex align-items-center"
-        data-label="Merge Request"
+        data-label="Merge request"
         role="cell"
       >
         <div>
@@ -122,18 +120,18 @@ exports[`MergeRequestTable component template matches the snapshot 1`] = `
                 This is just a super long merge request title that does not fit into one line so it needs to be truncated
               </a>
             </div>
-             
+
             <ul
               class="horizontal-list list-items-separated text-secondary mb-0"
             >
               <li>
                 !12345
               </li>
-               
+
               <li>
                 opened 5 months ago
               </li>
-               
+
               <li>
                 <span
                   class="d-flex align-items-center"
@@ -147,9 +145,9 @@ exports[`MergeRequestTable component template matches the snapshot 1`] = `
                       href="#clock"
                     />
                   </svg>
-                  
+
             11.1
-          
+
                 </span>
               </li>
             </ul>
@@ -185,7 +183,7 @@ exports[`MergeRequestTable component template matches the snapshot 1`] = `
             <div
               class="gl-avatar gl-avatar-identicon gl-avatar-circle gl-avatar-s24 gl-avatar-identicon-bg1"
             >
-              
+
   F
 
             </div>
@@ -210,8 +208,8 @@ exports[`MergeRequestTable component template matches the snapshot 1`] = `
               <div
                 class="gl-avatar gl-avatar-identicon gl-avatar-circle gl-avatar-s24 gl-avatar-identicon-bg1"
               >
-                
-  
+
+
 
               </div>
             </a>
@@ -250,13 +248,13 @@ exports[`MergeRequestTable component template matches the snapshot 1`] = `
           <span
             class="font-weight-bold cgreen"
           >
-             +504 
+             +504
           </span>
-           
+
           <span
             class="font-weight-bold cred"
           >
-             -10 
+             -10
           </span>
         </div>
       </td>

@@ -776,12 +776,7 @@ RSpec.describe 'layouts/nav/sidebar/_project' do
     context 'when the Confluence integration is active' do
       let(:active) { true }
 
-      it 'shows the Confluence tab' do
-        expect(rendered).to have_link('Confluence', href: project_wikis_confluence_path(project))
-      end
-
-      it 'does not show the GitLab wiki tab' do
-        expect(rendered).not_to have_link('Wiki')
+        expect(rendered).to have_link('Value stream', href: project_cycle_analytics_path(project))
       end
     end
 

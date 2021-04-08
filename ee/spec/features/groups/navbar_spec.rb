@@ -42,7 +42,7 @@ RSpec.describe 'Group navbar' do
       stub_licensed_features(productivity_analytics: true)
 
       insert_after_sub_nav_item(
-        _('Contribution'),
+        _('DevOps adoption'),
         within: _('Analytics'),
         new_sub_nav_item_name: _('Productivity')
       )
@@ -58,9 +58,9 @@ RSpec.describe 'Group navbar' do
       stub_licensed_features(cycle_analytics_for_groups: true)
 
       insert_after_sub_nav_item(
-        _('Contribution'),
+        _('DevOps adoption'),
         within: _('Analytics'),
-        new_sub_nav_item_name: _('Value Stream')
+        new_sub_nav_item_name: _('Value stream')
       )
 
       visit group_path(group)

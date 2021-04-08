@@ -31,7 +31,7 @@ exports[`GroupActivity component matches the snapshot 1`] = `
           class="text-secondary gl-font-sm gl-mb-2"
         >
           
-          Merge Requests opened
+          Merge requests opened
           
           <!---->
         </p>

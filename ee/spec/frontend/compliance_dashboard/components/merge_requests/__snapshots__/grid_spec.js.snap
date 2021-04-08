@@ -6,7 +6,7 @@ exports[`MergeRequestsGrid component when intialized matches the snapshot 1`] = 
     class="dashboard-grid gl-display-grid gl-grid-tpl-rows-auto"
   >
     <grid-column-heading-stub
-      heading="Merge Request"
+      heading="Merge request"
     />
      
     <grid-column-heading-stub

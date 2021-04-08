@@ -40,7 +40,7 @@ exports[`ComplianceDashboard component when there are merge requests and the sho
       </template>
       <template>
         <span>
-          Merge Requests
+          Merge requests
         </span>
       </template>
     </b-tab-stub>
