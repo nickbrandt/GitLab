@@ -801,8 +801,6 @@ RSpec/EmptyLineAfterFinalLetItBe:
     - spec/lib/gitlab/auth/otp/strategies/forti_token_cloud_spec.rb
     - spec/lib/gitlab/auth_spec.rb
     - spec/lib/gitlab/cache/ci/project_pipeline_status_spec.rb
-    - spec/lib/gitlab/checks/project_created_spec.rb
-    - spec/lib/gitlab/checks/project_moved_spec.rb
     - spec/lib/gitlab/ci/build/policy/changes_spec.rb
     - spec/lib/gitlab/ci/config/external/file/local_spec.rb
     - spec/lib/gitlab/ci/config/external/file/project_spec.rb
