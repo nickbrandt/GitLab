@@ -16071,6 +16071,9 @@ msgstr ""
 msgid "In progress"
 msgstr ""
 
+msgid "In this page you will find information about the settings that are used in your current instance."
+msgstr ""
+
 msgid "InProductMarketing|%{strong_start}Advanced application security%{strong_end} — including SAST, DAST scanning, FUZZ testing, dependency scanning, license compliance, secrete detection"
 msgstr ""
 
@@ -29908,6 +29911,9 @@ msgid "System output"
 msgstr ""
 
 msgid "Table of Contents"
+msgstr ""
+
+msgid "Table of contents"
 msgstr ""
 
 msgid "Tag"
