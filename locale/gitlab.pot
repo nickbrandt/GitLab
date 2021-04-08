@@ -1494,6 +1494,9 @@ msgstr ""
 msgid "APIFuzzing|Choose a profile"
 msgstr ""
 
+msgid "APIFuzzing|Code snippet could not be generated. Try again later."
+msgstr ""
+
 msgid "APIFuzzing|Code snippet for the API Fuzzing configuration"
 msgstr ""
 
@@ -1557,10 +1560,16 @@ msgstr ""
 msgid "APIFuzzing|Target URL"
 msgstr ""
 
-msgid "APIFuzzing|The configuration could not be saved, please try again later."
+msgid "APIFuzzing|There are two ways to perform scans."
 msgstr ""
 
-msgid "APIFuzzing|There are two ways to perform scans."
+msgid "APIFuzzing|Tip: Insert the following variables anywhere below stages and include"
+msgstr ""
+
+msgid "APIFuzzing|Tip: Insert this part below all include"
+msgstr ""
+
+msgid "APIFuzzing|Tip: Insert this part below all stages"
 msgstr ""
 
 msgid "APIFuzzing|To prevent a security leak, authentication info must be added as a %{ciVariablesLinkStart}CI variable%{ciVariablesLinkEnd}. A user with maintainer access rights can manage CI variables in the %{ciSettingsLinkStart}Settings%{ciSettingsLinkEnd} area. We detected that you are not a maintainer. Commit your changes and assign them to a maintainer to update the credentials before merging."

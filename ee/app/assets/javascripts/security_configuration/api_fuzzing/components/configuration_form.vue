@@ -18,6 +18,7 @@ import DynamicFields from '../../components/dynamic_fields.vue';
 import FormInput from '../../components/form_input.vue';
 import { SCAN_MODES, CONFIGURATION_SNIPPET_MODAL_ID } from '../constants';
 import apiFuzzingCiConfigurationCreate from '../graphql/api_fuzzing_ci_configuration_create.mutation.graphql';
+import { insertTips } from '../utils';
 import ConfigurationSnippetModal from './configuration_snippet_modal.vue';
 
 export default {
@@ -54,7 +55,7 @@ export default {
   data() {
     return {
       isLoading: false,
-      showError: false,
+      isErrorVisible: false,
       targetUrl: {
         field: 'targetUrl',
         label: s__('APIFuzzing|Target URL'),
@@ -155,11 +156,35 @@ export default {
       }
       return fields.some(({ value }) => isEmptyValue(value));
     },
+    configurationYamlWithTips() {
+      if (!this.configurationYaml) {
+        return '';
+      }
+      return insertTips(this.configurationYaml, [
+        {
+          tip: s__('APIFuzzing|Tip: Insert this part below all stages'),
+          // eslint-disable-next-line @gitlab/require-i18n-strings
+          token: 'stages:',
+        },
+        {
+          tip: s__('APIFuzzing|Tip: Insert this part below all include'),
+          // eslint-disable-next-line @gitlab/require-i18n-strings
+          token: 'include:',
+        },
+        {
+          tip: s__(
+            'APIFuzzing|Tip: Insert the following variables anywhere below stages and include',
+          ),
+          // eslint-disable-next-line @gitlab/require-i18n-strings
+          token: 'variables:',
+        },
+      ]);
+    },
   },
   methods: {
     async onSubmit() {
       this.isLoading = true;
-      this.showError = false;
+      this.dismissError();
       try {
         const input = {
           projectPath: this.fullPath,
@@ -186,21 +211,25 @@ export default {
           variables: { input },
         });
         if (errors.length) {
-          this.showError = true;
+          this.showError();
         } else {
           this.ciYamlEditPath = gitlabCiYamlEditPath;
           this.configurationYaml = configurationYaml;
           this.$refs[CONFIGURATION_SNIPPET_MODAL_ID].show();
         }
       } catch (e) {
-        this.showError = true;
+        this.showError();
         Sentry.captureException(e);
       } finally {
         this.isLoading = false;
       }
     },
+    showError() {
+      this.isErrorVisible = true;
+      window.scrollTo({ top: 0 });
+    },
     dismissError() {
-      this.showError = false;
+      this.isErrorVisible = false;
     },
   },
   SCAN_MODES,
@@ -209,8 +238,8 @@ export default {
 
 <template>
   <form @submit.prevent="onSubmit">
-    <gl-alert v-if="showError" variant="danger" class="gl-mb-5" @dismiss="dismissError">
-      {{ s__('APIFuzzing|The configuration could not be saved, please try again later.') }}
+    <gl-alert v-if="isErrorVisible" variant="danger" class="gl-mb-5" @dismiss="dismissError">
+      {{ s__('APIFuzzing|Code snippet could not be generated. Try again later.') }}
     </gl-alert>
 
     <form-input v-model="targetUrl.value" v-bind="targetUrl" class="gl-mb-7" />
@@ -303,7 +332,7 @@ export default {
     <configuration-snippet-modal
       :ref="$options.CONFIGURATION_SNIPPET_MODAL_ID"
       :ci-yaml-edit-url="ciYamlEditPath"
-      :yaml="configurationYaml"
+      :yaml="configurationYamlWithTips"
     />
   </form>
 </template>

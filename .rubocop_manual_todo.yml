@@ -872,8 +872,6 @@ RSpec/EmptyLineAfterFinalLetItBe:
     - spec/lib/gitlab/jira_import_spec.rb
     - spec/lib/gitlab/json_cache_spec.rb
     - spec/lib/gitlab/language_detection_spec.rb
-    - spec/lib/gitlab/phabricator_import/cache/map_spec.rb
-    - spec/lib/gitlab/phabricator_import/issues/task_importer_spec.rb
     - spec/lib/gitlab/project_search_results_spec.rb
     - spec/lib/gitlab/prometheus/query_variables_spec.rb
     - spec/lib/gitlab/reactive_cache_set_cache_spec.rb

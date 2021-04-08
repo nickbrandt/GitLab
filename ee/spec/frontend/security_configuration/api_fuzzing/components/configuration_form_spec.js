@@ -241,9 +241,16 @@ describe('EE - ApiFuzzingConfigurationForm', () => {
         ciYamlEditUrl:
           createApiFuzzingConfigurationMutationResponse.data.apiFuzzingCiConfigurationCreate
             .gitlabCiYamlEditPath,
-        yaml:
-          createApiFuzzingConfigurationMutationResponse.data.apiFuzzingCiConfigurationCreate
-            .configurationYaml,
+        yaml: `---
+# Tip: Insert this part below all stages
+stages:
+- fuzz
+# Tip: Insert this part below all include
+include:
+- template: template.gitlab-ci.yml
+# Tip: Insert the following variables anywhere below stages and include
+variables:
+- FOO: bar`,
       });
     });
 
@@ -263,6 +270,7 @@ describe('EE - ApiFuzzingConfigurationForm', () => {
       await waitForPromises();
 
       expect(findAlert().exists()).toBe(true);
+      expect(window.scrollTo).toHaveBeenCalledWith({ top: 0 });
     });
 
     it('shows an error on error-as-data', async () => {
@@ -287,6 +295,7 @@ describe('EE - ApiFuzzingConfigurationForm', () => {
       await waitForPromises();
 
       expect(findAlert().exists()).toBe(true);
+      expect(window.scrollTo).toHaveBeenCalledWith({ top: 0 });
     });
   });
 });
