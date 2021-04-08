@@ -431,28 +431,41 @@ describe('OnDemandScansForm', () => {
     });
 
     describe('on errors as data', () => {
-      const errors = ['error#1', 'error#2', 'error#3'];
-
-      beforeEach(async () => {
-        createShallowComponent();
+      const submitWithError = async (errors) => {
         wrapper.vm.$apollo.mutate.mockResolvedValue({
           data: { dastProfileCreate: { pipelineUrl: null, errors } },
         });
         await setValidFormData();
-        submitForm();
+        await submitForm();
+      };
+
+      beforeEach(async () => {
+        createShallowComponent();
       });
 
-      it('resets loading state', () => {
+      it('resets loading state', async () => {
+        await submitWithError(['error']);
+
         expect(wrapper.vm.loading).toBe(false);
       });
 
-      it('shows an alert with the returned errors', () => {
+      it('shows an alert with the returned errors', async () => {
+        const errors = ['error#1', 'error#2', 'error#3'];
+        await submitWithError(errors);
         const alert = findAlert();
 
         expect(alert.exists()).toBe(true);
         errors.forEach((error) => {
           expect(alert.text()).toContain(error);
         });
+      });
+
+      it('properly renders errors containing markup', async () => {
+        await submitWithError(['an error <a href="#" data-testid="error-link">with a link</a>']);
+        const alert = findAlert();
+
+        expect(alert.text()).toContain('an error with a link');
+        expect(alert.find('[data-testid="error-link"]').exists()).toBe(true);
       });
     });
   });
