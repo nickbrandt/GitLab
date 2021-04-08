@@ -35113,6 +35113,9 @@ msgstr ""
 msgid "Write milestone description..."
 msgstr ""
 
+msgid "Write to \"authorized_keys\" file"
+msgstr ""
+
 msgid "Write your release notes or drag your files here…"
 msgstr ""
 
