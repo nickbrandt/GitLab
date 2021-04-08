@@ -11,7 +11,15 @@ export const insertTip = ({ snippet, tip, token }) => {
   if (!isString(token)) {
     throw new Error('token must be a string');
   }
-  return snippet.replace(token, `# ${tip}\n${token}`);
+  const lines = snippet.split('\n');
+  for (let i = 0; i < lines.length; i += 1) {
+    if (lines[i].includes(token)) {
+      const indent = lines[i].match(/^[ \t]+/)?.[0] ?? '';
+      lines[i] = lines[i].replace(token, `# ${tip}\n${indent}${token}`);
+      break;
+    }
+  }
+  return lines.join('\n');
 };
 
 export const insertTips = (snippet, tips = []) =>

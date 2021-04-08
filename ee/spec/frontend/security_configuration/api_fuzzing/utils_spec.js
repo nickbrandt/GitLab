@@ -43,6 +43,27 @@ describe('insertTip', () => {
       }),
     ).toBe(expected);
   });
+
+  it('preserves indentation', () => {
+    const snippet = `---
+default:
+  artifacts:
+    expire_in: 30 days`;
+
+    const expected = `---
+default:
+  artifacts:
+    # a very helpful tip
+    expire_in: 30 days`;
+
+    expect(
+      insertTip({
+        snippet,
+        token: 'expire_in:',
+        tip,
+      }),
+    ).toBe(expected);
+  });
 });
 
 describe('insertTips', () => {
