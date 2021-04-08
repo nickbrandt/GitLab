@@ -85,7 +85,7 @@ with secure tokens as you complete the setup process.
 We note in the instructions below where these secrets are required.
 
 NOTE:
-Omnibus GitLab installations can use `gitlab-secrets.json`.
+Omnibus GitLab installations can use `gitlab-secrets.json` for `GITLAB_SHELL_SECRET_TOKEN`.
 
 ### PostgreSQL
 
