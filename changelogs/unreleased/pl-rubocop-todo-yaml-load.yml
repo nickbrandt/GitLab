@@ -1,5 +1,5 @@
 ---
 title: Resolves offenses Security/YAMLLoad
-merge_request:
+merge_request: 58042
 author: Shubham Kumar (@imskr)
 type: fixed
