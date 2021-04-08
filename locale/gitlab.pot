@@ -31959,6 +31959,9 @@ msgstr ""
 msgid "Time until first merge request"
 msgstr ""
 
+msgid "Time zone"
+msgstr ""
+
 msgid "TimeTrackingEstimated|Est"
 msgstr ""
 
