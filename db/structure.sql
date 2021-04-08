@@ -13565,7 +13565,9 @@ CREATE TABLE import_export_uploads (
     project_id integer,
     import_file text,
     export_file text,
-    group_id bigint
+    group_id bigint,
+    remote_import_url text,
+    CONSTRAINT check_58f0d37481 CHECK ((char_length(remote_import_url) <= 512))
 );
 
 CREATE SEQUENCE import_export_uploads_id_seq
