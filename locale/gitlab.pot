@@ -932,6 +932,9 @@ msgstr ""
 msgid "%{total} warnings found: showing first %{warningsDisplayed}"
 msgstr ""
 
+msgid "%{type} License"
+msgstr ""
+
 msgid "%{usage_ping_link_start}Learn more%{usage_ping_link_end} about what information is shared with GitLab Inc."
 msgstr ""
 
@@ -6450,40 +6453,13 @@ msgstr ""
 msgid "CloudLicense|I agree that my use of the GitLab Software is subject to the Subscription Agreement located at the %{linkStart}Terms of Service%{linkEnd}, unless otherwise agreed to in writing with GitLab."
 msgstr ""
 
-msgid "CloudLicense|ID"
-msgstr ""
-
-msgid "CloudLicense|Last Sync"
-msgstr ""
-
 msgid "CloudLicense|Learn how to %{linkStart}activate your subscription%{linkEnd}."
-msgstr ""
-
-msgid "CloudLicense|Licensed to"
-msgstr ""
-
-msgid "CloudLicense|Manage"
 msgstr ""
 
 msgid "CloudLicense|Maximum users"
 msgstr ""
 
 msgid "CloudLicense|Paste your activation code"
-msgstr ""
-
-msgid "CloudLicense|Plan"
-msgstr ""
-
-msgid "CloudLicense|Renews"
-msgstr ""
-
-msgid "CloudLicense|Started"
-msgstr ""
-
-msgid "CloudLicense|Subscription details"
-msgstr ""
-
-msgid "CloudLicense|Sync Subscription details"
 msgstr ""
 
 msgid "CloudLicense|This instance is currently using the %{planName} plan."
@@ -29646,6 +29622,9 @@ msgstr ""
 msgid "Subscription"
 msgstr ""
 
+msgid "Subscription History"
+msgstr ""
+
 msgid "Subscription deletion failed."
 msgstr ""
 
@@ -29890,6 +29869,48 @@ msgid "Summary"
 msgstr ""
 
 msgid "Sunday"
+msgstr ""
+
+msgid "SuperSonics|Activated on"
+msgstr ""
+
+msgid "SuperSonics|Expires on"
+msgstr ""
+
+msgid "SuperSonics|ID"
+msgstr ""
+
+msgid "SuperSonics|Last Sync"
+msgstr ""
+
+msgid "SuperSonics|Licensed to"
+msgstr ""
+
+msgid "SuperSonics|Manage"
+msgstr ""
+
+msgid "SuperSonics|Plan"
+msgstr ""
+
+msgid "SuperSonics|Renews"
+msgstr ""
+
+msgid "SuperSonics|Seats"
+msgstr ""
+
+msgid "SuperSonics|Started"
+msgstr ""
+
+msgid "SuperSonics|Subscription details"
+msgstr ""
+
+msgid "SuperSonics|Sync Subscription details"
+msgstr ""
+
+msgid "SuperSonics|Type"
+msgstr ""
+
+msgid "SuperSonics|Valid From"
 msgstr ""
 
 msgid "Support"
