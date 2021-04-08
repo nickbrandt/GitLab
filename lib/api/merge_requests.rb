@@ -424,8 +424,7 @@ module API
         mr_params[:force_remove_source_branch] = mr_params.delete(:remove_source_branch) if mr_params.has_key?(:remove_source_branch)
         mr_params = convert_parameters_from_legacy_format(mr_params)
 
-        service = if mr_params.keys == [:assignee_ids] || mr_params.keys == [:assignee_id]
-                    mr_params[:assignee_ids] = Array.wrap(mr_params[:assignee_ids]) if mr_params.key?(:assignee_id)
+        service = if mr_params.one? && (mr_params.keys & %i[assignee_id assignee_ids]).one?
                     ::MergeRequests::UpdateAssigneesService
                   else
                     ::MergeRequests::UpdateService

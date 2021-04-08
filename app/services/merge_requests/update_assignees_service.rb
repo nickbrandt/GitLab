@@ -56,6 +56,13 @@ module MergeRequests
       params.fetch(:assignee_ids).first(1)
     end
 
+    def params
+      ps = super
+
+      # allow either assignee_id or assignee_ids, preferring assignee_id if passed.
+      { assignee_ids: ps.key?(:assignee_id) ? Array.wrap(ps[:assignee_id]) : ps[:assignee_ids] }
+    end
+
     def update_attrs
       @attrs ||= { updated_at: Time.current, updated_by: current_user, assignee_ids: assignee_ids }
     end
