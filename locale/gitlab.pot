@@ -18909,9 +18909,6 @@ msgstr ""
 msgid "Manage projects."
 msgstr ""
 
-msgid "Manage storage usage"
-msgstr ""
-
 msgid "Manage two-factor authentication"
 msgstr ""
 
@@ -20454,15 +20451,13 @@ msgstr ""
 msgid "NamespaceStorageSize|You have reached %{usage_in_percent} of %{namespace_name}'s storage capacity (%{used_storage} of %{storage_limit})"
 msgstr ""
 
-msgid "NamespaceStorageSize|You have reached the free storage limit of %{free_size_limit} on %{locked_project_count} project. To unlock it, please purchase additional storage"
-msgid_plural "NamespaceStorageSize|You have reached the free storage limit of %{free_size_limit} on %{locked_project_count} projects. To unlock them, please purchase additional storage"
-msgstr[0] ""
-msgstr[1] ""
-
-msgid "NamespaceStorageSize|push to your repository, create pipelines, create issues or add comments. To learn more about reducing storage capacity please visit our docs."
+msgid "NamespaceStorageSize|You have reached the free storage limit of %{free_size_limit} on one or more projects."
 msgstr ""
 
 msgid "NamespaceStorageSize|push to your repository, create pipelines, create issues or add comments. To reduce storage capacity, delete unused repositories, artifacts, wikis, issues, and pipelines."
+msgstr ""
+
+msgid "NamespaceStorageSize|push to your repository, create pipelines, create issues or add comments. To reduce storage capacity, delete unused repositories, artifacts, wikis, issues, and pipelines. To learn more about reducing storage capacity please visit our docs."
 msgstr ""
 
 msgid "Namespaces"
@@ -34013,6 +34008,9 @@ msgid "View the latest successful deployment to this environment"
 msgstr ""
 
 msgid "View the performance dashboard at"
+msgstr ""
+
+msgid "View usage details"
 msgstr ""
 
 msgid "View users statistics"
