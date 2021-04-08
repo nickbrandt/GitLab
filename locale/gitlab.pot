@@ -4417,7 +4417,13 @@ msgstr ""
 msgid "Authenticate with GitHub"
 msgstr ""
 
+msgid "Authenticated API rate limit period in seconds"
+msgstr ""
+
 msgid "Authenticated API request rate limit"
+msgstr ""
+
+msgid "Authenticated web rate limit period in seconds"
 msgstr ""
 
 msgid "Authenticated web request rate limit"
@@ -11697,6 +11703,9 @@ msgstr ""
 msgid "Enable and disable Service Desk. Some additional configuration might be required. %{link_start}Learn more%{link_end}."
 msgstr ""
 
+msgid "Enable authenticated API request rate limit"
+msgstr ""
+
 msgid "Enable automatic repository housekeeping (git repack, git gc)"
 msgstr ""
 
@@ -11785,6 +11794,9 @@ msgid "Enable snowplow tracking"
 msgstr ""
 
 msgid "Enable two-factor authentication"
+msgstr ""
+
+msgid "Enable unauthenticated request rate limit"
 msgstr ""
 
 msgid "Enable usage ping"
@@ -15599,6 +15611,9 @@ msgstr ""
 msgid "Helps reduce alert volume (e.g. if creating too many issues)"
 msgstr ""
 
+msgid "Helps reduce request volume (e.g. from crawlers or abusive bots)"
+msgstr ""
+
 msgid "Helps reduce request volume for protected paths"
 msgstr ""
 
@@ -16120,6 +16135,9 @@ msgid "In case of pull mirroring, your user will be the author of all events in 
 msgstr ""
 
 msgid "In progress"
+msgstr ""
+
+msgid "In this page you will find information about the settings that are used in your current instance."
 msgstr ""
 
 msgid "InProductMarketing|%{strong_start}Advanced application security%{strong_end} — including SAST, DAST scanning, FUZZ testing, dependency scanning, license compliance, secrete detection"
@@ -19146,6 +19164,12 @@ msgstr ""
 msgid "Max access level"
 msgstr ""
 
+msgid "Max authenticated API requests per period per user"
+msgstr ""
+
+msgid "Max authenticated web requests per period per user"
+msgstr ""
+
 msgid "Max file size is 200 KB."
 msgstr ""
 
@@ -19153,6 +19177,9 @@ msgid "Max requests per minute per user"
 msgstr ""
 
 msgid "Max role"
+msgstr ""
+
+msgid "Max unauthenticated requests per period per IP"
 msgstr ""
 
 msgid "MaxBuilds"
@@ -30072,6 +30099,9 @@ msgstr ""
 msgid "Table of Contents"
 msgstr ""
 
+msgid "Table of contents"
+msgstr ""
+
 msgid "Tag"
 msgstr ""
 
@@ -32965,6 +32995,9 @@ msgid "Unassign from commenting user"
 msgstr ""
 
 msgid "Unassigned"
+msgstr ""
+
+msgid "Unauthenticated rate limit period in seconds"
 msgstr ""
 
 msgid "Unauthenticated request rate limit"
