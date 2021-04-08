@@ -329,7 +329,7 @@ RSpec.describe Gitlab do
         before do
           stub_path(
             'ee/app/models/license.rb',
-            'jh/app/helpers/jh/appearances_helper.rb',
+            'jh',
             exist?: true)
         end
 
