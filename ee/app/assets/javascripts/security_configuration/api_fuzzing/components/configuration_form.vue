@@ -55,7 +55,7 @@ export default {
   data() {
     return {
       isLoading: false,
-      showError: false,
+      isErrorVisible: false,
       targetUrl: {
         field: 'targetUrl',
         label: s__('APIFuzzing|Target URL'),
@@ -184,7 +184,7 @@ export default {
   methods: {
     async onSubmit() {
       this.isLoading = true;
-      this.showError = false;
+      this.dismissError();
       try {
         const input = {
           projectPath: this.fullPath,
@@ -211,21 +211,25 @@ export default {
           variables: { input },
         });
         if (errors.length) {
-          this.showError = true;
+          this.showError();
         } else {
           this.ciYamlEditPath = gitlabCiYamlEditPath;
           this.configurationYaml = configurationYaml;
           this.$refs[CONFIGURATION_SNIPPET_MODAL_ID].show();
         }
       } catch (e) {
-        this.showError = true;
+        this.showError();
         Sentry.captureException(e);
       } finally {
         this.isLoading = false;
       }
     },
+    showError() {
+      this.isErrorVisible = true;
+      window.scrollTo({ top: 0 });
+    },
     dismissError() {
-      this.showError = false;
+      this.isErrorVisible = false;
     },
   },
   SCAN_MODES,
@@ -234,8 +238,8 @@ export default {
 
 <template>
   <form @submit.prevent="onSubmit">
-    <gl-alert v-if="showError" variant="danger" class="gl-mb-5" @dismiss="dismissError">
-      {{ s__('APIFuzzing|The configuration could not be saved, please try again later.') }}
+    <gl-alert v-if="isErrorVisible" variant="danger" class="gl-mb-5" @dismiss="dismissError">
+      {{ s__('APIFuzzing|Code snippet could not be generated. Try again later.') }}
     </gl-alert>
 
     <form-input v-model="targetUrl.value" v-bind="targetUrl" class="gl-mb-7" />

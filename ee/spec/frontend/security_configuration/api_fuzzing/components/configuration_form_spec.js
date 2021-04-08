@@ -270,6 +270,7 @@ variables:
       await waitForPromises();
 
       expect(findAlert().exists()).toBe(true);
+      expect(window.scrollTo).toHaveBeenCalledWith({ top: 0 });
     });
 
     it('shows an error on error-as-data', async () => {
@@ -294,6 +295,7 @@ variables:
       await waitForPromises();
 
       expect(findAlert().exists()).toBe(true);
+      expect(window.scrollTo).toHaveBeenCalledWith({ top: 0 });
     });
   });
 });

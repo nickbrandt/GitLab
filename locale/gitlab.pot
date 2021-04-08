@@ -1494,6 +1494,9 @@ msgstr ""
 msgid "APIFuzzing|Choose a profile"
 msgstr ""
 
+msgid "APIFuzzing|Code snippet could not be generated. Try again later."
+msgstr ""
+
 msgid "APIFuzzing|Code snippet for the API Fuzzing configuration"
 msgstr ""
 
@@ -1555,9 +1558,6 @@ msgid "APIFuzzing|Show code snippet for the profile"
 msgstr ""
 
 msgid "APIFuzzing|Target URL"
-msgstr ""
-
-msgid "APIFuzzing|The configuration could not be saved, please try again later."
 msgstr ""
 
 msgid "APIFuzzing|There are two ways to perform scans."
