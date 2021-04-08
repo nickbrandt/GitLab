@@ -19275,6 +19275,9 @@ msgstr ""
 msgid "Maximum size of individual attachments in comments."
 msgstr ""
 
+msgid "Maximum size of pages (MB)"
+msgstr ""
+
 msgid "Maximum time between updates that a mirror can have when scheduled to synchronize."
 msgstr ""
 
