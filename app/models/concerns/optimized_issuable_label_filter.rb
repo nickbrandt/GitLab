@@ -33,23 +33,38 @@ module OptimizedIssuableLabelFilter
     count_params = params.merge(state: nil, sort: nil, force_cte: true)
     finder = self.class.new(current_user, count_params)
 
-    state_counts = finder
-      .execute
-      .reorder(nil)
-      .group(:state_id)
-      .count
-
-    counts = Hash.new(0)
-
-    state_counts.each do |key, value|
-      counts[count_key(key)] += value
+    if Feature.enabled?(:cached_issuable_count_by_state, default_enabled: :yaml) &&
+      !filters_set?(finder, count_params)
+      cached_state_counts(finder)
+    else
+      uncached_state_counts(finder)
     end
-
-    counts[:all] = counts.values.sum
-    counts.with_indifferent_access
   end
 
   private
+
+  def filters_set?(finder, params)
+    scalar_and_array_filters = finder.class.scalar_params + finder.class.array_params.keys
+    scalar_and_array_filters.any? { |filter| params.with_indifferent_access.include?(filter) }
+  end
+
+  def uncached_state_counts(finder)
+    state_counts = finder.execute.reorder(nil).group(:state_id).count
+    counts       = state_counts.transform_keys { |key| count_key(key) }
+    counts[:all] = counts.values.sum
+
+    counts.with_indifferent_access
+  end
+
+  def cached_state_counts(finder)
+    key = if finder.params.project?
+            ['project', finder.params.project_id, "#{finder.class.name}_count_by_state"]
+          elsif finder.params.group?
+            ['group', finder.params.group_id, "#{finder.class.name}_count_by_state"]
+          end
+
+    Rails.cache.fetch(key, expires_in: 1.day) { uncached_state_counts(finder) }
+  end
 
   def issuables_with_selected_labels(items, target_model)
     if root_namespace

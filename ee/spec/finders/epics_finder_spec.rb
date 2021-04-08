@@ -725,13 +725,15 @@ RSpec.describe EpicsFinder do
   end
 
   describe '#count_by_state' do
+    let(:params) { { group_id: group.id } }
+
     before do
       group.add_developer(search_user)
       stub_licensed_features(epics: true)
     end
 
     it 'returns correct counts' do
-      results = described_class.new(search_user, group_id: group.id).count_by_state
+      results = described_class.new(search_user, params).count_by_state
 
       expect(results).to eq('opened' => 2, 'closed' => 1, 'all' => 3)
     end
@@ -744,6 +746,11 @@ RSpec.describe EpicsFinder do
       end
 
       expect(finder.row_count).to eq(-1)
+    end
+
+    it_behaves_like 'a finder with cached count by state' do
+      let(:user) { search_user }
+      let(:cache_key) { ['group', group.id, "#{described_class.name}_count_by_state"] }
     end
 
     context 'when using group cte for search' do

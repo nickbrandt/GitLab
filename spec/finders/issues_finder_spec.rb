@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe IssuesFinder do
+RSpec.describe IssuesFinder, :clean_gitlab_redis_shared_state do
   using RSpec::Parameterized::TableSyntax
   include_context 'IssuesFinder context'
 
@@ -987,6 +987,35 @@ RSpec.describe IssuesFinder do
       end
 
       expect(finder.row_count).to eq(-1)
+    end
+  end
+
+  describe '#count_by_state' do
+    context 'when filtering by project id' do
+      let(:project) { project1 }
+      let(:params) { { project_id: project.id } }
+      let(:cache_key) { ['project', project.id, "#{described_class.name}_count_by_state"] }
+
+      it 'returns correct counts' do
+        results = described_class.new(user, params).count_by_state
+
+        expect(results).to eq('opened' => 2, 'all' => 2)
+      end
+
+      it_behaves_like 'a finder with cached count by state'
+    end
+
+    context 'when filtering by group id' do
+      let(:params) { { group_id: group.id } }
+      let(:cache_key) { ['group', group.id, "#{described_class.name}_count_by_state"] }
+
+      it 'returns correct counts' do
+        results = described_class.new(user, params).count_by_state
+
+        expect(results).to eq('opened' => 2, 'all' => 2)
+      end
+
+      it_behaves_like 'a finder with cached count by state'
     end
   end
 
