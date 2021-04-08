@@ -29,8 +29,14 @@ RSpec.describe SearchService do
 
   describe '#project' do
     context 'when the project is accessible' do
-      it 'returns the project' do
+      it 'returns the project for param project_id' do
         project = described_class.new(user, project_id: accessible_project.id).project
+
+        expect(project).to eq accessible_project
+      end
+
+      it 'returns the project for param id' do
+        project = described_class.new(user, id: accessible_project.id).project
 
         expect(project).to eq accessible_project
       end

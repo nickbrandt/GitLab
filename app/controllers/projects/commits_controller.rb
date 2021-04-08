@@ -69,14 +69,14 @@ class Projects::CommitsController < Projects::ApplicationController
 
     @commits =
       if search.present?
-        @repository.find_commits_by_message(search, @ref, @path, @limit, @offset)
+        page = (@offset / @limit) + 1
+        search_service = ::SearchService.new(current_user, params.merge(scope: 'commits', per_page: @limit, page: page))
+        CommitCollection.new(@project, search_service.search_objects, @ref)
       elsif author.present?
         @repository.commits(@ref, author: author, path: @path, limit: @limit, offset: @offset)
       else
         @repository.commits(@ref, path: @path, limit: @limit, offset: @offset)
       end
-
-    @commits.each(&:lazy_author) # preload authors
 
     @commits = @commits.with_latest_pipeline(@ref)
     @commits = set_commits_for_rendering(@commits)

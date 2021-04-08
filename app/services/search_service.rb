@@ -18,8 +18,11 @@ class SearchService
     return @project if defined?(@project)
 
     @project =
-      if params[:project_id].present?
-        the_project = Project.find_by(id: params[:project_id])
+      if params[:namespace_id].present? && params[:project_id].present?
+        the_project = Project.find_by_full_path([params[:namespace_id], '/', params[:project_id]].join(''))
+        can?(current_user, :read_project, the_project) ? the_project : nil
+      elsif params[:project_id].present?
+        the_project = Project.find_by(id: params[:project_id] || params[:id])
         can?(current_user, :read_project, the_project) ? the_project : nil
       else
         nil
