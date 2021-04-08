@@ -13,6 +13,7 @@ module Gitlab
     # like for SyncSeatLinkRequestWorker, the params are passed because the values from when
     # the job was enqueued are necessary.
     def initialize(timestamp: nil, key: default_key, max_users: nil, active_users: nil)
+      @current_time = Time.current
       @timestamp = timestamp || historical_data&.recorded_at || current_time
       @key = key
       @max_users = max_users || default_max_count
@@ -25,17 +26,27 @@ module Gitlab
       SyncSeatLinkWorker.perform_async
     end
 
-    # Only sync paid licenses from start date until 14 days after expiration
-    # when seat link feature is enabled.
     def should_sync_seats?
-      Gitlab::CurrentSettings.seat_link_enabled? &&
-        !license&.trial? &&
-        license&.expires_at && # Skip sync if license has no expiration
-        historical_data.present? && # Skip sync if there is no historical data
-        timestamp.between?(license.starts_at.beginning_of_day, license.expires_at.end_of_day + 14.days)
+      return false unless license
+
+      if license.cloud?
+        !license.trial? &&
+          license.expires_at && # Skip sync if license has no expiration
+          timestamp.between?(license.starts_at.beginning_of_day, license.expires_at.end_of_day + 14.days)
+      else
+        # Only sync paid licenses from start date until 14 days after expiration
+        # when seat link feature is enabled.
+        Gitlab::CurrentSettings.seat_link_enabled? &&
+          !license.trial? &&
+          license.expires_at && # Skip sync if license has no expiration
+          historical_data.present? && # Skip sync if there is no historical data
+          timestamp.between?(license.starts_at.beginning_of_day, license.expires_at.end_of_day + 14.days)
+      end
     end
 
     private
+
+    attr_reader :current_time
 
     def data
       {
@@ -65,10 +76,6 @@ module Gitlab
 
         license&.historical_data(to: to_timestamp)&.order(:recorded_at)&.last
       end
-    end
-
-    def current_time
-      strong_memoize(:current_time) { Time.current }
     end
 
     def default_active_count
