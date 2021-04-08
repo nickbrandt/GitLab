@@ -249,35 +249,6 @@ RSpec.describe 'Admin updates settings' do
         expect(page).to have_content "Application settings saved successfully"
         expect(current_settings.hide_third_party_offers).to be true
       end
-
-      it 'change Slack Notifications Service template settings', :js do
-        first(:link, 'Service Templates').click
-        click_link 'Slack notifications'
-        fill_in 'Webhook', with: 'http://localhost'
-        fill_in 'Username', with: 'test_user'
-        fill_in 'service[push_channel]', with: '#test_channel'
-        page.check('Notify only broken pipelines')
-        page.select 'All branches', from: 'Branches to be notified'
-
-        check_all_events
-        click_button 'Save changes'
-
-        expect(page).to have_content 'Application settings saved successfully'
-
-        click_link 'Slack notifications'
-
-        expect(page.all('input[type=checkbox]')).to all(be_checked)
-        expect(find_field('Webhook').value).to eq 'http://localhost'
-        expect(find_field('Username').value).to eq 'test_user'
-        expect(find('[name="service[push_channel]"]').value).to eq '#test_channel'
-      end
-
-      it 'defaults Deployment events to false for chat notification template settings', :js do
-        first(:link, 'Service Templates').click
-        click_link 'Slack notifications'
-
-        expect(find_field('Deployment')).not_to be_checked
-      end
     end
 
     context 'Integration page', :js do
