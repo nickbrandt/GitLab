@@ -28,6 +28,8 @@ module PaidFeatureCalloutHelper
     base_attrs.merge({
       container_id: container_id,
       days_remaining: group.trial_days_remaining,
+      href_compare_plans: group_billings_path(group),
+      href_upgrade_to_paid: premium_subscription_path_for_group(group),
       plan_name_for_trial: group.gitlab_subscription&.plan_title,
       plan_name_for_upgrade: 'Premium',
       target_id: container_id
@@ -42,5 +44,10 @@ module PaidFeatureCalloutHelper
 
   def base_paid_feature_data_attrs(feature_name)
     { feature_name: feature_name }
+  end
+
+  def premium_subscription_path_for_group(group)
+    # Hard-coding the plan_id to the Premium plan on production & staging
+    new_subscriptions_path(namespace_id: group.id, plan_id: '2c92c0f876e0f4cc0176e176a08f1b70')
   end
 end

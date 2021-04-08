@@ -15,8 +15,10 @@ describe('PaidFeatureCalloutPopover', () => {
   const defaultProps = {
     daysRemaining: 12,
     featureName: 'some feature',
-    planNameForTrial: 'Ultimate',
-    planNameForUpgrade: 'Premium',
+    hrefComparePlans: '/group/test-group/-/billings',
+    hrefUpgradeToPaid: '/-/subscriptions/new?namespace_id=123&plan_id=abc456',
+    planNameForTrial: 'Awesomesauce',
+    planNameForUpgrade: 'Amazing',
     targetId: 'some-feature-callout-target',
   };
 
@@ -32,38 +34,59 @@ describe('PaidFeatureCalloutPopover', () => {
     wrapper.destroy();
   });
 
-  describe('with some default props', () => {
-    beforeEach(() => {
-      wrapper = createComponent();
+  describe('GlPopover attributes', () => {
+    describe('with some default props', () => {
+      beforeEach(() => {
+        wrapper = createComponent();
+      });
+
+      it('sets attributes on the GlPopover component', () => {
+        const attributes = findGlPopover().attributes();
+
+        expect(attributes).toMatchObject({
+          boundary: 'viewport',
+          placement: 'top',
+          target: 'some-feature-callout-target',
+        });
+        expect(attributes.containerId).toBeUndefined();
+      });
     });
 
-    it('sets attributes on the GlPopover component', () => {
-      const attributes = findGlPopover().attributes();
-
-      expect(attributes).toMatchObject({
-        boundary: 'viewport',
-        placement: 'top',
-        target: 'some-feature-callout-target',
+    describe('with additional, optional props', () => {
+      beforeEach(() => {
+        wrapper = createComponent({
+          ...defaultProps,
+          containerId: 'some-container-id',
+        });
       });
-      expect(attributes.containerId).toBeUndefined();
+
+      it('sets more attributes on the GlPopover component', () => {
+        expect(findGlPopover().attributes()).toMatchObject({
+          boundary: 'viewport',
+          container: 'some-container-id',
+          placement: 'top',
+          target: 'some-feature-callout-target',
+        });
+      });
     });
   });
 
-  describe('with additional, optional props', () => {
-    beforeEach(() => {
-      wrapper = createComponent({
-        ...defaultProps,
-        containerId: 'some-container-id',
-      });
-    });
+  describe('popoverTitle', () => {
+    it('renders the title text', () => {
+      wrapper = createComponent();
 
-    it('sets more attributes on the GlPopover component', () => {
-      expect(findGlPopover().attributes()).toMatchObject({
-        boundary: 'viewport',
-        container: 'some-container-id',
-        placement: 'top',
-        target: 'some-feature-callout-target',
-      });
+      expect(wrapper.vm.popoverTitle).toEqual('12 days remaining to enjoy some feature');
+    });
+  });
+
+  describe('popoverContent', () => {
+    it('renders the content text', () => {
+      wrapper = createComponent();
+
+      expect(wrapper.vm.popoverContent).toEqual(
+        'Enjoying your GitLab Awesomesauce trial? To continue using some feature after your trial ends, upgrade to ' +
+          'GitLab Amazing.',
+      );
     });
   });
 
@@ -117,6 +140,49 @@ describe('PaidFeatureCalloutPopover', () => {
 
       it('does not render a promo image', () => {
         expect(findPromoImage().exists()).toBe(false);
+      });
+    });
+  });
+
+  describe('call-to-action buttons', () => {
+    const findUpgradeBtn = () => wrapper.findByTestId('upgradeBtn');
+    const findCompareBtn = () => wrapper.findByTestId('compareBtn');
+
+    beforeEach(() => {
+      wrapper = createComponent();
+    });
+
+    it('correctly renders an Upgrade button', () => {
+      const upgradeBtn = findUpgradeBtn();
+
+      expect(upgradeBtn.text()).toEqual('Upgrade to GitLab Amazing');
+      expect(upgradeBtn.attributes()).toMatchObject({
+        href: '/-/subscriptions/new?namespace_id=123&plan_id=abc456',
+        target: '_blank',
+        category: 'primary',
+        variant: 'confirm',
+        size: 'small',
+        block: '',
+        'data-track-event': 'click_button',
+        'data-track-label': 'upgrade_to_ultimate',
+        'data-track-property': 'experiment:highlight_paid_features_during_active_trial',
+      });
+    });
+
+    it('correctly renders a Compare button', () => {
+      const compareBtn = findCompareBtn();
+
+      expect(compareBtn.text()).toEqual('Compare all plans');
+      expect(compareBtn.attributes()).toMatchObject({
+        href: '/group/test-group/-/billings',
+        target: '_blank',
+        category: 'secondary',
+        variant: 'confirm',
+        size: 'small',
+        block: '',
+        'data-track-event': 'click_button',
+        'data-track-label': 'compare_all_plans',
+        'data-track-property': 'experiment:highlight_paid_features_during_active_trial',
       });
     });
   });
