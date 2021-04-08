@@ -303,15 +303,6 @@ export default {
     return axios.get(url, { params: { country } });
   },
 
-  fetchPackages(projectId, params = {}) {
-    const url = Api.buildUrl(this.projectPackagesPath).replace(
-      ':id',
-      encodeURIComponent(projectId),
-    );
-
-    return axios.get(url, { params });
-  },
-
   fetchPaymentFormParams(id) {
     const url = Api.buildUrl(this.paymentFormPath);
     return axios.get(url, { params: { id } });
