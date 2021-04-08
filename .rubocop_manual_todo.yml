@@ -1050,9 +1050,6 @@ RSpec/EmptyLineAfterFinalLetItBe:
     - spec/lib/gitlab/alert_management/payload/managed_prometheus_spec.rb
     - spec/lib/gitlab/alert_management/payload/prometheus_spec.rb
     - spec/lib/gitlab/alert_management/payload_spec.rb
-    - spec/lib/gitlab/analytics/cycle_analytics/base_query_builder_spec.rb
-    - spec/lib/gitlab/analytics/cycle_analytics/median_spec.rb
-    - spec/lib/gitlab/analytics/cycle_analytics/records_fetcher_spec.rb
     - spec/lib/gitlab/auth/otp/strategies/devise_spec.rb
     - spec/lib/gitlab/auth/otp/strategies/forti_authenticator_spec.rb
     - spec/lib/gitlab/auth/otp/strategies/forti_token_cloud_spec.rb
