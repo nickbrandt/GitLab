@@ -36,6 +36,7 @@
 module Gitlab
   module Utils
     module UsageData
+      include Gitlab::Utils::StrongMemoize
       extend self
 
       FALLBACK = -1
@@ -209,17 +210,17 @@ module Gitlab
         Gitlab::UsageDataCounters::HLLRedisCounter.track_event(event_name.to_s, values: values)
       end
 
-      def maximum_id(relation)
-        key = :"#{relation.name.downcase}_maximum_id"
+      def maximum_id(model)
+        key = :"#{model.name.downcase}_maximum_id"
         strong_memoize(key) do
-          relation.maximum(:id)
+          model.maximum(:id)
         end
       end
 
-      def minimum_id(relation)
-        key = :"#{relation.name.downcase}_minimum_id"
+      def minimum_id(model)
+        key = :"#{model.name.downcase}_minimum_id"
         strong_memoize(key) do
-          relation.minimum(:id)
+          model.minimum(:id)
         end
       end
 
