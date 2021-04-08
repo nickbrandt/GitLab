@@ -68,12 +68,7 @@ RSpec.describe 'User edit preferences profile', :js do
     let(:user) { create(:user, preferred_language: :es) }
 
     it 'shows the user preferred language by default' do
-      expect(page).to have_select(
-        'user[preferred_language]',
-        selected: 'Spanish - español',
-        options: Gitlab::I18n.selectable_locales.values,
-        visible: :all
-      )
+      expect(find('[data-testid="user-preferred-language-select"] .select2-chosen')).to have_content('Spanish - español')
     end
   end
 end
