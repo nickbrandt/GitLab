@@ -9,6 +9,8 @@ RSpec.describe Resolvers::Ci::TestSuiteResolver do
   let(:project) { create(:project, :public, :repository) }
 
   describe '#resolve' do
+    subject(:test_suite) { resolve(described_class, obj: pipeline, args: { build_ids: build_ids }) }
+
     context 'when pipeline has builds with test reports' do
       let(:main_pipeline) { create(:ci_pipeline, :with_test_reports_with_three_failures, project: project) }
       let(:pipeline) { create(:ci_pipeline, :with_test_reports_with_three_failures, project: project, ref: 'new-feature') }
@@ -25,8 +27,6 @@ RSpec.describe Resolvers::Ci::TestSuiteResolver do
       end
 
       it 'renders test suite data' do
-        test_suite = resolve(described_class, obj: pipeline, args: { build_ids: build_ids })
-
         expect(test_suite[:name]).to eq('test')
 
         # Each test failure in this pipeline has a matching failure in the default branch
@@ -42,11 +42,10 @@ RSpec.describe Resolvers::Ci::TestSuiteResolver do
     context 'when pipeline has no builds that matches the given build_ids' do
       let(:pipeline) { create(:ci_empty_pipeline) }
       let(:suite_name) { 'test' }
+      let(:build_ids) { [non_existing_record_id] }
 
       it 'returns nil' do
-        test_suite = resolve(described_class, obj: pipeline, args: { build_ids: ['1'] })
-
-        expect(test_suite).to eq(nil)
+        expect(test_suite).to be_nil
       end
     end
   end

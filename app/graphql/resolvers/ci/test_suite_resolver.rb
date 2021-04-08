@@ -3,6 +3,9 @@
 module Resolvers
   module Ci
     class TestSuiteResolver < BaseResolver
+      include Gitlab::Graphql::Authorize::AuthorizeResource
+
+      authorize :read_build
       type ::Types::Ci::TestSuiteType, null: true
 
       alias_method :pipeline, :object
@@ -13,17 +16,23 @@ module Resolvers
 
       def resolve(build_ids:)
         builds = pipeline.latest_builds.id_in(build_ids).presence
-        return if builds.nil? || builds.empty?
+        return unless builds
 
+        TestSuiteSerializer
+          .new(project: pipeline.project, current_user: @current_user)
+          .represent(load_test_suite_data(builds), details: true)
+      end
+
+      private
+
+      def load_test_suite_data(builds)
         suite = builds.sum do |build|
           build.collect_test_reports!(Gitlab::Ci::Reports::TestReports.new)
         end
 
         Gitlab::Ci::Reports::TestFailureHistory.new(suite.failed.values, pipeline.project).load!
 
-        TestSuiteSerializer
-          .new(project: pipeline.project, current_user: @current_user)
-          .represent(suite, details: true)
+        suite
       end
     end
   end
