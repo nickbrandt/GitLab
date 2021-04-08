@@ -932,6 +932,9 @@ msgstr ""
 msgid "%{total} warnings found: showing first %{warningsDisplayed}"
 msgstr ""
 
+msgid "%{type} License"
+msgstr ""
+
 msgid "%{usage_ping_link_start}Learn more%{usage_ping_link_end} about what information is shared with GitLab Inc."
 msgstr ""
 
@@ -6483,40 +6486,13 @@ msgstr ""
 msgid "CloudLicense|I agree that my use of the GitLab Software is subject to the Subscription Agreement located at the %{linkStart}Terms of Service%{linkEnd}, unless otherwise agreed to in writing with GitLab."
 msgstr ""
 
-msgid "CloudLicense|ID"
-msgstr ""
-
-msgid "CloudLicense|Last Sync"
-msgstr ""
-
 msgid "CloudLicense|Learn how to %{linkStart}activate your subscription%{linkEnd}."
-msgstr ""
-
-msgid "CloudLicense|Licensed to"
-msgstr ""
-
-msgid "CloudLicense|Manage"
 msgstr ""
 
 msgid "CloudLicense|Maximum users"
 msgstr ""
 
 msgid "CloudLicense|Paste your activation code"
-msgstr ""
-
-msgid "CloudLicense|Plan"
-msgstr ""
-
-msgid "CloudLicense|Renews"
-msgstr ""
-
-msgid "CloudLicense|Started"
-msgstr ""
-
-msgid "CloudLicense|Subscription details"
-msgstr ""
-
-msgid "CloudLicense|Sync Subscription details"
 msgstr ""
 
 msgid "CloudLicense|This instance is currently using the %{planName} plan."
@@ -16593,6 +16569,9 @@ msgstr ""
 msgid "IncidentSettings|Incidents"
 msgstr ""
 
+msgid "IncidentSettings|Introduce a countdown timer in incident issues to better track Service Level Agreements (SLAs). The timer starts automatically when the incident is created, and sets a time limit for resolving the incident. When activated, the time to SLA countdown appears on all new incidents."
+msgstr ""
+
 msgid "IncidentSettings|PagerDuty integration"
 msgstr ""
 
@@ -16602,19 +16581,16 @@ msgstr ""
 msgid "IncidentSettings|Time limit"
 msgstr ""
 
-msgid "IncidentSettings|Time limit must be a multiple of 15 minutes"
+msgid "IncidentSettings|Time limit must be a multiple of 15 minutes."
 msgstr ""
 
-msgid "IncidentSettings|Time limit must be a valid number"
+msgid "IncidentSettings|Time limit must be a valid number."
 msgstr ""
 
-msgid "IncidentSettings|Time limit must be greater than 0"
+msgid "IncidentSettings|Time limit must be greater than 0."
 msgstr ""
 
-msgid "IncidentSettings|When activated, this will apply to all new incidents within the project"
-msgstr ""
-
-msgid "IncidentSettings|You may choose to introduce a countdown timer in incident issues to better track Service Level Agreements (SLAs). The timer is automatically started when the incident is created, and sets a time limit for the incident to be resolved in. When activated, \"time to SLA\" countdown will appear on all new incidents."
+msgid "IncidentSettings|When activated, this applies to all new incidents in the project."
 msgstr ""
 
 msgid "IncidentSettings|hours"
@@ -29715,6 +29691,9 @@ msgstr ""
 msgid "Subscription"
 msgstr ""
 
+msgid "Subscription History"
+msgstr ""
+
 msgid "Subscription deletion failed."
 msgstr ""
 
@@ -29959,6 +29938,48 @@ msgid "Summary"
 msgstr ""
 
 msgid "Sunday"
+msgstr ""
+
+msgid "SuperSonics|Activated on"
+msgstr ""
+
+msgid "SuperSonics|Expires on"
+msgstr ""
+
+msgid "SuperSonics|ID"
+msgstr ""
+
+msgid "SuperSonics|Last Sync"
+msgstr ""
+
+msgid "SuperSonics|Licensed to"
+msgstr ""
+
+msgid "SuperSonics|Manage"
+msgstr ""
+
+msgid "SuperSonics|Plan"
+msgstr ""
+
+msgid "SuperSonics|Renews"
+msgstr ""
+
+msgid "SuperSonics|Seats"
+msgstr ""
+
+msgid "SuperSonics|Started"
+msgstr ""
+
+msgid "SuperSonics|Subscription details"
+msgstr ""
+
+msgid "SuperSonics|Sync Subscription details"
+msgstr ""
+
+msgid "SuperSonics|Type"
+msgstr ""
+
+msgid "SuperSonics|Valid From"
 msgstr ""
 
 msgid "Support"
