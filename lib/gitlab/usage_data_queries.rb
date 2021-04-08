@@ -36,10 +36,10 @@ module Gitlab
         'SELECT ' + args.map {|arg| "(#{arg})" }.join(' + ')
       end
 
-      def maximum_id(relation)
+      def maximum_id(model)
       end
 
-      def minimum_id(relation)
+      def minimum_id(model)
       end
 
       private
