@@ -214,7 +214,7 @@ export default {
 <template>
   <form @submit.prevent="onSubmit">
     <gl-alert v-if="isErrorVisible" variant="danger" class="gl-mb-5" @dismiss="dismissError">
-      {{ s__('APIFuzzing|The configuration could not be saved, please try again later.') }}
+      {{ s__('APIFuzzing|Code snippet could not be generated. Try again later.') }}
     </gl-alert>
 
     <form-input v-model="targetUrl.value" v-bind="targetUrl" class="gl-mb-7" />
