@@ -22640,7 +22640,7 @@ msgstr ""
 msgid "PerformanceBar|Bullet notifications"
 msgstr ""
 
-msgid "PerformanceBar|Dom content loaded"
+msgid "PerformanceBar|DOM Content Loaded"
 msgstr ""
 
 msgid "PerformanceBar|Download"
@@ -22652,7 +22652,7 @@ msgstr ""
 msgid "PerformanceBar|External Http calls"
 msgstr ""
 
-msgid "PerformanceBar|First contentful paint"
+msgid "PerformanceBar|First Contentful Paint"
 msgstr ""
 
 msgid "PerformanceBar|Frontend resources"

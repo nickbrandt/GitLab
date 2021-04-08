@@ -56,11 +56,11 @@ export default {
     metricDetailsSummary() {
       const summary = {};
 
-      if (!this.metricDetails.summaryOptions || !this.metricDetails.summaryOptions.hideTotal) {
+      if (!this.metricDetails.summaryOptions?.hideTotal) {
         summary[s__('Total')] = this.metricDetails.calls;
       }
 
-      if (!this.metricDetails.summaryOptions || !this.metricDetails.summaryOptions.hideDuration) {
+      if (!this.metricDetails.summaryOptions?.hideDuration) {
         summary[s__('PerformanceBar|Total duration')] = this.metricDetails.duration;
       }
 

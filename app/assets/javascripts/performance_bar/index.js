@@ -84,8 +84,8 @@ const initPerformanceBar = (el) => {
 
             summary = {
               [s__('PerformanceBar|Backend')]: backend,
-              [s__('PerformanceBar|First contentful paint')]: firstContentfulPaint,
-              [s__('PerformanceBar|Dom content loaded')]: domContentLoaded,
+              [s__('PerformanceBar|First Contentful Paint')]: firstContentfulPaint,
+              [s__('PerformanceBar|DOM Content Loaded')]: domContentLoaded,
             };
 
             durationString = `${backend} | ${firstContentfulPaint} | ${domContentLoaded}`;
