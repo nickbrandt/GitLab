@@ -25127,7 +25127,7 @@ msgstr ""
 msgid "Promotions|Not now, thanks!"
 msgstr ""
 
-msgid "Promotions|See the other features in the %{subscription_link_start}bronze plan%{subscription_link_end}"
+msgid "Promotions|See the other features in the %{subscription_link_start}Premium plan%{subscription_link_end}"
 msgstr ""
 
 msgid "Promotions|Start GitLab Ultimate trial"
