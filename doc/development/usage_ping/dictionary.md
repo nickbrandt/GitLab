@@ -8296,7 +8296,7 @@ Count of unique users per month who changed assignees of a MR
 
 Group: `group::code review`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -8308,7 +8308,7 @@ Count of unique users per week who changed assignees of a MR
 
 Group: `group::code review`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -8512,7 +8512,7 @@ Count of unique users per month who changed labels of a MR
 
 Group: `group::code review`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -8524,7 +8524,7 @@ Count of unique users per week who changed labels of a MR
 
 Group: `group::code review`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -8584,7 +8584,7 @@ Count of unique users per month who changed milestone of a MR
 
 Group: `group::code review`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -8596,7 +8596,7 @@ Count of unique users per week who changed milestone of a MR
 
 Group: `group::code review`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -8608,7 +8608,7 @@ Count of unique users per month who locked a MR
 
 Group: `group::code review`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -8620,7 +8620,7 @@ Count of unique users per week who locked a MR
 
 Group: `group::code review`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -8632,7 +8632,7 @@ Count of unique users per month who unlocked a MR
 
 Group: `group::code review`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -8644,7 +8644,7 @@ Count of unique users per week who unlocked a MR
 
 Group: `group::code review`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -8800,7 +8800,7 @@ Count of unique users per month who changed reviewers of a MR
 
 Group: `group::code review`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -8812,7 +8812,7 @@ Count of unique users per week who changed reviewers of a MR
 
 Group: `group::code review`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -8848,7 +8848,7 @@ Count of unique users per month who changed time estimate of a MR
 
 Group: `group::code review`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -8860,7 +8860,7 @@ Count of unique users per week who changed time estimate of a MR
 
 Group: `group::code review`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -8872,7 +8872,7 @@ Count of unique users per month who changed time spent on a MR
 
 Group: `group::code review`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -8884,7 +8884,7 @@ Count of unique users per week who changed time spent on a MR
 
 Group: `group::code review`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -9592,7 +9592,7 @@ Calculated unique users to trigger a Slack message by performing an action on a 
 
 Group: `group::ecosystem`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -9604,7 +9604,7 @@ Calculated unique users to trigger a Slack message by performing an action on a 
 
 Group: `group::ecosystem`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -9616,7 +9616,7 @@ Calculated unique users to trigger a Slack message by creating a confidential no
 
 Group: `group::ecosystem`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -9628,7 +9628,7 @@ Calculated unique users to trigger a Slack message by creating a confidential no
 
 Group: `group::ecosystem`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -9640,7 +9640,7 @@ Calculated unique users to trigger a Slack message by performing a deployment by
 
 Group: `group::ecosystem`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -9652,7 +9652,7 @@ Calculated unique users to trigger a Slack message by performing a deployment by
 
 Group: `group::ecosystem`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -9664,7 +9664,7 @@ Calculated unique users to trigger a Slack message by performing an action on an
 
 Group: `group::ecosystem`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -9676,7 +9676,7 @@ Calculated unique users to trigger a Slack message by performing an action on an
 
 Group: `group::ecosystem`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -9688,7 +9688,7 @@ Calculated unique users to trigger a Slack message by performing an action on a 
 
 Group: `group::ecosystem`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -9700,7 +9700,7 @@ Calculated unique users to trigger a Slack message by performing an action on a 
 
 Group: `group::ecosystem`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -9712,7 +9712,7 @@ Calculated unique users to trigger a Slack message by creating a note by month
 
 Group: `group::ecosystem`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -9724,7 +9724,7 @@ Calculated unique users to trigger a Slack message by creating a note by week
 
 Group: `group::ecosystem`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -9736,7 +9736,7 @@ Calculated unique users to trigger a Slack message by performing a Git push by m
 
 Group: `group::ecosystem`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -9748,7 +9748,7 @@ Calculated unique users to trigger a Slack message by performing a Git push by w
 
 Group: `group::ecosystem`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -9760,7 +9760,7 @@ Calculated unique users to trigger a Slack message by performing a tag push by m
 
 Group: `group::ecosystem`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -9772,7 +9772,7 @@ Calculated unique users to trigger a Slack message by performing a tag push by w
 
 Group: `group::ecosystem`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -9784,7 +9784,7 @@ Calculated unique users to trigger a Slack message by performing an action on a 
 
 Group: `group::ecosystem`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -9796,7 +9796,7 @@ Calculated unique users to trigger a Slack message by performing an action on a 
 
 Group: `group::ecosystem`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -9844,7 +9844,7 @@ Counts of WAU closing epics
 
 Group: `group::product planning`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `premium`, `ultimate`
 
@@ -9856,7 +9856,7 @@ Count of MAU creating epics
 
 Group: `group::product planning`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `premium`, `ultimate`
 
@@ -9868,7 +9868,7 @@ Count of WAU creating epics
 
 Group: `group::product planning`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `premium`, `ultimate`
 
@@ -10000,7 +10000,7 @@ Counts of MAU adding epic notes
 
 Group: `group::product planning`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `premium`, `ultimate`
 
@@ -10012,7 +10012,7 @@ Counts of WAU adding epic notes
 
 Group: `group::product planning`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `premium`, `ultimate`
 
@@ -11680,7 +11680,7 @@ Monthly unique user count having merge requests which contains the CI config fil
 
 Group: `group::pipeline authoring`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -11692,7 +11692,7 @@ Weekly unique user count having merge requests which contains the CI config file
 
 Group: `group::pipeline authoring`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -12208,7 +12208,7 @@ Unique users using the /invite_email quick action to add a multiple email partic
 
 Group: `group::product planning`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -12232,7 +12232,7 @@ Unique users using the /invite_email quick action to add a single email particip
 
 Group: `group::product planning`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -14236,7 +14236,7 @@ Information about the operating system running GitLab
 
 Group: `group::distribution`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -14814,7 +14814,7 @@ Number of Git fetch events from Prometheus on the Geo secondary
 
 Group: `group::geo`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `premium`, `ultimate`
 
