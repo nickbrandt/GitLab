@@ -900,6 +900,7 @@ RSpec.describe EE::NotificationService, :mailer do
       let_it_be(:user) { create(:user) }
       let_it_be(:alert) { create(:alert_management_alert) }
       let_it_be(:project) { alert.project }
+
       let(:tracking_params) do
         {
           event_names: 'i_incident_management_oncall_notification_sent',
