@@ -23525,6 +23525,9 @@ msgstr ""
 msgid "Prevent adding new members to project membership within this group"
 msgstr ""
 
+msgid "Prevent approval of merge requests by merge request committers."
+msgstr ""
+
 msgid "Prevent environment from auto-stopping"
 msgstr ""
 
