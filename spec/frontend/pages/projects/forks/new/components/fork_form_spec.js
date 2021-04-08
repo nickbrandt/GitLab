@@ -1,4 +1,4 @@
-import { GlForm, GlFormInputGroup, GlFormInput } from '@gitlab/ui';
+import { GlFormInputGroup, GlFormInput } from '@gitlab/ui';
 import { shallowMount } from '@vue/test-utils';
 import axios from 'axios';
 import AxiosMockAdapter from 'axios-mock-adapter';
@@ -97,44 +97,6 @@ describe('ForkForm component', () => {
     const cancelButton = wrapper.find('[data-testid="cancel-button"]');
 
     expect(cancelButton.attributes('href')).toBe(projectFullPath);
-  });
-
-  it('make POST request with project param', async () => {
-    jest.spyOn(axios, 'post');
-
-    const namespaceId = 20;
-
-    mockGetRequest();
-    createComponent(
-      {},
-      {
-        selectedNamespace: {
-          id: namespaceId,
-        },
-      },
-    );
-
-    wrapper.find(GlForm).vm.$emit('submit', { preventDefault: () => {} });
-
-    const {
-      projectId,
-      projectDescription,
-      projectName,
-      projectPath,
-      projectVisibility,
-    } = DEFAULT_PROPS;
-
-    const url = `/api/${GON_API_VERSION}/projects/${projectId}/fork`;
-    const project = {
-      description: projectDescription,
-      id: projectId,
-      name: projectName,
-      namespace_id: namespaceId,
-      path: projectPath,
-      visibility: projectVisibility,
-    };
-
-    expect(axios.post).toHaveBeenCalledWith(url, project);
   });
 
   it('has input with csrf token', () => {
@@ -258,9 +220,7 @@ describe('ForkForm component', () => {
             projectVisibility: project,
           },
           {
-            selectedNamespace: {
-              visibility: namespace,
-            },
+            form: { fields: { namespace: { value: { visibility: namespace } } } },
           },
         );
 
@@ -274,17 +234,57 @@ describe('ForkForm component', () => {
   describe('onSubmit', () => {
     beforeEach(() => {
       jest.spyOn(urlUtility, 'redirectTo').mockImplementation();
+
+      mockGetRequest();
+      createComponent(
+        {},
+        {
+          namespaces: MOCK_NAMESPACES_RESPONSE,
+          form: {
+            state: true,
+          },
+        },
+      );
+    });
+
+    const namespaceId = MOCK_NAMESPACES_RESPONSE[1].id;
+
+    const submitForm = async () => {
+      findForkUrlInput().vm.$emit('input', { id: namespaceId });
+      await wrapper.vm.onSubmit();
+    };
+
+    it('make POST request with project param', async () => {
+      jest.spyOn(axios, 'post');
+
+      await submitForm();
+
+      const {
+        projectId,
+        projectDescription,
+        projectName,
+        projectPath,
+        projectVisibility,
+      } = DEFAULT_PROPS;
+
+      const url = `/api/${GON_API_VERSION}/projects/${projectId}/fork`;
+      const project = {
+        description: projectDescription,
+        id: projectId,
+        name: projectName,
+        namespace_id: namespaceId,
+        path: projectPath,
+        visibility: projectVisibility,
+      };
+
+      expect(axios.post).toHaveBeenCalledWith(url, project);
     });
 
     it('redirect to POST web_url response', async () => {
       const webUrl = `new/fork-project`;
-
       jest.spyOn(axios, 'post').mockResolvedValue({ data: { web_url: webUrl } });
 
-      mockGetRequest();
-      createComponent();
-
-      await wrapper.vm.onSubmit();
+      await submitForm();
 
       expect(urlUtility.redirectTo).toHaveBeenCalledWith(webUrl);
     });
@@ -294,10 +294,7 @@ describe('ForkForm component', () => {
 
       jest.spyOn(axios, 'post').mockRejectedValue(dummyError);
 
-      mockGetRequest();
-      createComponent();
-
-      await wrapper.vm.onSubmit();
+      await submitForm();
 
       expect(urlUtility.redirectTo).not.toHaveBeenCalled();
       expect(createFlash).toHaveBeenCalledWith({
