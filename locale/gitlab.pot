@@ -1042,6 +1042,9 @@ msgstr ""
 msgid "(deleted)"
 msgstr ""
 
+msgid "(leave blank if you don't want to change it)"
+msgstr ""
+
 msgid "(max size 15 MB)"
 msgstr ""
 
@@ -1049,6 +1052,9 @@ msgid "(removed)"
 msgstr ""
 
 msgid "(revoked)"
+msgstr ""
+
+msgid "(we need your current password to confirm your changes)"
 msgstr ""
 
 msgid "* * * * *"
@@ -4621,6 +4627,9 @@ msgstr ""
 msgid "AwardEmoji|No emojis found."
 msgstr ""
 
+msgid "Back"
+msgstr ""
+
 msgid "Back to page %{number}"
 msgstr ""
 
@@ -5569,6 +5578,9 @@ msgid "Cancel running"
 msgstr ""
 
 msgid "Cancel this job"
+msgstr ""
+
+msgid "Cancel your account"
 msgstr ""
 
 msgid "Cancel, keep project"
@@ -32701,6 +32713,9 @@ msgid "Unfollow"
 msgstr ""
 
 msgid "Unfortunately, your email message to GitLab could not be processed."
+msgstr ""
+
+msgid "Unhappy?"
 msgstr ""
 
 msgid "Uninstall"
