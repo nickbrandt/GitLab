@@ -13721,6 +13721,9 @@ msgstr ""
 msgid "ForkProject|Internal"
 msgstr ""
 
+msgid "ForkProject|Please select a namespace"
+msgstr ""
+
 msgid "ForkProject|Private"
 msgstr ""
 
@@ -23325,6 +23328,9 @@ msgid "Please select a group."
 msgstr ""
 
 msgid "Please select a valid target branch"
+msgstr ""
+
+msgid "Please select a visibility level."
 msgstr ""
 
 msgid "Please select and add a member"
