@@ -4,14 +4,12 @@ module Gitlab
   module Database
     module LoadBalancing
       class SidekiqServerMiddleware
-        JobReplicaNotUpToDate = Class.new(StandardError)
-
         def call(worker, job, _queue)
           if requires_primary?(worker.class, job)
             Session.current.use_primary!
           end
 
-          yield
+          yield unless job[:database_chosen] == 'retry'
         ensure
           clear
         end
@@ -28,19 +26,42 @@ module Gitlab
           return true if worker_class.get_data_consistency == :always
           return true unless worker_class.get_data_consistency_feature_flag_enabled?
 
-          location = job['database_write_location'] || job['database_replica_location']
+          check_for_replica(worker.class, job)
+
+          job[:database_chosen] == 'primary'
+        end
+
+        def check_for_replica(worker_class, job)
+          location = job['database_replica_location'] || job['database_write_location']
 
           if replica_caught_up?(location)
             job[:database_chosen] = 'replica'
-            false
-          elsif worker_class.get_data_consistency == :delayed && job['retry_count'].to_i == 0
-            job[:database_chosen] = 'retry'
-            raise JobReplicaNotUpToDate, "Sidekiq job #{worker_class} JID-#{job['jid']} couldn't use the replica."\
-               "  Replica was not up to date."
+          elsif worker_class.get_data_consistency == :delayed
+            attempt_retry(worker_class, job)
           else
             job[:database_chosen] = 'primary'
-            true
           end
+        end
+
+        def attempt_retry(worker_class, job)
+          max_retry_attempts = worker_class.get_max_replica_retry_count
+
+          count = job["delayed_retry_count"] = job["delayed_retry_count"].to_i + 1
+
+          if count < max_retry_attempts
+            retry_at = Time.now.to_f + delay(count)
+            payload = Sidekiq.dump_json(job)
+            Sidekiq.redis do |conn|
+              conn.zadd("retry", retry_at.to_s, payload)
+            end
+            job[:database_chosen] = 'retry'
+          else
+            job[:database_chosen] = 'primary'
+          end
+        end
+
+        def delay(count)
+          (count**4) + 15 + (rand(30) * (count + 1))
         end
 
         def load_balancer

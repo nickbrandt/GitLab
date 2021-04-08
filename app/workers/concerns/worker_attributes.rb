@@ -100,6 +100,14 @@ module WorkerAttributes
       Feature.enabled?(class_attributes[:data_consistency_feature_flag], default_enabled: :yaml)
     end
 
+    def max_replica_retry_count(value)
+      class_attributes[:max_replica_retry_count] = value
+    end
+
+    def get_max_replica_retry_count
+      get_class_attribute(:max_replica_retry_count) || 1
+    end
+
     # Set this attribute on a job when it will call to services outside of the
     # application, such as 3rd party applications, other k8s clusters etc See
     # doc/development/sidekiq_style_guide.md#jobs-with-external-dependencies for
