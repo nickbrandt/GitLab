@@ -8774,6 +8774,12 @@ msgstr ""
 msgid "Corpus Management|Are you sure you want to delete the corpus?"
 msgstr ""
 
+msgid "Corpus name"
+msgstr ""
+
+msgid "CorpusManagement|Corpus are used in fuzz testing as mutation source to Improve future testing."
+msgstr ""
+
 msgid "CorpusManagement|Fuzz testing corpus management"
 msgstr ""
 
@@ -18287,6 +18293,9 @@ msgid "Learn GitLab - Ultimate trial"
 msgstr ""
 
 msgid "Learn GitLab|Trial only"
+msgstr ""
+
+msgid "Learn More"
 msgstr ""
 
 msgid "Learn how to %{link_start}contribute to the built-in templates%{link_end}"
@@ -30148,6 +30157,9 @@ msgid "TagsPage|Write your release notes or drag files here…"
 msgstr ""
 
 msgid "TagsPage|protected"
+msgstr ""
+
+msgid "Target"
 msgstr ""
 
 msgid "Target Branch"
