@@ -5144,7 +5144,7 @@ Represents rules that commit pushes must follow.
 
 ### `RecentFailures`
 
-Represents the recent failure history of a test case.
+Recent failure history of a test case.
 
 | Field | Type | Description |
 | ----- | ---- | ----------- |
@@ -6213,7 +6213,7 @@ Test case in pipeline test report.
 | Field | Type | Description |
 | ----- | ---- | ----------- |
 | `classname` | [`String`](#string) | Classname of the test case. |
-| `executionTime` | [`Float`](#float) | Time it took for the test case to finish in seconds. |
+| `executionTime` | [`Float`](#float) | Test case execution time in seconds. |
 | `file` | [`String`](#string) | Path to the file of the test case. |
 | `name` | [`String`](#string) | Name of the test case. |
 | `recentFailures` | [`RecentFailures`](#recentfailures) | Recent failure history of the test case on the base branch. |

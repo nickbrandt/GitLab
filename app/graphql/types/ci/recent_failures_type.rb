@@ -5,7 +5,7 @@ module Types
     # rubocop: disable Graphql/AuthorizeTypes
     class RecentFailuresType < BaseObject
       graphql_name 'RecentFailures'
-      description 'Represents the recent failure history of a test case.'
+      description 'Recent failure history of a test case.'
 
       connection_type_class(Types::CountableConnectionType)
 
