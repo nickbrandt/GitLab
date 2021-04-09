@@ -22653,6 +22653,9 @@ msgstr ""
 msgid "Pending comments"
 msgstr ""
 
+msgid "Pending sync…"
+msgstr ""
+
 msgid "People without permission will never get a notification and won't be able to comment."
 msgstr ""
 
@@ -29848,6 +29851,9 @@ msgstr ""
 msgid "Successfully unlocked"
 msgstr ""
 
+msgid "Successfully updated %{last_updated_timeago}."
+msgstr ""
+
 msgid "Successfully verified domain ownership"
 msgstr ""
 
@@ -33163,6 +33169,12 @@ msgstr ""
 msgid "Update %{sourcePath} file"
 msgstr ""
 
+msgid "Update Now"
+msgstr ""
+
+msgid "Update Scheduled…"
+msgstr ""
+
 msgid "Update all"
 msgstr ""
 
@@ -33233,6 +33245,9 @@ msgid "Updates"
 msgstr ""
 
 msgid "Updating"
+msgstr ""
+
+msgid "Updating…"
 msgstr ""
 
 msgid "Upgrade offers available!"
