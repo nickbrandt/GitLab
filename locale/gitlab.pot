@@ -22899,13 +22899,13 @@ msgstr ""
 msgid "Pipelines|By revoking a trigger you will break any processes making use of it. Are you sure?"
 msgstr ""
 
-msgid "Pipelines|CI Lint"
+msgid "Pipelines|CI lint"
 msgstr ""
 
 msgid "Pipelines|Child pipeline"
 msgstr ""
 
-msgid "Pipelines|Clear Runner Caches"
+msgid "Pipelines|Clear runner caches"
 msgstr ""
 
 msgid "Pipelines|Continuous deployment template to test and deploy your %{name} project."
@@ -22953,6 +22953,9 @@ msgstr ""
 msgid "Pipelines|Loading Pipelines"
 msgstr ""
 
+msgid "Pipelines|Loading pipelines"
+msgstr ""
+
 msgid "Pipelines|Merged YAML is view only"
 msgstr ""
 
@@ -22972,9 +22975,6 @@ msgid "Pipelines|Project cache successfully reset."
 msgstr ""
 
 msgid "Pipelines|Revoke"
-msgstr ""
-
-msgid "Pipelines|Run Pipeline"
 msgstr ""
 
 msgid "Pipelines|Something went wrong while cleaning runners cache."
@@ -23130,13 +23130,13 @@ msgstr ""
 msgid "Pipeline|Raw text search is not currently supported. Please use the available search tokens."
 msgstr ""
 
-msgid "Pipeline|Run Pipeline"
-msgstr ""
-
 msgid "Pipeline|Run for"
 msgstr ""
 
 msgid "Pipeline|Run for branch name or tag"
+msgstr ""
+
+msgid "Pipeline|Run pipeline"
 msgstr ""
 
 msgid "Pipeline|Running"
