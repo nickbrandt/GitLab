@@ -1213,11 +1213,13 @@ GET /user/emails
 [
   {
     "id": 1,
-    "email": "email@example.com"
+    "email": "email@example.com",
+    "confirmed?" : true
   },
   {
     "id": 3,
-    "email": "email2@example.com"
+    "email": "email2@example.com",
+    "confirmed?" : false
   }
 ]
 ```
@@ -1257,7 +1259,8 @@ Parameters:
 ```json
 {
   "id": 1,
-  "email": "email@example.com"
+  "email": "email@example.com",
+  "confirmed?" : true
 }
 ```
 
@@ -1276,7 +1279,8 @@ Parameters:
 ```json
 {
   "id": 4,
-  "email": "email@example.com"
+  "email": "email@example.com",
+  "confirmed?" : true
 }
 ```
 
