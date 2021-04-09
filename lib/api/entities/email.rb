@@ -3,7 +3,7 @@
 module API
   module Entities
     class Email < Grape::Entity
-      expose :id, :email, :confirmed?
+      expose :id, :email, :confirmed_at
     end
   end
 end

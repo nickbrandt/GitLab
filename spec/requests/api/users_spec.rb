@@ -1795,7 +1795,7 @@ RSpec.describe API::Users do
         post api("/users/#{user.id}/emails", admin), params: email_attrs
       end.to change { user.emails.count }.by(1)
 
-      expect(json_response['confirmed?']).to be_falsey
+      expect(json_response['confirmed_at']).to be_nil
     end
 
     it "returns a 400 for invalid ID" do
@@ -1812,7 +1812,7 @@ RSpec.describe API::Users do
 
       expect(response).to have_gitlab_http_status(:created)
 
-      expect(json_response['confirmed?']).to be_truthy
+      expect(json_response['confirmed_at']).not_to be_nil
     end
   end
 
