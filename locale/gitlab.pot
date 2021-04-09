@@ -25626,6 +25626,9 @@ msgstr ""
 msgid "Remediations"
 msgstr ""
 
+msgid "Remember me"
+msgstr ""
+
 msgid "Remind later"
 msgstr ""
 
