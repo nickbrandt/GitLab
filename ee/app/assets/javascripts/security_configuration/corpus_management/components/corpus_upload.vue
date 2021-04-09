@@ -2,8 +2,9 @@
 import { GlButton, GlModal, GlModalDirective } from '@gitlab/ui';
 import CorpusUploadModal from 'ee/security_configuration/corpus_management/components/corpus_upload_modal.vue';
 import { numberToHumanSize } from '~/lib/utils/number_utils';
-import { s__ } from '~/locale';
+import { s__, __ } from '~/locale';
 import addCorpusMutation from '../graphql/mutations/add_corpus.mutation.graphql';
+import resetCorpus from '../graphql/mutations/reset_corpus.mutation.graphql';
 import getCorpusesQuery from '../graphql/queries/get_corpuses.query.graphql';
 
 export default {
@@ -15,7 +16,7 @@ export default {
   directives: {
     GlModalDirective,
   },
-  inject: ['projectFullPath','corpusHelpPath'],
+  inject: ['projectFullPath', 'corpusHelpPath'],
   apollo: {
     states: {
       query: getCorpusesQuery,
@@ -32,24 +33,16 @@ export default {
         this.states = null;
       },
     },
-  },   
+  },
   modal: {
     actionCancel: {
       text: s__('Cancel'),
-    },  
-  },  
+    },
+  },
   props: {
     totalSize: {
       type: Number,
       required: true,
-    },
-  },
-  methods: {
-    addCorpus() {
-      this.$apollo.mutate({
-        mutation: addCorpusMutation,
-        variables: { name: "New Upload", projectPath: this.projectFullPath },
-      })
     },
   },
   computed: {
@@ -58,18 +51,35 @@ export default {
     },
     isUploaded() {
       return this.states?.uploadState.progress === 100;
-    },  
+    },
     variant() {
-      return this.isUploaded ? 'confirm' : 'default'
+      return this.isUploaded ? 'confirm' : 'default';
     },
     actionPrimaryProps() {
       return {
         text: s__('Add'),
-        attributes: { 'data-testid': 'modal-confirm', disabled: !this.isUploaded, variant: this.variant},
-      }  
-    } 
+        attributes: {
+          'data-testid': 'modal-confirm',
+          disabled: !this.isUploaded,
+          variant: this.variant,
+        },
+      };
+    },
   },
-
+  methods: {
+    addCorpus() {
+      this.$apollo.mutate({
+        mutation: addCorpusMutation,
+        variables: { name: __('New Upload'), projectPath: this.projectFullPath },
+      });
+    },
+    resetCorpus() {
+      this.$apollo.mutate({
+        mutation: resetCorpus,
+        variables: { name: '', projectPath: this.projectFullPath },
+      });
+    },
+  },
 };
 </script>
 <template>
@@ -81,21 +91,20 @@ export default {
       <span class="gl-font-weight-bold">{{ formattedFileSize }}</span>
     </div>
 
-    <gl-button class="gl-mr-5" variant="confirm" v-gl-modal-directive="`corpus-upload-modal`">
+    <gl-button v-gl-modal-directive="`corpus-upload-modal`" class="gl-mr-5" variant="confirm">
       {{ s__('CorpusManagement|New corpus') }}
-    </gl-button>  
+    </gl-button>
 
     <gl-modal
       modal-id="corpus-upload-modal"
       title="New corpus"
       size="sm"
-      @primary="addCorpus"
       :action-primary="actionPrimaryProps"
-      :action-cancel="$options.modal.actionCancel"      
+      :action-cancel="$options.modal.actionCancel"
+      @primary="addCorpus"
+      @canceled="resetCorpus"
     >
-      <corpus-upload-modal 
-      />
-    </gl-modal> 
-
+      <corpus-upload-modal />
+    </gl-modal>
   </div>
 </template>

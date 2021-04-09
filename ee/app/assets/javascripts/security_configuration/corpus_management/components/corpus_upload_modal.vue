@@ -1,9 +1,17 @@
 <script>
-import { GlForm, GlFormInput, GlFormInputGroup, GlButton, GlIcon, GlLoadingIcon, GlFormGroup } from '@gitlab/ui';
+import {
+  GlForm,
+  GlFormInput,
+  GlFormInputGroup,
+  GlButton,
+  GlIcon,
+  GlLoadingIcon,
+  GlFormGroup,
+} from '@gitlab/ui';
 import { s__, __ } from '~/locale';
 import { VALID_CORPUS_MIMETYPE } from '../constants';
-import uploadCorpus from '../graphql/mutations/upload_corpus.mutation.graphql';
 import resetCorpus from '../graphql/mutations/reset_corpus.mutation.graphql';
+import uploadCorpus from '../graphql/mutations/upload_corpus.mutation.graphql';
 import getCorpusesQuery from '../graphql/queries/get_corpuses.query.graphql';
 
 export default {
@@ -16,13 +24,14 @@ export default {
     GlButton,
     GlIcon,
   },
-  inject: ['projectFullPath','corpusHelpPath'],
+  inject: ['projectFullPath', 'corpusHelpPath'],
   i18n: {
     uploadButtonText: __('Choose File...'),
-    uploadMessage: s__('CorpusManagement|New corpus needs to be a upload in *.zip format. Maximum 10Gib')
+    uploadMessage: s__(
+      'CorpusManagement|New corpus needs to be a upload in *.zip format. Maximum 10Gib',
+    ),
   },
-  props: {
-  },
+  props: {},
   apollo: {
     states: {
       query: getCorpusesQuery,
@@ -39,13 +48,24 @@ export default {
         this.states = null;
       },
     },
-  },  
+  },
+  data() {
+    return {
+      attachmentName: '',
+      corpusName: '',
+      files: [],
+      uploadTimeout: null,
+    };
+  },
   computed: {
     hasAttachment() {
       return Boolean(this.attachmentName);
     },
     isShowingAttatchmentName() {
-      return this.hasAttachment && !this.isLoading
+      return this.hasAttachment && !this.isLoading;
+    },
+    isShowingAttatchmentCancel() {
+      return !this.isUploaded && !this.isUploading;
     },
     isUploading() {
       return this.states?.uploadState.isUploading;
@@ -54,7 +74,7 @@ export default {
       return this.states?.uploadState.progress === 100;
     },
     showUploadButton() {
-      return this.hasAttachment && !this.isUploading && !this.isUploaded
+      return this.hasAttachment && !this.isUploading && !this.isUploaded;
     },
     showFilePickerButton() {
       return !this.isUploaded;
@@ -63,24 +83,20 @@ export default {
       return this.states?.uploadState.progress;
     },
   },
-  data() {
-    return {
-      attachmentName: '',
-      corpusName: '',
-      files: [],
-      uploadTimeout: null,
-    }
+  beforeDestroy() {
+    this.resetAttatchment();
+    this.cancelUpload();
   },
   methods: {
     clearName() {
       this.corpusName = '';
     },
-    resetAttatchment(){
+    resetAttatchment() {
       this.$refs.fileUpload.value = null;
       this.attachmentName = '';
       this.files = [];
     },
-    cancelUpload(){
+    cancelUpload() {
       clearTimeout(this.uploadTimeout);
       this.$apollo.mutate({
         mutation: resetCorpus,
@@ -94,44 +110,36 @@ export default {
       const uploadCallback = this.beginFileUpload;
       const component = this;
       // Simulate incrementing file upload progress
-      this.$apollo.mutate({
-        mutation: uploadCorpus,
-        variables: { name: this.corpusName, projectPath: this.projectFullPath },
-      }).then(({data})=>{
-        if(data.uploadCorpus<100){
-          component.uploadTimeout = setTimeout(()=>{
+      return this.$apollo
+        .mutate({
+          mutation: uploadCorpus,
+          variables: { name: this.corpusName, projectPath: this.projectFullPath },
+        })
+        .then(({ data }) => {
+          if (data.uploadCorpus < 100) {
+            component.uploadTimeout = setTimeout(() => {
               uploadCallback();
-            },500)
-        }
-      });
+            }, 500);
+          }
+        });
     },
     onFileUploadChange(e) {
       this.attachmentName = e.target.files[0].name;
       this.files = e.target.files;
     },
   },
-  VALID_CORPUS_MIMETYPE,  
+  VALID_CORPUS_MIMETYPE,
 };
 </script>
 <template>
   <gl-form>
-    <gl-form-group
-      label="Corpus name"
-      label-size="sm"
-      label-for="corpus-name"
-    >
+    <gl-form-group label="Corpus name" label-size="sm" label-for="corpus-name">
       <gl-form-input-group class="gl-corpus-name">
-
         <slot name="input">
-          <gl-form-input
-            ref="input"
-            id="corpus-name"
-            v-model="corpusName"
-          />
+          <gl-form-input id="corpus-name" ref="input" v-model="corpusName" />
         </slot>
 
         <gl-button
-          @click="clearName"
           class="gl-search-box-by-click-icon-button gl-search-box-by-click-clear-button gl-clear-icon-button"
           variant="default"
           category="tertiary"
@@ -139,36 +147,23 @@ export default {
           name="clear"
           title="title"
           icon="clear"
-          aria-label="Clear"
+          :aria-label="__(`Clear`)"
+          @click="clearName"
         />
-
       </gl-form-input-group>
-
     </gl-form-group>
 
-    <gl-form-group
-      label="Corpus name"
-      label-size="sm"
-      label-for="corpus-file"
-    >
-      <gl-form-input-group 
-        id='corpus-file'
-        class="gl-display-flex gl-align-items-center"
-      >
-    
-        <gl-button
-          v-if="showFilePickerButton"
-          @click="openFileUpload"
-          :disabled="isUploading"
-        >
-          {{ this.$options.i18n.uploadButtonText }}
-        </gl-button>
+    <gl-form-group label="Corpus name" label-size="sm" label-for="corpus-file">
+      <gl-button v-if="showFilePickerButton" :disabled="isUploading" @click="openFileUpload">
+        {{ this.$options.i18n.uploadButtonText }}
+      </gl-button>
 
-        <span class="foo" v-if="isShowingAttatchmentName">
-          {{ this.attachmentName }}
-          <gl-icon v-if="!isUploaded" @click="resetAttatchment" name="close" />
-        </span>
+      <span v-if="isShowingAttatchmentName" class="gl-ml-3">
+        {{ attachmentName }}
+        <gl-icon v-if="isShowingAttatchmentCancel" name="close" @click="resetAttatchment" />
+      </span>
 
+      <gl-form-input-group id="corpus-file" class="gl-display-flex gl-align-items-center">
         <input
           ref="fileUpload"
           type="file"
@@ -177,26 +172,19 @@ export default {
           class="gl-display-none"
           @change="onFileUploadChange"
         />
-
-
-        <span>{{ this.$options.i18n.uploadMessage }}</span>
-
-        <gl-button 
-          v-if="showUploadButton" variant="success"
-          @click="beginFileUpload"
-        >
-          {{ __('Upload file') }}
-        </gl-button>  
-
-        <div v-if="isUploading">
-          <gl-loading-icon inline size="sm" /> Attatching File - {{ progress }} %
-          <gl-button @click="cancelUpload" size="small"> {{ __('Cancel') }} </gl-button>
-        </div>
-
-
-      </gl-form-input-group>      
-
+      </gl-form-input-group>
     </gl-form-group>
 
+    <span>{{ this.$options.i18n.uploadMessage }}</span>
+
+    <gl-button v-if="showUploadButton" class="gl-mt-2" variant="success" @click="beginFileUpload">
+      {{ __('Upload file') }}
+    </gl-button>
+
+    <div v-if="isUploading" class="gl-mt-2">
+      <gl-loading-icon inline size="sm" />
+      {{ sprintf(__('Attatching File - %{progress}%'), { progress }) }}
+      <gl-button size="small" @click="cancelUpload"> {{ __('Cancel') }} </gl-button>
+    </div>
   </gl-form>
 </template>
