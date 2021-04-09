@@ -342,7 +342,6 @@ export default {
         commit_message: this.commitMessage,
         auto_merge_strategy: useAutoMerge ? this.preferredAutoMergeStrategy : undefined,
         should_remove_source_branch: this.removeSourceBranch === true,
-        force_remove_source_branch: this.removeSourceBranch === true,
         squash: this.squashBeforeMerge,
       };
 
