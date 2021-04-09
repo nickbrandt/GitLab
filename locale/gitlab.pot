@@ -16862,7 +16862,7 @@ msgstr ""
 msgid "Integrations|Add namespace"
 msgstr ""
 
-msgid "Integrations|Adding a namespace currently works only in browsers that allow cross‑site cookies. Please make sure to use %{firefox_link_start}Firefox%{firefox_link_end} or enable cross‑site cookies in your browser when adding a namespace."
+msgid "Integrations|Adding a namespace works only in browsers that allow cross‑site cookies. Use %{firefox_link_start}Firefox%{firefox_link_end}, or enable cross‑site cookies in your browser, when adding a namespace."
 msgstr ""
 
 msgid "Integrations|All details"
@@ -16922,7 +16922,7 @@ msgstr ""
 msgid "Integrations|Namespace successfully linked"
 msgstr ""
 
-msgid "Integrations|Namespaces are your GitLab groups and subgroups that will be linked to this Jira instance."
+msgid "Integrations|Namespaces are the GitLab groups and subgroups you link to this Jira instance."
 msgstr ""
 
 msgid "Integrations|No available namespaces."
@@ -35272,7 +35272,7 @@ msgstr ""
 msgid "You are receiving this message because you are a GitLab administrator for %{url}."
 msgstr ""
 
-msgid "You are signed into GitLab as %{user_link}"
+msgid "You are signed in to GitLab as %{user_link}"
 msgstr ""
 
 msgid "You are trying to upload something other than an image. Please upload a .png, .jpg, .jpeg, .gif, .bmp, .tiff or .ico."
