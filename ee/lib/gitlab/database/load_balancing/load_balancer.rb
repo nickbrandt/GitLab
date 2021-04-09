@@ -165,7 +165,7 @@ module Gitlab
           # Hosts can come online after the time when this scan was done,
           # so we need to remember the ones that can be used. If the host went
           # offline, we'll just rely on the retry mechanism to use the primary.
-          set_valid_hosts(HostList.new(valid_hosts))
+          set_consistent_hosts_for_request(HostList.new(valid_hosts))
 
           # Since we will be using a subset from the original list, let's just
           # pick a random host and mix up the original list to ensure we don't
@@ -176,7 +176,7 @@ module Gitlab
           true
         end
 
-        def set_valid_hosts(hosts)
+        def set_consistent_hosts_for_request(hosts)
           RequestStore[VALID_HOSTS_CACHE_KEY] = hosts
         end
 
