@@ -14,6 +14,26 @@ RSpec.describe MergeRequests::AfterCreateService do
       allow(SyncSecurityReportsToReportApprovalRulesWorker).to receive(:perform_async)
     end
 
+    it 'refreshes code owners for the merge request' do
+      fake_refresh_service = instance_double(::MergeRequests::SyncCodeOwnerApprovalRules)
+
+      expect(::MergeRequests::SyncCodeOwnerApprovalRules)
+        .to receive(:new).with(kind_of(MergeRequest)).and_return(fake_refresh_service)
+      expect(fake_refresh_service).to receive(:execute)
+
+      execute
+    end
+
+    context 'report approvers' do
+      it 'refreshes report approvers for the merge request' do
+        expect_next_instance_of(::MergeRequests::SyncReportApproverApprovalRules) do |service|
+          expect(service).to receive(:execute)
+        end
+
+        execute
+      end
+    end
+
     context 'when the merge request has actual_head_pipeline' do
       let(:pipeline_id) { 1881 }
 

@@ -9,9 +9,6 @@ module EE
       def after_create(issuable)
         super
 
-        ::MergeRequests::SyncCodeOwnerApprovalRules.new(issuable).execute
-        ::MergeRequests::SyncReportApproverApprovalRules.new(issuable).execute
-
         ::MergeRequests::UpdateBlocksService
           .new(issuable, current_user, blocking_merge_requests_params)
           .execute
