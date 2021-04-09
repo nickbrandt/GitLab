@@ -54,15 +54,15 @@ export default {
 };
 </script>
 <template>
-  <div class="gl-display-flex gl-pr-4">
+  <div class="gl-display-flex gl-pr-3">
     <gl-search-box-by-click
       v-model="searchTerm"
       :placeholder="$options.i18n.searchPlaceholder"
-      class="gl-pr-4"
+      class="gl-pr-3"
       data-testid="tag-search"
       @submit="visitUrlFromOption(selectedKey)"
     />
-    <gl-dropdown :text="selectedSortMethod" data-testid="tags-dropdown">
+    <gl-dropdown :text="selectedSortMethod" right data-testid="tags-dropdown">
       <gl-dropdown-item
         v-for="(value, key) in sortOptions"
         :key="key"

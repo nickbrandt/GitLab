@@ -47,8 +47,4 @@ module TagsHelper
       okTitle: s_('TagsPage|Delete tag')
     }.to_json
   end
-
-  def gldropdown_tags_enabled?
-    Feature.enabled?(:gldropdown_tags)
-  end
 end
