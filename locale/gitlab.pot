@@ -4480,6 +4480,9 @@ msgstr ""
 msgid "Authorization required"
 msgstr ""
 
+msgid "Authorization token duration (minutes)"
+msgstr ""
+
 msgid "Authorization was granted by entering your username and password in the application."
 msgstr ""
 
