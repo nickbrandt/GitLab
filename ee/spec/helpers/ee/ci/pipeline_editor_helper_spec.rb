@@ -7,8 +7,6 @@ RSpec.describe EE::Ci::PipelineEditorHelper do
 
   describe '#js_pipeline_editor_data' do
     before do
-      stub_licensed_features(api_fuzzing: true)
-
       allow(helper)
         .to receive(:namespace_project_new_merge_request_path)
         .and_return('/mock/project/-/merge_requests/new')
@@ -20,8 +18,20 @@ RSpec.describe EE::Ci::PipelineEditorHelper do
 
     subject(:pipeline_editor_data) { helper.js_pipeline_editor_data(project) }
 
-    it 'returns ee specific values' do
-      expect(pipeline_editor_data.keys).to include('api-fuzzing-configuration-path')
+    context 'with licensed feature' do
+      before do
+        stub_licensed_features(api_fuzzing: true)
+      end
+
+      it 'returns ee specific values' do
+        expect(pipeline_editor_data.keys).to include('api-fuzzing-configuration-path')
+      end
+    end
+
+    context 'without licensed feature' do
+      it 'returns ee specific values' do
+        expect(pipeline_editor_data.keys).not_to include('api-fuzzing-configuration-path')
+      end
     end
   end
 end
