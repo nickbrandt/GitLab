@@ -29,7 +29,7 @@ RSpec.describe EE::Ci::PipelineEditorHelper do
     end
 
     context 'without licensed feature' do
-      it 'returns ee specific values' do
+      it 'does not return the API fuzzing path' do
         expect(pipeline_editor_data.keys).not_to include('api-fuzzing-configuration-path')
       end
     end
