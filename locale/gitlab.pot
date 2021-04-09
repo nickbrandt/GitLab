@@ -3362,10 +3362,10 @@ msgstr ""
 msgid "An error occurred when updating the issue due date"
 msgstr ""
 
-msgid "An error occurred when updating the issue title"
+msgid "An error occurred when updating the issue weight"
 msgstr ""
 
-msgid "An error occurred when updating the issue weight"
+msgid "An error occurred when updating the title"
 msgstr ""
 
 msgid "An error occurred while acknowledging the notification. Refresh the page and try again."
@@ -3696,9 +3696,6 @@ msgid "An instance-level serverless domain already exists."
 msgstr ""
 
 msgid "An issue already exists"
-msgstr ""
-
-msgid "An issue title is required"
 msgstr ""
 
 msgid "An unauthenticated user"
@@ -17420,9 +17417,6 @@ msgstr ""
 msgid "Issue published on status page."
 msgstr ""
 
-msgid "Issue title"
-msgstr ""
-
 msgid "Issue types"
 msgstr ""
 
@@ -22657,6 +22651,9 @@ msgid "Pending"
 msgstr ""
 
 msgid "Pending comments"
+msgstr ""
+
+msgid "Pending sync…"
 msgstr ""
 
 msgid "People without permission will never get a notification and won't be able to comment."
@@ -29854,6 +29851,9 @@ msgstr ""
 msgid "Successfully unlocked"
 msgstr ""
 
+msgid "Successfully updated %{last_updated_timeago}."
+msgstr ""
+
 msgid "Successfully verified domain ownership"
 msgstr ""
 
@@ -32068,6 +32068,9 @@ msgstr ""
 msgid "Time until first merge request"
 msgstr ""
 
+msgid "Time zone"
+msgstr ""
+
 msgid "TimeTrackingEstimated|Est"
 msgstr ""
 
@@ -33169,6 +33172,12 @@ msgstr ""
 msgid "Update %{sourcePath} file"
 msgstr ""
 
+msgid "Update Now"
+msgstr ""
+
+msgid "Update Scheduled…"
+msgstr ""
+
 msgid "Update all"
 msgstr ""
 
@@ -33239,6 +33248,9 @@ msgid "Updates"
 msgstr ""
 
 msgid "Updating"
+msgstr ""
+
+msgid "Updating…"
 msgstr ""
 
 msgid "Upgrade offers available!"
