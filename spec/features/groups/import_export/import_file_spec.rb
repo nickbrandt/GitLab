@@ -20,84 +20,183 @@ RSpec.describe 'Import/Export - Group Import', :js do
     FileUtils.rm_rf(import_path, secure: true)
   end
 
-  context 'when the user uploads a valid export file' do
-    let(:file) { File.join(Rails.root, 'spec', %w[fixtures group_export.tar.gz]) }
+  context 'with gltabs_create_group ff disabled' do
+    before do
+      stub_feature_flags(gltabs_create_group: false)
+    end
 
-    context 'when using the pre-filled path', :sidekiq_inline do
-      it 'successfully imports the group' do
-        group_name = 'Test Group Import'
+    context 'when the user uploads a valid export file' do
+      let(:file) { File.join(Rails.root, 'spec', %w[fixtures group_export.tar.gz]) }
 
-        visit new_group_path
+      context 'when using the pre-filled path', :sidekiq_inline do
+        it 'successfully imports the group' do
+          group_name = 'Test Group Import'
 
-        fill_in :group_name, with: group_name
-        find('#import-group-tab').click
+          visit new_group_path
 
-        expect(page).to have_content 'Import group from file'
-        attach_file(file) do
-          find('.js-filepicker-button').click
+          fill_in :group_name, with: group_name
+          find('#import-group-tab').click
+
+          expect(page).to have_content 'Import group from file'
+          attach_file(file) do
+            find('.js-filepicker-button').click
+          end
+
+          expect { click_on 'Import' }.to change { Group.count }.by 1
+
+          group = Group.find_by(name: group_name)
+
+          expect(group).not_to be_nil
+          expect(group.description).to eq 'A voluptate non sequi temporibus quam at.'
+          expect(group.path).to eq 'test-group-import'
+          expect(group.import_state.status).to eq GroupImportState.state_machine.states[:finished].value
+        end
+      end
+
+      context 'when modifying the pre-filled path' do
+        it 'successfully imports the group' do
+          visit new_group_path
+
+          fill_in :group_name, with: 'Test Group Import'
+          find('#import-group-tab').click
+
+          fill_in :import_group_path, with: 'custom-path'
+          attach_file(file) do
+            find('.js-filepicker-button').click
+          end
+
+          expect { click_on 'Import' }.to change { Group.count }.by 1
+
+          group = Group.find_by(name: 'Test Group Import')
+          expect(group.path).to eq 'custom-path'
+        end
+      end
+
+      context 'when the path is already taken' do
+        before do
+          create(:group, path: 'test-group-import')
         end
 
-        expect { click_on 'Import' }.to change { Group.count }.by 1
+        it 'suggests a unique path' do
+          visit new_group_path
+          find('#import-group-tab').click
 
-        group = Group.find_by(name: group_name)
-
-        expect(group).not_to be_nil
-        expect(group.description).to eq 'A voluptate non sequi temporibus quam at.'
-        expect(group.path).to eq 'test-group-import'
-        expect(group.import_state.status).to eq GroupImportState.state_machine.states[:finished].value
+          fill_in :import_group_path, with: 'test-group-import'
+          expect(page).to have_content 'Group path is already taken. Suggestions: test-group-import1'
+        end
       end
     end
 
-    context 'when modifying the pre-filled path' do
-      it 'successfully imports the group' do
+    context 'when the user uploads an invalid export file' do
+      let(:file) { File.join(Rails.root, 'spec', %w[fixtures big-image.png]) }
+
+      it 'displays an error' do
         visit new_group_path
 
         fill_in :group_name, with: 'Test Group Import'
         find('#import-group-tab').click
-
-        fill_in :import_group_path, with: 'custom-path'
         attach_file(file) do
           find('.js-filepicker-button').click
         end
 
-        expect { click_on 'Import' }.to change { Group.count }.by 1
+        expect { click_on 'Import' }.not_to change { Group.count }
 
-        group = Group.find_by(name: 'Test Group Import')
-        expect(group.path).to eq 'custom-path'
-      end
-    end
-
-    context 'when the path is already taken' do
-      before do
-        create(:group, path: 'test-group-import')
-      end
-
-      it 'suggests a unique path' do
-        visit new_group_path
-        find('#import-group-tab').click
-
-        fill_in :import_group_path, with: 'test-group-import'
-        expect(page).to have_content 'Group path is already taken. Suggestions: test-group-import1'
+        page.within('.flash-container') do
+          expect(page).to have_content('Unable to process group import file')
+        end
       end
     end
   end
 
-  context 'when the user uploads an invalid export file' do
-    let(:file) { File.join(Rails.root, 'spec', %w[fixtures big-image.png]) }
+  context 'with gltabs_create_group ff enabled' do
+    before do
+      stub_feature_flags(gltabs_create_group: true)
+    end
 
-    it 'displays an error' do
-      visit new_group_path
+    context 'when the user uploads a valid export file' do
+      let(:file) { File.join(Rails.root, 'spec', %w[fixtures group_export.tar.gz]) }
 
-      fill_in :group_name, with: 'Test Group Import'
-      find('#import-group-tab').click
-      attach_file(file) do
-        find('.js-filepicker-button').click
+      context 'when using the pre-filled path', :sidekiq_inline do
+        it 'successfully imports the group' do
+          group_name = 'Test Group Import'
+
+          visit new_group_path
+
+          fill_in :group_name, with: group_name
+
+          find('[data-testid="import-group-tab"]').click
+
+          expect(page).to have_content 'Import group from file'
+          attach_file(file) do
+            find('.js-filepicker-button').click
+          end
+
+          expect { click_on 'Import' }.to change { Group.count }.by 1
+
+          group = Group.find_by(name: group_name)
+
+          expect(group).not_to be_nil
+          expect(group.description).to eq 'A voluptate non sequi temporibus quam at.'
+          expect(group.path).to eq 'test-group-import'
+          expect(group.import_state.status).to eq GroupImportState.state_machine.states[:finished].value
+        end
       end
 
-      expect { click_on 'Import' }.not_to change { Group.count }
+      context 'when modifying the pre-filled path' do
+        it 'successfully imports the group' do
+          visit new_group_path
 
-      page.within('.flash-container') do
-        expect(page).to have_content('Unable to process group import file')
+          fill_in :group_name, with: 'Test Group Import'
+
+          find('[data-testid="import-group-tab"]').click
+
+          fill_in :import_group_path, with: 'custom-path'
+          attach_file(file) do
+            find('.js-filepicker-button').click
+          end
+
+          expect { click_on 'Import' }.to change { Group.count }.by 1
+
+          group = Group.find_by(name: 'Test Group Import')
+          expect(group.path).to eq 'custom-path'
+        end
+      end
+
+      context 'when the path is already taken' do
+        before do
+          create(:group, path: 'test-group-import')
+        end
+
+        it 'suggests a unique path' do
+          visit new_group_path
+
+          find('[data-testid="import-group-tab"]').click
+
+          fill_in :import_group_path, with: 'test-group-import'
+          expect(page).to have_content 'Group path is already taken. Suggestions: test-group-import1'
+        end
+      end
+    end
+
+    context 'when the user uploads an invalid export file' do
+      let(:file) { File.join(Rails.root, 'spec', %w[fixtures big-image.png]) }
+
+      it 'displays an error' do
+        visit new_group_path
+
+        fill_in :group_name, with: 'Test Group Import'
+
+        find('[data-testid="import-group-tab"]').click
+
+        attach_file(file) do
+          find('.js-filepicker-button').click
+        end
+
+        expect { click_on 'Import' }.not_to change { Group.count }
+
+        page.within('.flash-container') do
+          expect(page).to have_content('Unable to process group import file')
+        end
       end
     end
   end

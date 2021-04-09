@@ -11,7 +11,7 @@ export default {
 
 <template>
   <gl-tabs content-class="gl-display-none" v-bind="$attrs" justified v-on="$listeners">
-    <gl-tab no-body>
+    <gl-tab :title-link-attributes="{ 'data-testid': 'create-group-tab' }" no-body>
       <template #title>
         <span class="gl-display-none gl-sm-display-block!">{{
           s__('GroupsNew|Create group')
@@ -19,7 +19,7 @@ export default {
         <span class="gl-display-block gl-sm-display-none!">{{ s__('GroupsNew|Create') }}</span>
       </template>
     </gl-tab>
-    <gl-tab no-body>
+    <gl-tab :title-link-attributes="{ 'data-testid': 'import-group-tab' }" no-body>
       <template #title>
         <span class="gl-display-none gl-sm-display-block!">{{
           s__('GroupsNew|Import group')

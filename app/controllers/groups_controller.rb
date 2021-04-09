@@ -37,6 +37,10 @@ class GroupsController < Groups::ApplicationController
 
   before_action :export_rate_limit, only: [:export, :download_export]
 
+  before_action do
+    push_frontend_feature_flag(:gltabs_create_group)
+  end
+
   helper_method :captcha_required?
 
   skip_cross_project_access_check :index, :new, :create, :edit, :update,
