@@ -3731,6 +3731,9 @@ msgstr ""
 msgid "Analyze your source code for known vulnerabilities."
 msgstr ""
 
+msgid "Analyzing file…"
+msgstr ""
+
 msgid "Ancestors"
 msgstr ""
 
