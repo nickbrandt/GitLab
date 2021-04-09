@@ -31426,6 +31426,9 @@ msgstr ""
 msgid "There was an error fetching configuration for charts"
 msgstr ""
 
+msgid "There was an error fetching countries"
+msgstr ""
+
 msgid "There was an error fetching data for the selected stage"
 msgstr ""
 
@@ -31439,6 +31442,9 @@ msgid "There was an error fetching median data for stages"
 msgstr ""
 
 msgid "There was an error fetching projects"
+msgstr ""
+
+msgid "There was an error fetching states"
 msgstr ""
 
 msgid "There was an error fetching the %{replicableType}"
