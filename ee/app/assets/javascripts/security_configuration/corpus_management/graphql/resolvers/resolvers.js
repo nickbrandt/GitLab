@@ -1,6 +1,6 @@
 import produce from 'immer';
 import { corpuses } from 'ee_jest/security_configuration/corpus_management/mock_data';
-import getCorpusesQuery from './queries/get_corpuses.query.graphql';
+import getCorpusesQuery from '../queries/get_corpuses.query.graphql';
 
 export default {
   Query: {
@@ -30,13 +30,16 @@ export default {
       });
 
       const data = produce(sourceData, (draftState) => {
+        draftState.uploadState.isUploading = false;
+        draftState.uploadState.progress = 0
+
         draftState.mockedPackages.data = [
           ...draftState.mockedPackages.data,
           {
             __typename: 'Corpus',
             name,
-            lastUpdated: new Date(),
-            lastUsed: new Date(),
+            lastUpdated: new Date().toString(),
+            lastUsed: new Date().toString(),
             latestJobPath: '',
             target: '',
             downloadPath: 'farias-gl/go-fuzzing-example/-/jobs/959593462/artifacts/download',

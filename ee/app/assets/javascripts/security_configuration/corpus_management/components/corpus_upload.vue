@@ -59,10 +59,13 @@ export default {
     isUploaded() {
       return this.states?.uploadState.progress === 100;
     },  
+    variant() {
+      return this.isUploaded ? 'confirm' : 'default'
+    },
     actionPrimaryProps() {
       return {
         text: s__('Add'),
-        attributes: { 'data-testid': 'modal-confirm', disabled: !this.isUploaded},
+        attributes: { 'data-testid': 'modal-confirm', disabled: !this.isUploaded, variant: this.variant},
       }  
     } 
   },
@@ -78,7 +81,7 @@ export default {
       <span class="gl-font-weight-bold">{{ formattedFileSize }}</span>
     </div>
 
-    <gl-button class="gl-mr-5" variant="success" v-gl-modal-directive="`corpus-upload-modal`">
+    <gl-button class="gl-mr-5" variant="confirm" v-gl-modal-directive="`corpus-upload-modal`">
       {{ s__('CorpusManagement|New corpus') }}
     </gl-button>  
 
