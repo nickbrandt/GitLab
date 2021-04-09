@@ -56,14 +56,18 @@ module Gitlab
     end
 
     def default_max_count
-      license&.historical_max(to: timestamp)
+      license&.historical_max(to: historical_data_query_to_time)
     end
 
     def historical_data
       strong_memoize(:historical_data) do
-        to_timestamp = timestamp || Time.current
+        license&.historical_data(to: historical_data_query_to_time)&.order(:recorded_at)&.last
+      end
+    end
 
-        license&.historical_data(to: to_timestamp)&.order(:recorded_at)&.last
+    def historical_data_query_to_time
+      strong_memoize(:historical_data_query_to_time) do
+        timestamp || Time.current
       end
     end
 
