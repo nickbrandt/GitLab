@@ -32968,6 +32968,9 @@ msgstr ""
 msgid "Unable to create link to vulnerability"
 msgstr ""
 
+msgid "Unable to fetch branch list for this project."
+msgstr ""
+
 msgid "Unable to fetch unscanned projects"
 msgstr ""
 
