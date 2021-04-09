@@ -185,6 +185,7 @@ export default {
             type="button"
             class="add-diff-note note-button js-add-diff-note-button qa-diff-comment"
             :disabled="line.left.commentsDisabled"
+            :aria-label="addCommentTooltipLeft"
             @click="handleCommentButton(line.left)"
           >
             <gl-icon :size="12" name="comment" />
@@ -241,6 +242,7 @@ export default {
             type="button"
             class="add-diff-note note-button js-add-diff-note-button qa-diff-comment"
             :disabled="line.right.commentsDisabled"
+            :aria-label="addCommentTooltipRight"
             @click="handleCommentButton(line.right)"
           >
             <gl-icon :size="12" name="comment" />
