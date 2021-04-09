@@ -35,14 +35,18 @@ module IncidentManagement
       attr_reader :oncall_schedule, :original_schedule_timezone, :user, :params, :project
 
       def update_rotations!
-        return unless original_schedule_timezone != oncall_schedule.timezone
+        return if same_schedule_timezone?
 
-        update_rotation_active_periods
+        update_rotation_active_periods!
+      end
+
+      def same_schedule_timezone?
+        original_schedule_timezone == oncall_schedule.timezone
       end
 
       # Converts & updates the active period to the new timezone
       # Ex: 8:00 - 17:00 Europe/Berlin becomes 6:00 - 15:00 UTC
-      def update_rotation_active_periods
+      def update_rotation_active_periods!
         original_schedule_current_time = Time.current.in_time_zone(original_schedule_timezone)
 
         oncall_schedule.rotations.with_active_period.each do |rotation|
