@@ -237,35 +237,29 @@ export default {
 
     <div class="row">
       <div class="col-sm-6 col-md-4 col-lg-3 col-xl-2">
-        <gl-form-group :disabled="hasParsingError">
-          <gl-form-group :label="s__('NetworkPolicies|Policy type')" label-for="policyType">
-            <gl-form-select
-              id="policyType"
-              value="networkPolicy"
-              :options="$options.policyTypes"
-              disabled
-            />
-          </gl-form-group>
+        <gl-form-group :label="s__('NetworkPolicies|Policy type')" label-for="policyType">
+          <gl-form-select
+            id="policyType"
+            value="networkPolicy"
+            :options="$options.policyTypes"
+            disabled
+          />
         </gl-form-group>
       </div>
       <div class="col-sm-6 col-md-6 col-lg-5 col-xl-4">
-        <gl-form-group :disabled="hasParsingError" data-testid="policy-name">
-          <gl-form-group
-            :disabled="hasParsingError"
-            :label="s__('NetworkPolicies|Name')"
-            label-for="policyName"
-          >
-            <gl-form-input id="policyName" v-model="policy.name" />
-          </gl-form-group>
+        <gl-form-group :label="s__('NetworkPolicies|Name')" label-for="policyName">
+          <gl-form-input id="policyName" v-model="policy.name" :disabled="hasParsingError" />
         </gl-form-group>
       </div>
     </div>
     <div class="row">
       <div class="col-sm-12 col-md-10 col-lg-8 col-xl-6">
-        <gl-form-group :disabled="hasParsingError" data-testid="policy-description">
-          <gl-form-group :label="s__('NetworkPolicies|Description')" label-for="policyDescription">
-            <gl-form-textarea id="policyDescription" v-model="policy.description" />
-          </gl-form-group>
+        <gl-form-group :label="s__('NetworkPolicies|Description')" label-for="policyDescription">
+          <gl-form-textarea
+            id="policyDescription"
+            v-model="policy.description"
+            :disabled="hasParsingError"
+          />
         </gl-form-group>
       </div>
     </div>

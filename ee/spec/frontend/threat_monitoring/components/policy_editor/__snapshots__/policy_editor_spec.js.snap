@@ -52,18 +52,16 @@ exports[`PolicyEditorApp component renders the policy editor layout 1`] = `
     <div
       class="col-sm-6 col-md-4 col-lg-3 col-xl-2"
     >
-      <gl-form-group-stub>
-        <gl-form-group-stub
-          label="Policy type"
-          label-for="policyType"
-        >
-          <gl-form-select-stub
-            disabled=""
-            id="policyType"
-            options="[object Object]"
-            value="networkPolicy"
-          />
-        </gl-form-group-stub>
+      <gl-form-group-stub
+        label="Policy type"
+        label-for="policyType"
+      >
+        <gl-form-select-stub
+          disabled=""
+          id="policyType"
+          options="[object Object]"
+          value="networkPolicy"
+        />
       </gl-form-group-stub>
     </div>
      
@@ -71,17 +69,13 @@ exports[`PolicyEditorApp component renders the policy editor layout 1`] = `
       class="col-sm-6 col-md-6 col-lg-5 col-xl-4"
     >
       <gl-form-group-stub
-        data-testid="policy-name"
+        label="Name"
+        label-for="policyName"
       >
-        <gl-form-group-stub
-          label="Name"
-          label-for="policyName"
-        >
-          <gl-form-input-stub
-            id="policyName"
-            value=""
-          />
-        </gl-form-group-stub>
+        <gl-form-input-stub
+          id="policyName"
+          value=""
+        />
       </gl-form-group-stub>
     </div>
   </div>
@@ -93,18 +87,14 @@ exports[`PolicyEditorApp component renders the policy editor layout 1`] = `
       class="col-sm-12 col-md-10 col-lg-8 col-xl-6"
     >
       <gl-form-group-stub
-        data-testid="policy-description"
+        label="Description"
+        label-for="policyDescription"
       >
-        <gl-form-group-stub
-          label="Description"
-          label-for="policyDescription"
-        >
-          <gl-form-textarea-stub
-            id="policyDescription"
-            noresize="true"
-            value=""
-          />
-        </gl-form-group-stub>
+        <gl-form-textarea-stub
+          id="policyDescription"
+          noresize="true"
+          value=""
+        />
       </gl-form-group-stub>
     </div>
   </div>

@@ -132,9 +132,9 @@ const hasUnsupportedAttribute = (manifest) => {
     return !Object.keys(object).every((item) => allowedValues.includes(item));
   };
 
-  const hasInvalidPolicy = (type) => {
+  const hasInvalidPolicy = (ingress = [], egress = []) => {
     let isInvalidPolicy = false;
-    manifest.spec[type].forEach((item) => {
+    [...ingress, ...egress].forEach((item) => {
       isInvalidPolicy = hasInvalidKey(item, ruleKeys);
       if (item.toPorts?.length && !isInvalidPolicy) {
         item.toPorts.forEach((entry) => {
@@ -158,11 +158,8 @@ const hasUnsupportedAttribute = (manifest) => {
   if (manifest?.spec && !isUnsupported) {
     isUnsupported = hasInvalidKey(manifest.spec, specKeys);
   }
-  if (manifest?.spec?.ingress?.length && !isUnsupported) {
-    isUnsupported = hasInvalidPolicy('ingress');
-  }
-  if (manifest?.spec?.egress?.length && !isUnsupported) {
-    isUnsupported = hasInvalidPolicy('egress');
+  if (!isUnsupported && (manifest?.spec?.ingress?.length || manifest?.spec?.egress?.length)) {
+    isUnsupported = hasInvalidPolicy(manifest.spec.ingress, manifest.spec.egress);
   }
 
   return isUnsupported;

@@ -79,10 +79,9 @@ spec:
   const findYAMLParsingAlert = () => wrapper.findByTestId('parsing-alert');
   const findNetworkPolicyEditor = () => wrapper.findByTestId('network-policy-editor');
   const findPolicyAlertPicker = () => wrapper.find(PolicyAlertPicker);
-  const findPolicyDescriptionContainer = () => wrapper.findByTestId('policy-description');
+  const findPolicyDescription = () => wrapper.find("[id='policyDescription']");
   const findPolicyEnableContainer = () => wrapper.findByTestId('policy-enable');
-  const findPolicyNameContainer = () => wrapper.findByTestId('policy-name');
-  const findPolicyName = () => findPolicyNameContainer().find("[id='policyName']");
+  const findPolicyName = () => wrapper.find("[id='policyName']");
   const findSavePolicy = () => wrapper.findByTestId('save-policy');
   const findDeletePolicy = () => wrapper.findByTestId('delete-policy');
   const findEditorModeToggle = () => wrapper.findByTestId('editor-mode');
@@ -280,11 +279,11 @@ spec:
     });
 
     it('disables policy name field', () => {
-      expect(findPolicyNameContainer().attributes().disabled).toBe('true');
+      expect(findPolicyName().attributes().disabled).toBe('true');
     });
 
     it('disables policy description field', () => {
-      expect(findPolicyDescriptionContainer().attributes().disabled).toBe('true');
+      expect(findPolicyDescription().attributes().disabled).toBe('true');
     });
 
     it('disables policy enable/disable toggle', () => {
