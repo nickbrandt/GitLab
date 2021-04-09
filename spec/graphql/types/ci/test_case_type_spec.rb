@@ -7,7 +7,7 @@ RSpec.describe Types::Ci::TestCaseType do
 
   it 'contains attributes related to a pipeline test case' do
     expected_fields = %w[
-      name status classname file execution_time stack_Trace system_output recent_failures
+      name status classname file attachment_url execution_time stack_trace system_output recent_failures
     ]
 
     expect(described_class).to have_graphql_fields(*expected_fields)

@@ -6212,6 +6212,7 @@ Test case in pipeline test report.
 
 | Field | Type | Description |
 | ----- | ---- | ----------- |
+| `attachmentUrl` | [`String`](#string) | URL of the test case attachment file. |
 | `classname` | [`String`](#string) | Classname of the test case. |
 | `executionTime` | [`Float`](#float) | Test case execution time in seconds. |
 | `file` | [`String`](#string) | Path to the file of the test case. |

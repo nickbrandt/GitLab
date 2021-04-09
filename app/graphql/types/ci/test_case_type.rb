@@ -24,6 +24,9 @@ module Types
       field :file, GraphQL::STRING_TYPE, null: true,
         description: 'Path to the file of the test case.'
 
+      field :attachment_url, GraphQL::STRING_TYPE, null: true,
+        description: 'URL of the test case attachment file.'
+
       field :system_output, GraphQL::STRING_TYPE, null: true,
         description: 'System output of the test case.'
 
