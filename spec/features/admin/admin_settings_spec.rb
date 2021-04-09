@@ -283,12 +283,10 @@ RSpec.describe 'Admin updates settings' do
       it 'defaults Deployment events to false for chat notification template settings', :js do
         first(:link, 'Service Templates').click
         click_link 'Slack notifications'
-  
+
         expect(find_field('Deployment')).not_to be_checked
       end
     end
-
-
 
     context 'Integration page', :js do
       before do

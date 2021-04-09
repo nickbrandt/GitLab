@@ -37,7 +37,7 @@ RSpec.describe 'Admin visits service templates' do
         expect(page).not_to have_link('Slack', href: edit_admin_application_settings_integration_path(slack_service))
       end
     end
-  
+
     context 'with instance-level integration' do
       before do
         create(:slack_service, instance: true, project: nil)
