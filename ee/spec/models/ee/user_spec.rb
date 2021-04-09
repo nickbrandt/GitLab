@@ -753,11 +753,31 @@ RSpec.describe User do
   describe '#allow_password_authentication_for_web?' do
     context 'when user has managing group linked' do
       before do
-        user.managing_group = Group.new
+        user.managing_group = build(:group)
       end
 
       it 'is false' do
         expect(user.allow_password_authentication_for_web?).to eq false
+      end
+    end
+
+    context 'when user is provisioned by group' do
+      before do
+        user.user_detail.provisioned_by_group = build(:group)
+      end
+
+      it 'is false' do
+        expect(user.allow_password_authentication_for_web?).to eq false
+      end
+
+      context 'with feature flag switched off' do
+        before do
+          stub_feature_flags(block_password_auth_for_saml_users: false)
+        end
+
+        it 'is true' do
+          expect(user.allow_password_authentication_for_web?).to eq true
+        end
       end
     end
   end
@@ -765,11 +785,31 @@ RSpec.describe User do
   describe '#allow_password_authentication_for_git?' do
     context 'when user has managing group linked' do
       before do
-        user.managing_group = Group.new
+        user.managing_group = build(:group)
       end
 
       it 'is false' do
         expect(user.allow_password_authentication_for_git?).to eq false
+      end
+    end
+
+    context 'when user is provisioned by group' do
+      before do
+        user.user_detail.provisioned_by_group = build(:group)
+      end
+
+      it 'is false' do
+        expect(user.allow_password_authentication_for_git?).to eq false
+      end
+
+      context 'with feature flag switched off' do
+        before do
+          stub_feature_flags(block_password_auth_for_saml_users: false)
+        end
+
+        it 'is true' do
+          expect(user.allow_password_authentication_for_git?).to eq true
+        end
       end
     end
   end
