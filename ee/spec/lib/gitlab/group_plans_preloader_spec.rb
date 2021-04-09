@@ -3,15 +3,16 @@
 require 'spec_helper'
 
 RSpec.describe Gitlab::GroupPlansPreloader do
-  describe '#preload' do
-    let!(:plan1) { create(:free_plan, name: 'plan-1') }
-    let!(:plan2) { create(:free_plan, name: 'plan-2') }
 
+  shared_examples 'preloaded group plans' do
     let(:preloaded_groups) do
       # We don't use the factory objects here because they might have the plan
       # loaded already (as we specify the plan when creating them).
       described_class.new.preload(Group.order(id: :asc))
     end
+
+    let!(:plan1) { create(:free_plan, name: 'plan-1') }
+    let!(:plan2) { create(:free_plan, name: 'plan-2') }
 
     before do
       group1 = create(:group, name: 'group-1')
@@ -47,6 +48,19 @@ RSpec.describe Gitlab::GroupPlansPreloader do
         .count
 
       expect(amount).to be_zero
+    end
+
+  end
+
+  describe '#preload' do
+    it_behaves_like 'preloaded group plans'
+
+    context 'with load_ancestors false' do
+      let(:preloaded_groups) do
+        described_class.new.preload(Group.order(id: :asc), load_ancestors: false)
+      end
+
+      it_behaves_like 'preloaded group plans'
     end
   end
 end

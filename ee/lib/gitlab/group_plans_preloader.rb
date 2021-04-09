@@ -10,12 +10,21 @@ module Gitlab
     # Preloads all the plans for the given Groups.
     #
     # groups - An ActiveRecord::Relation returning a set of Group instances.
+    # load_ancestors - Load ancestors of the groups. If groups includes all
+    # ancestors then you can pass `load_ancestors: false` to save considerable
+    # query time. Default true.
     #
     # Returns an Array containing all the Groups, including their preloaded
     # plans.
     # rubocop: disable CodeReuse/ActiveRecord
-    def preload(groups)
-      groups_and_ancestors = groups_and_ancestors_for(groups)
+    def preload(groups, load_ancestors: true)
+      groups_and_ancestors = if load_ancestors
+                               groups_and_ancestors_for(groups) 
+                             else
+                               groups
+                             end
+      groups_and_ancestors = join_gitlab_subscription_for(groups_and_ancestors)
+
       # A Hash mapping group IDs to their corresponding Group instances.
       groups_map = groups_and_ancestors.each_with_object({}) do |group, hash|
         hash[group.id] = group
@@ -57,9 +66,11 @@ module Gitlab
     # Returns an ActiveRecord::Relation that includes the given groups, and all
     # their (recursive) ancestors.
     def groups_and_ancestors_for(groups)
-      Gitlab::ObjectHierarchy
-        .new(groups)
-        .base_and_ancestors
+      Gitlab::ObjectHierarchy.new(groups).base_and_ancestors
+    end
+
+    def join_gitlab_subscription_for(groups)
+      groups
         .join_gitlab_subscription
         .select('namespaces.id', 'namespaces.parent_id', 'gitlab_subscriptions.hosted_plan_id')
     end
