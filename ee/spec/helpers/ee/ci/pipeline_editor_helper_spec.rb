@@ -7,7 +7,7 @@ RSpec.describe EE::Ci::PipelineEditorHelper do
 
   describe '#js_pipeline_editor_data' do
     before do
-      stub_licensed_features(coverage_fuzzing: true)
+      stub_licensed_features(api_fuzzing: true)
 
       allow(helper)
         .to receive(:namespace_project_new_merge_request_path)
