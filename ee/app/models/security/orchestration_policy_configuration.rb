@@ -9,10 +9,22 @@ module Security
     POLICY_PATH = '.gitlab/security-policies/policy.yml'
     POLICY_LIMIT = 5
 
+    RULE_TYPES = {
+      pipeline: 'pipeline',
+      schedule: 'schedule',
+    }.freeze
+
     ON_DEMAND_SCANS = %w[dast].freeze
 
     belongs_to :project, inverse_of: :security_orchestration_policy_configuration
     belongs_to :security_policy_management_project, class_name: 'Project', foreign_key: 'security_policy_management_project_id'
+
+    has_many :rule_schedules, class_name: 'Security::OrchestrationPolicyRuleSchedule', foreign_key: :security_orchestration_policy_configuration_id, inverse_of: :security_orchestration_policy_configuration
+
+    scope :with_outdated_configuration, -> do
+      joins(:security_policy_management_project)
+        .where(arel_table[:configured_at].lt(Project.arel_table[:last_activity_at]).or(arel_table[:configured_at].eq(nil)))
+    end
 
     validates :project, presence: true, uniqueness: true
     validates :security_policy_management_project, presence: true
@@ -70,13 +82,17 @@ module Security
     end
 
     def scan_execution_policy_at(path)
-      policy_repo.blob_data_at(default_branch_or_master, path)
-        .then { |config| Gitlab::Config::Loader::Yaml.new(config).load!.fetch(:scan_execution_policy, []) }
+      policy_data = policy_repo.blob_data_at(default_branch_or_master, path)
+      return [] if policy_data.blank?
+
+      Gitlab::Config::Loader::Yaml.new(policy_data)
+        .load!
+        .fetch(:scan_execution_policy, [])
     end
 
     def applicable_for_branch?(policy, ref)
       policy[:rules].any? do |rule|
-        rule[:type] == 'pipeline' && rule[:branches].any? { |branch| RefMatcher.new(branch).matches?(ref) }
+        rule[:type] == RULE_TYPES[:pipeline] && rule[:branches].any? { |branch| RefMatcher.new(branch).matches?(ref) }
       end
     end
   end
