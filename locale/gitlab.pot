@@ -2352,7 +2352,7 @@ msgstr ""
 msgid "AdminSettings|When creating a new environment variable it will be protected by default."
 msgstr ""
 
-msgid "AdminSettings|You can't add new templates or edit existing ones. To migrate or remove a Service template, create a new integration at %{settings_link_start}Settings > Integrations%{link_end}. Learn more about %{doc_link_start}Project integration management%{link_end}."
+msgid "AdminSettings|You can't add new templates. To migrate or remove a Service template, create a new integration at %{settings_link_start}Settings &gt; Integrations%{link_end}. Learn more about %{doc_link_start}Project integration management%{link_end}."
 msgstr ""
 
 msgid "AdminStatistics|Active Users"
