@@ -2,6 +2,7 @@ import { shallowMount } from '@vue/test-utils';
 import Vue from 'vue';
 import Vuex from 'vuex';
 import GeoNodeReplicationCounts from 'ee/geo_nodes_beta/components/details/secondary_node/geo_node_replication_counts.vue';
+import GeoNodeReplicationSyncPercentage from 'ee/geo_nodes_beta/components/details/secondary_node/geo_node_replication_sync_percentage.vue';
 import { REPOSITORY, BLOB } from 'ee/geo_nodes_beta/constants';
 import {
   MOCK_NODES,
@@ -16,7 +17,7 @@ describe('GeoNodeReplicationCounts', () => {
   let wrapper;
 
   const defaultProps = {
-    node: MOCK_NODES[1],
+    nodeId: MOCK_NODES[1].id,
   };
 
   const createComponent = (props, getters) => {
@@ -45,11 +46,9 @@ describe('GeoNodeReplicationCounts', () => {
 
   const findReplicationTypeSections = () => wrapper.findAllByTestId('replication-type');
   const findReplicationTypeSectionTitles = () =>
-    findReplicationTypeSections().wrappers.map((w) =>
-      extendedWrapper(w).findByTestId('replicable-title').text(),
-    );
-  const findReplicationTypeSyncData = () => wrapper.findAllByTestId('sync-data');
-  const findReplicationTypeVerificationData = () => wrapper.findAllByTestId('verification-data');
+    findReplicationTypeSections().wrappers.map((w) => w.text());
+  const findGeoNodeReplicationSyncPercentage = () =>
+    wrapper.findAllComponents(GeoNodeReplicationSyncPercentage);
 
   describe('template', () => {
     describe('always', () => {
@@ -62,85 +61,27 @@ describe('GeoNodeReplicationCounts', () => {
         expect(findReplicationTypeSectionTitles()).toStrictEqual(['Git', 'File']);
       });
 
-      it('renders a sync section for Git and File', () => {
-        expect(findReplicationTypeSyncData()).toHaveLength(2);
-      });
-
-      it('renders a verification section for Git and File', () => {
-        expect(findReplicationTypeVerificationData()).toHaveLength(2);
+      it('renders a sync and verification section for Git and File', () => {
+        expect(findGeoNodeReplicationSyncPercentage()).toHaveLength(4);
       });
     });
 
     describe.each`
-      description               | mockGetterData                                                                                                              | expectedUI
-      ${'with no data'}         | ${[]}                                                                                                                       | ${{ GIT: { color: 'gl-bg-gray-200', text: 'N/A' }, FILE: { color: 'gl-bg-gray-200', text: 'N/A' } }}
-      ${'with no File data'}    | ${[{ dataType: REPOSITORY, values: { total: 100, success: 0 } }]}                                                           | ${{ GIT: { color: 'gl-bg-red-500', text: '0%' }, FILE: { color: 'gl-bg-gray-200', text: 'N/A' } }}
-      ${'with no Git data'}     | ${[{ dataType: BLOB, values: { total: 100, success: 100 } }]}                                                               | ${{ GIT: { color: 'gl-bg-gray-200', text: 'N/A' }, FILE: { color: 'gl-bg-green-500', text: '100%' } }}
-      ${'with all data'}        | ${[{ dataType: REPOSITORY, values: { total: 100, success: 0 } }, { dataType: BLOB, values: { total: 100, success: 100 } }]} | ${{ GIT: { color: 'gl-bg-red-500', text: '0%' }, FILE: { color: 'gl-bg-green-500', text: '100%' } }}
-      ${'with malformed data'}  | ${[{ dataType: REPOSITORY, values: { total: null, success: 0 } }]}                                                          | ${{ GIT: { color: 'gl-bg-gray-200', text: 'N/A' }, FILE: { color: 'gl-bg-gray-200', text: 'N/A' } }}
-      ${'with very small data'} | ${[{ dataType: REPOSITORY, values: { total: 1000, success: 1 } }]}                                                          | ${{ GIT: { color: 'gl-bg-red-500', text: '< 1%' }, FILE: { color: 'gl-bg-gray-200', text: 'N/A' } }}
-    `(`percentages`, ({ description, mockGetterData, expectedUI }) => {
-      const gitReplicationSection = {};
-      const fileReplicationSection = {};
-
+      description            | mockGetterData                                                                                                              | expectedData
+      ${'with no data'}      | ${[]}                                                                                                                       | ${[{ title: 'Git', sync: [], verification: [] }, { title: 'File', sync: [], verification: [] }]}
+      ${'with no File data'} | ${[{ dataType: REPOSITORY, values: { total: 100, success: 0 } }]}                                                           | ${[{ title: 'Git', sync: [{ total: 100, success: 0 }], verification: [{ total: 100, success: 0 }] }, { title: 'File', sync: [], verification: [] }]}
+      ${'with no Git data'}  | ${[{ dataType: BLOB, values: { total: 100, success: 100 } }]}                                                               | ${[{ title: 'Git', sync: [], verification: [] }, { title: 'File', sync: [{ total: 100, success: 100 }], verification: [{ total: 100, success: 100 }] }]}
+      ${'with all data'}     | ${[{ dataType: REPOSITORY, values: { total: 100, success: 0 } }, { dataType: BLOB, values: { total: 100, success: 100 } }]} | ${[{ title: 'Git', sync: [{ total: 100, success: 0 }], verification: [{ total: 100, success: 0 }] }, { title: 'File', sync: [{ total: 100, success: 100 }], verification: [{ total: 100, success: 100 }] }]}
+    `('replicationOverview $description', ({ mockGetterData, expectedData }) => {
       beforeEach(() => {
         createComponent(null, {
           syncInfo: () => () => mockGetterData,
           verificationInfo: () => () => mockGetterData,
         });
-
-        gitReplicationSection.syncData = extendedWrapper(
-          findReplicationTypeSections().at(0),
-        ).findByTestId('sync-data');
-        gitReplicationSection.verificationData = extendedWrapper(
-          findReplicationTypeSections().at(0),
-        ).findByTestId('verification-data');
-        fileReplicationSection.syncData = extendedWrapper(
-          findReplicationTypeSections().at(1),
-        ).findByTestId('sync-data');
-        fileReplicationSection.verificationData = extendedWrapper(
-          findReplicationTypeSections().at(1),
-        ).findByTestId('verification-data');
       });
 
-      describe(`Git section ${description}`, () => {
-        it('renders the correct sync data percentage color and text', () => {
-          expect(
-            gitReplicationSection.syncData.find('.gl-rounded-full').classes(expectedUI.GIT.color),
-          ).toBe(true);
-          expect(gitReplicationSection.syncData.find('span').text()).toBe(expectedUI.GIT.text);
-        });
-
-        it('renders the correct verification data percentage color and text', () => {
-          expect(
-            gitReplicationSection.verificationData
-              .find('.gl-rounded-full')
-              .classes(expectedUI.GIT.color),
-          ).toBe(true);
-          expect(gitReplicationSection.verificationData.find('span').text()).toBe(
-            expectedUI.GIT.text,
-          );
-        });
-      });
-
-      describe(`File section ${description}`, () => {
-        it('renders the correct sync data percentage color and text', () => {
-          expect(
-            fileReplicationSection.syncData.find('.gl-rounded-full').classes(expectedUI.FILE.color),
-          ).toBe(true);
-          expect(fileReplicationSection.syncData.find('span').text()).toBe(expectedUI.FILE.text);
-        });
-
-        it('renders the correct verification data percentage color and text', () => {
-          expect(
-            fileReplicationSection.verificationData
-              .find('.gl-rounded-full')
-              .classes(expectedUI.FILE.color),
-          ).toBe(true);
-          expect(fileReplicationSection.verificationData.find('span').text()).toBe(
-            expectedUI.FILE.text,
-          );
-        });
+      it('creates the correct array', () => {
+        expect(wrapper.vm.replicationOverview).toStrictEqual(expectedData);
       });
     });
   });

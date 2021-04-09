@@ -1,8 +1,8 @@
 <script>
 import { mapGetters } from 'vuex';
 import { REPOSITORY, BLOB } from 'ee/geo_nodes_beta/constants';
-import { roundDownFloat } from '~/lib/utils/common_utils';
 import { __, s__ } from '~/locale';
+import GeoNodeReplicationSyncPercentage from './geo_node_replication_sync_percentage.vue';
 
 export default {
   name: 'GeoNodeReplicationCounts',
@@ -10,71 +10,44 @@ export default {
     dataType: s__('Geo|Data type'),
     synchronization: s__('Geo|Synchronization'),
     verification: s__('Geo|Verification'),
-    nA: __('N/A'),
-    git: s__('Geo|Git'),
-    file: s__('Git|File'),
+    git: __('Git'),
+    file: __('File'),
+  },
+  components: {
+    GeoNodeReplicationSyncPercentage,
   },
   props: {
-    node: {
-      type: Object,
+    nodeId: {
+      type: Number,
       required: true,
     },
   },
   computed: {
     ...mapGetters(['verificationInfo', 'syncInfo']),
     replicationOverview() {
-      const syncInfoData = this.syncInfo(this.node.id);
-      const verificationInfoData = this.verificationInfo(this.node.id);
+      const syncInfoData = this.syncInfo(this.nodeId);
+      const verificationInfoData = this.verificationInfo(this.nodeId);
 
-      const overview = [
+      return [
         {
           title: this.$options.i18n.git,
-          sync: syncInfoData.filter((replicable) => replicable.dataType === REPOSITORY),
-          verification: verificationInfoData.filter(
-            (replicable) => replicable.dataType === REPOSITORY,
-          ),
+          sync: syncInfoData
+            .filter((replicable) => replicable.dataType === REPOSITORY)
+            .map((d) => d.values),
+          verification: verificationInfoData
+            .filter((replicable) => replicable.dataType === REPOSITORY)
+            .map((d) => d.values),
         },
         {
           title: this.$options.i18n.file,
-          sync: syncInfoData.filter((replicable) => replicable.dataType === BLOB),
-          verification: verificationInfoData.filter((replicable) => replicable.dataType === BLOB),
+          sync: syncInfoData
+            .filter((replicable) => replicable.dataType === BLOB)
+            .map((d) => d.values),
+          verification: verificationInfoData
+            .filter((replicable) => replicable.dataType === BLOB)
+            .map((d) => d.values),
         },
       ];
-
-      return overview.map((type) => {
-        return {
-          title: type.title,
-          synchronizationPercent: this.getPercent(type.sync),
-          verificationPercent: this.getPercent(type.verification),
-        };
-      });
-    },
-  },
-  methods: {
-    getPercent(type) {
-      // If no data at all, handle as N/A
-      if (!type.length) {
-        return null;
-      }
-
-      const total = type.map((t) => t.values.total).reduce((a, b) => a + b);
-      const success = type.map((t) => t.values.success).reduce((a, b) => a + b);
-
-      const percent = roundDownFloat((success / total) * 100, 1);
-      if (percent > 0 && percent < 1) {
-        // Special case for very small numbers
-        return '< 1';
-      }
-
-      // If total/success has any null values it will return NaN, lets render N/A for this case too.
-      return Number.isNaN(percent) ? null : percent;
-    },
-    percentColor(value) {
-      if (value === null) {
-        return 'gl-bg-gray-200';
-      }
-
-      return value === 100 ? 'gl-bg-green-500' : 'gl-bg-red-500';
     },
   },
 };
@@ -94,29 +67,8 @@ export default {
       data-testid="replication-type"
     >
       <span class="gl-flex-fill-1" data-testid="replicable-title">{{ type.title }}</span>
-      <div class="gl-display-flex gl-align-items-center gl-flex-fill-1" data-testid="sync-data">
-        <div
-          :class="percentColor(type.synchronizationPercent)"
-          class="gl-rounded-full gl-w-3 gl-h-3 gl-mr-2"
-        ></div>
-        <span class="gl-font-weight-bold">{{
-          type.synchronizationPercent === null
-            ? $options.i18n.nA
-            : `${type.synchronizationPercent}%`
-        }}</span>
-      </div>
-      <div
-        class="gl-display-flex gl-align-items-center gl-flex-fill-1"
-        data-testid="verification-data"
-      >
-        <div
-          :class="percentColor(type.verificationPercent)"
-          class="gl-rounded-full gl-w-3 gl-h-3 gl-mr-2"
-        ></div>
-        <span class="gl-font-weight-bold">{{
-          type.verificationPercent === null ? $options.i18n.nA : `${type.verificationPercent}%`
-        }}</span>
-      </div>
+      <geo-node-replication-sync-percentage :values="type.sync" />
+      <geo-node-replication-sync-percentage :values="type.verification" />
     </div>
   </div>
 </template>

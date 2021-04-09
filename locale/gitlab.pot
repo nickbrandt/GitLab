@@ -14314,9 +14314,6 @@ msgstr ""
 msgid "Geo|Geo sites"
 msgstr ""
 
-msgid "Geo|Git"
-msgstr ""
-
 msgid "Geo|Go to the primary site"
 msgstr ""
 
@@ -14876,9 +14873,6 @@ msgid "Gitpod|Gitpod URL"
 msgstr ""
 
 msgid "Gitpod|e.g. https://gitpod.example.com"
-msgstr ""
-
-msgid "Git|File"
 msgstr ""
 
 msgid "Given access %{time_ago}"

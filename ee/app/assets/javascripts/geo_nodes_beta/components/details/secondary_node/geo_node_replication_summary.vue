@@ -50,6 +50,6 @@ export default {
       <span>{{ $options.i18n.syncSettings }}</span>
       <geo-node-sync-settings class="gl-mt-2" :node="node" />
     </div>
-    <geo-node-replication-counts :node="node" class="gl-mb-5" />
+    <geo-node-replication-counts :node-id="node.id" class="gl-mb-5" />
   </gl-card>
 </template>
