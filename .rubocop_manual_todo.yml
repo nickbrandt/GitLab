@@ -777,8 +777,6 @@ RSpec/EmptyLineAfterFinalLetItBe:
     - spec/lib/api/entities/design_management/design_spec.rb
     - spec/lib/api/entities/merge_request_changes_spec.rb
     - spec/lib/api/entities/release_spec.rb
-    - spec/lib/api/helpers/caching_spec.rb
-    - spec/lib/api/helpers/packages_manager_clients_helpers_spec.rb
     - spec/lib/bulk_imports/groups/loaders/group_loader_spec.rb
     - spec/lib/extracts_path_spec.rb
     - spec/lib/extracts_ref_spec.rb
