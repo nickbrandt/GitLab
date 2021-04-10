@@ -802,9 +802,6 @@ RSpec/EmptyLineAfterFinalLetItBe:
     - spec/lib/gitlab/hook_data/issue_builder_spec.rb
     - spec/lib/gitlab/hook_data/merge_request_builder_spec.rb
     - spec/lib/gitlab/hook_data/release_builder_spec.rb
-    - spec/lib/gitlab/jira_import/base_importer_spec.rb
-    - spec/lib/gitlab/jira_import/handle_labels_service_spec.rb
-    - spec/lib/gitlab/jira_import_spec.rb
     - spec/lib/gitlab/json_cache_spec.rb
     - spec/lib/gitlab/language_detection_spec.rb
     - spec/lib/gitlab/project_search_results_spec.rb
