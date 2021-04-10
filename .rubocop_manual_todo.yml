@@ -970,8 +970,6 @@ RSpec/EmptyLineAfterFinalLetItBe:
     - spec/finders/ci/commit_statuses_finder_spec.rb
     - spec/finders/container_repositories_finder_spec.rb
     - spec/finders/deployments_finder_spec.rb
-    - spec/finders/design_management/designs_finder_spec.rb
-    - spec/finders/design_management/versions_finder_spec.rb
     - spec/finders/events_finder_spec.rb
     - spec/finders/group_descendants_finder_spec.rb
     - spec/finders/groups_finder_spec.rb
