@@ -72,7 +72,8 @@ export default {
     },
     shouldRemoveSourceBranch() {
       if (this.glFeatures.mergeRequestWidgetGraphql) {
-        return this.state.shouldRemoveSourceBranch || this.state.forceRemoveSourceBranch;
+        if (this.state.shouldRemoveSourceBranch === false) return false;
+        return this.state.forceRemoveSourceBranch;
       }
 
       return this.mr.shouldRemoveSourceBranch;
