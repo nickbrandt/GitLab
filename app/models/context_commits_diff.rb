@@ -32,8 +32,8 @@ class ContextCommitsDiff
 
   def diff_refs
     Gitlab::Diff::DiffRefs.new(
-      base_sha: commits.last.diff_refs.base_sha,
-      head_sha: commits.first.diff_refs.head_sha
+      base_sha: commits.last&.diff_refs&.base_sha,
+      head_sha: commits.first&.diff_refs&.head_sha
     )
   end
 
