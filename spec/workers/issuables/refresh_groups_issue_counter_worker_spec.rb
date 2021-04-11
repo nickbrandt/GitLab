@@ -12,14 +12,6 @@ RSpec.describe Issuables::RefreshGroupsIssueCounterWorker do
     let(:count_service) { Groups::OpenIssuesCountService }
     let(:group_ids) { [root_group.id] }
 
-    it 'anticipates the inability to find the issue' do
-      expect(Gitlab::ErrorTracking).to receive(:log_exception)
-        .with(ActiveRecord::RecordNotFound, include(user_id: -1))
-      expect(count_service).not_to receive(:new)
-
-      described_class.new.perform(-1, group_ids)
-    end
-
     context 'when group_ids is empty' do
       let(:group_ids) { [] }
 
@@ -27,7 +19,7 @@ RSpec.describe Issuables::RefreshGroupsIssueCounterWorker do
         expect(count_service).not_to receive(:new)
         expect(Gitlab::ErrorTracking).not_to receive(:log_exception)
 
-        described_class.new.perform(user.id, group_ids)
+        described_class.new.perform(group_ids)
       end
     end
 
@@ -36,15 +28,15 @@ RSpec.describe Issuables::RefreshGroupsIssueCounterWorker do
       let(:instance2) { instance_double(count_service) }
 
       it_behaves_like 'an idempotent worker' do
-        let(:job_args) { [user.id, group_ids] }
+        let(:job_args) { [group_ids] }
         let(:exec_times) { IdempotentWorkerHelper::WORKER_EXEC_TIMES }
 
         it 'refreshes the issue count in given groups and ancestors' do
           expect(count_service).to receive(:new)
-            .exactly(exec_times).times.with(root_group, user).and_return(instance1)
+            .exactly(exec_times).times.with(root_group).and_return(instance1)
           expect(count_service).to receive(:new)
-            .exactly(exec_times).times.with(parent_group, user).and_return(instance2)
-          expect(count_service).not_to receive(:new).with(subgroup, user)
+            .exactly(exec_times).times.with(parent_group).and_return(instance2)
+          expect(count_service).not_to receive(:new).with(subgroup)
 
           [instance1, instance2].all? do |instance|
             expect(instance).to receive(:refresh_cache_over_threshold).exactly(exec_times).times

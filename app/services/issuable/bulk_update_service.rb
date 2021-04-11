@@ -91,10 +91,10 @@ module Issuable
     end
 
     def schedule_group_issues_count_refresh(updated_issuables)
-      group_ids = updated_issuables.map(&:project).map { |project| project.namespace_id }
+      group_ids = updated_issuables.map(&:project).map(&:namespace_id)
       return if group_ids.empty?
 
-      Issuables::RefreshGroupsIssueCounterWorker.perform_async(current_user.id, group_ids)
+      Issuables::RefreshGroupsIssueCounterWorker.perform_async(group_ids)
     end
   end
 end
