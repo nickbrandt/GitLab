@@ -13,6 +13,7 @@ import PathNavigation from 'ee/analytics/cycle_analytics/components/path_navigat
 import StageNavItem from 'ee/analytics/cycle_analytics/components/stage_nav_item.vue';
 import StageTable from 'ee/analytics/cycle_analytics/components/stage_table.vue';
 import StageTableNav from 'ee/analytics/cycle_analytics/components/stage_table_nav.vue';
+import StageTableNew from 'ee/analytics/cycle_analytics/components/stage_table_new.vue';
 import TypeOfWorkCharts from 'ee/analytics/cycle_analytics/components/type_of_work_charts.vue';
 import ValueStreamSelect from 'ee/analytics/cycle_analytics/components/value_stream_select.vue';
 import createStore from 'ee/analytics/cycle_analytics/store';
@@ -166,8 +167,8 @@ describe('Value Stream Analytics component', () => {
     expect(wrapper.find(Metrics).exists()).toBe(flag);
   };
 
-  const displaysStageTable = (flag) => {
-    expect(wrapper.find(StageTable).exists()).toBe(flag);
+  const displaysStageTable = (flag, component = StageTable) => {
+    expect(wrapper.find(component).exists()).toBe(flag);
   };
 
   const displaysDurationChart = (flag) => {
@@ -233,6 +234,7 @@ describe('Value Stream Analytics component', () => {
 
     it('does not display the stage table', () => {
       displaysStageTable(false);
+      displaysStageTable(false, StageTableNew);
     });
 
     it('does not display the duration chart', () => {
@@ -289,6 +291,7 @@ describe('Value Stream Analytics component', () => {
 
     it('does not display the stage table', () => {
       displaysStageTable(false);
+      displaysStageTable(false, StageTableNew);
     });
 
     it('does not display the add stage button', () => {
@@ -394,6 +397,7 @@ describe('Value Stream Analytics component', () => {
 
     it('hides the stage table', () => {
       displaysStageTable(false);
+      displaysStageTable(false, StageTableNew);
     });
 
     it('hides the add stage button', () => {
@@ -402,28 +406,25 @@ describe('Value Stream Analytics component', () => {
 
     describe('Without the overview stage selected', () => {
       beforeEach(async () => {
+        mock = new MockAdapter(axios);
+        mockRequiredRoutes(mock);
+        wrapper = await createComponent({
+          withStageSelected: true,
+          featureFlags: {
+            hasPathNavigation: true,
+          },
+        });
+
         await store.dispatch('setSelectedStage', mockData.issueStage);
         await wrapper.vm.$nextTick();
       });
 
       it('displays the stage table', () => {
-        displaysStageTable(true);
+        displaysStageTable(true, StageTableNew);
       });
 
-      it('displays the add stage button', async () => {
-        wrapper = await createComponent({
-          opts: {
-            stubs: {
-              StageTable,
-              StageTableNav,
-              AddStageButton,
-            },
-          },
-          withStageSelected: true,
-        });
-
-        await wrapper.vm.$nextTick();
-        displaysAddStageButton(true);
+      it('does not display the add stage button', () => {
+        displaysAddStageButton(false);
       });
     });
 
@@ -441,6 +442,65 @@ describe('Value Stream Analytics component', () => {
         it('does not display the path navigation', () => {
           displaysPathNavigation(false);
         });
+
+        describe('StageTable', () => {
+          beforeEach(async () => {
+            mock = new MockAdapter(axios);
+            mockRequiredRoutes(mock);
+
+            wrapper = await createComponent({
+              opts: {
+                stubs: {
+                  StageTable,
+                  StageTableNav,
+                  StageNavItem,
+                },
+              },
+              withStageSelected: true,
+            });
+          });
+
+          it('has the first stage selected by default', () => {
+            const first = findStageNavItemAtIndex(0);
+            const second = findStageNavItemAtIndex(1);
+
+            expect(first.props('isActive')).toBe(true);
+            expect(second.props('isActive')).toBe(false);
+          });
+
+          it('can navigate to different stages', async () => {
+            findStageNavItemAtIndex(2).trigger('click');
+
+            await wrapper.vm.$nextTick();
+            const first = findStageNavItemAtIndex(0);
+            const third = findStageNavItemAtIndex(2);
+            expect(third.props('isActive')).toBe(true);
+            expect(first.props('isActive')).toBe(false);
+          });
+
+          describe('Add stage button', () => {
+            beforeEach(async () => {
+              wrapper = await createComponent({
+                opts: {
+                  stubs: {
+                    StageTable,
+                    StageTableNav,
+                    AddStageButton,
+                  },
+                },
+                withStageSelected: true,
+              });
+            });
+
+            it('can navigate to the custom stage form', async () => {
+              expect(wrapper.find(CustomStageForm).exists()).toBe(false);
+              findAddStageButton().trigger('click');
+
+              await wrapper.vm.$nextTick();
+              expect(wrapper.find(CustomStageForm).exists()).toBe(true);
+            });
+          });
+        });
       });
 
       describe('enabled', () => {
@@ -455,65 +515,6 @@ describe('Value Stream Analytics component', () => {
 
         it('displays the path navigation', () => {
           displaysPathNavigation(true);
-        });
-      });
-    });
-
-    describe('StageTable', () => {
-      beforeEach(async () => {
-        mock = new MockAdapter(axios);
-        mockRequiredRoutes(mock);
-
-        wrapper = await createComponent({
-          opts: {
-            stubs: {
-              StageTable,
-              StageTableNav,
-              StageNavItem,
-            },
-          },
-          withStageSelected: true,
-        });
-      });
-
-      it('has the first stage selected by default', () => {
-        const first = findStageNavItemAtIndex(0);
-        const second = findStageNavItemAtIndex(1);
-
-        expect(first.props('isActive')).toBe(true);
-        expect(second.props('isActive')).toBe(false);
-      });
-
-      it('can navigate to different stages', async () => {
-        findStageNavItemAtIndex(2).trigger('click');
-
-        await wrapper.vm.$nextTick();
-        const first = findStageNavItemAtIndex(0);
-        const third = findStageNavItemAtIndex(2);
-        expect(third.props('isActive')).toBe(true);
-        expect(first.props('isActive')).toBe(false);
-      });
-
-      describe('Add stage button', () => {
-        beforeEach(async () => {
-          wrapper = await createComponent({
-            opts: {
-              stubs: {
-                StageTable,
-                StageTableNav,
-                AddStageButton,
-              },
-            },
-            withStageSelected: true,
-          });
-        });
-
-        it('can navigate to the custom stage form', async () => {
-          expect(wrapper.find(CustomStageForm).exists()).toBe(false);
-          findAddStageButton().trigger('click');
-
-          await wrapper.vm.$nextTick();
-          expect(wrapper.find(CustomStageForm).exists()).toBe(true);
         });
       });
     });
