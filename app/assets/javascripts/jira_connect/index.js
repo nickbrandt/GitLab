@@ -1,7 +1,7 @@
 import setConfigs from '@gitlab/ui/dist/config';
 import Vue from 'vue';
-import { addSubscription, removeSubscription, getLocation } from '~/jira_connect/api';
-import { reloadPage, sizeToParent } from '~/jira_connect/utils';
+import { addSubscription, removeSubscription } from '~/jira_connect/api';
+import { getLocation, reloadPage, sizeToParent } from '~/jira_connect/utils';
 import GlFeatureFlagsPlugin from '~/vue_shared/gl_feature_flags_plugin';
 import Translate from '~/vue_shared/translate';
 

@@ -1,5 +1,7 @@
 <script>
 import { GlButton, GlTable } from '@gitlab/ui';
+import { removeSubscription } from '~/jira_connect/api';
+import { reloadPage } from '~/jira_connect/utils';
 import { __, s__ } from '~/locale';
 import TimeagoTooltip from '~/vue_shared/components/time_ago_tooltip.vue';
 import GroupItemName from './group_item_name.vue';
@@ -33,6 +35,11 @@ export default {
   ],
   methods: {
     onClick(item) {
+      removeSubscription(item.unlink_path)
+        .then(() => {
+          reloadPage();
+        })
+        .catch(() => {});
       return item;
     },
   },
