@@ -282,7 +282,7 @@ module MergeRequests
       #   on multiple attributes, but for now limit to only single attribute
       #   updates.
       #
-      return unless params.keys.length == 1
+      return unless params.one?
 
       attempt_specialized_update_services(merge_request, params.each_key.first.to_sym)
     end
