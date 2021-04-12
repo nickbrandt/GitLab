@@ -18220,6 +18220,9 @@ msgstr ""
 msgid "Last contact"
 msgstr ""
 
+msgid "Last edit"
+msgstr ""
+
 msgid "Last edited %{date}"
 msgstr ""
 

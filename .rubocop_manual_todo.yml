@@ -719,9 +719,6 @@ RSpec/EmptyLineAfterFinalLetItBe:
     - spec/graphql/resolvers/project_pipeline_resolver_spec.rb
     - spec/graphql/resolvers/project_pipelines_resolver_spec.rb
     - spec/graphql/resolvers/timelog_resolver_spec.rb
-    - spec/graphql/types/admin/analytics/usage_trends/measurement_type_spec.rb
-    - spec/graphql/types/global_id_type_spec.rb
-    - spec/graphql/types/snippet_type_spec.rb
     - spec/helpers/blob_helper_spec.rb
     - spec/helpers/broadcast_messages_helper_spec.rb
     - spec/helpers/ci/runners_helper_spec.rb
