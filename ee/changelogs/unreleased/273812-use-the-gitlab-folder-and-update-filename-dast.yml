@@ -1,0 +1,5 @@
+---
+title: User can isolate API fuzzing configuration inside `.gitlab/` directory.
+merge_request:
+author:
+type: changed
