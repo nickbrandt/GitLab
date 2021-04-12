@@ -5310,9 +5310,6 @@ msgstr ""
 msgid "Branches|Show stale branches"
 msgstr ""
 
-msgid "Branches|Sort by"
-msgstr ""
-
 msgid "Branches|Stale"
 msgstr ""
 
