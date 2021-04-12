@@ -553,6 +553,7 @@ RSpec.describe ProjectPolicy do
 
   describe 'permissions for security bot' do
     let_it_be(:current_user) { create(:user, :security_bot) }
+
     let(:project) { private_project }
 
     let(:permissions) do

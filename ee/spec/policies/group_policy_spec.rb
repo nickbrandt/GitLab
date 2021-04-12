@@ -423,6 +423,7 @@ RSpec.describe GroupPolicy do
 
           context 'when the group is a subgroup' do
             let_it_be(:subgroup) { create(:group, :private, parent: group) }
+
             let(:current_user) { owner }
 
             subject { described_class.new(current_user, subgroup) }
