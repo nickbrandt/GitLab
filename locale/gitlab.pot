@@ -21284,6 +21284,9 @@ msgstr ""
 msgid "No prioritized labels with such name or description"
 msgstr ""
 
+msgid "No projects found"
+msgstr ""
+
 msgid "No public groups"
 msgstr ""
 
