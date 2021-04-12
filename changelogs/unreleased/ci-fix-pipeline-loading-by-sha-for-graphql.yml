@@ -1,5 +1,5 @@
 ---
 title: Fix loading pipelines by commit SHA for GraphQL
-merge_request:
+merge_request: 59110
 author:
 type: fixed
