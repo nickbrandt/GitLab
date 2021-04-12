@@ -25506,6 +25506,9 @@ msgstr ""
 msgid "Purchase more storage"
 msgstr ""
 
+msgid "PurchaseStep|An error occured in the purchase step. If the problem persists please contact support@gitlab.com."
+msgstr ""
+
 msgid "Push"
 msgstr ""
 
