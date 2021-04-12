@@ -99,7 +99,7 @@ RSpec.describe GitlabSchema.types['DastSiteProfile'] do
         it 'is redacted' do
           create(:dast_site_profile_secret_variable, dast_site_profile: object, key: Dast::SiteProfileSecretVariable::REQUEST_HEADERS)
 
-          expect(resolve_field(:request_headers, object, current_user: user)).to eq('[Redacted]')
+          expect(resolve_field(:request_headers, object, current_user: user)).to eq('••••••••')
         end
       end
     end
