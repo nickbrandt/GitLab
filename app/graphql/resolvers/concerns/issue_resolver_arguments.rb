@@ -12,10 +12,10 @@ module IssueResolverArguments
     argument :iids, [GraphQL::STRING_TYPE],
               required: false,
               description: 'List of IIDs of issues. For example, [1, 2].'
-    argument :label_name, GraphQL::STRING_TYPE.to_list_type,
+    argument :label_name, [GraphQL::STRING_TYPE, null: true],
               required: false,
               description: 'Labels applied to this issue.'
-    argument :milestone_title, GraphQL::STRING_TYPE.to_list_type,
+    argument :milestone_title, [GraphQL::STRING_TYPE, null: true],
               required: false,
               description: 'Milestone applied to this issue.'
     argument :author_username, GraphQL::STRING_TYPE,

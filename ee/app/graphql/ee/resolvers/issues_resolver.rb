@@ -7,7 +7,7 @@ module EE
       extend ::Gitlab::Utils::Override
 
       prepended do
-        argument :iteration_id, ::GraphQL::ID_TYPE.to_list_type,
+        argument :iteration_id, [::GraphQL::ID_TYPE, null: true],
                  required: false,
                  description: 'Iterations applied to the issue.'
         argument :epic_id, GraphQL::STRING_TYPE,

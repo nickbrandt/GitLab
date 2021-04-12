@@ -8,10 +8,10 @@ module Types
       argument :iids, [GraphQL::STRING_TYPE],
                 required: false,
                 description: 'List of IIDs of issues to exclude. For example, [1, 2].'
-      argument :label_name, GraphQL::STRING_TYPE.to_list_type,
+      argument :label_name, [GraphQL::STRING_TYPE],
                 required: false,
                 description: 'Labels not applied to this issue.'
-      argument :milestone_title, GraphQL::STRING_TYPE.to_list_type,
+      argument :milestone_title, [GraphQL::STRING_TYPE],
                 required: false,
                 description: 'Milestone not applied to this issue.'
       argument :assignee_username, GraphQL::STRING_TYPE,
