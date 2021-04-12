@@ -1,3 +1,4 @@
+import { isFunction } from 'lodash';
 import AccessorUtilities from '~/lib/utils/accessor';
 import { ALERT_LOCALSTORAGE_KEY } from './constants';
 
@@ -30,4 +31,42 @@ export const retrieveAlert = () => {
   }
 
   return JSON.parse(initialAlertJSON);
+};
+
+export const getJwt = () => {
+  return new Promise((resolve) => {
+    if (isFunction(AP?.context?.getToken)) {
+      AP.context.getToken((token) => {
+        resolve(token);
+      });
+    } else {
+      resolve();
+    }
+  });
+};
+
+export const getLocation = () => {
+  return new Promise((resolve) => {
+    if (isFunction(AP?.getLocation)) {
+      AP.getLocation((location) => {
+        resolve(location);
+      });
+    } else {
+      resolve();
+    }
+  });
+};
+
+export const reloadPage = () => {
+  if (isFunction(AP?.navigator?.reload)) {
+    AP.navigator.reload();
+  } else {
+    window.location.reload();
+  }
+};
+
+export const sizeToParent = () => {
+  if (isFunction(AP?.sizeToParent)) {
+    AP.sizeToParent();
+  }
 };

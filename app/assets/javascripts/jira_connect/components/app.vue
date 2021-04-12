@@ -1,11 +1,10 @@
 <script>
 import { GlAlert, GlButton, GlLink, GlModal, GlModalDirective, GlSprintf } from '@gitlab/ui';
 import { mapState, mapMutations } from 'vuex';
-import { getLocation } from '~/jira_connect/api';
+import { retrieveAlert, getLocation } from '~/jira_connect/utils';
 import { __ } from '~/locale';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import { SET_ALERT } from '../store/mutation_types';
-import { retrieveAlert } from '../utils';
 import GroupsList from './groups_list.vue';
 import SubscriptionsList from './subscriptions_list.vue';
 

@@ -2,8 +2,8 @@
 import { GlAvatar, GlButton, GlIcon } from '@gitlab/ui';
 import { helpPagePath } from '~/helpers/help_page_helper';
 import { addSubscription } from '~/jira_connect/api';
+import { persistAlert, reloadPage } from '~/jira_connect/utils';
 import { s__ } from '~/locale';
-import { persistAlert } from '../utils';
 import GroupItemName from './group_item_name.vue';
 
 export default {
@@ -49,7 +49,7 @@ export default {
             variant: 'success',
           });
 
-          AP.navigator.reload();
+          reloadPage();
         })
         .catch((error) => {
           this.$emit(
