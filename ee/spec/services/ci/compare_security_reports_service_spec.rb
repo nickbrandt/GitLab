@@ -4,6 +4,7 @@ require 'spec_helper'
 
 RSpec.describe Ci::CompareSecurityReportsService do
   let_it_be(:project) { create(:project, :repository) }
+
   let(:current_user) { project.owner }
 
   def collect_ids(collection)
