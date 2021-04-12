@@ -23877,6 +23877,9 @@ msgstr ""
 msgid "Profiles|Enter your name, so people you know can recognize you"
 msgstr ""
 
+msgid "Profiles|Expired key is not valid."
+msgstr ""
+
 msgid "Profiles|Expires at"
 msgstr ""
 
@@ -23907,6 +23910,9 @@ msgstr ""
 msgid "Profiles|Increase your account's security by enabling Two-Factor Authentication (2FA)"
 msgstr ""
 
+msgid "Profiles|Invalid key."
+msgstr ""
+
 msgid "Profiles|Invalid password"
 msgstr ""
 
@@ -23914,6 +23920,15 @@ msgid "Profiles|Invalid username"
 msgstr ""
 
 msgid "Profiles|Key"
+msgstr ""
+
+msgid "Profiles|Key can still be used after expiration."
+msgstr ""
+
+msgid "Profiles|Key usable beyond expiration date."
+msgstr ""
+
+msgid "Profiles|Key will be deleted on this date."
 msgstr ""
 
 msgid "Profiles|Last used:"
@@ -23961,6 +23976,9 @@ msgstr ""
 msgid "Profiles|Public email"
 msgstr ""
 
+msgid "Profiles|Publicly visible private SSH keys can compromise your system."
+msgstr ""
+
 msgid "Profiles|Remove avatar"
 msgstr ""
 
@@ -23983,9 +24001,6 @@ msgid "Profiles|The ability to update your name has been disabled by your admini
 msgstr ""
 
 msgid "Profiles|The maximum file size allowed is 200KB."
-msgstr ""
-
-msgid "Profiles|This doesn't look like a public SSH key, are you sure you want to add it? It will be publicly visible."
 msgstr ""
 
 msgid "Profiles|This email will be displayed on your public profile"
@@ -24073,9 +24088,6 @@ msgid "Profiles|Your account is currently an owner in these groups:"
 msgstr ""
 
 msgid "Profiles|Your email address was automatically set based on your %{provider_label} account"
-msgstr ""
-
-msgid "Profiles|Your key has expired"
 msgstr ""
 
 msgid "Profiles|Your location was automatically set based on your %{provider_label} account"
