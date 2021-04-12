@@ -3,7 +3,7 @@
 module Dast
   class SiteProfilePresenter < Gitlab::View::Presenter::Delegated
     REDACTED_PASSWORD = '••••••••'
-    REDACTED_REQUEST_HEADERS = '[Redacted]'
+    REDACTED_REQUEST_HEADERS = '••••••••'
 
     presents :site_profile
 
