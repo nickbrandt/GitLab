@@ -143,7 +143,9 @@ export default {
       return this.$apollo.queries.pipeline.loading && !this.pipeline;
     },
     showGraphViewSelector() {
-      return Boolean(this.glFeatures.pipelineGraphLayersView && this.pipeline);
+      return Boolean(
+        this.glFeatures.pipelineGraphLayersView && this.pipeline && this.pipeline.usesNeeds,
+      );
     },
   },
   mounted() {
