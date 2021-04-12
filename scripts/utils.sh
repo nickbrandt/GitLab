@@ -13,6 +13,25 @@ function retry() {
   return 1
 }
 
+function bundle_install_script() {
+  local extra_install_args="${1}"
+
+  bundle --version
+  bundle config set clean 'true'
+
+  run_timed_command "bundle install ${BUNDLE_INSTALL_FLAGS} ${extra_install_args} && bundle check"
+
+  if [[ $(bundle info pg 2&> /dev/null) ]]; then
+    # When we test multiple versions of PG in the same pipeline, we have a single `setup-test-env`
+    # job but the `pg` gem needs to be rebuilt since it includes extensions (https://guides.rubygems.org/gems-with-extensions).
+    # Uncomment the following line if multiple versions of PG are tested in the same pipeline.
+    run_timed_command "bundle pristine pg"
+  fi
+
+  run_timed_command "du -h -d 3 vendor/ruby/*/cache || true"
+  run_timed_command "rm -rf vendor/ruby/*/cache"
+}
+
 function setup_db_user_only() {
   source scripts/create_postgres_user.sh
 }
