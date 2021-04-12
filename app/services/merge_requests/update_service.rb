@@ -284,14 +284,16 @@ module MergeRequests
       #
       return unless params.keys.length == 1
 
-      updated_merge_request = nil
+      attempt_specialized_update_services(merge_request, params.each_key.first.to_sym)
+    end
 
-      case params.each_key.first.to_sym
+    def attempt_specialized_update_services(merge_request, attribute)
+      case attribute
       when :assignee_ids
-        updated_merge_request = assignees_service.execute(merge_request)
+        assignees_service.execute(merge_request)
+      else
+        nil
       end
-
-      updated_merge_request
     end
 
     def assignees_service
