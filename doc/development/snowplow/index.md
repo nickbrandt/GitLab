@@ -11,7 +11,7 @@ This guide provides an overview of how Snowplow works, and implementation detail
 For more information about Product Intelligence, see:
 
 - [Product Intelligence Guide](https://about.gitlab.com/handbook/product/product-intelligence-guide/)
-- [Usage Ping Guide](usage_ping/index.md)
+- [Usage Ping Guide](../usage_ping/index.md)
 
 More useful links:
 
@@ -33,7 +33,7 @@ Snowplow is an enterprise-grade marketing and Product Intelligence platform whic
 - **Data modeling** is where event-level data is joined with other data sets and aggregated into smaller data sets, and business logic is applied. This produces a clean set of tables which make it easier to perform analysis on the data. We have data models for Redshift and Looker.
 - **Analytics** are performed on the Snowplow events or on the aggregate tables.
 
-![snowplow_flow](img/snowplow_flow.png)
+![snowplow_flow](../img/snowplow_flow.png)
 
 ## Snowplow schema
 
@@ -209,7 +209,7 @@ tracking_attrs(label, action, property) # { data: { track_label... } }
 
 #### Caveats
 
-When using the GitLab helper method [`nav_link`](https://gitlab.com/gitlab-org/gitlab/-/blob/898b286de322e5df6a38d257b10c94974d580df8/app/helpers/tab_helper.rb#L69) be sure to wrap `html_options` under the `html_options` keyword argument.
+When using the GitLab helper method [`nav_link`](https://gitlab.com/gitlab-org/gitlab/-/blob/master/app/helpers/tab_helper.rb#L76) be sure to wrap `html_options` under the `html_options` keyword argument.
 Be careful, as this behavior can be confused with the `ActionView` helper method [`link_to`](https://api.rubyonrails.org/v5.2.3/classes/ActionView/Helpers/UrlHelper.html#method-i-link_to) that does not require additional wrapping of `html_options`
 
 ```ruby
