@@ -585,6 +585,68 @@ RSpec.describe Ci::Build do
         is_expected.to be_falsey
       end
     end
+
+    context 'with runners_cached_states feature flag enabled' do
+      before do
+        stub_feature_flags(runners_cached_states: true)
+      end
+
+      it 'caches the result in Redis' do
+        expect(Rails.cache).to receive(:fetch).with(['has-online-runners', build.id], expires_in: 1.minute)
+
+        build.any_runners_online?
+      end
+    end
+
+    context 'with runners_cached_states feature flag disabled' do
+      before do
+        stub_feature_flags(runners_cached_states: false)
+      end
+
+      it 'does not cache' do
+        expect(Rails.cache).not_to receive(:fetch).with(['has-online-runners', build.id], expires_in: 1.minute)
+
+        build.any_runners_online?
+      end
+    end
+  end
+
+  describe '#any_runners_available?' do
+    subject { build.any_runners_available? }
+
+    context 'when no runners' do
+      it { is_expected.to be_falsey }
+    end
+
+    context 'when there are runners' do
+      let!(:runner) { create(:ci_runner, :project, projects: [build.project]) }
+
+      it { is_expected.to be_truthy }
+    end
+
+    context 'with runners_cached_states feature flag enabled' do
+      before do
+        stub_feature_flags(runners_cached_states: true)
+      end
+
+      it 'caches the result in Redis' do
+        expect(Rails.cache).to receive(:fetch).with(['has-available-runners', build.project.id], expires_in: 1.minute)
+
+        build.any_runners_available?
+      end
+    end
+
+    context 'with runners_cached_states feature flag disabled' do
+      before do
+        stub_feature_flags(runners_cached_states: false)
+      end
+
+      it 'does not cache' do
+        expect(Rails.cache).not_to receive(:fetch).with(['has-available-runners', build.project.id], expires_in: 1.minute)
+
+        build.any_runners_available?
+      end
+    end
   end
 
   describe '#artifacts?' do
@@ -1135,6 +1197,8 @@ RSpec.describe Ci::Build do
   end
 
   describe 'state transition as a deployable' do
+    subject { build.send(event) }
+
     let!(:build) { create(:ci_build, :with_deployment, :start_review_app, project: project, pipeline: pipeline) }
     let(:deployment) { build.deployment }
     let(:environment) { deployment.environment }
@@ -1149,54 +1213,78 @@ RSpec.describe Ci::Build do
       expect(environment.name).to eq('review/master')
     end
 
-    context 'when transits to running' do
-      before do
-        build.run!
+    shared_examples_for 'avoid deadlock' do
+      it 'executes UPDATE in the right order' do
+        recorded = ActiveRecord::QueryRecorder.new { subject }
+
+        index_for_build = recorded.log.index { |l| l.include?("UPDATE \"ci_builds\"") }
+        index_for_deployment = recorded.log.index { |l| l.include?("UPDATE \"deployments\"") }
+
+        expect(index_for_build).to be < index_for_deployment
       end
+    end
+
+    context 'when transits to running' do
+      let(:event) { :run! }
+
+      it_behaves_like 'avoid deadlock'
 
       it 'transits deployment status to running' do
+        subject
+
         expect(deployment).to be_running
       end
     end
 
     context 'when transits to success' do
+      let(:event) { :success! }
+
       before do
         allow(Deployments::UpdateEnvironmentWorker).to receive(:perform_async)
         allow(Deployments::ExecuteHooksWorker).to receive(:perform_async)
-        build.success!
       end
 
+      it_behaves_like 'avoid deadlock'
+
       it 'transits deployment status to success' do
+        subject
+
         expect(deployment).to be_success
       end
     end
 
     context 'when transits to failed' do
-      before do
-        build.drop!
-      end
+      let(:event) { :drop! }
+
+      it_behaves_like 'avoid deadlock'
 
       it 'transits deployment status to failed' do
+        subject
+
         expect(deployment).to be_failed
       end
     end
 
     context 'when transits to skipped' do
-      before do
-        build.skip!
-      end
+      let(:event) { :skip! }
+
+      it_behaves_like 'avoid deadlock'
 
       it 'transits deployment status to skipped' do
+        subject
+
         expect(deployment).to be_skipped
       end
     end
 
     context 'when transits to canceled' do
-      before do
-        build.cancel!
-      end
+      let(:event) { :cancel! }
+
+      it_behaves_like 'avoid deadlock'
 
       it 'transits deployment status to canceled' do
+        subject
+
         expect(deployment).to be_canceled
       end
     end

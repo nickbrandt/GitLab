@@ -66,6 +66,10 @@ Gitaly comes pre-configured with Omnibus GitLab, which is a configuration
 
 GitLab installations for more than 2000 users should use Gitaly Cluster.
 
+NOTE:
+If not set in GitLab, feature flags are read as false from the console and Gitaly uses their
+default value. The default value depends on the GitLab version.
+
 ## Gitaly Cluster
 
 Gitaly, the service that provides storage for Git repositories, can
@@ -626,11 +630,30 @@ unset http_proxy
 unset https_proxy
 ```
 
-### Permission denied errors appearing in Gitaly logs when accessing repositories from a standalone Gitaly server
+### Permission denied errors appearing in Gitaly or Praefect logs when accessing repositories
 
-If this error occurs even though file permissions are correct, it's likely that
-the Gitaly server is experiencing
+You might see the following in Gitaly and Praefect logs:
+
+```shell
+{
+  ...
+  "error":"rpc error: code = PermissionDenied desc = permission denied",
+  "grpc.code":"PermissionDenied",
+  "grpc.meta.client_name":"gitlab-web",
+  "grpc.request.fullMethod":"/gitaly.ServerService/ServerInfo",
+  "level":"warning",
+  "msg":"finished unary call with code PermissionDenied",
+  ...
+}
+```
+
+This is a GRPC call
+[error response code](https://grpc.github.io/grpc/core/md_doc_statuscodes.html).
+
+If this error occurs, even though
+[the Gitaly auth tokens are correctly setup](../gitaly/praefect.md#debugging-praefect),
+it's likely that the Gitaly servers are experiencing
 [clock drift](https://en.wikipedia.org/wiki/Clock_drift).
 
 Ensure the Gitaly clients and servers are synchronized, and use an NTP time
-server to keep them synchronized, if possible.
+server to keep them synchronized.

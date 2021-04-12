@@ -49,15 +49,6 @@ module EE
         reset_approvals(merge_request)
       end
 
-      override :handle_assignees_change
-      def handle_assignees_change(merge_request, _old_assignees)
-        super
-
-        return unless merge_request.project.feature_available?(:code_review_analytics)
-
-        ::Analytics::RefreshReassignData.new(merge_request).execute_async
-      end
-
       def reset_approval_rules(merge_request)
         return unless merge_request.project.can_override_approvers?
 

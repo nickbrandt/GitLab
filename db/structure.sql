@@ -9830,6 +9830,7 @@ CREATE TABLE batched_background_migrations (
     table_name text NOT NULL,
     column_name text NOT NULL,
     job_arguments jsonb DEFAULT '"[]"'::jsonb NOT NULL,
+    total_tuple_count bigint,
     CONSTRAINT check_5bb0382d6f CHECK ((char_length(column_name) <= 63)),
     CONSTRAINT check_6b6a06254a CHECK ((char_length(table_name) <= 63)),
     CONSTRAINT check_batch_size_in_range CHECK ((batch_size >= sub_batch_size)),
@@ -16519,6 +16520,7 @@ CREATE TABLE project_settings (
     allow_editing_commit_messages boolean DEFAULT false NOT NULL,
     prevent_merge_without_jira_issue boolean DEFAULT false NOT NULL,
     cve_id_request_enabled boolean DEFAULT true NOT NULL,
+    mr_default_target_self boolean DEFAULT false NOT NULL,
     CONSTRAINT check_bde223416c CHECK ((show_default_award_emojis IS NOT NULL))
 );
 
@@ -23206,6 +23208,8 @@ CREATE INDEX index_non_requested_project_members_on_source_id_and_type ON member
 
 CREATE UNIQUE INDEX index_note_diff_files_on_diff_note_id ON note_diff_files USING btree (diff_note_id);
 
+CREATE INDEX index_notes_for_cherry_picked_merge_requests ON notes USING btree (project_id, commit_id) WHERE ((noteable_type)::text = 'MergeRequest'::text);
+
 CREATE INDEX index_notes_on_author_id_and_created_at_and_id ON notes USING btree (author_id, created_at, id);
 
 CREATE INDEX index_notes_on_commit_id ON notes USING btree (commit_id);
@@ -23226,9 +23230,7 @@ CREATE INDEX index_notes_on_project_id_and_noteable_type ON notes USING btree (p
 
 CREATE INDEX index_notes_on_review_id ON notes USING btree (review_id);
 
-CREATE INDEX index_notification_settings_on_source_id_and_source_type ON notification_settings USING btree (source_id, source_type);
-
-CREATE INDEX index_notification_settings_on_user_id ON notification_settings USING btree (user_id);
+CREATE INDEX index_notification_settings_on_source_and_level_and_user ON notification_settings USING btree (source_id, source_type, level, user_id);
 
 CREATE UNIQUE INDEX index_notifications_on_user_id_and_source_id_and_source_type ON notification_settings USING btree (user_id, source_id, source_type);
 

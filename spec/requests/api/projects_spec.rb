@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 RSpec.shared_examples 'languages and percentages JSON response' do
-  let(:expected_languages) { project.repository.languages.map { |language| language.values_at(:label, :value)}.to_h }
+  let(:expected_languages) { project.repository.languages.to_h { |language| language.values_at(:label, :value) } }
 
   before do
     allow(project.repository).to receive(:languages).and_return(
@@ -835,6 +835,29 @@ RSpec.describe API::Projects do
         end.not_to exceed_query_limit(control.count)
       end
     end
+
+    context 'when service desk is enabled', :use_clean_rails_memory_store_caching do
+      let_it_be(:admin) { create(:admin) }
+
+      it 'avoids N+1 queries' do
+        allow(Gitlab::ServiceDeskEmail).to receive(:enabled?).and_return(true)
+        allow(Gitlab::IncomingEmail).to receive(:enabled?).and_return(true)
+
+        get api('/projects', admin)
+
+        create(:project, :public, :service_desk_enabled, namespace: admin.namespace)
+
+        control = ActiveRecord::QueryRecorder.new do
+          get api('/projects', admin)
+        end
+
+        create_list(:project, 2, :public, :service_desk_enabled, namespace: admin.namespace)
+
+        expect do
+          get api('/projects', admin)
+        end.not_to exceed_query_limit(control.count)
+      end
+    end
   end
 
   describe 'POST /projects' do
@@ -1561,7 +1584,6 @@ RSpec.describe API::Projects do
       expect(json_response['alt']).to eq("dk")
       expect(json_response['url']).to start_with("/uploads/")
       expect(json_response['url']).to end_with("/dk.png")
-
       expect(json_response['full_path']).to start_with("/#{project.namespace.path}/#{project.path}/uploads")
     end
 
@@ -1571,6 +1593,24 @@ RSpec.describe API::Projects do
       expect(Gitlab::AppLogger).to receive(:info).with(hash_including(message: 'File exceeds maximum size')).and_call_original
 
       post api("/projects/#{project.id}/uploads", user), params: { file: file }
+    end
+
+    it "does not leave the temporary file in place after uploading, even when the tempfile reaper does not run" do
+      stub_env('GITLAB_TEMPFILE_IMMEDIATE_UNLINK', '1')
+      tempfile = Tempfile.new('foo')
+      path = tempfile.path
+
+      allow_any_instance_of(Rack::TempfileReaper).to receive(:call) do |instance, env|
+        instance.instance_variable_get(:@app).call(env)
+      end
+
+      expect(path).not_to be(nil)
+      expect(Rack::Multipart::Parser::TEMPFILE_FACTORY).to receive(:call).and_return(tempfile)
+
+      post api("/projects/#{project.id}/uploads", user), params: { file: fixture_file_upload("spec/fixtures/dk.png", "image/png") }
+
+      expect(tempfile.path).to be(nil)
+      expect(File.exist?(path)).to be(false)
     end
 
     shared_examples 'capped upload attachments' do
