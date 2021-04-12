@@ -11,22 +11,7 @@ module MergeRequests
     end
 
     def execute(merge_request)
-      updated_merge_request = update_merge_request_with_specialized_service(merge_request)
-
-      return updated_merge_request unless updated_merge_request.nil?
-
-      # We don't allow change of source/target projects and source branch
-      # after merge request was created
-      params.delete(:source_project_id)
-      params.delete(:target_project_id)
-      params.delete(:source_branch)
-
-      if merge_request.closed_or_merged_without_fork?
-        params.delete(:target_branch)
-        params.delete(:force_remove_source_branch)
-      end
-
-      update_task_event(merge_request) || update(merge_request)
+      update_merge_request_with_specialized_service(merge_request) || general_fallback(merge_request)
     end
 
     def handle_changes(merge_request, options)
@@ -89,6 +74,21 @@ module MergeRequests
     private
 
     attr_reader :target_branch_was_deleted
+
+    def general_fallback(merge_request)
+      # We don't allow change of source/target projects and source branch
+      # after merge request was created
+      params.delete(:source_project_id)
+      params.delete(:target_project_id)
+      params.delete(:source_branch)
+
+      if merge_request.closed_or_merged_without_fork?
+        params.delete(:target_branch)
+        params.delete(:force_remove_source_branch)
+      end
+
+      update_task_event(merge_request) || update(merge_request)
+    end
 
     def track_title_and_desc_edits(changed_fields)
       tracked_fields = %w(title description)

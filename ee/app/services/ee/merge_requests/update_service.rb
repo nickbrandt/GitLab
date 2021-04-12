@@ -5,12 +5,10 @@ module EE
     module UpdateService
       extend ::Gitlab::Utils::Override
 
-      override :execute
-      def execute(merge_request)
-        updated_merge_request = update_merge_request_with_specialized_service(merge_request)
+      private
 
-        return updated_merge_request unless updated_merge_request.nil?
-
+      override :general_fallback
+      def general_fallback(merge_request)
         unless update_task_event?
           old_approvers = merge_request.overall_approvers(exclude_code_owners: true)
         end
@@ -36,8 +34,6 @@ module EE
 
         merge_request
       end
-
-      private
 
       override :after_update
       def after_update(merge_request)
