@@ -1,4 +1,4 @@
-query groupProjects($fullPath: ID!) {
+query vulnerableProjects($fullPath: ID!) {
   group(fullPath: $fullPath) {
     projects(includeSubgroups: true) {
       nodes {
