@@ -144,7 +144,7 @@ RSpec.describe CommitsHelper do
       }
     end
 
-    subject { helper.conditionally_paginate_diff_files(diffs_collection, paginate: paginate) }
+    subject { helper.conditionally_paginate_diff_files(diffs_collection, paginate: paginate, per: Projects::CommitController::COMMIT_DIFFS_PER_PAGE) }
 
     before do
       allow(helper).to receive(:params).and_return(params)
