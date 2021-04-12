@@ -31,7 +31,13 @@ msgstr ""
 msgid " Please sign in."
 msgstr ""
 
+msgid " Target Path"
+msgstr ""
+
 msgid " Try to %{action} this file again."
+msgstr ""
+
+msgid " Type"
 msgstr ""
 
 msgid " You need to do this before %{grace_period_deadline}."
@@ -5245,6 +5251,9 @@ msgstr ""
 msgid "Broadcast Messages"
 msgstr ""
 
+msgid "Broadcast messages are displayed for every user and can be used to notify users about scheduled maintenance, recent upgrades and more."
+msgstr ""
+
 msgid "Browse Directory"
 msgstr ""
 
@@ -9690,16 +9699,37 @@ msgstr ""
 msgid "DORA4Metrics|Date"
 msgstr ""
 
+msgid "DORA4Metrics|Days from merge to deploy"
+msgstr ""
+
 msgid "DORA4Metrics|Deployments"
 msgstr ""
 
 msgid "DORA4Metrics|Deployments charts"
 msgstr ""
 
+msgid "DORA4Metrics|Lead time"
+msgstr ""
+
+msgid "DORA4Metrics|Median lead time"
+msgstr ""
+
+msgid "DORA4Metrics|No merge requests were deployed during this period"
+msgstr ""
+
 msgid "DORA4Metrics|Something went wrong while getting deployment frequency data"
 msgstr ""
 
+msgid "DORA4Metrics|Something went wrong while getting lead time data."
+msgstr ""
+
 msgid "DORA4Metrics|These charts display the frequency of deployments to the production environment, as part of the DORA 4 metrics. The environment must be named %{codeStart}production%{codeEnd} for its data to appear in these charts."
+msgstr ""
+
+msgid "DORA4Metrics|These charts display the median time between a merge request being merged and deployed to production, as part of the DORA 4 metrics."
+msgstr ""
+
+msgid "DORA4|Lead time charts"
 msgstr ""
 
 msgid "Dashboard"
@@ -11872,6 +11902,9 @@ msgid "Encountered an error while rendering: %{err}"
 msgstr ""
 
 msgid "End Time"
+msgstr ""
+
+msgid "Ends"
 msgstr ""
 
 msgid "Ends at (UTC)"
@@ -29546,6 +29579,9 @@ msgid "Started:"
 msgstr ""
 
 msgid "Starting..."
+msgstr ""
+
+msgid "Starts"
 msgstr ""
 
 msgid "Starts %{startsIn}"
