@@ -6,8 +6,8 @@ module Epics
 
     attr_reader :group, :parent_epic, :child_epic
 
-    def initialize(group, current_user, params = {})
-      @group = group
+    def initialize(container:, current_user:, params: {})
+      @group = container
       @current_user = current_user
       @params = params
     end
