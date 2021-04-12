@@ -286,7 +286,7 @@ module MergeRequests
 
       updated_merge_request = nil
 
-      case params.keys[0].to_sym
+      case params.each_key.first.to_sym
       when :assignee_ids
         updated_merge_request = assignees_service.execute(merge_request)
       end
