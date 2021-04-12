@@ -1379,9 +1379,6 @@ RSpec/EmptyLineAfterFinalLetItBe:
     - spec/services/groups/group_links/update_service_spec.rb
     - spec/services/groups/transfer_service_spec.rb
     - spec/services/groups/update_shared_runners_service_spec.rb
-    - spec/services/ide/base_config_service_spec.rb
-    - spec/services/ide/schemas_config_service_spec.rb
-    - spec/services/ide/terminal_config_service_spec.rb
     - spec/services/import/bitbucket_server_service_spec.rb
     - spec/services/incident_management/incidents/create_service_spec.rb
     - spec/services/incident_management/pager_duty/create_incident_issue_service_spec.rb
