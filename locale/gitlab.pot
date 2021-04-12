@@ -8564,6 +8564,9 @@ msgstr ""
 msgid "Contains %{count} blobs of images (%{size})"
 msgstr ""
 
+msgid "ContentEditor|You have to provide a renderMarkdown function or a custom serializer"
+msgstr ""
+
 msgid "Contents of .gitlab-ci.yml"
 msgstr ""
 
