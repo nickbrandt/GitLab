@@ -1,6 +1,6 @@
 <script>
 import { GlIcon, GlLink, GlTable, GlTooltipDirective } from '@gitlab/ui';
-import { __ } from '~/locale';
+import { sprintf, s__, __ } from '~/locale';
 import TimeAgoTooltip from '~/vue_shared/components/time_ago_tooltip.vue';
 
 export default {
@@ -56,6 +56,13 @@ export default {
       ];
     },
   },
+  methods: {
+    getStatusTooltipTitle(integration) {
+      return sprintf(s__('Integrations|%{integrationName}: active'), {
+        integrationName: integration.name,
+      });
+    },
+  },
 };
 </script>
 
@@ -67,11 +74,7 @@ export default {
         v-gl-tooltip
         name="check"
         class="gl-text-green-500"
-        :title="
-          sprintf(s__('Integrations|%{integrationName}: active'), {
-            integrationName: item.name,
-          })
-        "
+        :title="getStatusTooltipTitle(integration)"
       />
     </template>
 

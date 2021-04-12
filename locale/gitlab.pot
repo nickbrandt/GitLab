@@ -17125,9 +17125,6 @@ msgstr ""
 msgid "Integrations|Includes commit title and branch"
 msgstr ""
 
-msgid "Integrations|Integrations"
-msgstr ""
-
 msgid "Integrations|Issues created in Jira are shown here once you have created the issues in project setup in Jira."
 msgstr ""
 
