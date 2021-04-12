@@ -943,15 +943,37 @@ RSpec.describe MergeRequests::UpdateService, :mailer do
     end
 
     context 'updating asssignee_ids' do
-      context 'when :use_specialized_service is true' do
-        it 'passes the update action to ::MergeRequests::UpdateAssigneesService' do
-          expect(::MergeRequests::UpdateAssigneesService)
-            .to receive(:new).and_call_original
+      context ':use_specialized_service' do
+        context 'when true' do
+          it 'passes the update action to ::MergeRequests::UpdateAssigneesService' do
+            expect(::MergeRequests::UpdateAssigneesService)
+              .to receive(:new).and_call_original
 
-          update_merge_request({
-            assignee_ids: [user2.id],
-            use_specialized_service: true
-          })
+            update_merge_request({
+              assignee_ids: [user2.id],
+              use_specialized_service: true
+            })
+          end
+        end
+
+        context 'when false or nil' do
+          before do
+            expect(::MergeRequests::UpdateAssigneesService).not_to receive(:new)
+          end
+
+          it 'does not pass the update action to ::MergeRequests::UpdateAssigneesService when false' do
+            update_merge_request({
+              assignee_ids: [user2.id],
+              use_specialized_service: false
+            })
+          end
+
+          it 'does not pass the update action to ::MergeRequests::UpdateAssigneesService when nil' do
+            update_merge_request({
+              assignee_ids: [user2.id],
+              use_specialized_service: nil
+            })
+          end
         end
       end
 
