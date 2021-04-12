@@ -31,7 +31,13 @@ msgstr ""
 msgid " Please sign in."
 msgstr ""
 
+msgid " Target Path"
+msgstr ""
+
 msgid " Try to %{action} this file again."
+msgstr ""
+
+msgid " Type"
 msgstr ""
 
 msgid " You need to do this before %{grace_period_deadline}."
@@ -5243,6 +5249,9 @@ msgid "Broadcast Message was successfully updated."
 msgstr ""
 
 msgid "Broadcast Messages"
+msgstr ""
+
+msgid "Broadcast messages are displayed for every user and can be used to notify users about scheduled maintenance, recent upgrades and more."
 msgstr ""
 
 msgid "Browse Directory"
@@ -11893,6 +11902,9 @@ msgid "Encountered an error while rendering: %{err}"
 msgstr ""
 
 msgid "End Time"
+msgstr ""
+
+msgid "Ends"
 msgstr ""
 
 msgid "Ends at (UTC)"
@@ -29567,6 +29579,9 @@ msgid "Started:"
 msgstr ""
 
 msgid "Starting..."
+msgstr ""
+
+msgid "Starts"
 msgstr ""
 
 msgid "Starts %{startsIn}"
