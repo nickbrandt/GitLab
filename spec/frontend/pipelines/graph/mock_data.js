@@ -570,6 +570,7 @@ export const wrappedPipelineReturn = {
         __typename: 'Pipeline',
         id: 'gid://gitlab/Ci::Pipeline/175',
         iid: '38',
+        usesNeeds: true,
         downstream: {
           __typename: 'PipelineConnection',
           nodes: [],
