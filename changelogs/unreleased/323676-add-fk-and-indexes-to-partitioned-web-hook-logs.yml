@@ -1,0 +1,5 @@
+---
+title: Add indexes and FK to partitioned web_hook_logs
+merge_request: 59190
+author:
+type: other
