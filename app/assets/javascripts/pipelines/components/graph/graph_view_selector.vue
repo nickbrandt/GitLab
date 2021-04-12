@@ -1,5 +1,5 @@
 <script>
-import { GlSegmentedControl } from '@gitlab/ui';
+import { GlSegmentedControl, GlToggle } from '@gitlab/ui';
 import { __ } from '~/locale';
 import { STAGE_VIEW, LAYER_VIEW } from './constants';
 
@@ -7,6 +7,7 @@ export default {
   name: 'GraphViewSelector',
   components: {
     GlSegmentedControl,
+    GlToggle,
   },
   props: {
     type: {
@@ -16,11 +17,13 @@ export default {
   },
   data() {
     return {
-      currentViewType: STAGE_VIEW,
+      currentViewType: this.type,
+      showLinks: false,
     };
   },
   i18n: {
-    labelText: __('Group jobs by'),
+    viewLabelText: __('Group jobs by'),
+    linksLabelText: __('Show dependencies'),
   },
   views: {
     [STAGE_VIEW]: {
@@ -39,6 +42,9 @@ export default {
     },
   },
   computed: {
+    showLinksToggle() {
+      return this.currentViewType === LAYER_VIEW;
+    },
     viewTypesList() {
       return Object.keys(this.$options.views).map((key) => {
         return {
@@ -52,19 +58,32 @@ export default {
     itemClick(type) {
       this.$emit('updateViewType', type);
     },
+    updateShowLinks(val) {
+      this.showLinks = val;
+      this.$emit('updateShowLinks', val);
+    },
   },
 };
 </script>
 
 <template>
   <div class="gl-display-flex gl-align-items-center gl-my-4">
-    <span class="gl-font-weight-bold">{{ $options.i18n.labelText }}</span>
+    <span class="gl-font-weight-bold">{{ $options.i18n.viewLabelText }}</span>
     <gl-segmented-control
-      :checked="currentViewType"
+      v-model="currentViewType"
       :options="viewTypesList"
       data-testid="pipeline-view-selector"
-      class="gl-ml-4"
+      class="gl-mx-4"
       @input="itemClick"
     />
+    <div v-if="showLinksToggle">
+      <gl-toggle
+        v-model="showLinks"
+        class="gl-mx-4"
+        :label="$options.i18n.linksLabelText"
+        label-position="left"
+        @change="updateShowLinks"
+      />
+    </div>
   </div>
 </template>

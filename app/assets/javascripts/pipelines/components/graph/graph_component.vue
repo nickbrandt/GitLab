@@ -25,6 +25,10 @@ export default {
       type: Object,
       required: true,
     },
+    showLinks: {
+      type: Boolean,
+      required: true,
+    },
     viewType: {
       type: String,
       required: true,
@@ -91,7 +95,7 @@ export default {
       };
     },
     shouldHideLinks() {
-      return this.isStageView;
+      return this.isStageView || !this.showLinks;
     },
     // The show downstream check prevents showing redundant linked columns
     showDownstreamPipelines() {
