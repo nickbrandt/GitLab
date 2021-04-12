@@ -37556,6 +37556,9 @@ msgstr ""
 msgid "severity|Unknown"
 msgstr ""
 
+msgid "shared"
+msgstr ""
+
 msgid "should be an array of %{object_name} objects"
 msgstr ""
 
