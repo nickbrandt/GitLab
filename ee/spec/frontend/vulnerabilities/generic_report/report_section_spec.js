@@ -45,7 +45,7 @@ describe('ee/vulnerabilities/components/generic_report/report_section.vue', () =
       name: /evidence/i,
     });
   const findReportsSection = () => wrapper.findByTestId('reports');
-  const findAllReportRows = () => wrapper.findAll('[data-testid*="report-row"');
+  const findAllReportRows = () => wrapper.findAll('[data-testid*="report-row"]');
   const findReportRowByLabel = (label) => wrapper.findByTestId(`report-row-${label}`);
   const findReportItemByLabel = (label) => wrapper.findByTestId(`report-item-${label}`);
   const supportedReportTypesLabels = Object.keys(TEST_DATA.supportedTypes);
