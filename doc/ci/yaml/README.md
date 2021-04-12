@@ -2884,9 +2884,9 @@ You can specify a [fallback cache key](#fallback-cache-key) to use if the specif
 
 ##### Multiple caches
 
-> - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/32814) in GitLab 13.10,
->   and disabled by default.
-> - Enabled by default in GitLab 13.11.
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/32814) in GitLab 13.10.
+> - [Deployed behind a feature flag](../../user/feature_flags.md), disabled by default.
+> - [Enabled by default](https://gitlab.com/gitlab-org/gitlab/-/issues/321877) in GitLab 13.11.
 > - Enabled on GitLab.com.
 > - Recommended for production use.
 > - For GitLab self-managed instances, GitLab administrators can opt to [disable it](#enable-or-disable-multiple-caches). **(FREE SELF)**
