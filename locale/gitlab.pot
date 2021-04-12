@@ -6378,6 +6378,9 @@ msgstr ""
 msgid "Click the button below."
 msgstr ""
 
+msgid "Click the link below to confirm your email address."
+msgstr ""
+
 msgid "Click to expand it."
 msgstr ""
 
@@ -8151,6 +8154,12 @@ msgid "Configure which lists are shown for anyone who visits this board"
 msgstr ""
 
 msgid "Confirm"
+msgstr ""
+
+msgid "Confirm your account"
+msgstr ""
+
+msgid "Confirm your email address"
 msgstr ""
 
 msgid "Confirmation email sent to %{email}"
@@ -30615,6 +30624,9 @@ msgstr ""
 msgid "Thank you for your support request! We are tracking your request as ticket #%{issue_iid}, and will respond as soon as we can."
 msgstr ""
 
+msgid "Thanks for signing up to GitLab!"
+msgstr ""
+
 msgid "Thanks for your purchase!"
 msgstr ""
 
@@ -34902,6 +34914,9 @@ msgid "Welcome to GitLab,%{br_tag}%{name}!"
 msgstr ""
 
 msgid "Welcome to the guided GitLab tour"
+msgstr ""
+
+msgid "Welcome, %{name}!"
 msgstr ""
 
 msgid "What are you searching for?"
