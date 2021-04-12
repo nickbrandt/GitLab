@@ -5682,6 +5682,21 @@ msgstr ""
 msgid "Capacity threshold"
 msgstr ""
 
+msgid "CascadingSettings|Enforce for all subgroups"
+msgstr ""
+
+msgid "CascadingSettings|Setting enforced"
+msgstr ""
+
+msgid "CascadingSettings|Subgroups cannot change this setting."
+msgstr ""
+
+msgid "CascadingSettings|This setting has been enforced by an instance admin."
+msgstr ""
+
+msgid "CascadingSettings|This setting has been enforced by an owner of %{link}."
+msgstr ""
+
 msgid "CascadingSettings|cannot be changed because it is locked by an ancestor"
 msgstr ""
 
@@ -6376,6 +6391,9 @@ msgid "Click %{link_to} to view the request."
 msgstr ""
 
 msgid "Click the button below."
+msgstr ""
+
+msgid "Click the link below to confirm your email address."
 msgstr ""
 
 msgid "Click to expand it."
@@ -8151,6 +8169,12 @@ msgid "Configure which lists are shown for anyone who visits this board"
 msgstr ""
 
 msgid "Confirm"
+msgstr ""
+
+msgid "Confirm your account"
+msgstr ""
+
+msgid "Confirm your email address"
 msgstr ""
 
 msgid "Confirmation email sent to %{email}"
@@ -15350,7 +15374,16 @@ msgstr ""
 msgid "GroupSettings|Prevent sharing a project within %{group} with other groups"
 msgstr ""
 
-msgid "GroupSettings|Projects will be permanently deleted after a %{waiting_period}-day delay. This delay can be %{customization_link} in instance settings"
+msgid "GroupSettings|Projects will be permanently deleted after a %{waiting_period}-day delay."
+msgstr ""
+
+msgid "GroupSettings|Projects will be permanently deleted after a %{waiting_period}-day delay. Inherited by subgroups."
+msgstr ""
+
+msgid "GroupSettings|Projects will be permanently deleted after a %{waiting_period}-day delay. This delay can be %{link_start}customized by an admin%{link_end} in instance settings."
+msgstr ""
+
+msgid "GroupSettings|Projects will be permanently deleted after a %{waiting_period}-day delay. This delay can be %{link_start}customized by an admin%{link_end} in instance settings. Inherited by subgroups."
 msgstr ""
 
 msgid "GroupSettings|Select a sub-group as the custom project template source for this group."
@@ -30618,6 +30651,9 @@ msgstr ""
 msgid "Thank you for your support request! We are tracking your request as ticket #%{issue_iid}, and will respond as soon as we can."
 msgstr ""
 
+msgid "Thanks for signing up to GitLab!"
+msgstr ""
+
 msgid "Thanks for your purchase!"
 msgstr ""
 
@@ -34907,6 +34943,9 @@ msgstr ""
 msgid "Welcome to the guided GitLab tour"
 msgstr ""
 
+msgid "Welcome, %{name}!"
+msgstr ""
+
 msgid "What are you searching for?"
 msgstr ""
 
@@ -35906,9 +35945,6 @@ msgid "Your U2F device did not send a valid JSON response."
 msgstr ""
 
 msgid "Your U2F device was registered!"
-msgstr ""
-
-msgid "Your Version"
 msgstr ""
 
 msgid "Your WebAuthn device did not send a valid JSON response."
