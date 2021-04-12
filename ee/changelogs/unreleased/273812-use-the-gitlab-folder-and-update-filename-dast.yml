@@ -1,5 +1,5 @@
 ---
-title: User can isolate API fuzzing configuration inside `.gitlab/` directory.
+title: Change default API Fuzzing configuration file location.
 merge_request: 59173
 author:
 type: changed
