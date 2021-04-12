@@ -8,6 +8,7 @@ export const mockPipelineResponse = {
         __typename: 'Pipeline',
         id: 163,
         iid: '22',
+        usesNeeds: true,
         downstream: null,
         upstream: null,
         stages: {
