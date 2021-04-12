@@ -217,6 +217,7 @@ export default {
             >
               <div
                 role="button"
+                tabindex="0"
                 :draggable="glFeatures.dragCommentSelection"
                 type="button"
                 class="add-diff-note unified-diff-components-diff-note-button note-button js-add-diff-note-button qa-diff-comment"
@@ -224,6 +225,8 @@ export default {
                 :class="{ 'gl-cursor-grab': dragging }"
                 :disabled="line.left.commentsDisabled"
                 @click="handleCommentButton(line.left)"
+                @keydown.enter="handleCommentButton(line.left)"
+                @keydown.space="handleCommentButton(line.left)"
                 @dragstart="onDragStart({ ...line.left, index })"
               ></div>
             </span>
