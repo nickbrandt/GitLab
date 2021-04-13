@@ -1,3 +1,36 @@
+export const baseRespoonse = {
+  mockedPackages: {
+    data: [],
+    totalSize: 0
+  },
+  uploadState: {
+    isUploading: false,
+    progress: 0
+  }
+}
+
+export const isUploadingResponse = {
+  mockedPackages: {
+    data: [],
+    totalSize: 0
+  },
+  uploadState: {
+    isUploading: true,
+    progress: 25
+  }
+}
+
+export const isUploadedResponse = {
+  mockedPackages: {
+    data: [],
+    totalSize: 0
+  },
+  uploadState: {
+    isUploading: false,
+    progress: 100
+  }
+}
+
 export const corpuses = [
   {
     name: 'Test corpus 1',
