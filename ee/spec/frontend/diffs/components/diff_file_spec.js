@@ -1,4 +1,4 @@
-import { mount, createLocalVue } from '@vue/test-utils';
+import { shallowMount, createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
 
 import CodeQualityBadge from 'ee/diffs/components/code_quality_badge.vue';
@@ -9,7 +9,7 @@ import createDiffsStore from '~/diffs/store/modules';
 
 const getReadableFile = () => JSON.parse(JSON.stringify(diffFileMockDataReadable));
 
-function createComponent({ withCodequality = true }) {
+function createComponent({ first = false, last = false, options = {}, props = {} }) {
   const file = getReadableFile();
   const localVue = createLocalVue();
 
@@ -23,31 +23,18 @@ function createComponent({ withCodequality = true }) {
 
   store.state.diffs.diffFiles = [file];
 
-  if (withCodequality) {
-    store.state.diffs.codequalityDiff = {
-      files: {
-        [file.file_path]: [
-          { line: 1, description: 'Unexpected alert.', severity: 'minor' },
-          {
-            line: 3,
-            description: 'Arrow function has too many statements (52). Maximum allowed is 30.',
-            severity: 'minor',
-          },
-        ],
-      },
-    };
-  }
-
-  const wrapper = mount(DiffFileComponent, {
+  const wrapper = shallowMount(DiffFileComponent, {
     store,
     localVue,
     propsData: {
       file,
       canCurrentUserFork: false,
       viewDiffsFileByFile: false,
-      isFirstFile: false,
-      isLastFile: false,
+      isFirstFile: first,
+      isLastFile: last,
+      ...props,
     },
+    ...options,
   });
 
   return {
@@ -65,24 +52,27 @@ describe('EE DiffFile', () => {
   });
 
   describe('code quality badge', () => {
-    describe('when there is diff data for the file', () => {
-      beforeEach(() => {
-        ({ wrapper } = createComponent({ withCodequality: true }));
-      });
+    it('is shown when there is diff data for the file', () => {
+      ({ wrapper } = createComponent({
+        props: {
+          codequalityDiff: [
+            { line: 1, description: 'Unexpected alert.', severity: 'minor' },
+            {
+              line: 3,
+              description: 'Arrow function has too many statements (52). Maximum allowed is 30.',
+              severity: 'minor',
+            },
+          ],
+        },
+      }));
 
-      it('shows the code quality badge', () => {
-        expect(wrapper.find(CodeQualityBadge).exists()).toBe(true);
-      });
+      expect(wrapper.find(CodeQualityBadge)).toExist();
     });
 
-    describe('when there is no diff data for the file', () => {
-      beforeEach(() => {
-        ({ wrapper } = createComponent({ withCodequality: false }));
-      });
+    it('is not shown when there is no diff data for the file', () => {
+      ({ wrapper } = createComponent({}));
 
-      it('does not show the code quality badge', () => {
-        expect(wrapper.find(CodeQualityBadge).exists()).toBe(false);
-      });
+      expect(wrapper.find(CodeQualityBadge)).toExist();
     });
   });
 });
