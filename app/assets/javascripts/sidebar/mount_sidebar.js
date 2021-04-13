@@ -10,6 +10,8 @@ import {
   parseBoolean,
 } from '~/lib/utils/common_utils';
 import { __ } from '~/locale';
+import CollapsedAssigneeList from '~/sidebar/components/assignees/collapsed_assignee_list.vue';
+import SidebarAssigneesWidget from '~/sidebar/components/assignees/sidebar_assignees_widget.vue';
 import SidebarConfidentialityWidget from '~/sidebar/components/confidential/sidebar_confidentiality_widget.vue';
 import SidebarReferenceWidget from '~/sidebar/components/reference/sidebar_reference_widget.vue';
 import { apolloProvider } from '~/sidebar/graphql';
@@ -32,15 +34,6 @@ function getSidebarOptions(sidebarOptEl = document.querySelector('.js-sidebar-op
   return JSON.parse(sidebarOptEl.innerHTML);
 }
 
-/**
- * Extracts the list of assignees with availability information from a hidden input
- * field and converts to a key:value pair for use in the sidebar assignees component.
- * The assignee username is used as the key and their busy status is the value
- *
- * e.g { root: 'busy', admin: '' }
- *
- * @returns {Object}
- */
 function getSidebarAssigneeAvailabilityData() {
   const sidebarAssigneeEl = document.querySelectorAll('.js-sidebar-assignee-data input');
   return Array.from(sidebarAssigneeEl)
@@ -54,7 +47,7 @@ function getSidebarAssigneeAvailabilityData() {
     );
 }
 
-function mountAssigneesComponent(mediator) {
+function mountAssigneesComponentDeprecated(mediator) {
   const el = document.getElementById('js-vue-sidebar-assignees');
 
   if (!el) return;
@@ -81,6 +74,51 @@ function mountAssigneesComponent(mediator) {
               ? IssuableType.Issue
               : IssuableType.MergeRequest,
           assigneeAvailabilityStatus,
+        },
+      }),
+  });
+}
+
+function mountAssigneesComponent() {
+  const el = document.getElementById('js-vue-sidebar-assignees');
+
+  if (!el) return;
+
+  const { iid, fullPath, editable, projectMembersPath } = getSidebarOptions();
+  // eslint-disable-next-line no-new
+  new Vue({
+    el,
+    apolloProvider,
+    components: {
+      SidebarAssigneesWidget,
+    },
+    provide: {
+      canUpdate: editable,
+      projectMembersPath,
+      directlyInviteMembers: el.hasAttribute('data-directly-invite-members'),
+      indirectlyInviteMembers: el.hasAttribute('data-indirectly-invite-members'),
+    },
+    render: (createElement) =>
+      createElement('sidebar-assignees-widget', {
+        props: {
+          iid: String(iid),
+          fullPath,
+          issuableType:
+            isInIssuePage() || isInIncidentPage() || isInDesignPage()
+              ? IssuableType.Issue
+              : IssuableType.MergeRequest,
+          multipleAssignees: !el.dataset.maxAssignees,
+        },
+        scopedSlots: {
+          collapsed: ({ users, onClick }) =>
+            createElement(CollapsedAssigneeList, {
+              props: {
+                users,
+              },
+              nativeOn: {
+                click: onClick,
+              },
+            }),
         },
       }),
   });
@@ -342,7 +380,11 @@ function mountCopyEmailComponent() {
 }
 
 export function mountSidebar(mediator) {
-  mountAssigneesComponent(mediator);
+  if (isInIssuePage() || isInDesignPage()) {
+    mountAssigneesComponent();
+  } else {
+    mountAssigneesComponentDeprecated(mediator);
+  }
   mountReviewersComponent(mediator);
   mountConfidentialComponent(mediator);
   mountReferenceComponent(mediator);
