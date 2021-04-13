@@ -73,7 +73,7 @@ export default {
         profileName: initFormField({ value: name }),
         targetUrl: initFormField({ value: targetUrl }),
         excludedUrls: initFormField({
-          value: excludedUrls.join(EXCLUDED_URLS_SEPARATOR),
+          value: (excludedUrls || []).join(EXCLUDED_URLS_SEPARATOR),
           required: false,
           skipValidation: true,
         }),
