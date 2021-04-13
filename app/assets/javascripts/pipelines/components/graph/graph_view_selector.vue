@@ -10,6 +10,10 @@ export default {
     GlToggle,
   },
   props: {
+    linksLoading: {
+      type: Boolean,
+      required: true,
+    },
     type: {
       type: String,
       required: true,
@@ -41,6 +45,11 @@ export default {
       },
     },
   },
+  watch: {
+    showLinks(val) {
+      this.$emit('updateShowLinks', val);
+    },
+  },
   computed: {
     showLinksToggle() {
       return this.currentViewType === LAYER_VIEW;
@@ -60,7 +69,6 @@ export default {
     },
     updateShowLinks(val) {
       this.showLinks = val;
-      this.$emit('updateShowLinks', val);
     },
   },
 };
@@ -81,6 +89,7 @@ export default {
         v-model="showLinks"
         class="gl-mx-4"
         :label="$options.i18n.linksLabelText"
+        :is-loading="linksLoading"
         label-position="left"
         @change="updateShowLinks"
       />

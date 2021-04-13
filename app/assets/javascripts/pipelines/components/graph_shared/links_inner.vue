@@ -184,6 +184,7 @@ export default {
         const arrayOfJobs = this.pipelineData.flatMap(({ groups }) => groups);
         this.parsedData = parseData(arrayOfJobs);
         this.refreshLinks();
+        this.$emit('linksCalculated');
       } catch (err) {
         this.$emit('error', { type: DRAW_FAILURE, reportToSentry: false });
         reportToSentry(this.$options.name, err);
