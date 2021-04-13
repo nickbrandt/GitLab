@@ -5,32 +5,22 @@ require 'spec_helper'
 RSpec.describe Namespaces::InProductMarketingEmailsWorker, '#perform' do
   using RSpec::Parameterized::TableSyntax
 
-  RSpec.shared_examples 'in-product marketing email' do
-    before do
-      stub_application_setting(in_product_marketing_emails_enabled: in_product_marketing_emails_enabled)
-      stub_experiment(in_product_marketing_emails: experiment_active)
-      allow(::Gitlab).to receive(:com?).and_return(is_gitlab_com)
-    end
+  # Running these tests in EE would call the overriden method, which we can't test in CE.
+  # EE is covered in a separate EE spec.
+  unless Gitlab.ee?
+    context 'not on gitlab.com' do
+      let(:is_gitlab_com) { false }
 
-    it 'executes the email service service' do
-      expect(Namespaces::InProductMarketingEmailsService).to receive(:send_for_all_tracks_and_intervals).exactly(executes_service).times
+      where(:in_product_marketing_emails_enabled, :experiment_active, :executes_service) do
+        true     | true     | 1
+        true     | false    | 1
+        false    | false    | 0
+        false    | true     | 0
+      end
 
-      subject.perform
-    end
-  end
-
-  context 'not on gitlab.com' do
-    let(:is_gitlab_com) { false }
-
-    where(:in_product_marketing_emails_enabled, :experiment_active, :executes_service) do
-      true     | true     | 1
-      true     | false    | 1
-      false    | false    | 0
-      false    | true     | 0
-    end
-
-    with_them do
-      include_examples 'in-product marketing email'
+      with_them do
+        include_examples 'in-product marketing email'
+      end
     end
   end
 
