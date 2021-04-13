@@ -29041,6 +29041,9 @@ msgstr ""
 msgid "Something went wrong while setting %{issuableType} confidentiality."
 msgstr ""
 
+msgid "Something went wrong while setting %{issuableType} due date."
+msgstr ""
+
 msgid "Something went wrong while stopping this environment. Please try again."
 msgstr ""
 

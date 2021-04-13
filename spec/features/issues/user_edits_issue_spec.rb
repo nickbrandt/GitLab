@@ -324,24 +324,23 @@ RSpec.describe "Issues > User edits issue", :js do
         it 'adds due date to issue' do
           date = Date.today.at_beginning_of_month + 2.days
 
-          page.within '.due_date' do
-            click_link 'Edit'
-
+          page.within '[data-testid="due-date"]' do
+            click_button 'Edit'
             page.within '.pika-single' do
               click_button date.day
             end
 
             wait_for_requests
 
-            expect(find('.value').text).to have_content date.strftime('%b %-d, %Y')
+            expect(find('[data-testid="sidebar-duedate-value"]').text).to have_content date.strftime('%b %-d, %Y')
           end
         end
 
         it 'removes due date from issue' do
           date = Date.today.at_beginning_of_month + 2.days
 
-          page.within '.due_date' do
-            click_link 'Edit'
+          page.within '[data-testid="due-date"]' do
+            click_button 'Edit'
 
             page.within '.pika-single' do
               click_button date.day
@@ -351,7 +350,7 @@ RSpec.describe "Issues > User edits issue", :js do
 
             expect(page).to have_no_content 'None'
 
-            click_link 'remove due date'
+            click_button 'remove due date'
             expect(page).to have_content 'None'
           end
         end

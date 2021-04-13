@@ -233,6 +233,19 @@ export const issueConfidentialityResponse = (confidential = false) => ({
   },
 });
 
+export const issueDueDateResponse = (dueDate = null) => ({
+  data: {
+    workspace: {
+      __typename: 'Project',
+      issuable: {
+        __typename: 'Issue',
+        id: 'gid://gitlab/Issue/4',
+        dueDate,
+      },
+    },
+  },
+});
+
 export const issueReferenceResponse = (reference) => ({
   data: {
     workspace: {
