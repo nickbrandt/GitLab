@@ -7,8 +7,11 @@ import createMockApollo from 'helpers/mock_apollo_helper';
 import waitForPromises from 'helpers/wait_for_promises';
 import createFlash from '~/flash';
 import searchUsersQuery from '~/graphql_shared/queries/users_search.query.graphql';
+import { IssuableType } from '~/issue_show/constants';
+import SidebarAssigneesRealtime from '~/sidebar/components/assignees/assignees_realtime.vue';
 import IssuableAssignees from '~/sidebar/components/assignees/issuable_assignees.vue';
 import SidebarAssigneesWidget from '~/sidebar/components/assignees/sidebar_assignees_widget.vue';
+import SidebarInviteMembers from '~/sidebar/components/assignees/sidebar_invite_members.vue';
 import SidebarEditableItem from '~/sidebar/components/sidebar_editable_item.vue';
 import { ASSIGNEES_DEBOUNCE_DELAY } from '~/sidebar/constants';
 import MultiSelectDropdown from '~/vue_shared/components/sidebar/multiselect_dropdown.vue';
@@ -40,21 +43,23 @@ const initialAssignees = [
   },
 ];
 
-describe('BoardCardAssigneeDropdown', () => {
+describe('Sidebar assignees widget', () => {
   let wrapper;
   let fakeApollo;
 
   const findAssignees = () => wrapper.findComponent(IssuableAssignees);
+  const findRealtimeAssignees = () => wrapper.findComponent(SidebarAssigneesRealtime);
   const findEditableItem = () => wrapper.findComponent(SidebarEditableItem);
   const findDropdown = () => wrapper.findComponent(MultiSelectDropdown);
-  const findAssigneesLoading = () => wrapper.find('[data-testid="loading-assignees"]');
+  const findInviteMembersLink = () => wrapper.findComponent(SidebarInviteMembers);
+  const findSearchField = () => wrapper.findComponent(GlSearchBoxByType);
+
   const findParticipantsLoading = () => wrapper.find('[data-testid="loading-participants"]');
   const findSelectedParticipants = () => wrapper.findAll('[data-testid="selected-participant"]');
   const findUnselectedParticipants = () =>
     wrapper.findAll('[data-testid="unselected-participant"]');
   const findCurrentUser = () => wrapper.findAll('[data-testid="current-user"]');
   const findUnassignLink = () => wrapper.find('[data-testid="unassign"]');
-  const findSearchField = () => wrapper.findComponent(GlSearchBoxByType);
   const findEmptySearchResults = () => wrapper.find('[data-testid="empty-results"]');
 
   const expandDropdown = () => wrapper.vm.$refs.toggle.expand();
@@ -65,6 +70,7 @@ describe('BoardCardAssigneeDropdown', () => {
     searchQueryHandler = jest.fn().mockResolvedValue(searchQueryResponse),
     updateIssueAssigneesMutationHandler = updateIssueAssigneesMutationSuccess,
     props = {},
+    provide = {},
   } = {}) => {
     fakeApollo = createMockApollo([
       [getIssueParticipantsQuery, issuableQueryHandler],
@@ -88,6 +94,7 @@ describe('BoardCardAssigneeDropdown', () => {
       provide: {
         canUpdate: true,
         rootPath: '/',
+        ...provide,
       },
       stubs: {
         SidebarEditableItem,
@@ -99,28 +106,27 @@ describe('BoardCardAssigneeDropdown', () => {
   };
 
   beforeEach(() => {
-    window.gon = window.gon || {};
-    window.gon.current_username = 'root';
-    window.gon.current_user_fullname = 'Administrator';
-    window.gon.current_user_avatar_url = '/root';
+    gon.current_username = 'root';
+    gon.current_user_fullname = 'Administrator';
+    gon.current_user_avatar_url = '/root';
   });
 
   afterEach(() => {
     wrapper.destroy();
     wrapper = null;
     fakeApollo = null;
-    delete window.gon.current_username;
+    delete gon.current_username;
   });
 
   describe('with passed initial assignees', () => {
-    it('does not show loading state when query is loading', () => {
+    it('passes `initialLoading` as false to editable item', () => {
       createComponent({
         props: {
           initialAssignees,
         },
       });
 
-      expect(findAssigneesLoading().exists()).toBe(false);
+      expect(findEditableItem().props('initialLoading')).toBe(false);
     });
 
     it('renders an initial assignees list with initialAssignees prop', () => {
@@ -158,10 +164,10 @@ describe('BoardCardAssigneeDropdown', () => {
   });
 
   describe('without passed initial assignees', () => {
-    it('shows loading state when query is loading', () => {
+    it('passes `initialLoading` as true to editable item', () => {
       createComponent();
 
-      expect(findAssigneesLoading().exists()).toBe(true);
+      expect(findEditableItem().props('initialLoading')).toBe(true);
     });
 
     it('renders assignees list from API response when resolved', async () => {
@@ -232,6 +238,7 @@ describe('BoardCardAssigneeDropdown', () => {
               name: 'Administrator',
               username: 'root',
               webUrl: '/root',
+              status: null,
             },
           ],
         ],
@@ -239,9 +246,9 @@ describe('BoardCardAssigneeDropdown', () => {
     });
 
     it('renders current user if they are not in participants or assignees', async () => {
-      window.gon.current_username = 'random';
-      window.gon.current_user_fullname = 'Mr Random';
-      window.gon.current_user_avatar_url = '/random';
+      gon.current_username = 'random';
+      gon.current_user_fullname = 'Mr Random';
+      gon.current_user_avatar_url = '/random';
 
       createComponent();
       await waitForPromises();
@@ -393,6 +400,7 @@ describe('BoardCardAssigneeDropdown', () => {
           name: 'Roodie',
           username: 'roodie',
           webUrl: '/roodie',
+          status: null,
         });
 
         const issuableQueryHandler = jest.fn().mockResolvedValue(responseCopy);
@@ -453,5 +461,98 @@ describe('BoardCardAssigneeDropdown', () => {
         });
       });
     });
+  });
+
+  describe('when user is not signed in', () => {
+    beforeEach(() => {
+      gon.current_username = undefined;
+      createComponent();
+    });
+
+    it('does not show current user in the dropdown', () => {
+      expandDropdown();
+      expect(findCurrentUser().exists()).toBe(false);
+    });
+
+    it('passes signedIn prop as false to IssuableAssignees', () => {
+      expect(findAssignees().props('signedIn')).toBe(false);
+    });
+  });
+
+  it('when realtime feature flag is disabled', async () => {
+    createComponent();
+    await waitForPromises();
+    expect(findRealtimeAssignees().exists()).toBe(false);
+  });
+
+  it('when realtime feature flag is enabled', async () => {
+    createComponent({
+      provide: {
+        glFeatures: {
+          realTimeIssueSidebar: true,
+        },
+      },
+    });
+    await waitForPromises();
+    expect(findRealtimeAssignees().exists()).toBe(true);
+  });
+
+  describe('when making changes to participants list', () => {
+    beforeEach(async () => {
+      createComponent();
+    });
+
+    it('passes falsy `isDirty` prop to editable item if no changes to selected users were made', () => {
+      expandDropdown();
+      expect(findEditableItem().props('isDirty')).toBe(false);
+    });
+
+    it('passes truthy `isDirty` prop if selected users list was changed', async () => {
+      expandDropdown();
+      expect(findEditableItem().props('isDirty')).toBe(false);
+      findUnselectedParticipants().at(0).vm.$emit('click');
+      await nextTick();
+      expect(findEditableItem().props('isDirty')).toBe(true);
+    });
+
+    it('passes falsy `isDirty` prop after dropdown is closed', async () => {
+      expandDropdown();
+      findUnselectedParticipants().at(0).vm.$emit('click');
+      findEditableItem().vm.$emit('close');
+      await waitForPromises();
+      expect(findEditableItem().props('isDirty')).toBe(false);
+    });
+  });
+
+  it('does not render invite members link on non-issue sidebar', async () => {
+    createComponent({ props: { issuableType: IssuableType.MergeRequest } });
+    await waitForPromises();
+    expect(findInviteMembersLink().exists()).toBe(false);
+  });
+
+  it('does not render invite members link if `directlyInviteMembers` and `indirectlyInviteMembers` were not passed', async () => {
+    createComponent();
+    await waitForPromises();
+    expect(findInviteMembersLink().exists()).toBe(false);
+  });
+
+  it('renders invite members link if `directlyInviteMembers` is true', async () => {
+    createComponent({
+      provide: {
+        directlyInviteMembers: true,
+      },
+    });
+    await waitForPromises();
+    expect(findInviteMembersLink().exists()).toBe(true);
+  });
+
+  it('renders invite members link if `indirectlyInviteMembers` is true', async () => {
+    createComponent({
+      provide: {
+        indirectlyInviteMembers: true,
+      },
+    });
+    await waitForPromises();
+    expect(findInviteMembersLink().exists()).toBe(true);
   });
 });
