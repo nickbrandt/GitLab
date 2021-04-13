@@ -82,7 +82,7 @@ module Gitlab
           )
 
           if uploader.save!
-            @job['args'] = nil
+            @job['args'] = []
             @job['offloaded'] = true
           else
             # Track upload error here
