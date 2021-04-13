@@ -26331,6 +26331,9 @@ msgstr ""
 msgid "Reset key"
 msgstr ""
 
+msgid "Reset password"
+msgstr ""
+
 msgid "Reset registration token"
 msgstr ""
 
