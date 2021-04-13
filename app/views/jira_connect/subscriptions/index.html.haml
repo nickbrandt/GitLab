@@ -22,25 +22,6 @@
   - else
     .js-jira-connect-app{ data: jira_connect_app_data(@subscriptions) }
 
-    .jira-connect-app-body
-      - if @subscriptions.present?
-        %table.subscriptions.gl-w-full
-          %thead
-            %tr
-              %th= _('Namespace')
-              %th= _('Added')
-              %th
-          %tbody
-            - @subscriptions.each do |subscription|
-              %tr
-                %td= subscription.namespace.full_path
-                %td= subscription.created_at
-                %td= link_to _('Remove'), jira_connect_subscription_path(subscription), class: 'js-jira-connect-remove-subscription'
-      - else
-        .gl-text-center
-          %h4= s_('Integrations|No linked namespaces')
-          %p= s_('Integrations|Namespaces are the GitLab groups and subgroups you link to this Jira instance.')
-
   %p.jira-connect-app-body.gl-mt-7.gl-font-base.gl-text-center
     %strong= s_('Integrations|Browser limitations')
     - firefox_link_url = 'https://www.mozilla.org/en-US/firefox/'
