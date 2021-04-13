@@ -15954,6 +15954,9 @@ msgstr ""
 msgid "ImageViewerDimensions|W"
 msgstr ""
 
+msgid "Impersonate"
+msgstr ""
+
 msgid "Impersonation Tokens"
 msgstr ""
 
@@ -27003,6 +27006,9 @@ msgid "SSH host keys are not available on this system. Please use %{ssh_keyscan}
 msgstr ""
 
 msgid "SSH key"
+msgstr ""
+
+msgid "SSH keys"
 msgstr ""
 
 msgid "SSH keys allow you to establish a secure connection between your computer and GitLab."
