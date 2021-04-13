@@ -78,7 +78,7 @@ RSpec.describe Resolvers::VulnerabilitiesResolver do
     end
 
     context 'when given scanner ID' do
-      let(:params) { { scanner_id: [high_vulnerability.finding_scanner_id] } }
+      let(:params) { { scanner_id: [GitlabSchema.id_from_object(high_vulnerability.finding.scanner)] } }
 
       it 'only returns vulnerabilities of the given scanner IDs' do
         is_expected.to contain_exactly(high_vulnerability)
