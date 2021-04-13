@@ -14,9 +14,6 @@ module Types
       argument :milestone_title, [GraphQL::STRING_TYPE],
                 required: false,
                 description: 'Milestone not applied to this issue.'
-      argument :assignee_username, GraphQL::STRING_TYPE,
-                required: false,
-                description: 'Username of a user not assigned to the issue.'
       argument :assignee_usernames, [GraphQL::STRING_TYPE],
                 required: false,
                 description: 'Usernames of users not assigned to the issue.'

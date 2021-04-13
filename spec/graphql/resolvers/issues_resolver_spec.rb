@@ -46,14 +46,6 @@ RSpec.describe Resolvers::IssuesResolver do
         expect(resolve_issues(milestone_title: [milestone.title])).to contain_exactly(issue1)
       end
 
-      it 'filters by assignee_username' do
-        expect(resolve_issues(assignee_username: [assignee.username])).to contain_exactly(issue2)
-      end
-
-      it 'filters by assignee_usernames' do
-        expect(resolve_issues(assignee_usernames: [assignee.username])).to contain_exactly(issue2)
-      end
-
       it 'filters by two assignees' do
         assignee2 = create(:user)
         issue2.update!(assignees: [assignee, assignee2])
@@ -80,6 +72,24 @@ RSpec.describe Resolvers::IssuesResolver do
       it 'filters by labels' do
         expect(resolve_issues(label_name: [label1.title])).to contain_exactly(issue1, issue2)
         expect(resolve_issues(label_name: [label1.title, label2.title])).to contain_exactly(issue2)
+      end
+
+      describe 'filters by assignee_username' do
+        it 'filters by assignee_username' do
+          expect(resolve_issues(assignee_username: [assignee.username])).to contain_exactly(issue2)
+        end
+
+        it 'filters by assignee_usernames' do
+          expect(resolve_issues(assignee_usernames: [assignee.username])).to contain_exactly(issue2)
+        end
+
+        context 'when both assignee_username and assignee_usernames are provided' do
+          it 'raises a mutually exclusive filter error' do
+            expect do
+              resolve_issues(assignee_usernames: [assignee.username], assignee_username: assignee.username)
+            end.to raise_error(Gitlab::Graphql::Errors::ArgumentError, 'only one of [assigneeUsernames, assigneeUsername] arguments is allowed at the same time.')
+          end
+        end
       end
 
       describe 'filters by created_at' do
@@ -160,10 +170,6 @@ RSpec.describe Resolvers::IssuesResolver do
 
         it 'returns issues without the specified milestone' do
           expect(resolve_issues(not: { milestone_title: [milestone.title] })).to contain_exactly(issue2)
-        end
-
-        it 'returns issues without the specified assignee_username' do
-          expect(resolve_issues(not: { assignee_username: assignee.username })).to contain_exactly(issue1)
         end
 
         it 'returns issues without the specified assignee_usernames' do
