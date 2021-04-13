@@ -32,13 +32,15 @@ export default {
   i18n: {
     activeTableEmptyText: s__("Integrations|You haven't activated any integrations yet."),
     inactiveTableEmptyText: s__("Integrations|You've activated every integration 🎉"),
+    activeIntegrationsHeading: s__('Integrations|Active integrations'),
+    inactiveIntegrationsHeading: s__('Integrations|Add an integration'),
   },
 };
 </script>
 
 <template>
   <div>
-    <h4>{{ s__('Integrations|Active integrations') }}</h4>
+    <h4>{{ $options.i18n.activeIntegrationsHeading }}</h4>
     <integrations-table
       class="gl-mb-7!"
       :integrations="integrationsGrouped.active"
@@ -47,7 +49,7 @@ export default {
       data-testid="active-integrations-table"
     />
 
-    <h4>{{ s__('Integrations|Add an integration') }}</h4>
+    <h4>{{ $options.i18n.inactiveIntegrationsHeading }}</h4>
     <integrations-table
       :integrations="integrationsGrouped.inactive"
       :empty-text="$options.i18n.inactiveTableEmptyText"

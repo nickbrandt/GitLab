@@ -74,7 +74,7 @@ export default {
         v-gl-tooltip
         name="check"
         class="gl-text-green-500"
-        :title="getStatusTooltipTitle(integration)"
+        :title="getStatusTooltipTitle(item)"
       />
     </template>
 
