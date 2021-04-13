@@ -85,6 +85,11 @@ RSpec.describe Resolvers::IssuesResolver do
           expect(resolve_issues(iteration_id: [iteration1.to_global_id, iteration2.to_global_id]))
             .to contain_exactly(issue_with_iteration1, issue_with_iteration2)
         end
+
+        it 'returns issues with list iterations using a mix' do
+          expect(resolve_issues(iteration_id: [iteration1.id, iteration2.to_global_id]))
+            .to contain_exactly(issue_with_iteration1, issue_with_iteration2)
+        end
       end
 
       describe 'filter by epic' do
