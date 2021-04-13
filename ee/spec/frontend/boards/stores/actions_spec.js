@@ -921,7 +921,7 @@ describe('moveIssue', () => {
         { type: 'updateMovedIssue', payload: moveData },
         { type: 'updateEpicForIssue', payload: { itemId: params.itemId, epicId: 'some-epic-id' } },
         {
-          type: 'requestIssueMoveListMutation',
+          type: 'updateIssueOrder',
           payload: {
             moveData,
             mutationVariables: {

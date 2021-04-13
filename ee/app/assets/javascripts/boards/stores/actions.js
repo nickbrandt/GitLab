@@ -488,7 +488,7 @@ export default {
     dispatch('moveIssueCard', moveData);
     dispatch('updateMovedIssue', moveData);
     dispatch('updateEpicForIssue', { itemId, epicId });
-    dispatch('requestIssueMoveListMutation', {
+    dispatch('updateIssueOrder', {
       moveData,
       mutationVariables: { epicId },
     });

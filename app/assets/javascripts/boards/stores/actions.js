@@ -340,12 +340,21 @@ export default {
 
     dispatch('moveIssueCard', moveData);
     dispatch('updateMovedIssue', moveData);
-    dispatch('requestIssueMoveListMutation', { moveData });
+    dispatch('updateIssueOrder', { moveData });
   },
 
   moveIssueCard: ({ commit }, moveData) => {
-    const { reordering, shouldClone, itemNotInToList } = moveData;
-    const { itemId, fromListId, toListId, moveBeforeId, moveAfterId } = moveData;
+    const {
+      reordering,
+      shouldClone,
+      itemNotInToList,
+      originalIndex,
+      itemId,
+      fromListId,
+      toListId,
+      moveBeforeId,
+      moveAfterId,
+    } = moveData;
 
     commit(types.REMOVE_BOARD_ITEM_FROM_LIST, { itemId, listId: fromListId });
 
@@ -370,8 +379,6 @@ export default {
     }
 
     if (shouldClone) {
-      const { originalIndex } = moveData;
-
       commit(types.ADD_BOARD_ITEM_TO_LIST, { itemId, listId: fromListId, atIndex: originalIndex });
     }
   },
@@ -390,9 +397,16 @@ export default {
   },
 
   undoMoveIssueCard: ({ commit }, moveData) => {
-    const { reordering, shouldClone, itemNotInToList } = moveData;
-    const { itemId, fromListId, toListId } = moveData;
-    const { originalIssue, originalIndex } = moveData;
+    const {
+      reordering,
+      shouldClone,
+      itemNotInToList,
+      itemId,
+      fromListId,
+      toListId,
+      originalIssue,
+      originalIndex,
+    } = moveData;
 
     commit(types.UPDATE_BOARD_ITEM, originalIssue);
 
@@ -412,10 +426,7 @@ export default {
     commit(types.ADD_BOARD_ITEM_TO_LIST, { itemId, listId: fromListId, atIndex: originalIndex });
   },
 
-  requestIssueMoveListMutation: async (
-    { commit, dispatch, state },
-    { moveData, mutationVariables = {} },
-  ) => {
+  updateIssueOrder: async ({ commit, dispatch, state }, { moveData, mutationVariables = {} }) => {
     try {
       const { itemId, fromListId, toListId, moveBeforeId, moveAfterId } = moveData;
       const {

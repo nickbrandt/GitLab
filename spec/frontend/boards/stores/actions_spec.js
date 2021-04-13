@@ -666,7 +666,7 @@ describe('moveIssue', () => {
       expectedActions: [
         { type: 'moveIssueCard', payload: mockMoveData },
         { type: 'updateMovedIssue', payload: mockMoveData },
-        { type: 'requestIssueMoveListMutation', payload: { moveData: mockMoveData } },
+        { type: 'updateIssueOrder', payload: { moveData: mockMoveData } },
       ],
     });
   });
@@ -938,7 +938,7 @@ describe('updateMovedIssueCard', () => {
   );
 });
 
-describe('requestIssueMoveListMutation', () => {
+describe('updateIssueOrder', () => {
   const issues = {
     436: mockIssue,
     437: mockIssue2,
@@ -977,10 +977,7 @@ describe('requestIssueMoveListMutation', () => {
       },
     });
 
-    actions.requestIssueMoveListMutation(
-      { state, commit: () => {}, dispatch: () => {} },
-      { moveData },
-    );
+    actions.updateIssueOrder({ state, commit: () => {}, dispatch: () => {} }, { moveData });
 
     expect(gqlClient.mutate).toHaveBeenCalledWith(mutationVariables);
   });
@@ -996,7 +993,7 @@ describe('requestIssueMoveListMutation', () => {
     });
 
     testAction(
-      actions.requestIssueMoveListMutation,
+      actions.updateIssueOrder,
       { moveData },
       state,
       [
@@ -1020,7 +1017,7 @@ describe('requestIssueMoveListMutation', () => {
     });
 
     testAction(
-      actions.requestIssueMoveListMutation,
+      actions.updateIssueOrder,
       { moveData },
       state,
       [
