@@ -37,5 +37,15 @@ RSpec.describe MergeRequests::AfterCreateService do
         expect(SyncSecurityReportsToReportApprovalRulesWorker).not_to have_received(:perform_async)
       end
     end
+
+    context 'report approvers' do
+      it 'refreshes report approvers for the merge request' do
+        expect_next_instance_of(::MergeRequests::SyncReportApproverApprovalRules) do |service|
+          expect(service).to receive(:execute)
+        end
+
+        execute
+      end
+    end
   end
 end

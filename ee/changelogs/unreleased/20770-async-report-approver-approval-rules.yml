@@ -1,0 +1,5 @@
+---
+title: Set report approver approval rules asynchronously when creating merge request
+merge_request: 59308
+author:
+type: performance

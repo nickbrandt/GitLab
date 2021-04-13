@@ -35,16 +35,6 @@ RSpec.describe MergeRequests::CreateService do
       end
     end
 
-    context 'report approvers' do
-      it 'refreshes report approvers for the merge request' do
-        expect_next_instance_of(::MergeRequests::SyncReportApproverApprovalRules) do |service|
-          expect(service).to receive(:execute)
-        end
-
-        service.execute
-      end
-    end
-
     it_behaves_like 'new issuable with scoped labels' do
       let(:parent) { project }
     end

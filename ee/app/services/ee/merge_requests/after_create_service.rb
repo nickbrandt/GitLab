@@ -9,6 +9,8 @@ module EE
       def prepare_merge_request(merge_request)
         super
 
+        ::MergeRequests::SyncReportApproverApprovalRules.new(merge_request).execute
+
         schedule_sync_for(merge_request.head_pipeline_id)
       end
 
