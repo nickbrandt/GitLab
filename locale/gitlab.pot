@@ -29017,6 +29017,9 @@ msgstr ""
 msgid "Something went wrong on our end"
 msgstr ""
 
+msgid "Something went wrong on our end while loading the code quality diff."
+msgstr ""
+
 msgid "Something went wrong on our end."
 msgstr ""
 
@@ -30988,7 +30991,7 @@ msgstr ""
 msgid "The merge request can now be merged."
 msgstr ""
 
-msgid "The merge request has been updated, and the number of code quality violations in this file has changed."
+msgid "The merge request has made changes to this file that affect the number of code quality violations in it."
 msgstr ""
 
 msgid "The metric must be one of %{metrics}."
