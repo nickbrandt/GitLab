@@ -424,7 +424,6 @@ RSpec/EmptyLineAfterFinalLetItBe:
   Exclude:
     - ee/spec/controllers/admin/geo/projects_controller_spec.rb
     - ee/spec/controllers/admin/projects_controller_spec.rb
-    - ee/spec/controllers/ee/projects/jobs_controller_spec.rb
     - ee/spec/controllers/groups/analytics/cycle_analytics/stages_controller_spec.rb
     - ee/spec/controllers/groups/analytics/cycle_analytics/summary_controller_spec.rb
     - ee/spec/controllers/groups/analytics/cycle_analytics/value_streams_controller_spec.rb
