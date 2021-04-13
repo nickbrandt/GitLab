@@ -40,7 +40,7 @@ RSpec.describe 'Service templates deprecation callout' do
 
       it 'displays callout' do
         expect(page).to have_content callout_content
-        expect(page).to have_link 'See affected service templates', href: integrations_admin_application_settings_path
+        expect(page).to have_link 'See affected service templates', href: admin_application_settings_services_path
       end
 
       context 'when callout is dismissed', :js do

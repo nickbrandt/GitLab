@@ -13,7 +13,7 @@
     .gl-alert-body
       = html_escape_once(s_('AdminSettings|You should migrate to %{doc_link_start}Project integration management%{link_end}, available at %{settings_link_start}Settings &gt; Integrations.%{link_end}')).html_safe % { doc_link_start: doc_link_start, settings_link_start: settings_link_start, link_end: '</a>'.html_safe }
     .gl-alert-actions
-      = link_to integrations_admin_application_settings_path, class: 'btn gl-alert-action btn-info btn-md gl-button' do
+      = link_to admin_application_settings_services_path, class: 'btn gl-alert-action btn-info btn-md gl-button' do
         %span.gl-button-text
           = s_('AdminSettings|See affected service templates')
       = link_to "https://gitlab.com/gitlab-org/gitlab/-/issues/325905", class: 'btn gl-alert-action btn-default btn-md gl-button', target: '_blank', rel: 'noopener noreferrer' do
