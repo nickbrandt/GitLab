@@ -98,16 +98,6 @@ module EE
         @subject.saml_group_sync_available?
       end
 
-      with_scope :global
-      condition(:commit_committer_check_disabled_globally) do
-        !PushRule.global&.commit_committer_check
-      end
-
-      with_scope :global
-      condition(:reject_unsigned_commits_disabled_globally) do
-        !PushRule.global&.reject_unsigned_commits
-      end
-
       condition(:commit_committer_check_available) do
         @subject.feature_available?(:commit_committer_check)
       end
@@ -329,9 +319,7 @@ module EE
         prevent(:download_wiki_code)
       end
 
-      rule { admin | (commit_committer_check_disabled_globally & can?(:maintainer_access)) }.policy do
-        enable :change_commit_committer_check
-      end
+      rule { admin | maintainer }.enable :change_commit_committer_check
 
       rule { commit_committer_check_available }.policy do
         enable :read_commit_committer_check
@@ -341,7 +329,7 @@ module EE
         prevent :change_commit_committer_check
       end
 
-      rule { admin | (reject_unsigned_commits_disabled_globally & can?(:maintainer_access)) }.enable :change_reject_unsigned_commits
+      rule { admin | maintainer }.enable :change_reject_unsigned_commits
 
       rule { reject_unsigned_commits_available }.enable :read_reject_unsigned_commits
 
