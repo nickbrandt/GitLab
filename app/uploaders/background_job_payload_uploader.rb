@@ -8,7 +8,7 @@ class BackgroundJobPayloadUploader < GitlabUploader
   alias_method :upload, :model
 
   def filename
-    "#{model['jid']}-payload"
+    "#{model[:jid]}-payload.json"
   end
 
   def store_dir
@@ -25,7 +25,7 @@ class BackgroundJobPayloadUploader < GitlabUploader
 
   def save!
     tmp = Tempfile.new(filename)
-    File.open(tmp.path, "w") { |f| f.write model['args'].to_json }
+    File.open(tmp.path, "w") { |f| f.write model[:args] }
     file = {
       tempfile:     tmp,
       filename:     filename,
@@ -48,6 +48,6 @@ class BackgroundJobPayloadUploader < GitlabUploader
   private
 
   def dynamic_segment
-    model['class']
+    model[:class]
   end
 end

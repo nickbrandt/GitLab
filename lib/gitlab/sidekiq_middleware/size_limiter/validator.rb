@@ -22,7 +22,8 @@ module Gitlab
 
         MODES = [
           TRACK_MODE = 'track',
-          RAISE_MODE = 'raise'
+          RAISE_MODE = 'raise',
+          OFFLOAD_MODE = 'offload'
         ].freeze
 
         attr_reader :mode, :size_limit
@@ -51,7 +52,12 @@ module Gitlab
           return unless @size_limit > 0
 
           return if allow_big_payload?
+
+          job_args = ::Sidekiq.dump_json(@job['args'])
+          job_size = job_args.bytesize
+
           return if job_size <= @size_limit
+          return offload(job_args) if offload_mode?
 
           exception = ExceedLimitError.new(@worker_class, job_size, @size_limit)
           # This should belong to Gitlab::ErrorTracking. We'll remove this
@@ -68,11 +74,19 @@ module Gitlab
 
         private
 
-        def job_size
-          # This maynot be the optimal solution, but can be acceptable solution
-          # for now. Internally, Sidekiq calls Sidekiq.dump_json everywhere.
-          # There is no clean way to intefere to prevent double serialization.
-          @job_size ||= ::Sidekiq.dump_json(@job).bytesize
+        def offload(job_args)
+          uploader = BackgroundJobPayloadUploader.new(
+            jid: @job['jid'],
+            class: @job['class'],
+            args: job_args
+          )
+
+          if uploader.save!
+            @job['args'] = nil
+            @job['offloaded'] = true
+          else
+            # Track upload error here
+          end
         end
 
         def allow_big_payload?
@@ -82,6 +96,10 @@ module Gitlab
 
         def raise_mode?
           @mode == RAISE_MODE
+        end
+
+        def offload_mode?
+          @mode == OFFLOAD_MODE
         end
 
         def track(exception)
