@@ -468,11 +468,11 @@ export default {
           <div class="row">
             <profile-selector-summary-cell
               :label="s__('DastProfiles|Spider timeout')"
-              :value="n__('%d minute', '%d minutes', selectedScannerProfile.spiderTimeout)"
+              :value="n__('%d minute', '%d minutes', selectedScannerProfile.spiderTimeout || 0)"
             />
             <profile-selector-summary-cell
               :label="s__('DastProfiles|Target timeout')"
-              :value="n__('%d second', '%d seconds', selectedScannerProfile.targetTimeout)"
+              :value="n__('%d second', '%d seconds', selectedScannerProfile.targetTimeout || 0)"
             />
           </div>
           <div class="row">
