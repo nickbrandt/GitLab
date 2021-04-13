@@ -283,6 +283,25 @@ production: &base
     #     aws_secret_access_key: AWS_SECRET_ACCESS_KEY
     #     region: us-east-1
 
+  ## Background Job Payload
+  background_job_payloads:
+    # If disabled (the default), Sidekiq will send all the jobs to Redis,
+    # regardless of how big the payload is. This could kill Redis. When
+    # enabled, the oversized payload is sent to object storage, and restored
+    # later before it is processed.
+    # enabled: false
+    # storage_path: shared/background-job-payloads
+    # object_store:
+    #   enabled: false
+    #   remote_directory: background-job-payloads
+    #   background_upload: false
+    #   proxy_download: false
+    #   connection:
+    #     provider: AWS
+    #     aws_access_key_id: AWS_ACCESS_KEY_ID
+    #     aws_secret_access_key: AWS_SECRET_ACCESS_KEY
+    #     region: us-east-1
+
   ## Git LFS
   lfs:
     enabled: true
