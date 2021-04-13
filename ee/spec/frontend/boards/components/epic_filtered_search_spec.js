@@ -3,7 +3,10 @@ import Vuex from 'vuex';
 import EpicFilteredSearch from 'ee_component/boards/components/epic_filtered_search.vue';
 import { createStore } from '~/boards/stores';
 import * as commonUtils from '~/lib/utils/common_utils';
+import { __ } from '~/locale';
 import FilteredSearchBarRoot from '~/vue_shared/components/filtered_search_bar/filtered_search_bar_root.vue';
+import AuthorToken from '~/vue_shared/components/filtered_search_bar/tokens/author_token.vue';
+import LabelToken from '~/vue_shared/components/filtered_search_bar/tokens/label_token.vue';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
@@ -42,6 +45,33 @@ describe('EpicFilteredSearch', () => {
 
     it('renders FilteredSearch', () => {
       expect(findFilteredSearch().exists()).toBe(true);
+    });
+
+    it('passes the correct tokens to FilteredSearch', () => {
+      const tokens = [
+        {
+          icon: 'labels',
+          title: __('Label'),
+          type: 'labels',
+          operators: [{ value: '=', description: 'is' }],
+          token: LabelToken,
+          unique: false,
+          symbol: '~',
+          fetchLabels: wrapper.vm.fetchLabels,
+        },
+        {
+          icon: 'pencil',
+          title: __('Author'),
+          type: 'author',
+          operators: [{ value: '=', description: 'is' }],
+          symbol: '@',
+          token: AuthorToken,
+          unique: true,
+          fetchAuthors: wrapper.vm.fetchAuthors,
+        },
+      ];
+
+      expect(findFilteredSearch().props('tokens')).toEqual(tokens);
     });
 
     describe('when onFilter is emitted', () => {
