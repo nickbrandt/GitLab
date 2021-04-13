@@ -1,5 +1,5 @@
 ---
-redirect_to: '../snowplow.md'
+redirect_to: '../snowplow/index.md'
 ---
 
 This document was moved to [another location](../snowplow/index.md).
