@@ -3,7 +3,7 @@ import { createLocalVue, mount } from '@vue/test-utils';
 import VueApollo from 'vue-apollo';
 import createMockApollo from 'helpers/mock_apollo_helper';
 import CorpusUploadModal from 'ee/security_configuration/corpus_management/components/corpus_upload_modal.vue';
-import { baseResponse, isUploadingResponse , isUploadedResponse } from './mock_data';
+import waitForPromises from 'helpers/wait_for_promises';
 import getCorpusesQuery from 'ee/security_configuration/corpus_management/graphql/queries/get_corpuses.query.graphql';
 
 const TEST_PROJECT_FULL_PATH = '/namespace/project';
@@ -12,12 +12,37 @@ const TEST_CORPUS_HELP_PATH = '/docs/corpus-management';
 const localVue = createLocalVue();
 localVue.use(VueApollo);
 
+let mockTotalSize, mockData, mockIsUploading, mockProgress;
+
+const mockResolver = {
+  Query: {
+    /* eslint-disable no-unused-vars */
+    mockedPackages(_, { projectPath }) {
+      return {
+        // Mocked data goes here
+        totalSize: mockTotalSize(),
+        data: mockData(),
+        __typename: 'MockedPackages',
+      };
+    },
+    /* eslint-disable no-unused-vars */
+    uploadState(_, { projectPath }) {
+      return {
+        isUploading: mockIsUploading(),
+        progress: mockProgress(),
+        __typename: 'UploadState',
+      }
+    },
+  },
+};
+
+
 describe('Corpus upload modal', () => {
   let wrapper;
 
-  const baseState = jest.fn().mockResolvedValue(baseResponse);
-  const isUploadingState = jest.fn().mockResolvedValue(isUploadingResponse);
-  const isUploadedState = jest.fn().mockResolvedValue(isUploadedResponse);
+  // const baseState = jest.fn().mockResolvedValue(baseResponse);
+  // const isUploadingState = jest.fn().mockResolvedValue(isUploadingResponse);
+  // const isUploadedState = jest.fn().mockResolvedValue(isUploadedResponse);
 
   const findCorpusName =   () => wrapper.find('[data-testid="corpus-name"]');
   const findUploadAttatchment =  () => wrapper.find('[data-testid="upload-attatchment-button"]');
@@ -27,17 +52,15 @@ describe('Corpus upload modal', () => {
   function createMockApolloProvider(resolverMock) {
     localVue.use(VueApollo);
 
-    const requestResolvers = [[getCorpusesQuery, resolverMock]];
-
-    return createMockApollo([],requestResolvers);
+    return createMockApollo([],resolverMock);
   }
 
   const createComponent = (resolverMock, options = {}) => {
-    const defaultMocks = {
-      $apollo: {
-        mutate: jest.fn().mockResolvedValue(baseState)
-        },
-    }
+    // const defaultMocks = {
+    //   $apollo: {
+    //     mutate: jest.fn().mockResolvedValue(baseState)
+    //     },
+    // }
     
 
     wrapper = mount(CorpusUploadModal, {
@@ -51,6 +74,12 @@ describe('Corpus upload modal', () => {
     });
   };
 
+  beforeEach(() => {
+    mockTotalSize = jest.fn();
+    mockData = jest.fn();
+    mockIsUploading = jest.fn();
+    mockProgress = jest.fn();
+  });
 
   afterEach(() => {
     wrapper.destroy();
@@ -126,7 +155,7 @@ describe('Corpus upload modal', () => {
       const attachmentName =  'corpus.zip';
       const corpusName = 'User entered name';
 
-      beforeEach(() => {
+      beforeEach(async () => {
         const data = () => {
           return {       
             attachmentName,
@@ -136,7 +165,14 @@ describe('Corpus upload modal', () => {
           }
         };
 
-        createComponent(isUploadingState,{ data });
+        mockTotalSize.mockResolvedValue(0);
+        mockData.mockResolvedValue([]);
+        mockIsUploading.mockResolvedValue(true);
+        mockProgress.mockResolvedValue(25);
+        
+        createComponent(mockResolver,{ data });
+
+        await waitForPromises();
       });
 
       it('shows name field',()=>{
@@ -144,6 +180,7 @@ describe('Corpus upload modal', () => {
       });
 
       it('shows the choose file button', () =>{
+        debugger;
         expect(findUploadAttatchment().exists()).toBe(false);
       });
 

@@ -1,35 +1,69 @@
-export const baseRespoonse = {
-  mockedPackages: {
-    data: [],
-    totalSize: 0
+export const baseResolver = {
+  Query: {
+    /* eslint-disable no-unused-vars */
+    mockedPackages(_, { projectPath }) {
+      return {
+        // Mocked data goes here
+        totalSize: 20.45e8,
+        data: [],
+        __typename: 'MockedPackages',
+      };
+    },
+    /* eslint-disable no-unused-vars */
+    uploadState(_, { projectPath }) {
+      return {
+        isUploading: false,
+        progress: 0,
+        __typename: 'UploadState',
+      }
+    },
   },
-  uploadState: {
-    isUploading: false,
-    progress: 0
-  }
-}
+};
 
-export const isUploadingResponse = {
-  mockedPackages: {
-    data: [],
-    totalSize: 0
-  },
-  uploadState: {
-    isUploading: true,
-    progress: 25
-  }
-}
 
-export const isUploadedResponse = {
-  mockedPackages: {
-    data: [],
-    totalSize: 0
+export const isUploadingResolver = {
+  Query: {
+    /* eslint-disable no-unused-vars */
+    mockedPackages(_, { projectPath }) {
+      return {
+        // Mocked data goes here
+        totalSize: 20.45e8,
+        data: [],
+        __typename: 'MockedPackages',
+      };
+    },
+    /* eslint-disable no-unused-vars */
+    uploadState(_, { projectPath }) {
+      return {
+        isUploading: true,
+        progress: 25,
+        __typename: 'UploadState',
+      }
+    },
   },
-  uploadState: {
-    isUploading: false,
-    progress: 100
-  }
-}
+};
+
+export const isUploadedResolver = {
+  Query: {
+    /* eslint-disable no-unused-vars */
+    mockedPackages(_, { projectPath }) {
+      return {
+        // Mocked data goes here
+        totalSize: 20.45e8,
+        data: [],
+        __typename: 'MockedPackages',
+      };
+    },
+    /* eslint-disable no-unused-vars */
+    uploadState(_, { projectPath }) {
+      return {
+        isUploading: false,
+        progress: 100,
+        __typename: 'UploadState',
+      }
+    },
+  },
+};
 
 export const corpuses = [
   {
