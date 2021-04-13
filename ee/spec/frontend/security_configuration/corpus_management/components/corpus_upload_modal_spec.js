@@ -40,7 +40,7 @@ describe('Corpus upload modal', () => {
   let wrapper;
 
   const findCorpusName = () => wrapper.find('[data-testid="corpus-name"]');
-  const findUploadAttatchment = () => wrapper.find('[data-testid="upload-attatchment-button"]');
+  const findUploadAttachment = () => wrapper.find('[data-testid="upload-attachment-button"]');
   const findUploadCorpus = () => wrapper.find('[data-testid="upload-corpus"]');
   const findUploadStatus = () => wrapper.find('[data-testid="upload-status"]');
 
@@ -97,10 +97,10 @@ describe('Corpus upload modal', () => {
       });
 
       it('shows the choose file button', () => {
-        expect(findUploadAttatchment().exists()).toBe(true);
+        expect(findUploadAttachment().exists()).toBe(true);
       });
 
-      it('show the upload corpus button', () => {
+      it('does not show the upload corpus button', () => {
         expect(findUploadCorpus().exists()).toBe(false);
       });
 
@@ -136,7 +136,7 @@ describe('Corpus upload modal', () => {
       });
 
       it('shows the choose file button', () => {
-        expect(findUploadAttatchment().exists()).toBe(true);
+        expect(findUploadAttachment().exists()).toBe(true);
       });
 
       it('shows the upload corpus button', () => {
@@ -177,15 +177,15 @@ describe('Corpus upload modal', () => {
       });
 
       it('shows the choose file button as disabled', () => {
-        expect(findUploadAttatchment().exists()).toBe(true);
-        expect(findUploadAttatchment().attributes('disabled')).toBe('disabled');
+        expect(findUploadAttachment().exists()).toBe(true);
+        expect(findUploadAttachment().attributes('disabled')).toBe('disabled');
       });
 
       it('does not show the upload corpus button', () => {
         expect(findUploadCorpus().exists()).toBe(false);
       });
 
-      it('does shows the upload progress', () => {
+      it('does show the upload progress', () => {
         expect(findUploadStatus().exists()).toBe(true);
         expect(findUploadStatus().element).toMatchSnapshot();
       });
@@ -220,7 +220,7 @@ describe('Corpus upload modal', () => {
       });
 
       it('does not show the choose file button', () => {
-        expect(findUploadAttatchment().exists()).toBe(false);
+        expect(findUploadAttachment().exists()).toBe(false);
       });
 
       it('does not show the upload corpus button', () => {

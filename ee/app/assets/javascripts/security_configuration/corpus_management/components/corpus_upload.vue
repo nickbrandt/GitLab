@@ -2,7 +2,7 @@
 import { GlButton, GlModal, GlModalDirective } from '@gitlab/ui';
 import CorpusUploadModal from 'ee/security_configuration/corpus_management/components/corpus_upload_modal.vue';
 import { numberToHumanSize } from '~/lib/utils/number_utils';
-import { s__, __ } from '~/locale';
+import { s__ } from '~/locale';
 import addCorpusMutation from '../graphql/mutations/add_corpus.mutation.graphql';
 import resetCorpus from '../graphql/mutations/reset_corpus.mutation.graphql';
 import getCorpusesQuery from '../graphql/queries/get_corpuses.query.graphql';
@@ -15,6 +15,11 @@ export default {
   },
   directives: {
     GlModalDirective,
+  },
+  i18n: {
+    totalSize: s__('CorpusManagement|Total Size:'),
+    newUpload: s__('CorpusManagement|New upload'),
+    newCorpus: s__('CorpusMnagement|New corpus'),
   },
   inject: ['projectFullPath', 'corpusHelpPath'],
   apollo: {
@@ -29,15 +34,13 @@ export default {
       update: (data) => {
         return data;
       },
-      error() {
-        this.states = null;
-      },
     },
   },
   modal: {
     actionCancel: {
       text: s__('Cancel'),
     },
+    modalId: 'corpus-upload-modal',
   },
   props: {
     totalSize: {
@@ -70,7 +73,7 @@ export default {
     addCorpus() {
       this.$apollo.mutate({
         mutation: addCorpusMutation,
-        variables: { name: __('New Upload'), projectPath: this.projectFullPath },
+        variables: { name: this.$options.i18n.newCorpus, projectPath: this.projectFullPath },
       });
     },
     resetCorpus() {
@@ -91,13 +94,13 @@ export default {
       <span class="gl-font-weight-bold">{{ formattedFileSize }}</span>
     </div>
 
-    <gl-button v-gl-modal-directive="`corpus-upload-modal`" class="gl-mr-5" variant="confirm">
-      {{ s__('CorpusManagement|New corpus') }}
+    <gl-button v-gl-modal-directive="$options.modal.modalId" class="gl-mr-5" variant="confirm">
+      {{ this.$options.i18n.newCorpus }}
     </gl-button>
 
     <gl-modal
-      modal-id="corpus-upload-modal"
-      title="New corpus"
+      :modal-id="$options.modal.modalId"
+      :title="$options.i18n.newCorpus"
       size="sm"
       :action-primary="actionPrimaryProps"
       :action-cancel="$options.modal.actionCancel"

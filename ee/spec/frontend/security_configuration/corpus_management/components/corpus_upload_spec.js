@@ -16,7 +16,6 @@ describe('Corpus Upload', () => {
         projectFullPath: TEST_PROJECT_FULL_PATH,
         corpusHelpPath: TEST_CORPUS_HELP_PATH,
       },
-      mocks: {},
       ...options,
     });
   };

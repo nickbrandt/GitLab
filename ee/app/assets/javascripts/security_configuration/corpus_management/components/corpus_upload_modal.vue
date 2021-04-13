@@ -4,7 +4,6 @@ import {
   GlFormInput,
   GlFormInputGroup,
   GlButton,
-  GlIcon,
   GlLoadingIcon,
   GlFormGroup,
 } from '@gitlab/ui';
@@ -22,23 +21,21 @@ export default {
     GlLoadingIcon,
     GlFormInputGroup,
     GlButton,
-    GlIcon,
   },
   inject: ['projectFullPath'],
   i18n: {
+    corpusName: s__('CorpusManagement|Corpus name'),
     uploadButtonText: __('Choose File...'),
     uploadMessage: s__(
       'CorpusManagement|New corpus needs to be a upload in *.zip format. Maximum 10Gib',
     ),
   },
-  props: {},
   apollo: {
     states: {
       query: getCorpusesQuery,
       variables() {
         return {
           projectPath: this.projectFullPath,
-          ...this.cursor,
         };
       },
       update: (data) => {
@@ -61,10 +58,10 @@ export default {
     hasAttachment() {
       return Boolean(this.attachmentName);
     },
-    isShowingAttatchmentName() {
+    isShowingAttachmentName() {
       return this.hasAttachment && !this.isLoading;
     },
-    isShowingAttatchmentCancel() {
+    isShowingAttachmentCancel() {
       return !this.isUploaded && !this.isUploading;
     },
     isUploading() {
@@ -84,14 +81,14 @@ export default {
     },
   },
   beforeDestroy() {
-    this.resetAttatchment();
+    this.resetAttachment();
     this.cancelUpload();
   },
   methods: {
     clearName() {
       this.corpusName = '';
     },
-    resetAttatchment() {
+    resetAttachment() {
       this.$refs.fileUpload.value = null;
       this.attachmentName = '';
       this.files = [];
@@ -133,16 +130,14 @@ export default {
 </script>
 <template>
   <gl-form>
-    <gl-form-group label="Corpus name" label-size="sm" label-for="corpus-name">
-      <gl-form-input-group class="gl-corpus-name">
-        <slot name="input">
-          <gl-form-input
-            id="corpus-name"
-            ref="input"
-            v-model="corpusName"
-            data-testid="corpus-name"
-          />
-        </slot>
+    <gl-form-group :label="$options.i18n.corpusName" label-size="sm" label-for="corpus-name">
+      <gl-form-input-group>
+        <gl-form-input
+          id="corpus-name"
+          ref="input"
+          v-model="corpusName"
+          data-testid="corpus-name"
+        />
 
         <gl-button
           class="gl-search-box-by-click-icon-button gl-search-box-by-click-clear-button gl-clear-icon-button"
@@ -158,31 +153,35 @@ export default {
       </gl-form-input-group>
     </gl-form-group>
 
-    <gl-form-group label="Corpus name" label-size="sm" label-for="corpus-file">
+    <gl-form-group :label="$options.i18n.corpusName" label-size="sm" label-for="corpus-file">
       <gl-button
         v-if="showFilePickerButton"
-        data-testid="upload-attatchment-button"
+        data-testid="upload-attachment-button"
         :disabled="isUploading"
         @click="openFileUpload"
       >
         {{ this.$options.i18n.uploadButtonText }}
       </gl-button>
 
-      <span v-if="isShowingAttatchmentName" class="gl-ml-3">
+      <span v-if="isShowingAttachmentName" class="gl-ml-3">
         {{ attachmentName }}
-        <gl-icon v-if="isShowingAttatchmentCancel" name="close" @click="resetAttatchment" />
+        <gl-button
+          v-if="isShowingAttachmentCancel"
+          size="small"
+          icon="close"
+          category="tertiary"
+          @click="resetAttachment"
+        />
       </span>
 
-      <gl-form-input-group id="corpus-file" class="gl-display-flex gl-align-items-center">
-        <input
-          ref="fileUpload"
-          type="file"
-          name="corpus_file"
-          :accept="$options.VALID_CORPUS_MIMETYPE.mimetype"
-          class="gl-display-none"
-          @change="onFileUploadChange"
-        />
-      </gl-form-input-group>
+      <input
+        ref="fileUpload"
+        type="file"
+        name="corpus_file"
+        :accept="$options.VALID_CORPUS_MIMETYPE.mimetype"
+        class="gl-display-none"
+        @change="onFileUploadChange"
+      />
     </gl-form-group>
 
     <span>{{ this.$options.i18n.uploadMessage }}</span>
@@ -199,7 +198,7 @@ export default {
 
     <div v-if="isUploading" data-testid="upload-status" class="gl-mt-2">
       <gl-loading-icon inline size="sm" />
-      {{ sprintf(__('Attatching File - %{progress}%'), { progress }) }}
+      {{ sprintf(__('Attaching File - %{progress}%'), { progress }) }}
       <gl-button size="small" @click="cancelUpload"> {{ __('Cancel') }} </gl-button>
     </div>
   </gl-form>

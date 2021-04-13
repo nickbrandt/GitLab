@@ -36,7 +36,6 @@ export default {
         draftState.mockedPackages.data = [
           ...draftState.mockedPackages.data,
           {
-            __typename: __('Corpus'),
             name,
             lastUpdated: new Date().toString(),
             lastUsed: new Date().toString(),
@@ -44,6 +43,7 @@ export default {
             target: '',
             downloadPath: 'farias-gl/go-fuzzing-example/-/jobs/959593462/artifacts/download',
             size: 4e8,
+            __typename: 'CorpusData',
           },
         ];
         draftState.mockedPackages.totalSize += 4e8;
