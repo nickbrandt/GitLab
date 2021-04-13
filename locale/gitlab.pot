@@ -8804,7 +8804,22 @@ msgstr ""
 msgid "Corpus Management|Are you sure you want to delete the corpus?"
 msgstr ""
 
+msgid "CorpusManagement|Actions"
+msgstr ""
+
+msgid "CorpusManagement|Corpus are used in fuzz testing as mutation source to Improve future testing."
+msgstr ""
+
+msgid "CorpusManagement|Corpus name"
+msgstr ""
+
 msgid "CorpusManagement|Fuzz testing corpus management"
+msgstr ""
+
+msgid "CorpusManagement|Last updated"
+msgstr ""
+
+msgid "CorpusManagement|Last used"
 msgstr ""
 
 msgid "CorpusManagement|Latest Job:"
@@ -8814,6 +8829,9 @@ msgid "CorpusManagement|New corpus"
 msgstr ""
 
 msgid "CorpusManagement|Not Set"
+msgstr ""
+
+msgid "CorpusManagement|Target"
 msgstr ""
 
 msgid "CorpusManagement|Total Size: %{totalSize}"
@@ -18395,6 +18413,9 @@ msgid "Learn GitLab - Ultimate trial"
 msgstr ""
 
 msgid "Learn GitLab|Trial only"
+msgstr ""
+
+msgid "Learn More"
 msgstr ""
 
 msgid "Learn how to %{link_start}contribute to the built-in templates%{link_end}"
