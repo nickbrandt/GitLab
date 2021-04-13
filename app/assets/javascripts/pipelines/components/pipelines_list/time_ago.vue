@@ -59,47 +59,39 @@ export default {
 </script>
 <template>
   <div>
-    <div>
-      <span v-if="showInProgress" data-testid="pipeline-in-progress">
-        <gl-icon
-          v-if="stuck"
-          name="warning"
-          class="gl-mr-2"
-          :size="12"
-          data-testid="warning-icon"
-        />
-        <gl-icon
-          v-else
-          name="hourglass"
-          class="gl-vertical-align-baseline! gl-mr-2"
-          :size="12"
-          data-testid="hourglass-icon"
-        />
-        {{ s__('Pipeline|In progress') }}
-      </span>
+    <span v-if="showInProgress" data-testid="pipeline-in-progress">
+      <gl-icon v-if="stuck" name="warning" class="gl-mr-2" :size="12" data-testid="warning-icon" />
+      <gl-icon
+        v-else
+        name="hourglass"
+        class="gl-vertical-align-baseline! gl-mr-2"
+        :size="12"
+        data-testid="hourglass-icon"
+      />
+      {{ s__('Pipeline|In progress') }}
+    </span>
 
-      <span v-if="showSkipped" data-testid="pipeline-skipped">
-        <gl-icon name="status_skipped_borderless" class="gl-mr-2" :size="16" />
-        {{ s__('Pipeline|Skipped') }}
-      </span>
+    <span v-if="showSkipped" data-testid="pipeline-skipped">
+      <gl-icon name="status_skipped_borderless" class="gl-mr-2" :size="16" />
+      {{ s__('Pipeline|Skipped') }}
+    </span>
 
-      <p v-if="duration" class="duration">
-        <gl-icon name="timer" class="gl-vertical-align-baseline!" :size="12" />
-        {{ durationFormatted }}
-      </p>
+    <p v-if="duration" class="duration">
+      <gl-icon name="timer" class="gl-vertical-align-baseline!" :size="12" />
+      {{ durationFormatted }}
+    </p>
 
-      <p v-if="finishedTime" class="finished-at d-none d-md-block">
-        <gl-icon name="calendar" class="gl-vertical-align-baseline!" :size="12" />
+    <p v-if="finishedTime" class="finished-at d-none d-md-block">
+      <gl-icon name="calendar" class="gl-vertical-align-baseline!" :size="12" />
 
-        <time
-          v-gl-tooltip
-          :title="tooltipTitle(finishedTime)"
-          data-placement="top"
-          data-container="body"
-        >
-          {{ timeFormatted(finishedTime) }}
-        </time>
-      </p>
-    </div>
+      <time
+        v-gl-tooltip
+        :title="tooltipTitle(finishedTime)"
+        data-placement="top"
+        data-container="body"
+      >
+        {{ timeFormatted(finishedTime) }}
+      </time>
+    </p>
   </div>
 </template>
