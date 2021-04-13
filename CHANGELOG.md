@@ -562,6 +562,14 @@ entry.
 - Convert mattermost alert to pajamas. !56556
 
 
+## 13.9.6 (2021-04-13)
+
+### Security (2 changes)
+
+- Clean only legitimate JPG and TIFF files.
+- Update ruby-saml and rexml gems.
+
+
 ## 13.9.5 (2021-03-31)
 
 ### Security (6 changes)
