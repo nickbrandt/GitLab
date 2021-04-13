@@ -21086,6 +21086,9 @@ msgstr ""
 msgid "New project/repository"
 msgstr ""
 
+msgid "New public deploy key"
+msgstr ""
+
 msgid "New release"
 msgstr ""
 
