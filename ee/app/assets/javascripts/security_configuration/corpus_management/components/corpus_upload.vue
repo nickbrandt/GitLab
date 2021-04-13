@@ -1,6 +1,6 @@
 <script>
 import { GlButton, GlModal, GlModalDirective } from '@gitlab/ui';
-import CorpusUploadModal from 'ee/security_configuration/corpus_management/components/corpus_upload_modal.vue';
+import CorpusUploadForm from 'ee/security_configuration/corpus_management/components/corpus_upload_form.vue';
 import { numberToHumanSize } from '~/lib/utils/number_utils';
 import { s__ } from '~/locale';
 import addCorpusMutation from '../graphql/mutations/add_corpus.mutation.graphql';
@@ -11,7 +11,7 @@ export default {
   components: {
     GlButton,
     GlModal,
-    CorpusUploadModal,
+    CorpusUploadForm,
   },
   directives: {
     GlModalDirective,
@@ -107,7 +107,7 @@ export default {
       @primary="addCorpus"
       @canceled="resetCorpus"
     >
-      <corpus-upload-modal />
+      <corpus-upload-form />
     </gl-modal>
   </div>
 </template>

@@ -1,6 +1,6 @@
 import { createLocalVue, mount } from '@vue/test-utils';
 import VueApollo from 'vue-apollo';
-import CorpusUploadModal from 'ee/security_configuration/corpus_management/components/corpus_upload_modal.vue';
+import CorpusUploadForm from 'ee/security_configuration/corpus_management/components/corpus_upload_form.vue';
 import createMockApollo from 'helpers/mock_apollo_helper';
 import waitForPromises from 'helpers/wait_for_promises';
 
@@ -51,7 +51,7 @@ describe('Corpus upload modal', () => {
   }
 
   const createComponent = (resolverMock, options = {}) => {
-    wrapper = mount(CorpusUploadModal, {
+    wrapper = mount(CorpusUploadForm, {
       localVue,
       apolloProvider: createMockApolloProvider(resolverMock),
       provide: {

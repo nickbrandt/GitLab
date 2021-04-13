@@ -42,7 +42,7 @@ exports[`Corpus Upload component renders header 1`] = `
     title="New corpus"
     titletag="h4"
   >
-    <corpus-upload-modal-stub />
+    <corpus-upload-form-stub />
   </gl-modal-stub>
 </div>
 `;
