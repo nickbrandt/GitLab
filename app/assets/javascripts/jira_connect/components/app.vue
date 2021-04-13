@@ -93,8 +93,7 @@ export default {
     <h2 class="gl-text-center">{{ s__('JiraService|GitLab for Jira Configuration') }}</h2>
 
     <div class="jira-connect-app-body gl-my-7 gl-pb-4">
-      <div class="gl-display-flex gl-justify-content-space-between">
-        <h5 class="" data-testid="new-jira-connect-ui-heading"></h5>
+      <div class="gl-display-flex gl-justify-content-end">
         <gl-button
           v-if="usersPath"
           category="primary"
