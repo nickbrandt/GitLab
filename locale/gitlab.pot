@@ -18496,10 +18496,16 @@ msgstr ""
 msgid "LearnGitLab|Create a workflow for your new workspace, and learn how GitLab features work together:"
 msgstr ""
 
+msgid "LearnGitLab|Create an issue"
+msgstr ""
+
 msgid "LearnGitLab|Create or import a repository"
 msgstr ""
 
 msgid "LearnGitLab|Create or import your first repository into your new project."
+msgstr ""
+
+msgid "LearnGitLab|Create/import issues (tickets) to collaborate on ideas and plan work."
 msgstr ""
 
 msgid "LearnGitLab|Deploy"
@@ -26741,6 +26747,9 @@ msgid "Reset health check access token"
 msgstr ""
 
 msgid "Reset key"
+msgstr ""
+
+msgid "Reset password"
 msgstr ""
 
 msgid "Reset registration token"
