@@ -142,7 +142,7 @@ RSpec.describe Resolvers::VulnerabilitiesResolver do
       let(:vulnerable) { group }
 
       before do
-        project.update(namespace: group)
+        project.update!(namespace: group)
       end
 
       it 'only returns vulnerabilities belonging to the given projects' do
