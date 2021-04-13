@@ -2331,6 +2331,9 @@ msgstr ""
 msgid "AdminSettings|Service template allows you to set default values for integrations"
 msgstr ""
 
+msgid "AdminSettings|Service templates are deprecated and will be removed in GitLab 14.0."
+msgstr ""
+
 msgid "AdminSettings|Session duration for Git operations when 2FA is enabled (minutes)"
 msgstr ""
 
@@ -28294,9 +28297,6 @@ msgid "Service Templates"
 msgstr ""
 
 msgid "Service URL"
-msgstr ""
-
-msgid "Service templates are deprecated and will be removed in GitLab 14.0."
 msgstr ""
 
 msgid "ServiceDesk|Enable Service Desk"
