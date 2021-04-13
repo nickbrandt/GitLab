@@ -254,8 +254,6 @@ Rails/SaveBang:
     - 'spec/lib/gitlab/email/handler/unsubscribe_handler_spec.rb'
     - 'spec/lib/gitlab/gfm/reference_rewriter_spec.rb'
     - 'spec/lib/gitlab/git_access_spec.rb'
-    - 'spec/lib/gitlab/gitaly_client/object_pool_service_spec.rb'
-    - 'spec/lib/gitlab/gitaly_client/repository_service_spec.rb'
     - 'spec/lib/gitlab/import_export/avatar_saver_spec.rb'
     - 'spec/lib/gitlab/import_export/base/relation_factory_spec.rb'
     - 'spec/lib/gitlab/import_export/design_repo_restorer_spec.rb'
