@@ -4,7 +4,6 @@ import VueApollo from 'vue-apollo';
 import createMockApollo from 'helpers/mock_apollo_helper';
 import CorpusUploadModal from 'ee/security_configuration/corpus_management/components/corpus_upload_modal.vue';
 import waitForPromises from 'helpers/wait_for_promises';
-import getCorpusesQuery from 'ee/security_configuration/corpus_management/graphql/queries/get_corpuses.query.graphql';
 
 const TEST_PROJECT_FULL_PATH = '/namespace/project';
 const TEST_CORPUS_HELP_PATH = '/docs/corpus-management';
@@ -31,41 +30,29 @@ const mockResolver = {
         isUploading: mockIsUploading(),
         progress: mockProgress(),
         __typename: 'UploadState',
-      }
+      };
     },
   },
 };
 
-
 describe('Corpus upload modal', () => {
   let wrapper;
 
-  // const baseState = jest.fn().mockResolvedValue(baseResponse);
-  // const isUploadingState = jest.fn().mockResolvedValue(isUploadingResponse);
-  // const isUploadedState = jest.fn().mockResolvedValue(isUploadedResponse);
-
-  const findCorpusName =   () => wrapper.find('[data-testid="corpus-name"]');
-  const findUploadAttatchment =  () => wrapper.find('[data-testid="upload-attatchment-button"]');
-  const findUploadCorpus =  () => wrapper.find('[data-testid="upload-corpus"]');
-  const findUploadStatus =  () => wrapper.find('[data-testid="upload-status"]');
+  const findCorpusName = () => wrapper.find('[data-testid="corpus-name"]');
+  const findUploadAttatchment = () => wrapper.find('[data-testid="upload-attatchment-button"]');
+  const findUploadCorpus = () => wrapper.find('[data-testid="upload-corpus"]');
+  const findUploadStatus = () => wrapper.find('[data-testid="upload-status"]');
 
   function createMockApolloProvider(resolverMock) {
     localVue.use(VueApollo);
 
-    return createMockApollo([],resolverMock);
+    return createMockApollo([], resolverMock);
   }
 
   const createComponent = (resolverMock, options = {}) => {
-    // const defaultMocks = {
-    //   $apollo: {
-    //     mutate: jest.fn().mockResolvedValue(baseState)
-    //     },
-    // }
-    
-
     wrapper = mount(CorpusUploadModal, {
+      localVue,
       apolloProvider: createMockApolloProvider(resolverMock),
-      //mocks: defaultMocks,
       provide: {
         projectFullPath: TEST_PROJECT_FULL_PATH,
         corpusHelpPath: TEST_CORPUS_HELP_PATH,
@@ -86,123 +73,163 @@ describe('Corpus upload modal', () => {
   });
 
   describe('corpus modal', () => {
-    // describe('initial state', () => {
-    //   beforeEach(() => {
-    //     const data = () => {
-    //       return {       
-    //         attachmentName: '',
-    //         corpusName: '',
-    //         files: [],
-    //         uploadTimeout: null
-    //       }
-    //     };
+    describe('initial state', () => {
+      beforeEach(() => {
+        const data = () => {
+          return {
+            attachmentName: '',
+            corpusName: '',
+            files: [],
+            uploadTimeout: null,
+          };
+        };
 
-    //     createComponent(baseState,{ data });
-    //   });
+        mockTotalSize.mockResolvedValue(0);
+        mockData.mockResolvedValue([]);
+        mockIsUploading.mockResolvedValue(false);
+        mockProgress.mockResolvedValue(0);
 
-    //   it('shows empty name field',()=>{
-    //     expect(findCorpusName().element.value).toBe('');
-    //   });
+        createComponent(mockResolver, { data });
+      });
 
-    //   it('shows the choose file button', () =>{
-    //     expect(findUploadAttatchment().exists()).toBe(true);
-    //   });
+      it('shows empty name field', () => {
+        expect(findCorpusName().element.value).toBe('');
+      });
 
-    //   it('show the upload corpus button',()=>{
-    //     expect(findUploadCorpus().exists()).toBe(false);
-    //   });
+      it('shows the choose file button', () => {
+        expect(findUploadAttatchment().exists()).toBe(true);
+      });
 
-    //   it('does not show the upload progress', () =>{
-    //     expect(findUploadStatus().exists()).toBe(false);
-    //   });
-    // });
+      it('show the upload corpus button', () => {
+        expect(findUploadCorpus().exists()).toBe(false);
+      });
 
-    // describe('file selected state', () => {
-    //   const attachmentName =  'corpus.zip';
-    //   const corpusName = 'User entered name';
+      it('does not show the upload progress', () => {
+        expect(findUploadStatus().exists()).toBe(false);
+      });
+    });
 
-    //   beforeEach(() => {
-    //     const data = () => {
-    //       return {       
-    //         attachmentName,
-    //         corpusName,
-    //         files: [attachmentName],
-    //         uploadTimeout: null
-    //       }
-    //     };
+    describe('file selected state', () => {
+      const attachmentName = 'corpus.zip';
+      const corpusName = 'User entered name';
 
-    //     createComponent(baseState,{ data });
-    //   });
+      beforeEach(() => {
+        const data = () => {
+          return {
+            attachmentName,
+            corpusName,
+            files: [attachmentName],
+            uploadTimeout: null,
+          };
+        };
 
-    //   it('shows name field',()=>{
-    //     expect(findCorpusName().element.value).toBe(corpusName);
-    //   });
+        mockTotalSize.mockResolvedValue(0);
+        mockData.mockResolvedValue([]);
+        mockIsUploading.mockResolvedValue(false);
+        mockProgress.mockResolvedValue(0);
 
-    //   it('shows the choose file button', () =>{
-    //     expect(findUploadAttatchment().exists()).toBe(true);
-    //   });
+        createComponent(mockResolver, { data });
+      });
 
-    //   it('shows the upload corpus button',()=>{
-    //     expect(findUploadCorpus().exists()).toBe(true);
-    //   });
+      it('shows name field', () => {
+        expect(findCorpusName().element.value).toBe(corpusName);
+      });
 
-    //   it('does not show the upload progress', () =>{
-    //     expect(findUploadStatus().exists()).toBe(false);
-    //   });
-    // });
-    
+      it('shows the choose file button', () => {
+        expect(findUploadAttatchment().exists()).toBe(true);
+      });
+
+      it('shows the upload corpus button', () => {
+        expect(findUploadCorpus().exists()).toBe(true);
+      });
+
+      it('does not show the upload progress', () => {
+        expect(findUploadStatus().exists()).toBe(false);
+      });
+    });
+
     describe('uploading state', () => {
-      const attachmentName =  'corpus.zip';
+      const attachmentName = 'corpus.zip';
       const corpusName = 'User entered name';
 
       beforeEach(async () => {
         const data = () => {
-          return {       
+          return {
             attachmentName,
             corpusName,
             files: [attachmentName],
-            uploadTimeout: null
-          }
+            uploadTimeout: null,
+          };
         };
 
         mockTotalSize.mockResolvedValue(0);
         mockData.mockResolvedValue([]);
         mockIsUploading.mockResolvedValue(true);
         mockProgress.mockResolvedValue(25);
-        
-        createComponent(mockResolver,{ data });
+
+        createComponent(mockResolver, { data });
 
         await waitForPromises();
       });
 
-      it('shows name field',()=>{
+      it('shows name field', () => {
         expect(findCorpusName().element.value).toBe(corpusName);
       });
 
-      it('shows the choose file button', () =>{
-        debugger;
-        expect(findUploadAttatchment().exists()).toBe(false);
+      it('shows the choose file button as disabled', () => {
+        expect(findUploadAttatchment().exists()).toBe(true);
+        expect(findUploadAttatchment().attributes('disabled')).toBe('disabled');
       });
 
-      it('shows the upload corpus button',()=>{
+      it('does not show the upload corpus button', () => {
         expect(findUploadCorpus().exists()).toBe(false);
       });
 
-      it('does not show the upload progress', () =>{
+      it('does shows the upload progress', () => {
         expect(findUploadStatus().exists()).toBe(true);
+        expect(findUploadStatus().element).toMatchSnapshot();
       });
     });
-    
-    // describe('file uploaded state', () => {
-    //   beforeEach(() => {
-    //     const data = () => {
-    //       return { states: { mockedPackages: { totalSize: 12 } } };
-    //     };
 
-    //     createComponent({ data });
-    //   });
-    // });      
+    describe('file uploaded state', () => {
+      const attachmentName = 'corpus.zip';
+      const corpusName = 'User entered name';
 
+      beforeEach(async () => {
+        const data = () => {
+          return {
+            attachmentName,
+            corpusName,
+            files: [attachmentName],
+            uploadTimeout: null,
+          };
+        };
 
+        mockTotalSize.mockResolvedValue(0);
+        mockData.mockResolvedValue([]);
+        mockIsUploading.mockResolvedValue(false);
+        mockProgress.mockResolvedValue(100);
+
+        createComponent(mockResolver, { data });
+
+        await waitForPromises();
+      });
+
+      it('shows name field', () => {
+        expect(findCorpusName().element.value).toBe(corpusName);
+      });
+
+      it('does not show the choose file button', () => {
+        expect(findUploadAttatchment().exists()).toBe(false);
+      });
+
+      it('does not show the upload corpus button', () => {
+        expect(findUploadCorpus().exists()).toBe(false);
+      });
+
+      it('does not show the upload progress', () => {
+        expect(findUploadStatus().exists()).toBe(false);
+      });
+    });
   });
 });

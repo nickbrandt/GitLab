@@ -42,7 +42,6 @@ export default {
         };
       },
       update: (data) => {
-        debugger;
         return data;
       },
       error() {
@@ -85,10 +84,10 @@ export default {
       return this.states?.uploadState.progress;
     },
   },
-  // beforeDestroy() {
-  //   this.resetAttatchment();
-  //   this.cancelUpload();
-  // },
+  beforeDestroy() {
+    this.resetAttatchment();
+    this.cancelUpload();
+  },
   methods: {
     clearName() {
       this.corpusName = '';
@@ -138,7 +137,12 @@ export default {
     <gl-form-group label="Corpus name" label-size="sm" label-for="corpus-name">
       <gl-form-input-group class="gl-corpus-name">
         <slot name="input">
-          <gl-form-input id="corpus-name" data-testid="corpus-name" ref="input" v-model="corpusName" />
+          <gl-form-input
+            id="corpus-name"
+            data-testid="corpus-name"
+            ref="input"
+            v-model="corpusName"
+          />
         </slot>
 
         <gl-button
@@ -156,7 +160,12 @@ export default {
     </gl-form-group>
 
     <gl-form-group label="Corpus name" label-size="sm" label-for="corpus-file">
-      <gl-button v-if="showFilePickerButton" data-testid="upload-attatchment-button" :disabled="isUploading" @click="openFileUpload">
+      <gl-button
+        v-if="showFilePickerButton"
+        data-testid="upload-attatchment-button"
+        :disabled="isUploading"
+        @click="openFileUpload"
+      >
         {{ this.$options.i18n.uploadButtonText }}
       </gl-button>
 
@@ -179,11 +188,17 @@ export default {
 
     <span>{{ this.$options.i18n.uploadMessage }}</span>
 
-    <gl-button v-if="showUploadButton" data-testid="upload-corpus" class="gl-mt-2" variant="success" @click="beginFileUpload">
+    <gl-button
+      v-if="showUploadButton"
+      data-testid="upload-corpus"
+      class="gl-mt-2"
+      variant="success"
+      @click="beginFileUpload"
+    >
       {{ __('Upload file') }}
     </gl-button>
 
-    <div v-if="isUploading" data-testid="uploading-status" class="gl-mt-2">
+    <div v-if="isUploading" data-testid="upload-status" class="gl-mt-2">
       <gl-loading-icon inline size="sm" />
       {{ sprintf(__('Attatching File - %{progress}%'), { progress }) }}
       <gl-button size="small" @click="cancelUpload"> {{ __('Cancel') }} </gl-button>
