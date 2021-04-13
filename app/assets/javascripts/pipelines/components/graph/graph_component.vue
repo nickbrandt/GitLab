@@ -94,8 +94,8 @@ export default {
         collectMetrics: true,
       };
     },
-    shouldHideLinks() {
-      return this.isStageView || !this.showLinks;
+    showJobLinks() {
+      return !this.isStageView && this.showLinks;
     },
     // The show downstream check prevents showing redundant linked columns
     showDownstreamPipelines() {
@@ -185,6 +185,7 @@ export default {
             :config-paths="configPaths"
             :linked-pipelines="upstreamPipelines"
             :column-title="__('Upstream')"
+            :show-links="showJobLinks"
             :type="$options.pipelineTypeConstants.UPSTREAM"
             :view-type="viewType"
             @error="onError"
@@ -199,9 +200,8 @@ export default {
               :container-measurements="measurements"
               :highlighted-job="hoveredJobName"
               :metrics-config="metricsConfig"
-              :never-show-links="shouldHideLinks"
+              :show-links="showJobLinks"
               :view-type="viewType"
-              default-link-color="gl-stroke-transparent"
               @error="onError"
               @highlightedJobsChange="updateHighlightedJobs"
             >
@@ -229,6 +229,7 @@ export default {
             :config-paths="configPaths"
             :linked-pipelines="downstreamPipelines"
             :column-title="__('Downstream')"
+            :show-links="showJobLinks"
             :type="$options.pipelineTypeConstants.DOWNSTREAM"
             :view-type="viewType"
             @downstreamHovered="setJob"
