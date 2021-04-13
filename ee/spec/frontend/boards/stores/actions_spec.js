@@ -9,8 +9,9 @@ import * as types from 'ee/boards/stores/mutation_types';
 import mutations from 'ee/boards/stores/mutations';
 import { TEST_HOST } from 'helpers/test_constants';
 import testAction from 'helpers/vuex_action_helper';
-import { formatBoardLists } from '~/boards/boards_util';
+import { formatBoardLists, formatListIssues } from '~/boards/boards_util';
 import { issuableTypes } from '~/boards/constants';
+import listsIssuesQuery from '~/boards/graphql/lists_issues.query.graphql';
 import * as typesCE from '~/boards/stores/mutation_types';
 import * as commonUtils from '~/lib/utils/common_utils';
 import { mergeUrlParams, removeParams } from '~/lib/utils/url_utility';
@@ -19,6 +20,7 @@ import {
   mockLists,
   mockIssue,
   mockIssue2,
+  mockIssues,
   mockEpic,
   rawIssue,
   mockMilestones,
@@ -318,6 +320,89 @@ describe('fetchEpicsSwimlanes', () => {
         },
       ],
       done,
+    );
+  });
+});
+
+describe('fetchItemsForList', () => {
+  const listId = mockLists[0].id;
+
+  const state = {
+    fullPath: 'gitlab-org',
+    boardId: '1',
+    filterParams: {},
+    boardType: 'group',
+  };
+
+  const mockIssuesNodes = mockIssues.map((issue) => ({ node: issue }));
+
+  const pageInfo = {
+    endCursor: '',
+    hasNextPage: false,
+  };
+
+  const queryResponse = {
+    data: {
+      group: {
+        board: {
+          lists: {
+            nodes: [
+              {
+                id: listId,
+                issues: {
+                  edges: mockIssuesNodes,
+                  pageInfo,
+                },
+              },
+            ],
+          },
+        },
+      },
+    },
+  };
+
+  const formattedIssues = formatListIssues(queryResponse.data.group.board.lists);
+
+  const listPageInfo = {
+    [listId]: pageInfo,
+  };
+
+  it('add epicWildcardId with ANY as value when forSwimlanes is true', () => {
+    jest.spyOn(gqlClient, 'query').mockResolvedValue(queryResponse);
+
+    testAction(
+      actions.fetchItemsForList,
+      { listId, forSwimlanes: true },
+      state,
+      [
+        {
+          type: types.REQUEST_ITEMS_FOR_LIST,
+          payload: { listId, fetchNext: false },
+        },
+        {
+          type: types.RECEIVE_ITEMS_FOR_LIST_SUCCESS,
+          payload: { listItems: formattedIssues, listPageInfo, listId, noEpicIssues: false },
+        },
+      ],
+      [],
+      () => {
+        expect(gqlClient.query).toHaveBeenCalledWith({
+          query: listsIssuesQuery,
+          variables: {
+            boardId: 'gid://gitlab/Board/1',
+            filters: {
+              epicWildcardId: 'ANY',
+            },
+            fullPath: 'gitlab-org',
+            id: 'gid://gitlab/List/1',
+            isGroup: true,
+            isProject: false,
+          },
+          context: {
+            isSingleRequest: true,
+          },
+        });
+      },
     );
   });
 });
