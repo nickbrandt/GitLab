@@ -4,6 +4,7 @@ require "spec_helper"
 
 RSpec.describe Admin::UserEntity do
   let_it_be(:user) { build_stubbed(:user) }
+
   let(:request) { double('request') }
 
   let(:entity) do
@@ -14,19 +15,7 @@ RSpec.describe Admin::UserEntity do
     subject { entity.as_json&.keys }
 
     it 'exposes correct attributes' do
-      is_expected.to include(
-        :id,
-        :name,
-        :created_at,
-        :email,
-        :username,
-        :last_activity_on,
-        :avatar_url,
-        :note,
-        :badges,
-        :projects_count,
-        :actions
-      )
+      is_expected.to include(:oncall_schedules)
     end
   end
 end
