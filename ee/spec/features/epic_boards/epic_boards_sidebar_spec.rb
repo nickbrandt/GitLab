@@ -114,11 +114,11 @@ RSpec.describe 'Epic boards sidebar', :js do
       page.within('.confidentiality') do
         expect(page).to have_content('Not confidential')
 
-        find('[data-testid="edit-button"]').click
+        click_button 'Edit'
         expect(page).to have_css('.sidebar-item-warning-message')
 
         within('.sidebar-item-warning-message') do
-          find('[data-testid="confidential-toggle"]').click
+          click_button 'Turn on'
         end
 
         wait_for_requests
@@ -133,8 +133,7 @@ RSpec.describe 'Epic boards sidebar', :js do
       click_card(card)
 
       page.within('[data-testid="sidebar-notifications"]') do
-        expect(page).to have_selector('[data-testid="notification-subscribe-toggle"]')
-        expect(page).to have_content('Notifications')
+        expect(page).to have_button('Notifications')
         expect(page).not_to have_content('Notifications have been disabled by the project or group owner')
       end
     end
@@ -142,15 +141,13 @@ RSpec.describe 'Epic boards sidebar', :js do
     it 'shows toggle as on then as off as user toggles to subscribe and unsubscribe', :aggregate_failures do
       click_card(card)
 
-      toggle = find('[data-testid="notification-subscribe-toggle"]')
+      click_button 'Notifications'
 
-      toggle.click
+      expect(page).to have_button('Notifications', class: 'is-checked')
 
-      expect(toggle).to have_css("button.is-checked")
+      click_button 'Notifications'
 
-      toggle.click
-
-      expect(toggle).not_to have_css("button.is-checked")
+      expect(page).not_to have_button('Notifications', class: 'is-checked')
     end
 
     context 'when notifications have been disabled' do
