@@ -3281,6 +3281,18 @@ artifacts:
     - binaries/**/*.o
 ```
 
+Unlike [`artifacts:paths`](#artifactspaths), `exclude` paths are not recursive. To exclude all of the contents of a directory, you can match them explicitly rather than matching the directory itself.
+
+For example, to store all files in `binaries/` but nothing located in the `temp/` subdirectory:
+
+```yaml
+artifacts:
+  paths:
+    - binaries/
+  exclude:
+    - binaries/temp/**/*
+```
+
 Files matched by [`artifacts:untracked`](#artifactsuntracked) can be excluded using
 `artifacts:exclude` too.
 
