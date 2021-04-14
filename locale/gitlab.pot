@@ -36303,6 +36303,9 @@ msgstr ""
 msgid "Your new SCIM token"
 msgstr ""
 
+msgid "Your new comment"
+msgstr ""
+
 msgid "Your new personal access token has been created."
 msgstr ""
 
