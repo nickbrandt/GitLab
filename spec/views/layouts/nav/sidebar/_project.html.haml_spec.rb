@@ -175,6 +175,48 @@ RSpec.describe 'layouts/nav/sidebar/_project' do
     end
   end
 
+  describe 'External Issue Tracker' do
+    let_it_be_with_refind(:project) { create(:project, has_external_issue_tracker: true) }
+
+    context 'with custom external issue tracker' do
+      let(:external_issue_tracker_url) { 'http://test.com' }
+
+      let!(:external_issue_tracker) do
+        create(:custom_issue_tracker_service, active: external_issue_tracker_active, project: project, project_url: external_issue_tracker_url)
+      end
+
+      context 'when external issue tracker is configured and active' do
+        let(:external_issue_tracker_active) { true }
+
+        it 'has a link to the external issue tracker' do
+          render
+
+          expect(rendered).to have_link('Custom Issue Tracker', href: external_issue_tracker_url)
+        end
+      end
+
+      context 'when external issue tracker is not configured and active' do
+        let(:external_issue_tracker_active) { false }
+
+        it 'does not have a link to the external issue tracker' do
+          render
+
+          expect(rendered).not_to have_link('Custom Issue Tracker')
+        end
+      end
+    end
+
+    context 'with Jira issue tracker' do
+      let_it_be(:jira) { create(:jira_service, project: project, issues_enabled: false) }
+
+      it 'has a link to the Jira issue tracker' do
+        render
+
+        expect(rendered).to have_link('Jira', href: project.external_issue_tracker.issue_tracker_path)
+      end
+    end
+  end
+
   describe 'packages tab' do
     before do
       stub_container_registry_config(enabled: true)
