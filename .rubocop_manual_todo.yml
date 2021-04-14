@@ -965,9 +965,6 @@ RSpec/EmptyLineAfterFinalLetItBe:
     - spec/services/design_management/save_designs_service_spec.rb
     - spec/services/discussions/resolve_service_spec.rb
     - spec/services/discussions/unresolve_service_spec.rb
-    - spec/services/environments/auto_stop_service_spec.rb
-    - spec/services/environments/canary_ingress/update_service_spec.rb
-    - spec/services/environments/reset_auto_stop_service_spec.rb
     - spec/services/feature_flags/create_service_spec.rb
     - spec/services/feature_flags/destroy_service_spec.rb
     - spec/services/feature_flags/disable_service_spec.rb
