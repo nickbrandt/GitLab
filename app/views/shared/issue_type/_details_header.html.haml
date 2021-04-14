@@ -4,7 +4,7 @@
       = sprite_icon('issue-close', css_class: 'gl-display-block gl-sm-display-none!')
       .gl-display-none.gl-sm-display-block!
         = issue_closed_text(issuable, current_user)
-      %span.text-white.gl-sm-display-none!
+      %span.text-white.gl-pl-2.gl-sm-display-none!
         = " (#{issue_closed_link(issuable, current_user, css_class: 'text-underline text-white')})"
     .issuable-status-box.status-box.status-box-open{ class: issue_status_visibility(issuable, status_box: :open) }
       = sprite_icon('issue-open-m', css_class: 'gl-display-block gl-sm-display-none!')
