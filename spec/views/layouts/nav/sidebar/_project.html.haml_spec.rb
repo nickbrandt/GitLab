@@ -217,6 +217,26 @@ RSpec.describe 'layouts/nav/sidebar/_project' do
     end
   end
 
+  describe 'Labels' do
+    context 'when issues are not enabled' do
+      it 'has a link to the labels path' do
+        project.project_feature.update!(issues_access_level: ProjectFeature::DISABLED)
+
+        render
+
+        expect(rendered).to have_link('Labels', href: project_labels_path(project), class: 'shortcuts-labels')
+      end
+    end
+
+    context 'when issues are enabled' do
+      it 'does not have a link to the labels path' do
+        render
+
+        expect(rendered).not_to have_link('Labels', href: project_labels_path(project), class: 'shortcuts-labels')
+      end
+    end
+  end
+
   describe 'packages tab' do
     before do
       stub_container_registry_config(enabled: true)
