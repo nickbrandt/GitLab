@@ -31,23 +31,20 @@ export default {
       return [
         {
           title: this.$options.i18n.git,
-          sync: syncInfoData
-            .filter((replicable) => replicable.dataType === REPOSITORY)
-            .map((d) => d.values),
-          verification: verificationInfoData
-            .filter((replicable) => replicable.dataType === REPOSITORY)
-            .map((d) => d.values),
+          sync: this.filterByDataType(syncInfoData, REPOSITORY),
+          verification: this.filterByDataType(verificationInfoData, REPOSITORY),
         },
         {
           title: this.$options.i18n.file,
-          sync: syncInfoData
-            .filter((replicable) => replicable.dataType === BLOB)
-            .map((d) => d.values),
-          verification: verificationInfoData
-            .filter((replicable) => replicable.dataType === BLOB)
-            .map((d) => d.values),
+          sync: this.filterByDataType(syncInfoData, BLOB),
+          verification: this.filterByDataType(verificationInfoData, BLOB),
         },
       ];
+    },
+  },
+  methods: {
+    filterByDataType(data, type) {
+      return data.filter((replicable) => replicable.dataType === type).map((d) => d.values);
     },
   },
 };

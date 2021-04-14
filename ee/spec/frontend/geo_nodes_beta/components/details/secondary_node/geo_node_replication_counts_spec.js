@@ -66,12 +66,28 @@ describe('GeoNodeReplicationCounts', () => {
       });
     });
 
+    const mockRepositoryData = { dataType: REPOSITORY, values: { total: 100, success: 0 } };
+    const mockBlobData = { dataType: BLOB, values: { total: 100, success: 100 } };
+    const mockGitEmptySync = { title: 'Git', sync: [], verification: [] };
+    const mockGitSuccess0 = {
+      title: 'Git',
+      sync: [{ total: 100, success: 0 }],
+      verification: [{ total: 100, success: 0 }],
+    };
+
+    const mockFileEmptySync = { title: 'File', sync: [], verification: [] };
+    const mockFileSync100 = {
+      title: 'File',
+      sync: [{ total: 100, success: 100 }],
+      verification: [{ total: 100, success: 100 }],
+    };
+
     describe.each`
-      description            | mockGetterData                                                                                                              | expectedData
-      ${'with no data'}      | ${[]}                                                                                                                       | ${[{ title: 'Git', sync: [], verification: [] }, { title: 'File', sync: [], verification: [] }]}
-      ${'with no File data'} | ${[{ dataType: REPOSITORY, values: { total: 100, success: 0 } }]}                                                           | ${[{ title: 'Git', sync: [{ total: 100, success: 0 }], verification: [{ total: 100, success: 0 }] }, { title: 'File', sync: [], verification: [] }]}
-      ${'with no Git data'}  | ${[{ dataType: BLOB, values: { total: 100, success: 100 } }]}                                                               | ${[{ title: 'Git', sync: [], verification: [] }, { title: 'File', sync: [{ total: 100, success: 100 }], verification: [{ total: 100, success: 100 }] }]}
-      ${'with all data'}     | ${[{ dataType: REPOSITORY, values: { total: 100, success: 0 } }, { dataType: BLOB, values: { total: 100, success: 100 } }]} | ${[{ title: 'Git', sync: [{ total: 100, success: 0 }], verification: [{ total: 100, success: 0 }] }, { title: 'File', sync: [{ total: 100, success: 100 }], verification: [{ total: 100, success: 100 }] }]}
+      description            | mockGetterData                        | expectedData
+      ${'with no data'}      | ${[]}                                 | ${[mockGitEmptySync, mockFileEmptySync]}
+      ${'with no File data'} | ${[mockRepositoryData]}               | ${[mockGitSuccess0, mockFileEmptySync]}
+      ${'with no Git data'}  | ${[mockBlobData]}                     | ${[mockGitEmptySync, mockFileSync100]}
+      ${'with all data'}     | ${[mockRepositoryData, mockBlobData]} | ${[mockGitSuccess0, mockFileSync100]}
     `('replicationOverview $description', ({ mockGetterData, expectedData }) => {
       beforeEach(() => {
         createComponent(null, {
