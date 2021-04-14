@@ -69,8 +69,10 @@ You can also filter epics in the Roadmap view by the epics':
 - Label
 - Milestone
 - Confidentiality
+- Epic
+- Your Reaction
 
-![roadmap date range in weeks](img/roadmap_filters_v13_8.png)
+![roadmap date range in weeks](img/roadmap_filters_v13_11.png)
 
 Roadmaps can also be [visualized inside an epic](../epics/index.md#roadmap-in-epics).
 
