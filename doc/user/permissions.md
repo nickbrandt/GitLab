@@ -108,6 +108,7 @@ The following table depicts the various user permission levels in a project.
 | Upload [Design Management](project/issues/design_management.md) files |  |  | ✓        | ✓        | ✓      |
 | Create/edit [releases](project/releases/index.md)|   |            | ✓           | ✓        | ✓      |
 | Delete [releases](project/releases/index.md)|   |            |            | ✓        | ✓      |
+| Manage merge approval rules (project settings)    |         |            |             | ✓        | ✓      |
 | Create new merge request                          |         |            | ✓           | ✓        | ✓      |
 | Create new branches                               |         |            | ✓           | ✓        | ✓      |
 | Push to non-protected branches                    |         |            | ✓           | ✓        | ✓      |
