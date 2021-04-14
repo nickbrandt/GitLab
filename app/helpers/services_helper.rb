@@ -164,7 +164,7 @@ module ServicesHelper
 
   def serialize_integration(integration)
     {
-      active: integration.activated?,
+      active: integration.operating?,
       name: integration.title,
       description: integration.description,
       updated_at: integration.updated_at,
