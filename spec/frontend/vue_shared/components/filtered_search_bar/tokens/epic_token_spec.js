@@ -71,7 +71,7 @@ describe('EpicToken', () => {
 
     describe('currentValue', () => {
       it('returns numeric `iid` when have string as value', async () => {
-        wrapper.setProps({ value: { data: `"${mockEpics[0].title}"::&${mockEpics[0].iid}` } });
+        wrapper.setProps({ value: { data: `${mockEpics[0].title}::&${mockEpics[0].iid}` } });
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.currentValue).toBe(mockEpics[0].iid);
@@ -185,7 +185,7 @@ describe('EpicToken', () => {
       const tokenSegments = wrapper.findAll(GlFilteredSearchTokenSegment);
 
       expect(tokenSegments).toHaveLength(3);
-      expect(tokenSegments.at(2).text()).toBe(`"${mockEpics[0].title}"::&${mockEpics[0].iid}`);
+      expect(tokenSegments.at(2).text()).toBe(`${mockEpics[0].title}::&${mockEpics[0].iid}`);
     });
   });
 });

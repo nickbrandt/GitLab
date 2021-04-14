@@ -15101,7 +15101,7 @@ msgstr ""
 msgid "GroupRoadmap|To widen your search, change or remove filters; from %{startDate} to %{endDate}."
 msgstr ""
 
-msgid "GroupRoadmap|Try adding a start or end date to your epics so that they will display in the roadmap."
+msgid "GroupRoadmap|Try adding a start or due date to your epics so that they will display in the roadmap."
 msgstr ""
 
 msgid "GroupSAML|Active SAML Group Links (%{count})"

@@ -32,12 +32,16 @@ export default {
   },
   computed: {
     currentValue() {
-      /* When the URL contains the epic_iid, we'd get
+      /*
+       * When the URL contains the epic_iid, we'd get: '123'
        */
       if (isNumeric(this.value.data)) {
         return parseInt(this.value.data, 10);
       }
 
+      /*
+       * When the token is added in current session it'd be: 'Foo::&123'
+       */
       const id = this.value.data.split('::&')[1];
 
       if (id) {
@@ -96,7 +100,7 @@ export default {
     }, DEBOUNCE_DELAY),
 
     getEpicValue(epic) {
-      return `"${epic.title}"::&${epic.iid}`;
+      return `${epic.title}::&${epic.iid}`;
     },
   },
   stripQuotes,
