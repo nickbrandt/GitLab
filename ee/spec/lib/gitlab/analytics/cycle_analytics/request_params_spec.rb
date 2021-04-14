@@ -204,11 +204,13 @@ RSpec.describe Gitlab::Analytics::CycleAnalytics::RequestParams do
 
     subject { described_class.new(params).to_data_attributes }
 
-    it { expect(subject[:milestone]).to eq('title') }
-    it { expect(subject[:assignees]).to eq('["username1"]') }
-    it { expect(subject[:labels]).to eq('["label1","label2"]') }
-    it { expect(subject[:author]).to eq('author') }
-    it { expect(subject[:stage]).to eq('{"id":1,"title":"Stage #1"}') }
+    it "has the correct attributes" do
+      expect(subject[:milestone]).to eq('title')
+      expect(subject[:assignees]).to eq('["username1"]')
+      expect(subject[:labels]).to eq('["label1","label2"]')
+      expect(subject[:author]).to eq('author')
+      expect(subject[:stage]).to eq(%Q|{"id":#{stage.id},"title":"#{stage.name}"}|)
+    end
   end
 
   describe 'sorting params' do
