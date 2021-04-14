@@ -1,8 +1,14 @@
+---
+stage: none
+group: unassigned
+info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#assignments
+---
+
 # Using solargraph
 
 Gemfile packages [solargraph](https://github.com/castwide/solargraph) language server for additional intellisense and code formatting capabilities with editors that support it.
 
-Example configuration for solargraph can be found in [.solargraph.yml.example](/.solargraph.yml.example) file. Copy the contents of this file to `.solargraph.yml` file for language server to pick this configuration up. Since `.solargraph.yml` configuration file is ignored by Git, it's possible to adjust configuration according to your needs.
+Example configuration for solargraph can be found in [.solargraph.yml.example](https://gitlab.com/gitlab-org/gitlab/-/blob/master/.solargraph.yml.example) file. Copy the contents of this file to `.solargraph.yml` file for language server to pick this configuration up. Since `.solargraph.yml` configuration file is ignored by Git, it's possible to adjust configuration according to your needs.
 
 Refer to particular IDE plugin documentation on how to integrate it with solargraph language server:
 
