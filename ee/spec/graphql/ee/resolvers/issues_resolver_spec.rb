@@ -67,8 +67,8 @@ RSpec.describe Resolvers::IssuesResolver do
       end
 
       describe 'filtering by iteration' do
-        let_it_be(:iteration1) { create(:iteration, group: group) }
-        let_it_be(:iteration2) { create(:iteration, group: group) }
+        let_it_be(:iteration1) { create(:iteration, group: group, start_date: 4.weeks.ago, due_date: 3.weeks.ago) }
+        let_it_be(:iteration2) { create(:iteration, group: group, start_date: 6.weeks.ago, due_date: 5.weeks.ago) }
         let_it_be(:issue_with_iteration1) { create(:issue, project: project, iteration: iteration1) }
         let_it_be(:issue_with_iteration2) { create(:issue, project: project, iteration: iteration2) }
         let_it_be(:issue_without_iteration) { create(:issue, project: project) }
