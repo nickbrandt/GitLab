@@ -146,8 +146,8 @@ without leaving your terminal:
 
 1. Ensure you have access rights to the associated namespace. You need the name of
    your namespace for a later step. TODO HOW TO IDENTIFY
-1. If you want to push using SSH, ensure you have [created a SSH key](../../ssh/index.md) and
-   [added it to your GitLab account](../../ssh/index.md#add-an-ssh-key-to-your-gitlab-account).
+1. If you want to push using SSH, ensure you have [created a SSH key](../../ssh/README.md) and
+   [added it to your GitLab account](../../ssh/README.md#add-an-ssh-key-to-your-gitlab-account).
 1. Push with one of the following methods. Replace `gitlab.example.com` with the
    domain name of the machine that hosts your Git repository, `namespace` with the name of
    your namespace, and `myproject` with the name of your new project:
