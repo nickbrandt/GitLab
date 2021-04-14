@@ -23,7 +23,7 @@ module Pages
 
       @queue.close
 
-      @logger.info("Waiting for threads to finish...")
+      @logger.info(message: "Pages legacy storage migration: Waiting for threads to finish...")
       migration_threads.each(&:join)
 
       { migrated: @migrated, errored: @errored }
@@ -58,12 +58,12 @@ module Pages
         migrate_project(project)
       end
 
-      @logger.info("#{@migrated} projects are migrated successfully, #{@errored} projects failed to be migrated")
+      @logger.info(message: "Pages legacy storage migration: batch processed", migrated: @migrated, errored: @errored)
     rescue => e
       # This method should never raise exception otherwise all threads might be killed
       # and this will result in queue starving (and deadlock)
       Gitlab::ErrorTracking.track_exception(e)
-      @logger.error("failed processing a batch: #{e.message}")
+      @logger.error(message: "Pages legacy storage migration: failed processing a batch: #{e.message}")
     end
 
     def migrate_project(project)
@@ -75,15 +75,15 @@ module Pages
       end
 
       if result[:status] == :success
-        @logger.info("project_id: #{project.id} #{project.pages_path} has been migrated in #{time.round(2)} seconds: #{result[:message]}")
+        @logger.info(message: "Pages legacy storage migration: project migrated", project_id: project.id, pages_path: project.pages_path, duration: time.round(2))
         @counters_lock.synchronize { @migrated += 1 }
       else
-        @logger.error("project_id: #{project.id} #{project.pages_path} failed to be migrated in #{time.round(2)} seconds: #{result[:message]}")
+        @logger.error(message: "Pages legacy storage migration: project failed to be migrated", project_id: project.id, pages_path: project.pages_path, duration: time.round(2))
         @counters_lock.synchronize { @errored += 1 }
       end
     rescue => e
       @counters_lock.synchronize { @errored += 1 }
-      @logger.error("project_id: #{project&.id} #{project&.pages_path} failed to be migrated: #{e.message}")
+      @logger.error(message: "Pages legacy storage migration: project failed to be migrated", project_id: project&.id, pages_path: project&.pages_path)
       Gitlab::ErrorTracking.track_exception(e, project_id: project&.id)
     end
   end
