@@ -516,7 +516,7 @@ to your branch to address your reviewers' requests.
    ![A code change suggestion displayed, with the button to apply the batch of suggestions highlighted.](img/apply_batch_of_suggestions_v13_1.jpg "Apply a batch of suggestions")
 
 WARNING:
-Suggestions applied from multiple authors will create a commit authored by the user applying the suggestions.
+Suggestions applied from multiple authors creates a commit authored by the user applying the suggestions.
 
 ## Start a thread by replying to a standard comment
 

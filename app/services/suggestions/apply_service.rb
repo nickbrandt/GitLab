@@ -37,7 +37,11 @@ module Suggestions
     end
 
     def author
-      Gitlab::Git::User.from_gitlab(suggestion_set.authors.first) if suggestion_set.authors.one?
+      authors = suggestion_set.authors
+
+      return unless authors.one?
+
+      Gitlab::Git::User.from_gitlab(authors.first)
     end
 
     def multi_service
