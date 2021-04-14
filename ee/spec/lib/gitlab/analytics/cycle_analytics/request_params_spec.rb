@@ -189,12 +189,16 @@ RSpec.describe Gitlab::Analytics::CycleAnalytics::RequestParams do
   end
 
   describe 'issuable filter params' do
+    let_it_be(:stage) { create(:cycle_analytics_group_stage, group: root_group) }
+
     before do
       params.merge!(
         milestone_title: 'title',
         assignee_username: ['username1'],
         label_name: %w[label1 label2],
-        author_username: 'author'
+        author_username: 'author',
+        stage_id: stage.id,
+        value_stream: stage.value_stream
       )
     end
 
@@ -204,6 +208,7 @@ RSpec.describe Gitlab::Analytics::CycleAnalytics::RequestParams do
     it { expect(subject[:assignees]).to eq('["username1"]') }
     it { expect(subject[:labels]).to eq('["label1","label2"]') }
     it { expect(subject[:author]).to eq('author') }
+    it { expect(subject[:stage]).to eq('{"id":1,"title":"Stage #1"}') }
   end
 
   describe 'sorting params' do
