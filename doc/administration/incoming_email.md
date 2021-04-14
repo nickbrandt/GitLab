@@ -621,33 +621,20 @@ incoming_email:
 > Introduced in [GitLab 13.11](https://gitlab.com/gitlab-org/gitlab/-/issues/214900).
 
 GitLab can read incoming email using the Microsoft Graph API instead of
-IMAP. Because [Microsoft is deprecating IMAP usage with Basic
-Authentication](https://techcommunity.microsoft.com/t5/exchange-team-blog/announcing-oauth-2-0-support-for-imap-and-smtp-auth-protocols-in/ba-p/1330432),
-the Microsoft Graph API will soon be required for new Microsoft Exchange Online
+IMAP. Because [Microsoft is deprecating IMAP usage with Basic Authentication](https://techcommunity.microsoft.com/t5/exchange-team-blog/announcing-oauth-2-0-support-for-imap-and-smtp-auth-protocols-in/ba-p/1330432), the Microsoft Graph API will soon be required for new Microsoft Exchange Online
 mailboxes.
 
-To configure GitLab for Microsoft Graph, create an application in the
-Azure Active Directory:
-
-1. Sign in to the [Azure portal](https://portal.azure.com).
-1. Search for and select `Azure Active Directory`.
-1. Under `Manage`, select `App registrations` > `New registration`.
-1. Enter a `Name` for your application, such as `GitLab Mail`. Users of your app might see this name, and you can change it later.
-1. If `Supported account types` is listed, select the appropriate option.
-1. Leave `Redirect URI` blank. This is not needed.
-1. Select `Register`.
-1. Under `Manage`, select `Certificates & secrets`.
-1. Under `Client secrets`, select `New client secret`, and enter a name.
-1. Under `Expires`, select `Never`, unless you plan on updating the credentials every time it expires.
-1. Select `Add`. Record the secret value in a safe location for use in a later step.
-1. Under `Manage`, select `API Permissions` > `Add a permission`. Select `Microsoft Graph`.
-1. Select `Application permissions`.
-1. Under the `Mail` node, select `Mail.ReadWrite`, and then select Add permissions.
-1. If `User.Read` is listed in the permission list, you can delete this.
-1. Click `Grant admin consent` for these permissions.
-
-See the [Microsoft instructions](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app)
+To configure GitLab for Microsoft Graph, you will need to register an
+OAuth2 application in your Azure Active Directory that has the
+`Mail.ReadWrite` permission for all mailboxes. See the [MailRoom step-by-step guide](https://github.com/tpitale/mail_room/#microsoft-graph-configuration)
+and [Microsoft instructions](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app)
 for more details.
+
+You will need the following configuration items:
+
+- Tenant ID for your Azure Active Directory
+- Client ID for your OAuth2 application
+- Client secret your OAuth2 application
 
 ##### Restrict mailbox access
 
