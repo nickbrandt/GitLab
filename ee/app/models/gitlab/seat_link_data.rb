@@ -31,8 +31,7 @@ module Gitlab
 
       if license.cloud?
         !license.trial? &&
-          license.expires_at && # Skip sync if license has no expiration
-          timestamp.between?(license.starts_at.beginning_of_day, license.expires_at.end_of_day + 14.days)
+          license.expires_at.present? # Skip sync if license has no expiration
       else
         # Only sync paid licenses from start date until 14 days after expiration
         # when seat link feature is enabled.
