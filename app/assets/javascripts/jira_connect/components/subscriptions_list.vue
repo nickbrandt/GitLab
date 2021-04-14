@@ -38,7 +38,7 @@ export default {
     {
       key: 'actions',
       label: '',
-      tdClass: 'gl-text-right gl-vertical-align-middle! jira-subscription-actions',
+      tdClass: 'gl-text-right gl-vertical-align-middle! gl-pl-0!',
     },
   ],
   i18n: {
@@ -49,6 +49,12 @@ export default {
   },
   methods: {
     isEmpty,
+    isLoadingItem(item) {
+      return this.loadingItem === item;
+    },
+    unlinkBtnClass(item) {
+      return this.isLoadingItem(item) ? '' : 'gl-ml-6';
+    },
     onClick(item) {
       this.loadingItem = item;
 
@@ -80,8 +86,9 @@ export default {
       </template>
       <template #cell(actions)="{ item }">
         <gl-button
+          :class="unlinkBtnClass(item)"
           category="secondary"
-          :loading="loadingItem === item"
+          :loading="isLoadingItem(item)"
           @click.prevent="onClick(item)"
           >{{ __('Unlink') }}</gl-button
         >

@@ -92,7 +92,7 @@ export default {
 
     <h2 class="gl-text-center">{{ s__('JiraService|GitLab for Jira Configuration') }}</h2>
 
-    <div class="jira-connect-app-body gl-my-7 gl-pb-4">
+    <div class="jira-connect-app-body gl-my-7 gl-px-5 gl-pb-4">
       <div class="gl-display-flex gl-justify-content-end">
         <gl-button
           v-if="usersPath"
