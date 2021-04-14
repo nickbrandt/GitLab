@@ -1,6 +1,7 @@
-import { isFunction } from 'lodash';
 import AccessorUtilities from '~/lib/utils/accessor';
 import { ALERT_LOCALSTORAGE_KEY } from './constants';
+
+const isFunction = (fn) => typeof fn === 'function';
 
 /**
  * Persist alert data to localStorage.
