@@ -630,7 +630,7 @@ OAuth2 application in your Azure Active Directory that has the
 and [Microsoft instructions](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app)
 for more details.
 
-You will need the following configuration items:
+Record the following when you configure your OAuth2 application:
 
 - Tenant ID for your Azure Active Directory
 - Client ID for your OAuth2 application
