@@ -431,8 +431,6 @@ RSpec/EmptyLineAfterFinalLetItBe:
     - ee/spec/controllers/projects/merge_requests_controller_spec.rb
     - ee/spec/controllers/projects/mirrors_controller_spec.rb
     - ee/spec/controllers/projects/threat_monitoring_controller_spec.rb
-    - ee/spec/controllers/registrations/groups_controller_spec.rb
-    - ee/spec/controllers/registrations/projects_controller_spec.rb
     - ee/spec/controllers/subscriptions_controller_spec.rb
     - ee/spec/features/boards/group_boards/multiple_boards_spec.rb
     - ee/spec/features/ci_shared_runner_warnings_spec.rb
@@ -932,9 +930,6 @@ RSpec/EmptyLineAfterFinalLetItBe:
     - spec/services/audit_event_service_spec.rb
     - spec/services/auth/dependency_proxy_authentication_service_spec.rb
     - spec/services/auto_merge_service_spec.rb
-    - spec/services/award_emojis/add_service_spec.rb
-    - spec/services/award_emojis/destroy_service_spec.rb
-    - spec/services/award_emojis/toggle_service_spec.rb
     - spec/services/boards/destroy_service_spec.rb
     - spec/services/boards/issues/move_service_spec.rb
     - spec/services/bulk_create_integration_service_spec.rb
@@ -968,9 +963,6 @@ RSpec/EmptyLineAfterFinalLetItBe:
     - spec/services/design_management/save_designs_service_spec.rb
     - spec/services/discussions/resolve_service_spec.rb
     - spec/services/discussions/unresolve_service_spec.rb
-    - spec/services/environments/auto_stop_service_spec.rb
-    - spec/services/environments/canary_ingress/update_service_spec.rb
-    - spec/services/environments/reset_auto_stop_service_spec.rb
     - spec/services/feature_flags/create_service_spec.rb
     - spec/services/feature_flags/destroy_service_spec.rb
     - spec/services/feature_flags/disable_service_spec.rb
