@@ -1,6 +1,6 @@
 module gitlab.com/gitlab-org/gitlab-workhorse
 
-go 1.13
+go 1.15
 
 require (
 	github.com/Azure/azure-storage-blob-go v0.11.1-0.20201209121048-6df5d9af221d
