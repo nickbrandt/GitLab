@@ -5,15 +5,16 @@ require 'spec_helper'
 RSpec.describe Resolvers::Ci::TestSuiteResolver do
   include GraphqlHelpers
 
-  let(:user) { create(:user) }
-  let(:project) { create(:project, :public, :repository) }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:project) { create(:project, :public, :repository) }
 
   describe '#resolve' do
     subject(:test_suite) { resolve(described_class, obj: pipeline, args: { build_ids: build_ids }) }
 
     context 'when pipeline has builds with test reports' do
-      let(:main_pipeline) { create(:ci_pipeline, :with_test_reports_with_three_failures, project: project) }
-      let(:pipeline) { create(:ci_pipeline, :with_test_reports_with_three_failures, project: project, ref: 'new-feature') }
+      let_it_be(:main_pipeline) { create(:ci_pipeline, :with_test_reports_with_three_failures, project: project) }
+      let_it_be(:pipeline) { create(:ci_pipeline, :with_test_reports_with_three_failures, project: project, ref: 'new-feature') }
+
       let(:suite_name) { 'test' }
       let(:build_ids) { pipeline.latest_builds.pluck(:id) }
 
@@ -40,7 +41,8 @@ RSpec.describe Resolvers::Ci::TestSuiteResolver do
     end
 
     context 'when pipeline has no builds that matches the given build_ids' do
-      let(:pipeline) { create(:ci_empty_pipeline) }
+      let_it_be(:pipeline) { create(:ci_empty_pipeline) }
+
       let(:suite_name) { 'test' }
       let(:build_ids) { [non_existing_record_id] }
 

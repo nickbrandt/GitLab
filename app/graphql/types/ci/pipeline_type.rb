@@ -130,7 +130,7 @@ module Types
 
       field :test_suite,
             Types::Ci::TestSuiteType,
-            null: false,
+            null: true,
             description: 'A specific test suite in a pipeline test report.',
             resolver: Resolvers::Ci::TestSuiteResolver
 

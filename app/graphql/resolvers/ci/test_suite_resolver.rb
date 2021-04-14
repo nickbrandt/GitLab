@@ -5,8 +5,9 @@ module Resolvers
     class TestSuiteResolver < BaseResolver
       include Gitlab::Graphql::Authorize::AuthorizeResource
 
-      authorize :read_build
       type ::Types::Ci::TestSuiteType, null: true
+      authorize :read_build
+      authorizes_object!
 
       alias_method :pipeline, :object
 
