@@ -16118,9 +16118,6 @@ msgstr ""
 msgid "If you remove this license, GitLab will fall back on the previous license, if any."
 msgstr ""
 
-msgid "If you want a runner to build only specific projects, restrict the project in the table below. After you restrict a runner to a project, you cannot change it back to a shared runner."
-msgstr ""
-
 msgid "If you want to re-enable two-factor authentication, visit %{two_factor_link}"
 msgstr ""
 
@@ -27199,9 +27196,6 @@ msgstr ""
 msgid "Runners|Download latest binary"
 msgstr ""
 
-msgid "Runners|Group"
-msgstr ""
-
 msgid "Runners|IP Address"
 msgstr ""
 
@@ -27247,22 +27241,31 @@ msgstr ""
 msgid "Runners|Runner is paused, last contact was %{runner_contact} ago"
 msgstr ""
 
-msgid "Runners|Shared"
+msgid "Runners|Shared runners are available to every project in a GitLab instance. If you want a runner to build only specific projects, restrict the project in the table below. After you restrict a runner to a project, you cannot change it back to a shared runner."
 msgstr ""
 
 msgid "Runners|Show Runner installation instructions"
 msgstr ""
 
-msgid "Runners|Specific"
+msgid "Runners|Tags"
 msgstr ""
 
-msgid "Runners|Tags"
+msgid "Runners|This runner is associated with specific projects."
+msgstr ""
+
+msgid "Runners|This runner is available to all groups and projects in your GitLab instance."
+msgstr ""
+
+msgid "Runners|This runner is available to all projects and subgroups in a group."
 msgstr ""
 
 msgid "Runners|To install Runner in Kubernetes follow the instructions described in the GitLab documentation."
 msgstr ""
 
 msgid "Runners|To install Runner in a container follow the instructions described in the GitLab documentation"
+msgstr ""
+
+msgid "Runners|Use Group runners when you want all projects in a group to have access to a set of runners."
 msgstr ""
 
 msgid "Runners|Value"
@@ -27274,7 +27277,19 @@ msgstr ""
 msgid "Runners|View installation instructions"
 msgstr ""
 
+msgid "Runners|You can set up a specific runner to be used by multiple projects but you cannot make this a shared runner."
+msgstr ""
+
 msgid "Runners|You have used %{quotaUsed} out of %{quotaLimit} of your shared Runners pipeline minutes."
+msgstr ""
+
+msgid "Runners|group"
+msgstr ""
+
+msgid "Runners|shared"
+msgstr ""
+
+msgid "Runners|specific"
 msgstr ""
 
 msgid "Running"
@@ -32163,15 +32178,6 @@ msgstr ""
 msgid "This repository was last checked %{last_check_timestamp}. The check passed."
 msgstr ""
 
-msgid "This runner processes jobs for all projects in its group and subgroups."
-msgstr ""
-
-msgid "This runner processes jobs for all unassigned projects."
-msgstr ""
-
-msgid "This runner processes jobs for assigned projects only."
-msgstr ""
-
 msgid "This runner will only run on pipelines triggered on protected branches"
 msgstr ""
 
@@ -35763,9 +35769,6 @@ msgstr ""
 msgid "You cannot impersonate an internal user"
 msgstr ""
 
-msgid "You cannot make this a shared runner."
-msgstr ""
-
 msgid "You cannot play this scheduled pipeline at the moment. Please wait a minute."
 msgstr ""
 
@@ -37709,9 +37712,6 @@ msgid "reset it."
 msgstr ""
 
 msgid "revised"
-msgstr ""
-
-msgid "runners"
 msgstr ""
 
 msgid "satisfied"
