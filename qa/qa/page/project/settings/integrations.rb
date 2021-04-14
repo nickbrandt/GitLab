@@ -6,8 +6,8 @@ module QA
       module Settings
         class Integrations < QA::Page::Base
           view 'app/assets/javascripts/integrations/index/components/integrations_table.vue' do
-            element :prometheus_link, %q(:data-qa-selector="`${item.type}_link`") # rubocop:disable QA/ElementWithPattern
-            element :jira_link, %q(:data-qa-selector="`${item.type}_link`") # rubocop:disable QA/ElementWithPattern
+            element :prometheus_link, %q(:data-qa-selector="`${item.name}_link`") # rubocop:disable QA/ElementWithPattern
+            element :jira_link, %q(:data-qa-selector="`${item.name}_link`") # rubocop:disable QA/ElementWithPattern
           end
 
           def click_on_prometheus_integration

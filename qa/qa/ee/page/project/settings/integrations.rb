@@ -11,8 +11,8 @@ module QA
             def self.prepended(base)
               base.class_eval do
                 view 'app/assets/javascripts/integrations/index/components/integrations_table.vue' do
-                  element :jenkins_link, %q(:data-qa-selector="`${item.type}_link`") # rubocop:disable QA/ElementWithPattern
-                  element :jira_link, %q(:data-qa-selector="`${item.type}_link`") # rubocop:disable QA/ElementWithPattern
+                  element :jenkins_link, %q(:data-qa-selector="`${item.name}_link`") # rubocop:disable QA/ElementWithPattern
+                  element :jira_link, %q(:data-qa-selector="`${item.name}_link`") # rubocop:disable QA/ElementWithPattern
                 end
               end
             end

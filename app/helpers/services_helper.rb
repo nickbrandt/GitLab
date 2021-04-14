@@ -165,11 +165,11 @@ module ServicesHelper
   def serialize_integration(integration)
     {
       active: integration.operating?,
-      name: integration.title,
+      title: integration.title,
       description: integration.description,
       updated_at: integration.updated_at,
       edit_path: scoped_edit_integration_path(integration),
-      type: integration.to_param
+      name: integration.to_param
     }
   end
 end

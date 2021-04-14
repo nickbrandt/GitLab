@@ -38,7 +38,7 @@ export default {
           thClass: 'gl-w-10',
         },
         {
-          key: 'name',
+          key: 'title',
           label: __('Integration'),
           thClass: 'gl-w-quarter',
         },
@@ -58,8 +58,8 @@ export default {
   },
   methods: {
     getStatusTooltipTitle(integration) {
-      return sprintf(s__('Integrations|%{integrationName}: active'), {
-        integrationName: integration.name,
+      return sprintf(s__('Integrations|%{integrationTitle}: active'), {
+        integrationTitle: integration.title,
       });
     },
   },
@@ -78,13 +78,13 @@ export default {
       />
     </template>
 
-    <template #cell(name)="{ item }">
+    <template #cell(title)="{ item }">
       <gl-link
         :href="item.edit_path"
         class="gl-font-weight-bold"
-        :data-qa-selector="`${item.type}_link`"
+        :data-qa-selector="`${item.name}_link`"
       >
-        {{ item.name }}
+        {{ item.title }}
       </gl-link>
     </template>
 

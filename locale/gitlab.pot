@@ -17056,7 +17056,7 @@ msgstr ""
 msgid "Integrations"
 msgstr ""
 
-msgid "Integrations|%{integrationName}: active"
+msgid "Integrations|%{integrationTitle}: active"
 msgstr ""
 
 msgid "Integrations|%{integration} settings saved and active."
