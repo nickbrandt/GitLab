@@ -24599,7 +24599,7 @@ msgstr ""
 msgid "ProjectSelect|Search for project"
 msgstr ""
 
-msgid "ProjectService|Drone URL"
+msgid "ProjectService|Drone server URL"
 msgstr ""
 
 msgid "ProjectService|Enter new API key"
@@ -24635,10 +24635,16 @@ msgstr ""
 msgid "ProjectService|Perform common operations on GitLab project: %{project_name}"
 msgstr ""
 
+msgid "ProjectService|Run CI/CD pipelines with Drone."
+msgstr ""
+
 msgid "ProjectService|TeamCity URL"
 msgstr ""
 
 msgid "ProjectService|To configure this integration, you should:"
+msgstr ""
+
+msgid "ProjectService|Token for the Drone project."
 msgstr ""
 
 msgid "ProjectService|Trigger event for new comments on confidential issues."
