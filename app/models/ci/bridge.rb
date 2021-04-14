@@ -148,6 +148,10 @@ module Ci
     end
     # rubocop: enable CodeReuse/ServiceClass
 
+    def retryable?
+      downstream_pipeline&.failed?
+    end
+
     def artifacts?
       false
     end
