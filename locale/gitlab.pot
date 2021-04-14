@@ -91,6 +91,11 @@ msgid_plural "%d Approvals"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "%d Module"
+msgid_plural "%d Modules"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "%d Other"
 msgid_plural "%d Others"
 msgstr[0] ""
@@ -16903,6 +16908,21 @@ msgid "Information about additional Pages templates and how to install them can 
 msgstr ""
 
 msgid "Infrastructure Registry"
+msgstr ""
+
+msgid "InfrastructureRegistry|Infrastructure Registry"
+msgstr ""
+
+msgid "InfrastructureRegistry|Publish and share your modules. %{docLinkStart}More information%{docLinkEnd}"
+msgstr ""
+
+msgid "InfrastructureRegistry|Terraform"
+msgstr ""
+
+msgid "InfrastructureRegistry|Terraform modules are the main way to package and reuse resource configurations with Terraform. Learn more about how to %{noPackagesLinkStart}create Terraform modules%{noPackagesLinkEnd} in GitLab."
+msgstr ""
+
+msgid "InfrastructureRegistry|You have no Terraform modules in your project"
 msgstr ""
 
 msgid "Inherited"
