@@ -8224,6 +8224,14 @@ Values for sorting projects.
 | `SIMILARITY` | Most similar to the search query. |
 | `STORAGE` | Sort by storage size. |
 
+### `NegatedIterationWildcardId`
+
+Negated Iteration ID wildcard values.
+
+| Value | Description |
+| ----- | ----------- |
+| `CURRENT` | Current iteration. |
+
 ### `OncallRotationUnitEnum`
 
 Rotation length unit of an on-call rotation.
