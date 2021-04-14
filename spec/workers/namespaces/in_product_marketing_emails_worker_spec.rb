@@ -19,7 +19,7 @@ RSpec.describe Namespaces::InProductMarketingEmailsWorker, '#perform' do
       end
 
       with_them do
-        include_examples 'in-product marketing email'
+        it_behaves_like 'in-product marketing email'
       end
     end
   end
@@ -35,7 +35,7 @@ RSpec.describe Namespaces::InProductMarketingEmailsWorker, '#perform' do
     end
 
     with_them do
-      include_examples 'in-product marketing email'
+      it_behaves_like 'in-product marketing email'
     end
   end
 end

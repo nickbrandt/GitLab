@@ -27,13 +27,13 @@ RSpec.describe Namespaces::InProductMarketingEmailsWorker, '#perform' do
           let(:is_paid) { true }
           let(:executes_service) { 0 }
 
-          include_examples 'in-product marketing email'
+          it_behaves_like 'in-product marketing email'
         end
 
         context 'free' do
           let(:is_paid) { false }
 
-          include_examples 'in-product marketing email'
+          it_behaves_like 'in-product marketing email'
         end
       end
 
@@ -42,7 +42,7 @@ RSpec.describe Namespaces::InProductMarketingEmailsWorker, '#perform' do
           allow(License).to receive(:current).and_return(nil)
         end
 
-        include_examples 'in-product marketing email'
+        it_behaves_like 'in-product marketing email'
       end
     end
   end
@@ -58,7 +58,7 @@ RSpec.describe Namespaces::InProductMarketingEmailsWorker, '#perform' do
     end
 
     with_them do
-      include_examples 'in-product marketing email'
+      it_behaves_like 'in-product marketing email'
     end
   end
 end
