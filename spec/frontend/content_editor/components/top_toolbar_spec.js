@@ -1,6 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
 import { extendedWrapper } from 'helpers/vue_test_utils_helper';
-import ToolbarButton from '~/content_editor/components/toolbar_button.vue';
 import TopToolbar from '~/content_editor/components/top_toolbar.vue';
 
 describe('content_editor/components/top_toolbar', () => {
