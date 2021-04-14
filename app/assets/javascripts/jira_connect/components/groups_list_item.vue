@@ -55,8 +55,6 @@ export default {
             error?.response?.data?.error ||
               s__('Integrations|Failed to link namespace. Please try again.'),
           );
-        })
-        .finally(() => {
           this.isLoading = false;
         });
     },

@@ -20,6 +20,11 @@ export default {
       default: [],
     },
   },
+  data() {
+    return {
+      loadingItem: null,
+    };
+  },
   fields: [
     {
       key: 'name',
@@ -28,11 +33,12 @@ export default {
     {
       key: 'created_at',
       label: __('Added'),
-      tdClass: 'gl-vertical-align-middle!',
+      tdClass: 'gl-vertical-align-middle! gl-w-20p',
     },
     {
       key: 'actions',
       label: '',
+      tdClass: 'gl-text-right gl-vertical-align-middle! jira-subscription-actions',
     },
   ],
   i18n: {
@@ -44,12 +50,15 @@ export default {
   methods: {
     isEmpty,
     onClick(item) {
+      this.loadingItem = item;
+
       removeSubscription(item.unlink_path)
         .then(() => {
           reloadPage();
         })
-        .catch(() => {});
-      return item;
+        .catch(() => {
+          this.loadingItem = null;
+        });
     },
   },
 };
@@ -70,9 +79,12 @@ export default {
         <timeago-tooltip :time="item.created_at" />
       </template>
       <template #cell(actions)="{ item }">
-        <gl-button category="secondary" :loading="false" @click.prevent="onClick(item)">{{
-          __('Unlink')
-        }}</gl-button>
+        <gl-button
+          category="secondary"
+          :loading="loadingItem === item"
+          @click.prevent="onClick(item)"
+          >{{ __('Unlink') }}</gl-button
+        >
       </template>
     </gl-table>
   </div>
