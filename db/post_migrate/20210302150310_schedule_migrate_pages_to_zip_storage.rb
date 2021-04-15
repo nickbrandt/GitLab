@@ -6,8 +6,8 @@ class ScheduleMigratePagesToZipStorage < ActiveRecord::Migration[6.0]
   DOWNTIME = false
 
   MIGRATION = 'MigratePagesToZipStorage'
-  BATCH_SIZE = 100
-  BATCH_TIME = 6.minutes
+  BATCH_SIZE = 10
+  BATCH_TIME = 5.minutes
 
   disable_ddl_transaction!
 

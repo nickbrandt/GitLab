@@ -38,7 +38,7 @@ RSpec.describe ScheduleMigratePagesToZipStorage, :sidekiq_might_not_need_inline,
 
         migrate!
 
-        expect(migration_name).to be_scheduled_delayed_migration(6.minutes, first_id, last_id)
+        expect(migration_name).to be_scheduled_delayed_migration(5.minutes, first_id, last_id)
         expect(BackgroundMigrationWorker.jobs.size).to eq(1)
       end
     end
