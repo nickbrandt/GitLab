@@ -59,7 +59,6 @@ describe('EpicToken', () => {
 
   describe('computed', () => {
     beforeEach(async () => {
-      // Milestone title with spaces is always enclosed in quotations by component.
       wrapper = createComponent({
         data: {
           epics: mockEpics,
@@ -70,29 +69,17 @@ describe('EpicToken', () => {
     });
 
     describe('currentValue', () => {
-      it('returns numeric `iid` when have string as value', async () => {
-        wrapper.setProps({ value: { data: `${mockEpics[0].title}::&${mockEpics[0].iid}` } });
+      it.each`
+        data                                             | id
+        ${`${mockEpics[0].title  }::&${  mockEpics[0].iid}`} | ${mockEpics[0].iid}
+        ${mockEpics[0].iid}                              | ${mockEpics[0].iid}
+        ${'foobar'}                                      | ${'foobar'}
+      `('$data returns $id', async ({ data, id }) => {
+        wrapper.setProps({ value: { data } });
+
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.currentValue).toBe(mockEpics[0].iid);
-      });
-
-      it('returns numeric `iid` when have numeric string as value', async () => {
-        wrapper.setProps({
-          value: { data: `${mockEpics[0].iid}` },
-        });
-        await wrapper.vm.$nextTick();
-
-        expect(wrapper.vm.currentValue).toBe(mockEpics[0].iid);
-      });
-
-      it("returns value when it's not a numeric string", async () => {
-        wrapper.setProps({
-          value: { data: `foobar` },
-        });
-        await wrapper.vm.$nextTick();
-
-        expect(wrapper.vm.currentValue).toBe('foobar');
+        expect(wrapper.vm.currentValue).toBe(id);
       });
     });
 
@@ -101,6 +88,7 @@ describe('EpicToken', () => {
         wrapper.setProps({
           value: { data: `${mockEpics[0].iid}` },
         });
+
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.activeEpic).toEqual(mockEpics[0]);
@@ -118,51 +106,52 @@ describe('EpicToken', () => {
         expect(wrapper.vm.config.fetchEpics).toHaveBeenCalledWith('foo');
       });
 
-      it('sets response to `epics` when request is successful', () => {
+      it('sets response to `epics` when request is successful', async () => {
         jest.spyOn(wrapper.vm.config, 'fetchEpics').mockResolvedValue({
           data: mockEpics,
         });
 
         wrapper.vm.fetchEpicsBySearchTerm();
 
-        return waitForPromises().then(() => {
-          expect(wrapper.vm.epics).toEqual(mockEpics);
-        });
+        await waitForPromises();
+
+        expect(wrapper.vm.epics).toEqual(mockEpics);
       });
 
-      it('calls `createFlash` with flash error message when request fails', () => {
+      it('calls `createFlash` with flash error message when request fails', async () => {
         jest.spyOn(wrapper.vm.config, 'fetchEpics').mockRejectedValue({});
 
         wrapper.vm.fetchEpicsBySearchTerm('foo');
 
-        return waitForPromises().then(() => {
-          expect(createFlash).toHaveBeenCalledWith({
-            message: 'There was a problem fetching epics.',
-          });
+        await waitForPromises();
+
+        expect(createFlash).toHaveBeenCalledWith({
+          message: 'There was a problem fetching epics.',
         });
       });
 
-      it('sets `loading` to false when request completes', () => {
+      it('sets `loading` to false when request completes', async () => {
         jest.spyOn(wrapper.vm.config, 'fetchEpics').mockRejectedValue({});
 
         wrapper.vm.fetchEpicsBySearchTerm('foo');
 
-        return waitForPromises().then(() => {
-          expect(wrapper.vm.loading).toBe(false);
-        });
+        await waitForPromises();
+
+        expect(wrapper.vm.loading).toBe(false);
       });
     });
 
     describe('fetchSingleEpic', () => {
-      it('calls `config.fetchSingleEpic` with provided iid param', () => {
+      it('calls `config.fetchSingleEpic` with provided iid param', async () => {
         jest.spyOn(wrapper.vm.config, 'fetchSingleEpic');
 
         wrapper.vm.fetchSingleEpic(1);
 
         expect(wrapper.vm.config.fetchSingleEpic).toHaveBeenCalledWith(1);
-        return waitForPromises().then(() => {
-          expect(wrapper.vm.epics).toEqual([mockEpics[0]]);
-        });
+
+        await waitForPromises();
+
+        expect(wrapper.vm.epics).toEqual([mockEpics[0]]);
       });
     });
   });
@@ -171,7 +160,7 @@ describe('EpicToken', () => {
     beforeEach(async () => {
       wrapper = createComponent({
         value: { data: `${mockEpics[0].iid}` },
-        data: { milestones: mockEpics },
+        data: { epics: mockEpics },
       });
 
       await wrapper.vm.$nextTick();
