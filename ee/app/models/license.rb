@@ -180,6 +180,7 @@ class License < ApplicationRecord
     subepics
     threat_monitoring
     vulnerability_auto_fix
+    vulnerability_finding_signatures
   ]
   EEU_FEATURES.freeze
 
