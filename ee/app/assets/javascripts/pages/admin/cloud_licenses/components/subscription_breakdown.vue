@@ -10,7 +10,7 @@ import SubscriptionDetailsCard from './subscription_details_card.vue';
 import SubscriptionDetailsHistory from './subscription_details_history.vue';
 import SubscriptionDetailsUserInfo from './subscription_details_user_info.vue';
 
-export const subscriptionDetailsFields = ['id', 'plan', 'lastSync', 'startsAt', 'renews'];
+export const subscriptionDetailsFields = ['id', 'plan', 'expiresAt', 'lastSync', 'startsAt'];
 export const licensedToFields = ['name', 'email', 'company'];
 
 export default {
@@ -44,14 +44,17 @@ export default {
     };
   },
   computed: {
+    canMangeSubscription() {
+      return false;
+    },
     hasSubscription() {
       return Boolean(Object.keys(this.subscription).length);
     },
     hasSubscriptionHistory() {
       return Boolean(this.subscriptionList.length);
     },
-    canMangeSubscription() {
-      return false;
+    subscriptionHistory() {
+      return this.hasSubscriptionHistory ? this.subscriptionList : [this.subscription];
     },
   },
 };
@@ -87,9 +90,9 @@ export default {
     </section>
     <subscription-details-user-info v-if="hasSubscription" :subscription="subscription" />
     <subscription-details-history
-      v-if="hasSubscriptionHistory"
+      v-if="hasSubscription"
       :current-subscription-id="subscription.id"
-      :subscription-list="subscriptionList"
+      :subscription-list="subscriptionHistory"
     />
   </div>
 </template>
