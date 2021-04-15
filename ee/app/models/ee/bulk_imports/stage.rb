@@ -7,19 +7,19 @@ module EE
 
       EE_CONFIG = {
         iterations: {
-          pipeline: EE::BulkImports::Groups::Pipelines::IterationsPipeline,
+          pipeline: ::BulkImports::Groups::Pipelines::IterationsPipeline,
           stage: 1
         },
         epics: {
-          pipeline: EE::BulkImports::Groups::Pipelines::EpicsPipeline,
+          pipeline: ::BulkImports::Groups::Pipelines::EpicsPipeline,
           stage: 2
         },
         epic_award_emojis: {
-          pipeline: EE::BulkImports::Groups::Pipelines::EpicAwardEmojiPipeline,
+          pipeline: ::BulkImports::Groups::Pipelines::EpicAwardEmojiPipeline,
           stage: 3
         },
         epic_events: {
-          pipeline: EE::BulkImports::Groups::Pipelines::EpicEventsPipeline,
+          pipeline: ::BulkImports::Groups::Pipelines::EpicEventsPipeline,
           stage: 3
         },
         # Override the CE stage value for the EntityFinisher Pipeline
