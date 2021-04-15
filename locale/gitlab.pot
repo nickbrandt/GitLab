@@ -925,9 +925,6 @@ msgstr ""
 msgid "%{title} changes"
 msgstr ""
 
-msgid "%{token}..."
-msgstr ""
-
 msgid "%{totalCpu} (%{freeSpacePercentage}%{percentSymbol} free)"
 msgstr ""
 
@@ -22845,9 +22842,6 @@ msgid "Parsing error for param :embed_json. %{message}"
 msgstr ""
 
 msgid "Part of merge request changes"
-msgstr ""
-
-msgid "Partial token for reference only"
 msgstr ""
 
 msgid "Participants"
