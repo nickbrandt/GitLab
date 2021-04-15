@@ -321,10 +321,7 @@ export default {
       />
     </gl-form-group>
 
-    <gl-form-group
-      :state="form.fields.visibility.state"
-      :invalid-feedback="s__('Please select a visibility level.')"
-    >
+    <gl-form-group>
       <label>
         {{ s__('ForkProject|Visibility level') }}
         <gl-link :href="visibilityHelpPath" target="_blank">
@@ -333,7 +330,6 @@ export default {
       </label>
       <gl-form-radio-group
         v-model="form.fields.visibility.value"
-        v-validation:[form.showValidation]
         data-testid="fork-visibility-radio-group"
         name="visibility"
         required
@@ -359,6 +355,7 @@ export default {
         type="submit"
         category="primary"
         variant="confirm"
+        class="js-no-auto-disable"
         data-testid="submit-button"
         data-qa-selector="fork_project_button"
         :loading="isSaving"

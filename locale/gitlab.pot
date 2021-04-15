@@ -23795,9 +23795,6 @@ msgstr ""
 msgid "Please select a valid target branch"
 msgstr ""
 
-msgid "Please select a visibility level."
-msgstr ""
-
 msgid "Please select and add a member"
 msgstr ""
 
