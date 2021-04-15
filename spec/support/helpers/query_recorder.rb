@@ -12,7 +12,7 @@ module ActiveRecord
       @cached = []
       @skip_cached = skip_cached
       @query_recorder_debug = ENV['QUERY_RECORDER_DEBUG'] || query_recorder_debug
-      @log_file = File.open(log_file, 'w') if log_file && @query_recorder_debug
+      @log_file = log_file
       # force replacement of bind parameters to give tests the ability to check for ids
       ActiveRecord::Base.connection.unprepared_statement do
         ActiveSupport::Notifications.subscribed(method(:callback), 'sql.active_record', &block)
@@ -72,11 +72,11 @@ module ActiveRecord
 
     def callback(name, start, finish, message_id, values)
       duration = finish - start
-      backtrace = @query_recorder_debug ? show_backtrace(values, duration) : nil
 
       if values[:cached] && skip_cached
         @cached << values[:sql]
       elsif !values[:name]&.include?("SCHEMA")
+        backtrace = @query_recorder_debug ? show_backtrace(values, duration) : nil
         @log << values[:sql]
         store_sql_by_source(values: values, duration: duration, backtrace: backtrace)
       end
