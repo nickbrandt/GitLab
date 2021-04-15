@@ -75,15 +75,15 @@ module Pages
       end
 
       if result[:status] == :success
-        @logger.info(message: "Pages legacy storage migration: project migrated", project_id: project.id, pages_path: project.pages_path, duration: time.round(2))
+        @logger.info(message: "Pages legacy storage migration: project migrated: #{result[:message]}", project_id: project.id, pages_path: project.pages_path, duration: time.round(2))
         @counters_lock.synchronize { @migrated += 1 }
       else
-        @logger.error(message: "Pages legacy storage migration: project failed to be migrated", project_id: project.id, pages_path: project.pages_path, duration: time.round(2))
+        @logger.error(message: "Pages legacy storage migration: project failed to be migrated: #{result[:message]}", project_id: project.id, pages_path: project.pages_path, duration: time.round(2))
         @counters_lock.synchronize { @errored += 1 }
       end
     rescue => e
       @counters_lock.synchronize { @errored += 1 }
-      @logger.error(message: "Pages legacy storage migration: project failed to be migrated", project_id: project&.id, pages_path: project&.pages_path)
+      @logger.error(message: "Pages legacy storage migration: project failed to be migrated: #{result[:message]}", project_id: project&.id, pages_path: project&.pages_path)
       Gitlab::ErrorTracking.track_exception(e, project_id: project&.id)
     end
   end
