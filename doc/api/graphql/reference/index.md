@@ -631,7 +631,7 @@ Parsed field from an alert used for custom mappings.
 | Field | Type | Description |
 | ----- | ---- | ----------- |
 | `label` | [`String`](#string) | Human-readable label of the payload path. |
-| `path` | [`[String!]`](#string) | Path to value inside payload JSON. |
+| `path` | [`[PayloadAlertFieldPathSegment!]`](#payloadalertfieldpathsegment) | Path to value inside payload JSON. |
 | `type` | [`AlertManagementPayloadAlertFieldType`](#alertmanagementpayloadalertfieldtype) | Type of the parsed value. |
 
 ### `AlertManagementPayloadAlertMappingField`
@@ -642,7 +642,7 @@ Parsed field (with its name) from an alert used for custom mappings.
 | ----- | ---- | ----------- |
 | `fieldName` | [`AlertManagementPayloadAlertFieldName`](#alertmanagementpayloadalertfieldname) | A GitLab alert field name. |
 | `label` | [`String`](#string) | Human-readable label of the payload path. |
-| `path` | [`[String!]`](#string) | Path to value inside payload JSON. |
+| `path` | [`[PayloadAlertFieldPathSegment!]`](#payloadalertfieldpathsegment) | Path to value inside payload JSON. |
 | `type` | [`AlertManagementPayloadAlertFieldType`](#alertmanagementpayloadalertfieldtype) | Type of the parsed value. |
 
 ### `AlertManagementPrometheusIntegration`
@@ -8965,6 +8965,10 @@ An example `PackagesPackageFileID` is: `"gid://gitlab/Packages::PackageFile/1"`.
 A `PackagesPackageID` is a global ID. It is encoded as a string.
 
 An example `PackagesPackageID` is: `"gid://gitlab/Packages::Package/1"`.
+
+### `PayloadAlertFieldPathSegment`
+
+String or integer.
 
 ### `ProjectID`
 
