@@ -1,19 +1,10 @@
 <script>
-import {
-  GlDropdown,
-  GlSearchBoxByType,
-  GlIcon,
-  GlLoadingIcon,
-  GlTruncate,
-  GlDropdownText,
-} from '@gitlab/ui';
+import { GlDropdown, GlSearchBoxByType, GlTruncate, GlDropdownText } from '@gitlab/ui';
 
 export default {
   components: {
     GlDropdown,
     GlSearchBoxByType,
-    GlIcon,
-    GlLoadingIcon,
     GlTruncate,
     GlDropdownText,
   },
@@ -82,8 +73,7 @@ export default {
       @show="emitDropdownShow"
       @hide="$emit('dropdown-hide')"
     >
-      <template #button-content>
-        <gl-loading-icon v-if="loading" class="gl-mr-2" />
+      <template #button-text>
         <gl-truncate
           :text="firstSelectedOption"
           class="gl-min-w-0 gl-mr-2"
@@ -92,7 +82,6 @@ export default {
         <span v-if="extraOptionCount" class="gl-mr-2">
           {{ n__('+%d more', '+%d more', extraOptionCount) }}
         </span>
-        <gl-icon name="chevron-down" class="gl-flex-shrink-0 gl-ml-auto" />
       </template>
 
       <template v-if="showSearchBox" #header>
