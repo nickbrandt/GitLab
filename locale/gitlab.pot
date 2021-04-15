@@ -17746,7 +17746,10 @@ msgstr ""
 msgid "IssueTracker|EWM work items tracker"
 msgstr ""
 
-msgid "IssueTracker|Redmine issue tracker"
+msgid "IssueTracker|Use Redmine as the issue tracker."
+msgstr ""
+
+msgid "IssueTracker|Use Redmine as the issue tracker. %{docs_link}"
 msgstr ""
 
 msgid "IssueTracker|YouTrack issue tracker"
