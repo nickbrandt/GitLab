@@ -10,6 +10,10 @@ module Gitlab
           # Handle action mailer
           job_offloaded = job.delete('offloaded')
           if job_offloaded
+            # The current approach does not serve the outsiders well, for
+            # example, an attachment in mailroom. Hence, if the offloaded_path
+            # is available, it should use that instead of jid.
+            job.delete('offloaded_path')
             uploader = BackgroundJobPayloadUploader.new(
               jid: job['jid'],
               class: worker.class.name

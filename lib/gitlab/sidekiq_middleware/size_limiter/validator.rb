@@ -84,6 +84,7 @@ module Gitlab
           if uploader.save!
             @job['args'] = []
             @job['offloaded'] = true
+            @job['offloaded_path'] = uploader.path
           else
             # Track upload error here
           end
