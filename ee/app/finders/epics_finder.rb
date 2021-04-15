@@ -129,6 +129,8 @@ class EpicsFinder < IssuableFinder
     # API endpoints send in `nil` values so we test if there are any non-nil
     return items unless not_params&.values&.any?
 
+    items = by_negated_my_reaction_emoji(items)
+
     by_negated_label(items)
   end
 
