@@ -19,7 +19,6 @@ const mockResolver = {
     /* eslint-disable no-unused-vars */
     mockedPackages(_, { projectPath }) {
       return {
-        // Mocked data goes here
         totalSize: mockTotalSize(),
         data: mockData(),
         __typename: 'MockedPackages',
@@ -44,11 +43,9 @@ describe('Corpus upload modal', () => {
   const findUploadCorpus = () => wrapper.find('[data-testid="upload-corpus"]');
   const findUploadStatus = () => wrapper.find('[data-testid="upload-status"]');
 
-  function createMockApolloProvider(resolverMock) {
-    localVue.use(VueApollo);
-
+  const createMockApolloProvider = (resolverMock) => {
     return createMockApollo([], resolverMock);
-  }
+  };
 
   const createComponent = (resolverMock, options = {}) => {
     wrapper = mount(CorpusUploadForm, {

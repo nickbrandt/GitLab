@@ -1,14 +1,15 @@
 <script>
-import { GlButton, GlModal, GlModalDirective } from '@gitlab/ui';
-import CorpusUploadForm from 'ee/security_configuration/corpus_management/components/corpus_upload_form.vue';
+import { GlButton, GlModal, GlModalDirective, GlSprintf } from '@gitlab/ui';
 import { numberToHumanSize } from '~/lib/utils/number_utils';
-import { s__ } from '~/locale';
+import { s__, __ } from '~/locale';
 import addCorpusMutation from '../graphql/mutations/add_corpus.mutation.graphql';
 import resetCorpus from '../graphql/mutations/reset_corpus.mutation.graphql';
 import getCorpusesQuery from '../graphql/queries/get_corpuses.query.graphql';
+import CorpusUploadForm from './corpus_upload_form.vue';
 
 export default {
   components: {
+    GlSprintf,
     GlButton,
     GlModal,
     CorpusUploadForm,
@@ -17,7 +18,7 @@ export default {
     GlModalDirective,
   },
   i18n: {
-    totalSize: s__('CorpusManagement|Total Size:'),
+    totalSize: s__('CorpusManagement|Total Size: %{totalSize}'),
     newUpload: s__('CorpusManagement|New upload'),
     newCorpus: s__('CorpusMnagement|New corpus'),
   },
@@ -31,14 +32,14 @@ export default {
           ...this.cursor,
         };
       },
-      update: (data) => {
+      update(data) {
         return data;
       },
     },
   },
   modal: {
     actionCancel: {
-      text: s__('Cancel'),
+      text: __('Cancel'),
     },
     modalId: 'corpus-upload-modal',
   },
@@ -60,7 +61,7 @@ export default {
     },
     actionPrimaryProps() {
       return {
-        text: s__('Add'),
+        text: __('Add'),
         attributes: {
           'data-testid': 'modal-confirm',
           disabled: !this.isUploaded,
@@ -90,8 +91,11 @@ export default {
     class="gl-h-11 gl-bg-gray-10 gl-display-flex gl-justify-content-space-between gl-align-items-center"
   >
     <div class="gl-ml-5">
-      {{ s__('CorpusManagement|Total Size:') }}
-      <span class="gl-font-weight-bold">{{ formattedFileSize }}</span>
+      <gl-sprintf :message="$options.i18n.totalSize">
+        <template #totalSize>
+          <span class="gl-font-weight-bold">{{ formattedFileSize }}</span>
+        </template>
+      </gl-sprintf>
     </div>
 
     <gl-button v-gl-modal-directive="$options.modal.modalId" class="gl-mr-5" variant="confirm">

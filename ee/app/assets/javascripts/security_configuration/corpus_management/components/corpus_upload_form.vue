@@ -7,7 +7,7 @@ import {
   GlLoadingIcon,
   GlFormGroup,
 } from '@gitlab/ui';
-import { s__, __ } from '~/locale';
+import { s__, __, sprintf } from '~/locale';
 import { VALID_CORPUS_MIMETYPE } from '../constants';
 import resetCorpus from '../graphql/mutations/reset_corpus.mutation.graphql';
 import uploadCorpus from '../graphql/mutations/upload_corpus.mutation.graphql';
@@ -38,7 +38,7 @@ export default {
           projectPath: this.projectFullPath,
         };
       },
-      update: (data) => {
+      update(data) {
         return data;
       },
       error() {
@@ -79,6 +79,9 @@ export default {
     progress() {
       return this.states?.uploadState.progress;
     },
+    progressText() {
+      return sprintf(__('Attaching File - %{progress}'), { progress: `${this.progress}%` });
+    },
   },
   beforeDestroy() {
     this.resetAttachment();
@@ -104,8 +107,7 @@ export default {
       this.$refs.fileUpload.click();
     },
     beginFileUpload() {
-      const uploadCallback = this.beginFileUpload;
-      const component = this;
+      // const component = this;
       // Simulate incrementing file upload progress
       return this.$apollo
         .mutate({
@@ -114,8 +116,8 @@ export default {
         })
         .then(({ data }) => {
           if (data.uploadCorpus < 100) {
-            component.uploadTimeout = setTimeout(() => {
-              uploadCallback();
+            this.uploadTimeout = setTimeout(() => {
+              this.beginFileUpload();
             }, 500);
           }
         });
@@ -198,7 +200,7 @@ export default {
 
     <div v-if="isUploading" data-testid="upload-status" class="gl-mt-2">
       <gl-loading-icon inline size="sm" />
-      {{ sprintf(__('Attaching File - %{progress}%'), { progress }) }}
+      {{ progressText }}
       <gl-button size="small" @click="cancelUpload"> {{ __('Cancel') }} </gl-button>
     </div>
   </gl-form>
