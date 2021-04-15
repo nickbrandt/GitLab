@@ -127,6 +127,8 @@ export default {
             user.username.toLowerCase().includes(this.search.toLowerCase()),
         );
         const mergedSearchResults = searchResults.reduce((acc, current) => {
+          // Some users are duplicated in the query result:
+          // https://gitlab.com/gitlab-org/gitlab/-/issues/327822
           if (!acc.some((user) => current.username === user.username)) {
             acc.push(current);
           }
