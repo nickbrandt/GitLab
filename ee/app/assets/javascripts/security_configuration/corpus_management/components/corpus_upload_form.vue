@@ -142,7 +142,6 @@ export default {
         />
 
         <gl-button
-          class="gl-search-box-by-click-icon-button gl-search-box-by-click-clear-button gl-clear-icon-button"
           variant="default"
           category="tertiary"
           size="small"

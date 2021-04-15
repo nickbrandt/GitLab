@@ -7,14 +7,9 @@ exports[`Corpus Upload component renders header 1`] = `
   <div
     class="gl-ml-5"
   >
-    
-    Total Size:
-    
-    <span
-      class="gl-font-weight-bold"
-    >
-      381.47 MiB
-    </span>
+    <gl-sprintf-stub
+      message="Total Size: %{totalSize}"
+    />
   </div>
    
   <gl-button-stub
