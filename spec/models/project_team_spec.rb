@@ -276,6 +276,31 @@ RSpec.describe ProjectTeam do
         create(:project, :public)
       end
 
+      context 'cache behavior' do
+        call_count = 0
+        before do
+          project.add_maintainer(maintainer)
+          project.add_reporter(reporter)
+          project.add_guest(guest)
+          allow(project.team).to receive(:max_member_access_for_user_ids).
+            and_wrap_original { |m, *args| call_count+=1; m.call(args) }
+        end
+
+        it 'memoizes user_ids that have already been retrieved' do
+          project.team.max_member_access(maintainer.id)
+          expect(call_count).to eq(1)
+          project.team.max_member_access(maintainer.id)
+          expect(call_count).to eq(1)
+          project.team.max_member_access(reporter.id)
+          expect(call_count).to eq(2)
+          project.team.max_member_access(reporter.id)
+          expect(call_count).to eq(2)
+          project.team.max_member_access(guest.id)
+          project.team.max_member_access(guest.id)
+          expect(call_count).to eq(3)
+        end
+      end
+
       context 'when project is not shared with group' do
         before do
           project.add_maintainer(maintainer)
