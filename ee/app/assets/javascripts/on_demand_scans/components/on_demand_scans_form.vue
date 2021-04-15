@@ -263,13 +263,11 @@ export default {
         fullPath: this.projectPath,
         dastScannerProfileId: this.selectedScannerProfile.id,
         dastSiteProfileId: this.selectedSiteProfile.id,
+        branchName: this.selectedBranch,
         ...(this.isEdit ? { id: this.dastScan.id } : {}),
         ...serializeFormObject(this.form.fields),
         [this.isEdit ? 'runAfterUpdate' : 'runAfterCreate']: runAfter,
       };
-      if (this.glFeatures.dastBranchSelection) {
-        input.branchName = this.selectedBranch;
-      }
 
       this.$apollo
         .mutate({
@@ -429,7 +427,7 @@ export default {
         />
       </gl-form-group>
 
-      <gl-form-group v-if="glFeatures.dastBranchSelection" :label="__('Branch')">
+      <gl-form-group :label="__('Branch')">
         <ref-selector
           v-model="selectedBranch"
           data-testid="dast-scan-branch-input"
