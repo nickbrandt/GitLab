@@ -24,8 +24,7 @@ module Sidebars
                   pipelines#index
                   pipelines#show
                   pipelines#new
-                ]
-              }
+                ] }
             end
 
             override :title
