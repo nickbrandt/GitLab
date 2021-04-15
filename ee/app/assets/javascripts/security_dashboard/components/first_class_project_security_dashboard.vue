@@ -1,7 +1,6 @@
 <script>
 import Cookies from 'js-cookie';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
-import { vulnerabilitiesSeverityCountScopes } from '../constants';
 import AutoFixUserCallout from './auto_fix_user_callout.vue';
 import CsvExportButton from './csv_export_button.vue';
 import ReportsNotConfigured from './empty_states/reports_not_configured.vue';
@@ -54,7 +53,6 @@ export default {
       this.shouldShowAutoFixUserCallout = false;
     },
   },
-  vulnerabilitiesSeverityCountScopes,
 };
 </script>
 
@@ -79,7 +77,6 @@ export default {
           <project-pipeline-status :pipeline="pipeline" />
           <vulnerabilities-count-list
             class="gl-mt-6"
-            :scope="$options.vulnerabilitiesSeverityCountScopes.project"
             :full-path="projectFullPath"
             :filters="filters"
           />

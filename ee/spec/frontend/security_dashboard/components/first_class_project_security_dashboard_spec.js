@@ -92,7 +92,6 @@ describe('First class Project Security Dashboard component', () => {
 
     it('should pass down the properties correctly to the vulnerability count list', () => {
       expect(findVulnerabilityCountList().props()).toEqual({
-        scope: 'project',
         fullPath: provide.projectFullPath,
         filters,
       });
