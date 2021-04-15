@@ -13448,6 +13448,30 @@ Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
+### `redis_hll_counters.secure.users_expanding_secure_security_report_monthly`
+
+Count of expanding the security report widget
+
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_28d/20210409095855_users_expanding_secure_security_report_monthly.yml)
+
+Group: `group::static analysis`
+
+Status: `implemented`
+
+Tiers: `free`, `premium`, `ultimate`
+
+### `redis_hll_counters.secure.users_expanding_secure_security_report_weekly`
+
+Count of expanding the security report widget
+
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_7d/20210409095855_users_expanding_secure_security_report_weekly.yml)
+
+Group: `group::static analysis`
+
+Status: `implemented`
+
+Tiers: `free`, `premium`, `ultimate`
+
 ### `redis_hll_counters.snippets.i_snippets_show_monthly`
 
 Missing description
@@ -13855,6 +13879,54 @@ Group: ``
 Status: `data_available`
 
 Tiers:
+
+### `redis_hll_counters.testing.users_expanding_testing_accessibility_report_monthly`
+
+Count of expanding the accessibility report widget
+
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_28d/20210409100628_users_expanding_testing_accessibility_report_monthly.yml)
+
+Group: `group::testing`
+
+Status: `implemented`
+
+Tiers: `free`, `premium`, `ultimate`
+
+### `redis_hll_counters.testing.users_expanding_testing_accessibility_report_weekly`
+
+Count of expanding the accessibility report widget
+
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_7d/20210409100628_users_expanding_testing_accessibility_report_weekly.yml)
+
+Group: `group::testing`
+
+Status: `implemented`
+
+Tiers: `free`, `premium`, `ultimate`
+
+### `redis_hll_counters.testing.users_expanding_testing_code_quality_report_monthly`
+
+Count of expanding the code quality widget
+
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_28d/20210409100451_users_expanding_testing_code_quality_report_monthly.yml)
+
+Group: `group::testing`
+
+Status: `implemented`
+
+Tiers: `free`, `premium`, `ultimate`
+
+### `redis_hll_counters.testing.users_expanding_testing_code_quality_report_weekly`
+
+Count of expanding the code quality widget
+
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_7d/20210409100451_users_expanding_testing_code_quality_report_weekly.yml)
+
+Group: `group::testing`
+
+Status: `implemented`
+
+Tiers: `free`, `premium`, `ultimate`
 
 ### `redis_hll_counters.user_packages.i_package_composer_user_monthly`
 
