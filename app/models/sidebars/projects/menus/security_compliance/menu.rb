@@ -24,8 +24,7 @@ module Sidebars
 
           override :render?
           def render?
-            can?(context.current_user, :access_security_and_compliance, context.project) &&
-              can?(context.current_user, :read_security_configuration, context.project)
+            can?(context.current_user, :access_security_and_compliance, context.project) && has_renderable_items?
           end
 
           override :title
