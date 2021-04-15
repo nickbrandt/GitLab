@@ -16,12 +16,6 @@ RSpec.describe EE::GraphHelper do
   end
 
   describe '#should_render_deployment_frequency_charts' do
-    let(:is_flag_enabled) { true }
-
-    before do
-      stub_feature_flags(deployment_frequency_charts: is_flag_enabled)
-    end
-
     shared_examples 'returns true' do
       it { expect(should_render_deployment_frequency_charts).to be(true) }
     end
@@ -34,12 +28,6 @@ RSpec.describe EE::GraphHelper do
 
     context 'when the feature is not available' do
       let(:is_feature_licensed) { false }
-
-      it_behaves_like 'returns false'
-    end
-
-    context 'when the feature flag is disabled' do
-      let(:is_flag_enabled) { false }
 
       it_behaves_like 'returns false'
     end
