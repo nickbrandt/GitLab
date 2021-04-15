@@ -41,7 +41,7 @@ For these commands:
 - `foo/bar` is the new GitLab namespace/project created from your GitHub project.
   - Subgroups are also possible: `foo/foo/bar`.
 
-## Importing a single repository
+## Import a single repository
 
 To import a specific GitHub project (named `foo/github_repo` here):
 
@@ -61,13 +61,13 @@ For these commands:
   - Subgroups are also possible: `foo/foo/bar`.
 - `foo/github_repo` is the GitHub repository path
 
-## Importing from GitHub Enterprise
+## Import from GitHub Enterprise
 
 To import repositories from GitHub Enterprise, you will need to provide the URL to the GitHub Enterprise instance.
 
 ```shell
 # Omnibus installations
-sudo gitlab-rake "import:github[access_token,root,foo/bar,https://github.company.com,foo/github_repo]"
+sudo gitlab-rake "import:github[access_token,root,foo/bar,https://github.example.com,foo/github_repo]"
 
 # Installations from source
 bundle exec rake "import:github[access_token,root,foo/bar,https://github.company.com,foo/github_repo]" RAILS_ENV=production
