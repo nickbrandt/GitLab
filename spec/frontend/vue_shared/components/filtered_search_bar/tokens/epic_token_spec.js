@@ -71,7 +71,7 @@ describe('EpicToken', () => {
     describe('currentValue', () => {
       it.each`
         data                                             | id
-        ${`${mockEpics[0].title  }::&${  mockEpics[0].iid}`} | ${mockEpics[0].iid}
+        ${`${mockEpics[0].title}::&${mockEpics[0].iid}`} | ${mockEpics[0].iid}
         ${mockEpics[0].iid}                              | ${mockEpics[0].iid}
         ${'foobar'}                                      | ${'foobar'}
       `('$data returns $id', async ({ data, id }) => {
