@@ -401,7 +401,7 @@ export default {
             <gl-button
               :disabled="isDisabled"
               category="secondary"
-              variant="default"
+              variant="confirm"
               data-qa-selector="comment_now_button"
               class="gl-mr-3 js-comment-button"
               @click="handleUpdate()"
