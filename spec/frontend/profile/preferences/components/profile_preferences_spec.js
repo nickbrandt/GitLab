@@ -48,6 +48,7 @@ describe('ProfilePreferences component', () => {
         propsData: props,
         stubs: {
           GlSprintf,
+          Select2Select,
         },
         attachTo,
       }),
@@ -140,26 +141,42 @@ describe('ProfilePreferences component', () => {
   });
 
   describe('Localization Settings section', () => {
-    beforeEach(() => {
-      wrapper = createComponent();
-    });
-
     it('has an id for anchoring', () => {
+      wrapper = createComponent();
       expect(findLocalizationAnchor().exists()).toBe(true);
     });
 
-    it('passes the correct language options to select', async () => {
+    it('passes the correct language options to select', () => {
+      wrapper = createComponent();
       const languageSelect = findUserLanguageSelect();
       expect(languageSelect.props().options.data).toEqual(
         mapChoicesToSelect2Options(languageChoices),
       );
     });
 
-    it('passes the correct time settings options to select', async () => {
+    it('passes the correct time settings options to select', () => {
+      wrapper = createComponent();
       const firstDayOfTheWeekSelect = findUserFirstDayOfWeekSelect();
       expect(firstDayOfTheWeekSelect.props().options.data).toEqual(
         mapChoicesToSelect2Options(firstDayOfWeekChoicesWithDefault),
       );
+      expect(firstDayOfTheWeekSelect.attributes('data-placeholder')).toEqual(
+        firstDayOfWeekChoicesWithDefault[0][0],
+      );
+    });
+
+    it('converts first_day_of_week to a string', () => {
+      wrapper = createComponent();
+      const firstDayOfTheWeekSelect = findUserFirstDayOfWeekSelect();
+      expect(firstDayOfTheWeekSelect.props('value')).toEqual(String(userFields.first_day_of_week));
+    });
+
+    it('does not convert first_day_of_week to a string when `null`', () => {
+      wrapper = createComponent({
+        provide: { userFields: { ...userFields, first_day_of_week: null } },
+      });
+      const firstDayOfTheWeekSelect = findUserFirstDayOfWeekSelect();
+      expect(firstDayOfTheWeekSelect.props('value')).toEqual(null);
     });
   });
 

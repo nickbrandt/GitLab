@@ -53,12 +53,18 @@ export default {
   integrationViewConfigs: INTEGRATION_VIEW_CONFIGS,
   i18n,
   data() {
+    let selectedFirstDayOfWeek = null;
+    // Do not parse default value (null)
+    if (this.userFields.first_day_of_week !== null) {
+      selectedFirstDayOfWeek = String(this.userFields.first_day_of_week);
+    }
+
     return {
       isSubmitEnabled: true,
       darkModeOnCreate: null,
       darkModeOnSubmit: null,
       selectedPreferredLanguage: this.userFields.preferred_language,
-      selectedFirstDayOfWeek: String(this.userFields.first_day_of_week),
+      selectedFirstDayOfWeek,
       selectedTimeFormatIn24h: this.userFields.time_format_in_24h,
       selectedTimeDisplayRelative: this.userFields.time_display_relative,
     };
@@ -174,6 +180,7 @@ export default {
           id="user_first_day_of_week"
           v-model="selectedFirstDayOfWeek"
           name="user[first_day_of_week]"
+          :data-placeholder="selectFirstDayOfWeekChoicesWithDefault.data[0].text"
           :options="selectFirstDayOfWeekChoicesWithDefault"
         />
       </gl-form-group>
