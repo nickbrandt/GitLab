@@ -2,7 +2,6 @@
 - @hide_top_links = true
 - page_title    _('New Project')
 - header_title  _("Projects"), dashboard_projects_path
-- active_tab = local_assigns.fetch(:active_tab, 'blank')
 - add_page_specific_style 'page_bundles/new_namespace'
 
 .project-edit-container.gl-mt-5
@@ -31,10 +30,10 @@
 
     #import-project-pane.tab-pane.js-toggle-container
       - if import_sources_enabled?
-        = render 'import_project_pane', active_tab: active_tab
+        = render 'import_project_pane'
       - else
         .nothing-here-block
           %h4= s_('ProjectsNew|No import options available')
           %p= s_('ProjectsNew|Contact an administrator to enable options for importing your project.')
 
-    = render_if_exists 'projects/new_ci_cd_only_project_pane', active_tab: active_tab
+    = render_if_exists 'projects/new_ci_cd_only_project_pane'
