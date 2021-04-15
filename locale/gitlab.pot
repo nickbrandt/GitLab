@@ -27181,9 +27181,6 @@ msgstr ""
 msgid "Runner API"
 msgstr ""
 
-msgid "Runner token"
-msgstr ""
-
 msgid "Runner tokens"
 msgstr ""
 
@@ -27269,6 +27266,9 @@ msgid "Runners|Protected"
 msgstr ""
 
 msgid "Runners|Revision"
+msgstr ""
+
+msgid "Runners|Runner"
 msgstr ""
 
 msgid "Runners|Runner #%{runner_id}"
