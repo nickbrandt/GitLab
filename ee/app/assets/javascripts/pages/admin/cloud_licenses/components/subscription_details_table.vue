@@ -21,6 +21,7 @@ export default {
     },
     {
       key: 'value',
+      formatter: (v, k, item) => item.value.toString(),
       label: '',
       thClass: DEFAULT_TH_CLASSES,
       tdClass: DEFAULT_TD_CLASSES,
@@ -71,12 +72,12 @@ export default {
       </p>
     </template>
 
-    <template #cell(value)="{ item }">
+    <template #cell(value)="{ item, value }">
       <p class="gl-relative" data-testid="details-content">
-        {{ item.value }}
+        {{ value || '-' }}
         <clipboard-button
           v-if="item.canCopy"
-          :text="item.value"
+          :text="value"
           :title="$options.i18n.copySubscriptionIdButtonText"
           category="tertiary"
           class="gl-absolute gl-mt-n2 gl-ml-2"
