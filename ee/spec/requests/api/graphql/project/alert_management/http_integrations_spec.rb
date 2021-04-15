@@ -129,12 +129,12 @@ RSpec.describe 'getting Alert Management HTTP Integrations' do
             ],
             'payloadAlertFields' => [
               {
-                'label' => 'Name',
+                'label' => 'alert/name',
                 'path' => %w(alert name),
                 'type' => 'STRING'
               },
               {
-                'label' => 'Desc',
+                'label' => 'alert/desc',
                 'path' => %w(alert desc),
                 'type' => 'STRING'
               }
