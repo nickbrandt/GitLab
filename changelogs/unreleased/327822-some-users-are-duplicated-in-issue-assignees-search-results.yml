@@ -1,0 +1,5 @@
+---
+title: Resolve Some users are duplicated in Issue assignees search results
+merge_request: 59445
+author:
+type: fixed
