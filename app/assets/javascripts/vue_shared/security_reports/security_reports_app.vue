@@ -184,7 +184,7 @@ export default {
     :has-issues="false"
     class="mr-widget-border-top mr-report"
     data-testid="security-mr-widget"
-    track-action="users_expanding_security_report"
+    track-action="users_expanding_secure_security_report"
   >
     <template v-for="slot in $options.summarySlots" #[slot]>
       <span :key="slot">
@@ -213,7 +213,7 @@ export default {
     :has-issues="false"
     class="mr-widget-border-top mr-report"
     data-testid="security-mr-widget"
-    track-action="users_expanding_security_report"
+    track-action="users_expanding_secure_security_report"
   >
     <template #error>
       {{ $options.i18n.scansHaveRun }}
