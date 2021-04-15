@@ -206,19 +206,6 @@ module EE
       ]
     end
 
-    override :sidebar_security_configuration_paths
-    def sidebar_security_configuration_paths
-      super + %w[
-        projects/security/sast_configuration#show
-        projects/security/api_fuzzing_configuration#show
-        projects/security/dast_profiles#show
-        projects/security/dast_site_profiles#new
-        projects/security/dast_site_profiles#edit
-        projects/security/dast_scanner_profiles#new
-        projects/security/dast_scanner_profiles#edit
-      ]
-    end
-
     def size_limit_message(project)
       show_lfs = project.lfs_enabled? ? 'including LFS files' : ''
 

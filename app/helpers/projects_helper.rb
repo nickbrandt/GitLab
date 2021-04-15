@@ -723,12 +723,6 @@ module ProjectsHelper
     "#{request.path}?#{options.to_param}"
   end
 
-  def sidebar_security_configuration_paths
-    %w[
-      projects/security/configuration#show
-    ]
-  end
-
   def sidebar_settings_paths
     %w[
       projects#edit
@@ -764,10 +758,6 @@ module ProjectsHelper
       tracings
       terraform
     ]
-  end
-
-  def sidebar_security_paths
-    %w[projects/security/configuration#show]
   end
 
   def user_can_see_auto_devops_implicitly_enabled_banner?(project, user)

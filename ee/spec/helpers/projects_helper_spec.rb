@@ -256,25 +256,6 @@ RSpec.describe ProjectsHelper do
     it { is_expected.to eq(expected_on_demand_scans_paths) }
   end
 
-  describe '#sidebar_security_configuration_paths' do
-    let(:expected_security_configuration_paths) do
-      %w[
-        projects/security/configuration#show
-        projects/security/sast_configuration#show
-        projects/security/api_fuzzing_configuration#show
-        projects/security/dast_profiles#show
-        projects/security/dast_site_profiles#new
-        projects/security/dast_site_profiles#edit
-        projects/security/dast_scanner_profiles#new
-        projects/security/dast_scanner_profiles#edit
-      ]
-    end
-
-    subject { helper.sidebar_security_configuration_paths }
-
-    it { is_expected.to eq(expected_security_configuration_paths) }
-  end
-
   describe '#get_project_nav_tabs' do
     using RSpec::Parameterized::TableSyntax
 
