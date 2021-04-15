@@ -5,10 +5,9 @@ require 'spec_helper'
 RSpec.describe Namespaces::InProductMarketingEmailsWorker, '#perform' do
   using RSpec::Parameterized::TableSyntax
 
-  # Running this in EE would call the overridden method, which can't be tested in CE.
-  # The EE code is covered in a separate EE spec.
-  context 'not on gitlab.com', unless: Gitlab.ee? do
+  context 'not on gitlab.com' do
     let(:is_gitlab_com) { false }
+    let(:license) { build(:license) }
 
     where(:in_product_marketing_emails_enabled, :experiment_active, :executes_service) do
       true     | true     | 1
@@ -18,7 +17,33 @@ RSpec.describe Namespaces::InProductMarketingEmailsWorker, '#perform' do
     end
 
     with_them do
-      it_behaves_like 'in-product marketing email'
+      context 'with a license' do
+        before do
+          allow(license).to receive(:paid?).and_return(is_paid)
+          allow(License).to receive(:current).and_return(license)
+        end
+
+        context 'paid' do
+          let(:is_paid) { true }
+          let(:executes_service) { 0 }
+
+          it_behaves_like 'in-product marketing email'
+        end
+
+        context 'free' do
+          let(:is_paid) { false }
+
+          it_behaves_like 'in-product marketing email'
+        end
+      end
+
+      context 'without a license' do
+        before do
+          allow(License).to receive(:current).and_return(nil)
+        end
+
+        it_behaves_like 'in-product marketing email'
+      end
     end
   end
 
