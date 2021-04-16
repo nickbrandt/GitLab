@@ -31,7 +31,7 @@ module EE
       end
 
       def ready?(**args)
-        if iteration_params_not_mutaully_exclusive?(args) || iteration_params_not_mutaully_exclusive?(args.fetch(:not, {}))
+        if iteration_params_not_mutually_exclusive?(args) || iteration_params_not_mutually_exclusive?(args.fetch(:not, {}))
           arg_str = mutually_exclusive_iteration_args.map { |x| x.to_s.camelize(:lower) }.join(', ')
           raise ::Gitlab::Graphql::Errors::ArgumentError, "only one of [#{arg_str}] arguments is allowed at the same time."
         end
@@ -56,7 +56,7 @@ module EE
         args[:not][:iteration_id] = args[:not].delete(:iteration_wildcard_id) if args.dig(:not, :iteration_wildcard_id).present?
       end
 
-      def iteration_params_not_mutaully_exclusive?(args)
+      def iteration_params_not_mutually_exclusive?(args)
         args.slice(*mutually_exclusive_iteration_args).compact.size > 1
       end
 
