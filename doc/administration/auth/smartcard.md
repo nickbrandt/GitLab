@@ -108,6 +108,11 @@ attribute. As a prerequisite, you must use an LDAP server that:
 - Supports the `certificateExactMatch` matching rule.
 - Has the certificate stored in the `userCertificate` attribute.
 
+Please note that Active Directory doesn't support the `certificateExactMatch`
+matching rule so [it is not supported at this
+time](https://gitlab.com/gitlab-org/gitlab/-/issues/327491). Please follow
+[this issue](https://gitlab.com/gitlab-org/gitlab/-/issues/328074) for more.
+
 ## Configure GitLab for smartcard authentication
 
 **For Omnibus installations**
