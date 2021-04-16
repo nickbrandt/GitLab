@@ -65,18 +65,23 @@ describe('Markdown component', () => {
 
       return vm.$nextTick().then(() => {
         const images = vm.$el.querySelectorAll('img');
-        expect(images.length).toBe(3);
+        expect(images.length).toBe(5);
 
         const columns = vm.$el.querySelectorAll('td');
-        expect(images.length).toBe(3);
+        expect(columns.length).toBe(6);
 
         expect(columns[0].textContent).toEqual('Hello ');
         expect(columns[1].textContent).toEqual('Test ');
         expect(columns[2].textContent).toEqual('World ');
+        expect(columns[3].textContent).toEqual('Fake ');
+        expect(columns[4].textContent).toEqual('External image: ');
+        expect(columns[5].textContent).toEqual('Empty');
 
         expect(columns[0].innerHTML).toContain('<img src="data:image/jpeg;base64');
         expect(columns[1].innerHTML).toContain('<img src="data:image/png;base64');
         expect(columns[2].innerHTML).toContain('<img src="data:image/jpeg;base64');
+        expect(columns[3].innerHTML).toContain('<img>');
+        expect(columns[4].innerHTML).toContain('<img src="https://www.google.com/');
       });
     });
   });
