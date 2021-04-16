@@ -26,7 +26,7 @@ module QA
           def go_to_operations_metrics
             hover_operations do
               within_submenu do
-                click_element(:sidebar_menu_item_link: menu_item: 'Metrics')
+                click_element(:sidebar_menu_item_link, menu_item: 'Metrics')
               end
             end
           end
