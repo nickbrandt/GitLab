@@ -49,7 +49,7 @@ export const emptyStateWithFilters = s__(
 );
 
 export const emptyStateWithEpicIidFiltered = s__(
-  'GroupRoadmap|Try adding a start or due date to your epics so that they will display in the roadmap.',
+  'GroupRoadmap|To make your epics appear in the roadmap, add start or due dates to them.',
 );
 
 export const PRESET_DEFAULTS = {
