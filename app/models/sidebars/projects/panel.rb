@@ -17,6 +17,7 @@ module Sidebars
         add_menu(Sidebars::Projects::Menus::CiCd::Menu.new(context))
         add_menu(Sidebars::Projects::Menus::SecurityCompliance::Menu.new(context))
         add_menu(Sidebars::Projects::Menus::Monitoring::Menu.new(context))
+        add_menu(Sidebars::Projects::Menus::PackagesRegistries::Menu.new(context))
       end
 
       override :render_raw_menus_partial
