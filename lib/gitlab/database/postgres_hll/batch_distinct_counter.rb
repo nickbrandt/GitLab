@@ -69,10 +69,8 @@ module Gitlab
           hll_buckets = Buckets.new
 
           while batch_start <= finish
-            
-              hll_buckets.merge_hash!(hll_buckets_for_batch(batch_start, batch_start + batch_size))
-              batch_start += batch_size
-            
+            hll_buckets.merge_hash!(hll_buckets_for_batch(batch_start, batch_start + batch_size))
+            batch_start += batch_size
             sleep(SLEEP_TIME_IN_SECONDS)
           end
 
