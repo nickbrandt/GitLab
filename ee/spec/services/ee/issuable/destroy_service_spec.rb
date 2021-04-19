@@ -9,13 +9,17 @@ RSpec.describe Issuable::DestroyService do
 
   describe '#execute' do
     context 'when destroying an epic' do
-      let(:issuable) { create(:epic) }
+      let_it_be(:issuable) { create(:epic) }
+
+      let(:group) { issuable.group }
 
       it 'records usage ping epic destroy event' do
         expect(Gitlab::UsageDataCounters::EpicActivityUniqueCounter).to receive(:track_epic_destroyed).with(author: user)
 
         subject.execute(issuable)
       end
+
+      it_behaves_like 'service deleting todos'
     end
 
     context 'when destroying other issuable type' do
