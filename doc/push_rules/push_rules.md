@@ -105,10 +105,12 @@ GitLab uses [RE2 syntax](https://github.com/google/re2/wiki/Syntax) for regular 
 
 ### Caveat to "Reject unsigned commits" push rule **(PREMIUM)**
 
-Currently, this push rule ignores commits that are authenticated and created by GitLab (either through the UI or API).
-This means that when the "Reject unsigned commits" push rule is enabled, unsigned commits 
-may still show up in the commit history if a commit was created **within** GitLab itself. As expected, commits
-created outside GitLab and pushed to the repository will be rejected.
+This push rule ignores commits that are authenticated and created by GitLab
+(either through the UI or API). When the **Reject unsigned commits** push rule is
+enabled, unsigned commits may still show up in the commit history if a commit was
+created **within** GitLab itself. As expected, commits created outside GitLab and
+pushed to the repository are rejected. For more information about how GitLab
+plans to fix this issue, read [issue #19185](https://gitlab.com/gitlab-org/gitlab/-/issues/19185).
 
 #### "Reject unsigned commits" push rule disables Web IDE
 
