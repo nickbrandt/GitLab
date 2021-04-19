@@ -32827,6 +32827,9 @@ msgstr ""
 msgid "To get started, please enter your Gitea Host URL and a %{link_to_personal_token}."
 msgstr ""
 
+msgid "To get started, use the link below to confirm your account."
+msgstr ""
+
 msgid "To help improve GitLab and its user experience, GitLab will periodically collect usage information."
 msgstr ""
 
@@ -34120,6 +34123,9 @@ msgid "Use template"
 msgstr ""
 
 msgid "Use the link below to confirm your email address (%{email})"
+msgstr ""
+
+msgid "Use the link below to confirm your email address."
 msgstr ""
 
 msgid "Use the search bar on the top of this page"
