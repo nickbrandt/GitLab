@@ -556,6 +556,9 @@ msgstr ""
 msgid "%{group_docs_link_start}Groups%{group_docs_link_end} allow you to manage and collaborate across multiple projects. Members of a group have access to all of its projects."
 msgstr ""
 
+msgid "%{group_name} activity"
+msgstr ""
+
 msgid "%{group_name} group members"
 msgstr ""
 
