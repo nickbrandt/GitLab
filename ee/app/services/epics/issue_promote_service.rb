@@ -39,7 +39,7 @@ module Epics
     end
 
     def create_new_entity
-      @new_entity = Epics::CreateService.new(container: parent_group, current_user: current_user, params: params).execute
+      @new_entity = Epics::CreateService.new(group: parent_group, current_user: current_user, params: params).execute
     end
 
     def update_old_entity
