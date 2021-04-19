@@ -4322,6 +4322,9 @@ msgstr ""
 msgid "Artifacts"
 msgstr ""
 
+msgid "Artifacts maximum size"
+msgstr ""
+
 msgid "As we continue to build more features for SAST, we'd love your feedback on the SAST configuration feature in %{linkStart}this issue%{linkEnd}."
 msgstr ""
 
@@ -4918,6 +4921,9 @@ msgid "Before this can be merged, a Jira issue must be linked in the title or de
 msgstr ""
 
 msgid "Begin with the selected commit"
+msgstr ""
+
+msgid "Below are the current settings regarding"
 msgstr ""
 
 msgid "Below are the fingerprints for the current instance SSH host keys."
@@ -10309,6 +10315,9 @@ msgstr ""
 msgid "Decrease"
 msgstr ""
 
+msgid "Default"
+msgstr ""
+
 msgid "Default CI configuration path"
 msgstr ""
 
@@ -14633,6 +14642,9 @@ msgid "GitLab Account Request"
 msgstr ""
 
 msgid "GitLab Billing Team."
+msgstr ""
+
+msgid "GitLab CI"
 msgstr ""
 
 msgid "GitLab Import"
@@ -28788,6 +28800,9 @@ msgid "Sets time estimate to %{time_estimate}."
 msgstr ""
 
 msgid "Sets weight to %{weight}."
+msgstr ""
+
+msgid "Setting"
 msgstr ""
 
 msgid "Setting this to 0 means using the system default timeout value."
