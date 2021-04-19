@@ -1658,4 +1658,35 @@ RSpec.describe ProjectPolicy do
       end
     end
   end
+
+  describe ':build_read_project' do
+    using RSpec::Parameterized::TableSyntax
+
+    let(:policy) { :build_read_project }
+
+    where(:role, :project_visibility, :allowed) do
+      :guest      | 'public'  | true
+      :reporter   | 'public'  | true
+      :developer  | 'public'  | true
+      :maintainer | 'public'  | true
+      :owner      | 'public'  | true
+      :admin      | 'public'  | true
+      :guest      | 'private' | false
+      :reporter   | 'private' | true
+      :developer  | 'private' | true
+      :maintainer | 'private' | true
+      :owner      | 'private' | true
+      :admin      | 'private' | false
+    end
+
+    with_them do
+      let(:current_user) { public_send(role) }
+
+      before do
+        project.update_column(:visibility_level, Gitlab::VisibilityLevel.level_value(project_visibility))
+      end
+
+      it { is_expected.to(allowed ? be_allowed(policy) : be_disallowed(policy)) }
+    end
+  end
 end
