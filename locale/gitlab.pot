@@ -553,7 +553,7 @@ msgstr ""
 msgid "%{gitlab_experience_text}. We won't share this information with anyone."
 msgstr ""
 
-msgid "%{global_id} is not a valid ID for %{expected_type}."
+msgid "%{global_id} is not a valid ID for %{expected_types}."
 msgstr ""
 
 msgid "%{group_docs_link_start}Groups%{group_docs_link_end} allow you to manage and collaborate across multiple projects. Members of a group have access to all of its projects."
