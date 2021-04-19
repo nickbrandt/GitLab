@@ -681,8 +681,6 @@ RSpec.describe 'Pipelines', :js do
             end
               .to change { Ci::Pipeline.count }.by(1)
 
-            wait_for_requests
-
             expect(Ci::Pipeline.last).to be_web
           end
 
@@ -721,22 +719,6 @@ RSpec.describe 'Pipelines', :js do
             end
               .to change { Ci::Pipeline.count }.by(1)
           end
-        end
-      end
-    end
-
-    describe 'Run Pipelines' do
-      let(:project) { create(:project, :repository) }
-
-      before do
-        visit new_project_pipeline_path(project)
-      end
-
-      describe 'new pipeline page' do
-        it 'has field to add a new pipeline' do
-          expect(page).to have_selector("[data-testid='ref-select']")
-          expect(find("[data-testid='ref-select']")).to have_content project.default_branch
-          expect(page).to have_content('Run for')
         end
       end
     end
@@ -781,7 +763,6 @@ RSpec.describe 'Pipelines', :js do
       let(:project) { create(:project, :repository) }
 
       before do
-        stub_feature_flags(new_pipeline_form: false)
         visit new_project_pipeline_path(project)
       end
 
