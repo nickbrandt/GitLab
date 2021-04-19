@@ -10,7 +10,8 @@ RSpec.describe Vulnerabilities::Finding do
   where(vulnerability_finding_signatures_enabled: [true, false])
   with_them do
     before do
-      stub_feature_flags(vulnerability_finding_signatures: vulnerability_finding_signatures_enabled)
+      stub_feature_flags(vulnerability_finding_tracking_signatures: vulnerability_finding_signatures_enabled)
+      stub_licensed_features(vulnerability_finding_signatures: vulnerability_finding_signatures_enabled)
     end
 
     describe 'associations' do
