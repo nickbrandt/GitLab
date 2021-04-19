@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import { parseBoolean } from '~/lib/utils/common_utils';
 import initProjectVisibilitySelector from '../../../project_visibility';
 import initProjectNew from '../../../projects/project_new';
 import NewProjectCreationApp from './components/app.vue';
@@ -6,18 +7,32 @@ import NewProjectCreationApp from './components/app.vue';
 initProjectVisibilitySelector();
 initProjectNew.bindEvents();
 
-function initNewProjectCreation(el, props) {
-  const { pushToCreateProjectCommand, workingWithProjectsHelpPath } = el.dataset;
+function initNewProjectCreation(el) {
+  const {
+    pushToCreateProjectCommand,
+    workingWithProjectsHelpPath,
+    newProjectGuidelines,
+    hasErrors,
+    isCiCdAvailable,
+  } = el.dataset;
+
+  const props = {
+    hasErrors: parseBoolean(hasErrors),
+    isCiCdAvailable: parseBoolean(isCiCdAvailable),
+    newProjectGuidelines,
+  };
+
+  const provide = {
+    workingWithProjectsHelpPath,
+    pushToCreateProjectCommand,
+  };
 
   return new Vue({
     el,
     components: {
       NewProjectCreationApp,
     },
-    provide: {
-      workingWithProjectsHelpPath,
-      pushToCreateProjectCommand,
-    },
+    provide,
     render(h) {
       return h(NewProjectCreationApp, { props });
     },
@@ -26,10 +41,4 @@ function initNewProjectCreation(el, props) {
 
 const el = document.querySelector('.js-new-project-creation');
 
-const config = {
-  hasErrors: 'hasErrors' in el.dataset,
-  isCiCdAvailable: 'isCiCdAvailable' in el.dataset,
-  newProjectGuidelines: el.dataset.newProjectGuidelines,
-};
-
-initNewProjectCreation(el, config);
+initNewProjectCreation(el);

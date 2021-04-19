@@ -8,6 +8,10 @@ import NewNamespacePage from '~/vue_shared/new_namespace/new_namespace_page.vue'
 describe('Experimental new project creation app', () => {
   let wrapper;
 
+  const findWelcomePage = () => wrapper.findComponent(WelcomePage);
+  const findLegacyContainer = () => wrapper.findComponent(LegacyContainer);
+  const findBreadcrumb = () => wrapper.findComponent(GlBreadcrumb);
+
   const DEFAULT_PROPS = {
     title: 'Create something',
     initialBreadcrumb: 'Something',
@@ -31,14 +35,13 @@ describe('Experimental new project creation app', () => {
   afterEach(() => {
     wrapper.destroy();
     window.location.hash = '';
-    wrapper = null;
   });
 
   it('passes experiment to welcome component if provided', () => {
     const EXPERIMENT = 'foo';
     createComponent({ propsData: { experiment: EXPERIMENT } });
 
-    expect(wrapper.findComponent(WelcomePage).props().experiment).toBe(EXPERIMENT);
+    expect(findWelcomePage().props().experiment).toBe(EXPERIMENT);
   });
 
   describe('with empty hash', () => {
@@ -47,18 +50,18 @@ describe('Experimental new project creation app', () => {
     });
 
     it('renders welcome page', () => {
-      expect(wrapper.findComponent(WelcomePage).exists()).toBe(true);
+      expect(findWelcomePage().exists()).toBe(true);
     });
 
     it('does not render breadcrumbs', () => {
-      expect(wrapper.findComponent(GlBreadcrumb).exists()).toBe(false);
+      expect(findBreadcrumb().exists()).toBe(false);
     });
   });
 
   it('renders first container if jumpToLastPersistedPanel passed', () => {
     createComponent({ propsData: { jumpToLastPersistedPanel: true } });
-    expect(wrapper.findComponent(WelcomePage).exists()).toBe(false);
-    expect(wrapper.findComponent(LegacyContainer).exists()).toBe(true);
+    expect(findWelcomePage().exists()).toBe(false);
+    expect(findLegacyContainer().exists()).toBe(true);
   });
 
   describe('when hash is not empty on load', () => {
@@ -68,16 +71,16 @@ describe('Experimental new project creation app', () => {
     });
 
     it('renders relevant container', () => {
-      expect(wrapper.findComponent(WelcomePage).exists()).toBe(false);
+      expect(findWelcomePage().exists()).toBe(false);
 
-      const container = wrapper.findComponent(LegacyContainer);
+      const container = findLegacyContainer();
 
       expect(container.exists()).toBe(true);
       expect(container.props().selector).toBe(DEFAULT_PROPS.panels[1].selector);
     });
 
     it('renders breadcrumbs', () => {
-      const breadcrumb = wrapper.findComponent(GlBreadcrumb);
+      const breadcrumb = findBreadcrumb();
       expect(breadcrumb.exists()).toBe(true);
       expect(breadcrumb.props().items[0].text).toBe(DEFAULT_PROPS.initialBreadcrumb);
     });
@@ -97,7 +100,7 @@ describe('Experimental new project creation app', () => {
 
   it('renders relevant container when hash changes', async () => {
     createComponent();
-    expect(wrapper.findComponent(WelcomePage).exists()).toBe(true);
+    expect(findWelcomePage().exists()).toBe(true);
 
     window.location.hash = `#${DEFAULT_PROPS.panels[0].name}`;
     const ev = document.createEvent('HTMLEvents');
@@ -105,7 +108,7 @@ describe('Experimental new project creation app', () => {
     window.dispatchEvent(ev);
 
     await nextTick();
-    expect(wrapper.findComponent(WelcomePage).exists()).toBe(false);
-    expect(wrapper.findComponent(LegacyContainer).exists()).toBe(true);
+    expect(findWelcomePage().exists()).toBe(false);
+    expect(findLegacyContainer().exists()).toBe(true);
   });
 });

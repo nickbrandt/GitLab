@@ -6,15 +6,21 @@ import NewNamespacePage from '~/vue_shared/new_namespace/new_namespace_page.vue'
 describe('Experimental new project creation app', () => {
   let wrapper;
 
+  const findNewNamespacePage = () => wrapper.findComponent(NewNamespacePage);
+
   const createComponent = (propsData) => {
     wrapper = shallowMount(App, { propsData });
   };
+
+  afterEach(() => {
+    wrapper.destroy();
+  });
 
   describe('new_repo experiment', () => {
     it('passes new_repo experiment', () => {
       createComponent();
 
-      expect(wrapper.findComponent(NewNamespacePage).props().experiment).toBe('new_repo');
+      expect(findNewNamespacePage().props().experiment).toBe('new_repo');
     });
 
     describe('when in the candidate variant', () => {
@@ -23,7 +29,7 @@ describe('Experimental new project creation app', () => {
       it('has "repository" in the panel title', () => {
         createComponent();
 
-        expect(wrapper.findComponent(NewNamespacePage).props().panels[0].title).toBe(
+        expect(findNewNamespacePage().props().panels[0].title).toBe(
           'Create blank project/repository',
         );
       });
@@ -35,9 +41,7 @@ describe('Experimental new project creation app', () => {
       it('has "project" in the panel title', () => {
         createComponent();
 
-        expect(wrapper.findComponent(NewNamespacePage).props().panels[0].title).toBe(
-          'Create blank project',
-        );
+        expect(findNewNamespacePage().props().panels[0].title).toBe('Create blank project');
       });
     });
   });
