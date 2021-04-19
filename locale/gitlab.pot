@@ -9631,9 +9631,6 @@ msgstr ""
 msgid "CustomCycleAnalytics|Start event label"
 msgstr ""
 
-msgid "Customer Portal"
-msgstr ""
-
 msgid "Customizable by an administrator."
 msgstr ""
 
@@ -11511,9 +11508,6 @@ msgid "Download export"
 msgstr ""
 
 msgid "Download image"
-msgstr ""
-
-msgid "Download license"
 msgstr ""
 
 msgid "Download raw data (.csv)"
@@ -30063,9 +30057,6 @@ msgstr ""
 msgid "Step 4."
 msgstr ""
 
-msgid "Still, we recommend keeping a backup saved somewhere. Otherwise, if you ever need it and have lost it, you will need to request GitLab Inc. to send it to you again."
-msgstr ""
-
 msgid "Stop Terminal"
 msgstr ""
 
@@ -36460,9 +36451,6 @@ msgid "Your license is valid from"
 msgstr ""
 
 msgid "Your license was successfully synced."
-msgstr ""
-
-msgid "Your license will be included in your GitLab backup and will survive upgrades, so in normal usage you should never need to re-upload your %{code_open}.gitlab-license%{code_close} file."
 msgstr ""
 
 msgid "Your membership in %{group} no longer expires."
