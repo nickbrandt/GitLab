@@ -15,10 +15,16 @@ RSpec.describe ActiveRecord::QueryRecorder do
     let(:backtrace) { %r{QueryRecorder backtrace:  --> (\w+/)*\w+\.rb:\d+:in `.*'} }
     let(:duration_line) { %r{QueryRecorder DURATION:  --> \d+\.\d+} }
 
-    def match_section(query, lines)
+    def expect_section(query, lines)
       query_lines = lines.take(query.size)
+
+      # the query comes first
       expect(query_lines).to match(query)
+
+      # followed by the duration
       expect(lines[query.size]).to match(duration_line)
+
+      # and then one or more lines of backtrace
       backtrace_lines = lines.drop(query.size + 1).take_while { |line| line.match(backtrace) }
       expect(backtrace_lines).not_to be_empty
 
@@ -26,7 +32,7 @@ RSpec.describe ActiveRecord::QueryRecorder do
       lines.drop(query.size + 1 + backtrace_lines.size)
     end
 
-    it 'prints SQL, duration and backtrace, all prefixed with QueryRecorder' do
+    it 'prints SQL, duration and backtrace, all prefixed with QueryRecorder', :aggregate_failures do
       io = StringIO.new
 
       control = ActiveRecord::QueryRecorder.new(log_file: io, query_recorder_debug: true) do
@@ -53,9 +59,9 @@ RSpec.describe ActiveRecord::QueryRecorder do
       lines = io.string.lines.map(&:chomp)
 
       expect(lines).to all(start_with('QueryRecorder'))
-      lines = match_section([query_a], lines)
-      lines = match_section([query_b], lines)
-      lines = match_section([query_c_a, query_c_b, query_c_c, query_c_d], lines)
+      lines = expect_section([query_a], lines)
+      lines = expect_section([query_b], lines)
+      lines = expect_section([query_c_a, query_c_b, query_c_c, query_c_d], lines)
 
       expect(lines).to be_empty
     end
