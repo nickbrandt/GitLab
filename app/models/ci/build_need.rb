@@ -5,8 +5,9 @@ module Ci
     extend Gitlab::Ci::Model
 
     include BulkInsertSafe
+    include IgnorableColumns
 
-    self.ignored_columns += [:build_id_convert_to_bigint] # rubocop:disable Cop/IgnoredColumns
+    ignore_columns :build_id_convert_to_bigint, remove_with: '14.1', remove_after: '2021-07-22'
 
     belongs_to :build, class_name: "Ci::Processable", foreign_key: :build_id, inverse_of: :needs
 
@@ -16,5 +17,9 @@ module Ci
 
     scope :scoped_build, -> { where('ci_builds.id=ci_build_needs.build_id') }
     scope :artifacts, -> { where(artifacts: true) }
+
+    def attributes
+      super.except('build_id_convert_to_bigint')
+    end
   end
 end
