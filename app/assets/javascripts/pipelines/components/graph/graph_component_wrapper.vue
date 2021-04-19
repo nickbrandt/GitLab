@@ -45,11 +45,12 @@ export default {
     return {
       alertType: null,
       currentViewType: STAGE_VIEW,
-      linksLoading: false,
+      loadLinks: false,
       pipeline: null,
       pipelineLayers: null,
       showAlert: false,
       showLinks: false,
+      noms: false,
     };
   },
   errorTexts: {
@@ -174,9 +175,6 @@ export default {
       this.showAlert = false;
       this.alertType = null;
     },
-    linksCalculated() {
-      this.linksLoading = false;
-    },
     refreshPipelineGraph() {
       this.$apollo.queries.pipeline.refetch();
     },
@@ -190,7 +188,7 @@ export default {
     },
     /* eslint-enable @gitlab/require-i18n-strings */
     updateShowLinks(val) {
-      this.linksLoading = val;
+      this.loadLinks = val;
       this.showLinks = val;
     },
     updateViewType(type) {
@@ -213,7 +211,7 @@ export default {
       <graph-view-selector
         v-if="showGraphViewSelector"
         :type="currentViewType"
-        :links-loading="linksLoading"
+        :links-loading="showLinks"
         @updateViewType="updateViewType"
         @updateShowLinks="updateShowLinks"
       />
@@ -227,7 +225,6 @@ export default {
       :show-links="showLinks"
       :view-type="currentViewType"
       @error="reportFailure"
-      @linksCalculated="linksCalculated"
       @refreshPipelineGraph="refreshPipelineGraph"
     />
   </div>

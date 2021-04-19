@@ -204,7 +204,6 @@ export default {
               :view-type="viewType"
               @error="onError"
               @highlightedJobsChange="updateHighlightedJobs"
-              @linksCalculated="$emit('linksCalculated')"
             >
               <stage-column-component
                 v-for="column in layout"

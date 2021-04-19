@@ -1,11 +1,12 @@
 <script>
-import { GlSegmentedControl, GlToggle } from '@gitlab/ui';
+import { GlLoadingIcon, GlSegmentedControl, GlToggle } from '@gitlab/ui';
 import { __ } from '~/locale';
 import { STAGE_VIEW, LAYER_VIEW } from './constants';
 
 export default {
   name: 'GraphViewSelector',
   components: {
+    GlLoadingIcon,
     GlSegmentedControl,
     GlToggle,
   },
@@ -23,6 +24,8 @@ export default {
     return {
       currentViewType: this.type,
       showLinks: false,
+      isToggleLoading: false,
+      isSwitcherLoading: false,
     };
   },
   i18n: {
@@ -45,11 +48,6 @@ export default {
       },
     },
   },
-  watch: {
-    showLinks(val) {
-      this.$emit('updateShowLinks', val);
-    },
-  },
   computed: {
     showLinksToggle() {
       return this.currentViewType === LAYER_VIEW;
@@ -63,35 +61,56 @@ export default {
       });
     },
   },
-  methods: {
-    itemClick(type) {
-      this.$emit('updateViewType', type);
+  watch: {
+    linksLoading() {
+      this.isToggleLoading = false;
     },
-    updateShowLinks(val) {
-      this.showLinks = val;
+    type() {
+      this.isSwitcherLoading = false;
+    },
+  },
+  methods: {
+    toggleView(type) {
+      this.isSwitcherLoading = true;
+      setTimeout(() => {
+        this.$emit('updateViewType', type);
+      });
+    },
+    toggleLoading(val) {
+      this.isToggleLoading = true;
+      setTimeout(() => {
+        this.$emit('updateShowLinks', val);
+      });
     },
   },
 };
 </script>
 
 <template>
-  <div class="gl-display-flex gl-align-items-center gl-my-4">
+  <div class="gl-relative gl-display-flex gl-align-items-center gl-w-max-content gl-my-4">
+    <gl-loading-icon
+      v-if="isSwitcherLoading"
+      class="gl-absolute gl-w-full gl-bg-white gl-opacity-5 gl-z-index-2"
+      size="lg"
+    />
     <span class="gl-font-weight-bold">{{ $options.i18n.viewLabelText }}</span>
     <gl-segmented-control
       v-model="currentViewType"
       :options="viewTypesList"
+      :disabled="isSwitcherLoading"
       data-testid="pipeline-view-selector"
       class="gl-mx-4"
-      @input="itemClick"
+      @input="toggleView"
     />
+
     <div v-if="showLinksToggle">
       <gl-toggle
         v-model="showLinks"
         class="gl-mx-4"
         :label="$options.i18n.linksLabelText"
-        :is-loading="linksLoading"
+        :is-loading="isToggleLoading"
         label-position="left"
-        @change="updateShowLinks"
+        @change="toggleLoading"
       />
     </div>
   </div>
