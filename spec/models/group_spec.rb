@@ -427,6 +427,42 @@ RSpec.describe Group do
     end
   end
 
+  context 'traversal queries' do
+    let_it_be(:group, reload: true) { create(:group, :nested) }
+
+    context 'recursive' do
+      before do
+        stub_feature_flags(use_traversal_ids: false)
+      end
+
+      it_behaves_like 'namespace traversal'
+
+      describe '#self_and_descendants' do
+        it { expect(group.self_and_descendants.to_sql).not_to include 'traversal_ids @>' }
+      end
+
+      describe '#ancestors' do
+        it { expect(group.ancestors.to_sql).not_to include 'traversal_ids <@' }
+      end
+    end
+
+    context 'linear' do
+      it_behaves_like 'namespace traversal'
+
+      describe '#self_and_descendants' do
+        it { expect(group.self_and_descendants.to_sql).to include 'traversal_ids @>' }
+      end
+
+      describe '#ancestors' do
+        it { expect(group.ancestors.to_sql).to include 'traversal_ids <@' }
+      end
+
+      it 'hierarchy order' do
+        expect(group.ancestors(hierarchy_order: :asc).to_sql).to include 'ORDER BY "depth" ASC'
+      end
+    end
+  end
+
   describe '.without_integration' do
     let(:another_group) { create(:group) }
     let(:instance_integration) { build(:jira_service, :instance) }

@@ -936,42 +936,6 @@ RSpec.describe Namespace do
     end
   end
 
-  context 'traversal queries' do
-    let_it_be(:namespace, reload: true) { create(:namespace) }
-
-    context 'recursive' do
-      before do
-        stub_feature_flags(use_traversal_ids: false)
-      end
-
-      it_behaves_like 'namespace traversal'
-
-      describe '#self_and_descendants' do
-        it { expect(namespace.self_and_descendants.to_sql).not_to include 'traversal_ids @>' }
-      end
-
-      describe '#ancestors' do
-        it { expect(namespace.ancestors.to_sql).not_to include 'traversal_ids <@' }
-      end
-    end
-
-    context 'linear' do
-      it_behaves_like 'namespace traversal'
-
-      describe '#self_and_descendants' do
-        it { expect(namespace.self_and_descendants.to_sql).to include 'traversal_ids @>' }
-      end
-
-      describe '#ancestors' do
-        it { expect(namespace.ancestors.to_sql).to include 'traversal_ids <@' }
-
-        it 'hierarchy order' do
-          expect(namespace.ancestors(hierarchy_order: :asc).to_sql).to include 'ORDER BY "depth" ASC'
-        end
-      end
-    end
-  end
-
   describe '#users_with_descendants' do
     let(:user_a) { create(:user) }
     let(:user_b) { create(:user) }
