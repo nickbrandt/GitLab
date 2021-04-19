@@ -106,7 +106,7 @@ module Gitlab
             raise WriteInsideReadOnlyTransactionError, 'A write query is performed inside a read-only transaction'
           end
 
-          result = @load_balancer.read_write do |connection|
+          @load_balancer.read_write do |connection|
             # Sticking has to be enabled before calling the method. Not doing so
             # could lead to methods called in a block still being performed on a
             # secondary instead of on a primary (when necessary).
@@ -114,8 +114,6 @@ module Gitlab
 
             connection.send(name, *args, &block)
           end
-
-          result
         end
 
         private

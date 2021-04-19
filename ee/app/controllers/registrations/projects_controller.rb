@@ -54,7 +54,7 @@ module Registrations
     end
 
     def create_learn_gitlab_project
-      learn_gitlab_project = File.open(learn_gitlab_template_path) do |archive|
+      File.open(learn_gitlab_template_path) do |archive|
         ::Projects::GitlabProjectsImportService.new(
           current_user,
           namespace_id: @project.namespace_id,
@@ -62,8 +62,6 @@ module Registrations
           name: learn_gitlab_project_name
         ).execute
       end
-
-      learn_gitlab_project
     end
 
     def authorize_create_project!
