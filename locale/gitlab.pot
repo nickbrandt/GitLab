@@ -23120,6 +23120,18 @@ msgstr ""
 msgid "PipelineCharts|Total:"
 msgstr ""
 
+msgid "PipelineEditor|The CI/CD configuration is continuously validated. Errors and warnings are displayed when the CI/CD configuration file is not empty."
+msgstr ""
+
+msgid "PipelineEditor|The merged YAML view is displayed when the CI/CD configuration file has valid syntax."
+msgstr ""
+
+msgid "PipelineEditor|The pipeline visualization is displayed when the CI/CD configuration file has valid syntax."
+msgstr ""
+
+msgid "PipelineEditor|This tab will be usable when the CI/CD configuration file is populated with valid syntax."
+msgstr ""
+
 msgid "PipelineScheduleIntervalPattern|Custom (%{linkStart}Cron syntax%{linkEnd})"
 msgstr ""
 
@@ -31374,9 +31386,6 @@ msgstr ""
 msgid "The value of the provided variable exceeds the %{count} character limit"
 msgstr ""
 
-msgid "The visualization will appear in this tab when the CI/CD configuration file is populated with valid syntax."
-msgstr ""
-
 msgid "The vulnerability is known, and has not been remediated or mitigated, but is considered to be an acceptable business risk."
 msgstr ""
 
@@ -36123,7 +36132,7 @@ msgstr ""
 msgid "Your %{strong}%{plan_name}%{strong_close} subscription will expire on %{strong}%{expires_on}%{strong_close}. After that, you will not be able to create issues or merge requests as well as many other features."
 msgstr ""
 
-msgid "Your CI configuration file is invalid."
+msgid "Your CI/CD configuration syntax is invalid. View Lint tab for more details."
 msgstr ""
 
 msgid "Your CSV export has started. It will be emailed to %{email} when complete."
