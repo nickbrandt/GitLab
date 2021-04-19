@@ -6,6 +6,8 @@ module Ci
 
     include BulkInsertSafe
 
+    self.ignored_columns += [:build_id_convert_to_bigint] # rubocop:disable Cop/IgnoredColumns
+
     belongs_to :build, class_name: "Ci::Processable", foreign_key: :build_id, inverse_of: :needs
 
     validates :build, presence: true
