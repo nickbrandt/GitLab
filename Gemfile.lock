@@ -672,7 +672,7 @@ GEM
       kaminari-core (= 1.2.1)
     kaminari-core (1.2.1)
     kgio (2.11.3)
-    knapsack (1.17.0)
+    knapsack (1.21.1)
       rake
     kramdown (2.3.1)
       rexml
@@ -1476,7 +1476,7 @@ DEPENDENCIES
   json_schemer (~> 0.2.12)
   jwt (~> 2.1.0)
   kaminari (~> 1.0)
-  knapsack (~> 1.17)
+  knapsack (~> 1.21.1)
   kramdown (~> 2.3.1)
   kubeclient (~> 4.9.1)
   lefthook (~> 0.7.0)
