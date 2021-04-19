@@ -16130,6 +16130,9 @@ msgstr ""
 msgid "If you add %{codeStart}needs%{codeEnd} to jobs in your pipeline you'll be able to view the %{codeStart}needs%{codeEnd} relationships between jobs in this tab as a %{linkStart}Directed Acyclic Graph (DAG)%{linkEnd}."
 msgstr ""
 
+msgid "If you did not initiate this change, please contact your administrator immediately."
+msgstr ""
+
 msgid "If you did not recently sign in, you should immediately %{password_link_start}change your password%{password_link_end}."
 msgstr ""
 
@@ -31270,6 +31273,12 @@ msgid "The passphrase required to decrypt the private key. This is optional and 
 msgstr ""
 
 msgid "The password for the Jenkins server."
+msgstr ""
+
+msgid "The password for your GitLab account on %{gitlab_url} has successfully been changed."
+msgstr ""
+
+msgid "The password for your GitLab account on %{link_to_gitlab} has successfully been changed."
 msgstr ""
 
 msgid "The phase of the development lifecycle."
