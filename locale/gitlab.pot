@@ -33612,6 +33612,9 @@ msgstr ""
 msgid "Update iteration"
 msgstr ""
 
+msgid "Update milestone"
+msgstr ""
+
 msgid "Update now"
 msgstr ""
 
