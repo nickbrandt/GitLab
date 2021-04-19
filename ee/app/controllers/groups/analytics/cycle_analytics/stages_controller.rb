@@ -9,7 +9,8 @@ module Groups
 
         before_action :load_group
         before_action :load_value_stream
-        before_action :validate_params, only: %i[median average records duration_chart average_duration_chart]
+        before_action :validate_params, only: %i[median average records duration_chart average_duration_chart count]
+        before_action :authorize_read_group_stage, only: %i[median average records duration_chart average_duration_chart count]
 
         def index
           return render_403 unless can?(current_user, :read_group_cycle_analytics, @group)
@@ -42,20 +43,14 @@ module Groups
         end
 
         def median
-          return render_403 unless can?(current_user, :read_group_stage, @group)
-
           render json: { value: data_collector.median.seconds }
         end
 
         def average
-          return render_403 unless can?(current_user, :read_group_stage, @group)
-
           render json: { value: data_collector.average.seconds }
         end
 
         def records
-          return render_403 unless can?(current_user, :read_group_stage, @group)
-
           serialized_records = data_collector.serialized_records do |relation|
             add_pagination_headers(relation)
           end
@@ -64,15 +59,15 @@ module Groups
         end
 
         def duration_chart
-          return render_403 unless can?(current_user, :read_group_stage, @group)
-
           render json: ::Analytics::CycleAnalytics::DurationChartItemEntity.represent(data_collector.duration_chart_data)
         end
 
         def average_duration_chart
-          return render_403 unless can?(current_user, :read_group_stage, @group)
-
           render json: ::Analytics::CycleAnalytics::DurationChartAverageItemEntity.represent(data_collector.duration_chart_average_data)
+        end
+
+        def count
+          render json: { count: data_collector.count }
         end
 
         private
@@ -155,6 +150,10 @@ module Groups
             prev_page: relation.prev_page,
             params: permitted_cycle_analytics_params
           ).execute(exclude_total_headers: true, data_without_counts: true)
+        end
+
+        def authorize_read_group_stage
+          return render_403 unless can?(current_user, :delete_group_stage, @group)
         end
       end
     end

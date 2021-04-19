@@ -32,6 +32,7 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
             get :median
             get :average
             get :records
+            get :count
           end
         end
         resources :value_streams, only: [:index, :create, :update, :destroy] do
@@ -42,6 +43,7 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
               get :median
               get :average
               get :records
+              get :count
             end
           end
         end
