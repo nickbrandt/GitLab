@@ -34497,6 +34497,9 @@ msgstr ""
 msgid "Verify SAML Configuration"
 msgstr ""
 
+msgid "Verify code"
+msgstr ""
+
 msgid "Verify configuration"
 msgstr ""
 
