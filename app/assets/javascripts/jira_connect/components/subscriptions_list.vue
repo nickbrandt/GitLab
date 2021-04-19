@@ -68,9 +68,9 @@ export default {
         .then(() => {
           reloadPage();
         })
-        .catch(() => {
+        .catch((error) => {
           this.setAlert({
-            message: this.$options.i18n.unlinkError,
+            message: error?.response?.data?.error || this.$options.i18n.unlinkError,
             variant: 'danger',
           });
           this.loadingItem = null;
