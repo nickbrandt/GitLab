@@ -119,7 +119,6 @@ linters:
       - Lint/BooleanSymbol
       - Lint/LiteralInInterpolation
       - Lint/ParenthesesAsGroupedExpression
-      - Lint/RedundantWithIndex
       - Lint/SafeNavigationConsistency
       - Metrics/BlockNesting
       - Naming/VariableName
