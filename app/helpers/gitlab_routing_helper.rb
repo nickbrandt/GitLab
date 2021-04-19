@@ -365,7 +365,7 @@ module GitlabRoutingHelper
   end
 
   def graphql_etag_pipeline_sha_path(sha)
-    [Gitlab::Routing.url_helpers.api_graphql_path, "pipelines/sha/#{sha}"].join(':')
+    [api_graphql_path, "pipelines/sha/#{sha}"].join(':')
   end
 
   private

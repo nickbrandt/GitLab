@@ -4,7 +4,11 @@ module Mutations
   module Commits
     class Create < BaseMutation
       include FindsProject
-      include GitlabRoutingHelper
+
+      class UrlHelpers
+        include GitlabRoutingHelper
+        include Gitlab::Routing
+      end
 
       graphql_name 'CommitCreate'
 
@@ -56,7 +60,7 @@ module Mutations
 
         {
           commit: (project.repository.commit(result[:result]) if result[:status] == :success),
-          commit_pipeline_path: graphql_etag_pipeline_sha_path(result[:result]),
+          commit_pipeline_path: UrlHelpers.new.graphql_etag_pipeline_sha_path(result[:result]),
           errors: Array.wrap(result[:message])
         }
       end

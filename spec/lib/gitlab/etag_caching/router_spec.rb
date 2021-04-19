@@ -24,7 +24,7 @@ RSpec.describe Gitlab::EtagCaching::Router do
       end
 
       it 'matches pipeline sha endpoint' do
-        result = match_route('/api/graphql', 'pipelines/sha/4asda2jiwjdqw0')
+        result = match_route('/api/graphql', 'pipelines/sha/4asd12lla2jiwjdqw9as32glm8is8hiu8s2c5jsw')
 
         expect(result).to be_present
         expect(result.name).to eq 'ci_editor'

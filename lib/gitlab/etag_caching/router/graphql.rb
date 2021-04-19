@@ -14,7 +14,7 @@ module Gitlab
             'continuous_integration'
           ],
           [
-            %r(\Apipelines/sha/\w+\z),
+            %r(\Apipelines/sha/\w{7,40}\z),
             'ci_editor',
             'pipeline_authoring'
           ]

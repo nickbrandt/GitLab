@@ -76,11 +76,11 @@ module Ci
       each_pipelines_merge_request_path(pipeline) do |path|
         store.touch(path)
       end
-      store.touch(graphql_pipeline_sha_path(pipeline.sha))
 
       pipeline.self_with_ancestors_and_descendants.each do |relative_pipeline|
         store.touch(project_pipeline_path(relative_pipeline.project, relative_pipeline))
         store.touch(graphql_pipeline_path(relative_pipeline))
+        store.touch(graphql_pipeline_sha_path(relative_pipeline.sha))
       end
     end
 

@@ -279,7 +279,7 @@ FactoryBot.define do
 
     trait :with_merge_request_pipeline do
       transient do
-        merge_sha { 'testmergesha123' }
+        merge_sha { 'testmergeshawithfortycharacters123456' }
         source_sha { source_branch_sha }
         target_sha { target_branch_sha }
       end
