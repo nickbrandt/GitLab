@@ -11273,10 +11273,13 @@ Returns [`Tree`](#tree).
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
+| <a id="repositoryblobcanlock"></a>`canLock` | [`Boolean`](#boolean) | Whether the current user is able to mark this file as locked. |
 | <a id="repositoryblobeditblobpath"></a>`editBlobPath` | [`String`](#string) | Web path to edit the blob in the old-style editor. |
 | <a id="repositoryblobfiletype"></a>`fileType` | [`String`](#string) | The expected format of the blob based on the extension. |
 | <a id="repositoryblobid"></a>`id` | [`ID!`](#id) | ID of the blob. |
+| <a id="repositoryblobislocked"></a>`isLocked` | [`Boolean`](#boolean) | Whether this file is currently locked. |
 | <a id="repositorybloblfsoid"></a>`lfsOid` | [`String`](#string) | LFS OID of the blob. |
+| <a id="repositorybloblocklink"></a>`lockLink` | [`String`](#string) | Path to the endpoint used to toggle this file's lock status. |
 | <a id="repositoryblobmode"></a>`mode` | [`String`](#string) | Blob mode. |
 | <a id="repositoryblobname"></a>`name` | [`String`](#string) | Blob name. |
 | <a id="repositorybloboid"></a>`oid` | [`String!`](#string) | OID of the blob. |
