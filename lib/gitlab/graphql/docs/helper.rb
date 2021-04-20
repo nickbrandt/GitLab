@@ -143,10 +143,9 @@ module Gitlab
           graphql_interface_types.map { |t| t.merge(fields: t[:fields] + t[:connections]) }
         end
 
-        # 'queries' are the fields of the Query type
-        def queries
+        def fields_of(type_name)
           graphql_operation_types
-            .find { |type| type[:name] == 'Query' }
+            .find { |type| type[:name] == type_name }
             .values_at(:fields, :connections)
             .flatten
             .then { |fields| sorted_by_name(fields) }

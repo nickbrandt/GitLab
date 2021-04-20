@@ -26,8 +26,8 @@
   The `Query` type contains the API's top-level entry points for all executable queries.
 \
 
-- queries.each do |query|
-  = render_full_field(query, heading_level: 3, owner: 'Query')
+- fields_of('Query').each do |field|
+  = render_full_field(field, heading_level: 3, owner: 'Query')
   \
 
 :plain
