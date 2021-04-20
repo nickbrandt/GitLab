@@ -14,6 +14,33 @@ RSpec.describe Groups::GroupMembersController do
     sign_in(user)
   end
 
+  describe 'GET #index' do
+    context 'with members, invites and requests queries' do
+      render_views
+
+      let!(:invited) { create(:group_member, :invited, :developer, group: group) }
+      let!(:requested) { create(:group_member, :access_request, group: group) }
+
+      it 'records queries', :use_sql_query_cache do
+        get :index, params: { group_id: group }
+
+        control = ActiveRecord::QueryRecorder.new(skip_cached: false) { get :index, params: { group_id: group } }
+        create_list(:group_member, 5, group: group, created_by: user)
+        create_list(:group_member, 5, :invited, :developer, group: group, created_by: user)
+        create_list(:group_member, 5, :access_request, group: group)
+        # locally 87 vs 128
+        unresolved_n_plus_ones = 36
+        # created_by = 8 # 88 vs 134
+        # oncall_schedules = 6 # 87 vs 128
+        multiple_members_threshold = 5
+
+        expect do
+          get :index, params: { group_id: group.reload }
+        end.not_to exceed_all_query_limit(control.count).with_threshold(multiple_members_threshold + unresolved_n_plus_ones)
+      end
+    end
+  end
+
   describe 'POST #create' do
     it 'creates an audit event' do
       expect do
