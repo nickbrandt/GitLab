@@ -16163,6 +16163,9 @@ msgstr ""
 msgid "If you did not initiate this change, please contact your administrator immediately."
 msgstr ""
 
+msgid "If you did not perform this request, you can safely ignore this email."
+msgstr ""
+
 msgid "If you did not recently sign in, you should immediately %{password_link_start}change your password%{password_link_end}."
 msgstr ""
 
@@ -22467,6 +22470,9 @@ msgid "Other versions"
 msgstr ""
 
 msgid "Other visibility settings have been disabled by the administrator."
+msgstr ""
+
+msgid "Otherwise, click the link below to complete the process."
 msgstr ""
 
 msgid "Our documentation includes an example DevOps Score report."
@@ -29320,6 +29326,9 @@ msgid "Someone edited this merge request at the same time you did. Please refres
 msgstr ""
 
 msgid "Someone edited this test case at the same time you did. The description has been updated and you will need to make your changes again."
+msgstr ""
+
+msgid "Someone, hopefully you, has requested to reset the password for your GitLab account on %{link_to_gitlab}."
 msgstr ""
 
 msgid "Something went wrong"
