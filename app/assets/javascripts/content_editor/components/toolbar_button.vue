@@ -1,10 +1,9 @@
 <script>
-import { GlButton, GlIcon, GlTooltipDirective as GlTooltip } from '@gitlab/ui';
+import { GlButton, GlTooltipDirective as GlTooltip } from '@gitlab/ui';
 
 export default {
   components: {
     GlButton,
-    GlIcon,
   },
   directives: {
     GlTooltip,
@@ -55,11 +54,11 @@ export default {
     v-gl-tooltip
     category="tertiary"
     size="small"
+    class="gl-mx-2"
     :class="{ active: isActive }"
     :aria-label="label"
     :title="label"
+    :icon="iconName"
     @click="execute"
-  >
-    <gl-icon :name="iconName" :size="16" />
-  </gl-button>
+  />
 </template>

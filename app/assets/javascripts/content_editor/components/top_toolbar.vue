@@ -23,14 +23,14 @@ export default {
       data-testid="bold"
       content-type="bold"
       icon-name="bold"
-      :label="__('Bold')"
+      :label="__('Bold text')"
       :editor="editor"
     />
     <toolbar-button
       data-testid="italic"
       content-type="italic"
       icon-name="italic"
-      :label="__('Italic')"
+      :label="__('Italic text')"
       :editor="editor"
     />
     <toolbar-button

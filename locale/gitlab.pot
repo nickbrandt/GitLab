@@ -5229,9 +5229,6 @@ msgstr ""
 msgid "Board|Load more issues"
 msgstr ""
 
-msgid "Bold"
-msgstr ""
-
 msgid "Bold text"
 msgstr ""
 
@@ -17900,9 +17897,6 @@ msgid "It seems that there is currently no available data for code coverage"
 msgstr ""
 
 msgid "It's you"
-msgstr ""
-
-msgid "Italic"
 msgstr ""
 
 msgid "Italic text"

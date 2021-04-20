@@ -39,6 +39,11 @@ const createEditor = async ({ content, renderMarkdown, serializer: customSeriali
     ],
     editorProps: {
       attributes: {
+        /*
+         * Adds some padding to the contenteditable element where the user types.
+         * Otherwise, the text cursor is not visible when its position is at the
+         * beginning of a line.
+         */
         class: 'gl-py-4 gl-px-5',
       },
     },

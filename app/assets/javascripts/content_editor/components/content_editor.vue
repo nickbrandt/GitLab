@@ -1,5 +1,5 @@
 <script>
-import { EditorContent } from 'tiptap';
+import { EditorContent, Editor } from 'tiptap';
 import TopToolbar from './top_toolbar.vue';
 
 export default {
@@ -11,6 +11,7 @@ export default {
     editor: {
       type: Object,
       required: true,
+      validator: (editor) => editor instanceof Editor,
     },
   },
 };
