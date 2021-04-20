@@ -34,7 +34,47 @@ RSpec.describe API::Environments do
         expect(json_response.first['name']).to eq(environment.name)
         expect(json_response.first['external_url']).to eq(environment.external_url)
         expect(json_response.first['project'].keys).to contain_exactly(*project_data_keys)
-        expect(json_response.first).not_to have_key("last_deployment")
+        expect(json_response.first['enable_advanced_logs_querying']).to eq(false)
+        expect(json_response.first).not_to have_key('last_deployment')
+      end
+
+      context 'when elastic stack is available' do
+        before do
+          allow_next_found_instance_of(Environment) do |env|
+            allow(env).to receive(:elastic_stack_available?).and_return(true)
+          end
+        end
+
+        context 'when the user can read pod logs' do
+          it 'returns environment with enable_advanced_logs_querying' do
+            get api("/projects/#{project.id}/environments", user)
+
+            expect(response).to have_gitlab_http_status(:ok)
+            expect(response).to include_pagination_headers
+            expect(json_response).to be_an Array
+            expect(json_response.size).to eq(1)
+            expect(json_response.first['enable_advanced_logs_querying']).to eq(true)
+          end
+        end
+
+        context 'when the user cannot read pod logs' do
+          before do
+            allow_next_found_instance_of(User) do |user|
+              allow(user).to receive(:can?).and_call_original
+              allow(user).to receive(:can?).with(:read_pod_logs, project).and_return(false)
+            end
+          end
+
+          it 'does not contain enable_advanced_logs_querying' do
+            get api("/projects/#{project.id}/environments", user)
+
+            expect(response).to have_gitlab_http_status(:ok)
+            expect(response).to include_pagination_headers
+            expect(json_response).to be_an Array
+            expect(json_response.size).to eq(1)
+            expect(json_response.first).not_to have_key('enable_advanced_logs_querying')
+          end
+        end
       end
 
       context 'when filtering' do
