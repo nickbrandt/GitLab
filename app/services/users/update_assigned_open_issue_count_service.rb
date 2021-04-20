@@ -1,27 +1,38 @@
 # frozen_string_literal: true
 
 module Users
-  # Service class for calculating and persisting the number of assigned issues for a user.
+  # Service class for calculating and persisting the number of assigned open issues for a user.
   class UpdateAssignedOpenIssueCountService
     attr_accessor :current_user, :target_user, :params
 
     def initialize(current_user:, target_user:, params: {})
       @target_user, @current_user, @params = target_user, current_user, params.dup
+
+      raise ArgumentError.new("Please provide a user") unless current_user.is_a?(User)
+      raise ArgumentError.new("Please provide a target user") unless target_user.is_a?(User)
     end
 
     def execute
-      return ServiceResponse.error(message: 'Insufficient permissions') unless current_user
+      Rails.cache.delete(user_assigned_issue_cache)
 
-      value = persist_count(params[:count_to_persist] || calculate_count)
+      value = params[:count_to_persist] || calculate_count
+      persist_count(value)
+
+      Rails.cache.write(user_assigned_issue_cache, value, expires_in: target_user.count_cache_validity_period)
 
       ServiceResponse.success(payload: { count: value })
+    rescue => e
+      ServiceResponse.error(message: e.message)
     end
 
     private
 
+    def user_assigned_issue_cache
+      ['users', target_user.id, 'assigned_open_issues_count']
+    end
+
     def persist_count(count)
       Users::UpdateService.new(current_user, user: target_user, assigned_open_issues_count: count).execute
-      count
     end
 
     def calculate_count

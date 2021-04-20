@@ -663,22 +663,47 @@ RSpec.describe Issue do
     end
   end
 
-  describe 'cached counts', :clean_gitlab_redis_cache do
-    it 'updates when assignees change' do
-      user1 = create(:user)
-      user2 = create(:user)
-      issue = create(:issue, assignees: [user1], project: reusable_project)
+  describe 'cached assigned open issue counts per user', :sidekiq_inline do
+    let_it_be(:user1) { create(:user) }
+    let_it_be(:user2) { create(:user) }
+    let_it_be_with_reload(:issue) { create(:issue, assignees: [user1], project: reusable_project) }
+
+    before do
       reusable_project.add_developer(user1)
       reusable_project.add_developer(user2)
+    end
 
-      expect(user1.assigned_open_issues_count).to eq(1)
-      expect(user2.assigned_open_issues_count).to eq(0)
+    shared_examples 'updates when assignees change' do
+      specify do
+        expect(user1.assigned_open_issues_count).to eq(1)
+        expect(user2.assigned_open_issues_count).to eq(0)
 
-      issue.assignees = [user2]
-      issue.save!
+        # use a service instead of saving directly, or else the worker is not called.
+        ::Issues::UpdateService.new(
+            reusable_project,
+            user1,
+            assignee_ids: [user2.id]
+        ).execute(issue)
 
-      expect(user1.assigned_open_issues_count).to eq(0)
-      expect(user2.assigned_open_issues_count).to eq(1)
+        expect(user1.reload.assigned_open_issues_count).to eq(0)
+        expect(user2.reload.assigned_open_issues_count).to eq(1)
+      end
+    end
+
+    context 'with feature flag enabled' do
+      before do
+        stub_feature_flags(assigned_open_issues_database_cache: true)
+      end
+
+      it_behaves_like 'updates when assignees change'
+    end
+
+    context 'with feature flag disabled' do
+      before do
+        stub_feature_flags(assigned_open_issues_database_cache: false)
+      end
+
+      it_behaves_like 'updates when assignees change'
     end
   end
 

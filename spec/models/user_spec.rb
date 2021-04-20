@@ -4215,21 +4215,17 @@ RSpec.describe User do
   end
 
   describe 'open issue counts by user' do
+    let_it_be_with_reload(:user) { create(:user) }
+
     shared_examples 'invalidates the cached value' do
       it 'invalidates cache for issue counter' do
-        cache_mock = double
+        expect(Rails.cache).to receive(:delete).with(['users', user.id, 'assigned_open_issues_count'])
 
-        expect(cache_mock).to receive(:delete).with(['users', user.id, 'assigned_open_issues_count'])
-
-        allow(Rails).to receive(:cache).and_return(cache_mock)
-
-        user.recalculate_assigned_open_issue_counts
+        subject
       end
     end
 
     describe '#recalculate_assigned_open_issue_counts' do
-      let(:user) { create(:user) }
-
       subject do
         user.recalculate_assigned_open_issue_counts
         user.save!
@@ -4261,6 +4257,72 @@ RSpec.describe User do
         end
 
         it_behaves_like 'invalidates the cached value'
+      end
+    end
+
+    describe '#assigned_open_issue_counts' do
+      subject { user.assigned_open_issues_count }
+
+      context 'if feature flag assigned_open_issues_database_cache is enabled' do
+        let(:cached_count) { 1 }
+        let(:fake_service) { double }
+
+        before do
+          stub_feature_flags(assigned_open_issues_database_cache: true)
+          allow(Rails.cache).to receive(:fetch).with(['users', user.id, 'assigned_open_issues_count'], { expires_in: anything }).and_return(cached_count)
+          expect(Rails.cache).to receive(:fetch).with(['users', user.id, 'assigned_open_issues_count'], expires_in: anything, force: force).and_call_original
+          allow(Rails.cache).to receive(:delete).with(['users', user.id, 'assigned_open_issues_count'])
+        end
+
+        context 'if the value is identical to the cached value' do
+          let(:force) { false }
+
+          it 'does not recalculate' do
+            expect(Users::UpdateAssignedOpenIssueCountService).not_to receive(:new)
+            user.update_attribute(:assigned_open_issues_count, cached_count)
+
+            subject
+          end
+        end
+
+        context 'if the db value is nil' do
+          let(:force) { true }
+          # initial state, for example, if the feature flag has just been turned on or if it is a new user
+
+          it 'calls the recalculate service' do
+            expect(Users::UpdateAssignedOpenIssueCountService).to receive(:new).with(current_user: user, target_user: user).and_return(fake_service)
+            expect(fake_service).to receive(:execute)
+
+            subject
+          end
+        end
+
+        context 'if the non-nil db value is identical to the cached value' do
+          let(:force) { false }
+
+          it 'returns that' do
+            expect(Rails.cache).to receive(:fetch).with(['users', user.id, 'assigned_open_issues_count'], expires_in: anything).and_return(cached_count)
+            user.update_attribute(:assigned_open_issues_count, cached_count)
+
+            subject
+
+            expect(user.attributes['assigned_open_issues_count']).to eq(cached_count)
+          end
+        end
+
+        context 'if the db value is different than the cached value' do
+          let(:force) { true }
+
+          it 'sets the database value to the cached value' do
+            new_value = cached_count.to_i + 1
+            expect(Rails.cache).to receive(:fetch).with(['users', user.id, 'assigned_open_issues_count'], expires_in: anything).and_return(cached_count)
+            user.update_attribute(:assigned_open_issues_count, new_value)
+
+            subject
+
+            expect(user.attributes['assigned_open_issues_count']).to eq(new_value)
+          end
+        end
       end
     end
   end

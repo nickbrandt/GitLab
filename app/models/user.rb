@@ -1636,19 +1636,26 @@ class User < ApplicationRecord
   end
 
   def assigned_open_issues_count(force: false)
-    cached_count = Rails.cache.fetch(['users', id, 'assigned_open_issues_count'], force: force, expires_in: count_cache_validity_period) do
-      update_assigned_open_issues_count
-    end
-
     if Feature.enabled?(:assigned_open_issues_database_cache, default_enabled: :yaml)
-      # save to db column if different
-      if attributes['assigned_open_issues_count'] != cached_count
-        update_assigned_open_issues_count(count_to_persist: cached_count)
-        cached_count
+      db_value = attributes['assigned_open_issues_count']
+      cache_value = Rails.cache.fetch(['users', id, 'assigned_open_issues_count'], expires_in: count_cache_validity_period)
+      force_value = force || db_value != cache_value
+
+      Rails.cache.fetch(['users', id, 'assigned_open_issues_count'], force: force_value, expires_in: count_cache_validity_period) do
+        # we can't trust the db value until the feature flag is removed
+        # but otherwise we get no performance benefit. So if this number exists in the db, return it
+        # otherwise we'll just need to recalculate.
+        if db_value && !force
+          db_value
+        else
+          update_assigned_open_issues_count
+        end
+      end
+    else
+      Rails.cache.fetch(['users', id, 'assigned_open_issues_count'], force: force, expires_in: count_cache_validity_period) do
+        IssuesFinder.new(self, assignee_id: self.id, state: 'opened', non_archived: true).execute.count
       end
     end
-
-    cached_count
   end
 
   def update_assigned_open_issues_count(count_to_persist: nil)
@@ -1657,6 +1664,19 @@ class User < ApplicationRecord
     # rubocop: enable CodeReuse/ServiceClass
     response.payload[:count]
   end
+
+  def recalculate_assigned_open_issue_counts
+    Rails.cache.delete(['users', id, 'assigned_open_issues_count'])
+
+    if Feature.enabled?(:assigned_open_issues_database_cache, default_enabled: :yaml)
+      run_after_commit do
+        Users::UpdateOpenIssueCountWorker.perform_async(self.id, self.id)
+      end
+    end
+  end
+
+  # we use some metaprogramming so we need to preserve the method name
+  alias_method :invalidate_issue_cache_counts, :recalculate_assigned_open_issue_counts
 
   def todos_done_count(force: false)
     Rails.cache.fetch(['users', id, 'todos_done_count'], force: force, expires_in: count_cache_validity_period) do
@@ -1688,19 +1708,6 @@ class User < ApplicationRecord
     invalidate_todos_cache_counts
     invalidate_personal_projects_count
   end
-
-  def recalculate_assigned_open_issue_counts
-    Rails.cache.delete(['users', id, 'assigned_open_issues_count'])
-
-    if Feature.enabled?(:assigned_open_issues_database_cache, default_enabled: :yaml)
-      run_after_commit do
-        Users::UpdateOpenIssueCountWorker.perform_async(self.id, self.id)
-      end
-    end
-  end
-
-  # we use some metaprogramming so we need to preserve the method name
-  alias_method :invalidate_issue_cache_counts, :recalculate_assigned_open_issue_counts
 
   def invalidate_merge_request_cache_counts
     Rails.cache.delete(['users', id, 'assigned_open_merge_requests_count'])
