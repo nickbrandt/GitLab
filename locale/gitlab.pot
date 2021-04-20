@@ -11244,6 +11244,12 @@ msgstr ""
 msgid "Didn't receive a confirmation email?"
 msgstr ""
 
+msgid "Didn't receive confirmation instructions?"
+msgstr ""
+
+msgid "Didn't receive unlock instructions?"
+msgstr ""
+
 msgid "Diff content limits"
 msgstr ""
 
