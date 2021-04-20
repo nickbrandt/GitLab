@@ -23,7 +23,8 @@ module Projects
     attr_reader :build
 
     def initialize(project, build)
-      @project, @build = project, build
+      @project = project
+      @build = build
     end
 
     def execute
@@ -84,6 +85,8 @@ module Projects
       # path today used by one project can later be used by another
       # so we can't really scope this feature flag by project or group
       return unless ::Settings.pages.local_store.enabled
+
+      return if Feature.enabled?(:skip_pages_deploy_to_legacy_storage, project, default_enabled: :yaml)
 
       # Create temporary directory in which we will extract the artifacts
       make_secure_tmp_dir(tmp_path) do |tmp_path|

@@ -412,8 +412,6 @@ Rails/TimeZone:
 # WIP: https://gitlab.com/gitlab-org/gitlab/-/issues/325836
 RSpec/EmptyLineAfterFinalLetItBe:
   Exclude:
-    - ee/spec/controllers/admin/geo/projects_controller_spec.rb
-    - ee/spec/controllers/admin/projects_controller_spec.rb
     - ee/spec/controllers/groups/analytics/cycle_analytics/stages_controller_spec.rb
     - ee/spec/controllers/groups/analytics/cycle_analytics/summary_controller_spec.rb
     - ee/spec/controllers/groups/analytics/cycle_analytics/value_streams_controller_spec.rb
@@ -592,12 +590,6 @@ RSpec/EmptyLineAfterFinalLetItBe:
     - ee/spec/services/requirements_management/update_requirement_service_spec.rb
     - ee/spec/services/resource_access_tokens/create_service_spec.rb
     - ee/spec/services/resource_access_tokens/revoke_service_spec.rb
-    - ee/spec/services/status_page/publish_attachments_service_spec.rb
-    - ee/spec/services/status_page/publish_details_service_spec.rb
-    - ee/spec/services/status_page/publish_list_service_spec.rb
-    - ee/spec/services/status_page/publish_service_spec.rb
-    - ee/spec/services/status_page/trigger_publish_service_spec.rb
-    - ee/spec/services/status_page/unpublish_details_service_spec.rb
     - ee/spec/services/todo_service_spec.rb
     - ee/spec/support/shared_examples/graphql/geo/geo_registries_resolver_shared_examples.rb
     - ee/spec/support/shared_examples/graphql/mutations/set_multiple_assignees_shared_examples.rb
@@ -688,20 +680,6 @@ RSpec/EmptyLineAfterFinalLetItBe:
     - spec/graphql/resolvers/project_pipeline_resolver_spec.rb
     - spec/graphql/resolvers/project_pipelines_resolver_spec.rb
     - spec/graphql/resolvers/timelog_resolver_spec.rb
-    - spec/helpers/blob_helper_spec.rb
-    - spec/helpers/broadcast_messages_helper_spec.rb
-    - spec/helpers/ci/runners_helper_spec.rb
-    - spec/helpers/invite_members_helper_spec.rb
-    - spec/helpers/jira_connect_helper_spec.rb
-    - spec/helpers/labels_helper_spec.rb
-    - spec/helpers/markup_helper_spec.rb
-    - spec/helpers/notes_helper_spec.rb
-    - spec/helpers/projects/alert_management_helper_spec.rb
-    - spec/helpers/projects/issues/service_desk_helper_spec.rb
-    - spec/helpers/projects/project_members_helper_spec.rb
-    - spec/helpers/projects/terraform_helper_spec.rb
-    - spec/helpers/projects_helper_spec.rb
-    - spec/helpers/search_helper_spec.rb
     - spec/lib/bulk_imports/groups/loaders/group_loader_spec.rb
     - spec/lib/extracts_path_spec.rb
     - spec/lib/extracts_ref_spec.rb
@@ -902,8 +880,6 @@ RSpec/EmptyLineAfterFinalLetItBe:
     - spec/services/audit_event_service_spec.rb
     - spec/services/auth/dependency_proxy_authentication_service_spec.rb
     - spec/services/auto_merge_service_spec.rb
-    - spec/services/boards/destroy_service_spec.rb
-    - spec/services/boards/issues/move_service_spec.rb
     - spec/services/bulk_create_integration_service_spec.rb
     - spec/services/ci/change_variable_service_spec.rb
     - spec/services/ci/change_variables_service_spec.rb
@@ -930,9 +906,6 @@ RSpec/EmptyLineAfterFinalLetItBe:
     - spec/services/clusters/applications/prometheus_health_check_service_spec.rb
     - spec/services/container_expiration_policy_service_spec.rb
     - spec/services/dependency_proxy/find_or_create_manifest_service_spec.rb
-    - spec/services/design_management/copy_design_collection/copy_service_spec.rb
-    - spec/services/design_management/delete_designs_service_spec.rb
-    - spec/services/design_management/save_designs_service_spec.rb
     - spec/services/discussions/resolve_service_spec.rb
     - spec/services/discussions/unresolve_service_spec.rb
     - spec/services/feature_flags/create_service_spec.rb
@@ -2921,33 +2894,6 @@ Gitlab/NamespacedClass:
     - 'spec/support/sidekiq_middleware.rb'
     - 'spec/tasks/gitlab/task_helpers_spec.rb'
     - 'spec/uploaders/object_storage_spec.rb'
-
-# WIP: https://gitlab.com/gitlab-org/gitlab/-/issues/322739
-Style/HashTransformation:
-  Exclude:
-    - 'ee/app/models/ee/ci/build.rb'
-    - 'ee/app/models/productivity_analytics.rb'
-    - 'ee/app/models/sca/license_compliance.rb'
-    - 'ee/app/services/security/store_report_service.rb'
-    - 'ee/lib/ee/gitlab/auth/ldap/sync/group.rb'
-    - 'ee/lib/ee/gitlab/usage_data.rb'
-    - 'ee/lib/gitlab/custom_file_templates.rb'
-    - 'ee/spec/elastic_integration/global_search_spec.rb'
-    - 'ee/spec/lib/ee/gitlab/application_context_spec.rb'
-    - 'spec/lib/atlassian/jira_connect/serializers/pull_request_entity_spec.rb'
-    - 'spec/lib/gitlab/ci/status/composite_spec.rb'
-    - 'spec/lib/gitlab/conflict/file_spec.rb'
-    - 'spec/lib/gitlab/import_export/project/tree_restorer_spec.rb'
-    - 'spec/models/concerns/featurable_spec.rb'
-    - 'spec/models/event_spec.rb'
-    - 'spec/models/packages/dependency_spec.rb'
-    - 'spec/requests/api/graphql/project/alert_management/alert/assignees_spec.rb'
-    - 'spec/requests/api/graphql/project/alert_management/alert/notes_spec.rb'
-    - 'spec/requests/api/graphql/project/alert_management/alert/todos_spec.rb'
-    - 'spec/requests/api/projects_spec.rb'
-    - 'spec/support/helpers/graphql_helpers.rb'
-    - 'spec/support/import_export/project_tree_expectations.rb'
-    - 'spec/support/shared_contexts/services/projects/container_repository/delete_tags_service_shared_context.rb'
 
 Style/ClassEqualityComparison:
   Exclude:

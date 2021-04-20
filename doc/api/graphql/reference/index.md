@@ -397,7 +397,7 @@ Returns [`VulnerabilityConnection`](#vulnerabilityconnection).
 | `projectId` | [`[ID!]`](#id) | Filter vulnerabilities by project. |
 | `reportType` | [`[VulnerabilityReportType!]`](#vulnerabilityreporttype) | Filter vulnerabilities by report type. |
 | `scanner` | [`[String!]`](#string) | Filter vulnerabilities by VulnerabilityScanner.externalId. |
-| `scannerId` | [`[Int!]`](#int) | Filter vulnerabilities by scanner ID. |
+| `scannerId` | [`[VulnerabilitiesScannerID!]`](#vulnerabilitiesscannerid) | Filter vulnerabilities by scanner ID. |
 | `severity` | [`[VulnerabilitySeverity!]`](#vulnerabilityseverity) | Filter vulnerabilities by severity. |
 | `sort` | [`VulnerabilitySort`](#vulnerabilitysort) | List vulnerabilities by sort order. |
 | `state` | [`[VulnerabilityState!]`](#vulnerabilitystate) | Filter vulnerabilities by state. |
@@ -1960,7 +1960,7 @@ Represents a DAST Profile.
 
 | Field | Type | Description |
 | ----- | ---- | ----------- |
-| `branch` | [`DastProfileBranch`](#dastprofilebranch) | The associated branch. Will always return `null` if `dast_branch_selection` feature flag is disabled. |
+| `branch` | [`DastProfileBranch`](#dastprofilebranch) | The associated branch. |
 | `dastScannerProfile` | [`DastScannerProfile`](#dastscannerprofile) | The associated scanner profile. |
 | `dastSiteProfile` | [`DastSiteProfile`](#dastsiteprofile) | The associated site profile. |
 | `description` | [`String`](#string) | The description of the scan. |
@@ -2117,6 +2117,7 @@ Represents a DAST Site Profile.
 | `profileName` | [`String`](#string) | The name of the site profile. |
 | `referencedInSecurityPolicies` | [`[String!]`](#string) | List of security policy names that are referencing given project. |
 | `requestHeaders` | [`String`](#string) | Comma-separated list of request header names and values to be added to every request made by DAST. Will always return `null` if `security_dast_site_profiles_additional_fields` feature flag is disabled. |
+| `targetType` | [`DastTargetTypeEnum`](#dasttargettypeenum) | The type of target to be scanned. Will always return `null` if `security_dast_site_profiles_api_option` feature flag is disabled. |
 | `targetUrl` | [`String`](#string) | The URL of the target to be scanned. |
 | `userPermissions` | [`DastSiteProfilePermissions!`](#dastsiteprofilepermissions) | Permissions for the current user on the resource. |
 | `validationStatus` | [`DastSiteProfileValidationStatusEnum`](#dastsiteprofilevalidationstatusenum) | The current validation status of the site profile. |
@@ -3695,6 +3696,7 @@ Represents an iteration object.
 | `dueDate` | [`Time`](#time) | Timestamp of the iteration due date. |
 | `id` | [`ID!`](#id) | ID of the iteration. |
 | `iid` | [`ID!`](#id) | Internal ID of the iteration. |
+| `iterationCadence` | [`IterationCadence!`](#iterationcadence) | Cadence of the iteration. |
 | `report` | [`TimeboxReport`](#timeboxreport) | Historically accurate report about the timebox. |
 | `scopedPath` | [`String`](#string) | Web path of the iteration, scoped to the query parent. Only valid for Project parents. Returns null in other contexts. |
 | `scopedUrl` | [`String`](#string) | Web URL of the iteration, scoped to the query parent. Only valid for Project parents. Returns null in other contexts. |
@@ -7492,6 +7494,7 @@ Represents a vulnerability scanner.
 | Field | Type | Description |
 | ----- | ---- | ----------- |
 | `externalId` | [`String`](#string) | External ID of the vulnerability scanner. |
+| `id` | [`ID`](#id) | ID of the scanner. |
 | `name` | [`String`](#string) | Name of the vulnerability scanner. |
 | `reportType` | [`VulnerabilityReportType`](#vulnerabilityreporttype) | Type of the vulnerability report. |
 | `vendor` | [`String`](#string) | Vendor of the vulnerability scanner. |
@@ -7868,6 +7871,13 @@ Status of a container repository.
 | ----- | ----------- |
 | `HEADER` | Header validation. |
 | `TEXT_FILE` | Text file validation. |
+
+### `DastTargetTypeEnum`
+
+| Value | Description |
+| ----- | ----------- |
+| `API` | API target. |
+| `WEBSITE` | Website target. |
 
 ### `DataVisualizationColorEnum`
 
@@ -8286,6 +8296,14 @@ Values for sorting projects.
 | `SIMILARITY` | Most similar to the search query. |
 | `STORAGE` | Sort by storage size. |
 
+### `NegatedIterationWildcardId`
+
+Negated Iteration ID wildcard values.
+
+| Value | Description |
+| ----- | ----------- |
+| `CURRENT` | Current iteration. |
+
 ### `OncallRotationUnitEnum`
 
 Rotation length unit of an on-call rotation.
@@ -8596,6 +8614,7 @@ Name of the feature that the callout is for.
 | `GOLD_TRIAL_BILLINGS` | Callout feature name for gold_trial_billings. |
 | `NEW_USER_SIGNUPS_CAP_REACHED` | Callout feature name for new_user_signups_cap_reached. |
 | `PERSONAL_ACCESS_TOKEN_EXPIRY` | Callout feature name for personal_access_token_expiry. |
+| `PIPELINE_NEEDS_BANNER` | Callout feature name for pipeline_needs_banner. |
 | `REGISTRATION_ENABLED_CALLOUT` | Callout feature name for registration_enabled_callout. |
 | `SERVICE_TEMPLATES_DEPRECATED_CALLOUT` | Callout feature name for service_templates_deprecated_callout. |
 | `SUGGEST_PIPELINE` | Callout feature name for suggest_pipeline. |
@@ -9144,6 +9163,12 @@ An example `UserID` is: `"gid://gitlab/User/1"`.
 A `VulnerabilitiesExternalIssueLinkID` is a global ID. It is encoded as a string.
 
 An example `VulnerabilitiesExternalIssueLinkID` is: `"gid://gitlab/Vulnerabilities::ExternalIssueLink/1"`.
+
+### `VulnerabilitiesScannerID`
+
+A `VulnerabilitiesScannerID` is a global ID. It is encoded as a string.
+
+An example `VulnerabilitiesScannerID` is: `"gid://gitlab/Vulnerabilities::Scanner/1"`.
 
 ### `VulnerabilityID`
 

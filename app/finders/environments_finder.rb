@@ -6,7 +6,9 @@ class EnvironmentsFinder
   InvalidStatesError = Class.new(StandardError)
 
   def initialize(project, current_user, params = {})
-    @project, @current_user, @params = project, current_user, params
+    @project = project
+    @current_user = current_user
+    @params = params
   end
 
   def execute
@@ -15,9 +17,7 @@ class EnvironmentsFinder
     environments = by_search(environments)
 
     # Raises InvalidStatesError if params[:states] contains invalid states.
-    environments = by_states(environments)
-
-    environments
+    by_states(environments)
   end
 
   private

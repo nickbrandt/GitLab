@@ -9441,7 +9441,12 @@ CREATE TABLE application_settings (
     admin_mode boolean DEFAULT false NOT NULL,
     delayed_project_removal boolean DEFAULT false NOT NULL,
     lock_delayed_project_removal boolean DEFAULT false NOT NULL,
+    external_pipeline_validation_service_timeout integer,
+    encrypted_external_pipeline_validation_service_token text,
+    encrypted_external_pipeline_validation_service_token_iv text,
+    external_pipeline_validation_service_url text,
     CONSTRAINT app_settings_container_reg_cleanup_tags_max_list_size_positive CHECK ((container_registry_cleanup_tags_service_max_list_size >= 0)),
+    CONSTRAINT app_settings_ext_pipeline_validation_service_url_text_limit CHECK ((char_length(external_pipeline_validation_service_url) <= 255)),
     CONSTRAINT app_settings_registry_exp_policies_worker_capacity_positive CHECK ((container_registry_expiration_policies_worker_capacity >= 0)),
     CONSTRAINT check_17d9558205 CHECK ((char_length((kroki_url)::text) <= 1024)),
     CONSTRAINT check_2dba05b802 CHECK ((char_length(gitpod_url) <= 255)),
@@ -11856,6 +11861,7 @@ CREATE TABLE dast_site_profiles (
     auth_username_field text,
     auth_password_field text,
     auth_username text,
+    target_type smallint DEFAULT 0 NOT NULL,
     CONSTRAINT check_5203110fee CHECK ((char_length(auth_username_field) <= 255)),
     CONSTRAINT check_6cfab17b48 CHECK ((char_length(name) <= 255)),
     CONSTRAINT check_c329dffdba CHECK ((char_length(auth_password_field) <= 255)),
@@ -13864,7 +13870,9 @@ CREATE TABLE jira_connect_installations (
     client_key character varying,
     encrypted_shared_secret character varying,
     encrypted_shared_secret_iv character varying,
-    base_url character varying
+    base_url character varying,
+    instance_url text,
+    CONSTRAINT check_4c6abed669 CHECK ((char_length(instance_url) <= 255))
 );
 
 CREATE SEQUENCE jira_connect_installations_id_seq
@@ -22596,8 +22604,6 @@ CREATE INDEX index_epics_on_due_date_sourcing_milestone_id ON epics USING btree 
 
 CREATE INDEX index_epics_on_end_date ON epics USING btree (end_date);
 
-CREATE INDEX index_epics_on_group_id ON epics USING btree (group_id);
-
 CREATE UNIQUE INDEX index_epics_on_group_id_and_external_key ON epics USING btree (group_id, external_key) WHERE (external_key IS NOT NULL);
 
 CREATE UNIQUE INDEX index_epics_on_group_id_and_iid ON epics USING btree (group_id, iid);
@@ -23027,6 +23033,8 @@ CREATE UNIQUE INDEX index_members_on_invite_token ON members USING btree (invite
 CREATE INDEX index_members_on_requested_at ON members USING btree (requested_at);
 
 CREATE INDEX index_members_on_source_id_and_source_type ON members USING btree (source_id, source_type);
+
+CREATE INDEX index_members_on_user_id_and_access_level_requested_at_is_null ON members USING btree (user_id, access_level) WHERE (requested_at IS NULL);
 
 CREATE INDEX index_members_on_user_id_created_at ON members USING btree (user_id, created_at) WHERE ((ldap = true) AND ((type)::text = 'GroupMember'::text) AND ((source_type)::text = 'Namespace'::text));
 
@@ -24357,8 +24365,6 @@ CREATE UNIQUE INDEX snippet_user_mentions_on_snippet_id_and_note_id_index ON sni
 CREATE UNIQUE INDEX snippet_user_mentions_on_snippet_id_index ON snippet_user_mentions USING btree (snippet_id) WHERE (note_id IS NULL);
 
 CREATE UNIQUE INDEX taggings_idx ON taggings USING btree (tag_id, taggable_id, taggable_type, context, tagger_id, tagger_type);
-
-CREATE INDEX temporary_index_vulnerabilities_on_id ON vulnerabilities USING btree (id) WHERE ((state = 2) AND ((dismissed_at IS NULL) OR (dismissed_by_id IS NULL)));
 
 CREATE UNIQUE INDEX term_agreements_unique_index ON term_agreements USING btree (user_id, term_id);
 

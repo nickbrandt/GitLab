@@ -72,6 +72,13 @@ To include the DAST template:
    For more information about template versioning, see the
    [CI/CD documentation](../../../development/cicd/templates.md#latest-version).
 
+1. Add a `dast` stage to your GitLab CI stages configuration:
+
+    ```yaml
+    stages:
+      - dast
+    ```
+
 1. Add the template to GitLab, based on your version of GitLab:
 
    - In GitLab 11.9 and later, [include](../../../ci/yaml/README.md#includetemplate)
@@ -820,6 +827,7 @@ Alternatively, you can use the CI/CD variable `SECURE_ANALYZERS_PREFIX` to overr
 > - [Improved](https://gitlab.com/gitlab-org/gitlab/-/issues/218465) in GitLab 13.3.
 > - The saved scans feature was [introduced](https://gitlab.com/groups/gitlab-org/-/epics/5100) in GitLab 13.9.
 > - The option to select a branch was [introduced](https://gitlab.com/groups/gitlab-org/-/epics/4847) in GitLab 13.10.
+> - DAST branch selection [feature flag removed](https://gitlab.com/gitlab-org/gitlab/-/issues/322672) in GitLab 13.11.
 
 An on-demand DAST scan runs outside the DevOps life cycle. Changes in your repository don't trigger
 the scan. You must start it manually.
@@ -831,10 +839,7 @@ An on-demand DAST scan:
 - Is associated with your project's default branch.
 - Is saved on creation so it can be run later.
 
-In GitLab 13.10 and later, you can select to run an on-demand scan against a specific branch. This
-feature is [deployed behind a feature flag](../../feature_flags.md), enabled by default. It's
-enabled on GitLab.com and recommended for production use. [GitLab administrators with access to the GitLab Rails console](../../../administration/feature_flags.md)
-can opt to disable it with `Feature.disable(:dast_branch_selection)`.
+In GitLab 13.10 and later, you can select to run an on-demand scan against a specific branch.
 
 ### On-demand scan modes
 

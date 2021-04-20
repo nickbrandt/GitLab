@@ -278,9 +278,6 @@ gem 'charlock_holmes', '~> 0.7.7'
 # Detect mime content type from content
 gem 'ruby-magic', '~> 0.4'
 
-# Fake version of the gem to trick bundler
-gem 'mimemagic', '0.3.7', path: 'vendor/shims/mimemagic', require: false
-
 # Faster blank
 gem 'fast_blank'
 
@@ -345,7 +342,6 @@ group :metrics do
 end
 
 group :development do
-  gem 'brakeman', '~> 4.10.0', require: false
   gem 'lefthook', '~> 0.7.0', require: false
 
   gem 'letter_opener_web', '~> 1.4.0'
@@ -386,7 +382,7 @@ group :development, :test do
 
   gem 'benchmark-ips', '~> 2.3.0', require: false
 
-  gem 'knapsack', '~> 1.17'
+  gem 'knapsack', '~> 1.21.1'
   gem 'crystalball', '~> 0.7.0', require: false
 
   gem 'simple_po_parser', '~> 1.1.2', require: false
