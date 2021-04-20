@@ -150,7 +150,7 @@ module Gitlab
             input = inputs.first
             name = t[:name]
 
-            raise ViolatedAssumption, "Expected one input field to #{name}" unless inputs.one?
+            raise ViolatedAssumption, "Expected exactly 1 input field named #{name}. Found #{inputs.count} instead." unless inputs.one?
             raise ViolatedAssumption, "Expected the input of #{name} to be named 'input'" if input[:name] != 'input'
 
             input_type_name = input[:type][:name]
