@@ -1796,9 +1796,6 @@ msgstr ""
 msgid "Activate Service Desk"
 msgstr ""
 
-msgid "Activate user activity analysis"
-msgstr ""
-
 msgid "Active"
 msgstr ""
 
@@ -33334,9 +33331,6 @@ msgid "Turn off"
 msgstr ""
 
 msgid "Turn on"
-msgstr ""
-
-msgid "Turn on %{strongStart}usage ping%{strongEnd} to activate analysis of user activity, known as %{docLinkStart}Cohorts%{docLinkEnd}."
 msgstr ""
 
 msgid "Turn on usage ping"
