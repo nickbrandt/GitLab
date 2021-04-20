@@ -13,6 +13,16 @@ module Gitlab
       # are guarded with an assertion that our assumptions are not violated.
       ViolatedAssumption = Class.new(StandardError)
 
+      SUGGESTED_ACTION = <<~MSG
+        We expect it to be impossible to violate our assumptions about
+        how mutation arguments work.
+
+        If that is not the case, then something has probably changed in the
+        way we generate our schema, perhaps in the library we use: graphql-ruby
+
+        Please ask for help in the #f_graphql or #backend channels.
+      MSG
+
       CONNECTION_ARGS = %w[after before first last].to_set
 
       FIELD_HEADER = <<~MD
@@ -150,12 +160,12 @@ module Gitlab
             input = inputs.first
             name = t[:name]
 
-            raise ViolatedAssumption, "Expected exactly 1 input field named #{name}. Found #{inputs.count} instead." unless inputs.one?
-            raise ViolatedAssumption, "Expected the input of #{name} to be named 'input'" if input[:name] != 'input'
+            assert!(inputs.one?, "Expected exactly 1 input field named #{name}. Found #{inputs.count} instead.")
+            assert!(input[:name] == 'input', "Expected the input of #{name} to be named 'input'")
 
             input_type_name = input[:type][:name]
             input_type = graphql_input_object_types.find { |t| t[:name] == input_type_name }
-            raise ViolatedAssumption, "Cannot find #{input_type_name}" unless input_type
+            assert!(input_type.present?, "Cannot find #{input_type_name} for #{name}.input")
 
             arguments = input_type[:input_fields]
             seen_type!(input_type_name)
@@ -390,6 +400,10 @@ module Gitlab
 
             mapping.compact
           end
+        end
+
+        def assert!(claim, message)
+          raise ViolatedAssumption, "#{message}\n#{SUGGESTED_ACTION}" unless claim
         end
       end
     end
