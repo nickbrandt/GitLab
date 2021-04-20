@@ -26949,6 +26949,9 @@ msgstr[1] ""
 msgid "Requires values to meet regular expression requirements."
 msgstr ""
 
+msgid "Resend"
+msgstr ""
+
 msgid "Resend Request"
 msgstr ""
 
