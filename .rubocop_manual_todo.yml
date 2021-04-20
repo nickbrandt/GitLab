@@ -697,8 +697,6 @@ RSpec/EmptyLineAfterFinalLetItBe:
     - spec/lib/gitlab/closing_issue_extractor_spec.rb
     - spec/lib/gitlab/composer/cache_spec.rb
     - spec/lib/gitlab/data_builder/wiki_page_spec.rb
-    - spec/lib/gitlab/database/partitioning_migration_helpers/foreign_key_helpers_spec.rb
-    - spec/lib/gitlab/database/partitioning_migration_helpers/table_management_helpers_spec.rb
     - spec/lib/gitlab/deploy_key_access_spec.rb
     - spec/lib/gitlab/email/handler/service_desk_handler_spec.rb
     - spec/lib/gitlab/git/lfs_changes_spec.rb
