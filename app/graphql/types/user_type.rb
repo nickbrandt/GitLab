@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Types
-  class UserType < BaseObject
+  class UserType < ::Types::BaseObject
     graphql_name 'UserCore'
     description 'Core represention of a GitLab user.'
     implements ::Types::UserInterface
