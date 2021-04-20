@@ -5100,7 +5100,7 @@ Tiers: `free`, `premium`, `ultimate`
 
 Missing description
 
-[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/20210216182001_protected_branches.yml)
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/)
 
 Group: `group::source code`
 
