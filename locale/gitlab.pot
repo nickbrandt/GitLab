@@ -10342,6 +10342,9 @@ msgstr ""
 msgid "Default CI configuration path"
 msgstr ""
 
+msgid "Default Timeout Period"
+msgstr ""
+
 msgid "Default artifacts expiration"
 msgstr ""
 
@@ -13371,6 +13374,9 @@ msgid "Failure"
 msgstr ""
 
 msgid "False positive"
+msgstr ""
+
+msgid "Fast Timeout Period"
 msgstr ""
 
 msgid "Fast-forward merge is not possible. Rebase the source branch onto %{targetBranch} to allow this merge request to be merged."
@@ -19656,6 +19662,9 @@ msgid "Measured in bytes of code. Excludes generated and vendored code."
 msgstr ""
 
 msgid "Median"
+msgstr ""
+
+msgid "Medium Timeout Period"
 msgstr ""
 
 msgid "Medium vulnerabilities present"
