@@ -87,7 +87,12 @@ module EE
     def project_owners_and_participants(rotation, user)
       project = rotation.project
 
-      owners = project.members.owners.map(&:user).presence || [project.owner] || project.group&.owners
+      owners = project.members.owners.map(&:user).presence
+      proj_owner = project.owner if owners.blank?
+
+      if project.owner
+        owners = proj_owner.is_a?(Group) ? proj_owner.owners : [proj_owner]
+      end
 
       excluding_user = [owners, rotation.participants.map(&:user)].uniq - [user]
 
