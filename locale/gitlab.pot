@@ -1493,6 +1493,9 @@ msgstr ""
 msgid "API version"
 msgstr ""
 
+msgid "API?"
+msgstr ""
+
 msgid "APIFuzzing|$VariableWithPassword"
 msgstr ""
 
@@ -23999,6 +24002,9 @@ msgstr ""
 msgid "Primary"
 msgstr ""
 
+msgid "Primary Action"
+msgstr ""
+
 msgid "Print codes"
 msgstr ""
 
@@ -26019,6 +26025,9 @@ msgid "Rebase source branch"
 msgstr ""
 
 msgid "Rebase source branch on the target branch."
+msgstr ""
+
+msgid "Recaptcha verified?"
 msgstr ""
 
 msgid "Receive alerts from manually configured Prometheus servers."
@@ -29682,6 +29691,9 @@ msgstr ""
 msgid "Source Branch"
 msgstr ""
 
+msgid "Source IP"
+msgstr ""
+
 msgid "Source branch: %{source_branch_open}%{source_branch}%{source_branch_close}"
 msgstr ""
 
@@ -31519,6 +31531,9 @@ msgid "There are no SSH keys associated with this account."
 msgstr ""
 
 msgid "There are no SSH keys with access to your account."
+msgstr ""
+
+msgid "There are no Spam Logs"
 msgstr ""
 
 msgid "There are no abuse reports!"
