@@ -9413,7 +9413,7 @@ Represents an entry from the Cloud License history.
 | <a id="mergerequestapprovalsrequired"></a>`approvalsRequired` | [`Int`](#int) | Number of approvals required. |
 | <a id="mergerequestapproved"></a>`approved` | [`Boolean!`](#boolean) | Indicates if the merge request has all the required approvals. Returns true if no required approvals are configured. |
 | <a id="mergerequestapprovedby"></a>`approvedBy` | [`UserConnection`](#userconnection) | Users who approved the merge request. |
-| <a id="mergerequestassignees"></a>`assignees` | [`UserConnection`](#userconnection) | Assignees of the merge request. |
+| <a id="mergerequestassignees"></a>`assignees` | [`MergeRequestReviewerConnection`](#mergerequestreviewerconnection) | Assignees of the merge request. |
 | <a id="mergerequestauthor"></a>`author` | [`User`](#user) | User who created this merge request. |
 | <a id="mergerequestautomergeenabled"></a>`autoMergeEnabled` | [`Boolean!`](#boolean) | Indicates if auto merge is enabled for the merge request. |
 | <a id="mergerequestautomergestrategy"></a>`autoMergeStrategy` | [`String`](#string) | Selected auto merge strategy. |
