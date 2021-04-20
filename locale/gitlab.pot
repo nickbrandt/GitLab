@@ -14893,9 +14893,6 @@ msgstr ""
 msgid "GithubIntegration|This requires mirroring your GitHub repository to this project. %{docs_link}"
 msgstr ""
 
-msgid "Gitlab Pages"
-msgstr ""
-
 msgid "Gitpod"
 msgstr ""
 
