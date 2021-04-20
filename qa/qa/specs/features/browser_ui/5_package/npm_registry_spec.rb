@@ -5,7 +5,7 @@ module QA
     describe 'npm registry' do
       include Runtime::Fixtures
 
-      let!(:registry_scope) { 'gitlab-qa-sandbox-group' }
+      let!(:registry_scope) { Runtime::Namespace.sandbox_name }
       let(:auth_token) do
         unless Page::Main::Menu.perform(&:signed_in?)
           Flow::Login.sign_in
@@ -129,9 +129,11 @@ module QA
       after do
         package.remove_via_api!
         runner.remove_via_api!
+        project.remove_via_api!
+        another_project.remove_via_api!
       end
 
-      it 'push and pull a npm package via CI', testcase: 'https://gitlab.com/gitlab-org/quality/testcases/-/issues/944' do
+      it 'push and pull a npm package via CI', testcase: 'https://gitlab.com/gitlab-org/quality/testcases/-/issues/1772' do
         Resource::Repository::Commit.fabricate_via_api! do |commit|
           commit.project = project
           commit.commit_message = 'Add .gitlab-ci.yml'
@@ -173,7 +175,7 @@ module QA
           job.click_browse_button
         end
 
-        EE::Page::Project::Artifact::Show.perform do |artifacts|
+        Page::Project::Artifact::Show.perform do |artifacts|
           artifacts.go_to_directory('node_modules')
           artifacts.go_to_directory("@#{registry_scope}")
           expect(artifacts).to have_content( "#{project.name}")
