@@ -14,7 +14,7 @@ module Banzai
 
         # Public: Find `JIRA-123` issue references in text
         #
-        #   ExternalIssueReferenceFilter.references_in(text, pattern) do |match, issue|
+        #   references_in(text, pattern) do |match, issue|
         #     "<a href=...>##{issue}</a>"
         #   end
         #

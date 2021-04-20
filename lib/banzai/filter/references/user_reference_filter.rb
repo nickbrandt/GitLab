@@ -12,7 +12,7 @@ module Banzai
 
         # Public: Find `@user` user references in text
         #
-        #   UserReferenceFilter.references_in(text) do |match, username|
+        #   references_in(text) do |match, username|
         #     "<a href=...>@#{user}</a>"
         #   end
         #

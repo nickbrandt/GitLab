@@ -10,7 +10,7 @@ module Banzai
 
         # Public: Find `namespace/project>` project references in text
         #
-        #   ProjectReferenceFilter.references_in(text) do |match, project|
+        #   references_in(text) do |match, project|
         #     "<a href=...>#{project}></a>"
         #   end
         #

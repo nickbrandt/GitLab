@@ -16,7 +16,12 @@ module Banzai
         include OutputSafety
 
         class << self
+          # Implement in child class
+          # Example: self.reference_type = :merge_request
           attr_accessor :reference_type
+
+          # Implement in child class
+          # Example: self.object_class = MergeRequest
           attr_accessor :object_class
 
           def call(doc, context = nil, result = nil)
@@ -57,6 +62,19 @@ module Banzai
           doc
         end
 
+        # Public: Find references in text (like `!123` for merge requests)
+        #
+        #   references_in(text) do |match, id, project_ref, matches|
+        #     object = find_object(project_ref, id)
+        #     "<a href=...>#{object.to_reference}</a>"
+        #   end
+        #
+        # text - String text to search.
+        #
+        # Yields the String match, the Integer referenced object ID, an optional String
+        # of the external project reference, and all of the matchdata.
+        #
+        # Returns a String replaced with the return of the block.
         def references_in(text, pattern = object_reference_pattern)
           raise NotImplementedError, "#{self.class} must implement method: #{__callee__}"
         end
@@ -161,6 +179,14 @@ module Banzai
           CGI.unescape(href)
         end
 
+        def unescape_html_entities(text)
+          CGI.unescapeHTML(text.to_s)
+        end
+
+        def escape_html_entities(text)
+          CGI.escapeHTML(text.to_s)
+        end
+
         def replace_text_when_pattern_matches(node, index, pattern)
           return unless node.text =~ pattern
 
@@ -190,12 +216,16 @@ module Banzai
           node.is_a?(Nokogiri::XML::Element)
         end
 
+        def object_class
+          self.class.object_class
+        end
+
         def object_reference_pattern
-          @object_reference_pattern ||= self.class.object_class.reference_pattern
+          @object_reference_pattern ||= object_class.reference_pattern
         end
 
         def object_name
-          @object_name ||= self.class.object_class.name.underscore
+          @object_name ||= object_class.name.underscore
         end
 
         def object_sym
