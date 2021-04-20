@@ -30986,22 +30986,37 @@ msgstr ""
 msgid "TestReports|Jobs"
 msgstr ""
 
+msgid "TestReports|Learn how to upload pipeline test reports"
+msgstr ""
+
+msgid "TestReports|Learn more about pipeline test reports"
+msgstr ""
+
+msgid "TestReports|No test cases were found in the test report."
+msgstr ""
+
 msgid "TestReports|Tests"
 msgstr ""
 
 msgid "TestReports|There are no test cases to display."
 msgstr ""
 
+msgid "TestReports|There are no test reports for this pipeline"
+msgstr ""
+
 msgid "TestReports|There are no test suites to show."
 msgstr ""
 
-msgid "TestReports|There are no tests to show."
+msgid "TestReports|There are no tests to display"
 msgstr ""
 
 msgid "TestReports|There was an error fetching the summary."
 msgstr ""
 
 msgid "TestReports|There was an error fetching the test suite."
+msgstr ""
+
+msgid "TestReports|You can configure your job to use unit test reports, and GitLab will display a report here and in the related merge request."
 msgstr ""
 
 msgid "Tests"

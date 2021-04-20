@@ -63,7 +63,14 @@ const createLegacyPipelinesDetailApp = (mediator) => {
 
 const createTestDetails = () => {
   const el = document.querySelector(SELECTORS.PIPELINE_TESTS);
-  const { blobPath, summaryEndpoint, suiteEndpoint } = el?.dataset || {};
+  const {
+    blobPath,
+    emptyStateImagePath,
+    hasTestReport,
+    summaryEndpoint,
+    suiteEndpoint,
+    testReportDocPath,
+  } = el?.dataset || {};
   const testReportsStore = createTestReportsStore({
     blobPath,
     summaryEndpoint,
@@ -75,6 +82,11 @@ const createTestDetails = () => {
     el,
     components: {
       TestReports,
+    },
+    provide: {
+      emptyStateImagePath,
+      hasTestReport: hasTestReport !== undefined, // if hasTestReport is false that means the attribute isn't included
+      testReportDocPath,
     },
     store: testReportsStore,
     render(createElement) {
