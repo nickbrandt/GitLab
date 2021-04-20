@@ -19179,6 +19179,9 @@ msgstr ""
 msgid "Max role"
 msgstr ""
 
+msgid "Max session time"
+msgstr ""
+
 msgid "Max unauthenticated requests per period per IP"
 msgstr ""
 
@@ -19291,6 +19294,9 @@ msgid "Maximum size of pages (MB)"
 msgstr ""
 
 msgid "Maximum time between updates that a mirror can have when scheduled to synchronize."
+msgstr ""
+
+msgid "Maximum time for web terminal websocket connection (in seconds). 0 for unlimited."
 msgstr ""
 
 msgid "May"
