@@ -1,5 +1,5 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils';
-import { nextTick } from 'vue';
+import { shallowMount } from '@vue/test-utils';
+import Vue from 'vue';
 import Vuex from 'vuex';
 import ApproverTypeSelect from 'ee/approvals/components/approver_type_select.vue';
 import ApproversList from 'ee/approvals/components/approvers_list.vue';
@@ -58,8 +58,7 @@ const urlTakenError = {
   },
 };
 
-const localVue = createLocalVue();
-localVue.use(Vuex);
+Vue.use(Vuex);
 
 const addType = (type) => (x) => Object.assign(x, { type });
 
@@ -72,7 +71,6 @@ describe('EE Approvals RuleForm', () => {
     wrapper = shallowMount(RuleForm, {
       propsData: props,
       store: new Vuex.Store(store),
-      localVue,
       provide: {
         glFeatures: {
           ffComplianceApprovalGates: true,
@@ -174,8 +172,7 @@ describe('EE Approvals RuleForm', () => {
           wrapper.vm.branches = ['3'];
           wrapper.vm.submit();
 
-          localVue
-            .nextTick()
+          Vue.nextTick()
             .then(() => {
               expect(findBranchesValidation()).toEqual({
                 isValid: false,
@@ -280,7 +277,7 @@ describe('EE Approvals RuleForm', () => {
 
           wrapper.vm.submit();
 
-          await nextTick();
+          await Vue.nextTick();
 
           expect(findExternalUrlValidation()).toEqual({
             isValid: false,
@@ -354,8 +351,7 @@ describe('EE Approvals RuleForm', () => {
 
         wrapper.vm.submit();
 
-        localVue
-          .nextTick()
+        Vue.nextTick()
           .then(() => {
             expect(findNameValidation()).toEqual({
               isValid: false,
@@ -371,8 +367,7 @@ describe('EE Approvals RuleForm', () => {
 
         wrapper.vm.submit();
 
-        localVue
-          .nextTick()
+        Vue.nextTick()
           .then(() => {
             expect(findApprovalsRequiredValidation()).toEqual({
               isValid: false,
@@ -387,8 +382,7 @@ describe('EE Approvals RuleForm', () => {
         wrapper.vm.approvers = [];
         wrapper.vm.submit();
 
-        localVue
-          .nextTick()
+        Vue.nextTick()
           .then(() => {
             expect(findApproversValidation()).toEqual({
               isValid: false,
@@ -542,7 +536,7 @@ describe('EE Approvals RuleForm', () => {
       describe('with empty name and empty approvers', () => {
         beforeEach((done) => {
           wrapper.vm.submit();
-          localVue.nextTick(done);
+          Vue.nextTick(done);
         });
 
         it('does not post rule', () => {
@@ -565,7 +559,7 @@ describe('EE Approvals RuleForm', () => {
           wrapper.vm.name = 'Lorem';
           wrapper.vm.submit();
 
-          localVue.nextTick(done);
+          Vue.nextTick(done);
         });
 
         it('does not put fallback rule', () => {
@@ -582,7 +576,7 @@ describe('EE Approvals RuleForm', () => {
           wrapper.vm.approvers = TEST_APPROVERS;
           wrapper.vm.submit();
 
-          localVue.nextTick(done);
+          Vue.nextTick(done);
         });
 
         it('does not put fallback rule', () => {
@@ -600,7 +594,7 @@ describe('EE Approvals RuleForm', () => {
           wrapper.vm.name = 'Lorem';
           wrapper.vm.submit();
 
-          localVue.nextTick(done);
+          Vue.nextTick(done);
         });
 
         it('does not put fallback rule', () => {
@@ -795,7 +789,7 @@ describe('EE Approvals RuleForm', () => {
           wrapper.vm.approvers = TEST_APPROVERS;
           wrapper.vm.submit();
 
-          return localVue.nextTick();
+          return Vue.nextTick();
         });
 
         it('posts new rule', () => {
@@ -814,7 +808,7 @@ describe('EE Approvals RuleForm', () => {
         beforeEach(() => {
           wrapper.vm.submit();
 
-          return localVue.nextTick();
+          return Vue.nextTick();
         });
 
         it('puts fallback rule', () => {
@@ -845,7 +839,7 @@ describe('EE Approvals RuleForm', () => {
 
           wrapper.vm.submit();
 
-          return localVue.nextTick();
+          return Vue.nextTick();
         });
 
         it('deletes rule', () => {
@@ -865,7 +859,7 @@ describe('EE Approvals RuleForm', () => {
           wrapper.vm.approvers = TEST_APPROVERS;
           wrapper.vm.submit();
 
-          localVue.nextTick(done);
+          Vue.nextTick(done);
         });
 
         it('puts rule', () => {
@@ -896,7 +890,7 @@ describe('EE Approvals RuleForm', () => {
         },
       );
 
-      await nextTick();
+      await Vue.nextTick();
 
       expect(findApproverTypeSelect().exists()).toBe(false);
     });

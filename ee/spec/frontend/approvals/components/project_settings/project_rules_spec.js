@@ -1,4 +1,5 @@
-import { mount, createLocalVue } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
+import Vue from 'vue';
 import Vuex from 'vuex';
 import ApprovalGateIcon from 'ee/approvals/components/approval_gate_icon.vue';
 import RuleInput from 'ee/approvals/components/mr_edit/rule_input.vue';
@@ -13,8 +14,7 @@ import { createProjectRules, createExternalRule } from '../../mocks';
 
 const TEST_RULES = createProjectRules();
 
-const localVue = createLocalVue();
-localVue.use(Vuex);
+Vue.use(Vuex);
 
 const findCell = (tr, name) => tr.find(`td.js-${name}`);
 
@@ -37,7 +37,6 @@ describe('Approvals ProjectRules', () => {
     wrapper = mount(ProjectRules, {
       propsData: props,
       store: new Vuex.Store(store),
-      localVue,
       ...options,
     });
   };
