@@ -1493,9 +1493,6 @@ msgstr ""
 msgid "API key"
 msgstr ""
 
-msgid "API version"
-msgstr ""
-
 msgid "API?"
 msgstr ""
 
@@ -15963,6 +15960,9 @@ msgid "HighlightBar|Original alert:"
 msgstr ""
 
 msgid "HighlightBar|Time to SLA:"
+msgstr ""
+
+msgid "HipChat endpoint is deprecated and should not be created or modified."
 msgstr ""
 
 msgid "History"
