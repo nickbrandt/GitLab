@@ -7,6 +7,7 @@ class ProjectTeam
 
   def initialize(project)
     @project = project
+    @max_member_access = {}
   end
 
   def add_guest(user, current_user: nil)
@@ -179,10 +180,9 @@ class ProjectTeam
   end
 
   def max_member_access(user_id)
-    return @max_member_access[user_id] if @max_member_access && @max_member_access.key?(user_id)
+    return @max_member_access[user_id] if @max_member_access.key?(user_id)
 
     res = max_member_access_for_user_ids([user_id])
-    @max_member_access ||= {}
     @max_member_access.merge!(res)
     @max_member_access[user_id]
   end
