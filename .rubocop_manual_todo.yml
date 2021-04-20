@@ -166,8 +166,6 @@ Rails/SaveBang:
     - 'spec/lib/gitlab/auth_spec.rb'
     - 'spec/lib/gitlab/authorized_keys_spec.rb'
     - 'spec/lib/gitlab/bitbucket_server_import/importer_spec.rb'
-    - 'spec/lib/gitlab/ci/ansi2json/style_spec.rb'
-    - 'spec/lib/gitlab/ci/status/build/common_spec.rb'
     - 'spec/lib/gitlab/cycle_analytics/base_event_fetcher_spec.rb'
     - 'spec/lib/gitlab/database/custom_structure_spec.rb'
     - 'spec/lib/gitlab/database/partitioning_migration_helpers/table_management_helpers_spec.rb'
