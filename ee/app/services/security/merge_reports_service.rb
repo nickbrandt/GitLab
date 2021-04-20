@@ -22,7 +22,7 @@ module Security
         @source_reports.first.type,
         @source_reports.first.pipeline,
         @source_reports.first.created_at
-      )
+      ).tap { |report| report.errors = source_reports.flat_map(&:errors) }
       @findings = []
     end
 

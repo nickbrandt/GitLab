@@ -7,17 +7,20 @@ module Gitlab
         class Common
           SecurityReportParserError = Class.new(Gitlab::Ci::Parsers::ParserError)
 
-          def self.parse!(json_data, report, vulnerability_finding_signatures_enabled = false)
-            new(json_data, report, vulnerability_finding_signatures_enabled).parse!
+          def self.parse!(json_data, report, vulnerability_finding_signatures_enabled = false, validate: false)
+            new(json_data, report, vulnerability_finding_signatures_enabled, validate: validate).parse!
           end
 
-          def initialize(json_data, report, vulnerability_finding_signatures_enabled = false)
+          def initialize(json_data, report, vulnerability_finding_signatures_enabled = false, validate: false)
             @json_data = json_data
             @report = report
+            @validate = validate
             @vulnerability_finding_signatures_enabled = vulnerability_finding_signatures_enabled
           end
 
           def parse!
+            return report_data unless valid?
+
             raise SecurityReportParserError, "Invalid report format" unless report_data.is_a?(Hash)
 
             create_scanner
@@ -34,7 +37,19 @@ module Gitlab
 
           private
 
-          attr_reader :json_data, :report
+          attr_reader :json_data, :report, :validate
+
+          def valid?
+            return true if !validate || schema_validator.valid?
+
+            schema_validator.errors.each { |error| report.add_error('Schema', error) }
+
+            false
+          end
+
+          def schema_validator
+            @schema_validator ||= ::Gitlab::Ci::Parsers::Security::Validators::SchemaValidator.new(report.type, report_data)
+          end
 
           def report_data
             @report_data ||= Gitlab::Json.parse!(json_data)
