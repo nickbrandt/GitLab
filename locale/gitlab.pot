@@ -14356,6 +14356,9 @@ msgstr ""
 msgid "Geo|Geo sites"
 msgstr ""
 
+msgid "Geo|Geo supports replication of many data types."
+msgstr ""
+
 msgid "Geo|Go to the primary site"
 msgstr ""
 
@@ -14462,6 +14465,12 @@ msgid "Geo|Replicated data is verified with the secondary node(s) using checksum
 msgstr ""
 
 msgid "Geo|Replication Details"
+msgstr ""
+
+msgid "Geo|Replication Details Desktop"
+msgstr ""
+
+msgid "Geo|Replication Details Mobile"
 msgstr ""
 
 msgid "Geo|Replication details"
