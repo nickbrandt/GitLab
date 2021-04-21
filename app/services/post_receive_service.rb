@@ -81,12 +81,8 @@ class PostReceiveService
     banner = nil
 
     if project
-      # This provides the path in a similar manner to the frontend passing
-      # the request path, improving regex matching.
-      path = "/#{project.full_path}"
-
-      scoped_messages = BroadcastMessage.current_banner_messages(path).select do |message|
-        message.target_path.present? && message.matches_current_path(path)
+      scoped_messages = BroadcastMessage.current_banner_messages(project.full_path).select do |message|
+        message.target_path.present? && message.matches_current_path(project.full_path)
       end
 
       banner = scoped_messages.last
