@@ -1503,6 +1503,7 @@ Input type: `DastSiteProfileUpdateInput`
 | <a id="mutationdastsiteprofileupdateid"></a>`id` | [`DastSiteProfileID!`](#dastsiteprofileid) | ID of the site profile to be updated. |
 | <a id="mutationdastsiteprofileupdateprofilename"></a>`profileName` | [`String!`](#string) | The name of the site profile. |
 | <a id="mutationdastsiteprofileupdaterequestheaders"></a>`requestHeaders` | [`String`](#string) | Comma-separated list of request header names and values to be added to every request made by DAST. Will be ignored if `security_dast_site_profiles_additional_fields` feature flag is disabled. |
+| <a id="mutationdastsiteprofileupdatetargettype"></a>`targetType` | [`DastTargetTypeEnum`](#dasttargettypeenum) | The type of target to be scanned. Will be ignored if `security_dast_site_profiles_api_option` feature flag is disabled. |
 | <a id="mutationdastsiteprofileupdatetargeturl"></a>`targetUrl` | [`String`](#string) | The URL of the target to be scanned. |
 
 #### Fields
