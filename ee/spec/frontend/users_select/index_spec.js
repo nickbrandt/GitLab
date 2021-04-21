@@ -1,6 +1,5 @@
 import {
   createInputsModelExpectation,
-  createUnassignedExpectation,
   createAssignedExpectation,
   createTestContext,
   findDropdownItemsModel,
@@ -10,11 +9,11 @@ import {
   setAssignees,
   toggleDropdown,
   waitForDropdownItems,
-} from './test_helper';
+} from 'jest/users_select/test_helper';
 
-describe('~/users_select/index', () => {
+describe('EE ~/users_select/index with multiple assignees', () => {
   const context = createTestContext({
-    fixturePath: 'merge_requests/merge_request_with_single_assignee_feature.html',
+    fixturePath: 'ee/merge_requests/merge_request_with_multiple_assignees_feature.html',
   });
 
   beforeEach(() => {
@@ -33,16 +32,11 @@ describe('~/users_select/index', () => {
       await waitForDropdownItems();
     });
 
-    it('shows users', () => {
-      expect(findDropdownItemsModel()).toEqual(createUnassignedExpectation());
-    });
-
     describe('when users are selected', () => {
       const selectedUsers = [getUsersFixtureAt(2), getUsersFixtureAt(4)];
-      const lastSelected = selectedUsers[selectedUsers.length - 1];
       const expectation = createAssignedExpectation({
-        header: 'Assignee',
-        assigned: [lastSelected],
+        header: 'Assignee(s)',
+        assigned: selectedUsers,
       });
 
       beforeEach(() => {
@@ -55,15 +49,22 @@ describe('~/users_select/index', () => {
         expect(findDropdownItemsModel()).toEqual(expectation);
       });
 
+      it('shows assignee even after close and open', () => {
+        toggleDropdown();
+        toggleDropdown();
+
+        expect(findDropdownItemsModel()).toEqual(expectation);
+      });
+
       it('updates field', () => {
-        expect(findAssigneesInputsModel()).toEqual(createInputsModelExpectation([lastSelected]));
+        expect(findAssigneesInputsModel()).toEqual(createInputsModelExpectation(selectedUsers));
       });
     });
   });
 
   describe('with preselected user and opened', () => {
     const expectation = createAssignedExpectation({
-      header: 'Assignee',
+      header: 'Assignee(s)',
       assigned: [getUsersFixtureAt(0)],
     });
 
