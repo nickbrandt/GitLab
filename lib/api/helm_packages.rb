@@ -15,6 +15,7 @@ module API
     }.freeze
 
     content_type :binary, 'application/octet-stream'
+    content_type :binary, 'text/yaml'
 
     authenticate_with do |accept|
       accept.token_types(:personal_access_token, :deploy_token, :job_token)
@@ -34,6 +35,24 @@ module API
     end
     resource :projects, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
       namespace ':id/packages/helm' do
+        desc 'Download a chart index' do
+          detail 'This feature was introduced in GitLab 14.0'
+        end
+        params do
+          requires :channel, type: String, desc: 'Helm channel', regexp: Gitlab::Regex.helm_channel_regex
+        end
+        get ":channel/index.yaml" do
+          authorize_read_package!(authorized_user_project)
+
+          generated_index = Packages::Helm::GenerateIndexService.new(authorized_user_project, params[:channel]).execute
+          generated_index['serverInfo'] = {
+            'contextPath' => request.url.delete_suffix("/#{params[:channel]}/index.yaml")
+          }
+
+          content_type 'text/yaml'
+          generated_index.to_yaml
+        end
+
         desc 'Download a chart' do
           detail 'This feature was introduced in GitLab 14.0'
         end
