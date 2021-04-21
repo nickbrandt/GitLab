@@ -60,11 +60,7 @@ module Gitlab
     end
 
     def tier
-      value = if ee?
-        ['#- premium']
-      else
-        ['- free', '- premium']
-      end
+      value = ee? ? ['#- premium'] : ['- free', '- premium']
       value << '- ultimate'
       value.join("\n")
     end

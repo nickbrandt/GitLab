@@ -33,7 +33,7 @@ RSpec.describe Gitlab::UsageMetricDefinitionGenerator do
       let(:metric_definition_path) { Dir.glob(File.join(temp_dir, 'metrics/counts_7d/*_test_metric.yml')).first }
 
       it 'creates a metric definition file using the template' do
-        described_class.new([key_path], { 'dir' => dir}).invoke_all
+        described_class.new([key_path], { 'dir' => dir }).invoke_all
         expect(YAML.safe_load(File.read(metric_definition_path))).to eq(sample_metric)
       end
     end
