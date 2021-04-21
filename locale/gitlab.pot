@@ -34602,6 +34602,9 @@ msgstr ""
 msgid "ValueStreamAnalytics|Median time from issue created to issue closed."
 msgstr ""
 
+msgid "ValueStreamEvent|Stage time (median)"
+msgstr ""
+
 msgid "ValueStreamEvent|Start"
 msgstr ""
 
