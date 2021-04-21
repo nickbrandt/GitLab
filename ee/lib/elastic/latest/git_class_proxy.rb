@@ -157,7 +157,7 @@ module Elastic
         bool_expr = apply_simple_query_string(
           name: context.name(:blob, :match, :search_terms),
           query: query.term,
-          fields: %w[blob.content blob.file_name blob.path],
+          fields: %w[blob.content blob.multi_purpose_content.trigram blob.file_name blob.path],
           bool_expr: bool_expr,
           count_only: options[:count_only]
         )

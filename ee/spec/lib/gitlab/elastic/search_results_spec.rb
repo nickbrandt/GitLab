@@ -5,6 +5,7 @@ require 'spec_helper'
 RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need_inline do
   before do
     stub_ee_application_setting(elasticsearch_search: true, elasticsearch_indexing: true)
+    stub_feature_flags(elasticsearch_code_multi_purpose_content: false)
   end
 
   let(:user) { create(:user) }
@@ -955,6 +956,17 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
 
       it 'finds a ruby method call with numbers' do
         expect(search_for('ruby_call_method_123')).to include(file_name)
+      end
+
+      context 'when elasticsearch_code_multi_purpose_content feature is enabled' do
+        before do
+          stub_feature_flags(elasticsearch_code_multi_purpose_content: project_1)
+        end
+
+        it 'finds exact substrings with special characters in it' do
+          expect(search_for('l_object->per')).to include(file_name)
+          expect(search_for('l_object -> per')).not_to include(file_name)
+        end
       end
     end
   end

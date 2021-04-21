@@ -59,6 +59,9 @@ module Elastic
                 type: 'custom',
                 tokenizer: 'whitespace',
                 filter: %w(lowercase asciifolding)
+              },
+              code_trigram: {
+                tokenizer: 'trigram_tokenizer',
               }
             },
             filter: {
@@ -85,6 +88,11 @@ module Elastic
               path_tokenizer: {
                 type: 'path_hierarchy',
                 reverse: true
+              },
+              trigram_tokenizer: {
+                type: 'nGram',
+                min_gram: 3,
+                max_gram: 3
               }
             },
             normalizer: {
@@ -212,6 +220,15 @@ module Elastic
             index_options: 'positions',
             analyzer: :code_analyzer,
             search_analyzer: :code_search_analyzer
+          indexes :multi_purpose_content, type: :text,
+            index_options: 'positions',
+            analyzer: :code_analyzer,
+            search_analyzer: :code_search_analyzer do
+              indexes :trigram,
+                type: :text,
+                index_options: 'positions',
+                analyzer: 'code_trigram'
+            end
           indexes :language, type: :keyword
         end
 
