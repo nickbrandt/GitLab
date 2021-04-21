@@ -11861,6 +11861,7 @@ CREATE TABLE dast_site_profiles (
     auth_username_field text,
     auth_password_field text,
     auth_username text,
+    target_type smallint DEFAULT 0 NOT NULL,
     CONSTRAINT check_5203110fee CHECK ((char_length(auth_username_field) <= 255)),
     CONSTRAINT check_6cfab17b48 CHECK ((char_length(name) <= 255)),
     CONSTRAINT check_c329dffdba CHECK ((char_length(auth_password_field) <= 255)),
@@ -18544,7 +18545,7 @@ CREATE TABLE vulnerability_finding_evidence_requests (
     id bigint NOT NULL,
     created_at timestamp with time zone NOT NULL,
     updated_at timestamp with time zone NOT NULL,
-    vulnerability_finding_evidences_id bigint NOT NULL,
+    vulnerability_finding_evidence_id bigint NOT NULL,
     method text,
     url text,
     CONSTRAINT check_8152fbb236 CHECK ((char_length(url) <= 2048)),
@@ -21736,7 +21737,7 @@ CREATE UNIQUE INDEX epic_user_mentions_on_epic_id_index ON epic_user_mentions US
 
 CREATE INDEX expired_artifacts_temp_index ON ci_job_artifacts USING btree (id, created_at) WHERE ((expire_at IS NULL) AND (date(timezone('UTC'::text, created_at)) < '2020-06-22'::date));
 
-CREATE INDEX finding_evidence_requests_on_finding_evidence_id ON vulnerability_finding_evidence_requests USING btree (vulnerability_finding_evidences_id);
+CREATE INDEX finding_evidence_requests_on_finding_evidence_id ON vulnerability_finding_evidence_requests USING btree (vulnerability_finding_evidence_id);
 
 CREATE INDEX finding_evidences_on_vulnerability_occurrence_id ON vulnerability_finding_evidences USING btree (vulnerability_occurrence_id);
 
@@ -25054,9 +25055,6 @@ ALTER TABLE ONLY issues
 ALTER TABLE ONLY protected_branch_merge_access_levels
     ADD CONSTRAINT fk_8a3072ccb3 FOREIGN KEY (protected_branch_id) REFERENCES protected_branches(id) ON DELETE CASCADE;
 
-ALTER TABLE ONLY timelogs
-    ADD CONSTRAINT fk_8d058cd571 FOREIGN KEY (note_id) REFERENCES notes(id) ON DELETE CASCADE;
-
 ALTER TABLE ONLY releases
     ADD CONSTRAINT fk_8e4456f90f FOREIGN KEY (author_id) REFERENCES users(id) ON DELETE SET NULL;
 
@@ -25852,9 +25850,6 @@ ALTER TABLE ONLY lfs_file_locks
 ALTER TABLE ONLY dast_site_profile_secret_variables
     ADD CONSTRAINT fk_rails_43e2897950 FOREIGN KEY (dast_site_profile_id) REFERENCES dast_site_profiles(id) ON DELETE CASCADE;
 
-ALTER TABLE ONLY vulnerability_finding_evidence_requests
-    ADD CONSTRAINT fk_rails_4410592084 FOREIGN KEY (vulnerability_finding_evidences_id) REFERENCES vulnerability_finding_evidences(id) ON DELETE CASCADE;
-
 ALTER TABLE ONLY merge_request_assignees
     ADD CONSTRAINT fk_rails_443443ce6f FOREIGN KEY (merge_request_id) REFERENCES merge_requests(id) ON DELETE CASCADE;
 
@@ -26133,6 +26128,9 @@ ALTER TABLE ONLY dast_scanner_profiles
 
 ALTER TABLE ONLY vulnerability_historical_statistics
     ADD CONSTRAINT fk_rails_72b73ed023 FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY vulnerability_finding_evidence_requests
+    ADD CONSTRAINT fk_rails_72c87c8eb6 FOREIGN KEY (vulnerability_finding_evidence_id) REFERENCES vulnerability_finding_evidences(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY slack_integrations
     ADD CONSTRAINT fk_rails_73db19721a FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE CASCADE;
@@ -26913,6 +26911,9 @@ ALTER TABLE ONLY timelogs
 
 ALTER TABLE ONLY timelogs
     ADD CONSTRAINT fk_timelogs_merge_requests_merge_request_id FOREIGN KEY (merge_request_id) REFERENCES merge_requests(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY timelogs
+    ADD CONSTRAINT fk_timelogs_note_id FOREIGN KEY (note_id) REFERENCES notes(id) ON DELETE SET NULL;
 
 ALTER TABLE ONLY u2f_registrations
     ADD CONSTRAINT fk_u2f_registrations_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;
