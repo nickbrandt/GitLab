@@ -46,7 +46,7 @@ describe('AlertsList component', () => {
   const findEventCountColumn = () => wrapper.findByTestId('threat-alerts-event-count');
   const findIssueColumn = () => wrapper.findByTestId('threat-alerts-issue');
   const findIssueColumnTextAt = (id) =>
-    wrapper.findAll('[data-testid="threat-alerts-issue"').at(id).text();
+    wrapper.findAllByTestId('threat-alerts-issue').at(id).text();
   const findStatusColumn = () => wrapper.findComponent(AlertStatus);
   const findStatusColumnHeader = () => wrapper.findByTestId('threat-alerts-status-header');
   const findEmptyState = () => wrapper.findByTestId('threat-alerts-empty-state');
@@ -177,11 +177,14 @@ describe('AlertsList component', () => {
     });
 
     describe('issue column', () => {
+      it('only displays text when an issue is created', () => {
+        expect(wrapper.findAllByTestId('threat-alerts-issue').length).toBe(2);
+      });
+
       it.each`
         description                                 | id   | text
         ${'when an issue is created and is open'}   | ${0} | ${'#5'}
         ${'when an issue is created and is closed'} | ${1} | ${'#6 (closed)'}
-        ${'when an issue is not created'}           | ${2} | ${'None'}
       `('displays the correct text $description', ({ id, text }) => {
         expect(findIssueColumnTextAt(id)).toBe(text);
       });

@@ -131,7 +131,7 @@ export default {
     getIssueMeta({ issue: { iid, state } }) {
       return {
         state: state === 'closed' ? `(${this.$options.i18n.CLOSED})` : '',
-        link: joinPaths('/', this.projectPath, '-', 'issues/incident', iid),
+        link: joinPaths(gon.relative_url_root, 'issues/incident', iid),
       };
     },
     handleAlertError(msg) {
@@ -223,7 +223,6 @@ export default {
         >
           #{{ item.issue.iid }} {{ getIssueMeta(item).state }}
         </gl-link>
-        <div v-else data-testid="threat-alerts-issue">{{ __('None') }}</div>
       </template>
 
       <template #cell(status)="{ item }">
