@@ -17,11 +17,15 @@ export default () => {
     return null;
   }
 
-  const { hasActiveLicense } = el.dataset;
+  const { hasActiveLicense, freeTrialPath, buySubscriptionPath } = el.dataset;
 
   return new Vue({
     el,
     apolloProvider,
+    provide: {
+      freeTrialPath,
+      buySubscriptionPath,
+    },
     render: (h) =>
       h(CloudLicenseShowApp, {
         props: {
