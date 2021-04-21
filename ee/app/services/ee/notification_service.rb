@@ -87,16 +87,10 @@ module EE
     def project_owners_and_participants(rotation, user)
       project = rotation.project
 
-      owners = project.members.owners.map(&:user).presence
-      proj_owner = project.owner if owners.blank?
+      owners = project.owner.is_a?(Group) ? project.owner.owners : [project.owner]
+      member_owners = project.members.owners
 
-      if project.owner
-        owners = proj_owner.is_a?(Group) ? proj_owner.owners : [proj_owner]
-      end
-
-      excluding_user = [owners, rotation.participants.map(&:user)].uniq - [user]
-
-      excluding_user.compact.flatten
+      (owners + member_owners + rotation.participants.map(&:user) - [user]).compact.uniq
     end
 
     def add_mr_approvers_email(merge_request, approvers, current_user)
