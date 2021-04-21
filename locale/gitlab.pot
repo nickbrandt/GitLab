@@ -694,6 +694,9 @@ msgstr ""
 msgid "%{milliseconds}ms"
 msgstr ""
 
+msgid "%{model_name} not found"
+msgstr ""
+
 msgid "%{mrText}, this issue will be closed automatically."
 msgstr ""
 
@@ -5783,6 +5786,9 @@ msgstr ""
 msgid "Cannot create the abuse report. This user has been blocked."
 msgstr ""
 
+msgid "Cannot delete %{profile_name} referenced in security policy"
+msgstr ""
+
 msgid "Cannot enable shared runners because parent group does not allow it"
 msgstr ""
 
@@ -5802,6 +5808,9 @@ msgid "Cannot make the epic confidential if it contains non-confidential issues"
 msgstr ""
 
 msgid "Cannot merge"
+msgstr ""
+
+msgid "Cannot modify %{profile_name} referenced in security policy"
 msgstr ""
 
 msgid "Cannot modify managed Kubernetes cluster"
@@ -17104,6 +17113,9 @@ msgstr ""
 msgid "Instance overview"
 msgstr ""
 
+msgid "Insufficient permissions"
+msgstr ""
+
 msgid "Integration"
 msgstr ""
 
@@ -27544,6 +27556,12 @@ msgstr ""
 msgid "Scanner"
 msgstr ""
 
+msgid "Scanner profile failed to delete"
+msgstr ""
+
+msgid "Scanner profile not found for given parameters"
+msgstr ""
+
 msgid "Schedule a new pipeline"
 msgstr ""
 
@@ -29188,6 +29206,12 @@ msgid "Simulate a pipeline created for the default branch"
 msgstr ""
 
 msgid "Single or combined queries"
+msgstr ""
+
+msgid "Site profile failed to delete"
+msgstr ""
+
+msgid "Site profile not found for given parameters"
 msgstr ""
 
 msgid "Size"
