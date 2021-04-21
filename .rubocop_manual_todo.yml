@@ -420,7 +420,6 @@ RSpec/EmptyLineAfterFinalLetItBe:
     - ee/spec/controllers/subscriptions_controller_spec.rb
     - ee/spec/features/boards/group_boards/multiple_boards_spec.rb
     - ee/spec/features/ci_shared_runner_warnings_spec.rb
-    - ee/spec/features/dashboards/todos_spec.rb
     - ee/spec/features/groups/groups_security_credentials_spec.rb
     - ee/spec/features/groups/hooks/user_edits_hooks_spec.rb
     - ee/spec/features/groups/iterations/user_edits_iteration_spec.rb
