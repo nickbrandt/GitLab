@@ -5,7 +5,6 @@ require 'spec_helper'
 RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need_inline do
   before do
     stub_ee_application_setting(elasticsearch_search: true, elasticsearch_indexing: true)
-    stub_feature_flags(elasticsearch_code_multi_purpose_content: false)
   end
 
   let(:user) { create(:user) }
@@ -757,8 +756,8 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
       ensure_elasticsearch_index!
     end
 
-    def search_for(term)
-      described_class.new(user, term, [project_1.id]).objects('blobs').map(&:path)
+    def search_for(term, exact_match: false)
+      described_class.new(user, term, [project_1.id], exact_match: exact_match).objects('blobs').map(&:path)
     end
 
     it_behaves_like 'a paginated object', 'blobs'
@@ -958,15 +957,9 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
         expect(search_for('ruby_call_method_123')).to include(file_name)
       end
 
-      context 'when elasticsearch_code_multi_purpose_content feature is enabled' do
-        before do
-          stub_feature_flags(elasticsearch_code_multi_purpose_content: project_1)
-        end
-
-        it 'finds exact substrings with special characters in it' do
-          expect(search_for('l_object->per')).to include(file_name)
-          expect(search_for('l_object -> per')).not_to include(file_name)
-        end
+      it 'finds exact substrings with special characters in it' do
+        expect(search_for('l_object->per'), exact_match: true).to include(file_name)
+        expect(search_for('l_object -> per'), exact_match: true).not_to include(file_name)
       end
     end
   end

@@ -13,7 +13,7 @@ module Gitlab
       # It allows us to search only for projects user has access to
       attr_reader :limit_project_ids
 
-      def initialize(current_user, query, limit_project_ids = nil, public_and_internal_projects: true, order_by: nil, sort: nil, filters: {})
+      def initialize(current_user, query, limit_project_ids = nil, public_and_internal_projects: true, order_by: nil, sort: nil, filters: {}, exact_match: false)
         @current_user = current_user
         @query = query
         @limit_project_ids = limit_project_ids

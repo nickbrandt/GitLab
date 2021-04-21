@@ -154,6 +154,7 @@ module Elastic
           sort: [:_score]
         }
 
+        # TODO: If we we have exact_match then we use .trigram field, otherwise we use just blob.multi_purpose_content .
         bool_expr = apply_simple_query_string(
           name: context.name(:blob, :match, :search_terms),
           query: query.term,
@@ -266,6 +267,7 @@ module Elastic
       def apply_simple_query_string(name:, fields:, query:, bool_expr:, count_only:)
         fields = remove_fields_boost(fields) if count_only
 
+        # TODO: we may need to switch of simple query string for "exact" matches since we don't want any of the syntax things. Additionally we probably need to add post filter if whatever we switch to is still stripping white spaces.
         simple_query_string = {
           simple_query_string: {
             _name: name,
