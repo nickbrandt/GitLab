@@ -11693,6 +11693,9 @@ msgstr ""
 msgid "Edit iteration"
 msgstr ""
 
+msgid "Edit iteration cadence"
+msgstr ""
+
 msgid "Edit public deploy key"
 msgstr ""
 
@@ -17941,6 +17944,9 @@ msgstr ""
 msgid "Iteration"
 msgstr ""
 
+msgid "Iteration cadences"
+msgstr ""
+
 msgid "Iteration changed to"
 msgstr ""
 
@@ -21344,6 +21350,9 @@ msgid "New issue title"
 msgstr ""
 
 msgid "New iteration"
+msgstr ""
+
+msgid "New iteration cadence"
 msgstr ""
 
 msgid "New iteration created"
