@@ -32,7 +32,7 @@ export default {
         return currentLicense;
       },
       skip() {
-        return !this.hasCurrentLicense;
+        return !this.canShowSubscriptionDetails;
       },
     },
     subscriptionHistory: {
@@ -46,12 +46,12 @@ export default {
     return {
       currentSubscription: {},
       subscriptionHistory: [],
-      hasCurrentLicense: this.hasActiveLicense,
+      canShowSubscriptionDetails: this.hasActiveLicense,
     };
   },
   methods: {
-    handleActivation(result) {
-      this.hasCurrentLicense = result;
+    handleActivation(hasLicense) {
+      this.canShowSubscriptionDetails = hasLicense;
     },
   },
 };
@@ -61,7 +61,12 @@ export default {
   <div class="gl-display-flex gl-justify-content-center gl-flex-direction-column">
     <h4 data-testid="subscription-main-title">{{ $options.i18n.subscriptionMainTitle }}</h4>
     <hr />
-    <div v-if="!hasCurrentLicense" class="row">
+    <subscription-breakdown
+      v-if="canShowSubscriptionDetails"
+      :subscription="currentSubscription"
+      :subscription-list="subscriptionHistory"
+    />
+    <div v-else class="row">
       <div class="col-12 col-lg-8 offset-lg-2">
         <h3 class="gl-mb-7 gl-mt-6 gl-text-center" data-testid="subscription-activation-title">
           {{ $options.i18n.subscriptionActivationTitle }}
@@ -69,10 +74,5 @@ export default {
         <cloud-license-subscription-activation-form @subscription-activation="handleActivation" />
       </div>
     </div>
-    <subscription-breakdown
-      v-else
-      :subscription="currentSubscription"
-      :subscription-list="subscriptionHistory"
-    />
   </div>
 </template>
