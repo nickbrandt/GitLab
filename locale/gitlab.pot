@@ -10531,6 +10531,9 @@ msgstr ""
 msgid "DeleteProject|Failed to remove some tags in project container registry. Please try again or contact administrator."
 msgstr ""
 
+msgid "DeleteProject|Failed to remove webhooks. Please try again or contact administrator."
+msgstr ""
+
 msgid "DeleteProject|Failed to remove wiki repository. Please try again or contact administrator."
 msgstr ""
 
