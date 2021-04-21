@@ -8302,6 +8302,9 @@ msgstr ""
 msgid "Configure repository mirroring."
 msgstr ""
 
+msgid "Configure specific limits for Packages API requests that supersede the general user and IP rate limits."
+msgstr ""
+
 msgid "Configure storage path settings."
 msgstr ""
 
@@ -12036,6 +12039,9 @@ msgid "Enable snowplow tracking"
 msgstr ""
 
 msgid "Enable two-factor authentication"
+msgstr ""
+
+msgid "Enable unauthenticated API request rate limit"
 msgstr ""
 
 msgid "Enable unauthenticated request rate limit"
@@ -22575,6 +22581,9 @@ msgid "Owner"
 msgstr ""
 
 msgid "Package Registry"
+msgstr ""
+
+msgid "Package Registry Rate Limits"
 msgstr ""
 
 msgid "Package already exists"
@@ -33589,6 +33598,9 @@ msgid "Unassign from commenting user"
 msgstr ""
 
 msgid "Unassigned"
+msgstr ""
+
+msgid "Unauthenticated API request rate limit"
 msgstr ""
 
 msgid "Unauthenticated rate limit period in seconds"
