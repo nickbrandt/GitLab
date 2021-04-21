@@ -158,7 +158,7 @@ RSpec.describe ProjectTeam do
       it { expect(project.team.find_member(requester.id)).to be_nil }
     end
 
-    context 'group project' do
+    context 'group project', :request_store do
       let(:group) { create(:group) }
       let(:project) { create(:project, group: group) }
       let(:requester) { create(:user) }
@@ -271,42 +271,65 @@ RSpec.describe ProjectTeam do
   describe '#max_member_access' do
     let(:requester) { create(:user) }
 
-    context 'personal project' do
-      let(:project) do
-        create(:project, :public)
-      end
-
-      context 'cache behavior' do
-        call_count = 0
-        before do
-          project.add_maintainer(maintainer)
-          project.add_reporter(reporter)
-          project.add_guest(guest)
-          allow(project.team).to receive(:max_member_access_for_user_ids).
-            and_wrap_original { |m, *args| call_count+=1; m.call(args) }
+    shared_examples_for 'max member access' do
+      context 'personal project' do
+        let(:project) do
+          create(:project, :public)
         end
 
-        it 'memoizes user_ids that have already been retrieved' do
-          project.team.max_member_access(maintainer.id)
-          expect(call_count).to eq(1)
-          project.team.max_member_access(maintainer.id)
-          expect(call_count).to eq(1)
-          project.team.max_member_access(reporter.id)
-          expect(call_count).to eq(2)
-          project.team.max_member_access(reporter.id)
-          expect(call_count).to eq(2)
-          project.team.max_member_access(guest.id)
-          project.team.max_member_access(guest.id)
-          expect(call_count).to eq(3)
+        context 'when project is not shared with group' do
+          before do
+            project.add_maintainer(maintainer)
+            project.add_reporter(reporter)
+            project.add_guest(guest)
+            project.request_access(requester)
+          end
+
+          it { expect(project.team.max_member_access(maintainer.id)).to eq(Gitlab::Access::MAINTAINER) }
+          it { expect(project.team.max_member_access(reporter.id)).to eq(Gitlab::Access::REPORTER) }
+          it { expect(project.team.max_member_access(guest.id)).to eq(Gitlab::Access::GUEST) }
+          it { expect(project.team.max_member_access(nonmember.id)).to eq(Gitlab::Access::NO_ACCESS) }
+          it { expect(project.team.max_member_access(requester.id)).to eq(Gitlab::Access::NO_ACCESS) }
+        end
+
+        context 'when project is shared with group' do
+          before do
+            group = create(:group)
+            project.project_group_links.create(
+              group: group,
+              group_access: Gitlab::Access::DEVELOPER)
+
+            group.add_maintainer(maintainer)
+            group.add_reporter(reporter)
+          end
+
+          it { expect(project.team.max_member_access(maintainer.id)).to eq(Gitlab::Access::DEVELOPER) }
+          it { expect(project.team.max_member_access(reporter.id)).to eq(Gitlab::Access::REPORTER) }
+          it { expect(project.team.max_member_access(nonmember.id)).to eq(Gitlab::Access::NO_ACCESS) }
+          it { expect(project.team.max_member_access(requester.id)).to eq(Gitlab::Access::NO_ACCESS) }
+
+          context 'but share_with_group_lock is true' do
+            before do
+              project.namespace.update(share_with_group_lock: true)
+            end
+
+            it { expect(project.team.max_member_access(maintainer.id)).to eq(Gitlab::Access::NO_ACCESS) }
+            it { expect(project.team.max_member_access(reporter.id)).to eq(Gitlab::Access::NO_ACCESS) }
+          end
         end
       end
 
-      context 'when project is not shared with group' do
+      context 'group project' do
+        let(:group) { create(:group) }
+        let!(:project) do
+          create(:project, group: group)
+        end
+
         before do
-          project.add_maintainer(maintainer)
-          project.add_reporter(reporter)
-          project.add_guest(guest)
-          project.request_access(requester)
+          group.add_maintainer(maintainer)
+          group.add_reporter(reporter)
+          group.add_guest(guest)
+          group.request_access(requester)
         end
 
         it { expect(project.team.max_member_access(maintainer.id)).to eq(Gitlab::Access::MAINTAINER) }
@@ -315,52 +338,31 @@ RSpec.describe ProjectTeam do
         it { expect(project.team.max_member_access(nonmember.id)).to eq(Gitlab::Access::NO_ACCESS) }
         it { expect(project.team.max_member_access(requester.id)).to eq(Gitlab::Access::NO_ACCESS) }
       end
+    end
 
-      context 'when project is shared with group' do
-        before do
-          group = create(:group)
-          project.project_group_links.create(
-            group: group,
-            group_access: Gitlab::Access::DEVELOPER)
+    context 'with RequestStore enabled', :request_store do
+      include_examples 'max member access'
 
-          group.add_maintainer(maintainer)
-          group.add_reporter(reporter)
+      let!(:project) { create(:project, :public) }
+      let!(:maintainer) { create(:user) }
+      let!(:reporter) { create(:user) }
+      let!(:guest) { create(:user) }
+
+      it 'caches already retrieved user_ids' do
+        queries = ActiveRecord::QueryRecorder.new do
+          project.team.max_member_access(maintainer.id)
+          project.team.max_member_access(maintainer.id)
+          project.team.max_member_access(maintainer.id)
+          project.team.max_member_access(reporter.id)
+          project.team.max_member_access(reporter.id)
+          project.team.max_member_access(guest.id)
         end
-
-        it { expect(project.team.max_member_access(maintainer.id)).to eq(Gitlab::Access::DEVELOPER) }
-        it { expect(project.team.max_member_access(reporter.id)).to eq(Gitlab::Access::REPORTER) }
-        it { expect(project.team.max_member_access(nonmember.id)).to eq(Gitlab::Access::NO_ACCESS) }
-        it { expect(project.team.max_member_access(requester.id)).to eq(Gitlab::Access::NO_ACCESS) }
-
-        context 'but share_with_group_lock is true' do
-          before do
-            project.namespace.update(share_with_group_lock: true)
-          end
-
-          it { expect(project.team.max_member_access(maintainer.id)).to eq(Gitlab::Access::NO_ACCESS) }
-          it { expect(project.team.max_member_access(reporter.id)).to eq(Gitlab::Access::NO_ACCESS) }
-        end
+        expect(queries.count).to eq(3)
       end
     end
 
-    context 'group project' do
-      let(:group) { create(:group) }
-      let!(:project) do
-        create(:project, group: group)
-      end
-
-      before do
-        group.add_maintainer(maintainer)
-        group.add_reporter(reporter)
-        group.add_guest(guest)
-        group.request_access(requester)
-      end
-
-      it { expect(project.team.max_member_access(maintainer.id)).to eq(Gitlab::Access::MAINTAINER) }
-      it { expect(project.team.max_member_access(reporter.id)).to eq(Gitlab::Access::REPORTER) }
-      it { expect(project.team.max_member_access(guest.id)).to eq(Gitlab::Access::GUEST) }
-      it { expect(project.team.max_member_access(nonmember.id)).to eq(Gitlab::Access::NO_ACCESS) }
-      it { expect(project.team.max_member_access(requester.id)).to eq(Gitlab::Access::NO_ACCESS) }
+    context 'with RequestStore not enabled' do
+      include_examples 'max member access'
     end
   end
 

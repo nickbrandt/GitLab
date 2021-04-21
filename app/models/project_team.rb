@@ -7,7 +7,6 @@ class ProjectTeam
 
   def initialize(project)
     @project = project
-    @max_member_access = {}
   end
 
   def add_guest(user, current_user: nil)
@@ -180,11 +179,15 @@ class ProjectTeam
   end
 
   def max_member_access(user_id)
-    return @max_member_access[user_id] if @max_member_access.key?(user_id)
+    key = "max_member_access:#{project.id}"
+    store = Gitlab::SafeRequestStore[key] || {}
 
-    res = max_member_access_for_user_ids([user_id])
-    @max_member_access.merge!(res)
-    @max_member_access[user_id]
+    return store[user_id] if store.key?(user_id)
+
+    store.merge!(max_member_access_for_user_ids([user_id]))
+    Gitlab::SafeRequestStore[key] = store
+
+    store[user_id]
   end
 
   def contribution_check_for_user_ids(user_ids)
