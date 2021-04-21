@@ -71,4 +71,21 @@ RSpec.describe WorkerAttributes do
       end
     end
   end
+
+  describe '.max_replica_retry_count' do
+    context 'when max_replica_retry_count is provided' do
+      it 'returns correct max_replica_retry_count' do
+        value = 2
+        worker.max_replica_retry_count(value)
+
+        expect(worker.get_max_replica_retry_count).to eq(value)
+      end
+    end
+
+    context 'when max_replica_retry_count is not provided' do
+      it 'defaults to 1' do
+        expect(worker.get_max_replica_retry_count).to eq(1)
+      end
+    end
+  end
 end

@@ -26,7 +26,7 @@ module Gitlab
           return true if worker_class.get_data_consistency == :always
           return true unless worker_class.get_data_consistency_feature_flag_enabled?
 
-          check_for_replica(worker.class, job)
+          check_for_replica(worker_class, job)
 
           job[:database_chosen] == 'primary'
         end
