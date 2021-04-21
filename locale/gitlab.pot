@@ -1646,6 +1646,12 @@ msgstr ""
 msgid "Abuse reports"
 msgstr ""
 
+msgid "Abuse reports notification email"
+msgstr ""
+
+msgid "Abuse reports will be sent to this address if it is set. Abuse reports are always available in the admin area."
+msgstr ""
+
 msgid "Accept invitation"
 msgstr ""
 
