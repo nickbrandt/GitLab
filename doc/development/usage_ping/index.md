@@ -181,7 +181,7 @@ and update existing business analysis artefacts to use `example_metric_without_a
 ### 3. Deprecate a metric
 
 If a metric is obsolete and you no longer use it, you can mark it as deprecated.
-Before you mark it as deprecated, verify that it's not used by other teams or processes. To deprecate a metric:
+To deprecate a metric:
 
 1. Check the following YAML files and verify the metric is not used in an aggregate:
    - [`config/metrics/aggregates/*.yaml`](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/aggregates/)
@@ -263,11 +263,11 @@ To remove a deprecated metric:
    when the updated payload is collected and processed. Version App collects
    and persists all Usage Ping reports.
 
-1. Create an issue in the [GitLab Data Team
-   project](https://gitlab.com/gitlab-data/analytics/-/issues). Ask for
-   confirmation that the metric is not referred to in any Sisense dashboards and
-   can be safely removed from Usage Ping. Use this [example
-   issue](https://gitlab.com/gitlab-data/analytics/-/issues/7539) for guidance.
+1. Create an issue in the
+   [GitLab Data Team project](https://gitlab.com/gitlab-data/analytics/-/issues).
+   Ask for confirmation that the metric is not referred to in any Sisense dashboards and
+   can be safely removed from Usage Ping. Use this
+   [example issue](https://gitlab.com/gitlab-data/analytics/-/issues/7539) for guidance.
   
 1. After you verify the metric can be safely removed,
    update the attributes of the metric's YAML definition:
