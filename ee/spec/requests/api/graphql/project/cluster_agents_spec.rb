@@ -50,7 +50,7 @@ RSpec.describe 'Project.cluster_agents' do
   end
 
   context 'selecting tokens' do
-    let_it_be(:token_1) { create(:cluster_agent_token, agent: agents.first) }
+    let_it_be(:token_1) { create(:cluster_agent_token, agent: agents.second) }
     let_it_be(:token_2) { create(:cluster_agent_token, agent: agents.second, last_used_at: 3.days.ago) }
     let_it_be(:token_3) { create(:cluster_agent_token, agent: agents.second, last_used_at: 2.days.ago) }
 
