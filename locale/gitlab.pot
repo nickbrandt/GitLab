@@ -31016,7 +31016,7 @@ msgstr ""
 msgid "TestReports|There was an error fetching the test suite."
 msgstr ""
 
-msgid "TestReports|You can configure your job to use unit test reports, and GitLab will display a report here and in the related merge request."
+msgid "TestReports|You can configure your job to use unit test reports, and GitLab displays a report here and in the related merge request."
 msgstr ""
 
 msgid "Tests"
