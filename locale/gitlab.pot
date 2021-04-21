@@ -23678,6 +23678,9 @@ msgstr ""
 msgid "PlantUML"
 msgstr ""
 
+msgid "PlantUML URL"
+msgstr ""
+
 msgid "Play"
 msgstr ""
 
