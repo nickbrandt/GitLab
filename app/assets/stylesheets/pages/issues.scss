@@ -209,6 +209,12 @@ ul.related-merge-requests > li {
   }
 }
 
+@include media-breakpoint-down(md) {
+  .emoji-block {
+    flex-direction: column;
+  }
+}
+
 @include media-breakpoint-up(sm) {
   .emoji-block .row {
     display: flex;
