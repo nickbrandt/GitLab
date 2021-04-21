@@ -14650,7 +14650,7 @@ Field that are available while modifying the custom mapping attributes for an HT
 | <a id="boardissueinputlabelname"></a>`labelName` | [`[String]`](#string) | Filter by label name. |
 | <a id="boardissueinputmilestonetitle"></a>`milestoneTitle` | [`String`](#string) | Filter by milestone title. |
 | <a id="boardissueinputmyreactionemoji"></a>`myReactionEmoji` | [`String`](#string) | Filter by reaction emoji applied by the current user. |
-| <a id="boardissueinputnot"></a>`not` | [`NegatedBoardIssueInput`](#negatedboardissueinput) | List of negated arguments. Warning: this argument is experimental and a subject to change in future. |
+| <a id="boardissueinputnot"></a>`not` | [`NegatedBoardIssueInput`](#negatedboardissueinput) | List of negated arguments. |
 | <a id="boardissueinputreleasetag"></a>`releaseTag` | [`String`](#string) | Filter by release tag. |
 | <a id="boardissueinputsearch"></a>`search` | [`String`](#string) | Search query for issue title or description. |
 | <a id="boardissueinputweight"></a>`weight` | [`String`](#string) | Filter by weight. |
@@ -14742,7 +14742,7 @@ Input type for DastSiteProfile authentication.
 | <a id="epicfiltersauthorusername"></a>`authorUsername` | [`String`](#string) | Filter by author username. |
 | <a id="epicfilterslabelname"></a>`labelName` | [`[String]`](#string) | Filter by label name. |
 | <a id="epicfiltersmyreactionemoji"></a>`myReactionEmoji` | [`String`](#string) | Filter by reaction emoji applied by the current user. |
-| <a id="epicfiltersnot"></a>`not` | [`NegatedEpicBoardIssueInput`](#negatedepicboardissueinput) | Negated epic arguments. Warning: this argument is experimental and a subject to change in the future. |
+| <a id="epicfiltersnot"></a>`not` | [`NegatedEpicBoardIssueInput`](#negatedepicboardissueinput) | Negated epic arguments. |
 | <a id="epicfilterssearch"></a>`search` | [`String`](#string) | Search query for epic title or description. |
 
 ### `EpicTreeNodeFieldsInputType`
