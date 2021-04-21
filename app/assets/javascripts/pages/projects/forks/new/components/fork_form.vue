@@ -234,7 +234,7 @@ export default {
     <input type="hidden" name="authenticity_token" :value="$options.csrf.token" />
 
     <gl-form-group
-      label="Project name"
+      :label="__('Project name')"
       label-for="fork-name"
       :invalid-feedback="form.fields.name.feedback"
     >
@@ -252,7 +252,7 @@ export default {
     <div class="gl-md-display-flex">
       <div class="gl-flex-basis-half">
         <gl-form-group
-          label="Project URL"
+          :label="__('Project URL')"
           label-for="fork-url"
           class="gl-md-mr-3"
           :state="form.fields.namespace.state"
@@ -286,7 +286,7 @@ export default {
       </div>
       <div class="gl-flex-basis-half">
         <gl-form-group
-          label="Project slug"
+          :label="__('Project slug')"
           label-for="fork-slug"
           class="gl-md-ml-3"
           :invalid-feedback="form.fields.slug.feedback"
@@ -311,7 +311,7 @@ export default {
       </gl-link>
     </p>
 
-    <gl-form-group label="Project description (optional)" label-for="fork-description">
+    <gl-form-group :label="__('Project description (optional)')" label-for="fork-description">
       <gl-form-textarea
         id="fork-description"
         v-model="form.fields.description.value"
