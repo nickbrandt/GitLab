@@ -157,8 +157,8 @@ export default {
         table.classList.add(`${lineClass}-selected`);
       }
     },
-    handleCommentButton(line) {
-      this.showCommentForm({ lineCode: line.line_code, fileHash: this.fileHash });
+    handleCommentButton(line, disabled) {
+      if (!disabled) this.showCommentForm({ lineCode: line.line_code, fileHash: this.fileHash });
     },
     conflictText(line) {
       return line.type === CONFLICT_MARKER_THEIR
@@ -223,10 +223,10 @@ export default {
                 class="add-diff-note unified-diff-components-diff-note-button note-button js-add-diff-note-button qa-diff-comment"
                 data-qa-selector="diff_comment_button"
                 :class="{ 'gl-cursor-grab': dragging }"
-                :disabled="line.left.commentsDisabled"
-                @click="handleCommentButton(line.left)"
-                @keydown.enter="handleCommentButton(line.left)"
-                @keydown.space="handleCommentButton(line.left)"
+                :aria-disabled="line.left.commentsDisabled"
+                @click="handleCommentButton(line.left, line.left.commentsDisabled)"
+                @keydown.enter="handleCommentButton(line.left, line.left.commentsDisabled)"
+                @keydown.space="handleCommentButton(line.left, line.left.commentsDisabled)"
                 @dragstart="onDragStart({ ...line.left, index })"
               ></div>
             </span>
@@ -321,15 +321,19 @@ export default {
               class="add-diff-note tooltip-wrapper"
               :title="addCommentTooltipRight"
             >
-              <button
+              <div
+                role="button"
+                tabindex="0"
                 :draggable="glFeatures.dragCommentSelection"
                 type="button"
                 class="add-diff-note unified-diff-components-diff-note-button note-button js-add-diff-note-button qa-diff-comment"
                 :class="{ 'gl-cursor-grab': dragging }"
-                :disabled="line.right.commentsDisabled"
-                @click="handleCommentButton(line.right)"
+                :aria-disabled="line.right.commentsDisabled"
+                @click="handleCommentButton(line.right, line.right.commentsDisabled)"
+                @keydown.enter="handleCommentButton(line.right, line.right.commentsDisabled)"
+                @keydown.space="handleCommentButton(line.right, line.right.commentsDisabled)"
                 @dragstart="onDragStart({ ...line.right, index })"
-              ></button>
+              ></div>
             </span>
           </template>
           <a
