@@ -4,7 +4,10 @@ import SubscriptionSyncNotifications, {
   notificationType,
   SUCCESS_ALERT_DISMISSED_EVENT,
 } from 'ee/pages/admin/cloud_licenses/components/subscription_sync_notifications.vue';
-import { userNotifications } from 'ee/pages/admin/cloud_licenses/constants';
+import {
+  manualSyncFailureTitle,
+  manualSyncSuccessfulTitle,
+} from 'ee/pages/admin/cloud_licenses/constants';
 import { extendedWrapper } from 'helpers/vue_test_utils_helper';
 
 describe('Subscription Sync Notifications', () => {
@@ -47,7 +50,7 @@ describe('Subscription Sync Notifications', () => {
     });
 
     it('displays an alert with success message', () => {
-      expect(findSuccessAlert().text()).toBe(userNotifications.manualSyncSuccessfulText);
+      expect(findSuccessAlert().props('title')).toBe(manualSyncSuccessfulTitle);
     });
 
     it('emits an event when dismissed', () => {
@@ -65,8 +68,14 @@ describe('Subscription Sync Notifications', () => {
       });
     });
 
+    it('displays an alert with a failure title', () => {
+      expect(findFailureAlert().props('title')).toBe(manualSyncFailureTitle);
+    });
+
     it('displays an alert with a failure message', () => {
-      expect(findFailureAlert().text()).toContain('There is a connectivity issue');
+      expect(findFailureAlert().text()).toBe(
+        'You can no longer sync your subscription details with GitLab. Get help for the most common connectivity issues by troubleshooting the activation code.',
+      );
     });
 
     it('displays a link', () => {

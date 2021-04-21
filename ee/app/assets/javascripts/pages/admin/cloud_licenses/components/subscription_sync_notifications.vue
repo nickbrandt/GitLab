@@ -1,6 +1,10 @@
 <script>
 import { GlAlert, GlLink, GlSprintf } from '@gitlab/ui';
-import { userNotifications } from '../constants';
+import {
+  manualSyncFailureText,
+  manualSyncFailureTitle,
+  manualSyncSuccessfulTitle,
+} from '../constants';
 
 export const notificationType = {
   SYNC_FAILURE: 'SYNC_FAILURE',
@@ -15,7 +19,9 @@ const notificationTypeValidator = (value) =>
 export default {
   name: 'SubscriptionSyncNotifications',
   i18n: {
-    userNotifications,
+    manualSyncSuccessfulTitle,
+    manualSyncFailureText,
+    manualSyncFailureTitle,
   },
   components: {
     GlAlert,
@@ -52,18 +58,18 @@ export default {
     <gl-alert
       v-if="syncDidSuccess"
       variant="success"
+      :title="$options.i18n.manualSyncSuccessfulTitle"
       data-testid="sync-success-alert"
       @dismiss="didDismissSuccessAlert"
-    >
-      {{ $options.i18n.userNotifications.manualSyncSuccessfulText }}
-    </gl-alert>
+    />
     <gl-alert
       v-else-if="syncDidFail"
       variant="danger"
       :dismissible="false"
+      :title="$options.i18n.manualSyncFailureTitle"
       data-testid="sync-failure-alert"
     >
-      <gl-sprintf :message="$options.i18n.userNotifications.manualSyncFailureText">
+      <gl-sprintf :message="$options.i18n.manualSyncFailureText">
         <template #connectivityHelpLink="{ content }">
           <gl-link :href="connectivityHelpURL" target="_blank">{{ content }}</gl-link>
         </template>

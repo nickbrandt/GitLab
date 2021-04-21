@@ -10,7 +10,7 @@ export const subscriptionActivationTitle = s__(
 export const subscriptionDetailsHeaderText = s__('SuperSonics|Subscription details');
 export const licensedToHeaderText = s__('SuperSonics|Licensed to');
 export const manageSubscriptionButtonText = s__('SuperSonics|Manage');
-export const syncSubscriptionButtonText = s__('SuperSonics|Sync Subscription details');
+export const syncSubscriptionButtonText = s__('SuperSonics|Sync subscription details');
 export const copySubscriptionIdButtonText = __('Copy');
 export const subscriptionTypeText = __('%{type} License');
 export const detailsLabels = {
@@ -49,12 +49,13 @@ export const subscriptionTable = {
   title: __('Subscription History'),
   type: s__('SuperSonics|Type'),
 };
-export const userNotifications = {
-  manualSyncSuccessfulText: s__('SuperSonics|The subscription details synced successfully.'),
-  manualSyncFailureText: s__(
-    'SuperSonics|There is a connectivity issue. You can no longer sync your subscription details with GitLab. Get help for the most common connectivity issues by %{connectivityHelpLinkStart}troubleshooting the activation code%{connectivityHelpLinkEnd}.',
-  ),
-};
+export const manualSyncSuccessfulTitle = s__(
+  'SuperSonics|The subscription details synced successfully.',
+);
+export const manualSyncFailureText = s__(
+  'SuperSonics|You can no longer sync your subscription details with GitLab. Get help for the most common connectivity issues by %{connectivityHelpLinkStart}troubleshooting the activation code%{connectivityHelpLinkEnd}.',
+);
+export const manualSyncFailureTitle = s__('SuperSonics|There is a connectivity issue.');
 
 export const subscriptionType = {
   CLOUD: 'cloud',
