@@ -59,15 +59,15 @@ class Admin::LicensesController < Admin::ApplicationController
   end
 
   def sync_seat_link
-    sync_result = Gitlab::SeatLinkData.new.sync
-
-    if sync_result
-      flash[:notice] = _('Your license was successfully synced.')
-    else
-      flash[:error] = _('There was an error when trying to sync your license. Please verify that your instance is using an active license key.')
+    respond_to do |format|
+      format.json do
+        if Gitlab::SeatLinkData.new.sync
+          render json: { success: true }
+        else
+          render json: { success: false }, status: :unprocessable_entity
+        end
+      end
     end
-
-    redirect_to admin_license_path
   end
 
   private
