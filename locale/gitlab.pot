@@ -31914,9 +31914,6 @@ msgstr ""
 msgid "There was an error when subscribing to this label."
 msgstr ""
 
-msgid "There was an error when trying to sync your license. Please verify that your instance is using an active license key."
-msgstr ""
-
 msgid "There was an error when unsubscribing from this label."
 msgstr ""
 
@@ -36547,9 +36544,6 @@ msgid "Your license does not support on-call schedules"
 msgstr ""
 
 msgid "Your license is valid from"
-msgstr ""
-
-msgid "Your license was successfully synced."
 msgstr ""
 
 msgid "Your license will be included in your GitLab backup and will survive upgrades, so in normal usage you should never need to re-upload your %{code_open}.gitlab-license%{code_close} file."
