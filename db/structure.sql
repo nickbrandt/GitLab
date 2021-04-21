@@ -21792,10 +21792,6 @@ CREATE INDEX idx_packages_debian_project_component_files_on_architecture_id ON p
 
 CREATE INDEX idx_packages_packages_on_project_id_name_version_package_type ON packages_packages USING btree (project_id, name, version, package_type);
 
-CREATE INDEX idx_pkgs_deb_grp_architectures_on_distribution_id ON packages_debian_group_architectures USING btree (distribution_id);
-
-CREATE INDEX idx_pkgs_deb_proj_architectures_on_distribution_id ON packages_debian_project_architectures USING btree (distribution_id);
-
 CREATE UNIQUE INDEX idx_pkgs_dep_links_on_pkg_id_dependency_id_dependency_type ON packages_dependency_links USING btree (package_id, dependency_id, dependency_type);
 
 CREATE INDEX idx_proj_feat_usg_on_jira_dvcs_cloud_last_sync_at_and_proj_id ON project_feature_usages USING btree (jira_dvcs_cloud_last_sync_at, project_id) WHERE (jira_dvcs_cloud_last_sync_at IS NOT NULL);
