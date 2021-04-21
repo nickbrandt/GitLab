@@ -21655,6 +21655,9 @@ msgstr ""
 msgid "No prioritized labels with such name or description"
 msgstr ""
 
+msgid "No profiles found"
+msgstr ""
+
 msgid "No projects found"
 msgstr ""
 
@@ -22983,6 +22986,9 @@ msgid "Participants"
 msgstr ""
 
 msgid "Pass job variables"
+msgstr ""
+
+msgid "Pass the header %{codeOpen} X-Profile-Token: %{profile_token} %{codeClose} to profile the request"
 msgstr ""
 
 msgid "Passed"
