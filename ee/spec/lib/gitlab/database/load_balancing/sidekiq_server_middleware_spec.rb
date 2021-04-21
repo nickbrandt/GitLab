@@ -34,7 +34,7 @@ RSpec.describe Gitlab::Database::LoadBalancing::SidekiqServerMiddleware do
 
     shared_examples_for 'job marked with chosen database' do
       it 'yields and sets database chosen', :aggregate_failures do
-        expect{ |b| middleware.call(worker, job, double(:queue), &b) }.to yield_control
+        expect { |b| middleware.call(worker, job, double(:queue), &b) }.to yield_control
 
         expect(job[:database_chosen]).to eq('primary')
       end
@@ -92,7 +92,7 @@ RSpec.describe Gitlab::Database::LoadBalancing::SidekiqServerMiddleware do
       end
 
       context 'when database location is not set' do
-        let(:job) { { 'job_id' => 'a180b47c-3fd6-41b8-81e9-34da61c3400e'} }
+        let(:job) { { 'job_id' => 'a180b47c-3fd6-41b8-81e9-34da61c3400e' } }
 
         it_behaves_like 'replica is up to date', nil
       end
@@ -133,7 +133,7 @@ RSpec.describe Gitlab::Database::LoadBalancing::SidekiqServerMiddleware do
 
         context 'when max_replica_retry_count is not exceeded' do
           it 'retry job', :aggregate_failures do
-            expect{ |b| middleware.call(worker, job, double(:queue), &b) }.not_to yield_control
+            expect { |b| middleware.call(worker, job, double(:queue), &b) }.not_to yield_control
 
             expect(job[:database_chosen]).to eq('retry')
           end
