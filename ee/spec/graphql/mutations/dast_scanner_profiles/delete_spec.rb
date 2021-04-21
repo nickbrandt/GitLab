@@ -58,7 +58,7 @@ RSpec.describe Mutations::DastScannerProfiles::Delete do
 
       context 'when deletion fails' do
         it 'returns an error' do
-          allow_next_instance_of(::DastScannerProfiles::DestroyService) do |service|
+          allow_next_instance_of(::AppSec::Dast::ScannerProfiles::DestroyService) do |service|
             allow(service).to receive(:execute).and_return(
               ServiceResponse.error(message: 'Scanner profile failed to delete')
             )
