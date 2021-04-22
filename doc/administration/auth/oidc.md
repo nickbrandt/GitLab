@@ -134,25 +134,26 @@ See the [Google documentation](https://developers.google.com/identity/protocols/
 for more details:
 
 ```ruby
- gitlab_rails['omniauth_providers'] = [
- {
-   'name' => 'openid_connect',
-   'label' => 'Google OpenID',
-   'args' => {
-     'name' => 'openid_connect',
-     'scope' => ['openid', 'profile', 'email'],
-     'response_type' => 'code',
-     'issuer' => 'https://accounts.google.com',
-     'client_auth_method' => 'query',
-     'discovery' => true,
-     'uid_field' => 'preferred_username',
-     'client_options' => {
-       'identifier' => '<YOUR PROJECT CLIENT ID>',
-       'secret' => '<YOUR PROJECT CLIENT SECRET>',
-       'redirect_uri' => 'https://example.com/users/auth/openid_connect/callback',
+gitlab_rails['omniauth_providers'] = [
+  {
+    'name' => 'openid_connect',
+    'label' => 'Google OpenID',
+    'args' => {
+      'name' => 'openid_connect',
+      'scope' => ['openid', 'profile', 'email'],
+      'response_type' => 'code',
+      'issuer' => 'https://accounts.google.com',
+      'client_auth_method' => 'query',
+      'discovery' => true,
+      'uid_field' => 'preferred_username',
+      'client_options' => {
+        'identifier' => '<YOUR PROJECT CLIENT ID>',
+        'secret' => '<YOUR PROJECT CLIENT SECRET>',
+        'redirect_uri' => 'https://example.com/users/auth/openid_connect/callback',
+       }
      }
-   }
- }
+  }
+]
 ```
 
 ### Microsoft Azure
@@ -170,25 +171,26 @@ to obtain the tenant ID, client ID, and client secret for your app.
 Example Omnibus configuration block:
 
 ```ruby
- gitlab_rails['omniauth_providers'] = [
- {
-   'name' => 'openid_connect',
-   'label' => 'Azure OIDC',
-   'args' => {
-     'name' => 'openid_connect',
-     'scope' => ['openid', 'profile', 'email'],
-     'response_type' => 'code',
-     'issuer' =>  'https://login.microsoftonline.com/<YOUR-TENANT-ID>/v2.0',
-     'client_auth_method' => 'query',
-     'discovery' => true,
-     'uid_field' => 'preferred_username',
-     'client_options' => {
-       'identifier' => '<YOUR APP CLIENT ID>',
-       'secret' => '<YOUR APP CLIENT SECRET>',
-       'redirect_uri' => 'https://gitlab.example.com/users/auth/openid_connect/callback'
-     }
-   }
- }
+gitlab_rails['omniauth_providers'] = [
+  {
+    'name' => 'openid_connect',
+    'label' => 'Azure OIDC',
+    'args' => {
+      'name' => 'openid_connect',
+      'scope' => ['openid', 'profile', 'email'],
+      'response_type' => 'code',
+      'issuer' =>  'https://login.microsoftonline.com/<YOUR-TENANT-ID>/v2.0',
+      'client_auth_method' => 'query',
+      'discovery' => true,
+      'uid_field' => 'preferred_username',
+      'client_options' => {
+        'identifier' => '<YOUR APP CLIENT ID>',
+        'secret' => '<YOUR APP CLIENT SECRET>',
+        'redirect_uri' => 'https://gitlab.example.com/users/auth/openid_connect/callback'
+      }
+    }
+  }
+]
 ```
 
 Microsoft has documented how its platform works with [the OIDC protocol](https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-protocols-oidc).
