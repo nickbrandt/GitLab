@@ -559,6 +559,7 @@ describe('OnDemandScansForm', () => {
         provide: {
           glFeatures: {
             securityDastSiteProfilesAdditionalFields: true,
+            securityDastSiteProfilesApiOption: true,
           },
         },
       });
@@ -569,6 +570,7 @@ describe('OnDemandScansForm', () => {
       const summary = wrapper.find(SiteProfileSelector).text();
       const defaultPassword = '••••••••';
       const defaultRequestHeaders = '[Redacted]';
+      const defaultSiteType = 'Website';
 
       expect(summary).toMatch(authEnabledProfile.targetUrl);
       expect(summary).toMatch(authEnabledProfile.excludedUrls.join(','));
@@ -578,6 +580,7 @@ describe('OnDemandScansForm', () => {
       expect(summary).toMatch(authEnabledProfile.auth.passwordField);
       expect(summary).toMatch(defaultPassword);
       expect(summary).toMatch(defaultRequestHeaders);
+      expect(summary).toMatch(defaultSiteType);
     });
 
     it('does not render the summary provided an invalid profile ID', async () => {
