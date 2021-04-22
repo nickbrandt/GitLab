@@ -99,6 +99,10 @@ RSpec.describe 'layouts/nav/sidebar/_project' do
         render
 
         expect(rendered).to have_link('Tags', href: project_tags_path(project))
+      end
+    end
+
+    describe 'Contributors' do
       it 'has a link to the project contributors path' do
         render
 
