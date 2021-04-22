@@ -153,6 +153,16 @@ export default class Tracking {
     return loadEvents;
   }
 
+  static enableFormTracking(config, contexts = []) {
+    if (!this.enabled()) return;
+
+    contexts.unshift(STANDARD_CONTEXT);
+    const enabler = () => window.snowplow('enableFormTracking', config, contexts);
+
+    if (document.readyState !== 'loading') enabler();
+    else document.addEventListener('DOMContentLoaded', enabler)
+  }
+
   static mixin(opts = {}) {
     return {
       computed: {
