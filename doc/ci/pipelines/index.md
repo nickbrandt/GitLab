@@ -325,19 +325,44 @@ Pipelines can be complex structures with many sequential and parallel jobs.
 To make it easier to understand the flow of a pipeline, GitLab has pipeline graphs for viewing pipelines
 and their statuses.
 
-Pipeline graphs can be displayed in two different ways, depending on the page you
+Pipeline graphs can be displayed as a large graph or a miniature representation, depending on the page you
 access the graph from.
 
 GitLab capitalizes the stages' names in the pipeline graphs.
 
-### Regular pipeline graphs
+### Single pipeline page graphs
 
 > - [Visualization improved](https://gitlab.com/gitlab-org/gitlab/-/issues/276949) in GitLab 13.11.
+> - [Job dependency view added](https://gitlab.com/gitlab-org/gitlab/-/issues/328538) in GitLab 13.12.
 
-Regular pipeline graphs show the names of the jobs in each stage. Regular pipeline graphs can
-be found when you are on a [single pipeline page](#view-pipelines). For example:
+Single pipeline page graphs can be found when you are on a [single pipeline page](#view-pipelines). They show the names and statuses of the jobs that make up the pipeline, as well as further actions that can be taken. These jobs be displayed in either a stage-by-stage form or as a Job dependency graph.
+
+Stage-by-stage pipeline graphs the jobs in the stage to which they belong. For example:
 
 ![Pipelines example](img/pipelines_v13_11.png)
+
+In the case of a pipeline that does not use [directed acyclic graph (DAG) pipeline](../directed_acyclic_graph/index.md), the jobs in one stage will complete before those in the next begin.
+
+A pipeline that is a [directed acyclic graph (DAG) pipeline](../directed_acyclic_graph/index.md) can be view in two forms: in the stage view or in a job dependency view.   
+
+When this is possible, a control to select between them will show. For example:
+
+![Two-view example: stage view](img/pipelines_stage_v13_12.png)
+
+In this case, the stages are an organizing principle, but the jobs will execute whenever they are ready. To see what this dependency order looks like, you may select the second view. In this view, the stage name is moved to the job, and the jobs are ordered by the jobs they depend on.
+
+For example:
+
+![Two-view example: job dependency view](img/pipelines_job_dependencies_v13_12.png)
+
+In this view, it is also possible to show the dependency trail between jobs, similar to that show in the [needs visualization](../directed_acyclic_graph/index.md#needs_visualization).
+
+![Two-view example: job dependency view, with links](img/pipelines_job_dependencies_links_v13_12.png)
+
+Once the links are calculated, hovering over a job will highlight the jobs on which it depends.
+
+![Two-view example: job dependency view, with links and hover](img/pipelines_job_dependencies_links_hover_v13_12.png)
+
 
 [Multi-project pipeline graphs](../multi_project_pipelines.md#multi-project-pipeline-visualization) help
 you visualize the entire pipeline, including all cross-project inter-dependencies. **(PREMIUM)**
@@ -355,6 +380,8 @@ be found when you navigate to:
 Pipeline mini graphs allow you to see all related jobs for a single commit and the net result
 of each stage of your pipeline. This allows you to quickly see what failed and
 fix it.
+
+Pipeline mini graphs only display jobs by stage.
 
 Stages in pipeline mini graphs are collapsible. Hover your mouse over them and click to expand their jobs.
 

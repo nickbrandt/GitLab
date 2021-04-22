@@ -94,3 +94,5 @@ To see the needs visualization, click on the **Needs** tab when viewing a pipeli
 Clicking a node highlights all the job paths it depends on.
 
 ![Needs visualization with path highlight](img/dag_graph_example_clicked_v13_1.png)
+
+As of 13.12, it is also possible to see Needs relationships in [single-page pipeline graphs](../pipelines/index.md#single_pipeline_page_graphs).
