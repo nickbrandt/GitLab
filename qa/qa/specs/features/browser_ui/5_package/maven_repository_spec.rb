@@ -104,7 +104,7 @@ module QA
                   <url>#{gitlab_address_with_port}/api/v4/projects/#{another_project.id}/packages/maven</url>
                 </repository>
                 <snapshotRepository>
-                  <id>#{project.name}</id>
+                  <id>#{another_project.name}</id>
                   <url>#{gitlab_address_with_port}/api/v4/projects/#{another_project.id}/packages/maven</url>
                 </snapshotRepository>
               </distributionManagement>
