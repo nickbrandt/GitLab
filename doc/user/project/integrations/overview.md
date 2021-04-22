@@ -39,7 +39,7 @@ Click on the service links to see further configuration instructions and details
 | [Emails on push](emails_on_push.md)                       | Send commits and diff of each push by email.                                                 | **{dotted-circle}** No |
 | [EWM](ewm.md)                                             | Use IBM Engineering Workflow Management as the issue tracker.                                | **{dotted-circle}** No |
 | [External wiki](../wiki/index.md#link-an-external-wiki)   | Link an external wiki.                                          | **{dotted-circle}** No |
-| Flowdock                                                  | Use Flowdock with GitLab.                                                                    | **{dotted-circle}** No |
+| [Flowdock](../../../api/services.md#flowdock)             | Send notifications from GitLab to Flowdock flows. | **{dotted-circle}** No |
 | [GitHub](github.md)                                       | Obtain statuses for commits and pull requests.                                               | **{dotted-circle}** No |
 | [Hangouts Chat](hangouts_chat.md)                         | Receive events notifications.                                                                | **{dotted-circle}** No |
 | [Irker (IRC gateway)](irker.md)                           | Send IRC messages.                                                                           | **{dotted-circle}** No |
