@@ -17,13 +17,6 @@ module Sidebars
             end
           end
 
-          override :extra_container_html_options
-          def extra_container_html_options
-            {
-              class: 'qa-project-requirements-link'
-            }
-          end
-
           override :render?
           def render?
             can?(context.current_user, :read_requirement, context.project)
