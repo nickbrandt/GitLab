@@ -32974,6 +32974,9 @@ msgstr ""
 msgid "Tip:"
 msgstr ""
 
+msgid "Tip: Hover over a job to see the jobs it depends on to run."
+msgstr ""
+
 msgid "Tip: add a"
 msgstr ""
 
