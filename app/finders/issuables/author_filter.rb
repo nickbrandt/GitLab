@@ -2,7 +2,7 @@
 
 module Issuables
   class AuthorFilter < BaseFilter
-    def filter
+    def filter(issuables)
       filtered = by_author(issuables)
       filtered = by_author_union(filtered)
       by_negated_author(filtered)
