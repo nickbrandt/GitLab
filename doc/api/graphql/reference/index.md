@@ -8632,7 +8632,7 @@ four standard [pagination arguments](#connection-pagination-arguments):
 
 ##### `Group.complianceFrameworks`
 
-Compliance frameworks available to projects in this namespace. Available only when feature flag `ff_custom_compliance_frameworks` is enabled.
+Compliance frameworks available to projects in this namespace.
 
 Returns [`ComplianceFrameworkConnection`](#complianceframeworkconnection).
 
@@ -10162,7 +10162,7 @@ Contains statistics about a milestone.
 
 ##### `Namespace.complianceFrameworks`
 
-Compliance frameworks available to projects in this namespace. Available only when feature flag `ff_custom_compliance_frameworks` is enabled.
+Compliance frameworks available to projects in this namespace.
 
 Returns [`ComplianceFrameworkConnection`](#complianceframeworkconnection).
 

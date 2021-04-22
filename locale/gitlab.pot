@@ -8179,9 +8179,6 @@ msgstr ""
 msgid "Compliance framework"
 msgstr ""
 
-msgid "Compliance framework  (optional)"
-msgstr ""
-
 msgid "Compliance framework (optional)"
 msgstr ""
 
@@ -21807,7 +21804,7 @@ msgstr ""
 msgid "No compliance frameworks are in use."
 msgstr ""
 
-msgid "No compliance frameworks are in use. Create one using the GraphQL API."
+msgid "No compliance frameworks are in use. Create one from the %{link} section in Group Settings."
 msgstr ""
 
 msgid "No confirmation email received? Please check your spam folder or"
