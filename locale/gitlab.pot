@@ -15325,6 +15325,9 @@ msgstr ""
 msgid "Group project URLs are prefixed with the group namespace"
 msgstr ""
 
+msgid "Group projects"
+msgstr ""
+
 msgid "Group requires separate account"
 msgstr ""
 
@@ -18410,6 +18413,9 @@ msgid "Joined %{time_ago}"
 msgstr ""
 
 msgid "Joined %{user_created_time}"
+msgstr ""
+
+msgid "Joined projects (%{projects_count})"
 msgstr ""
 
 msgid "Jul"
@@ -26568,6 +26574,9 @@ msgstr ""
 msgid "Remove user from group"
 msgstr ""
 
+msgid "Remove user from project"
+msgstr ""
+
 msgid "Removed"
 msgstr ""
 
@@ -32560,6 +32569,9 @@ msgid "This user has no active %{type}."
 msgstr ""
 
 msgid "This user has no identities"
+msgstr ""
+
+msgid "This user has no personal projects."
 msgstr ""
 
 msgid "This user has previously committed to the %{name} project."
