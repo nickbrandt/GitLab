@@ -941,8 +941,6 @@ RSpec/EmptyLineAfterFinalLetItBe:
     - spec/features/groups_spec.rb
     - spec/features/issues/user_sees_breadcrumb_links_spec.rb
     - spec/features/markdown/metrics_spec.rb
-    - spec/features/merge_request/user_creates_merge_request_spec.rb
-    - spec/features/merge_request/user_posts_notes_spec.rb
     - spec/features/operations_sidebar_link_spec.rb
     - spec/features/participants_autocomplete_spec.rb
     - spec/features/projects/badges/pipeline_badge_spec.rb
