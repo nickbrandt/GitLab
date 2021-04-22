@@ -905,6 +905,10 @@ module Gitlab
         end
       end
 
+      def convert_to_bigint_column(column)
+        "#{column}_convert_to_bigint"
+      end
+
       # Initializes the conversion of a set of integer columns to bigint
       #
       # It can be used for converting both a Primary Key and any Foreign Keys
@@ -948,7 +952,7 @@ module Gitlab
 
         check_trigger_permissions!(table)
 
-        conversions = columns.to_h { |column| [column, "#{column}_convert_to_bigint"] }
+        conversions = columns.to_h { |column| [column, convert_to_bigint_column(column)] }
 
         with_lock_retries do
           conversions.each do |(source_column, temporary_name)|
@@ -975,7 +979,7 @@ module Gitlab
       # columns - The name, or array of names, of the column(s) that we're converting to bigint.
       def revert_initialize_conversion_of_integer_to_bigint(table, columns)
         columns = Array.wrap(columns)
-        temporary_columns = columns.map { |column| "#{column}_convert_to_bigint" }
+        temporary_columns = columns.map { |column| convert_to_bigint_column(column) }
 
         trigger_name = rename_trigger_name(table, columns, temporary_columns)
         remove_rename_triggers_for_postgresql(table, trigger_name)
@@ -1039,7 +1043,7 @@ module Gitlab
         conversions = Array.wrap(columns).to_h do |column|
           raise ArgumentError, "Column #{column} does not exist on #{table}" unless column_exists?(table, column)
 
-          temporary_name = "#{column}_convert_to_bigint"
+          temporary_name = convert_to_bigint_column(column)
           raise ArgumentError, "Column #{temporary_name} does not exist on #{table}" unless column_exists?(table, temporary_name)
 
           [column, temporary_name]
@@ -1075,7 +1079,7 @@ module Gitlab
           job_class_name: 'CopyColumnUsingBackgroundMigrationJob',
           table_name: table,
           column_name: primary_key,
-          job_arguments: [columns, columns.map { |c| "#{c}_convert_to_bigint" }].to_json
+          job_arguments: [columns, columns.map { |column| convert_to_bigint_column(column) }].to_json
         ])
 
         execute("DELETE FROM batched_background_migrations WHERE #{conditions}")
