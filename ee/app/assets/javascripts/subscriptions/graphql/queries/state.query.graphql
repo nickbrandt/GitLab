@@ -1,10 +1,5 @@
 query state {
   state @client {
-    plans {
-      name
-      code
-      pricePerYear
-    }
     namespaces {
       id
       name

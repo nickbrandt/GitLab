@@ -7,6 +7,12 @@ import SubscriptionDetails from './checkout/subscription_details.vue';
 
 export default {
   components: { ProgressBar, SubscriptionDetails },
+  props: {
+    plans: {
+      type: Array,
+      required: true,
+    },
+  },
   apollo: {
     state: {
       query: STATE_QUERY,
@@ -30,7 +36,7 @@ export default {
       <progress-bar v-if="isNewUser" :steps="$options.steps" :current-step="$options.currentStep" />
       <div class="flash-container"></div>
       <h2 class="gl-mt-4 gl-mb-3 gl-mb-lg-5">{{ $options.i18n.checkout }}</h2>
-      <subscription-details />
+      <subscription-details :plans="plans" />
     </div>
   </div>
 </template>

@@ -1,11 +1,9 @@
 import Vue from 'vue';
 import App from 'ee/subscriptions/buy_minutes/components/app.vue';
+import stateQuery from 'ee/subscriptions/graphql/queries/state.query.graphql';
 import { STEPS } from 'ee/subscriptions/new/constants';
-import ensureData from '~/ensure_data';
 import { convertObjectPropsToCamelCase, parseBoolean } from '~/lib/utils/common_utils';
-import stateQuery from '../graphql/queries/state.query.graphql';
 import apolloProvider from './graphql';
-import { parseData } from './utils';
 
 const arrayToGraphqlArray = (arr, typename) =>
   Array.from(arr, (item) =>
@@ -13,12 +11,11 @@ const arrayToGraphqlArray = (arr, typename) =>
   );
 
 const writeInitialDataToApolloProvider = (dataset) => {
+  const { groupData, newUser, setupForCompany, fullName, planId } = dataset;
   // eslint-disable-next-line @gitlab/require-i18n-strings
-  const plans = arrayToGraphqlArray(JSON.parse(dataset.ciMinutesPlans), 'Plan');
-  // eslint-disable-next-line @gitlab/require-i18n-strings
-  const namespaces = arrayToGraphqlArray(JSON.parse(dataset.groupData), 'Namespace');
-  const isNewUser = parseBoolean(dataset.newUser);
-  const isSetupForCompany = parseBoolean(dataset.setupForCompany) || !isNewUser;
+  const namespaces = arrayToGraphqlArray(JSON.parse(groupData), 'Namespace');
+  const isNewUser = parseBoolean(newUser);
+  const isSetupForCompany = parseBoolean(setupForCompany) || !isNewUser;
 
   apolloProvider.clients.defaultClient.cache.writeQuery({
     query: stateQuery,
@@ -26,11 +23,10 @@ const writeInitialDataToApolloProvider = (dataset) => {
       state: {
         isNewUser,
         isSetupForCompany,
-        plans,
         namespaces,
-        fullName: dataset.fullName,
+        fullName,
         subscription: {
-          planId: plans[0].code,
+          planId,
           paymentMethodId: null,
           quantity: 1,
           namespaceId: null,
@@ -62,18 +58,13 @@ export default (el) => {
     return null;
   }
 
-  const ExtendedApp = ensureData(App, {
-    parseData,
-    data: el.dataset,
-  });
-
   writeInitialDataToApolloProvider(el.dataset);
 
   return new Vue({
     el,
     apolloProvider,
     render(createElement) {
-      return createElement(ExtendedApp);
+      return createElement(App);
     },
   });
 };
