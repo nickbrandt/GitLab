@@ -23864,6 +23864,9 @@ msgstr ""
 msgid "Please provide attributes to update"
 msgstr ""
 
+msgid "Please provide your username or email address."
+msgstr ""
+
 msgid "Please reach out if you have any questions and we'll be happy to assist."
 msgstr ""
 
@@ -29266,6 +29269,9 @@ msgid "Sign in"
 msgstr ""
 
 msgid "Sign in / Register"
+msgstr ""
+
+msgid "Sign in preview"
 msgstr ""
 
 msgid "Sign in to \"%{group_name}\""
