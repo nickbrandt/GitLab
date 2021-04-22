@@ -15028,7 +15028,13 @@ msgstr ""
 msgid "Go to metrics"
 msgstr ""
 
+msgid "Go to next page"
+msgstr ""
+
 msgid "Go to parent"
+msgstr ""
+
+msgid "Go to previous page"
 msgstr ""
 
 msgid "Go to project"
