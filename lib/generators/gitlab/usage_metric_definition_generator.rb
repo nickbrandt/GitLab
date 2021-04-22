@@ -57,9 +57,7 @@ module Gitlab
     end
 
     def tier
-      value = ee? ? ['#- premium'] : ['- free', '- premium']
-      value << '- ultimate'
-      value.join("\n")
+      (ee? ? ['#- premium', '- ultimate'] : ['- free', '- premium', '- ultimate']).join("\n")
     end
 
     def milestone
