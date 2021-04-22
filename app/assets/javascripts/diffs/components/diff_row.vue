@@ -211,11 +211,11 @@ export default {
             <span
               v-if="shouldRenderCommentButton && !line.hasDiscussionsLeft"
               v-gl-tooltip
-              data-testid="leftCommentButton"
               class="add-diff-note tooltip-wrapper"
               :title="addCommentTooltipLeft"
             >
               <div
+                data-testid="leftCommentButton"
                 role="button"
                 tabindex="0"
                 :draggable="!line.left.commentsDisabled && glFeatures.dragCommentSelection"
@@ -318,11 +318,11 @@ export default {
             <span
               v-if="shouldRenderCommentButton && !line.hasDiscussionsRight"
               v-gl-tooltip
-              data-testid="rightCommentButton"
               class="add-diff-note tooltip-wrapper"
               :title="addCommentTooltipRight"
             >
               <div
+                data-testid="rightCommentButton"
                 role="button"
                 tabindex="0"
                 :draggable="!line.right.commentsDisabled && glFeatures.dragCommentSelection"

@@ -1,5 +1,6 @@
 import { getByTestId, fireEvent } from '@testing-library/dom';
-import { shallowMount, createLocalVue } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
+import Vue from 'vue';
 import Vuex from 'vuex';
 import DiffRow from '~/diffs/components/diff_row.vue';
 import { mapParallel } from '~/diffs/components/diff_row_utils';
@@ -28,12 +29,12 @@ describe('DiffRow', () => {
     },
   ];
 
-  const createWrapper = ({ props, state, isLoggedIn = true }) => {
-    const localVue = createLocalVue();
-    localVue.use(Vuex);
+  const createWrapper = ({ props, state, actions, isLoggedIn = true }) => {
+    Vue.use(Vuex);
 
     const diffs = diffsModule();
     diffs.state = { ...diffs.state, ...state };
+    diffs.actions = { ...diffs.actions, ...actions };
 
     const getters = { isLoggedIn: () => isLoggedIn };
 
@@ -54,7 +55,7 @@ describe('DiffRow', () => {
       glFeatures: { dragCommentSelection: true },
     };
 
-    return shallowMount(DiffRow, { propsData, localVue, store, provide });
+    return shallowMount(DiffRow, { propsData, store, provide });
   };
 
   it('isHighlighted returns true given line.left', () => {
@@ -95,6 +96,8 @@ describe('DiffRow', () => {
     expect(wrapper.vm.isHighlighted).toBe(false);
   });
 
+  const getCommentButton = (wrapper, side) => wrapper.find(`[data-testid="${side}CommentButton"]`);
+
   describe.each`
     side
     ${'left'}
@@ -106,9 +109,50 @@ describe('DiffRow', () => {
       expect(wrapper.find(`[data-testid="${side}EmptyCell"]`).exists()).toBe(true);
     });
 
-    it('renders comment button', () => {
-      const wrapper = createWrapper({ props: { line: testLines[3], inline: false } });
-      expect(wrapper.find(`[data-testid="${side}CommentButton"]`).exists()).toBe(true);
+    describe('comment button', () => {
+      const showCommentForm = jest.fn();
+      let line;
+
+      beforeEach(() => {
+        showCommentForm.mockReset();
+        // https://eslint.org/docs/rules/prefer-destructuring#when-not-to-use-it
+        // eslint-disable-next-line prefer-destructuring
+        line = testLines[3];
+      });
+
+      it('renders', () => {
+        const wrapper = createWrapper({ props: { line, inline: false } });
+        expect(getCommentButton(wrapper, side).exists()).toBe(true);
+      });
+
+      it('responds to click and keyboard events', async () => {
+        const wrapper = createWrapper({
+          props: { line, inline: false },
+          actions: { showCommentForm },
+        });
+        const commentButton = getCommentButton(wrapper, side);
+
+        await commentButton.trigger('click');
+        await commentButton.trigger('keydown.enter');
+        await commentButton.trigger('keydown.space');
+
+        expect(showCommentForm).toHaveBeenCalledTimes(3);
+      });
+
+      it('ignores click and keyboard events when comments are disabled', async () => {
+        line[side].commentsDisabled = true;
+        const wrapper = createWrapper({
+          props: { line, inline: false },
+          actions: { showCommentForm },
+        });
+        const commentButton = getCommentButton(wrapper, side);
+
+        await commentButton.trigger('click');
+        await commentButton.trigger('keydown.enter');
+        await commentButton.trigger('keydown.space');
+
+        expect(showCommentForm).not.toHaveBeenCalled();
+      });
     });
 
     it('renders avatars', () => {
