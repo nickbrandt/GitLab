@@ -185,7 +185,7 @@ module QA
         another_project.remove_via_api!
       end
 
-      it 'pushes and pulls a Maven package via CI', testcase: 'https://gitlab.com/gitlab-org/quality/testcases/-/issues/1115' do
+      it 'pushes and pulls a Maven package via CI and deletes it', testcase: 'https://gitlab.com/gitlab-org/quality/testcases/-/issues/1115' do
         Resource::Repository::Commit.fabricate_via_api! do |commit|
           commit.project = project
           commit.commit_message = 'Add .gitlab-ci.yml'
