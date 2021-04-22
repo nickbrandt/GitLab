@@ -6,7 +6,10 @@ import Checkout from 'ee/subscriptions/buy_minutes/components/checkout.vue';
 import subscriptionsResolvers from 'ee/subscriptions/buy_minutes/graphql/resolvers';
 import stateQuery from 'ee/subscriptions/graphql/queries/state.query.graphql';
 import purchaseFlowResolvers from 'ee/vue_shared/purchase_flow/graphql/resolvers';
-import { stateData as initialStateData } from 'ee_jest/subscriptions/buy_minutes/mock_data';
+import {
+  stateData as initialStateData,
+  mockCiMinutesPlans,
+} from 'ee_jest/subscriptions/buy_minutes/mock_data';
 import createMockApollo from 'helpers/mock_apollo_helper';
 
 const localVue = createLocalVue();
@@ -35,6 +38,9 @@ describe('Checkout', () => {
     wrapper = shallowMount(Checkout, {
       apolloProvider,
       localVue,
+      propsData: {
+        plans: mockCiMinutesPlans,
+      },
     });
   };
 

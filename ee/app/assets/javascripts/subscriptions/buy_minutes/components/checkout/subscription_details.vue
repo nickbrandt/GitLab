@@ -20,6 +20,12 @@ export default {
   directives: {
     autofocusonshow,
   },
+  props: {
+    plans: {
+      type: Array,
+      required: true,
+    },
+  },
   apollo: {
     state: {
       query: STATE_QUERY,
@@ -28,9 +34,6 @@ export default {
   computed: {
     subscription() {
       return this.state.subscription;
-    },
-    plans() {
-      return this.state.plans;
     },
     namespaces() {
       return this.state.namespaces;
@@ -71,7 +74,12 @@ export default {
       },
     },
     selectedPlan() {
-      return this.state.plans.find((plan) => plan.code === this.subscription.planId);
+      const selectedPlan = this.plans.find((plan) => plan.code === this.subscription.planId);
+      if (!selectedPlan) {
+        return this.plans[0];
+      }
+
+      return selectedPlan;
     },
     selectedPlanTextLine() {
       return sprintf(this.$options.i18n.selectedPlan, { selectedPlanText: this.selectedPlan.code });
