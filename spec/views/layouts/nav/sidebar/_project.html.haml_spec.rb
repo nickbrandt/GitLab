@@ -134,6 +134,12 @@ RSpec.describe 'layouts/nav/sidebar/_project' do
       expect(rendered).to have_link('Issues', href: project_issues_path(project))
     end
 
+    it 'shows pill with the number of merge requests' do
+      render
+
+      expect(rendered).to have_css('span.badge.badge-pill.issue_counter')
+    end
+
     describe 'Issue List' do
       it 'has a link to the issue list path' do
         render
@@ -234,6 +240,20 @@ RSpec.describe 'layouts/nav/sidebar/_project' do
 
         expect(rendered).not_to have_link('Labels', href: project_labels_path(project), class: 'shortcuts-labels')
       end
+    end
+  end
+
+  describe 'Merge Requests' do
+    it 'has a link to the merge request list path' do
+      render
+
+      expect(rendered).to have_link('Merge Requests', href: project_merge_requests_path(project), class: 'shortcuts-merge_requests')
+    end
+
+    it 'shows pill with the number of merge requests' do
+      render
+
+      expect(rendered).to have_css('span.badge.badge-pill.merge_counter.js-merge-counter')
     end
   end
 

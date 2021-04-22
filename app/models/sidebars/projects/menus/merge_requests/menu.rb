@@ -13,8 +13,7 @@ module Sidebars
           override :extra_container_html_options
           def extra_container_html_options
             {
-              class: 'shortcuts-merge_requests',
-              data: { qa_selector: 'merge_requests_link' }
+              class: 'shortcuts-merge_requests'
             }
           end
 
