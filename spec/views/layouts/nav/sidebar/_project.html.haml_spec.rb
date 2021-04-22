@@ -24,11 +24,7 @@ RSpec.describe 'layouts/nav/sidebar/_project' do
       render
 
       expect(rendered).to have_link('Project overview', href: project_path(project), class: %w(shortcuts-project rspec-project-link))
-<<<<<<< HEAD
       expect(rendered).to have_selector('[aria-label="Project overview"]')
-=======
-      expect(rendered).to have_css('.shortcuts-project[ data-qa-selector="project_link"]')
->>>>>>> ed49d5e41ff (Add specs)
     end
 
     describe 'Details' do
@@ -36,10 +32,7 @@ RSpec.describe 'layouts/nav/sidebar/_project' do
         render
 
         expect(rendered).to have_link('Details', href: project_path(project), class: 'shortcuts-project')
-<<<<<<< HEAD
         expect(rendered).to have_selector('[aria-label="Project details"]')
-=======
->>>>>>> ed49d5e41ff (Add specs)
       end
     end
 
@@ -48,10 +41,6 @@ RSpec.describe 'layouts/nav/sidebar/_project' do
         render
 
         expect(rendered).to have_link('Activity', href: activity_project_path(project), class: 'shortcuts-project-activity')
-<<<<<<< HEAD
-=======
-        expect(rendered).to have_css('.shortcuts-project-activity[data-qa-selector="activity_link"]')
->>>>>>> ed49d5e41ff (Add specs)
       end
     end
 
@@ -78,12 +67,7 @@ RSpec.describe 'layouts/nav/sidebar/_project' do
     it 'has a link to the project tree path' do
       render
 
-<<<<<<< HEAD
       expect(rendered).to have_link('Repository', href: project_tree_path(project, current_ref), class: 'shortcuts-tree')
-=======
-      expect(rendered).to have_link('Repository', href: project_tree_path(project, current_ref))
-      expect(rendered).to have_css('a.shortcuts-tree[data-qa-selector="repository_link"]', text: 'Repository')
->>>>>>> ed49d5e41ff (Add specs)
     end
 
     describe 'Files' do
@@ -107,10 +91,6 @@ RSpec.describe 'layouts/nav/sidebar/_project' do
         render
 
         expect(rendered).to have_link('Branches', href: project_branches_path(project), id: 'js-onboarding-branches-link')
-<<<<<<< HEAD
-=======
-        expect(rendered).to have_css('a[data-qa-selector="branches_link"]', text: 'Branches')
->>>>>>> ed49d5e41ff (Add specs)
       end
     end
 
@@ -119,10 +99,6 @@ RSpec.describe 'layouts/nav/sidebar/_project' do
         render
 
         expect(rendered).to have_link('Tags', href: project_tags_path(project))
-<<<<<<< HEAD
-=======
-        expect(rendered).to have_css('a[data-qa-selector="tags_link"]', text: 'Tags')
->>>>>>> ed49d5e41ff (Add specs)
       end
     end
 
