@@ -14827,6 +14827,9 @@ msgstr ""
 msgid "GitLab uses %{jaeger_link} to monitor distributed systems."
 msgstr ""
 
+msgid "GitLab uses %{linkStart}Sidekiq%{linkEnd} to process background jobs"
+msgstr ""
+
 msgid "GitLab version"
 msgstr ""
 
