@@ -4,20 +4,15 @@ module Gitlab
   module Usage
     module Metrics
       module Instrumentations
-        class CountIssuesMetric < BaseMetric
-          def value
-            count(relation, start: start, finish: finish)
-          end
+        class CountIssuesMetric < DatabaseMetric
+          operation :count
 
-          def start
+          start do
             ::Issue.minimum(:id)
           end
+          finish { ::Issue.maximum(:id) }
 
-          def finish
-            ::Issue.maximum(:id)
-          end
-
-          def relation
+          relation do |database_time_constraints|
             ::Issue.where(database_time_constraints)
           end
         end

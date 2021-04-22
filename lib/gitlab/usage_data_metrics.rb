@@ -25,7 +25,7 @@ module Gitlab
       end
 
       def time_constraints(definition)
-        ::Gitlab::Usage::Metrics::Instrumentations::Shared::TimeConstraint.new(definition.attributes[:time_frame], definition.attributes[:data_source]).build
+        ::Gitlab::Usage::Metrics::TimeConstraint.new(definition.attributes[:time_frame], definition.attributes[:data_source]).build
       end
     end
   end

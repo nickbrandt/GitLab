@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe Gitlab::Usage::Metrics::Instrumentations::Shared::TimeConstraint do
+RSpec.describe Gitlab::Usage::Metrics::TimeConstraint do
   describe ".build" do
     around do |example|
       freeze_time do

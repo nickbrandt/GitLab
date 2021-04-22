@@ -15,6 +15,20 @@ module Gitlab
 
           alias_method :database_time_constraints, :time_constraints
           alias_method :redis_hll_time_constraints, :time_constraints
+
+          class << self
+            def value(&block)
+              @metric_value = block
+            end
+
+            attr_reader :metric_value
+          end
+
+          def value
+            alt_usage_data do
+              self.class.metric_value.call
+            end
+          end
         end
       end
     end

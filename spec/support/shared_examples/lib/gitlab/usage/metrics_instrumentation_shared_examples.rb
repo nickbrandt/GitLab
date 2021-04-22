@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.shared_examples 'a correct instrumented metric value' do |options, expected_value|
-  let(:time_constraints) { ::Gitlab::Usage::Metrics::Instrumentations::Shared::TimeConstraint.new(options[:time_frame], options[:data_source]).build }
+  let(:time_constraints) { ::Gitlab::Usage::Metrics::TimeConstraint.new(options[:time_frame], options[:data_source]).build }
 
   before do
     allow(ActiveRecord::Base.connection).to receive(:transaction_open?).and_return(false)

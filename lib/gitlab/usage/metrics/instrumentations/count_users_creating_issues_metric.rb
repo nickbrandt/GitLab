@@ -4,16 +4,10 @@ module Gitlab
   module Usage
     module Metrics
       module Instrumentations
-        class CountUsersCreatingIssuesMetric < BaseMetric
-          def value
-            distinct_count(relation, column)
-          end
+        class CountUsersCreatingIssuesMetric < DatabaseMetric
+          operation :distinct_count, column: :author_id
 
-          def column
-            :author_id
-          end
-
-          def relation
+          relation do |database_time_constraints|
             ::Issue.where(database_time_constraints)
           end
         end

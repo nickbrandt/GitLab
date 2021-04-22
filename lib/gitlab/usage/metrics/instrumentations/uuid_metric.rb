@@ -5,11 +5,7 @@ module Gitlab
     module Metrics
       module Instrumentations
         class UuidMetric < BaseMetric
-          def value
-            alt_usage_data { setting }
-          end
-
-          def setting
+          value do
             Gitlab::CurrentSettings.uuid
           end
         end

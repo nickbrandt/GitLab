@@ -4,12 +4,10 @@ module Gitlab
   module Usage
     module Metrics
       module Instrumentations
-        class CountBoardsMetric < BaseMetric
-          def value
-            count(relation)
-          end
+        class CountBoardsMetric < DatabaseMetric
+          operation :count
 
-          def relation
+          relation do |database_time_constraints|
             Board.where(database_time_constraints)
           end
         end
