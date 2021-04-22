@@ -37878,9 +37878,6 @@ msgstr ""
 msgid "no approvers"
 msgstr ""
 
-msgid "no contributions"
-msgstr ""
-
 msgid "no expiration"
 msgstr ""
 
