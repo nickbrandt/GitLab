@@ -7,12 +7,11 @@ describe('Test report empty state', () => {
 
   const findEmptyState = () => wrapper.findComponent(GlEmptyState);
 
-  const createComponent = (hasTestReport = true) => {
+  const createComponent = ({ hasTestReport = true } = {}) => {
     wrapper = shallowMount(EmptyState, {
       provide: {
         emptyStateImagePath: '/image/path',
         hasTestReport,
-        testReportDocPath: '/docs/path',
       },
       stubs: {
         GlEmptyState,
@@ -34,7 +33,7 @@ describe('Test report empty state', () => {
 
   describe('when pipeline does not have a test report', () => {
     it('should render no test report message', () => {
-      createComponent(false);
+      createComponent({ hasTestReport: false });
 
       expect(findEmptyState().props()).toMatchObject({
         primaryButtonText: i18n.noReportsButton,

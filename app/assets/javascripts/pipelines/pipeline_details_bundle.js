@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import { deprecatedCreateFlash as Flash } from '~/flash';
+import { parseBoolean } from '~/lib/utils/common_utils';
 import { __ } from '~/locale';
 import Translate from '~/vue_shared/translate';
 import PipelineGraphLegacy from './components/graph/graph_component_legacy.vue';
@@ -63,14 +64,8 @@ const createLegacyPipelinesDetailApp = (mediator) => {
 
 const createTestDetails = () => {
   const el = document.querySelector(SELECTORS.PIPELINE_TESTS);
-  const {
-    blobPath,
-    emptyStateImagePath,
-    hasTestReport,
-    summaryEndpoint,
-    suiteEndpoint,
-    testReportDocPath,
-  } = el?.dataset || {};
+  const { blobPath, emptyStateImagePath, hasTestReport, summaryEndpoint, suiteEndpoint } =
+    el?.dataset || {};
   const testReportsStore = createTestReportsStore({
     blobPath,
     summaryEndpoint,
@@ -85,8 +80,7 @@ const createTestDetails = () => {
     },
     provide: {
       emptyStateImagePath,
-      hasTestReport: hasTestReport !== undefined, // if hasTestReport is false that means the attribute isn't included
-      testReportDocPath,
+      hasTestReport: parseBoolean(hasTestReport),
     },
     store: testReportsStore,
     render(createElement) {

@@ -17,7 +17,6 @@ export default {
   },
   inject: {
     hasTestReport: {
-      type: Boolean,
       default: false,
     },
   },

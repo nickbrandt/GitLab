@@ -31,7 +31,7 @@ describe('Test reports app', () => {
     removeSelectedSuiteIndex: jest.fn(),
   };
 
-  const createComponent = (state = {}, hasTestReport = true) => {
+  const createComponent = ({ state = {}, hasTestReport = true } = {}) => {
     store = new Vuex.Store({
       state: {
         isLoading: false,
@@ -66,14 +66,14 @@ describe('Test reports app', () => {
     });
 
     it('should not call fetchSummary when pipeline does not have test report', () => {
-      createComponent({}, false);
+      createComponent({ state: {}, hasTestReport: false });
 
       expect(actionSpies.fetchSummary).not.toHaveBeenCalled();
     });
   });
 
   describe('when loading', () => {
-    beforeEach(() => createComponent({ isLoading: true }));
+    beforeEach(() => createComponent({ state: { isLoading: true } }));
 
     it('shows the loading spinner', () => {
       expect(emptyState().exists()).toBe(false);
@@ -84,7 +84,7 @@ describe('Test reports app', () => {
 
   describe('when the api returns no data', () => {
     it('displays empty state component', () => {
-      createComponent({ testReports: {} });
+      createComponent({ state: { testReports: {} } });
 
       expect(emptyState().exists()).toBe(true);
     });
@@ -105,7 +105,7 @@ describe('Test reports app', () => {
 
   describe('when a suite is clicked', () => {
     beforeEach(() => {
-      createComponent({ hasFullReport: true });
+      createComponent({ state: { hasFullReport: true } });
       testSummaryTable().vm.$emit('row-click', 0);
     });
 
@@ -117,7 +117,7 @@ describe('Test reports app', () => {
 
   describe('when clicking back to summary', () => {
     beforeEach(() => {
-      createComponent({ selectedSuiteIndex: 0 });
+      createComponent({ state: { selectedSuiteIndex: 0 } });
       testSummary().vm.$emit('on-back-click');
     });
 

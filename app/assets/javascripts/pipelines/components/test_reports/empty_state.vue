@@ -1,5 +1,6 @@
 <script>
 import { GlEmptyState } from '@gitlab/ui';
+import { helpPagePath } from '~/helpers/help_page_helper';
 import { s__ } from '~/locale';
 
 export const i18n = {
@@ -20,16 +21,10 @@ export default {
   },
   inject: {
     emptyStateImagePath: {
-      type: String,
       default: '',
     },
     hasTestReport: {
-      type: Boolean,
       default: false,
-    },
-    testReportDocPath: {
-      type: String,
-      default: '',
     },
   },
   computed: {
@@ -46,6 +41,9 @@ export default {
         description: this.$options.i18n.noReportsDescription,
         title: this.$options.i18n.noReportsTitle,
       };
+    },
+    testReportDocPath() {
+      return helpPagePath('ci/unit_test_reports');
     },
   },
 };
