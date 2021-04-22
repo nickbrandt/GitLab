@@ -15,13 +15,6 @@ module Sidebars
             project_security_configuration_path(context.project)
           end
 
-          override :extra_container_html_options
-          def extra_container_html_options
-            {
-              data: { qa_selector: 'security_configuration_link' }
-            }
-          end
-
           override :render?
           def render?
             can?(context.current_user, :access_security_and_compliance, context.project) && has_renderable_items?

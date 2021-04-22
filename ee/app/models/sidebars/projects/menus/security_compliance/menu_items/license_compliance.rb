@@ -11,13 +11,6 @@ module Sidebars
               project_licenses_path(context.project)
             end
 
-            override :extra_container_html_options
-            def extra_container_html_options
-              {
-                data: { qa_selector: 'licenses_list_link' }
-              }
-            end
-
             override :active_routes
             def active_routes
               { path: 'projects/licenses#index' }

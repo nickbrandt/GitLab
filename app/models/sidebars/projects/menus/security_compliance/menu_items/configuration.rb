@@ -11,13 +11,6 @@ module Sidebars
               project_security_configuration_path(context.project)
             end
 
-            override :extra_container_html_options
-            def extra_container_html_options
-              {
-                data: { qa_selector: 'security_configuration_link' }
-              }
-            end
-
             override :active_routes
             def active_routes
               { path: ['projects/security/configuration#show'] }
