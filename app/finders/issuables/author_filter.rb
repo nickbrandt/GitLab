@@ -21,7 +21,7 @@ module Issuables
     end
 
     def by_author_union(issuables)
-      return issuables unless or_filters_enabled? && or_params&.fetch(:author_username).present?
+      return issuables unless or_filters_enabled? && or_params&.fetch(:author_username, false).present?
 
       issuables.authored(User.by_username(or_params[:author_username]))
     end
