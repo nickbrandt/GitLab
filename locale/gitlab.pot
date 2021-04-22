@@ -23243,6 +23243,9 @@ msgstr ""
 msgid "Personal project creation is not allowed. Please contact your administrator with questions"
 msgstr ""
 
+msgid "Personal projects"
+msgstr ""
+
 msgid "Phabricator Server Import"
 msgstr ""
 
@@ -25344,6 +25347,9 @@ msgid "Projects Successfully Retrieved"
 msgstr ""
 
 msgid "Projects are graded based on the highest severity vulnerability present"
+msgstr ""
+
+msgid "Projects contributed to"
 msgstr ""
 
 msgid "Projects shared with %{group_name}"
