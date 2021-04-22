@@ -36195,7 +36195,10 @@ msgstr ""
 msgid "You have been granted %{access_level} access to the %{source_name} %{source_type}."
 msgstr ""
 
-msgid "You have been granted %{member_human_access} access to %{title} %{name}."
+msgid "You have been granted %{member_human_access} access to group %{name}."
+msgstr ""
+
+msgid "You have been granted %{member_human_access} access to project %{name}."
 msgstr ""
 
 msgid "You have been invited"
