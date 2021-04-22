@@ -9824,7 +9824,8 @@ CREATE TABLE batched_background_migration_jobs (
     sub_batch_size integer NOT NULL,
     status smallint DEFAULT 0 NOT NULL,
     attempts smallint DEFAULT 0 NOT NULL,
-    metrics jsonb DEFAULT '{}'::jsonb NOT NULL
+    metrics jsonb DEFAULT '{}'::jsonb NOT NULL,
+    pause_ms integer DEFAULT 100 NOT NULL
 );
 
 CREATE SEQUENCE batched_background_migration_jobs_id_seq
@@ -9852,6 +9853,7 @@ CREATE TABLE batched_background_migrations (
     column_name text NOT NULL,
     job_arguments jsonb DEFAULT '"[]"'::jsonb NOT NULL,
     total_tuple_count bigint,
+    pause_ms integer DEFAULT 100 NOT NULL,
     CONSTRAINT check_5bb0382d6f CHECK ((char_length(column_name) <= 63)),
     CONSTRAINT check_6b6a06254a CHECK ((char_length(table_name) <= 63)),
     CONSTRAINT check_batch_size_in_range CHECK ((batch_size >= sub_batch_size)),
