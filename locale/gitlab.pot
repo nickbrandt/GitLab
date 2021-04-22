@@ -1937,6 +1937,9 @@ msgstr ""
 msgid "Add bold text"
 msgstr ""
 
+msgid "Add broadcast message"
+msgstr ""
+
 msgid "Add child epic to an epic"
 msgstr ""
 
@@ -33886,6 +33889,9 @@ msgid "Update approval rule"
 msgstr ""
 
 msgid "Update approvers"
+msgstr ""
+
+msgid "Update broadcast message"
 msgstr ""
 
 msgid "Update failed"
