@@ -96,6 +96,39 @@ RSpec.describe 'epic boards', :js do
       expect(find('.board:nth-child(1)')).not_to have_content(epic3.title)
       expect(find('.board:nth-child(2)')).to have_content(epic3.title)
     end
+
+    context 'lists' do
+      let_it_be(:label_list2) { create(:epic_list, epic_board: epic_board, label: label2, position: 1) }
+
+      it 'changes position of list' do
+        expect(find('.board:nth-child(2)')).to have_content(label.title)
+        expect(find('.board:nth-child(3)')).to have_content(label2.title)
+
+        drag(list_from_index: 2, list_to_index: 1, selector: '.board-header')
+
+        wait_for_all_requests
+
+        expect(find('.board:nth-child(2)')).to have_content(label2.title)
+        expect(find('.board:nth-child(3)')).to have_content(label.title)
+
+        # Make sure list positions are preserved after a reload
+        visit_epic_boards_page
+
+        wait_for_all_requests
+
+        expect(find('.board:nth-child(2)')).to have_content(label2.title)
+        expect(find('.board:nth-child(3)')).to have_content(label.title)
+      end
+
+      it 'dragging does not duplicate list' do
+        selector = '.board:not(.is-ghost) .board-header'
+        expect(page).to have_selector(selector, text: label.title, count: 1)
+
+        drag(list_from_index: 2, list_to_index: 1, selector: '.board-header', perform_drop: false)
+
+        expect(page).to have_selector(selector, text: label.title, count: 1)
+      end
+    end
   end
 
   context 'when user can admin epic boards' do
