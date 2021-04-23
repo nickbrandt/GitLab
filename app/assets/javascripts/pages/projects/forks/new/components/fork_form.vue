@@ -200,6 +200,7 @@ export default {
       }
 
       this.isSaving = true;
+      this.form.showValidation = false;
 
       const { projectId } = this;
       const { name, slug, description, visibility, namespace } = this.form.fields;
