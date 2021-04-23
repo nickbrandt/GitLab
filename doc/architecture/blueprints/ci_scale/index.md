@@ -25,12 +25,12 @@ builds is growing exponentially. We will run out of the available primary keys
 for builds before December 2021 unless we improve the database model used to
 store CI/CD data.
 
-We expect to see 20M builds created daily on Gitlab.com in the first half of
+We expect to see 20M builds created daily on GitLab.com in the first half of
 2024.
 
 ![ci_builds cumulative with forecast](ci_builds_cumulative_forecast.png)
 
-## Goal
+## Goals
 
 **Enable future growth by making processing 20M builds in a day possible.**
 
@@ -55,7 +55,8 @@ We will run out of the capacity of the integer type to store primary keys in
 workaround or an emergency plan, GitLab.com will go down.
 
 `ci_builds` is just one of the tables that are running out of the primary keys
-available for Int4 sequence.
+available in Int4 sequence. There are multiple other tables storing CI/CD data
+that have the same problem.
 
 Primary keys problem will be tackled by our Database Team.
 
@@ -78,37 +79,39 @@ on.
 The size of the table also hinders development velocity because queries that
 seem fine in the development environment may not work on GitLab.com. The
 difference in the dataset size between the environments makes it difficult to
-predict the performance of event the most simple queries.
+predict the performance of even the most simple queries.
 
 We also expect a significant, exponential growth in the upcoming years.
 
 One of the forecasts done using [Facebook's
 Prophet](https://facebook.github.io/prophet/) shows that in the first half of
-2024 we expect seeing 20M builds created on Gitlab.com each day. In comparison
+2024 we expect seeing 20M builds created on GitLab.com each day. In comparison
 to around 2M we see created today, this is 10x growth our product might need to
 sustain in upcoming years.
 
 ![ci_builds daily forecast](ci_builds_daily_forecast.png)
 
-### Queuing mechanisms using the large table
+### Queuing mechanisms are using the large table
 
 Because of how large the table is, mechanisms that we use to build queues of
-pending builds, are not very efficient. Pending builds represent a small
-fraction of what we store in the `ci_builds` table, yet we need to find them in
-this big dataset to determine an order in which we want to process them.
+pending builds (there is more than one queue), are not very efficient. Pending
+builds represent a small fraction of what we store in the `ci_builds` table,
+yet we need to find them in this big dataset to determine an order in which we
+want to process them.
 
 This mechanism is very inefficient, and it has been causing problems on the
 production environment frequently. This usually results in a significant drop
-of the CI/CD processing apdex score, and sometimes even causes a
-production-environment-wide performance degradation.
+of the CI/CD apdex score, and sometimes even causes a significant performance
+degradation in the production environment.
 
 There are multiple other strategies that can improve performance and
 reliability. We can use [Redis
 queuing](https://gitlab.com/gitlab-org/gitlab/-/issues/322972), or [a separate
 table that will accelerate SQL queries used to build
-queues](https://gitlab.com/gitlab-org/gitlab/-/issues/322766).
+queues](https://gitlab.com/gitlab-org/gitlab/-/issues/322766) and we want to
+explore them.
 
-### Moving this amount of data is challenging
+### Moving big amounts of data is challenging
 
 We store a significant amount of data in `ci_builds` table. Some of the columns
 in that table store a serialized user-provided data. Column `ci_builds.options`
@@ -136,30 +139,32 @@ environment.
 
 ## Proposal
 
-Making GitLab CI/CD product more suitable for the scale we expect to see in the
+Making GitLab CI/CD product ready for the scale we expect to see in the
 upcoming years is a multi-phase effort.
 
-First, we want to focus on extending metrics we already have, to get a better
-sense of how the system performs and what is the growth trajectory. This will
-make it easier for us to identify bottlenecks and perform more advanced
-capacity planning.
+First, we want to focus on things that are urgently needed right now. We need
+to fix primary keys overflow risk and unblock other teams that are working on
+database partitioning and sharding.
 
-We want to also improve situation around bottlenecks that are known already,
-like queuing mechanisms using the large table.
+We want to improve situation around bottlenecks that are known already, like
+queuing mechanisms using the large table and things that are holding other
+teams back.
 
-Migrating primary keys to Int8 is something that needs to happen in parallel,
-because although we might be able to resolve this problem for `ci_builds` using
-partitioning or sharding, there are other CI/CD tables that need to be updated.
+Extending CI/CD metrics is important to get a better sense of how the system
+performs and to what growth should we expect. This will make it easier for us
+to identify bottlenecks and perform more advanced capacity planning.
 
-As we work on queuing and metrics we expect our Database Sharding team and
+As we work on first iterations we expect our Database Sharding team and
 Database Scalability Working Group to make progress on patterns we will be able
-to use to partition the large CI/CD dataset. We consider the strong time-decay,
-related to he diminishing importance of pipelines with time, as an opportunity.
+to use to partition the large CI/CD dataset. We consider the strong time-decay
+effect, related to the diminishing importance of pipelines with time, as an
+opportunity we might want to seize.
 
 ## Iterations
 
 Work required to achieve our next CI/CD scaling target is tracked in the
-following epic: https://gitlab.com/groups/gitlab-org/-/epics/5745.
+[GitLab CI/CD 20M builds per day scaling
+target](https://gitlab.com/groups/gitlab-org/-/epics/5745) epic.
 
 ## Status
 
