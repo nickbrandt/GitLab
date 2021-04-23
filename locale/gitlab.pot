@@ -32995,6 +32995,9 @@ msgstr ""
 msgid "To ensure no loss of personal content, this account should only be used for matters related to %{group_name}."
 msgstr ""
 
+msgid "To find the state of this project's repository at the time of any of these versions, check out %{link_start}the tags%{link_end}."
+msgstr ""
+
 msgid "To further protect your account, consider configuring a %{mfa_link_start}two-factor authentication%{mfa_link_end} method."
 msgstr ""
 
