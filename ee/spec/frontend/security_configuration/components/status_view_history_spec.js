@@ -1,7 +1,7 @@
 import { GlLink } from '@gitlab/ui';
 import { shallowMount } from '@vue/test-utils';
 import StatusGeneric from 'ee/security_configuration/components/status_generic.vue';
-import StatusSast from 'ee/security_configuration/components/status_sast.vue';
+import StatusViewHistory from 'ee/security_configuration/components/status_view_history.vue';
 import { REPORT_TYPE_SAST } from '~/vue_shared/security_reports/constants';
 import { generateFeatures } from './helpers';
 
@@ -12,7 +12,7 @@ describe('StatusSast component', () => {
   let wrapper;
 
   const createComponent = (options) => {
-    wrapper = shallowMount(StatusSast, options);
+    wrapper = shallowMount(StatusViewHistory, options);
   };
 
   afterEach(() => {
