@@ -5,11 +5,11 @@ comments: false
 description: 'Improvements to CI/CD builds data storage model'
 ---
 
-# Improve CI/CD builds data storage model
+# Next CI/CD scale target: 20M builds per day
 
 ## Summary
 
-GitLab CI/CD is one of the most data and compute intensive components features.
+GitLab CI/CD is one of the most data and compute intensive components of GitLab.
 Since its [initial release in November 2012](https://about.gitlab.com/blog/2012/11/13/continuous-integration-server-from-gitlab/),
 the CI/CD subsystem has evolved significantly. It was [integrated into GitLab in September 2015](https://about.gitlab.com/releases/2015/09/22/gitlab-8-0-released/)
 and has become [one of the most beloved CI/CD solutions](https://about.gitlab.com/blog/2017/09/27/gitlab-leader-continuous-integration-forrester-wave/).
@@ -22,18 +22,22 @@ we are reaching database limits that are slowing our development velocity down.
 
 On February 1st, 2021, a billionth CI/CD job was created and the number of
 builds is growing exponentially. We will run out of the available primary keys
-before December 2021 unless we improve the database model used to store CI/CD
-builds.
+for builds before December 2021 unless we improve the database model used to
+store CI/CD data.
+
+We expect to see 20M builds created daily on Gitlab.com in the first half of
+2024.
 
 ![ci_builds cumulative with forecast](ci_builds_cumulative_forecast.png)
 
-## Goals
+## Goal
 
-1. Transition primary key for `ci_builds` to 64-bit integer
-1. Reduce the amount of data stored in `ci_builds` table
-1. Devise a database partitioning strategy for `ci_builds` table
+**Enable future growth by making processing 20M builds in a day possible.**
 
 ## Challenges
+
+The current state of CI/CD product architecture needs to be updated if we want
+to sustain future growth.
 
 ### We are running out of the capacity to store primary keys
 
@@ -48,16 +52,21 @@ bigint yet.
 
 We will run out of the capacity of the integer type to store primary keys in
 `ci_builds` table before December 2021. When it happens without a viable
-workaround, GitLab.com will go down.
+workaround or an emergency plan, GitLab.com will go down.
+
+`ci_builds` is just one of the tables that are running out of the primary keys
+available for Int4 sequence.
+
+Primary keys problem will be tackled by our Database Team.
 
 ### The table is too large
 
 There is more than a billion rows in `ci_builds` table. We store more than 2
 terabytes of data in that table, and the total size of indexes is more than 1
-terabyte.
+terabyte (as of February 2021).
 
-This amount of data contributes to a significant problems related to having
-this table in our database.
+This amount of data contributes to a significant performance problems we
+experience on our primary PostgreSQL database.
 
 Most of the problem are related to how PostgreSQL database works internally,
 and how it is making use of resources on a node the database runs on. We are at
@@ -71,20 +80,49 @@ seem fine in the development environment may not work on GitLab.com. The
 difference in the dataset size between the environments makes it difficult to
 predict the performance of event the most simple queries.
 
-### Background migrations are not reliable
+We also expect a significant, exponential growth in the upcoming years.
+
+One of the forecasts done using [Facebook's
+Prophet](https://facebook.github.io/prophet/) shows that in the first half of
+2024 we expect seeing 20M builds created on Gitlab.com each day. In comparison
+to around 2M we see created today, this is 10x growth our product might need to
+sustain in upcoming years.
+
+![ci_builds daily forecast](ci_builds_daily_forecast.png)
+
+### Queuing mechanisms using the large table
+
+Because of how large the table is, mechanisms that we use to build queues of
+pending builds, are not very efficient. Pending builds represent a small
+fraction of what we store in the `ci_builds` table, yet we need to find them in
+this big dataset to determine an order in which we want to process them.
+
+This mechanism is very inefficient, and it has been causing problems on the
+production environment frequently. This usually results in a significant drop
+of the CI/CD processing apdex score, and sometimes even causes a
+production-environment-wide performance degradation.
+
+There are multiple other strategies that can improve performance and
+reliability. We can use [Redis
+queuing](https://gitlab.com/gitlab-org/gitlab/-/issues/322972), or [a separate
+table that will accelerate SQL queries used to build
+queues](https://gitlab.com/gitlab-org/gitlab/-/issues/322766).
+
+### Moving this amount of data is challenging
 
 We store a significant amount of data in `ci_builds` table. Some of the columns
 in that table store a serialized user-provided data. Column `ci_builds.options`
-stores more than 600 gigabytes of data (as of February 2021), and
-`ci_builds.yaml_variables` more than 300 gigabytes.
+stores more than 600 gigabytes of data, and `ci_builds.yaml_variables` more
+than 300 gigabytes (as of February 2021).
 
-We also need to migrate all the primary keys to `bigint`.
+It is a lot of data that needs to be reliably moved to a different place.
+Unfortunately, right now, our [background
+migrations](https://docs.gitlab.com/ee/development/background_migrations.html)
+are not reliable enough to migrate this amount of data at scale. We need to
+build mechanisms that will give us confidence in moving this data between
+columns, tables, partitions or database shards.
 
-It is a lot of data that needs to be reliably moved to a different column or to
-a different table. Perhaps to a different database. Unfortunately, right now,
-background migration are not reliable enough to migrate data at scale. We need
-to improve this mechanism to have confidence in that we are capable of moving
-data as we see fit. Right now, evidence shows that it is not a case.
+Effort to improve background migrations will be owned by our Database Team.
 
 ### Development velocity is negatively affected
 
@@ -98,31 +136,34 @@ environment.
 
 ## Proposal
 
-We want to start from migrating primary keys what is the most urgent thing. We
-will need to create a new column and copy all the ids. It means that building
-reliable and fast background migrations is a prerequisite for getting it done.
+Making GitLab CI/CD product more suitable for the scale we expect to see in the
+upcoming years is a multi-phase effort.
 
-We will also need better background migrations to migrate data out of the
-`ci_builds` table and to setup partitioning for this table once we settle on
-our partitioning strategy for it.
+First, we want to focus on extending metrics we already have, to get a better
+sense of how the system performs and what is the growth trajectory. This will
+make it easier for us to identify bottlenecks and perform more advanced
+capacity planning.
 
-There are multiple ways to partition `ci_builds` table, but because the
-importance and relevance of a pipeline data decays with time, we might want to
-use a pipeline creation date as a partitioning key. Depending on the
-partitioning strategy we choose, we will need to change pipelines data access
-patterns in our product, what can be a significant effort. We want to minimize
-the risk of doing that by moving towards partitioning in an iterative way.
+We want to also improve situation around bottlenecks that are known already,
+like queuing mechanisms using the large table.
+
+Migrating primary keys to Int8 is something that needs to happen in parallel,
+because although we might be able to resolve this problem for `ci_builds` using
+partitioning or sharding, there are other CI/CD tables that need to be updated.
+
+As we work on queuing and metrics we expect our Database Sharding team and
+Database Scalability Working Group to make progress on patterns we will be able
+to use to partition the large CI/CD dataset. We consider the strong time-decay,
+related to he diminishing importance of pipelines with time, as an opportunity.
 
 ## Iterations
 
-1. [Redesign background migrations to make them reliable](https://gitlab.com/groups/gitlab-org/-/epics/5415)
-1. [Migrate primary key of `ci_builds` table to 64-bit integer](https://gitlab.com/groups/gitlab-org/-/epics/5416)
-1. [Migrate eligible data out of the `ci_builds` table](https://gitlab.com/groups/gitlab-org/-/epics/4685)
-1. [Devise a partitioning strategy for `ci_builds` table](https://gitlab.com/groups/gitlab-org/-/epics/5417)
+Work required to achieve our next CI/CD scaling target is tracked in the
+following epic: https://gitlab.com/groups/gitlab-org/-/epics/5745.
 
 ## Status
 
-Blueprint in approval.
+In progress.
 
 ## Who
 
@@ -147,6 +188,11 @@ DRIs:
 | Leadership                   | Darby Frey             |
 | Product                      | Jackie Porter          |
 | Engineering                  | Grzegorz Bizon         |
+
+Domain experts:
+
+| Area                         | Who
+|------------------------------|------------------------|
 | Domain Expert / Verify       | Fabio Pitino           |
 | Domain Expert / Database     | Jose Finotto           |
 | Domain Expert / PostgreSQL   | Nikolay Samokhvalov    |
