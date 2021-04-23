@@ -4,7 +4,7 @@ module Gitlab
   module Usage
     module Metrics
       module Instrumentations
-        class UuidMetric < BaseMetric
+        class UuidMetric < GenericMetric
           value do
             Gitlab::CurrentSettings.uuid
           end

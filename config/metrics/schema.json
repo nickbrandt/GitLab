@@ -53,7 +53,7 @@
     },
     "instrumentation_class": {
       "type": "string",
-      "pattern": "^(Gitlab::Usage::Metrics::Instrumentations::)([a-zA-Z]+::)*([a-zA-Z]+)$"
+      "pattern": "^(Gitlab::Usage::Metrics::Instrumentations::)(([A-Z][a-z]+)+::)*(([A-Z][a-z]+)+)$"
     },
     "distribution": {
       "type": "array",

@@ -37,10 +37,14 @@ module Gitlab
 
           def value
             method(self.class.metric_operation)
-              .call(self.class.metric_relation.call(database_time_constraints),
+              .call(relation,
                     self.class.column,
                     start: self.class.metric_start&.call,
                     finish: self.class.metric_finish&.call)
+          end
+
+          def relation
+            self.class.metric_relation.call.where(database_time_constraints)
           end
         end
       end
