@@ -8788,6 +8788,9 @@ msgstr ""
 msgid "Contains %{count} blobs of images (%{size})"
 msgstr ""
 
+msgid "Content parsed with %{link}."
+msgstr ""
+
 msgid "ContentEditor|You have to provide a renderMarkdown function or a custom serializer"
 msgstr ""
 
@@ -13472,7 +13475,13 @@ msgstr ""
 msgid "Faster releases. Better code. Less pain."
 msgstr ""
 
+msgid "Favicon"
+msgstr ""
+
 msgid "Favicon was successfully removed."
+msgstr ""
+
+msgid "Favicon will be removed. Are you sure?"
 msgstr ""
 
 msgid "Feature Flags"
@@ -15925,7 +15934,13 @@ msgstr ""
 msgid "Hashed storage can't be disabled anymore for new projects"
 msgstr ""
 
+msgid "Header logo"
+msgstr ""
+
 msgid "Header logo was successfully removed."
+msgstr ""
+
+msgid "Header logo will be removed. Are you sure?"
 msgstr ""
 
 msgid "Header message"
@@ -16365,6 +16380,9 @@ msgid "ImageViewerDimensions|H"
 msgstr ""
 
 msgid "ImageViewerDimensions|W"
+msgstr ""
+
+msgid "Images with incorrect dimensions are not resized automatically, and may result in unexpected behavior."
 msgstr ""
 
 msgid "Impersonate"
@@ -19403,6 +19421,9 @@ msgstr ""
 msgid "Logo was successfully removed."
 msgstr ""
 
+msgid "Logo will be removed. Are you sure?"
+msgstr ""
+
 msgid "Logs"
 msgstr ""
 
@@ -19776,6 +19797,15 @@ msgid "Maximum field length"
 msgstr ""
 
 msgid "Maximum file size indexed (KiB)"
+msgstr ""
+
+msgid "Maximum file size is 1MB. Image size must be 32x32px. Allowed image formats are  %{favicon_extension_whitelist}."
+msgstr ""
+
+msgid "Maximum file size is 1MB. Pages are optimized for a 28px tall header logo"
+msgstr ""
+
+msgid "Maximum file size is 1MB. Pages are optimized for a 640x360 px logo."
 msgstr ""
 
 msgid "Maximum file size is 2MB. Please select a smaller file."
@@ -21110,6 +21140,9 @@ msgstr ""
 msgid "Navigate to the project to close the milestone."
 msgstr ""
 
+msgid "Navigation bar"
+msgstr ""
+
 msgid "Nav|Help"
 msgstr ""
 
@@ -21530,6 +21563,12 @@ msgid "New pipelines cause older pending pipelines on the same branch to be canc
 msgstr ""
 
 msgid "New project"
+msgstr ""
+
+msgid "New project page"
+msgstr ""
+
+msgid "New project pages"
 msgstr ""
 
 msgid "New project/repository"
@@ -24341,6 +24380,9 @@ msgstr ""
 msgid "Profile Settings"
 msgstr ""
 
+msgid "Profile image guideline"
+msgstr ""
+
 msgid "ProfileSession|on"
 msgstr ""
 
@@ -26568,6 +26610,9 @@ msgstr ""
 msgid "Remove due date"
 msgstr ""
 
+msgid "Remove favicon"
+msgstr ""
+
 msgid "Remove file"
 msgstr ""
 
@@ -26583,6 +26628,9 @@ msgstr ""
 msgid "Remove group"
 msgstr ""
 
+msgid "Remove header logo"
+msgstr ""
+
 msgid "Remove iteration"
 msgstr ""
 
@@ -26596,6 +26644,9 @@ msgid "Remove list"
 msgstr ""
 
 msgid "Remove log"
+msgstr ""
+
+msgid "Remove logo"
 msgstr ""
 
 msgid "Remove member"
@@ -29385,6 +29436,9 @@ msgstr ""
 msgid "Sign in with smart card"
 msgstr ""
 
+msgid "Sign in/Sign up pages"
+msgstr ""
+
 msgid "Sign out"
 msgstr ""
 
@@ -29395,6 +29449,9 @@ msgid "Sign up"
 msgstr ""
 
 msgid "Sign up was successful! Please confirm your email to sign in."
+msgstr ""
+
+msgid "Sign-in page"
 msgstr ""
 
 msgid "Sign-in restrictions"
@@ -34006,6 +34063,9 @@ msgid "Update Scheduled…"
 msgstr ""
 
 msgid "Update all"
+msgstr ""
+
+msgid "Update appearance settings"
 msgstr ""
 
 msgid "Update approval rule"
