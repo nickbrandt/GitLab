@@ -330,10 +330,11 @@ access the graph from.
 
 GitLab capitalizes the stages' names in the pipeline graphs.
 
-### Single pipeline page graphs
+### View full pipeline graph
 
 > - [Visualization improved](https://gitlab.com/gitlab-org/gitlab/-/issues/276949) in GitLab 13.11.
-> - [Job dependency view added](https://gitlab.com/gitlab-org/gitlab/-/issues/328538) in GitLab 13.12.
+> - [Visualization improvements introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/276949) in GitLab 13.11.
+> - [Job dependency view introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/328538) in GitLab 13.12.
 
 Single pipeline page graphs can be found when you are on a [single pipeline page](#view-pipelines). They show the names and statuses of the jobs that make up the pipeline, as well as further actions that can be taken. These jobs be displayed in either a stage-by-stage form or as a Job dependency graph.
 
