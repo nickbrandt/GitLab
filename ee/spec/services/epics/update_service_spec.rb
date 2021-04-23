@@ -447,6 +447,7 @@ RSpec.describe Epics::UpdateService do
       context 'for /parent_epic' do
         it 'assigns parent epic' do
           parent_epic = create(:epic, group: epic.group)
+          expect(::Gitlab::UsageDataCounters::EpicActivityUniqueCounter).to receive(:track_epic_parent_updated_action)
 
           update_epic(description: "/parent_epic #{parent_epic.to_reference}")
 
@@ -457,6 +458,7 @@ RSpec.describe Epics::UpdateService do
           it 'does not update parent epic' do
             other_group = create(:group, :private)
             parent_epic = create(:epic, group: other_group)
+            expect(::Gitlab::UsageDataCounters::EpicActivityUniqueCounter).not_to receive(:track_epic_parent_updated_action)
 
             update_epic(description: "/parent_epic #{parent_epic.to_reference(group)}")
 
@@ -468,6 +470,7 @@ RSpec.describe Epics::UpdateService do
       context 'for /child_epic' do
         it 'sets a child epic' do
           child_epic = create(:epic, group: group)
+          expect(::Gitlab::UsageDataCounters::EpicActivityUniqueCounter).to receive(:track_epic_parent_updated_action)
 
           update_epic(description: "/child_epic #{child_epic.to_reference}")
 
@@ -478,6 +481,7 @@ RSpec.describe Epics::UpdateService do
           it 'does not set child epic' do
             other_group = create(:group, :private)
             child_epic = create(:epic, group: other_group)
+            expect(::Gitlab::UsageDataCounters::EpicActivityUniqueCounter).not_to receive(:track_epic_parent_updated_action)
 
             update_epic(description: "/child_epic #{child_epic.to_reference(group)}")
             expect(epic.reload.children).to be_empty
