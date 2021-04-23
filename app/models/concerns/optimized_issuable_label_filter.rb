@@ -57,13 +57,7 @@ module OptimizedIssuableLabelFilter
   end
 
   def cached_state_counts(finder)
-    key = if finder.params.project?
-            ['project', finder.params.project_id, "#{finder.class.name}_count_by_state"]
-          elsif finder.params.group?
-            ['group', finder.params.group_id, "#{finder.class.name}_count_by_state"]
-          end
-
-    Rails.cache.fetch(key, expires_in: 1.day) { uncached_state_counts(finder) }
+    Rails.cache.fetch(count_by_state_cache_key, expires_in: 1.hour) { uncached_state_counts(finder) }
   end
 
   def issuables_with_selected_labels(items, target_model)

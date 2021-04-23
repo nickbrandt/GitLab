@@ -750,7 +750,7 @@ RSpec.describe EpicsFinder do
 
     it_behaves_like 'a finder with cached count by state' do
       let(:user) { search_user }
-      let(:cache_key) { ['group', group.id, "#{described_class.name}_count_by_state"] }
+      let(:cache_key) { ['group', group.id, 'total_epics_count_by_state'] }
     end
 
     context 'when using group cte for search' do
@@ -764,6 +764,37 @@ RSpec.describe EpicsFinder do
 
         expect(results).to eq('opened' => 1, 'closed' => 1, 'all' => 2)
       end
+    end
+  end
+
+  describe '#count_by_state_cache_key' do
+    shared_examples 'count with specific cache key' do |key|
+      it 'returns correct key' do
+        expect(described_class.new(current_user, { group_id: group.id }).count_by_state_cache_key)
+          .to eq(['group', group.id, key])
+      end
+    end
+
+    before do
+      stub_licensed_features(epics: true)
+    end
+
+    context 'with no user' do
+      let(:current_user) { nil }
+
+      it_behaves_like 'count with specific cache key', 'public_epics_count_by_state'
+    end
+
+    context 'when user has no confidential access' do
+      let(:current_user) { create(:user) }
+
+      it_behaves_like 'count with specific cache key', 'public_epics_count_by_state'
+    end
+
+    context 'when user has confidential access', :enable_admin_mode do
+      let(:current_user) { create(:user, :admin) }
+
+      it_behaves_like 'count with specific cache key', 'total_epics_count_by_state'
     end
   end
 end

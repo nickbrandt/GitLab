@@ -229,6 +229,16 @@ class IssuableFinder
     end
   end
 
+  def count_by_state_cache_key
+    if params.group?
+      ['group', params.group_id]
+    elsif params.project?
+      ['project', params.project_id]
+    else
+      []
+    end
+  end
+
   private
 
   attr_reader :parent

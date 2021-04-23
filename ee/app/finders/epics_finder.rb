@@ -92,6 +92,11 @@ class EpicsFinder < IssuableFinder
     with_confidentiality_access_check(epics, groups)
   end
 
+  def count_by_state_cache_key
+    type = can_read_all_epics_in_related_groups?(permissioned_related_groups) ? 'total' : 'public'
+    super << "#{type}_epics_count_by_state"
+  end
+
   private
 
   def permissioned_related_groups

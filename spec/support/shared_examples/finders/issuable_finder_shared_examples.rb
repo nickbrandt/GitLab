@@ -14,7 +14,7 @@ RSpec.shared_examples 'a finder with cached count by state' do
 
     it 'does not cache the counts result' do
       subject
-      expect(Rails.cache).not_to receive(:fetch).with(cache_key, expires_in: 1.day)
+      expect(Rails.cache).not_to receive(:fetch).with(cache_key, expires_in: 1.hour)
     end
   end
 
@@ -24,11 +24,10 @@ RSpec.shared_examples 'a finder with cached count by state' do
     end
 
     it 'caches the counts result if no bar filters are present' do
-      counts = { 'opened' => 10, 'closed' => 5, 'all' => 15 }
-      allow(Rails.cache).to receive(:fetch).and_return(counts)
+      allow(Rails.cache).to receive(:fetch).and_return({ all: 5, opened: 3, closed: 2 })
 
-      expect(subject).to eq(counts)
-      expect(Rails.cache).to have_received(:fetch).with(cache_key, expires_in: 1.day)
+      subject
+      expect(Rails.cache).to have_received(:fetch).with(cache_key, expires_in: 1.hour)
     end
 
     context 'when bar filters are present' do
@@ -38,7 +37,7 @@ RSpec.shared_examples 'a finder with cached count by state' do
 
       it 'does not cache the counts result' do
         subject
-        expect(Rails.cache).not_to receive(:fetch).with(cache_key, expires_in: 1.day)
+        expect(Rails.cache).not_to receive(:fetch).with(cache_key, expires_in: 1.hour)
       end
     end
   end
