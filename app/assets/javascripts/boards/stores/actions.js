@@ -238,8 +238,10 @@ export default {
     dispatch('updateList', { listId, position: newPosition, backupList });
   },
 
-  updateList: ({ commit, state }, { listId, position, collapsed, backupList }) => {
-    const { issuableType } = state;
+  updateList: (
+    { commit, state: { issuableType } },
+    { listId, position, collapsed, backupList },
+  ) => {
     gqlClient
       .mutate({
         mutation: updateListQueries[issuableType].mutation,
