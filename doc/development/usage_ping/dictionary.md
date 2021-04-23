@@ -3018,7 +3018,7 @@ Group: `group::monitor`
 
 Status: `data_available`
 
-Tiers: `free`
+Tiers: `free`, `premium`, `ultimate`
 
 ### `counts.operations_dashboard_users_with_projects_added`
 
@@ -3030,7 +3030,7 @@ Group: `group::monitor`
 
 Status: `data_available`
 
-Tiers: `free`
+Tiers: `free`, `premium`, `ultimate`
 
 ### `counts.package_events_i_package_composer_delete_package`
 
@@ -15564,7 +15564,7 @@ Tiers:
 
 ### `usage_activity_by_stage.monitor.clusters`
 
-Total GitLab Managed clusters both enabled and disabled
+Users creating clusters.
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/20210216180945_clusters.yml)
 
@@ -15572,11 +15572,11 @@ Group: `group::monitor`
 
 Status: `data_available`
 
-Tiers: `free`
+Tiers: `free`, `premium`, `ultimate`
 
 ### `usage_activity_by_stage.monitor.clusters_applications_prometheus`
 
-Total GitLab Managed clusters with Prometheus enabled
+Users creating clusters with Prometheus enabled.
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/20210216180947_clusters_applications_prometheus.yml)
 
@@ -15584,7 +15584,7 @@ Group: `group::monitor`
 
 Status: `data_available`
 
-Tiers: `free`
+Tiers: `free`, `premium`, `ultimate`
 
 ### `usage_activity_by_stage.monitor.operations_dashboard_default_dashboard`
 
@@ -15596,7 +15596,7 @@ Group: `group::monitor`
 
 Status: `data_available`
 
-Tiers: `free`
+Tiers: `free`, `premium`
 
 ### `usage_activity_by_stage.monitor.operations_dashboard_users_with_projects_added`
 
@@ -15608,7 +15608,7 @@ Group: `group::monitor`
 
 Status: `data_available`
 
-Tiers: `free`
+Tiers: `free`, `premium`, `ultimate`
 
 ### `usage_activity_by_stage.monitor.projects_incident_sla_enabled`
 
@@ -17496,7 +17496,7 @@ Tiers:
 
 ### `usage_activity_by_stage_monthly.monitor.clusters`
 
-Total GitLab Managed clusters both enabled and disabled
+Count users creating clusters in last 28 days.
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_28d/20210216180956_clusters.yml)
 
@@ -17504,11 +17504,11 @@ Group: `group::monitor`
 
 Status: `data_available`
 
-Tiers: `free`
+Tiers: `free`, `premium`, `ultimate`
 
 ### `usage_activity_by_stage_monthly.monitor.clusters_applications_prometheus`
 
-Total GitLab Managed clusters with Prometheus enabled
+Users creating clusters with Prometheus enabled in last 28 days.
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_28d/20210216180958_clusters_applications_prometheus.yml)
 
@@ -17516,7 +17516,7 @@ Group: `group::monitor`
 
 Status: `data_available`
 
-Tiers: `free`
+Tiers: `free`, `premium`, `ultimate`
 
 ### `usage_activity_by_stage_monthly.monitor.operations_dashboard_default_dashboard`
 
@@ -17528,7 +17528,7 @@ Group: `group::monitor`
 
 Status: `data_available`
 
-Tiers: `free`
+Tiers: `free`, `premium`, `ultimate`
 
 ### `usage_activity_by_stage_monthly.monitor.operations_dashboard_users_with_projects_added`
 
@@ -17540,7 +17540,7 @@ Group: `group::monitor`
 
 Status: `data_available`
 
-Tiers: `free`
+Tiers: `free`, `premium`, `ultimate`
 
 ### `usage_activity_by_stage_monthly.monitor.projects_incident_sla_enabled`
 
