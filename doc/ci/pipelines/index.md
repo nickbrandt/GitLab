@@ -355,7 +355,7 @@ You can group the jobs by:
   ![jobs grouped by needs dependency](pipelines_graph_dependency_view_v13_12.png)
 
   To add lines that show the `needs` relationships between jobs, toggle **Show dependencies.
-  These lines are similar to the [needs visualization](../directed_acyclic_graph/index.md#needs_visualization):
+  These lines are similar to the [needs visualization](../directed_acyclic_graph/index.md#needs-visualization):
 
   ![jobs grouped by needs dependency with lines displayed](pipelines_graph_dependency_view_links_v13_12.png)
 
@@ -363,6 +363,10 @@ You can group the jobs by:
 
   ![single job dependency tree highlighted](pipelines_graph_dependency_view_hover_v13_12.png)
 
+NOTE:
+The **Job dependencies** view is [deployed behind a feature flag](../../user/feature_flags.md),
+enabled by default. To disable this view on self-managed GitLab instances, administrators can
+[disable the `pipeline_graph_layers_view` feature flag](../../administration/feature_flags.md).
 
 [Multi-project pipeline graphs](../multi_project_pipelines.md#multi-project-pipeline-visualization) help
 you visualize the entire pipeline, including all cross-project inter-dependencies. **(PREMIUM)**
