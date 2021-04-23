@@ -18,7 +18,6 @@ export const initSecurityConfiguration = (el) => {
     containerScanningHelpPath,
     dependencyScanningHelpPath,
     toggleAutofixSettingEndpoint,
-    projectPath,
     gitlabCiHistoryPath,
   } = el.dataset;
 
@@ -26,9 +25,6 @@ export const initSecurityConfiguration = (el) => {
     el,
     components: {
       SecurityConfigurationApp,
-    },
-    provide: {
-      projectPath,
     },
     render(createElement) {
       return createElement(SecurityConfigurationApp, {

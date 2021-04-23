@@ -1,7 +1,6 @@
 <script>
 import { propsUnion } from '~/vue_shared/components/lib/utils/props_utils';
 import glFeatureFlagMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
-import ManageViaMr from '~/vue_shared/security_configuration/components/manage_via_mr.vue';
 import {
   REPORT_TYPE_DAST_PROFILES,
   REPORT_TYPE_DEPENDENCY_SCANNING,
@@ -9,6 +8,7 @@ import {
 } from '~/vue_shared/security_reports/constants';
 import ManageDastProfiles from './manage_dast_profiles.vue';
 import ManageGeneric from './manage_generic.vue';
+import ManageViaMr from './manage_via_mr.vue';
 
 const scannerComponentMap = {
   [REPORT_TYPE_DAST_PROFILES]: ManageDastProfiles,

@@ -1,4 +1,4 @@
-import { scanners } from '~/security_configuration/components/constants';
+import { scanners } from '~/security_configuration/components/scanners_constants';
 
 export const generateFeatures = (n, overrides = {}) => {
   return [...Array(n).keys()].map((i) => ({

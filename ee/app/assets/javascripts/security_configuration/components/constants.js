@@ -1,5 +1,4 @@
 import { s__ } from '~/locale';
-import { featureToMutationMap as featureToMutationMapCE } from '~/security_configuration/components/constants';
 import {
   REPORT_TYPE_DEPENDENCY_SCANNING,
   REPORT_TYPE_SECRET_DETECTION,
@@ -24,21 +23,12 @@ export const CUSTOM_VALUE_MESSAGE = s__(
 );
 
 export const featureToMutationMap = {
-  ...featureToMutationMapCE,
   [REPORT_TYPE_DEPENDENCY_SCANNING]: {
-    mutationId: 'configureDependencyScanning',
-    getMutationPayload: (projectPath) => ({
-      mutation: configureDependencyScanningMutation,
-      variables: {
-        fullPath: projectPath,
-      },
-    }),
+    type: 'configureDependencyScanning',
+    mutation: configureDependencyScanningMutation,
   },
   [REPORT_TYPE_SECRET_DETECTION]: {
-    mutationId: 'configureSecretDetection',
-    getMutationPayload: (projectPath) => ({
-      mutation: configureSecretDetectionMutation,
-      variables: { fullPath: projectPath },
-    }),
+    type: 'configureSecretDetection',
+    mutation: configureSecretDetectionMutation,
   },
 };
