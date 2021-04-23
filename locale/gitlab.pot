@@ -9334,6 +9334,9 @@ msgstr ""
 msgid "Create tag %{tagName}"
 msgstr ""
 
+msgid "Create user"
+msgstr ""
+
 msgid "Create wildcard: %{searchTerm}"
 msgstr ""
 
@@ -27234,6 +27237,9 @@ msgstr ""
 msgid "Reset key"
 msgstr ""
 
+msgid "Reset link will be generated and sent to the user. %{break} User will be forced to set the password on first sign in."
+msgstr ""
+
 msgid "Reset password"
 msgstr ""
 
@@ -38195,6 +38201,9 @@ msgstr[0] ""
 msgstr[1] ""
 
 msgid "repository:"
+msgstr ""
+
+msgid "required"
 msgstr ""
 
 msgid "reset it."
