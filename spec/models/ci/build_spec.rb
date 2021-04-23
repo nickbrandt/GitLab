@@ -3,8 +3,6 @@
 require 'spec_helper'
 
 RSpec.describe Ci::Build do
-  include AfterNextHelpers
-
   let_it_be(:user) { create(:user) }
   let_it_be(:group, reload: true) { create(:group) }
   let_it_be(:project, reload: true) { create(:project, :repository, group: group) }
@@ -4716,7 +4714,9 @@ RSpec.describe Ci::Build do
       end
 
       it 'executes services' do
-        expect_any_instance_of(Service).to receive(:async_execute)
+        allow_next_found_instance_of(Service) do |service|
+          expect(service).to receive(:async_execute)
+        end
 
         build.execute_hooks
       end
@@ -4728,7 +4728,9 @@ RSpec.describe Ci::Build do
       end
 
       it 'does not execute services' do
-        expect_any_instance_of(Service).not_to receive(:async_execute)
+        allow_next_found_instance_of(Service) do |service|
+          expect(service).not_to receive(:async_execute)
+        end
 
         build.execute_hooks
       end
