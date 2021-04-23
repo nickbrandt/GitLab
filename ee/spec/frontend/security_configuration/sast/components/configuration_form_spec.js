@@ -10,7 +10,9 @@ import { redirectTo } from '~/lib/utils/url_utility';
 import configureSastMutation from '~/security_configuration/graphql/configure_sast.mutation.graphql';
 import { makeEntities, makeSastCiConfiguration } from '../../helpers';
 
-jest.mock('~/lib/utils/url_utility');
+jest.mock('~/lib/utils/url_utility', () => ({
+  redirectTo: jest.fn(),
+}));
 
 const projectPath = 'group/project';
 const sastAnalyzersDocumentationPath = '/help/sast/analyzers';
