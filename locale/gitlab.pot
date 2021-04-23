@@ -18285,6 +18285,9 @@ msgstr ""
 msgid "Issues closed"
 msgstr ""
 
+msgid "Issues manual ordering is temporarily disabled for technical reasons."
+msgstr ""
+
 msgid "Issues must match this scope to appear in this list."
 msgstr ""
 
