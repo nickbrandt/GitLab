@@ -45,8 +45,7 @@ describe('AlertsList component', () => {
   const findIdColumn = () => wrapper.findByTestId('threat-alerts-id');
   const findEventCountColumn = () => wrapper.findByTestId('threat-alerts-event-count');
   const findIssueColumn = () => wrapper.findByTestId('threat-alerts-issue');
-  const findIssueColumnTextAt = (id) =>
-    wrapper.findAllByTestId('threat-alerts-issue').at(id).text();
+  const findIssueColumnAt = (id) => wrapper.findAllByTestId('threat-alerts-issue').at(id);
   const findStatusColumn = () => wrapper.findComponent(AlertStatus);
   const findStatusColumnHeader = () => wrapper.findByTestId('threat-alerts-status-header');
   const findEmptyState = () => wrapper.findByTestId('threat-alerts-empty-state');
@@ -182,11 +181,26 @@ describe('AlertsList component', () => {
       });
 
       it.each`
-        description                                 | id   | text
-        ${'when an issue is created and is open'}   | ${0} | ${'#5'}
-        ${'when an issue is created and is closed'} | ${1} | ${'#6 (closed)'}
-      `('displays the correct text $description', ({ id, text }) => {
-        expect(findIssueColumnTextAt(id)).toBe(text);
+        description                                 | id   | text             | link
+        ${'when an issue is created and is open'}   | ${0} | ${'#5'}          | ${'/#/-/issues/incident/5'}
+        ${'when an issue is created and is closed'} | ${1} | ${'#6 (closed)'} | ${'/#/-/issues/incident/6'}
+      `('displays the correct text $description', ({ id, text, link }) => {
+        expect(findIssueColumnAt(id).text()).toBe(text);
+        expect(findIssueColumnAt(id).attributes('href')).toBe(link);
+      });
+
+      describe('gon.relative_url_root', () => {
+        beforeAll(() => {
+          gon.relative_url_root = '/test';
+        });
+
+        afterEach(() => {
+          gon.relative_url_root = '';
+        });
+
+        it('creates the correct href when the gon.relative_url_root is set', () => {
+          expect(findIssueColumnAt(0).attributes('href')).toBe('/test/#/-/issues/incident/5');
+        });
       });
     });
   });

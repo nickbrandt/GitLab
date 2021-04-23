@@ -131,7 +131,13 @@ export default {
     getIssueMeta({ issue: { iid, state } }) {
       return {
         state: state === 'closed' ? `(${this.$options.i18n.CLOSED})` : '',
-        link: joinPaths(gon.relative_url_root, 'issues/incident', iid),
+        link: joinPaths(
+          gon.relative_url_root || '/',
+          this.projectPath,
+          '-',
+          'issues/incident',
+          iid,
+        ),
       };
     },
     handleAlertError(msg) {
