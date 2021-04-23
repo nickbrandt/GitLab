@@ -152,6 +152,11 @@ RSpec.describe Gitlab::Graphql::Docs::Renderer do
 
     context 'when a field has a documentation reference' do
       let(:type) do
+        wibble = Class.new(::Types::BaseObject) do
+          graphql_name 'Wibble'
+          field :x, ::GraphQL::INT_TYPE, null: false
+        end
+
         Class.new(Types::BaseObject) do
           graphql_name 'DocRefSpec'
           description 'Testing doc refs'
@@ -168,6 +173,11 @@ RSpec.describe Gitlab::Graphql::Docs::Renderer do
                 see: { 'A list of bars' => 'https://example.com/bars' } do
                   argument :barity, ::GraphQL::INT_TYPE, required: false, description: '?'
                 end
+          field :wibbles,
+                type: wibble.connection_type,
+                null: true,
+                description: 'The wibbles',
+                see: { 'wibblance' => 'https://example.com/wibbles' }
         end
       end
 
@@ -182,6 +192,7 @@ RSpec.describe Gitlab::Graphql::Docs::Renderer do
           | Name | Type | Description |
           | ---- | ---- | ----------- |
           | <a id="docrefspecfoo"></a>`foo` | [`String!`](#string) | The foo. See [A list of foos](https://example.com/foos). |
+          | <a id="docrefspecwibbles"></a>`wibbles` | [`WibbleConnection`](#wibbleconnection) | The wibbles. See [wibblance](https://example.com/wibbles). (see [Connections](#connections)) |
 
           #### Fields with arguments
 
