@@ -23,7 +23,7 @@ module Types
       field :stage, Types::Ci::StageType, null: true,
             description: 'Stage of the job.'
       field :allow_failure, ::GraphQL::BOOLEAN_TYPE, null: false,
-            description: 'Whether this job is allowed to fail.'
+            description: 'Whether the job is allowed to fail.'
       field :duration, GraphQL::INT_TYPE, null: true,
             description: 'Duration of the job in seconds.'
       field :tags, [GraphQL::STRING_TYPE], null: true,
@@ -45,7 +45,7 @@ module Types
       field :queued_duration,
             type: Types::DurationType,
             null: true,
-            description: 'How long this job was enqueued before starting.'
+            description: 'How long the job was enqueued before starting.'
 
       field :detailed_status, Types::Ci::DetailedStatusType, null: true,
             description: 'Detailed status of the job.'
