@@ -96,7 +96,8 @@ describe('DiffRow', () => {
     expect(wrapper.vm.isHighlighted).toBe(false);
   });
 
-  const getCommentButton = (wrapper, side) => wrapper.find(`[data-testid="${side}CommentButton"]`);
+  const getCommentButton = (wrapper, side) =>
+    wrapper.find(`[data-testid="${side}-comment-button"]`);
 
   describe.each`
     side
@@ -105,8 +106,8 @@ describe('DiffRow', () => {
   `('$side side', ({ side }) => {
     it(`renders empty cells if ${side} is unavailable`, () => {
       const wrapper = createWrapper({ props: { line: testLines[2], inline: false } });
-      expect(wrapper.find(`[data-testid="${side}LineNumber"]`).exists()).toBe(false);
-      expect(wrapper.find(`[data-testid="${side}EmptyCell"]`).exists()).toBe(true);
+      expect(wrapper.find(`[data-testid="${side}-line-number"]`).exists()).toBe(false);
+      expect(wrapper.find(`[data-testid="${side}-empty-cell"]`).exists()).toBe(true);
     });
 
     describe('comment button', () => {
@@ -157,7 +158,7 @@ describe('DiffRow', () => {
 
     it('renders avatars', () => {
       const wrapper = createWrapper({ props: { line: testLines[0], inline: false } });
-      expect(wrapper.find(`[data-testid="${side}Discussions"]`).exists()).toBe(true);
+      expect(wrapper.find(`[data-testid="${side}-discussions"]`).exists()).toBe(true);
     });
   });
 

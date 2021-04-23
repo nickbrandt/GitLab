@@ -204,7 +204,7 @@ export default {
       <template v-if="line.left && line.left.type !== $options.CONFLICT_MARKER">
         <div
           :class="classNameMapCellLeft"
-          data-testid="leftLineNumber"
+          data-testid="left-line-number"
           class="diff-td diff-line-num"
         >
           <template v-if="!isLeftConflictMarker">
@@ -215,7 +215,7 @@ export default {
               :title="addCommentTooltipLeft"
             >
               <div
-                data-testid="leftCommentButton"
+                data-testid="left-comment-button"
                 role="button"
                 tabindex="0"
                 :draggable="!line.left.commentsDisabled && glFeatures.dragCommentSelection"
@@ -243,7 +243,7 @@ export default {
             v-if="line.hasDiscussionsLeft"
             :discussions="line.left.discussions"
             :discussions-expanded="line.left.discussionsExpanded"
-            data-testid="leftDiscussions"
+            data-testid="left-discussions"
             @toggleLineDiscussions="
               toggleLineDiscussions({
                 lineCode: line.left.line_code,
@@ -273,7 +273,7 @@ export default {
           :key="line.left.line_code"
           :class="[parallelViewLeftLineType, { parallel: !inline }]"
           class="diff-td line_content with-coverage left-side"
-          data-testid="leftContent"
+          data-testid="left-content"
           @mousedown="handleParallelLineMouseDown"
         >
           <strong v-if="isLeftConflictMarker">{{ conflictText(line.left) }}</strong>
@@ -282,7 +282,7 @@ export default {
       </template>
       <template v-else-if="!inline || (line.left && line.left.type === $options.CONFLICT_MARKER)">
         <div
-          data-testid="leftEmptyCell"
+          data-testid="left-empty-cell"
           class="diff-td diff-line-num old_line empty-cell"
           :class="emptyCellLeftClassMap"
         >
@@ -322,7 +322,7 @@ export default {
               :title="addCommentTooltipRight"
             >
               <div
-                data-testid="rightCommentButton"
+                data-testid="right-comment-button"
                 role="button"
                 tabindex="0"
                 :draggable="!line.right.commentsDisabled && glFeatures.dragCommentSelection"
@@ -349,7 +349,7 @@ export default {
             v-if="line.hasDiscussionsRight"
             :discussions="line.right.discussions"
             :discussions-expanded="line.right.discussionsExpanded"
-            data-testid="rightDiscussions"
+            data-testid="right-discussions"
             @toggleLineDiscussions="
               toggleLineDiscussions({
                 lineCode: line.right.line_code,
@@ -391,7 +391,7 @@ export default {
       </template>
       <template v-else>
         <div
-          data-testid="rightEmptyCell"
+          data-testid="right-empty-cell"
           class="diff-td diff-line-num old_line empty-cell"
           :class="emptyCellRightClassMap"
         ></div>
