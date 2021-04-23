@@ -11657,6 +11657,9 @@ msgstr ""
 msgid "Dynamic Application Security Testing (DAST)"
 msgstr ""
 
+msgid "E-mail:"
+msgstr ""
+
 msgid "Each project can also have an issue tracker and a wiki."
 msgstr ""
 
@@ -19259,6 +19262,9 @@ msgstr ""
 msgid "LinkedIn"
 msgstr ""
 
+msgid "LinkedIn:"
+msgstr ""
+
 msgid "LinkedPipelines|%{counterLabel} more downstream pipelines"
 msgstr ""
 
@@ -19344,6 +19350,9 @@ msgid "Localization"
 msgstr ""
 
 msgid "Location"
+msgstr ""
+
+msgid "Location:"
 msgstr ""
 
 msgid "Lock"
@@ -19851,6 +19860,9 @@ msgid "Medium vulnerabilities present"
 msgstr ""
 
 msgid "Member lock"
+msgstr ""
+
+msgid "Member since"
 msgstr ""
 
 msgid "Member since %{date}"
@@ -29460,6 +29472,9 @@ msgstr ""
 msgid "Skipped deployment to"
 msgstr ""
 
+msgid "Skype:"
+msgstr ""
+
 msgid "Slack application"
 msgstr ""
 
@@ -33591,6 +33606,9 @@ msgstr ""
 msgid "Twitter"
 msgstr ""
 
+msgid "Twitter:"
+msgstr ""
+
 msgid "Two-Factor Authentication"
 msgstr ""
 
@@ -35597,6 +35615,9 @@ msgid "Webhooks|Use this token to validate received payloads. It is sent with th
 msgstr ""
 
 msgid "Webhooks|Wiki page events"
+msgstr ""
+
+msgid "Website:"
 msgstr ""
 
 msgid "Wednesday"
