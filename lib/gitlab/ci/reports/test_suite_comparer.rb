@@ -85,12 +85,14 @@ module Gitlab
           new_errors.count + existing_errors.count
         end
 
+        TestSummary = Struct.new(:new_failures, :existing_failures, :resolved_failures, :new_errors, :existing_errors, :resolved_errors, keyword_init: true)
+
         # This is used to limit the presented test cases but does not affect
         # total count of tests in the summary
         def limited_tests
           strong_memoize(:limited_tests) do
             # rubocop: disable CodeReuse/ActiveRecord
-            OpenStruct.new(
+            TestSummary.new(
               new_failures: new_failures.take(max_tests),
               existing_failures: existing_failures.take(max_tests(new_failures)),
               resolved_failures: resolved_failures.take(max_tests(new_failures, existing_failures)),
