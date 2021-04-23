@@ -2,10 +2,10 @@
 stage: none
 group: unassigned
 comments: false
-description: 'Improvements to CI/CD builds data storage model'
+description: 'Improve scalability of GitLab CI/CD'
 ---
 
-# Next CI/CD scale target: 20M builds per day
+# Next CI/CD scale target: 20M builds per day by 2024
 
 ## Summary
 
