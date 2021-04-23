@@ -33148,6 +33148,9 @@ msgstr ""
 msgid "To keep this project going, create a new merge request"
 msgstr ""
 
+msgid "To learn more about this project, read %{link_to_wiki}."
+msgstr ""
+
 msgid "To link Sentry to GitLab, enter your Sentry URL and Auth Token."
 msgstr ""
 
@@ -38315,6 +38318,9 @@ msgid "the correct format."
 msgstr ""
 
 msgid "the following issue(s)"
+msgstr ""
+
+msgid "the wiki"
 msgstr ""
 
 msgid "this document"
