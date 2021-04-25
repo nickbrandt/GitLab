@@ -10,7 +10,7 @@ module Gitlab
       Gitlab::SafeRequestStore[:peek_enabled]
     end
 
-    def self.enabled_for_user?(user = nil)
+    def self.allowed_for_user?(user = nil)
       return true if Rails.env.development?
       return true if user&.admin?
       return false unless user && allowed_group_id
