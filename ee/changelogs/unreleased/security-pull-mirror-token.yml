@@ -1,0 +1,5 @@
+---
+title: Do not expose pull mirror username and password
+merge_request:
+author:
+type: security
