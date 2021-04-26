@@ -25,7 +25,7 @@ class EnsureU2fRegistrationsMigrated < ActiveRecord::Migration[6.0]
         .each_batch(of: BATCH_SIZE) do |batch, index|
       batch.each do |record|
         Gitlab::BackgroundMigration::MigrateU2fWebauthn.new.perform(record.id, record.id)
-      rescue => e
+      rescue StandardError => e
         Gitlab::ErrorTracking.track_exception(e, u2f_registration_id: record.id)
       end
     end
