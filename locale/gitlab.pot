@@ -12173,6 +12173,9 @@ msgstr ""
 msgid "Enable usage ping"
 msgstr ""
 
+msgid "Enable version check"
+msgstr ""
+
 msgid "EnableReviewApp|%{stepStart}Step 1%{stepEnd}. Ensure you have Kubernetes set up and have a base domain for your %{linkStart}cluster%{linkEnd}."
 msgstr ""
 
@@ -14945,6 +14948,9 @@ msgid "GitLab uses %{linkStart}Sidekiq%{linkEnd} to process background jobs"
 msgstr ""
 
 msgid "GitLab version"
+msgstr ""
+
+msgid "GitLab will inform you if a new version is available."
 msgstr ""
 
 msgid "GitLab will periodically run %{link_to_git_fsck} in all project and wiki repositories to look for silent disk corruption issues."
