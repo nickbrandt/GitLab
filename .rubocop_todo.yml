@@ -893,13 +893,6 @@ Style/RedundantSelf:
 Style/RescueModifier:
   Enabled: false
 
-# Offense count: 359
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: implicit, explicit
-Style/RescueStandardError:
-  Enabled: false
-
 # Offense count: 123
 # Cop supports --auto-correct.
 Style/SingleArgumentDig:

@@ -69,7 +69,7 @@ class ProjectMember < Member
       end
 
       true
-    rescue
+    rescue StandardError
       false
     end
 
