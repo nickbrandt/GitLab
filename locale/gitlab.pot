@@ -11825,6 +11825,9 @@ msgstr ""
 msgid "Edit title and description"
 msgstr ""
 
+msgid "Edit user: %{user_name}"
+msgstr ""
+
 msgid "Edit wiki page"
 msgstr ""
 
