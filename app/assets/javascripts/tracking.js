@@ -165,7 +165,7 @@ export default class Tracking {
     const enabler = () => window.snowplow('enableFormTracking', config, contexts);
 
     if (document.readyState !== 'loading') enabler();
-    // else document.addEventListener('DOMContentLoaded', enabler)
+    else document.addEventListener('DOMContentLoaded', enabler);
   }
 
   static mixin(opts = {}) {
