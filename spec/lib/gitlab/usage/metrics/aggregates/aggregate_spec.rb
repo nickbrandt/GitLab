@@ -81,7 +81,7 @@ RSpec.describe Gitlab::Usage::Metrics::Aggregates::Aggregate, :clean_gitlab_redi
         end
 
         context 'with OR operator' do
-          let(:operator) { 'OR' }
+          let(:operator) { Gitlab::Usage::Metrics::Aggregates::UNION_OF_AGGREGATED_METRICS }
 
           it 'returns the number of unique events occurred for any metric in aggregate', :aggregate_failures do
             expect(namespace::SOURCES[datasource]).to receive(:calculate_metrics_union).with(params.merge(metric_names: %w[event1 event2 event3])).and_return(5)
@@ -90,9 +90,9 @@ RSpec.describe Gitlab::Usage::Metrics::Aggregates::Aggregate, :clean_gitlab_redi
         end
 
         context 'with AND operator' do
-          let(:operator) { 'AND' }
+          let(:operator) { Gitlab::Usage::Metrics::Aggregates::INTERSECTION_OF_AGGREGATED_METRICS }
 
-          it 'returns the number of unique events occurred for any metric in aggregate', :aggregate_failures do
+          it 'returns the number of unique events that occurred for all of metrics in the aggregate', :aggregate_failures do
             expect(namespace::SOURCES[datasource]).to receive(:calculate_metrics_intersections).with(params.merge(metric_names: %w[event1 event2 event3])).and_return(5)
             expect(aggregated_metrics_data).to eq(results)
           end
