@@ -342,7 +342,7 @@ You can group the jobs by:
 
 - **Stage**: Arrange jobs in the same stage together in the same column.
 
-  ![jobs grouped by stage](pipelines_graph_stage_view_v13_12.png)
+  ![jobs grouped by stage](img/pipelines_graph_stage_view_v13_12.png)
 
 - **Job dependencies**: Arrange jobs based on their [`needs`](../yaml/README.md#needs)
   dependencies. Jobs in the left column run first, and jobs that depend on them are
@@ -352,16 +352,16 @@ You can group the jobs by:
   in the second column. `deploy-job2` depends on jobs in both the first and second column
   and displays in the third column:
 
-  ![jobs grouped by needs dependency](pipelines_graph_dependency_view_v13_12.png)
+  ![jobs grouped by needs dependency](img/pipelines_graph_dependency_view_v13_12.png)
 
   To add lines that show the `needs` relationships between jobs, toggle **Show dependencies.
   These lines are similar to the [needs visualization](../directed_acyclic_graph/index.md#needs-visualization):
 
-  ![jobs grouped by needs dependency with lines displayed](pipelines_graph_dependency_view_links_v13_12.png)
+  ![jobs grouped by needs dependency with lines displayed](img/pipelines_graph_dependency_view_links_v13_12.png)
 
   To see the full `needs` dependency tree for a job, hover over it:
 
-  ![single job dependency tree highlighted](pipelines_graph_dependency_view_hover_v13_12.png)
+  ![single job dependency tree highlighted](img/pipelines_graph_dependency_view_hover_v13_12.png)
 
 NOTE:
 The **Job dependencies** view is [deployed behind a feature flag](../../user/feature_flags.md),
