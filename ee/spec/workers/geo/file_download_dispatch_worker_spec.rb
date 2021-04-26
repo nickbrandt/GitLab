@@ -38,7 +38,7 @@ RSpec.describe Geo::FileDownloadDispatchWorker, :geo, :use_sql_query_cache_for_t
     create(:lfs_object, :with_file)
 
     secondary.enabled = false
-    secondary.save
+    secondary.save!
 
     expect(Geo::FileDownloadWorker).not_to receive(:perform_async)
 
@@ -76,7 +76,7 @@ RSpec.describe Geo::FileDownloadDispatchWorker, :geo, :use_sql_query_cache_for_t
     expect(Geo::FileDownloadWorker).to receive(:perform_async).with('lfs', lfs_object_1.id).once do
       Thread.new do
         # Rails will invalidate the query cache if the update happens in the same thread
-        Geo::LfsObjectRegistry.update(success: true)
+        Geo::LfsObjectRegistry.update(success: true) # rubocop:disable Rails/SaveBang
       end
     end
 
