@@ -14,6 +14,8 @@ module AppSec
           return ServiceResponse.error(message: _('Cannot delete %{profile_name} referenced in security policy') % { profile_name: dast_site_profile.name }) if referenced_in_security_policy?(dast_site_profile)
 
           if dast_site_profile.destroy
+            audit_deletion(dast_site_profile)
+
             ServiceResponse.success(payload: dast_site_profile)
           else
             ServiceResponse.error(message: _('Site profile failed to delete'))
@@ -36,6 +38,15 @@ module AppSec
 
         def find_dast_site_profile(id)
           project.dast_site_profiles.id_in(id).first
+        end
+
+        def audit_deletion(profile)
+          AuditEventService.new(current_user, project, {
+            remove: 'DAST site profile',
+            target_id: profile.id,
+            target_type: 'DastSiteProfile',
+            target_details: profile.name
+          }).security_event
         end
       end
     end
