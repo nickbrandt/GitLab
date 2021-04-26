@@ -140,8 +140,6 @@ Rails/SaveBang:
     - 'spec/controllers/boards/issues_controller_spec.rb'
     - 'spec/controllers/sent_notifications_controller_spec.rb'
     - 'spec/controllers/sessions_controller_spec.rb'
-    - 'spec/frontend/fixtures/issues.rb'
-    - 'spec/frontend/fixtures/merge_requests.rb'
     - 'spec/lib/after_commit_queue_spec.rb'
     - 'spec/lib/backup/manager_spec.rb'
     - 'spec/lib/gitlab/alerting/alert_spec.rb'
