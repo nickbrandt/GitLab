@@ -153,3 +153,5 @@ export const mockPageInfo = {
   hasPreviousPage: false,
   startCursor: 'eyJpZCI6IjM5Iiwic3RhcnRlZF9hdCI6IjIwMjAtMTItMDQgMTg6MDE6MDcuNzY1ODgyMDAwIFVUQyJ9',
 };
+
+export const mockAlertDetails = { iid: '01', issue: { iid: '02' }, title: 'dropingress' };

@@ -72,3 +72,15 @@ export const DEBOUNCE = 250;
 export const ALL = { key: 'ALL', value: __('All') };
 
 export const CLOSED = __('closed');
+
+export const HIDDEN_VALUES = [
+  '__typename',
+  'assignees',
+  'details',
+  'iid',
+  'issue',
+  'notes',
+  'severity',
+  'status',
+  'todos',
+];
