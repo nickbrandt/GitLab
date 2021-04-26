@@ -1,0 +1,5 @@
+---
+title: Remove migrate_user_mentions feature flag
+merge_request: 60322
+author:
+type: other

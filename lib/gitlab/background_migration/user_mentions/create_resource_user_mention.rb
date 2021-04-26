@@ -12,8 +12,6 @@ module Gitlab
         ISOLATION_MODULE = 'Gitlab::BackgroundMigration::UserMentions::Models'
 
         def perform(resource_model, join, conditions, with_notes, start_id, end_id)
-          return unless Feature.enabled?(:migrate_user_mentions, default_enabled: true)
-
           resource_model = "#{ISOLATION_MODULE}::#{resource_model}".constantize if resource_model.is_a?(String)
           model = with_notes ? Gitlab::BackgroundMigration::UserMentions::Models::Note : resource_model
           resource_user_mention_model = resource_model.user_mention_model
