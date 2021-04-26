@@ -186,6 +186,13 @@ Potential resolutions:
 1. If `scope=api` is missing from the URL, edit the
    [GitLab account configuration](#configure-a-gitlab-application-for-dvcs). Review
    the **Scopes** field and ensure the `api` check box is selected.
+1. If the URL includes `scope=repo`, this indicates that your DVCS account is configured
+   to use the **GitHub** or **GitHub Enterprise** host type. To resolve this, change
+   the host type to **GitLab** or
+  <!-- vale gitlab.Substitutions = NO -->
+   **GitLab Self-Hosted**
+  <!-- vale gitlab.Substitutions = YES -->
+  which are available in Jira versions 8.14 and later.
 
 ### Jira error adding account and no repositories listed
 
