@@ -2,12 +2,12 @@
 
 module Types
   module MergeRequests
-    class ReviewerType < ::Types::UserType
+    class AssigneeType < ::Types::UserType
       include FindClosest
       include ::Types::MergeRequests::InteractsWithMergeRequest
 
-      graphql_name 'MergeRequestReviewer'
-      description 'A user assigned to a merge request as a reviewer.'
+      graphql_name 'MergeRequestAssignee'
+      description 'A user assigned to a merge request.'
       authorize :read_user
     end
   end
