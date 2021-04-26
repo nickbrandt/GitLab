@@ -628,11 +628,6 @@ Rails/SquishedSQLHeredocs:
 
 # Offense count: 44
 # Cop supports --auto-correct.
-Rails/WhereEquals:
-  Enabled: false
-
-# Offense count: 44
-# Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle.
 # SupportedStyles: exists, where
 Rails/WhereExists:
