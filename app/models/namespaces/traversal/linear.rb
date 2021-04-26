@@ -66,6 +66,7 @@ module Namespaces
 
       def ancestors(hierarchy_order: nil)
         return super() unless use_traversal_ids?
+        return super() unless Feature.enabled?(:use_traversal_ids_for_ancestors, root_ancestor, default_enabled: :yaml)
 
         return self.class.none if parent_id.blank?
 

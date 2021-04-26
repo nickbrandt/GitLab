@@ -455,10 +455,18 @@ RSpec.describe Group do
 
       describe '#ancestors' do
         it { expect(group.ancestors.to_sql).to include 'traversal_ids <@' }
-      end
 
-      it 'hierarchy order' do
-        expect(group.ancestors(hierarchy_order: :asc).to_sql).to include 'ORDER BY "depth" ASC'
+        it 'hierarchy order' do
+          expect(group.ancestors(hierarchy_order: :asc).to_sql).to include 'ORDER BY "depth" ASC'
+        end
+
+        context 'ancestor linear queries feature flag disabled' do
+          before do
+            stub_feature_flags(use_traversal_ids_for_ancestors: false)
+          end
+
+          it { expect(group.ancestors.to_sql).not_to include 'traversal_ids <@' }
+        end
       end
     end
   end
