@@ -601,7 +601,6 @@ RSpec/EmptyLineAfterFinalLetItBe:
     - ee/spec/services/dast_scanner_profiles/destroy_service_spec.rb
     - ee/spec/services/dast_scanner_profiles/update_service_spec.rb
     - ee/spec/services/dast_site_profiles/destroy_service_spec.rb
-    - ee/spec/services/dora/aggregate_metrics_service_spec.rb
     - ee/spec/services/external_approval_rules/create_service_spec.rb
     - ee/spec/services/external_approval_rules/destroy_service_spec.rb
     - ee/spec/services/external_approval_rules/update_service_spec.rb
