@@ -13801,6 +13801,14 @@ msgstr ""
 msgid "FeatureFlag|User List"
 msgstr ""
 
+msgid "FeatureHighlight|%{daysRemaining} day remaining to enjoy %{featureName}"
+msgid_plural "FeatureHighlight|%{daysRemaining} days remaining to enjoy %{featureName}"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "FeatureHighlight|Enjoying your GitLab %{planNameForTrial} trial? To continue using %{featureName} after your trial ends, upgrade to GitLab %{planNameForUpgrade}."
+msgstr ""
+
 msgid "Feb"
 msgstr ""
 
