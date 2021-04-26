@@ -33,10 +33,7 @@ class ProjectNoteEntity < NoteEntity
     delete_attachment_project_note_path(note.project, note)
   end
 
-  expose :diff_note_diff_path, if: -> (note, _) { note.type == "DiffNote" } do |note|
-    project_blob_diff_path(
-      note.project,
-      "#{note.original_position.head_sha}/#{note.original_position.file_path}"
-    )
+  expose :diff_note_batch_diffs_path, if: -> (note, _) { note.is_a?(DiffNote) && note.noteable } do |note|
+    diffs_batch_project_json_merge_request_path(note.project, note.noteable, 'json', {})
   end
 end

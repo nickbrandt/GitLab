@@ -154,6 +154,7 @@ export default {
               v-for="note in replies"
               :key="note.id"
               :note="componentData(note)"
+              :discussion-file="discussion.diff_file"
               :help-page-path="helpPagePath"
               :line="line"
               @handleDeleteNote="$emit('deleteNote')"

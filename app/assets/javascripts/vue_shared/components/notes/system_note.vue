@@ -63,6 +63,11 @@ export default {
       type: Object,
       required: true,
     },
+    discussionFile: {
+      type: Object,
+      required: false,
+      default: null,
+    },
   },
   data() {
     return {
@@ -121,8 +126,9 @@ export default {
         this.changedLinesError = false;
         const startPosition = this.note.position.line_range.start;
         const endPosition = this.note.position.line_range.end;
-        const url = /href="(.*)"/.exec(this.note.note_html);
-        const changedLines = await Api.changedDiff(url[1]);
+        let url = `${this.note.diff_note_batch_diffs_path}?diff_head=true&view=inline&w=0&page=0&per_page=5`;
+        if (this.discussionFile) url = `${url}&paths[]=${this.discussionFile.file_path}`;
+        const changedLines = await Api.changedDiff(url);
         const diffLines = changedLines.diff_files[0].highlighted_diff_lines;
         const getIndex = (position) => (line) => {
           if (!line.type === 'match') return false;
@@ -130,8 +136,8 @@ export default {
           return line.new_line === position.new_line;
         };
 
-        const startIndex = diffLines.findIndex(getIndex(startPosition));
-        const endIndex = diffLines.findIndex(getIndex(endPosition));
+        const startIndex = diffLines.findIndex(getIndex(startPosition)) - 2;
+        const endIndex = diffLines.findIndex(getIndex(endPosition)) + 2;
 
         this.changedLines = changedLines.diff_files[0].highlighted_diff_lines.slice(
           startIndex,
