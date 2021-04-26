@@ -117,7 +117,7 @@ module GitalySetup
 
     begin
       try_connect!(service)
-    rescue
+    rescue StandardError
       Process.kill('TERM', pid)
       raise
     end
