@@ -60,7 +60,6 @@ Rails/SaveBang:
     - 'ee/spec/lib/gitlab/git_access_spec.rb'
     - 'ee/spec/lib/gitlab/import_export/group/relation_factory_spec.rb'
     - 'ee/spec/lib/gitlab/mirror_spec.rb'
-    - 'ee/spec/mailers/notify_spec.rb'
     - 'ee/spec/models/application_setting_spec.rb'
     - 'ee/spec/models/approval_merge_request_rule_spec.rb'
     - 'ee/spec/models/approval_project_rule_spec.rb'
