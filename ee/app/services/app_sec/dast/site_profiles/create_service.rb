@@ -25,6 +25,8 @@ module AppSec
             create_secret_variable!(::Dast::SiteProfileSecretVariable::PASSWORD, params[:auth_password])
             create_secret_variable!(::Dast::SiteProfileSecretVariable::REQUEST_HEADERS, params[:request_headers])
 
+            audit_creation
+
             ServiceResponse.success(payload: dast_site_profile)
           end
         rescue Rollback => e
@@ -51,6 +53,15 @@ module AppSec
           raise Rollback, response.errors if response.error?
 
           response
+        end
+
+        def audit_creation
+          AuditEventService.new(current_user, project, {
+            add: 'DAST site profile',
+            target_id: @dast_site_profile.id,
+            target_type: 'DastSiteProfile',
+            target_details: @dast_site_profile.name
+          }).security_event
         end
       end
     end
