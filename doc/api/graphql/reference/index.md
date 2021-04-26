@@ -8475,7 +8475,6 @@ four standard [pagination arguments](#connection-pagination-arguments):
 | <a id="groupmentionsdisabled"></a>`mentionsDisabled` | [`Boolean`](#boolean) | Indicates if a group is disabled from getting mentioned. |
 | <a id="groupname"></a>`name` | [`String!`](#string) | Name of the namespace. |
 | <a id="grouppackagesettings"></a>`packageSettings` | [`PackageSettings`](#packagesettings) | The package settings for the namespace. |
-| <a id="grouppackages"></a>`packages` | [`PackageConnection`](#packageconnection) | Packages of the group. |
 | <a id="groupparent"></a>`parent` | [`Group`](#group) | Parent group. |
 | <a id="grouppath"></a>`path` | [`String!`](#string) | Path of the namespace. |
 | <a id="groupprojectcreationlevel"></a>`projectCreationLevel` | [`String`](#string) | The permission level required to create projects in the group. |
@@ -8827,6 +8826,22 @@ four standard [pagination arguments](#connection-pagination-arguments):
 | <a id="groupmilestonesstate"></a>`state` | [`MilestoneStateEnum`](#milestonestateenum) | Filter milestones by state. |
 | <a id="groupmilestonestimeframe"></a>`timeframe` | [`Timeframe`](#timeframe) | List items overlapping the given timeframe. |
 | <a id="groupmilestonestitle"></a>`title` | [`String`](#string) | The title of the milestone. |
+
+##### `Group.packages`
+
+Packages of the group.
+
+Returns [`PackageConnection`](#packageconnection).
+
+This field returns a [connection](#connections). It accepts the
+four standard [pagination arguments](#connection-pagination-arguments):
+`before: String`, `after: String`, `first: Int`, `last: Int`.
+
+###### Arguments
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| <a id="grouppackagessort"></a>`sort` | [`PackageGroupSort`](#packagegroupsort) | Sort packages by this criteria. |
 
 ##### `Group.projects`
 
@@ -10323,7 +10338,6 @@ Represents vulnerability finding of a security report on the pipeline.
 | <a id="projectonlyallowmergeifalldiscussionsareresolved"></a>`onlyAllowMergeIfAllDiscussionsAreResolved` | [`Boolean`](#boolean) | Indicates if merge requests of the project can only be merged when all the discussions are resolved. |
 | <a id="projectonlyallowmergeifpipelinesucceeds"></a>`onlyAllowMergeIfPipelineSucceeds` | [`Boolean`](#boolean) | Indicates if merge requests of the project can only be merged with successful jobs. |
 | <a id="projectopenissuescount"></a>`openIssuesCount` | [`Int`](#int) | Number of open issues for the project. |
-| <a id="projectpackages"></a>`packages` | [`PackageConnection`](#packageconnection) | Packages of the project. |
 | <a id="projectpath"></a>`path` | [`String!`](#string) | Path of the project. |
 | <a id="projectpipelineanalytics"></a>`pipelineAnalytics` | [`PipelineAnalytics`](#pipelineanalytics) | Pipeline analytics. |
 | <a id="projectprintingmergerequestlinkenabled"></a>`printingMergeRequestLinkEnabled` | [`Boolean`](#boolean) | Indicates if a link to create or view a merge request should display after a push to Git repositories of the project from the command line. |
@@ -10822,6 +10836,22 @@ four standard [pagination arguments](#connection-pagination-arguments):
 | <a id="projectmilestonesstate"></a>`state` | [`MilestoneStateEnum`](#milestonestateenum) | Filter milestones by state. |
 | <a id="projectmilestonestimeframe"></a>`timeframe` | [`Timeframe`](#timeframe) | List items overlapping the given timeframe. |
 | <a id="projectmilestonestitle"></a>`title` | [`String`](#string) | The title of the milestone. |
+
+##### `Project.packages`
+
+Packages of the project.
+
+Returns [`PackageConnection`](#packageconnection).
+
+This field returns a [connection](#connections). It accepts the
+four standard [pagination arguments](#connection-pagination-arguments):
+`before: String`, `after: String`, `first: Int`, `last: Int`.
+
+###### Arguments
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| <a id="projectpackagessort"></a>`sort` | [`PackageSort`](#packagesort) | Sort packages by this criteria. |
 
 ##### `Project.pipeline`
 
@@ -13584,6 +13614,36 @@ Rotation length unit of an on-call rotation.
 | <a id="oncallrotationunitenumdays"></a>`DAYS` | Days. |
 | <a id="oncallrotationunitenumhours"></a>`HOURS` | Hours. |
 | <a id="oncallrotationunitenumweeks"></a>`WEEKS` | Weeks. |
+
+### `PackageGroupSort`
+
+Values for sorting group packages.
+
+| Value | Description |
+| ----- | ----------- |
+| <a id="packagegroupsortcreated_asc"></a>`CREATED_ASC` | Ordered by created_at in ascending order. |
+| <a id="packagegroupsortcreated_desc"></a>`CREATED_DESC` | Ordered by created_at in descending order. |
+| <a id="packagegroupsortname_asc"></a>`NAME_ASC` | Ordered by name in ascending order. |
+| <a id="packagegroupsortname_desc"></a>`NAME_DESC` | Ordered by name in descending order. |
+| <a id="packagegroupsorttype_asc"></a>`TYPE_ASC` | Ordered by type in ascending order. |
+| <a id="packagegroupsorttype_desc"></a>`TYPE_DESC` | Ordered by type in descending order. |
+| <a id="packagegroupsortversion_asc"></a>`VERSION_ASC` | Ordered by version in ascending order. |
+| <a id="packagegroupsortversion_desc"></a>`VERSION_DESC` | Ordered by version in descending order. |
+
+### `PackageSort`
+
+Values for sorting package.
+
+| Value | Description |
+| ----- | ----------- |
+| <a id="packagesortcreated_asc"></a>`CREATED_ASC` | Ordered by created_at in ascending order. |
+| <a id="packagesortcreated_desc"></a>`CREATED_DESC` | Ordered by created_at in descending order. |
+| <a id="packagesortname_asc"></a>`NAME_ASC` | Ordered by name in ascending order. |
+| <a id="packagesortname_desc"></a>`NAME_DESC` | Ordered by name in descending order. |
+| <a id="packagesorttype_asc"></a>`TYPE_ASC` | Ordered by type in ascending order. |
+| <a id="packagesorttype_desc"></a>`TYPE_DESC` | Ordered by type in descending order. |
+| <a id="packagesortversion_asc"></a>`VERSION_ASC` | Ordered by version in ascending order. |
+| <a id="packagesortversion_desc"></a>`VERSION_DESC` | Ordered by version in descending order. |
 
 ### `PackageTypeEnum`
 
