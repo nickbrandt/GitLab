@@ -182,7 +182,7 @@ and update existing business analysis artefacts to use `example_metric_without_a
 
 If a metric is obsolete and you no longer use it, you can mark it as deprecated.
 
-For example of metric deprecation process take a look at this [example merge request](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/59899)
+For an example of the metric deprecation process take a look at this [example merge request](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/59899)
 
 To deprecate a metric:
 
@@ -237,19 +237,13 @@ To deprecate a metric:
    module Gitlab
      class UsageData
        DEPRECATED_VALUE = -1000
-       MAX_GENERATION_TIME_FOR_SAAS = 40.hours
 
-       #....
+       def analytics_unique_visits_data
+         results['analytics_unique_visits_for_any_target'] = redis_usage_data { unique_visit_service.unique_visits_for(targets: :analytics) }
+         results['analytics_unique_visits_for_any_target_monthly'] = DEPRECATED_VALUE
 
-         def analytics_unique_visits_data
-           results = ::Gitlab::Analytics::UniqueVisits.analytics_events.each_with_object({}) do |target, hash|
-             hash[target] = redis_usage_data { unique_visit_service.unique_visits_for(targets: target) }
-           end
-           results['analytics_unique_visits_for_any_target'] = redis_usage_data { unique_visit_service.unique_visits_for(targets: :analytics) }
-           results['analytics_unique_visits_for_any_target_monthly'] = DEPRECATED_VALUE
-
-           { analytics_unique_visits: results }
-         end
+         { analytics_unique_visits: results }
+       end
      # ...
      end
    end
@@ -261,7 +255,7 @@ To deprecate a metric:
 
 Only deprecated metrics can be removed from Usage Ping. 
 
-For example of metric removal process take a look at this [example issue](https://gitlab.com/gitlab-org/gitlab/-/issues/297029)
+For an example of the metric removal process take a look at this [example issue](https://gitlab.com/gitlab-org/gitlab/-/issues/297029)
 
 To remove a deprecated metric:
 
@@ -271,7 +265,7 @@ To remove a deprecated metric:
    and persists all Usage Ping reports. To do that you can modify 
    [fixtures](https://gitlab.com/gitlab-services/version-gitlab-com/-/blob/master/spec/support/usage_data_helpers.rb#L540)
    used to test 
-   [`UsageDataController#create`](https://gitlab.com/gitlab-services/version-gitlab-com/-/blob/master/spec/controllers/usage_data_controller_spec.rb#L75)
+   [`UsageDataController#create`](https://gitlab.com/gitlab-services/version-gitlab-com/-/blob/3760ef28/spec/controllers/usage_data_controller_spec.rb#L75)
    endpoint, and assure that test suite does not fail when metric that you wish to remove is not included into test payload.  
 
 1. Create an issue in the
