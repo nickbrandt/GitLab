@@ -68,3 +68,5 @@ export const STATUS_DELAY_THRESHOLD_MS = 600000;
 export const REPOSITORY = 'repository';
 
 export const BLOB = 'blob';
+
+export const REMOVE_NODE_MODAL_ID = 'remove-node-modal';
