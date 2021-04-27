@@ -1,0 +1,5 @@
+---
+title: Fix multiline comments
+merge_request: 60431
+author:
+type: fixed
