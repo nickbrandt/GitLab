@@ -283,6 +283,13 @@ Please view this file on the master branch, on stable branches it's out of date.
 - Remove dast_branch_selection feature flag. !59349
 
 
+## 13.10.4 (2021-04-27)
+
+### Security (1 change)
+
+- Do not expose pull mirror username and password.
+
+
 ## 13.10.3 (2021-04-13)
 
 - No changes.
