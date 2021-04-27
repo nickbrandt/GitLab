@@ -7642,27 +7642,27 @@ Tiers:
 
 ### `redis_hll_counters.ci_templates.p_ci_templates_5_min_production_app_monthly`
 
-Missing description
+Number of projects using 5 min production app CI template in last 7 days.
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_28d/20210216184517_p_ci_templates_5_min_production_app_monthly.yml)
 
-Group: ``
+Group: `group::5-min-app`
 
 Status: `data_available`
 
-Tiers: `free`
+Tiers: `free`, `premium`, `ultimate`
 
 ### `redis_hll_counters.ci_templates.p_ci_templates_5_min_production_app_weekly`
 
-Missing description
+Number of projects using 5 min production app CI template in last 7 days.
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_7d/20210216184515_p_ci_templates_5_min_production_app_weekly.yml)
 
-Group: ``
+Group: `group::5-min-app`
 
 Status: `data_available`
 
-Tiers:
+Tiers: `free`, `premium`, `ultimate`
 
 ### `redis_hll_counters.ci_templates.p_ci_templates_auto_devops_build_monthly`
 
