@@ -26137,6 +26137,9 @@ msgstr ""
 msgid "Provider"
 msgstr ""
 
+msgid "Provisioned by:"
+msgstr ""
+
 msgid "Proxy support for this API is not available currently"
 msgstr ""
 
