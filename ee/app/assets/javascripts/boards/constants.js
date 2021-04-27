@@ -69,6 +69,7 @@ export const updateListQueries = {
 };
 
 export default {
+  updateListQueries,
   DRAGGABLE_TAG,
   EpicFilterType,
 };
