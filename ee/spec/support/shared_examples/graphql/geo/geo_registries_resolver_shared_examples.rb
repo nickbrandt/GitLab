@@ -11,6 +11,7 @@ RSpec.shared_examples_for 'a Geo registries resolver' do |registry_factory_name|
     let_it_be(:registry2) { create(registry_factory_name) }
     let_it_be(:registry3) { create(registry_factory_name) }
     # rubocop:enable Rails/SaveBang
+
     let(:registries) { [registry1, registry2, registry3] }
     let(:gql_context) { { current_user: current_user } }
 
