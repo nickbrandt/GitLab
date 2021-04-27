@@ -580,6 +580,7 @@
   :idempotent:
   :tags: []
 - :name: cronjob:users_deactivate_dormant_users
+  :worker_name: Users::DeactivateDormantUsersWorker
   :feature_category: :utilization
   :has_external_dependencies:
   :urgency: :low
@@ -1254,6 +1255,7 @@
   :idempotent:
   :tags: []
 - :name: package_repositories:packages_debian_process_changes
+  :worker_name: Packages::Debian::ProcessChangesWorker
   :feature_category: :package_registry
   :has_external_dependencies:
   :urgency: :low
@@ -2743,6 +2745,7 @@
   :idempotent:
   :tags: []
 - :name: users_update_open_issue_count
+  :worker_name: Users::UpdateOpenIssueCountWorker
   :feature_category: :users
   :has_external_dependencies:
   :urgency: :low
