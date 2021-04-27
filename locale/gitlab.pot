@@ -23641,6 +23641,9 @@ msgstr ""
 msgid "Pipelines|Copy trigger token"
 msgstr ""
 
+msgid "Pipelines|Could not load artifacts."
+msgstr ""
+
 msgid "Pipelines|Could not load merged YAML content"
 msgstr ""
 
