@@ -15,6 +15,8 @@ module Gitlab
           succeeded: 3
         }
 
+        scope :successful_in_execution_order, -> { where.not(finished_at: nil).succeeded.order(:finished_at) }
+
         delegate :aborted?, :job_class, :table_name, :column_name, :job_arguments,
           to: :batched_migration, prefix: :migration
 

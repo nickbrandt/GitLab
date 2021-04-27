@@ -13,9 +13,6 @@ module Gitlab
         has_one :last_job, -> { order(id: :desc) },
           class_name: 'Gitlab::Database::BackgroundMigration::BatchedJob',
           foreign_key: :batched_background_migration_id
-        has_many :last_jobs, -> { order(id: :desc) },
-          class_name: 'Gitlab::Database::BackgroundMigration::BatchedJob',
-          foreign_key: :batched_background_migration_id
 
         scope :queue_order, -> { order(id: :asc) }
 
@@ -81,7 +78,7 @@ module Gitlab
         end
 
         def smoothed_time_efficiency(number_of_jobs: 10, alpha: 0.2)
-          jobs = last_jobs.succeeded.limit(number_of_jobs)
+          jobs = batched_jobs.successful_in_execution_order.reverse_order.limit(number_of_jobs)
 
           return if jobs.size < number_of_jobs
 

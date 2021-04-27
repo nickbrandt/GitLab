@@ -268,7 +268,7 @@ RSpec.describe Gitlab::Database::BackgroundMigration::BatchedMigration, type: :m
       let(:number_of_jobs) { 10 }
 
       before do
-        expect(migration).to receive_message_chain(:last_jobs, :succeeded, :limit).with(no_args).with(no_args).with(number_of_jobs).and_return(jobs)
+        expect(migration).to receive_message_chain(:batched_jobs, :successful_in_execution_order, :reverse_order, :limit).with(no_args).with(no_args).with(number_of_jobs).and_return(jobs)
       end
 
       def mock_efficiencies(*effs)
