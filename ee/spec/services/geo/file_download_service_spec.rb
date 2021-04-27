@@ -433,7 +433,18 @@ RSpec.describe Geo::FileDownloadService do
       it_behaves_like 'a service that handles orphaned uploads', 'namespace_file'
     end
 
+    context 'with an incident metrics upload' do
+      let(:file) { create(:upload, :issue_metric_image) }
+
+      it_behaves_like 'a service that downloads the file and registers the sync result', 'issuable_metric_image'
+      it_behaves_like 'a service that handles orphaned uploads', 'issuable_metric_image'
+    end
+
     context 'LFS object' do
+      before do
+        stub_feature_flags(geo_lfs_object_replication: false)
+      end
+
       it_behaves_like "a service that downloads the file and registers the sync result", 'lfs' do
         let(:file) { create(:lfs_object) }
       end

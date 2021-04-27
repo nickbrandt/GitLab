@@ -12,12 +12,18 @@ import {
   BulletList,
   OrderedList,
   ListItem,
+  HardBreak,
 } from 'tiptap-extensions';
 import { PROVIDE_SERIALIZER_OR_RENDERER_ERROR } from '../constants';
 import CodeBlockHighlight from '../extensions/code_block_highlight';
 import createMarkdownSerializer from './markdown_serializer';
 
-const createEditor = async ({ content, renderMarkdown, serializer: customSerializer } = {}) => {
+const createEditor = async ({
+  content,
+  renderMarkdown,
+  serializer: customSerializer,
+  ...options
+} = {}) => {
   if (!customSerializer && !isFunction(renderMarkdown)) {
     throw new Error(PROVIDE_SERIALIZER_OR_RENDERER_ERROR);
   }
@@ -36,7 +42,14 @@ const createEditor = async ({ content, renderMarkdown, serializer: customSeriali
       new ListItem(),
       new OrderedList(),
       new CodeBlockHighlight(),
+      new HardBreak(),
     ],
+    editorProps: {
+      attributes: {
+        class: 'gl-outline-0!',
+      },
+    },
+    ...options,
   });
   const serializer = customSerializer || createMarkdownSerializer({ render: renderMarkdown });
 

@@ -23,6 +23,9 @@ gem 'grape-path-helpers', '~> 1.6.1'
 gem 'faraday', '~> 1.0'
 gem 'marginalia', '~> 1.10.0'
 
+# Authorization
+gem 'declarative_policy', '~> 1.0.0'
+
 # Authentication libraries
 gem 'devise', '~> 4.7.2'
 gem 'bcrypt', '~> 3.1', '>= 3.1.14'
@@ -264,7 +267,7 @@ gem 'kubeclient', '~> 4.9.1'
 
 # Sanitize user input
 gem 'sanitize', '~> 5.2.1'
-gem 'babosa', '~> 1.0.2'
+gem 'babosa', '~> 1.0.4'
 
 # Sanitizes SVG input
 gem 'loofah', '~> 2.2'
@@ -343,6 +346,7 @@ end
 
 group :development do
   gem 'lefthook', '~> 0.7.0', require: false
+  gem 'solargraph', '~> 0.40.4', require: false
 
   gem 'letter_opener_web', '~> 1.4.0'
 
@@ -413,7 +417,6 @@ group :development, :test, :omnibus do
 end
 
 group :test do
-  gem 'json-schema', '~> 2.8.0'
   gem 'fuubar', '~> 2.2.0'
   gem 'rspec-retry', '~> 0.6.1'
   gem 'rspec_profiling', '~> 0.0.6'

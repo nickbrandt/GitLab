@@ -11,11 +11,6 @@ module EE
       ]
     end
 
-    override :sidebar_repository_paths
-    def sidebar_repository_paths
-      super + %w(path_locks)
-    end
-
     override :sidebar_operations_paths
     def sidebar_operations_paths
       super + %w[
@@ -200,12 +195,6 @@ module EE
         projects/threat_monitoring#alert_details
         projects/security/policies#show
         projects/audit_events#index
-      ]
-    end
-
-    def sidebar_external_tracker_paths
-      %w[
-        projects/integrations/jira/issues#index
       ]
     end
 

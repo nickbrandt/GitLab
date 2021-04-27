@@ -247,8 +247,8 @@ You can customize the default scanning rules provided by our SAST analyzers.
 
 Ruleset customization supports two capabilities:
 
-1. Disabling predefined rules
-1. Modifying the default behavior of a given analyzer
+1. Disabling predefined rules (available for all analyzers).
+1. Modifying the default behavior of a given analyzer (only available for `nodejs-scan` and `gosec`).
 
 These capabilities can be used simultaneously.
 
@@ -464,7 +464,7 @@ Some analyzers make it possible to filter out vulnerabilities under a given thre
 
 | CI/CD variable               | Default value            | Description                                                                                                                                                                                                                 |
 |------------------------------|--------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `SAST_EXCLUDED_PATHS`        | `spec, test, tests, tmp` | Exclude vulnerabilities from output based on the paths. This is a comma-separated list of patterns. Patterns can be globs, or file or folder paths (for example, `doc,spec` ). Parent directories also match patterns. You might need to exclude temporary directories used by your build tool as these can generate false positives. |
+| `SAST_EXCLUDED_PATHS`        | `spec, test, tests, tmp` | Exclude vulnerabilities from output based on the paths. This is a comma-separated list of patterns. Patterns can be globs, or file or folder paths (for example, `doc,spec`). Parent directories also match patterns. You might need to exclude temporary directories used by your build tool as these can generate false positives. To exclude paths, copy and paste the default excluded paths, then **add** your own paths to be excluded. If you don't specify the default excluded paths, you will override the defaults and _only_ paths you specify will be excluded from the SAST scans. |
 | `SEARCH_MAX_DEPTH`           | 4                        | SAST searches the repository to detect the programming languages used, and selects the matching analyzers. Set the value of `SEARCH_MAX_DEPTH` to specify how many directory levels the search phase should span. After the analyzers have been selected, the _entire_ repository is analyzed. |
 | `SAST_BANDIT_EXCLUDED_PATHS` |                          | Comma-separated list of paths to exclude from scan. Uses Python's [`fnmatch` syntax](https://docs.python.org/2/library/fnmatch.html); For example: `'*/tests/*, */venv/*'`                                                  |
 | `SAST_BRAKEMAN_LEVEL`        | 1                        | Ignore Brakeman vulnerabilities under given confidence level. Integer, 1=Low 3=High.                                                                                                                                        |
@@ -707,6 +707,10 @@ If a SAST job invokes a package manager, you must configure its certificate veri
 offline environment, certificate verification with an external source is not possible. Either use a
 self-signed certificate or disable certificate verification. Refer to the package manager's
 documentation for instructions.
+
+## Running SAST in SELinux
+
+By default SAST analyzers are supported in GitLab instances hosted on SELinux. Adding a `before_script` in an [overriden SAST job](#overriding-sast-jobs) may not work as runners hosted on SELinux have restricted permissions.
 
 ## Troubleshooting
 

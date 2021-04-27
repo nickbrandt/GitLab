@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/browser';
-import { pick } from 'lodash';
+import { updateListQueries } from 'ee_else_ce/boards/constants';
 import createBoardListMutation from 'ee_else_ce/boards/graphql/board_list_create.mutation.graphql';
 import boardListsQuery from 'ee_else_ce/boards/graphql/board_lists.query.graphql';
 import issueMoveListMutation from 'ee_else_ce/boards/graphql/issue_move_list.mutation.graphql';
@@ -11,6 +11,7 @@ import {
   ISSUABLE,
   titleQueries,
   subscriptionQueries,
+  SupportedFilters,
 } from '~/boards/constants';
 import { getIdFromGraphQLId } from '~/graphql_shared/utils';
 import createGqClient, { fetchPolicies } from '~/lib/graphql';
@@ -27,10 +28,10 @@ import {
   transformNotFilters,
   moveItemListHelper,
   getMoveData,
+  getSupportedParams,
 } from '../boards_util';
 import boardLabelsQuery from '../graphql/board_labels.query.graphql';
 import destroyBoardListMutation from '../graphql/board_list_destroy.mutation.graphql';
-import updateBoardListMutation from '../graphql/board_list_update.mutation.graphql';
 import groupProjectsQuery from '../graphql/group_projects.query.graphql';
 import issueCreateMutation from '../graphql/issue_create.mutation.graphql';
 import issueSetDueDateMutation from '../graphql/issue_set_due_date.mutation.graphql';
@@ -65,16 +66,11 @@ export default {
   },
 
   setFilters: ({ commit }, filters) => {
-    const filterParams = pick(filters, [
-      'assigneeUsername',
-      'authorUsername',
-      'labelName',
-      'milestoneTitle',
-      'releaseTag',
-      'search',
-      'myReactionEmoji',
-    ]);
-    filterParams.not = transformNotFilters(filters);
+    const filterParams = {
+      ...getSupportedParams(filters, SupportedFilters),
+      not: transformNotFilters(filters),
+    };
+
     commit(types.SET_FILTERS, filterParams);
   },
 
@@ -242,10 +238,13 @@ export default {
     dispatch('updateList', { listId, position: newPosition, backupList });
   },
 
-  updateList: ({ commit }, { listId, position, collapsed, backupList }) => {
+  updateList: (
+    { commit, state: { issuableType } },
+    { listId, position, collapsed, backupList },
+  ) => {
     gqlClient
       .mutate({
-        mutation: updateBoardListMutation,
+        mutation: updateListQueries[issuableType].mutation,
         variables: {
           listId,
           position,

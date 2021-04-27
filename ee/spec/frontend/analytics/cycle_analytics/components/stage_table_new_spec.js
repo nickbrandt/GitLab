@@ -9,6 +9,8 @@ import {
   issueStage,
   testEvents,
   testStage,
+  reviewStage,
+  reviewEvents,
 } from '../mock_data';
 
 let wrapper = null;
@@ -19,6 +21,7 @@ const notEnoughDataError = "We don't have enough data to show this stage.";
 const [firstIssueEvent] = issueEvents;
 const [firstStagingEvent] = stagingEvents;
 const [firstTestEvent] = testEvents;
+const [firstReviewEvent] = reviewEvents;
 
 const findStageEvents = () => wrapper.findAllByTestId('vsa-stage-event');
 const findStageEventTitle = (ev) => extendedWrapper(ev).findByTestId('vsa-stage-event-title');
@@ -67,6 +70,22 @@ describe('StageTable', () => {
     });
   });
 
+  describe('with minimal stage data', () => {
+    beforeEach(() => {
+      wrapper = createComponent({ currentStage: { title: 'New stage title' } });
+    });
+
+    it('will render the correct events', () => {
+      const evs = findStageEvents();
+      expect(evs).toHaveLength(issueEvents.length);
+
+      const titles = evs.wrappers.map((ev) => findStageEventTitle(ev).text());
+      issueEvents.forEach((ev, index) => {
+        expect(titles[index]).toBe(ev.title);
+      });
+    });
+  });
+
   describe('default event', () => {
     beforeEach(() => {
       wrapper = createComponent({
@@ -77,6 +96,10 @@ describe('StageTable', () => {
 
     it('will render the event title', () => {
       expect(wrapper.findByTestId('vsa-stage-event-title').text()).toBe(firstIssueEvent.title);
+    });
+
+    it('will set the workflow title to "Issues"', () => {
+      expect(wrapper.find('thead').text()).toContain('Issues');
     });
 
     it('does not render the fork icon', () => {
@@ -104,12 +127,31 @@ describe('StageTable', () => {
     });
   });
 
+  describe('merge request event', () => {
+    beforeEach(() => {
+      wrapper = createComponent({
+        stageEvents: [{ ...firstReviewEvent }],
+        currentStage: { ...reviewStage, custom: false },
+      });
+    });
+
+    it('will set the workflow title to "Merge requests"', () => {
+      expect(wrapper.find('thead').text()).toContain('Merge requests');
+      expect(wrapper.find('thead').text()).not.toContain('Issues');
+    });
+  });
+
   describe('staging event', () => {
     beforeEach(() => {
       wrapper = createComponent({
         stageEvents: [{ ...firstStagingEvent }],
         currentStage: { ...stagingStage, custom: false },
       });
+    });
+
+    it('will set the workflow title to "Deployments"', () => {
+      expect(wrapper.find('thead').text()).toContain('Deployments');
+      expect(wrapper.find('thead').text()).not.toContain('Issues');
     });
 
     it('will not render the event title', () => {
@@ -147,6 +189,11 @@ describe('StageTable', () => {
         stageEvents: [{ ...firstTestEvent }],
         currentStage: { ...testStage, custom: false },
       });
+    });
+
+    it('will set the workflow title to "Jobs"', () => {
+      expect(wrapper.find('thead').text()).toContain('Jobs');
+      expect(wrapper.find('thead').text()).not.toContain('Issues');
     });
 
     it('will not render the event title', () => {

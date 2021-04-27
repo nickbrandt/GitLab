@@ -257,8 +257,8 @@ The following configuration options can be configured:
   Defaults to `cpu`.
 - `STACKPROF_INTERVAL`: Sampling interval. Unit semantics depend on `STACKPROF_MODE`.
   For `object` mode this is a per-event interval (every `nth` event is sampled)
-  and defaults to `1000`.
-  For other modes such as `cpu` this is a frequency and defaults to `10000` μs (100hz).
+  and defaults to `100`.
+  For other modes such as `cpu` this is a frequency interval and defaults to `10100` μs (99hz).
 - `STACKPROF_FILE_PREFIX`: File path prefix where profiles are stored. Defaults
   to `$TMPDIR` (often corresponds to `/tmp`).
 - `STACKPROF_TIMEOUT_S`: Profiling timeout in seconds. Profiling will
@@ -363,7 +363,7 @@ This patch is available by default for
 [CNG](https://gitlab.com/gitlab-org/build/CNG/-/merge_requests/591),
 [GitLab CI](https://gitlab.com/gitlab-org/gitlab-build-images/-/merge_requests/355),
 [GCK](https://gitlab.com/gitlab-org/gitlab-compose-kit/-/merge_requests/149)
-and can additionally be enabled for [GDK](https://gitlab.com/gitlab-org/gitlab-development-kit/-/blob/master/doc/advanced.md#apply-custom-patches-for-ruby).
+and can additionally be enabled for [GDK](https://gitlab.com/gitlab-org/gitlab-development-kit/-/blob/main/doc/advanced.md#apply-custom-patches-for-ruby).
 
 This patch provides a set of 3 metrics that makes it easier to understand efficiency of memory usage for a given codepath:
 

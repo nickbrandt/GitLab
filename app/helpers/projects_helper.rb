@@ -743,25 +743,7 @@ module ProjectsHelper
       operations#show
       badges#index
       pages#show
-    ]
-  end
-
-  def sidebar_repository_paths
-    %w[
-      tree
-      blob
-      blame
-      edit_tree
-      new_tree
-      find_file
-      commit
-      commits
-      compare
-      projects/repositories
-      tags
-      branches
-      graphs
-      network
+      packages_and_registries#index
     ]
   end
 
@@ -801,6 +783,16 @@ module ProjectsHelper
   end
 
   def settings_container_registry_expiration_policy_available?(project)
+    Feature.disabled?(:sidebar_refactor) &&
+      can_destroy_container_registry_image?(current_user, project)
+  end
+
+  def settings_packages_and_registries_enabled?(project)
+    Feature.enabled?(:sidebar_refactor) &&
+      can_destroy_container_registry_image?(current_user, project)
+  end
+
+  def can_destroy_container_registry_image?(current_user, project)
     Gitlab.config.registry.enabled &&
       can?(current_user, :destroy_container_image, project)
   end

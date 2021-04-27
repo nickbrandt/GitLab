@@ -101,7 +101,7 @@ with [domain expertise](#domain-experts).
 1. If your merge request includes frontend changes (*1*), it must be
    **approved by a [frontend maintainer](https://about.gitlab.com/handbook/engineering/projects/#gitlab_maintainers_frontend)**.
 1. If your merge request includes user-facing changes (*3*), it must be
-   **approved by a [Product Designer](https://about.gitlab.com/handbook/engineering/ux/product-design/)**,
+   **approved by a [Product Designer](https://about.gitlab.com/handbook/engineering/projects/#gitlab_reviewers_UX)**,
    based on assignments in the appropriate [DevOps stage group](https://about.gitlab.com/handbook/product/categories/#devops-stages).
 1. If your merge request includes adding a new JavaScript library (*1*)...
    - If the library significantly increases the
@@ -114,8 +114,8 @@ with [domain expertise](#domain-experts).
 1. If your merge request includes a new dependency or a file system change, it must be
    **approved by a [Distribution team member](https://about.gitlab.com/company/team/)**. See how to work with the [Distribution team](https://about.gitlab.com/handbook/engineering/development/enablement/distribution/#how-to-work-with-distribution) for more details.
 1. If your merge request includes documentation changes, it must be **approved
-   by a [Technical writer](https://about.gitlab.com/handbook/engineering/ux/technical-writing/#assignments)**, based on
-   the appropriate [product category](https://about.gitlab.com/handbook/product/categories/).
+   by a [Technical writer](https://about.gitlab.com/handbook/engineering/ux/technical-writing/#assignments)**,
+   based on assignments in the appropriate [DevOps stage group](https://about.gitlab.com/handbook/product/categories/#devops-stages).
 1. If your merge request includes end-to-end **and** non-end-to-end changes (*4*), it must be **approved
    by a [Software Engineer in Test](https://about.gitlab.com/handbook/engineering/quality/#individual-contributors)**.
 1. If your merge request only includes end-to-end changes (*4*) **or** if the MR author is a [Software Engineer in Test](https://about.gitlab.com/handbook/engineering/quality/#individual-contributors), it must be **approved by a [Quality maintainer](https://about.gitlab.com/handbook/engineering/projects/#gitlab_maintainers_qa)**
@@ -299,8 +299,10 @@ first time.
   of your shiny new branch, read through the entire diff. Does it make sense?
   Did you include something unrelated to the overall purpose of the changes? Did
   you forget to remove any debugging code?
-- Consider providing instructions on how to test the merge request. This can be
-  helpful for reviewers not familiar with the product feature or area of the codebase.
+- Write a detailed description as outlined in the [merge request guidelines](contributing/merge_request_workflow.md#merge-request-guidelines).
+  Some reviewers may not be familiar with the product feature or area of the
+  codebase. Thorough descriptions help all reviewers understand your request
+  and test effectively.
 - If you know your change depends on another being merged first, note it in the
   description and set an [merge request dependency](../user/project/merge_requests/merge_request_dependencies.md).
 - Be grateful for the reviewer's suggestions. (`Good call. I'll make that change.`)

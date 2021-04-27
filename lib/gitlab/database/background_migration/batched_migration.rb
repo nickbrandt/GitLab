@@ -23,6 +23,8 @@ module Gitlab
           finished: 3
         }
 
+        attribute :pause_ms, :integer, default: 100
+
         def self.active_migration
           active.queue_order.first
         end
@@ -35,7 +37,13 @@ module Gitlab
         end
 
         def create_batched_job!(min, max)
-          batched_jobs.create!(min_value: min, max_value: max, batch_size: batch_size, sub_batch_size: sub_batch_size)
+          batched_jobs.create!(
+            min_value: min,
+            max_value: max,
+            batch_size: batch_size,
+            sub_batch_size: sub_batch_size,
+            pause_ms: pause_ms
+          )
         end
 
         def next_min_value
@@ -56,6 +64,10 @@ module Gitlab
 
         def batch_class_name=(class_name)
           write_attribute(:batch_class_name, class_name.demodulize)
+        end
+
+        def migrated_tuple_count
+          batched_jobs.succeeded.sum(:batch_size)
         end
 
         def prometheus_labels

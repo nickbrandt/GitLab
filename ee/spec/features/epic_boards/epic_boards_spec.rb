@@ -16,7 +16,7 @@ RSpec.describe 'epic boards', :js do
   let_it_be(:backlog_list) { create(:epic_list, epic_board: epic_board, list_type: :backlog) }
   let_it_be(:closed_list) { create(:epic_list, epic_board: epic_board, list_type: :closed) }
 
-  let_it_be(:epic1) { create(:epic, group: group, labels: [label], title: 'Epic1') }
+  let_it_be(:epic1) { create(:epic, group: group, labels: [label], author: user, title: 'Epic1') }
   let_it_be(:epic2) { create(:epic, group: group, title: 'Epic2') }
   let_it_be(:epic3) { create(:epic, group: group, labels: [label2], title: 'Epic3') }
 
@@ -93,8 +93,41 @@ RSpec.describe 'epic boards', :js do
       drag(list_from_index: 0, list_to_index: 1)
       wait_for_all_requests
 
-      expect(find('.board:nth-child(1)')).not_to have_content(epic3.title)
-      expect(find('.board:nth-child(2)')).to have_content(epic3.title)
+      expect(find_board_list(1)).not_to have_content(epic3.title)
+      expect(find_board_list(2)).to have_content(epic3.title)
+    end
+
+    context 'lists' do
+      let_it_be(:label_list2) { create(:epic_list, epic_board: epic_board, label: label2, position: 1) }
+
+      it 'changes position of list' do
+        expect(find_board_list(2)).to have_content(label.title)
+        expect(find_board_list(3)).to have_content(label2.title)
+
+        drag(list_from_index: 2, list_to_index: 1, selector: '.board-header')
+
+        wait_for_all_requests
+
+        expect(find_board_list(2)).to have_content(label2.title)
+        expect(find_board_list(3)).to have_content(label.title)
+
+        # Make sure list positions are preserved after a reload
+        visit_epic_boards_page
+
+        wait_for_all_requests
+
+        expect(find_board_list(2)).to have_content(label2.title)
+        expect(find_board_list(3)).to have_content(label.title)
+      end
+
+      it 'dragging does not duplicate list' do
+        selector = '.board:not(.is-ghost) .board-header'
+        expect(page).to have_selector(selector, text: label.title, count: 1)
+
+        drag(list_from_index: 2, list_to_index: 1, selector: '.board-header', perform_drop: false)
+
+        expect(page).to have_selector(selector, text: label.title, count: 1)
+      end
     end
   end
 
@@ -166,22 +199,39 @@ RSpec.describe 'epic boards', :js do
       group.add_guest(user)
       sign_in(user)
       visit_epic_boards_page
+
+      # Focus on search field
+      find_field('Search').click
     end
 
-    it 'can select an Author and Label' do
-      page.find('[data-testid="epic-filtered-search"]').click
-
+    it 'can select a Label in order to filter the board' do
       page.within('[data-testid="epic-filtered-search"]') do
-        click_link 'Author'
-        wait_for_requests
-        click_link user.name
-
         click_link 'Label'
-        wait_for_requests
         click_link label.title
 
-        expect(page).to have_text("Author = #{user.name} Label = ~#{label.title}")
+        find('input').native.send_keys(:return)
       end
+
+      wait_for_requests
+
+      expect(page).to have_content('Epic1')
+      expect(page).not_to have_content('Epic2')
+      expect(page).not_to have_content('Epic3')
+    end
+
+    it 'can select an Author in order to filter the board' do
+      page.within('[data-testid="epic-filtered-search"]') do
+        click_link 'Author'
+        click_link user.name
+
+        find('input').native.send_keys(:return)
+      end
+
+      wait_for_requests
+
+      expect(page).to have_content('Epic1')
+      expect(page).not_to have_content('Epic2')
+      expect(page).not_to have_content('Epic3')
     end
   end
 
@@ -271,5 +321,9 @@ RSpec.describe 'epic boards', :js do
   #
   def click_on_board_modal
     find('.board-config-modal .modal-content').click
+  end
+
+  def find_board_list(board_number)
+    find(".board:nth-child(#{board_number})")
   end
 end

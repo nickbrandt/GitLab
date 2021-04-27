@@ -98,11 +98,12 @@ module Gitlab
       end
 
       def get_all_lfs_pointers
-        request = Gitaly::GetAllLFSPointersRequest.new(
-          repository: @gitaly_repo
+        request = Gitaly::ListLFSPointersRequest.new(
+          repository: @gitaly_repo,
+          revisions: [encode_binary("--all")]
         )
 
-        response = GitalyClient.call(@gitaly_repo.storage_name, :blob_service, :get_all_lfs_pointers, request, timeout: GitalyClient.medium_timeout)
+        response = GitalyClient.call(@gitaly_repo.storage_name, :blob_service, :list_lfs_pointers, request, timeout: GitalyClient.medium_timeout)
         map_lfs_pointers(response)
       end
 
@@ -114,7 +115,7 @@ module Gitlab
         # necessary graph walk to detect only new LFS pointers and instead scan
         # through all quarantined objects.
         git_env = ::Gitlab::Git::HookEnv.all(@gitaly_repo.gl_repository)
-        if Feature.enabled?(:lfs_integrity_inspect_quarantined_objects, @project, default_enabled: :yaml) && git_env['GIT_OBJECT_DIRECTORY_RELATIVE'].present?
+        if git_env['GIT_OBJECT_DIRECTORY_RELATIVE'].present?
           repository = @gitaly_repo.dup
           repository.git_alternate_object_directories = Google::Protobuf::RepeatedField.new(:string)
 
@@ -125,19 +126,20 @@ module Gitlab
 
           [request, :list_all_lfs_pointers]
         else
-          request = Gitaly::GetNewLFSPointersRequest.new(
+          revisions = [revision]
+          revisions += if not_in.nil? || not_in == :all
+                         ["--not", "--all"]
+                       else
+                         not_in.prepend "--not"
+                       end
+
+          request = Gitaly::ListLFSPointersRequest.new(
             repository: @gitaly_repo,
-            revision: encode_binary(revision),
-            limit: limit || 0
+            limit: limit || 0,
+            revisions: revisions.map { |rev| encode_binary(rev) }
           )
 
-          if not_in.nil? || not_in == :all
-            request.not_in_all = true
-          else
-            request.not_in_refs += not_in
-          end
-
-          [request, :get_new_lfs_pointers]
+          [request, :list_lfs_pointers]
         end
       end
 

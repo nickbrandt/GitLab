@@ -25,7 +25,7 @@ module Security
 
     def execute
       findings = requested_reports.each_with_object([]) do |(type, report), findings|
-        raise ParseError, 'JSON parsing failed' if report.error.is_a?(Gitlab::Ci::Parsers::Security::Common::SecurityReportParserError)
+        raise ParseError, 'JSON parsing failed' if report.errored?
 
         normalized_findings = normalize_report_findings(
           report.findings,
@@ -114,7 +114,7 @@ module Security
     end
 
     def dismissal_feedback?(finding)
-      if ::Feature.enabled?(:vulnerability_finding_signatures, pipeline.project) && !finding.signatures.empty?
+      if ::Feature.enabled?(:vulnerability_finding_tracking_signatures, pipeline.project) && pipeline.project.licensed_feature_available?(:vulnerability_finding_signatures) && !finding.signatures.empty?
         dismissal_feedback_by_finding_signatures(finding)
       else
         dismissal_feedback_by_project_fingerprint(finding)

@@ -1,4 +1,9 @@
+import { issuableTypes } from '~/boards/constants';
+import updateBoardListMutation from '~/boards/graphql/board_list_update.mutation.graphql';
+
 import { s__ } from '~/locale';
+
+import updateEpicBoardListMutation from './graphql/epic_board_list_update.mutation.graphql';
 
 export const DRAGGABLE_TAG = 'div';
 
@@ -9,6 +14,8 @@ export const EpicFilterType = {
   any: 'Any',
   none: 'None',
 };
+
+export const SupportedFiltersEE = ['epicId', 'iterationTitle', 'weight'];
 
 export const IterationFilterType = {
   any: 'Any',
@@ -52,7 +59,17 @@ export const ErrorMessages = {
   ),
 };
 
+export const updateListQueries = {
+  [issuableTypes.issue]: {
+    mutation: updateBoardListMutation,
+  },
+  [issuableTypes.epic]: {
+    mutation: updateEpicBoardListMutation,
+  },
+};
+
 export default {
+  updateListQueries,
   DRAGGABLE_TAG,
   EpicFilterType,
 };
