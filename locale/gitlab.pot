@@ -16487,6 +16487,9 @@ msgstr ""
 msgid "Import Projects from Gitea"
 msgstr ""
 
+msgid "Import a project"
+msgstr ""
+
 msgid "Import an exported GitLab project"
 msgstr ""
 
