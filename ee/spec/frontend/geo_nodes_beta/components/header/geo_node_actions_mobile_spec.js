@@ -72,6 +72,12 @@ describe('GeoNodeActionsMobile', () => {
           MOCK_NODES[0].webEditUrl,
         );
       });
+
+      it('emits remove when remove button is clicked', () => {
+        findGeoMobileActionsRemoveDropdownItem().vm.$emit('click');
+
+        expect(wrapper.emitted('remove')).toHaveLength(1);
+      });
     });
 
     describe.each`

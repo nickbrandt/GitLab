@@ -783,6 +783,22 @@ describe('Api', () => {
         });
       });
     });
+
+    describe('removeGeoNode', () => {
+      it('DELETES with correct ID', () => {
+        mockNode = {
+          id: 1,
+        };
+
+        jest.spyOn(Api, 'buildUrl').mockReturnValue(`${expectedUrl}/${mockNode.id}`);
+        jest.spyOn(axios, 'delete');
+        mock.onDelete(`${expectedUrl}/${mockNode.id}`).replyOnce(httpStatus.OK, {});
+
+        return Api.removeGeoNode(mockNode.id).then(() => {
+          expect(axios.delete).toHaveBeenCalledWith(`${expectedUrl}/${mockNode.id}`);
+        });
+      });
+    });
   });
 
   describe('Application Settings', () => {

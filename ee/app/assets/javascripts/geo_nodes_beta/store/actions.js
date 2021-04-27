@@ -25,3 +25,24 @@ export const fetchNodes = ({ commit }) => {
       commit(types.RECEIVE_NODES_ERROR);
     });
 };
+
+export const prepNodeRemoval = ({ commit }, id) => {
+  commit(types.STAGE_NODE_REMOVAL, id);
+};
+
+export const cancelNodeRemoval = ({ commit }) => {
+  commit(types.UNSTAGE_NODE_REMOVAL);
+};
+
+export const removeNode = ({ commit, state }) => {
+  commit(types.REQUEST_NODE_REMOVAL);
+
+  return Api.removeGeoNode(state.nodeToBeRemoved)
+    .then(() => {
+      commit(types.RECEIVE_NODE_REMOVAL_SUCCESS);
+    })
+    .catch(() => {
+      createFlash({ message: s__('Geo|There was an error deleting the Geo Node') });
+      commit(types.RECEIVE_NODE_REMOVAL_ERROR);
+    });
+};

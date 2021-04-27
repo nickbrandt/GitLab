@@ -1,4 +1,4 @@
-import { GlLink, GlButton, GlLoadingIcon } from '@gitlab/ui';
+import { GlLink, GlButton, GlLoadingIcon, GlModal } from '@gitlab/ui';
 import { createLocalVue, shallowMount } from '@vue/test-utils';
 import Vuex from 'vuex';
 import GeoNodesBetaApp from 'ee/geo_nodes_beta/components/app.vue';
@@ -21,6 +21,8 @@ describe('GeoNodesBetaApp', () => {
 
   const actionSpies = {
     fetchNodes: jest.fn(),
+    removeNode: jest.fn(),
+    cancelNodeRemoval: jest.fn(),
   };
 
   const defaultProps = {
@@ -59,6 +61,7 @@ describe('GeoNodesBetaApp', () => {
   const findGlLoadingIcon = () => wrapper.findComponent(GlLoadingIcon);
   const findGeoEmptyState = () => wrapper.findComponent(GeoNodesEmptyState);
   const findGeoNodes = () => wrapper.findAllComponents(GeoNodes);
+  const findGlModal = () => wrapper.findComponent(GlModal);
 
   describe('template', () => {
     describe('always', () => {
@@ -73,6 +76,10 @@ describe('GeoNodesBetaApp', () => {
       it('renders the Learn more link correctly', () => {
         expect(findGeoLearnMoreLink().exists()).toBe(true);
         expect(findGeoLearnMoreLink().attributes('href')).toBe(GEO_INFO_URL);
+      });
+
+      it('renders the GlModal', () => {
+        expect(findGlModal().exists()).toBe(true);
       });
     });
 
@@ -127,6 +134,24 @@ describe('GeoNodesBetaApp', () => {
 
     it('calls fetchNodes', () => {
       expect(actionSpies.fetchNodes).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('Modal Events', () => {
+    beforeEach(() => {
+      createComponent();
+    });
+
+    it('calls removeNode when modal primary button clicked', () => {
+      findGlModal().vm.$emit('primary');
+
+      expect(actionSpies.removeNode).toHaveBeenCalled();
+    });
+
+    it('calls cancelNodeRemoval when modal cancel button clicked', () => {
+      findGlModal().vm.$emit('cancel');
+
+      expect(actionSpies.cancelNodeRemoval).toHaveBeenCalled();
     });
   });
 });

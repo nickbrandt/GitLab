@@ -66,6 +66,12 @@ describe('GeoNodeActionsDesktop', () => {
           MOCK_NODES[0].webEditUrl,
         );
       });
+
+      it('emits remove when remove button is clicked', () => {
+        findGeoDesktopActionsRemoveButton().vm.$emit('click');
+
+        expect(wrapper.emitted('remove')).toHaveLength(1);
+      });
     });
 
     describe.each`
