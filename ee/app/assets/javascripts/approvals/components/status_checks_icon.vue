@@ -1,7 +1,7 @@
 <script>
 import { GlIcon, GlPopover } from '@gitlab/ui';
 import { uniqueId } from 'lodash';
-import { __ } from '~/locale';
+import { s__ } from '~/locale';
 
 export default {
   components: {
@@ -16,14 +16,14 @@ export default {
   },
   computed: {
     iconId() {
-      return uniqueId('approval-icon-');
+      return uniqueId('status-checks-icon-');
     },
     containerId() {
-      return uniqueId('approva-icon-container-');
+      return uniqueId('status-checks-icon-container-');
     },
   },
   i18n: {
-    title: __('Approval Gate'),
+    title: s__('StatusCheck|Status to check'),
   },
 };
 </script>
