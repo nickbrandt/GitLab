@@ -110,12 +110,12 @@ module LimitedCapacity
 
     def report_prometheus_metrics(*args)
       report_running_jobs_metrics
-      remaining_work_gauge.set(prometheus_labels, remaining_work_count(*args))
-      max_running_jobs_gauge.set(prometheus_labels, max_running_jobs)
+      set_metric(:remaining_work_gauge, remaining_work_count(*args))
+      set_metric(:max_running_jobs_gauge, max_running_jobs)
     end
 
     def report_running_jobs_metrics
-      running_jobs_gauge.set(prometheus_labels, running_jobs_count)
+      set_metric(:running_jobs_gauge, running_jobs_count)
     end
 
     def required_jobs_count(*args)
@@ -144,26 +144,16 @@ module LimitedCapacity
       self.class.perform_async(*args)
     end
 
-    def running_jobs_gauge
-      strong_memoize(:running_jobs_gauge) do
-        Gitlab::Metrics.gauge(:limited_capacity_worker_running_jobs, 'Number of running jobs')
+    def set_metric(name, value)
+      metrics = strong_memoize(:metrics) do
+        {
+          running_jobs_gauge: Gitlab::Metrics.gauge(:limited_capacity_worker_running_jobs, 'Number of running jobs'),
+          max_running_jobs_gauge: Gitlab::Metrics.gauge(:limited_capacity_worker_max_running_jobs, 'Maximum number of running jobs'),
+          remaining_work_gauge: Gitlab::Metrics.gauge(:limited_capacity_worker_remaining_work_count, 'Number of jobs waiting to be enqueued')
+        }
       end
-    end
 
-    def max_running_jobs_gauge
-      strong_memoize(:max_running_jobs_gauge) do
-        Gitlab::Metrics.gauge(:limited_capacity_worker_max_running_jobs, 'Maximum number of running jobs')
-      end
-    end
-
-    def remaining_work_gauge
-      strong_memoize(:remaining_work_gauge) do
-        Gitlab::Metrics.gauge(:limited_capacity_worker_remaining_work_count, 'Number of jobs waiting to be enqueued')
-      end
-    end
-
-    def prometheus_labels
-      { worker: self.class.name }
+      metrics[name].set({ worker: self.class.name }, value)
     end
   end
 end
