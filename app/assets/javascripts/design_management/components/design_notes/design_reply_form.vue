@@ -119,8 +119,9 @@ export default {
       <gl-button
         ref="submitButton"
         :disabled="!hasValue || isSaving"
+        class="gl-mr-3"
         category="primary"
-        variant="success"
+        variant="confirm"
         type="submit"
         data-track-event="click_button"
         data-qa-selector="save_comment_button"
