@@ -35,9 +35,9 @@ module Mutations
                description: 'Array of action hashes to commit as a batch.'
 
       field :commit_pipeline_path,
-               GraphQL::STRING_TYPE,
-               null: true,
-               description: "ETag path for the commit's pipeline."
+            GraphQL::STRING_TYPE,
+            null: true,
+            description: "ETag path for the commit's pipeline."
 
       field :commit,
             Types::CommitType,
