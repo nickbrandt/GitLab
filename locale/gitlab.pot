@@ -8335,6 +8335,9 @@ msgstr ""
 msgid "Configure Tracing"
 msgstr ""
 
+msgid "Configure What's new drawer and content."
+msgstr ""
+
 msgid "Configure a %{codeStart}.gitlab-webide.yml%{codeEnd} file in the %{codeStart}.gitlab%{codeEnd} directory to start using the Web Terminal. %{helpStart}Learn more.%{helpEnd}"
 msgstr ""
 
@@ -11397,6 +11400,9 @@ msgstr ""
 msgid "Disable Two-factor Authentication"
 msgstr ""
 
+msgid "Disable What's new"
+msgstr ""
+
 msgid "Disable for this project"
 msgstr ""
 
@@ -12045,6 +12051,12 @@ msgid "Enable Seat Link"
 msgstr ""
 
 msgid "Enable Spam Check via external API endpoint"
+msgstr ""
+
+msgid "Enable What's new: All tiers"
+msgstr ""
+
+msgid "Enable What's new: Current tier only"
 msgstr ""
 
 msgid "Enable access to Grafana"
@@ -35893,6 +35905,15 @@ msgid "What is your job title? (optional)"
 msgstr ""
 
 msgid "What's new"
+msgstr ""
+
+msgid "What's new is disabled and can no longer be viewed."
+msgstr ""
+
+msgid "What's new presents new features for your current subscription tier, while hiding new features not available to your subscription tier."
+msgstr ""
+
+msgid "What's new presents new features from all tiers to help you keep track of all new features."
 msgstr ""
 
 msgid "What’s your experience level?"
