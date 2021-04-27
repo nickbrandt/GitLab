@@ -236,7 +236,7 @@ link to an existing one with an e-mail address.
 Carefully follow the instructions for [creating a custom policy](https://docs.microsoft.com/en-us/azure/active-directory-b2c/tutorial-create-user-flows?pivots=b2c-custom-policy).
 
 The Microsoft instructions use `SocialAndLocalAccounts` in the [custom policy starter pack](https://docs.microsoft.com/en-us/azure/active-directory-b2c/tutorial-create-user-flows?pivots=b2c-custom-policy#custom-policy-starter-pack),
-but `LocalAccounts` works for authenticating against local, Active Directory accounts. Before the instructions to [upload the polices](https://docs.microsoft.com/en-us/azure/active-directory-b2c/tutorial-create-user-flows?pivots=b2c-custom-policy#upload-the-policies), do the following:
+but `LocalAccounts` works for authenticating against local, Active Directory accounts. Before you follow the instructions to [upload the polices](https://docs.microsoft.com/en-us/azure/active-directory-b2c/tutorial-create-user-flows?pivots=b2c-custom-policy#upload-the-policies), do the following:
 
 1. To export the `email` claim, modify the `SignUpOrSignin.xml`. Replace the following line:
 
@@ -326,7 +326,7 @@ gitlab_rails['omniauth_providers'] = [
 
 #### Troubleshooting Azure B2C
 
-- Ensure all occurrences of `yourtenant.onmicrosoft.com`, `ProxyIdentityExperienceFrameworkAppId`, and `IdentityExperienceFrameworkAppId` with your B2C tenant hostname and
+- Ensure all occurrences of `yourtenant.onmicrosoft.com`, `ProxyIdentityExperienceFrameworkAppId`, and `IdentityExperienceFrameworkAppId` match your B2C tenant hostname and
 the respective client IDs in the XML policy files.
 
 - Add `https://jwt.ms` as a redirect URI to the app, and use the [custom policy tester](https://docs.microsoft.com/en-us/azure/active-directory-b2c/tutorial-create-user-flows?pivots=b2c-custom-policy#test-the-custom-policy).
@@ -336,7 +336,8 @@ Make sure the payload includes `email` that matches the user's e-mail access.
 issue with the `IdentityExperienceFramework` app. See [this Microsoft comment](https://docs.microsoft.com/en-us/answers/questions/50355/unable-to-sign-on-using-custom-policy.html?childToView=122370#comment-122370)
 that suggests checking that the app manifest contains these settings:
 
-    1. `"accessTokenAcceptedVersion": null`
+  - `"accessTokenAcceptedVersion": null`
+  - `"signInAudience": "AzureADMyOrg"`
     1. `"signInAudience": "AzureADMyOrg"`
 
     Note that this configuration corresponds with the `Supported account types` setting used when creating the `IdentityExperienceFramework` app.
