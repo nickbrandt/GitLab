@@ -1,5 +1,12 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 13.9.7 (2021-04-27)
+
+### Security (1 change)
+
+- Do not expose pull mirror username and password.
+
+
 ## 13.9.6 (2021-04-13)
 
 - No changes.
