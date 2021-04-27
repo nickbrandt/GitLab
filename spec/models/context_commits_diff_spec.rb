@@ -3,19 +3,14 @@
 require 'spec_helper'
 
 RSpec.describe ContextCommitsDiff do
-  let(:sha1) { "33f3729a45c02fc67d00adb1b8bca394b0e761d9" }
-  let(:sha2) { "ae73cb07c9eeaf35924a10f713b364d32b2dd34f" }
-  let(:sha3) { "0b4bc9a49b562e85de7cc9e834518ea6828729b9" }
-
-  let(:merge_request) do
-    create(:merge_request) do |merge_request|
-      project = merge_request.project
-      mrcc1 = create(:merge_request_context_commit, sha: sha1, committed_date: project.commit_by(oid: sha1).committed_date)
-      mrcc2 = create(:merge_request_context_commit, sha: sha2, committed_date: project.commit_by(oid: sha2).committed_date)
-      mrcc3 = create(:merge_request_context_commit, sha: sha3, committed_date: project.commit_by(oid: sha3).committed_date)
-      merge_request.merge_request_context_commits << [mrcc1, mrcc2, mrcc3]
-    end
-  end
+  let_it_be(:sha1) { "33f3729a45c02fc67d00adb1b8bca394b0e761d9" }
+  let_it_be(:sha2) { "ae73cb07c9eeaf35924a10f713b364d32b2dd34f" }
+  let_it_be(:sha3) { "0b4bc9a49b562e85de7cc9e834518ea6828729b9" }
+  let_it_be(:merge_request) { create(:merge_request) }
+  let_it_be(:project) { merge_request.project }
+  let_it_be(:mrcc1) { create(:merge_request_context_commit, merge_request: merge_request, sha: sha1, committed_date: project.commit_by(oid: sha1).committed_date) }
+  let_it_be(:mrcc2) { create(:merge_request_context_commit, merge_request: merge_request, sha: sha2, committed_date: project.commit_by(oid: sha2).committed_date) }
+  let_it_be(:mrcc3) { create(:merge_request_context_commit, merge_request: merge_request, sha: sha3, committed_date: project.commit_by(oid: sha3).committed_date) }
 
   subject { merge_request.context_commits_diff }
 
