@@ -7870,6 +7870,7 @@ Snapshot.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
+| <a id="devopsadoptionsnapshotcodeownersusedcount"></a>`codeOwnersUsedCount` | [`Int`](#int) | Total number of projects with existing CODEOWNERS file. |
 | <a id="devopsadoptionsnapshotdeploysucceeded"></a>`deploySucceeded` | [`Boolean!`](#boolean) | At least one deployment succeeded. |
 | <a id="devopsadoptionsnapshotendtime"></a>`endTime` | [`Time!`](#time) | The end time for the snapshot where the data points were collected. |
 | <a id="devopsadoptionsnapshotissueopened"></a>`issueOpened` | [`Boolean!`](#boolean) | At least one issue was opened. |
@@ -7880,6 +7881,7 @@ Snapshot.
 | <a id="devopsadoptionsnapshotrunnerconfigured"></a>`runnerConfigured` | [`Boolean!`](#boolean) | At least one runner was used. |
 | <a id="devopsadoptionsnapshotsecurityscansucceeded"></a>`securityScanSucceeded` | [`Boolean!`](#boolean) | At least one security scan succeeded. |
 | <a id="devopsadoptionsnapshotstarttime"></a>`startTime` | [`Time!`](#time) | The start time for the snapshot where the data points were collected. |
+| <a id="devopsadoptionsnapshottotalprojectscount"></a>`totalProjectsCount` | [`Int`](#int) | Total number of projects. |
 
 ### `DiffPosition`
 
@@ -13183,10 +13185,10 @@ Alert status values.
 
 | Value | Description |
 | ----- | ----------- |
-| <a id="alertmanagementstatusacknowledged"></a>`ACKNOWLEDGED` | Acknowledged status. |
-| <a id="alertmanagementstatusignored"></a>`IGNORED` | Ignored status. |
-| <a id="alertmanagementstatusresolved"></a>`RESOLVED` | Resolved status. |
-| <a id="alertmanagementstatustriggered"></a>`TRIGGERED` | Triggered status. |
+| <a id="alertmanagementstatusacknowledged"></a>`ACKNOWLEDGED` | Someone is actively investigating the problem. |
+| <a id="alertmanagementstatusignored"></a>`IGNORED` | No action will be taken on the alert. |
+| <a id="alertmanagementstatusresolved"></a>`RESOLVED` | No further work is required. |
+| <a id="alertmanagementstatustriggered"></a>`TRIGGERED` | Investigation has not started. |
 
 ### `ApiFuzzingScanMode`
 
