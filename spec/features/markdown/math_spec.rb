@@ -47,7 +47,7 @@ RSpec.describe 'Math rendering', :js do
     page.within '.description > .md' do
       # unfortunately there is no class selector for KaTeX's "unsupported command"
       # formatting so we must match the style attribute
-      expect(page).to have_selector('.katex-html .mord[style="color:#cc0000;"]', text: '\href')
+      expect(page).to have_selector('.katex-html .mord[style*="color:"][style*="#cc0000"]', text: '\href')
       expect(page).to have_selector('.katex-html a', text: 'Gitlab')
     end
   end
