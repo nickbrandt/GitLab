@@ -93,6 +93,6 @@ if matching_changed_files.any?
   if labels.any?
     gitlab.api.update_merge_request(gitlab.mr_json['project_id'],
                                     gitlab.mr_json['iid'],
-                                    add_labels: helper.prepare_labels_for_mr(labels))
+                                    add_labels: labels)
   end
 end
