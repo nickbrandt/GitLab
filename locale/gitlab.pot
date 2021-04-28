@@ -30989,6 +30989,9 @@ msgstr ""
 msgid "SuperSonics|Your subscription"
 msgstr ""
 
+msgid "SuperSonics|Your subscription was successfully activated. You can see the details below."
+msgstr ""
+
 msgid "Support"
 msgstr ""
 
