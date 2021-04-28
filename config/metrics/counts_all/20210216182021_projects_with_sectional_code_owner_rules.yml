@@ -10,7 +10,7 @@ status: data_available
 time_frame: all
 data_source: database
 distribution:
-- ce
+- ee
 tier:
 - premium
-skip_validation: true
+- ultimate

@@ -12,5 +12,5 @@ data_source: database
 distribution:
 - ee
 tier:
-- Premium
-skip_validation: true
+- premium
+- ultimate

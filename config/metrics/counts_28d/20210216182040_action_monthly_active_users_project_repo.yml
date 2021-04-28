@@ -8,7 +8,7 @@ product_category: source_code_management
 value_type: number
 status: data_available
 time_frame: 28d
-data_source: database
+data_source: redis_hll
 distribution:
 - ce
 tier:

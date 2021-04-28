@@ -10,7 +10,9 @@ status: data_available
 time_frame: 7d
 data_source: redis_hll
 distribution:
+- ce
 - ee
 tier:
 - free
-skip_validation: true
+- premium
+- ultimate
