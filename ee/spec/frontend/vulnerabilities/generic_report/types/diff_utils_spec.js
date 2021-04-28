@@ -32,7 +32,7 @@ function checkLine(line, oldLine, newLine, lineType, actionSpecs) {
 
 describe('Report Items Diff Utils', () => {
   describe('groupActionsByLines', () => {
-    it('Correctly groups single-line changes by lines', () => {
+    it('correctly groups single-line changes by lines', () => {
       const before = 'hello world';
       const after = 'HELLO world';
 

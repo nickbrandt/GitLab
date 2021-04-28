@@ -6,14 +6,14 @@ export const REPORT_TYPES = [REPORT_TYPE_LIST, REPORT_TYPE_URL];
 /*
  * Diff component
  */
-export const DIFF = 'diff';
-export const BEFORE = 'before';
-export const AFTER = 'after';
+const DIFF = 'diff';
+const BEFORE = 'before';
+const AFTER = 'after';
 
 export const VIEW_TYPES = { DIFF, BEFORE, AFTER };
 
-export const NORMAL = 'normal';
-export const REMOVED = 'removed';
-export const ADDED = 'added';
+const NORMAL = 'normal';
+const REMOVED = 'removed';
+const ADDED = 'added';
 
 export const LINE_TYPES = { NORMAL, REMOVED, ADDED };
