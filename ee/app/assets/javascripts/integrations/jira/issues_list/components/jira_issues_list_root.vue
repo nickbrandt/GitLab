@@ -128,8 +128,12 @@ export default {
         })
         .catch((error) => {
           this.issuesListLoadFailed = true;
+          const errorMessage =
+            (error?.response?.data?.errors || [])[0] ||
+            __('An error occurred while loading issues');
+
           createFlash({
-            message: __('An error occurred while loading issues'),
+            message: errorMessage,
             captureError: true,
             error,
           });
@@ -200,9 +204,10 @@ export default {
     @filter="handleFilterIssues"
   >
     <template #nav-actions>
-      <gl-button :href="issueCreateUrl" target="_blank" class="gl-my-5"
-        >{{ s__('Integrations|Create new issue in Jira') }}<gl-icon name="external-link"
-      /></gl-button>
+      <gl-button :href="issueCreateUrl" target="_blank" class="gl-my-5">
+        {{ s__('Integrations|Create new issue in Jira') }}
+        <gl-icon name="external-link" />
+      </gl-button>
     </template>
     <template #reference="{ issuable }">
       <span v-safe-html="jiraLogo" class="svg-container jira-logo-container"></span>
