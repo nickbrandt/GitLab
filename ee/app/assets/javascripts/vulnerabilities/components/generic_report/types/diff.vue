@@ -107,10 +107,10 @@ export default {
         class="line_holder"
       >
         <td class="diff-line-num old_line gl-border-t-0 gl-border-b-0" :class="changeClass(line)">
-          {{ line.old_line }}
+          {{ line.oldLine }}
         </td>
         <td class="diff-line-num new_line gl-border-t-0 gl-border-b-0" :class="changeClass(line)">
-          {{ line.new_line }}
+          {{ line.newLine }}
         </td>
         <td class="line_content" :class="changeClass(line)">
           <span

@@ -30,15 +30,15 @@
     const lineNumbers = {};
 
     if (line.type === LINE_TYPES.NORMAL) {
-      lineNumbers.old_line = beforeLineNo;
-      lineNumbers.new_line = afterLineNo;
+      lineNumbers.oldLine = beforeLineNo;
+      lineNumbers.newLine = afterLineNo;
       beforeLineNo += 1;
       afterLineNo += 1;
     } else if (line.type === LINE_TYPES.REMOVED) {
-      lineNumbers.old_line = beforeLineNo;
+      lineNumbers.oldLine = beforeLineNo;
       beforeLineNo += 1;
     } else if (line.type === LINE_TYPES.ADDED) {
-      lineNumbers.new_line = afterLineNo;
+      lineNumbers.newLine = afterLineNo;
       afterLineNo += 1;
     }
     return { ...line, ...lineNumbers };
@@ -48,7 +48,7 @@
  function splitLinesInline(lines) {
    const res = [];
    const createLine = (type) => {
-     return { type, actions: [], old_line: undefined, new_line: undefined };
+     return { type, actions: [], oldLine: undefined, newLine: undefined };
    };
    const hasNonEmpty = (line, type) => {
      let typeCount = 0;
@@ -143,8 +143,8 @@
   *   {
   *     type: normal | added | removed,
   *     actions: [], // array of action objects (see below)
-  *     new_line: undefined or number,
-  *     old_line: undefined or number,
+  *     newLine: undefined or number,
+  *     oldLine: undefined or number,
   *   }
   *
   * Action objects have the form

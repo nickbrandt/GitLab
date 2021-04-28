@@ -25,8 +25,8 @@ function checkLineActions(line, actionSpecs) {
 
 function checkLine(line, oldLine, newLine, lineType, actionSpecs) {
   expect(line.type).toEqual(lineType);
-  expect(line.old_line).toEqual(oldLine);
-  expect(line.new_line).toEqual(newLine);
+  expect(line.oldLine).toEqual(oldLine);
+  expect(line.newLine).toEqual(newLine);
   checkLineActions(line, actionSpecs);
 }
 
