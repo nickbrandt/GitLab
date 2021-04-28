@@ -8,6 +8,7 @@ module Geo
 
     idempotent!
 
+    tags :exclude_from_kubernetes
     loggable_arguments 0
 
     def perform(replicable_name, replicable_id)
