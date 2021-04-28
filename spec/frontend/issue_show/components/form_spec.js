@@ -1,6 +1,5 @@
 import { GlAlert } from '@gitlab/ui';
 import { shallowMount } from '@vue/test-utils';
-import Vue from 'vue';
 import Autosave from '~/autosave';
 import DescriptionTemplate from '~/issue_show/components/fields/description_template.vue';
 import formComponent from '~/issue_show/components/form.vue';
