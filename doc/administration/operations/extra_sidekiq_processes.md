@@ -192,8 +192,6 @@ have higher precedence than OR.
 later, as with the standard queue group syntax above, a single `*` as the
 entire queue group selects all queues.
 
-### Example queries
-
 In `/etc/gitlab/gitlab.rb`:
 
 ```ruby
