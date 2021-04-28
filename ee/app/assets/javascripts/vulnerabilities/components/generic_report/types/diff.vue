@@ -81,18 +81,21 @@ export default {
       <gl-button-group class="gl-display-flex gl-float-right">
         <gl-button
           :class="{ selected: isDiffView }"
+          data-testid="diffButton"
           @click="setView($options.viewTypes.DIFF)"
         >
           {{ s__('GenericReport|Diff') }}
         </gl-button>
         <gl-button
           :class="{ selected: isBeforeView }"
+          data-testid="beforeButton"
           @click="setView($options.viewTypes.BEFORE)"
         >
           {{ s__('GenericReport|Before') }}
         </gl-button>
         <gl-button
           :class="{ selected: isAfterView }"
+          data-testid="afterButton"
           @click="setView($options.viewTypes.AFTER)"
         >
           {{ s__('GenericReport|After') }}
@@ -105,6 +108,7 @@ export default {
         :key="idx"
         :class="changeClass(line)"
         class="line_holder"
+        data-testid="diffLine"
       >
         <td class="diff-line-num old_line gl-border-t-0 gl-border-b-0" :class="changeClass(line)">
           {{ line.oldLine }}
@@ -112,7 +116,7 @@ export default {
         <td class="diff-line-num new_line gl-border-t-0 gl-border-b-0" :class="changeClass(line)">
           {{ line.newLine }}
         </td>
-        <td class="line_content" :class="changeClass(line)">
+        <td data-testid="diffContent" class="line_content" :class="changeClass(line)">
           <span
             v-for="(action, actionIdx) in line.actions"
             :key="actionIdx"

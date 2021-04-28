@@ -1,57 +1,58 @@
-import { shallowMount } from '@vue/test-utils';
-import { VIEW_TYPES } from 'ee/vulnerabilities/components/generic_report/types/constants';
+import { mount } from '@vue/test-utils';
 import Diff from 'ee/vulnerabilities/components/generic_report/types/diff.vue';
+import { extendedWrapper } from 'helpers/vue_test_utils_helper';
 
 const TEST_DATA = {
-  before: `
-  Hello World
-  Hello Again
-  
-  Hello With a Space`,
-  after: `
-  Hello Wo5ld
-  Hello Again
-  
-  Hello With a SpAce
-  Additional Hello`,
+  before: `beforeText`,
+  after: `afterText`,
 };
 
 describe('ee/vulnerabilities/components/generic_report/types/diff.vue', () => {
   let wrapper;
 
   const createWrapper = () => {
-    return shallowMount(Diff, {
-      propsData: {
-        ...TEST_DATA,
-      },
-    });
+    return extendedWrapper(
+      mount(Diff, {
+        propsData: {
+          ...TEST_DATA,
+        },
+      }),
+    );
   };
 
   beforeEach(() => {
     wrapper = createWrapper();
   });
 
-  it('renders the diff tab', () => {
-    expect(wrapper.find('.code').element).toMatchSnapshot();
+  afterEach(() => {
+    wrapper.destroy();
   });
 
-  it('renders the before tab', async () => {
-    wrapper.setData({
-      view: VIEW_TYPES.BEFORE,
-    });
+  const findButton = (type) => wrapper.findByTestId(`${type}Button`);
+  const findDiffOutput = () => wrapper.find('.code').text();
+  const findDiffLines = () => wrapper.findAllByTestId('diffLine');
 
-    await wrapper.vm.$nextTick();
+  describe.each`
+    viewType    | expectedLines | includesBeforeText | includesAfterText
+    ${'diff'}   | ${2}          | ${true}            | ${true}
+    ${'before'} | ${1}          | ${true}            | ${false}
+    ${'after'}  | ${1}          | ${false}           | ${true}
+  `(
+    'with "$viewType" selected',
+    ({ viewType, expectedLines, includesBeforeText, includesAfterText }) => {
+      beforeEach(() => findButton(viewType).trigger('click'));
 
-    expect(wrapper.find('.code').element).toMatchSnapshot();
-  });
+      it(`shows $expectedLines`, () => {
+        expect(findDiffLines()).toHaveLength(expectedLines);
+      });
 
-  it('renders the after tab', async () => {
-    wrapper.setData({
-      view: VIEW_TYPES.AFTER,
-    });
+      it(`${includesBeforeText ? 'includes' : 'does not include'} before text`, () => {
+        expect(findDiffOutput().includes(TEST_DATA.before)).toBe(includesBeforeText);
+      });
 
-    await wrapper.vm.$nextTick();
-
-    expect(wrapper.find('.code').element).toMatchSnapshot();
-  });
+      it(`${includesAfterText ? 'includes' : 'does not include'} after text`, () => {
+        expect(findDiffOutput().includes(TEST_DATA.after)).toBe(includesAfterText);
+      });
+    },
+  );
 });
