@@ -236,12 +236,12 @@ spec:
   });
 
   it('adds a new rule', async () => {
-    expect(wrapper.findAll(PolicyRuleBuilder)).toHaveLength(1);
+    expect(wrapper.findAllComponents(PolicyRuleBuilder)).toHaveLength(1);
     const button = findAddRuleButton();
     button.vm.$emit('click');
     button.vm.$emit('click');
     await wrapper.vm.$nextTick();
-    const elements = wrapper.findAll(PolicyRuleBuilder);
+    const elements = wrapper.findAllComponents(PolicyRuleBuilder);
     expect(elements).toHaveLength(3);
 
     elements.wrappers.forEach((builder, idx) => {
@@ -259,11 +259,11 @@ spec:
   it('removes a new rule', async () => {
     findAddRuleButton().vm.$emit('click');
     await wrapper.vm.$nextTick();
-    expect(wrapper.findAll(PolicyRuleBuilder)).toHaveLength(2);
+    expect(wrapper.findAllComponents(PolicyRuleBuilder)).toHaveLength(2);
 
     findPolicyRuleBuilder().vm.$emit('remove');
     await wrapper.vm.$nextTick();
-    expect(wrapper.findAll(PolicyRuleBuilder)).toHaveLength(1);
+    expect(wrapper.findAllComponents(PolicyRuleBuilder)).toHaveLength(1);
   });
 
   it('updates yaml editor value on switch to yaml editor', async () => {
@@ -371,7 +371,7 @@ spec:
 
     it('presents existing policy', () => {
       expect(findPolicyName().attributes().value).toEqual('policy');
-      expect(wrapper.findAll(PolicyRuleBuilder).length).toEqual(1);
+      expect(wrapper.findAllComponents(PolicyRuleBuilder)).toHaveLength(1);
     });
 
     it('updates existing policy and redirects to a threat monitoring path', async () => {
