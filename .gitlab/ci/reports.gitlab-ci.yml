@@ -14,11 +14,11 @@ code_quality:
       - gl-code-quality-report.json  # GitLab-specific
   rules: !reference [".reports:rules:code_quality", rules]
 
-# Putting the `extends` in `.sast-analyzer` would override the `extends: sast` that's already there.
-sast:
-  extends: .default-retry
-
 .sast-analyzer:
+  # We need to re-`extends` from `sast` as the `extends` here overrides the one from the template.
+  extends:
+    - .default-retry
+    - sast
   needs: []
   artifacts:
     paths:
@@ -49,11 +49,11 @@ nodejs-scan-sast:
 secret_detection:
   rules: !reference [".reports:rules:secret_detection", rules]
 
-# Putting the `extends` in `.ds-analyzer` would override the `extends: dependency_scanning` that's already there.
-dependency_scanning:
-  extends: .default-retry
-
 .ds-analyzer:
+  # We need to re-`extends` from `dependency_scanning` as the `extends` here overrides the one from the template.
+  extends:
+    - .default-retry
+    - dependency_scanning
   needs: []
   variables:
     DS_EXCLUDED_PATHS: "qa/qa/ee/fixtures/secure_premade_reports, spec, ee/spec, tmp"  # GitLab-specific
