@@ -67,7 +67,7 @@ module QA
             show.click_browse_button
           end
 
-          EE::Page::Project::Artifact::Show.perform do |show|
+          Page::Project::Artifact::Show.perform do |show|
             show.go_to_directory(directory_name)
             expect(show).to have_content(file_name)
           end
