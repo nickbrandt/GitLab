@@ -1,5 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
-import { BEFORE, AFTER } from 'ee/vulnerabilities/components/generic_report/types/constants';
+import { VIEW_TYPES } from 'ee/vulnerabilities/components/generic_report/types/constants';
 import Diff from 'ee/vulnerabilities/components/generic_report/types/diff.vue';
 
 const TEST_DATA = {
@@ -37,7 +37,7 @@ describe('ee/vulnerabilities/components/generic_report/types/diff.vue', () => {
 
   it('renders the before tab', async () => {
     wrapper.setData({
-      view: BEFORE,
+      view: VIEW_TYPES.BEFORE,
     });
 
     await wrapper.vm.$nextTick();
@@ -47,7 +47,7 @@ describe('ee/vulnerabilities/components/generic_report/types/diff.vue', () => {
 
   it('renders the after tab', async () => {
     wrapper.setData({
-      view: AFTER,
+      view: VIEW_TYPES.AFTER,
     });
 
     await wrapper.vm.$nextTick();

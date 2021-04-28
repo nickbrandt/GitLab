@@ -1,6 +1,6 @@
 <script>
 import { GlButtonGroup, GlButton } from '@gitlab/ui';
-import { DIFF, BEFORE, AFTER } from './constants';
+import { VIEW_TYPES } from './constants';
 import { createDiffData } from './diff_utils';
 
 export default {
@@ -20,11 +20,11 @@ export default {
   },
   data() {
     return {
-      view: DIFF,
+      view: VIEW_TYPES.DIFF,
     };
   },
-  viewType: {
-    DIFF,
+  viewTypes: {
+    DIFF: VIEW_TYPES.DIFF,
   },
   computed: {
     diffData() {
@@ -34,22 +34,22 @@ export default {
       return this.diffData.filter(this.shouldShowLine);
     },
     isDiffView() {
-      return this.view === DIFF;
+      return this.view === VIEW_TYPES.DIFF;
     },
     isBeforeView() {
-      return this.view === BEFORE;
+      return this.view === VIEW_TYPES.BEFORE;
     },
     isAfterView() {
-      return this.view === AFTER;
+      return this.view === VIEW_TYPES.AFTER;
     },
   },
   methods: {
     shouldShowLine(line) {
       return (
-        this.view === DIFF ||
+        this.view === VIEW_TYPES.DIFF ||
         line.type === 'normal' ||
-        (line.type === 'removed' && this.view === BEFORE) ||
-        (line.type === 'added' && this.view === AFTER)
+        (line.type === 'removed' && this.view === VIEW_TYPES.BEFORE) ||
+        (line.type === 'added' && this.view === VIEW_TYPES.AFTER)
       );
     },
     changeClass(change) {
@@ -66,13 +66,13 @@ export default {
       return '';
     },
     setDiffViewType() {
-      this.view = DIFF;
+      this.view = VIEW_TYPES.DIFF;
     },
     setBeforeViewType() {
-      this.view = BEFORE;
+      this.view = VIEW_TYPES.BEFORE;
     },
     setAfterViewType() {
-      this.view = AFTER;
+      this.view = VIEW_TYPES.AFTER;
     },
   },
   userColorScheme: window.gon.user_color_scheme,
@@ -85,21 +85,21 @@ export default {
       <gl-button-group class="gl-display-flex gl-float-right">
         <gl-button
           :class="{ selected: isDiffView }"
-          :data-view-type="$options.viewType.DIFF"
+          :data-view-type="$options.viewTypes.DIFF"
           @click="setDiffViewType"
         >
           {{ s__('GenericReport|Diff') }}
         </gl-button>
         <gl-button
           :class="{ selected: isBeforeView }"
-          :data-view-type="$options.viewType.DIFF"
+          :data-view-type="$options.viewTypes.DIFF"
           @click="setBeforeViewType"
         >
           {{ s__('GenericReport|Before') }}
         </gl-button>
         <gl-button
           :class="{ selected: isAfterView }"
-          :data-view-type="$options.viewType.DIFF"
+          :data-view-type="$options.viewTypes.DIFF"
           @click="setAfterViewType"
         >
           {{ s__('Genericreport|After') }}
