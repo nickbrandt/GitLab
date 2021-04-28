@@ -15,36 +15,35 @@
    ) {
      splitValues.pop();
    }
-   const res = [];
-   splitValues.forEach((splitValue) => {
-     res.push({
-       added: action.added,
-       removed: action.removed,
-       value: splitValue,
-     });
-   });
-   return res;
+   return splitValues.map((splitValue) => ({
+    added: action.added,
+    removed: action.removed,
+    value: splitValue,
+  }));
  }
  
  function setLineNumbers(lines) {
-   let beforeLineNo = 1;
-   let afterLineNo = 1;
-   lines.forEach((l) => {
-     const line = l;
-     if (line.type === LINE_TYPES.NORMAL) {
-       line.old_line = beforeLineNo;
-       line.new_line = afterLineNo;
-       beforeLineNo += 1;
-       afterLineNo += 1;
-     } else if (line.type === LINE_TYPES.REMOVED) {
-       line.old_line = beforeLineNo;
-       beforeLineNo += 1;
-     } else if (line.type === LINE_TYPES.ADDED) {
-       line.new_line = afterLineNo;
-       afterLineNo += 1;
-     }
-   });
- }
+  let beforeLineNo = 1;
+  let afterLineNo = 1;
+
+  return lines.map((line) => {
+    const lineNumbers = {};
+
+    if (line.type === LINE_TYPES.NORMAL) {
+      lineNumbers.old_line = beforeLineNo;
+      lineNumbers.new_line = afterLineNo;
+      beforeLineNo += 1;
+      afterLineNo += 1;
+    } else if (line.type === LINE_TYPES.REMOVED) {
+      lineNumbers.old_line = beforeLineNo;
+      beforeLineNo += 1;
+    } else if (line.type === LINE_TYPES.ADDED) {
+      lineNumbers.new_line = afterLineNo;
+      afterLineNo += 1;
+    }
+    return { ...line, ...lineNumbers };
+  });
+}
  
  function splitLinesInline(lines) {
    const res = [];
@@ -106,8 +105,7 @@
      maybeAddAfter();
    });
  
-   setLineNumbers(res);
-   return res;
+   return setLineNumbers(res);
  }
  
  export function groupActionsByLines(actions) {
