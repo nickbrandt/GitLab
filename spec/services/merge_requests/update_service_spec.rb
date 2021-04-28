@@ -1053,19 +1053,15 @@ RSpec.describe MergeRequests::UpdateService, :mailer do
     end
 
     context 'when adding time spent' do
+      let(:spend_time) { { duration: 1800, user_id: user3.id } }
+
       context ':use_specialized_service' do
         context 'when true' do
           it 'passes the update action to ::MergeRequests::AddSpentTimeService' do
             expect(::MergeRequests::AddSpentTimeService)
               .to receive(:new).and_call_original
 
-            update_merge_request({
-              spend_time: {
-                duration: 1800, # 30min
-                user_id: user3.id
-              },
-              use_specialized_service: true
-            })
+            update_merge_request(spend_time: spend_time, use_specialized_service: true)
           end
         end
 
@@ -1075,23 +1071,11 @@ RSpec.describe MergeRequests::UpdateService, :mailer do
           end
 
           it 'does not pass the update action to ::MergeRequests::UpdateAssigneesService when false' do
-            update_merge_request({
-              spend_time: {
-                duration: 1800, # 30min
-                user_id: user3.id
-              },
-              use_specialized_service: false
-            })
+            update_merge_request(spend_time: spend_time, use_specialized_service: false)
           end
 
           it 'does not pass the update action to ::MergeRequests::UpdateAssigneesService when nil' do
-            update_merge_request({
-              spend_time: {
-                duration: 1800, # 30min
-                user_id: user3.id
-              },
-              use_specialized_service: nil
-            })
+            update_merge_request(spend_time: spend_time, use_specialized_service: nil)
           end
         end
       end
