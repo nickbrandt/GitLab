@@ -51,7 +51,7 @@ RSpec.describe 'User views releases', :js do
           let!(:release_link) { create(:release_link, release: release_v1, name: 'linux-amd64 binaries', filepath: '/binaries/linux-amd64', url: url) }
           let(:url) { "#{project.web_url}/-/jobs/1/artifacts/download" }
 
-          it 'sees the link' do
+          it 'sees the link', quarantine: 'https://gitlab.com/gitlab-org/gitlab/-/issues/329301' do
             page.within("##{release_v1.tag} .js-assets-list") do
               expect(page).to have_link release_link.name, href: direct_asset_link
               expect(page).not_to have_css('[data-testid="external-link-indicator"]')
@@ -62,7 +62,7 @@ RSpec.describe 'User views releases', :js do
         context 'when url points to external resource' do
           let(:url) { 'http://google.com/download' }
 
-          it 'sees that the link is external resource' do
+          it 'sees that the link is external resource', quarantine: 'https://gitlab.com/gitlab-org/gitlab/-/issues/329302' do
             page.within("##{release_v1.tag} .js-assets-list") do
               expect(page).to have_css('[data-testid="external-link-indicator"]')
             end
