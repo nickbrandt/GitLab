@@ -3,23 +3,20 @@
 module Mutations
   module Security
     module CiConfiguration
-      class ConfigureSast < BaseMutation
+      class ConfigureSecretDetection < BaseMutation
         include FindsProject
 
-        graphql_name 'ConfigureSast'
+        graphql_name 'ConfigureSecretDetection'
         description <<~DESC
-          Configure SAST for a project by enabling SAST in a new or modified
-          `.gitlab-ci.yml` file in a new branch. The new branch and a URL to
-          create a Merge Request are a part of the response.
+          Configure Secret Detection for a project by enabling Secret Detection
+          in a new or modified `.gitlab-ci.yml` file in a new branch. The new
+          branch and a URL to create a Merge Request are a part of the
+          response.
         DESC
 
         argument :project_path, GraphQL::ID_TYPE,
           required: true,
           description: 'Full path of the project.'
-
-        argument :configuration, ::Types::CiConfiguration::Sast::InputType,
-          required: true,
-          description: 'SAST CI configuration for the project.'
 
         field :success_path, GraphQL::STRING_TYPE, null: true,
           description: 'Redirect path to use when the response is successful.'
@@ -29,10 +26,10 @@ module Mutations
 
         authorize :push_code
 
-        def resolve(project_path:, configuration:)
+        def resolve(project_path:)
           project = authorized_find!(project_path)
 
-          result = ::Security::CiConfiguration::SastCreateService.new(project, current_user, configuration).execute
+          result = ::Security::CiConfiguration::SecretDetectionCreateService.new(project, current_user).execute
           prepare_response(result)
         end
 
