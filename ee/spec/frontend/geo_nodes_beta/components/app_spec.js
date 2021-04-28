@@ -1,4 +1,4 @@
-import { GlLink, GlButton, GlLoadingIcon, GlModal } from '@gitlab/ui';
+import { GlLink, GlButton, GlLoadingIcon, GlModal, GlSprintf } from '@gitlab/ui';
 import { shallowMount } from '@vue/test-utils';
 import Vue from 'vue';
 import Vuex from 'vuex';
@@ -38,6 +38,7 @@ describe('GeoNodesBetaApp', () => {
         ...defaultProps,
         ...props,
       },
+      stubs: { GlSprintf },
     });
   };
 
