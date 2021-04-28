@@ -674,7 +674,7 @@ We have the following recommendations for [Adding new events](#adding-new-events
 
 ##### Enable/Disable Redis HLL tracking
 
-Events are tracked behind [feature flags](../feature_flags/index.md) due to concerns for Redis performance and scalability.
+Events are tracked behind optional [feature flags](../feature_flags/index.md) due to concerns for Redis performance and scalability.
 
 For a full list of events and corresponding feature flags see, [known_events](https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/usage_data_counters/known_events/) files.
 
@@ -684,6 +684,13 @@ To enable or disable tracking for specific event in <https://gitlab.com> or <htt
 ```shell
 /chatops run feature set <feature_name> true
 /chatops run feature set <feature_name> false
+```
+
+We can also disable tracking completely by using the global flag:
+
+```shell
+/chatops run feature set redis_hll_tracking true
+/chatops run feature set redis_hll_tracking false
 ```
 
 ##### Known events are added automatically in usage data payload
