@@ -46,7 +46,7 @@ describe('Report Items Diff Utils', () => {
       ]);
     });
 
-    it('Correctly groups whole-line deletions by lines', () => {
+    it('correctly groups whole-line deletions by lines', () => {
       const before = 'a\nb';
       const after = 'b';
 
@@ -58,7 +58,7 @@ describe('Report Items Diff Utils', () => {
       checkLineActions(lines[1], [[LINE_TYPES.NORMAL, 'b']]);
     });
 
-    it('Correctly groups whole-line insertions by lines', () => {
+    it('correctly groups whole-line insertions by lines', () => {
       const before = 'x\ny\nz';
       const after = 'x\ny\ny\nz';
 
@@ -74,7 +74,7 @@ describe('Report Items Diff Utils', () => {
       ]);
     });
 
-    it('Correctly groups empty line deletions', () => {
+    it('correctly groups empty line deletions', () => {
       const before = '\n\n';
       const after = '\n';
 
@@ -100,7 +100,7 @@ describe('Report Items Diff Utils', () => {
   });
 
   describe('createDiffData', () => {
-    it('Correctly creates diff lines for single line changes', () => {
+    it('correctly creates diff lines for single line changes', () => {
       const before = 'hello world';
       const after = 'HELLO world';
 
@@ -117,7 +117,7 @@ describe('Report Items Diff Utils', () => {
       ]);
     });
 
-    it('Correctly creates diff lines for single line deletions', () => {
+    it('correctly creates diff lines for single line deletions', () => {
       const before = 'a\nb';
       const after = 'b';
 
@@ -127,7 +127,7 @@ describe('Report Items Diff Utils', () => {
       checkLine(lines[1], 2, 1, LINE_TYPES.NORMAL, [[LINE_TYPES.NORMAL, 'b']]);
     });
 
-    it('Correctly tracks line numbers for single-line additions', () => {
+    it('correctly tracks line numbers for single-line additions', () => {
       const before = 'x\ny\nz';
       const after = 'x\ny\ny\nz';
 
@@ -140,7 +140,7 @@ describe('Report Items Diff Utils', () => {
       checkLine(lines[3], 3, 4, LINE_TYPES.NORMAL, [[LINE_TYPES.NORMAL, 'z']]);
     });
 
-    it('Correctly tracks line numbers for multi-line additions', () => {
+    it('correctly tracks line numbers for multi-line additions', () => {
       const before = 'Hello there\nHello world\nhello again';
       const after = 'Hello there\nHello World\nanew line\nhello again\nhello again';
 
@@ -163,7 +163,7 @@ describe('Report Items Diff Utils', () => {
       checkLine(lines[5], undefined, 5, LINE_TYPES.ADDED, [[LINE_TYPES.ADDED, 'hello again']]);
     });
 
-    it('Correctly diffs empty line deletions', () => {
+    it('correctly diffs empty line deletions', () => {
       const before = '\n\n';
       const after = '\n';
 
@@ -174,7 +174,7 @@ describe('Report Items Diff Utils', () => {
       checkLine(lines[1], 2, undefined, LINE_TYPES.REMOVED, [[LINE_TYPES.REMOVED, '']]);
     });
 
-    it('Correctly diffs empty line additions', () => {
+    it('correctly diffs empty line additions', () => {
       const before = '\n';
       const after = '\n\n\n';
 
