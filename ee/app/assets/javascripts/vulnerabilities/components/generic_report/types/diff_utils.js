@@ -8,10 +8,14 @@
  
  export function splitAction(action) {
    const splitValues = action.value.split(/(\n)/);
+
+   const hasEmptyCharacter = splitValues[splitValues.length - 1] === '';
+   const hasNewLine = splitValues[splitValues.length - 2] === '\n'
+   
    if (
      splitValues.length >= 2 &&
-     splitValues[splitValues.length - 1] === '' &&
-     splitValues[splitValues.length - 2] === '\n'
+     hasEmptyCharacter &&
+     hasNewLine
    ) {
      splitValues.pop();
    }

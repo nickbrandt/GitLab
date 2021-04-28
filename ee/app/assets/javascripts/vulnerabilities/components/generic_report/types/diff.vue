@@ -36,13 +36,13 @@ export default {
       return this.diffData.filter(this.shouldShowLine);
     },
     isDiffView() {
-      return this.view === VIEW_TYPES.DIFF;
+      return this.view === $options.viewTypes.DIFF;
     },
     isBeforeView() {
-      return this.view === VIEW_TYPES.BEFORE;
+      return this.view === $options.viewTypes.BEFORE;
     },
     isAfterView() {
-      return this.view === VIEW_TYPES.AFTER;
+      return this.view === $options.viewTypes.AFTER;
     },
   },
   methods: {
