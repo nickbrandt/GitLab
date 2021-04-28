@@ -20,7 +20,7 @@ function actionType(action) {
 function checkLineActions(line, actionSpecs) {
   const lineActions = line.actions.map((action) => actionType(action));
   expect(lineActions).toEqual(actionSpecs);
-  expect(line.actions.length).toEqual(actionSpecs.length);
+  expect(line.actions).toHaveLength(actionSpecs.length);
 }
 
 function checkLine(line, oldLine, newLine, lineType, actionSpecs) {
@@ -38,7 +38,7 @@ describe('Report Items Diff Utils', () => {
 
       const actions = diffChars(before, after);
       const lines = groupActionsByLines(actions);
-      expect(lines.length).toEqual(1);
+      expect(lines).toHaveLength(1);
       checkLineActions(lines[0], [
         [LINE_TYPES.REMOVED, 'hello'],
         [LINE_TYPES.ADDED, 'HELLO'],
@@ -52,7 +52,7 @@ describe('Report Items Diff Utils', () => {
 
       const actions = diffChars(before, after);
       const lines = groupActionsByLines(actions);
-      expect(lines.length).toEqual(2);
+      expect(lines).toHaveLength(2);
 
       checkLineActions(lines[0], [[LINE_TYPES.REMOVED, 'a']]);
       checkLineActions(lines[1], [[LINE_TYPES.NORMAL, 'b']]);
@@ -64,7 +64,7 @@ describe('Report Items Diff Utils', () => {
 
       const actions = diffChars(before, after);
       const lines = groupActionsByLines(actions);
-      expect(lines.length).toEqual(3);
+      expect(lines).toHaveLength(3);
 
       checkLineActions(lines[0], [[LINE_TYPES.NORMAL, 'x']]);
       checkLineActions(lines[1], [[LINE_TYPES.NORMAL, 'y']]);
@@ -80,7 +80,7 @@ describe('Report Items Diff Utils', () => {
 
       const actions = diffChars(before, after);
       const lines = groupActionsByLines(actions);
-      expect(lines.length).toEqual(2);
+      expect(lines).toHaveLength(2);
 
       checkLineActions(lines[0], [[LINE_TYPES.NORMAL, '']]);
       checkLineActions(lines[1], [[LINE_TYPES.REMOVED, '']]);
@@ -92,7 +92,7 @@ describe('Report Items Diff Utils', () => {
 
       const actions = diffChars(before, after);
       const lines = groupActionsByLines(actions);
-      expect(lines.length).toEqual(2);
+      expect(lines).toHaveLength(2);
 
       checkLineActions(lines[0], [[LINE_TYPES.NORMAL, '']]);
       checkLineActions(lines[1], [[LINE_TYPES.ADDED, '\n\n']]);
@@ -105,7 +105,7 @@ describe('Report Items Diff Utils', () => {
       const after = 'HELLO world';
 
       const lines = createDiffData(before, after);
-      expect(lines.length).toEqual(2);
+      expect(lines).toHaveLength(2);
       expect(lines[0].type).toEqual(LINE_TYPES.REMOVED);
       checkLine(lines[0], 1, undefined, LINE_TYPES.REMOVED, [
         [LINE_TYPES.REMOVED, 'hello'],
@@ -122,7 +122,7 @@ describe('Report Items Diff Utils', () => {
       const after = 'b';
 
       const lines = createDiffData(before, after);
-      expect(lines.length).toEqual(2);
+      expect(lines).toHaveLength(2);
       checkLine(lines[0], 1, undefined, LINE_TYPES.REMOVED, [[LINE_TYPES.REMOVED, 'a']]);
       checkLine(lines[1], 2, 1, LINE_TYPES.NORMAL, [[LINE_TYPES.NORMAL, 'b']]);
     });
@@ -132,7 +132,7 @@ describe('Report Items Diff Utils', () => {
       const after = 'x\ny\ny\nz';
 
       const lines = createDiffData(before, after);
-      expect(lines.length).toEqual(4);
+      expect(lines).toHaveLength(4);
 
       checkLine(lines[0], 1, 1, LINE_TYPES.NORMAL, [[LINE_TYPES.NORMAL, 'x']]);
       checkLine(lines[1], 2, 2, LINE_TYPES.NORMAL, [[LINE_TYPES.NORMAL, 'y']]);
@@ -145,7 +145,7 @@ describe('Report Items Diff Utils', () => {
       const after = 'Hello there\nHello World\nanew line\nhello again\nhello again';
 
       const lines = createDiffData(before, after);
-      expect(lines.length).toEqual(6);
+      expect(lines).toHaveLength(6);
 
       checkLine(lines[0], 1, 1, LINE_TYPES.NORMAL, [[LINE_TYPES.NORMAL, 'Hello there']]);
       checkLine(lines[1], 2, undefined, LINE_TYPES.REMOVED, [
@@ -168,7 +168,7 @@ describe('Report Items Diff Utils', () => {
       const after = '\n';
 
       const lines = createDiffData(before, after);
-      expect(lines.length).toEqual(2);
+      expect(lines).toHaveLength(2);
 
       checkLine(lines[0], 1, 1, LINE_TYPES.NORMAL, [[LINE_TYPES.NORMAL, '']]);
       checkLine(lines[1], 2, undefined, LINE_TYPES.REMOVED, [[LINE_TYPES.REMOVED, '']]);
@@ -179,7 +179,7 @@ describe('Report Items Diff Utils', () => {
       const after = '\n\n\n';
 
       const lines = createDiffData(before, after);
-      expect(lines.length).toEqual(3);
+      expect(lines).toHaveLength(3);
 
       checkLine(lines[0], 1, 1, LINE_TYPES.NORMAL, [[LINE_TYPES.NORMAL, '']]);
       checkLine(lines[1], undefined, 2, LINE_TYPES.ADDED, [[LINE_TYPES.ADDED, '']]);
