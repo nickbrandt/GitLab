@@ -26663,13 +26663,13 @@ msgstr ""
 msgid "Releases|New Release"
 msgstr ""
 
-msgid "Release|Something went wrong while creating a new release"
+msgid "Release|Something went wrong while creating a new release."
 msgstr ""
 
 msgid "Release|Something went wrong while getting the release details."
 msgstr ""
 
-msgid "Release|Something went wrong while saving the release details"
+msgid "Release|Something went wrong while saving the release details."
 msgstr ""
 
 msgid "Remediations"
