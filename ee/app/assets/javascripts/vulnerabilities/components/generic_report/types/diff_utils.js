@@ -9,13 +9,13 @@
  export function splitAction(action) {
    const splitValues = action.value.split(/(\n)/);
 
-   const hasEmptyCharacter = splitValues[splitValues.length - 1] === '';
-   const hasNewLine = splitValues[splitValues.length - 2] === '\n'
+   const isEmptyCharacter = splitValues[splitValues.length - 1] === '';
+   const isNewLine = splitValues[splitValues.length - 2] === '\n'
    
    if (
      splitValues.length >= 2 &&
-     hasEmptyCharacter &&
-     hasNewLine
+     isEmptyCharacter &&
+     isNewLine
    ) {
      splitValues.pop();
    }
@@ -114,15 +114,13 @@
  
  export function groupActionsByLines(actions) {
    const res = [];
-   let currLine = null;
+   let currLine = { actions: [] };
+   
    const newLine = () => {
-     if (currLine !== null) {
-       res.push(currLine);
-     }
+     res.push(currLine);
      currLine = { actions: [] };
    };
-   newLine();
- 
+
    actions.forEach((action) => {
      if (action.added) {
        currLine.actions.push(action);
