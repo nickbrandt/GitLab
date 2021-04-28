@@ -778,7 +778,7 @@ Tiers: `free`, `premium`, `ultimate`
 
 ### `counts.commit_comment`
 
-Missing description
+Count of total unique commit comments. Does not include MR diff comments
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/20210216182004_commit_comment.yml)
 
@@ -786,7 +786,7 @@ Group: `group::source code`
 
 Status: `data_available`
 
-Tiers: `free`
+Tiers: `free`, `premium`, `ultimate`
 
 ### `counts.confidential_epics`
 
@@ -5038,15 +5038,15 @@ Tiers: `free`
 
 ### `counts.projects_with_repositories_enabled`
 
-Missing description
+Count of users creating projects that have a matching Git repository, result of a Git push action.
 
-[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/20210216181959_projects_with_repositories_enabled.yml)
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_all/20210216181959_projects_with_repositories_enabled.yml)
 
 Group: `group::source code`
 
 Status: `data_available`
 
-Tiers: `free`
+Tiers: `premium`, `ultimate`
 
 ### `counts.projects_with_terraform_reports`
 
@@ -5098,27 +5098,27 @@ Tiers: `free`, `premium`, `ultimate`
 
 ### `counts.protected_branches`
 
-Missing description
+Count of total protected branches
 
-[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/)
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_all/20210216182001_protected_branches.yml)
 
 Group: `group::source code`
 
 Status: `data_available`
 
-Tiers: `free`
+Tiers: `premium`, `ultimate`
 
 ### `counts.protected_branches_except_default`
 
-Missing description
+Count of branches that have been protected and are not the default branch
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/20210216182454_protected_branches_except_default.yml)
 
-Group: ``
+Group: `group::source code`
 
 Status: `data_available`
 
-Tiers: `free`
+Tiers: `free`, `premium`, `ultimate`
 
 ### `counts.releases`
 
@@ -5134,7 +5134,7 @@ Tiers: `free`
 
 ### `counts.remote_mirrors`
 
-Missing description
+Count of total remote mirrors. Includes both push and pull mirrors
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/20210216182002_remote_mirrors.yml)
 
@@ -5142,7 +5142,7 @@ Group: `group::source code`
 
 Status: `data_available`
 
-Tiers: `free`
+Tiers: `free`, `premium`, `ultimate`
 
 ### `counts.requirement_test_reports_ci`
 
@@ -5290,7 +5290,7 @@ Tiers: `free`, `premium`, `ultimate`
 
 ### `counts.source_code_pushes`
 
-Missing description
+Count of total Git push operations
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/20210216182006_source_code_pushes.yml)
 
@@ -5298,7 +5298,7 @@ Group: `group::source code`
 
 Status: `data_available`
 
-Tiers: `free`
+Tiers: `free`, `premium`, `ultimate`
 
 ### `counts.static_site_editor_commits`
 
@@ -5410,15 +5410,15 @@ Tiers: `free`
 
 ### `counts.template_repositories`
 
-Missing description
+Count of total repo templates used to aggregate all file templates
 
-[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/20210216182008_template_repositories.yml)
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_all/20210216182008_template_repositories.yml)
 
 Group: `group::source code`
 
 Status: `data_available`
 
-Tiers: `free`
+Tiers: `premium`, `ultimate`
 
 ### `counts.templates_asana_active`
 
@@ -6360,13 +6360,13 @@ Tiers: `free`
 
 The version of the PostgreSQL database.
 
-[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/license/20210216175609_version.yml)
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/settings/20210216175609_version.yml)
 
 Group: `group::distribution`
 
 Status: `data_available`
 
-Tiers: `free`
+Tiers: `free`, `premium`, `ultimate`
 
 ### `dependency_proxy_enabled`
 
@@ -6384,7 +6384,7 @@ Tiers: `free`
 
 Edition of GitLab such as EE or CE
 
-[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/license/20210216175604_edition.yml)
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/settings/20210216175604_edition.yml)
 
 Group: `group::distribution`
 
@@ -13522,7 +13522,7 @@ Tiers:
 
 ### `redis_hll_counters.source_code.design_action_monthly`
 
-Missing description
+Count of total design actions (upload, delete, comment, reply)
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_28d/20210216182106_design_action_monthly.yml)
 
@@ -13530,43 +13530,43 @@ Group: `group::source code`
 
 Status: `data_available`
 
-Tiers: `free`
+Tiers: `free`, `premium`, `ultimate`
 
 ### `redis_hll_counters.source_code.design_action_weekly`
 
-Missing description
+Count of total design actions (upload, delete, comment, reply)
 
-[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_7d/20210216182104_design_action_weekly.yml)
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_7d/20210216182104_design_action_weekly.yml)
 
 Group: `group::source code`
 
 Status: `data_available`
 
-Tiers:
+Tiers: `free`, `premium`, `ultimate`
 
 ### `redis_hll_counters.source_code.git_write_action_monthly`
 
-Missing description
+Count of unique Git write actions
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_28d/20210216184047_git_write_action_monthly.yml)
 
-Group: ``
+Group: `group::source code`
 
 Status: `data_available`
 
-Tiers: `free`
+Tiers: `free`, `premium`, `ultimate`
 
 ### `redis_hll_counters.source_code.git_write_action_weekly`
 
-Missing description
+Count of unique Git write actions
 
-[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_7d/20210216184045_git_write_action_weekly.yml)
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_7d/20210216184045_git_write_action_weekly.yml)
 
-Group: ``
+Group: `group::source code`
 
 Status: `data_available`
 
-Tiers:
+Tiers: `free`, `premium`, `ultimate`
 
 ### `redis_hll_counters.source_code.i_source_code_code_intelligence_monthly`
 
@@ -13618,7 +13618,7 @@ Tiers:
 
 ### `redis_hll_counters.source_code.project_action_monthly`
 
-Missing description
+Count of unique actions done on projects and related resources (create, edit, delete, comment)
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_28d/20210216182109_project_action_monthly.yml)
 
@@ -13626,23 +13626,23 @@ Group: `group::source code`
 
 Status: `data_available`
 
-Tiers: `free`
+Tiers: `free`, `premium`, `ultimate`
 
 ### `redis_hll_counters.source_code.project_action_weekly`
 
-Missing description
+Count of unique actions done on projects and related resources (create, edit, delete, comment)
 
-[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_7d/20210216182107_project_action_weekly.yml)
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_7d/20210216182107_project_action_weekly.yml)
 
 Group: `group::source code`
 
 Status: `data_available`
 
-Tiers:
+Tiers: `free`, `premium`, `ultimate`
 
 ### `redis_hll_counters.source_code.wiki_action_monthly`
 
-Missing description
+Count of unique actions done on a wiki (create, edit, delete)
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_28d/20210216182102_wiki_action_monthly.yml)
 
@@ -13650,19 +13650,19 @@ Group: `group::source code`
 
 Status: `data_available`
 
-Tiers: `free`
+Tiers: `free`, `premium`, `ultimate`
 
 ### `redis_hll_counters.source_code.wiki_action_weekly`
 
-Missing description
+Count of unique actions done on a wiki (create, edit, delete)
 
-[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_7d/20210216182100_wiki_action_weekly.yml)
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_7d/20210216182100_wiki_action_weekly.yml)
 
 Group: `group::source code`
 
 Status: `data_available`
 
-Tiers:
+Tiers: `free`, `premium`, `ultimate`
 
 ### `redis_hll_counters.terraform.p_terraform_state_api_unique_users_monthly`
 
@@ -14640,7 +14640,7 @@ Tiers: `free`, `premium`, `ultimate`
 
 ### `usage_activity_by_stage.create.approval_project_rules`
 
-Number of project approval rules
+Total number of project approval rules
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_all/20210216182030_approval_project_rules.yml)
 
@@ -14648,7 +14648,7 @@ Group: `group::source code`
 
 Status: `data_available`
 
-Tiers:
+Tiers: `premium`, `ultimate`
 
 ### `usage_activity_by_stage.create.approval_project_rules_with_exact_required_approvers`
 
@@ -14688,7 +14688,7 @@ Tiers: `free`
 
 ### `usage_activity_by_stage.create.approval_project_rules_with_target_branch`
 
-Number of project approval rules with not default target branch
+Number of project approval rules scoped to a specific repo branch.
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_all/20210216182032_approval_project_rules_with_target_branch.yml)
 
@@ -14696,11 +14696,11 @@ Group: `group::source code`
 
 Status: `data_available`
 
-Tiers:
+Tiers: `premium`, `ultimate`
 
 ### `usage_activity_by_stage.create.deploy_keys`
 
-Missing description
+Count of users creating deploy keys.
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/20210216182010_deploy_keys.yml)
 
@@ -14708,11 +14708,11 @@ Group: `group::source code`
 
 Status: `data_available`
 
-Tiers: `free`
+Tiers: `free`, `premium`, `ultimate`
 
 ### `usage_activity_by_stage.create.keys`
 
-Missing description
+Count of users creating regular keys.
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/20210216182012_keys.yml)
 
@@ -14720,7 +14720,7 @@ Group: `group::source code`
 
 Status: `data_available`
 
-Tiers: `free`
+Tiers: `free`, `premium`, `ultimate`
 
 ### `usage_activity_by_stage.create.merge_requests`
 
@@ -14784,15 +14784,15 @@ Tiers:
 
 ### `usage_activity_by_stage.create.projects_enforcing_code_owner_approval`
 
-Missing description
+Count of users creating projects that require approval by code owners for code changes.
 
-[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/20210216182019_projects_enforcing_code_owner_approval.yml)
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_all/20210216182019_projects_enforcing_code_owner_approval.yml)
 
 Group: `group::source code`
 
 Status: `data_available`
 
-Tiers: `free`
+Tiers: `premium`, `ultimate`
 
 ### `usage_activity_by_stage.create.projects_imported_from_github`
 
@@ -14808,7 +14808,7 @@ Tiers: `free`
 
 ### `usage_activity_by_stage.create.projects_with_disable_overriding_approvers_per_merge_request`
 
-Missing description
+Total count of projects that do not allow overriding approvers on discrete merge requests
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/20210216182014_projects_with_disable_overriding_approvers_per_merge_request.yml)
 
@@ -14816,35 +14816,35 @@ Group: `group::source code`
 
 Status: `data_available`
 
-Tiers: `free`
+Tiers: `free`, `premium`, `ultimate`
 
 ### `usage_activity_by_stage.create.projects_with_repositories_enabled`
 
-Missing description
+Count of projects that have a matching Git repository, result of a Git push action
 
-[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/20210216182023_projects_with_repositories_enabled.yml)
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_all/20210216182023_projects_with_repositories_enabled.yml)
 
 Group: `group::source code`
 
 Status: `data_available`
 
-Tiers: `free`
+Tiers: `premium`, `ultimate`
 
 ### `usage_activity_by_stage.create.projects_with_sectional_code_owner_rules`
 
-Missing description
+Count of projects using code owners with code owners section feature
 
-[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/20210216182021_projects_with_sectional_code_owner_rules.yml)
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_all/20210216182021_projects_with_sectional_code_owner_rules.yml)
 
 Group: `group::source code`
 
 Status: `data_available`
 
-Tiers: `free`
+Tiers: `premium`, `ultimate`
 
 ### `usage_activity_by_stage.create.projects_without_disable_overriding_approvers_per_merge_request`
 
-Missing description
+Count of total projects that do not disable overriding approvers per discrete merge request
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/20210216182015_projects_without_disable_overriding_approvers_per_merge_request.yml)
 
@@ -14852,23 +14852,23 @@ Group: `group::source code`
 
 Status: `data_available`
 
-Tiers: `free`
+Tiers: `free`, `premium`, `ultimate`
 
 ### `usage_activity_by_stage.create.protected_branches`
 
-Missing description
+Count of users creating projects with repositories making use of at least one protected branch.
 
-[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/20210216182025_protected_branches.yml)
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_all/20210216182025_protected_branches.yml)
 
 Group: `group::source code`
 
 Status: `data_available`
 
-Tiers: `free`
+Tiers: `premium`, `ultimate`
 
 ### `usage_activity_by_stage.create.remote_mirrors`
 
-Missing description
+Count of users creating projects with remote mirrors.
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/20210216182017_remote_mirrors.yml)
 
@@ -14876,7 +14876,7 @@ Group: `group::source code`
 
 Status: `data_available`
 
-Tiers: `free`
+Tiers: `free`, `premium`, `ultimate`
 
 ### `usage_activity_by_stage.create.snippets`
 
@@ -14904,51 +14904,51 @@ Tiers: `free`
 
 ### `usage_activity_by_stage.create.total_number_of_locked_files`
 
-The total number of exclusive file locks (through the CLI)
+The total number of files which have been locked via the GitLab UI
 
-[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/20210216182028_total_number_of_locked_files.yml)
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_all/20210216182028_total_number_of_locked_files.yml)
 
 Group: `group::source code`
 
 Status: `data_available`
 
-Tiers: `free`
+Tiers: `premium`, `ultimate`
 
 ### `usage_activity_by_stage.create.total_number_of_path_locks`
 
-The total number of default branch locks done through the GitLab UI
+Number of paths/directories manually locked through the UI
 
-[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/20210216182027_total_number_of_path_locks.yml)
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_all/20210216182027_total_number_of_path_locks.yml)
 
 Group: `group::source code`
 
 Status: `data_available`
 
-Tiers: `free`
+Tiers: `premium`, `ultimate`
 
 ### `usage_activity_by_stage.create.users_using_lfs_locks`
 
-Missing description
+Number of unique users who have locked files or directories using LFS via the command line
 
-[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/20210216183346_users_using_lfs_locks.yml)
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_all/20210216183346_users_using_lfs_locks.yml)
 
-Group: ``
+Group: `group::source code`
 
 Status: `data_available`
 
-Tiers: `free`
+Tiers: `premium`, `ultimate`
 
 ### `usage_activity_by_stage.create.users_using_path_locks`
 
-Missing description
+Number of users who have manually locked paths/directories through the UI
 
-[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/20210216183344_users_using_path_locks.yml)
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_all/20210216183344_users_using_path_locks.yml)
 
-Group: ``
+Group: `group::source code`
 
 Status: `data_available`
 
-Tiers: `free`
+Tiers: `premium`, `ultimate`
 
 ### `usage_activity_by_stage.enablement.counts.geo_node_usage.git_fetch_event_count_weekly`
 
@@ -16476,7 +16476,7 @@ Tiers: `free`
 
 ### `usage_activity_by_stage_monthly.create.action_monthly_active_users_git_write`
 
-Aggregated value for wiki, design and project repo actions
+Aggregated value for wiki, design, and project repo Git write actions
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_28d/20210216182041_action_monthly_active_users_git_write.yml)
 
@@ -16484,7 +16484,7 @@ Group: `group::source code`
 
 Status: `data_available`
 
-Tiers: `free`
+Tiers: `free`, `premium`, `ultimate`
 
 ### `usage_activity_by_stage_monthly.create.action_monthly_active_users_ide_edit`
 
@@ -16500,7 +16500,7 @@ Tiers: `free`
 
 ### `usage_activity_by_stage_monthly.create.action_monthly_active_users_project_repo`
 
-Missing description
+Count of monthly active users who have performed any Git operation (read/write/push)
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_28d/20210216182040_action_monthly_active_users_project_repo.yml)
 
@@ -16508,7 +16508,7 @@ Group: `group::source code`
 
 Status: `data_available`
 
-Tiers: `free`
+Tiers: `free`, `premium`, `ultimate`
 
 ### `usage_activity_by_stage_monthly.create.action_monthly_active_users_sfe_edit`
 
@@ -16572,7 +16572,7 @@ Tiers: `free`
 
 ### `usage_activity_by_stage_monthly.create.approval_project_rules`
 
-Number of project approval rules
+Total number of project approval rules
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_28d/20210216182056_approval_project_rules.yml)
 
@@ -16580,7 +16580,7 @@ Group: `group::source code`
 
 Status: `data_available`
 
-Tiers:
+Tiers: `premium`, `ultimate`
 
 ### `usage_activity_by_stage_monthly.create.approval_project_rules_with_exact_required_approvers`
 
@@ -16620,7 +16620,7 @@ Tiers: `free`
 
 ### `usage_activity_by_stage_monthly.create.approval_project_rules_with_target_branch`
 
-Number of project approval rules with not default target branch
+Number of project approval rules scoped to a specific repo branch.
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_28d/20210216182058_approval_project_rules_with_target_branch.yml)
 
@@ -16628,11 +16628,11 @@ Group: `group::source code`
 
 Status: `data_available`
 
-Tiers:
+Tiers: `premium`, `ultimate`
 
 ### `usage_activity_by_stage_monthly.create.deploy_keys`
 
-Missing description
+Count of users creating deploy keys in last 28 days.
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_28d/20210216182034_deploy_keys.yml)
 
@@ -16640,11 +16640,11 @@ Group: `group::source code`
 
 Status: `data_available`
 
-Tiers: `free`
+Tiers: `free`, `premium`, `ultimate`
 
 ### `usage_activity_by_stage_monthly.create.keys`
 
-Missing description
+Count of users creating regular keys in last 28 days.
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_28d/20210216182036_keys.yml)
 
@@ -16652,7 +16652,7 @@ Group: `group::source code`
 
 Status: `data_available`
 
-Tiers: `free`
+Tiers: `free`, `premium`, `ultimate`
 
 ### `usage_activity_by_stage_monthly.create.merge_requests`
 
@@ -16704,7 +16704,7 @@ Tiers:
 
 ### `usage_activity_by_stage_monthly.create.merge_requests_with_overridden_project_rules`
 
-Number of merge requests that have local rules that have overwritten a project rule
+Number of merge requests which have overriden rules created at the project level
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_28d/20210216182047_merge_requests_with_overridden_project_rules.yml)
 
@@ -16712,7 +16712,7 @@ Group: `group::source code`
 
 Status: `data_available`
 
-Tiers:
+Tiers: `premium`, `ultimate`
 
 ### `usage_activity_by_stage_monthly.create.merge_requests_with_required_codeowners`
 
@@ -16728,15 +16728,15 @@ Tiers:
 
 ### `usage_activity_by_stage_monthly.create.projects_enforcing_code_owner_approval`
 
-Missing description
+Count of total projects that require approval by code owners for code changes
 
-[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_28d/20210216182043_projects_enforcing_code_owner_approval.yml)
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_28d/20210216182043_projects_enforcing_code_owner_approval.yml)
 
 Group: `group::source code`
 
 Status: `data_available`
 
-Tiers: `free`
+Tiers: `premium`, `ultimate`
 
 ### `usage_activity_by_stage_monthly.create.projects_imported_from_github`
 
@@ -16764,27 +16764,27 @@ Tiers: `free`
 
 ### `usage_activity_by_stage_monthly.create.projects_with_repositories_enabled`
 
-Missing description
+Count of users creating projects that have a matching Git repository, result of a Git push action, for last 28 days.
 
-[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_28d/20210216182049_projects_with_repositories_enabled.yml)
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_28d/20210216182049_projects_with_repositories_enabled.yml)
 
 Group: `group::source code`
 
 Status: `data_available`
 
-Tiers: `free`
+Tiers: `premium`, `ultimate`
 
 ### `usage_activity_by_stage_monthly.create.projects_with_sectional_code_owner_rules`
 
-Missing description
+Count of projects using code owners with code owners section feature
 
-[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_28d/20210216182045_projects_with_sectional_code_owner_rules.yml)
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_28d/20210216182045_projects_with_sectional_code_owner_rules.yml)
 
 Group: `group::source code`
 
 Status: `data_available`
 
-Tiers: `free`
+Tiers: `premium`, `ultimate`
 
 ### `usage_activity_by_stage_monthly.create.projects_without_disable_overriding_approvers_per_merge_request`
 
@@ -16800,7 +16800,7 @@ Tiers: `free`
 
 ### `usage_activity_by_stage_monthly.create.protected_branches`
 
-Missing description
+Count of users creating projects with repositories making use of at least one protected branch in last 28 days.
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_28d/20210216182051_protected_branches.yml)
 
@@ -16808,11 +16808,11 @@ Group: `group::source code`
 
 Status: `data_available`
 
-Tiers: `free`
+Tiers: `free`, `premium`, `ultimate`
 
 ### `usage_activity_by_stage_monthly.create.remote_mirrors`
 
-Missing description
+Count of users creating projects with remote mirrors. Includes both push and pull mirrors.
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_28d/20210216182038_remote_mirrors.yml)
 
@@ -16820,7 +16820,7 @@ Group: `group::source code`
 
 Status: `data_available`
 
-Tiers: `free`
+Tiers: `free`, `premium`, `ultimate`
 
 ### `usage_activity_by_stage_monthly.create.snippets`
 
@@ -16848,31 +16848,31 @@ Tiers: `free`
 
 ### `usage_activity_by_stage_monthly.create.total_number_of_locked_files`
 
-Missing description
+The total number of files which have been locked via the GitLab UI
 
-[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_28d/20210216183614_total_number_of_locked_files.yml)
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_28d/20210216183614_total_number_of_locked_files.yml)
 
-Group: ``
+Group: `group::source code`
 
 Status: `data_available`
 
-Tiers: `free`
+Tiers: `premium`, `ultimate`
 
 ### `usage_activity_by_stage_monthly.create.total_number_of_path_locks`
 
-Missing description
+Number of paths/directories manually locked through the UI
 
-[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_28d/20210216183613_total_number_of_path_locks.yml)
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_28d/20210216183613_total_number_of_path_locks.yml)
 
-Group: ``
+Group: `group::source code`
 
 Status: `data_available`
 
-Tiers: `free`
+Tiers: `premium`, `ultimate`
 
 ### `usage_activity_by_stage_monthly.create.users_using_lfs_locks`
 
-Number of users that have used default branch locks through the UI
+Number of unique users who have locked files or directories using LFS via the command line
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_28d/20210216182054_users_using_lfs_locks.yml)
 
@@ -16880,11 +16880,11 @@ Group: `group::source code`
 
 Status: `data_available`
 
-Tiers:
+Tiers: `premium`, `ultimate`
 
 ### `usage_activity_by_stage_monthly.create.users_using_path_locks`
 
-Number of users that have used exclusive file locks through the CLI
+Number of users creating path_locks in last 28 days.
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_28d/20210216182053_users_using_path_locks.yml)
 
@@ -16892,7 +16892,7 @@ Group: `group::source code`
 
 Status: `data_available`
 
-Tiers:
+Tiers: `premium`, `ultimate`
 
 ### `usage_activity_by_stage_monthly.manage.bulk_imports.gitlab`
 

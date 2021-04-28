@@ -11,6 +11,8 @@ time_frame: 28d
 data_source: database
 distribution:
 - ce
+- ee
 tier:
 - free
-skip_validation: true
+- premium
+- ultimate
