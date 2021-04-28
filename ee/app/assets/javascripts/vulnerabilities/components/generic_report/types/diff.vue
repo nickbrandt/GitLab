@@ -36,13 +36,13 @@ export default {
       return this.diffData.filter(this.shouldShowLine);
     },
     isDiffView() {
-      return this.view === VIEW_TYPES.DIFF;
+      return this.view === this.$options.viewTypes.DIFF;
     },
     isBeforeView() {
-      return this.view === VIEW_TYPES.BEFORE;
+      return this.view === this.$options.viewTypes.BEFORE;
     },
     isAfterView() {
-      return this.view === VIEW_TYPES.AFTER;
+      return this.view === this.$options.viewTypes.AFTER;
     },
   },
   methods: {
@@ -110,10 +110,10 @@ export default {
         class="line_holder"
         data-testid="diffLine"
       >
-        <td class="diff-line-num old_line gl-border-t-0 gl-border-b-0" :class="changeClass(line)">
+        <td class="diff-line-num gl-border-t-0 gl-border-b-0" :class="changeClass(line)">
           {{ line.oldLine }}
         </td>
-        <td class="diff-line-num new_line gl-border-t-0 gl-border-b-0" :class="changeClass(line)">
+        <td class="diff-line-num gl-border-t-0 gl-border-b-0" :class="changeClass(line)">
           {{ line.newLine }}
         </td>
         <td data-testid="diffContent" class="line_content" :class="changeClass(line)">
