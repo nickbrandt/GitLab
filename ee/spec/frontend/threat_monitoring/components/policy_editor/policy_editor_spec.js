@@ -236,13 +236,13 @@ spec:
   });
 
   it('adds a new rule', async () => {
-    expect(wrapper.findAll(PolicyRuleBuilder).length).toEqual(1);
+    expect(wrapper.findAll(PolicyRuleBuilder)).toHaveLength(1);
     const button = findAddRuleButton();
     button.vm.$emit('click');
     button.vm.$emit('click');
     await wrapper.vm.$nextTick();
     const elements = wrapper.findAll(PolicyRuleBuilder);
-    expect(elements.length).toEqual(3);
+    expect(elements).toHaveLength(3);
 
     elements.wrappers.forEach((builder, idx) => {
       expect(builder.props().rule).toMatchObject({
@@ -259,11 +259,11 @@ spec:
   it('removes a new rule', async () => {
     findAddRuleButton().vm.$emit('click');
     await wrapper.vm.$nextTick();
-    expect(wrapper.findAll(PolicyRuleBuilder).length).toEqual(2);
+    expect(wrapper.findAll(PolicyRuleBuilder)).toHaveLength(2);
 
     findPolicyRuleBuilder().vm.$emit('remove');
     await wrapper.vm.$nextTick();
-    expect(wrapper.findAll(PolicyRuleBuilder).length).toEqual(1);
+    expect(wrapper.findAll(PolicyRuleBuilder)).toHaveLength(1);
   });
 
   it('updates yaml editor value on switch to yaml editor', async () => {
