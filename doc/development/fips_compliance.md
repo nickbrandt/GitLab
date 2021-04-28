@@ -25,7 +25,7 @@ mean FIPS 140-2.
 
 ## Current status
 
-We don't yet know whether we want to make GitLab FIPS-compliant or not. We are
+GitLab Inc has not committed to making GitLab FIPS-compliant at this time. We are
 performing initial investigations to see how much work such an effort would be.
 
 Read [Epic &5104](https://gitlab.com/groups/gitlab-org/-/epics/5104) for more
