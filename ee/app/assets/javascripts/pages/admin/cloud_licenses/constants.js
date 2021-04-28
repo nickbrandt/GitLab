@@ -4,6 +4,9 @@ import getCurrentLicense from './graphql/queries/get_current_license.query.graph
 import getLicenseHistory from './graphql/queries/get_license_history.query.graphql';
 
 export const subscriptionMainTitle = s__('SuperSonics|Your subscription');
+export const subscriptionActivationNotificationText = s__(
+  `SuperSonics|Your subscription was successfully activated. You can see the details below.`,
+);
 export const subscriptionActivationTitle = s__(
   `SuperSonics|You do not have an active subscription`,
 );
