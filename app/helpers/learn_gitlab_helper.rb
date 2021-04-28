@@ -48,7 +48,7 @@ module LearnGitlabHelper
   end
 
   def learn_gitlab_project
-    @learn_gitlab_project ||= LearnGitlab.new(current_user).project
+    @learn_gitlab_project ||= LearnGitlab::Project.new(current_user).project
   end
 
   def onboarding_progress(project)
@@ -57,6 +57,6 @@ module LearnGitlabHelper
 
   def learn_gitlab_onboarding_available?(project)
     OnboardingProgress.onboarding?(project.namespace) &&
-      LearnGitlab.new(current_user).available?
+      LearnGitlab::Project.new(current_user).available?
   end
 end

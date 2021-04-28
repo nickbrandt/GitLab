@@ -7,14 +7,14 @@ RSpec.describe LearnGitlabHelper do
   include Devise::Test::ControllerHelpers
 
   let_it_be(:user) { create(:user) }
-  let_it_be(:project) { create(:project, name: LearnGitlab::PROJECT_NAME, namespace: user.namespace) }
+  let_it_be(:project) { create(:project, name: LearnGitlab::Project::PROJECT_NAME, namespace: user.namespace) }
   let_it_be(:namespace) { project.namespace }
 
   before do
     project.add_developer(user)
 
     allow(helper).to receive(:user).and_return(user)
-    allow_next_instance_of(LearnGitlab) do |learn_gitlab|
+    allow_next_instance_of(LearnGitlab::Project) do |learn_gitlab|
       allow(learn_gitlab).to receive(:project).and_return(project)
     end
 
@@ -75,7 +75,7 @@ RSpec.describe LearnGitlabHelper do
       before do
         stub_experiment_for_subject(learn_gitlab_a: experiment_a, learn_gitlab_b: experiment_b)
         allow(OnboardingProgress).to receive(:onboarding?).with(project.namespace).and_return(onboarding)
-        allow_next(LearnGitlab, user).to receive(:available?).and_return(learn_gitlab_available)
+        allow_next(LearnGitlab::Project, user).to receive(:available?).and_return(learn_gitlab_available)
       end
 
       context 'when signed in' do
