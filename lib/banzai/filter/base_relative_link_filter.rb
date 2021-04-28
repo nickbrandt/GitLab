@@ -40,12 +40,21 @@ module Banzai
 
       def fetch_linkable_attributes
         attrs = []
-
-        attrs += doc.search('a:not(.gfm), img:not(.gfm), video:not(.gfm), audio:not(.gfm)').flat_map do |el|
+        attrs += doc.search(xpath_query).flat_map do |el|
           [el.attribute('href'), el.attribute('src'), el.attribute('data-src')]
         end
 
         attrs.reject { |attr| attr.blank? || attr.value.start_with?('//') }
+      end
+
+      def xpath_query
+        strong_memoize(:xpath_query) do
+          tag_names = %w[a img video audio]
+
+          # We need to use both `.//<tag>` and `tag` because of https://github.com/sparklemotion/nokogiri/issues/572
+          not_gfm = "[not(contains(concat(' ', @class, ' '), ' gfm '))]"
+          tag_names.map {|t| ".//#{t}#{not_gfm}|#{t}#{not_gfm}"}.join('|')
+        end
       end
     end
   end
