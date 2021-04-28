@@ -124,7 +124,7 @@ export default {
       const savedLockVersion = this.autosaveDescription.getSavedLockVersion();
 
       this.showOutdatedDescriptionWarning =
-        savedLockVersion && `${this.formState.lock_version}` !== savedLockVersion;
+        savedLockVersion && String(this.formState.lock_version) !== savedLockVersion;
 
       this.autosaveTitle = new Autosave($(input), [
         document.location.pathname,
@@ -166,10 +166,10 @@ export default {
     <locked-warning v-if="showLockedWarning" />
     <gl-alert
       v-if="showOutdatedDescriptionWarning"
-      class="mb-3"
+      class="gl-mb-5"
       variant="warning"
-      primary-button-text="Keep"
-      secondary-button-text="Discard"
+      primary-button-text="__('Keep')"
+      secondary-button-text="__('Discard')"
       :dismissible="false"
       @primaryAction="keepAutosave"
       @secondaryAction="discardAutosave"

@@ -27,16 +27,11 @@ describe('Inline edit form component', () => {
   };
 
   afterEach(() => {
-    if (wrapper) {
-      wrapper.destroy();
-      wrapper = null;
-    }
+    wrapper.destroy();
   });
 
   const createComponent = (props) => {
-    const Component = Vue.extend(formComponent);
-
-    wrapper = shallowMount(Component, {
+    wrapper = shallowMount(formComponent, {
       propsData: {
         ...defaultProps,
         ...props,
