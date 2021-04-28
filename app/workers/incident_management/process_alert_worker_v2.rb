@@ -7,6 +7,8 @@ module IncidentManagement
     queue_namespace :incident_management
     feature_category :incident_management
 
+    idempotent!
+
     def perform(alert_id)
       return unless alert_id
 

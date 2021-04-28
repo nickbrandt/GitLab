@@ -42,6 +42,14 @@ RSpec.describe IncidentManagement::ProcessAlertWorkerV2 do
 
         expect(Gitlab::AppLogger).not_to have_received(:warn)
       end
+
+      it_behaves_like 'an idempotent worker' do
+        let(:job_args) { [alert.id] }
+
+        it 'does not create a second issue' do
+          expect { perform_worker }.to change { Issue.count }.by(1)
+        end
+      end
     end
 
     context 'with valid alert' do

@@ -1054,7 +1054,7 @@
   :urgency: :low
   :resource_boundary: :unknown
   :weight: 2
-  :idempotent:
+  :idempotent: true
   :tags: []
 - :name: incident_management:incident_management_process_prometheus_alert
   :worker_name: IncidentManagement::ProcessPrometheusAlertWorker
