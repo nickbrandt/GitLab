@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Issuables
-  class RefreshGroupsIssueCounterWorker
+  class ClearGroupsIssueCounterWorker
     include ApplicationWorker
 
     idempotent!
@@ -15,14 +15,14 @@ module Issuables
         .new(Group.by_id(group_ids))
         .base_and_ancestors
 
-      refresh_cached_count(groups_with_ancestors)
+      clear_cached_count(groups_with_ancestors)
     end
 
     private
 
-    def refresh_cached_count(groups)
+    def clear_cached_count(groups)
       groups.each do |group|
-        Groups::OpenIssuesCountService.new(group).refresh_cache_over_threshold
+        Groups::OpenIssuesCountService.new(group).clear_all_cache_keys
       end
     end
   end

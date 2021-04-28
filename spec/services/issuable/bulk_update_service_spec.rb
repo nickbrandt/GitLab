@@ -101,17 +101,17 @@ RSpec.describe Issuable::BulkUpdateService do
     end
   end
 
-  shared_examples 'scheduling cached group count refresh' do
+  shared_examples 'scheduling cached group count clear' do
     it 'schedules worker' do
-      expect(Issuables::RefreshGroupsIssueCounterWorker).to receive(:perform_async)
+      expect(Issuables::ClearGroupsIssueCounterWorker).to receive(:perform_async)
 
       bulk_update(issuables, params)
     end
   end
 
-  shared_examples 'not scheduling cached group count refresh' do
+  shared_examples 'not scheduling cached group count clear' do
     it 'does not schedule worker' do
-      expect(Issuables::RefreshGroupsIssueCounterWorker).not_to receive(:perform_async)
+      expect(Issuables::ClearGroupsIssueCounterWorker).not_to receive(:perform_async)
 
       bulk_update(issuables, params)
     end
@@ -148,7 +148,7 @@ RSpec.describe Issuable::BulkUpdateService do
         expect(project.issues.closed).not_to be_empty
       end
 
-      it_behaves_like 'scheduling cached group count refresh' do
+      it_behaves_like 'scheduling cached group count clear' do
         let(:issuables) { issues }
         let(:params) { { state_event: 'close' } }
       end
@@ -171,7 +171,7 @@ RSpec.describe Issuable::BulkUpdateService do
         expect(project.issues.opened).not_to be_empty
       end
 
-      it_behaves_like 'scheduling cached group count refresh' do
+      it_behaves_like 'scheduling cached group count clear' do
         let(:issuables) { issues }
         let(:params) { { state_event: 'reopen' } }
       end
@@ -258,7 +258,7 @@ RSpec.describe Issuable::BulkUpdateService do
 
       it_behaves_like 'updates milestones'
 
-      it_behaves_like 'not scheduling cached group count refresh' do
+      it_behaves_like 'not scheduling cached group count clear' do
         let(:params) { { milestone_id: milestone.id } }
       end
     end

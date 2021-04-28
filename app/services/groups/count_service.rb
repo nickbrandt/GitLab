@@ -22,11 +22,12 @@ module Groups
       refresh_cache_over_threshold
     end
 
-    def refresh_cache_over_threshold
+    def refresh_cache_over_threshold(key = nil)
+      key ||= cache_key
       new_count = uncached_count
 
       if new_count > CACHED_COUNT_THRESHOLD
-        update_cache_for_key(cache_key) { new_count }
+        update_cache_for_key(key) { new_count }
       else
         delete_cache
       end
@@ -34,8 +35,10 @@ module Groups
       new_count
     end
 
-    def cache_key
-      ['groups', "#{issuable_key}_count_service", VERSION, group.id, cache_key_name]
+    def cache_key(key_name = nil)
+      key_name ||= cache_key_name
+
+      ['groups', "#{issuable_key}_count_service", VERSION, group.id, key_name]
     end
 
     private
