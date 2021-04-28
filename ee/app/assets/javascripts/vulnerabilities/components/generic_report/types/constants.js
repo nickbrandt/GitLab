@@ -10,4 +10,10 @@ export const DIFF = 'diff';
 export const BEFORE = 'before';
 export const AFTER = 'after';
 
-export const VIEW_TYPES = [DIFF, BEFORE, AFTER];
+export const VIEW_TYPES = { DIFF, BEFORE, AFTER };
+
+export const NORMAL = 'normal';
+export const REMOVED = 'removed';
+export const ADDED = 'added';
+
+export const LINE_TYPES = { NORMAL, REMOVED, ADDED };
