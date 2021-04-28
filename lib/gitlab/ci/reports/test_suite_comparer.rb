@@ -8,6 +8,7 @@ module Gitlab
 
         DEFAULT_MAX_TESTS = 100
         DEFAULT_MIN_TESTS = 10
+        TestSummary = Struct.new(:new_failures, :existing_failures, :resolved_failures, :new_errors, :existing_errors, :resolved_errors, keyword_init: true)
 
         attr_reader :name, :base_suite, :head_suite
 
@@ -84,8 +85,6 @@ module Gitlab
         def error_count
           new_errors.count + existing_errors.count
         end
-
-        TestSummary = Struct.new(:new_failures, :existing_failures, :resolved_failures, :new_errors, :existing_errors, :resolved_errors, keyword_init: true)
 
         # This is used to limit the presented test cases but does not affect
         # total count of tests in the summary
