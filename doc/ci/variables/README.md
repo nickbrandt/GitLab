@@ -43,7 +43,7 @@ predefined variable:
 test_variable:
   stage: test
   script:
-    - echo $CI_JOB_STAGE
+    - echo "$CI_JOB_STAGE"
 ```
 
 The script outputs the `stage` for the `test_variable`, which is `test`:
@@ -88,7 +88,7 @@ job1:
   variables:
     TEST_VAR_JOB: "Only job1 can use this variable's value"
   script:
-    - echo $TEST_VAR and $TEST_VAR_JOB
+    - echo "$TEST_VAR" and "$TEST_VAR_JOB"
 ```
 
 Variables saved in the `.gitlab-ci.yml` file should store only non-sensitive project
@@ -114,9 +114,9 @@ name inside another variable:
 ```yaml
 variables:
   FLAGS: '-al'
-  LS_CMD: 'ls $FLAGS $$TMP_DIR'
+  LS_CMD: 'ls "$FLAGS" $$TMP_DIR'
 script:
-  - 'eval $LS_CMD'  # Executes 'ls -al $TMP_DIR'
+  - 'eval "$LS_CMD"'  # Executes 'ls -al $TMP_DIR'
 ```
 
 Use the [`value` and `description`](../yaml/README.md#prefill-variables-in-manual-pipelines)
@@ -151,10 +151,10 @@ After you create a variable, you can use it in the `.gitlab-ci.yml` file:
 test_variable:
   stage: test
   script:
-    - echo $CI_JOB_STAGE  # calls a predefined variable
-    - echo $TEST          # calls a custom variable of type `env_var`
-    - echo $GREETING      # calls a custom variable of type `file` that contains the path to the temp file
-    - cat $GREETING       # the temp file itself contains the variable value
+    - echo "$CI_JOB_STAGE"  # calls a predefined variable
+    - echo "$TEST"          # calls a custom variable of type `env_var`
+    - echo "$GREETING"      # calls a custom variable of type `file` that contains the path to the temp file
+    - cat "$GREETING"       # the temp file itself contains the variable value
 ```
 
 The output is:
@@ -366,7 +366,7 @@ CI/CD variable with (`$`):
 ```yaml
 job_name:
   script:
-    - echo $CI_JOB_ID
+    - echo "$CI_JOB_ID"
 ```
 
 ### Use variables with PowerShell
@@ -506,7 +506,7 @@ build:
 deploy:
   stage: deploy
   script:
-    - echo $BUILD_VERSION  # Output is: 'hello'
+    - echo "$BUILD_VERSION"  # Output is: 'hello'
   dependencies:
     - build
 ```
@@ -525,7 +525,7 @@ build:
 deploy:
   stage: deploy
   script:
-    - echo $BUILD_VERSION  # Output is: 'hello'
+    - echo "$BUILD_VERSION"  # Output is: 'hello'
   needs:
     - job: build
       artifacts: true
