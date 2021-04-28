@@ -1487,6 +1487,9 @@ msgstr ""
 msgid "ACTION REQUIRED: Something went wrong while obtaining the Let's Encrypt certificate for GitLab Pages domain '%{domain}'"
 msgstr ""
 
+msgid "API"
+msgstr ""
+
 msgid "API Fuzzing"
 msgstr ""
 
@@ -18543,10 +18546,22 @@ msgstr ""
 msgid "Job|This job is stuck because you don't have any active runners that can run this job."
 msgstr ""
 
+msgid "Job|allowed to fail"
+msgstr ""
+
+msgid "Job|delayed"
+msgstr ""
+
 msgid "Job|for"
 msgstr ""
 
 msgid "Job|into"
+msgstr ""
+
+msgid "Job|manual"
+msgstr ""
+
+msgid "Job|triggered"
 msgstr ""
 
 msgid "Job|with"
@@ -23641,6 +23656,9 @@ msgstr ""
 msgid "Pipelines|Copy trigger token"
 msgstr ""
 
+msgid "Pipelines|Could not load artifacts."
+msgstr ""
+
 msgid "Pipelines|Could not load merged YAML content"
 msgstr ""
 
@@ -26135,6 +26153,9 @@ msgid "Provide feedback"
 msgstr ""
 
 msgid "Provider"
+msgstr ""
+
+msgid "Provisioned by:"
 msgstr ""
 
 msgid "Proxy support for this API is not available currently"
@@ -37579,6 +37600,9 @@ msgid "created %{timeAgoString} by %{user} in Jira"
 msgstr ""
 
 msgid "created %{timeAgo}"
+msgstr ""
+
+msgid "created by"
 msgstr ""
 
 msgid "data"
