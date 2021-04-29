@@ -50,9 +50,10 @@ module Banzai
       def xpath_query
         strong_memoize(:xpath_query) do
           tag_names = %w[a img video audio]
-
-          # We need to use both `.//<tag>` and `tag` because of https://github.com/sparklemotion/nokogiri/issues/572
           not_gfm = "[not(contains(concat(' ', @class, ' '), ' gfm '))]"
+
+          # We need to use both `.//<tag>` and `<tag>` for xpath search
+          # because of https://github.com/sparklemotion/nokogiri/issues/572
           tag_names.map {|t| ".//#{t}#{not_gfm}|#{t}#{not_gfm}"}.join('|')
         end
       end

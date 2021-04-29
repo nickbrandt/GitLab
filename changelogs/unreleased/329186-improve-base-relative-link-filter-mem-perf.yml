@@ -1,0 +1,5 @@
+---
+title: Use `xpath` Nokogiri search for memory & cpu improvements
+merge_request: 60509
+author:
+type: performance
