@@ -610,6 +610,38 @@ When using `DAST_PATHS` and `DAST_PATHS_FILE`, note the following:
 
 To perform a [full scan](#full-scan) on the listed paths, use the `DAST_FULL_SCAN_ENABLED` CI/CD variable.
 
+### View details of a vulnerability detected by DAST
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/36332) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 13.1.
+
+Vulnerabilities detected by DAST occur in the live web application. Addressing these types of
+vulnerabilities requires specific information. DAST provides the information required to
+investigate and rectify the underlying cause.
+
+To view details of vulnerabilities detected by DAST:
+
+1. To see all vulnerabilities detected, either:
+   - Go to your project and select **Security & Compliance**.
+   - Go to the merge request and select the **Security** tab.
+
+1. Select a vulnerability's description. The following details are provided:
+
+   | Field            | Description                                                        |
+   |:-----------------|:------------------------------------------------------------------ |
+   | Description      | Description of the vulnerability.                                  |
+   | Project          | Namespace and project in which the vulnerability was detected.     |
+   | Method           | HTTP method used to detect the vulnerability.                      |
+   | URL              | URL at which the vulnerability was detected.                       |
+   | Request Headers  | Headers of the request.                                            |
+   | Response Status  | Response status received from the application.                     |
+   | Response Headers | Headers of the response received from the application.             |
+   | Evidence         | Evidence of the data found that verified the vulnerability. Often a snippet of the request or response, this can be used to help verify that the finding is a vulnerability. |
+   | Identifiers      | Identifiers of the vulnerability.                                  |
+   | Severity         | Severity of the vulnerability.                                     |
+   | Scanner Type     | Type of vulnerability report.                                      |
+   | Links            | Links to further details of the detected vulnerability.            |
+   | Solution         | Details of a recommended solution to the vulnerability (optional). |
+
 ### Customizing the DAST settings
 
 WARNING:
@@ -795,9 +827,9 @@ For DAST, import the following default DAST analyzer image from `registry.gitlab
 
 The process for importing Docker images into a local offline Docker registry depends on
 **your network security policy**. Please consult your IT staff to find an accepted and approved
-process by which external resources can be imported or temporarily accessed. Note
-that these scanners are [updated periodically](../index.md#maintenance-and-update-of-the-vulnerabilities-database)
-with new definitions, so consider if you're able to make periodic updates yourself.
+process by which external resources can be imported or temporarily accessed.
+These scanners are [periodically updated](../vulnerabilities/index.md#vulnerability-scanner-maintenance)
+with new definitions, and you may be able to make occasional updates on your own.
 
 For details on saving and transporting Docker images as a file, see Docker's documentation on
 [`docker save`](https://docs.docker.com/engine/reference/commandline/save/),

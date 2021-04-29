@@ -162,6 +162,15 @@ BEGIN
 END;
 $$;
 
+CREATE FUNCTION trigger_cf2f9e35f002() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+  NEW."build_id_convert_to_bigint" := NEW."build_id";
+  RETURN NEW;
+END;
+$$;
+
 CREATE TABLE audit_events (
     id bigint NOT NULL,
     author_id integer NOT NULL,
@@ -10370,7 +10379,8 @@ CREATE TABLE ci_build_trace_chunks (
     data_store integer NOT NULL,
     raw_data bytea,
     checksum bytea,
-    lock_version integer DEFAULT 0 NOT NULL
+    lock_version integer DEFAULT 0 NOT NULL,
+    build_id_convert_to_bigint bigint DEFAULT 0 NOT NULL
 );
 
 CREATE SEQUENCE ci_build_trace_chunks_id_seq
@@ -17417,7 +17427,8 @@ CREATE TABLE security_orchestration_policy_configurations (
     project_id bigint NOT NULL,
     security_policy_management_project_id bigint NOT NULL,
     created_at timestamp with time zone NOT NULL,
-    updated_at timestamp with time zone NOT NULL
+    updated_at timestamp with time zone NOT NULL,
+    configured_at timestamp with time zone
 );
 
 COMMENT ON TABLE security_orchestration_policy_configurations IS '{"owner":"group::container security","description":"Configuration used to store relationship between project and security policy repository"}';
@@ -17430,6 +17441,29 @@ CREATE SEQUENCE security_orchestration_policy_configurations_id_seq
     CACHE 1;
 
 ALTER SEQUENCE security_orchestration_policy_configurations_id_seq OWNED BY security_orchestration_policy_configurations.id;
+
+CREATE TABLE security_orchestration_policy_rule_schedules (
+    id bigint NOT NULL,
+    created_at timestamp with time zone NOT NULL,
+    updated_at timestamp with time zone NOT NULL,
+    next_run_at timestamp with time zone,
+    security_orchestration_policy_configuration_id bigint NOT NULL,
+    user_id bigint NOT NULL,
+    policy_index integer NOT NULL,
+    cron text NOT NULL,
+    CONSTRAINT check_915825a76e CHECK ((char_length(cron) <= 255))
+);
+
+COMMENT ON TABLE security_orchestration_policy_rule_schedules IS '{"owner":"group::container security","description":"Schedules used to store relationship between project and security policy repository"}';
+
+CREATE SEQUENCE security_orchestration_policy_rule_schedules_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE security_orchestration_policy_rule_schedules_id_seq OWNED BY security_orchestration_policy_rule_schedules.id;
 
 CREATE TABLE security_scans (
     id bigint NOT NULL,
@@ -19848,6 +19882,8 @@ ALTER TABLE ONLY security_findings ALTER COLUMN id SET DEFAULT nextval('security
 
 ALTER TABLE ONLY security_orchestration_policy_configurations ALTER COLUMN id SET DEFAULT nextval('security_orchestration_policy_configurations_id_seq'::regclass);
 
+ALTER TABLE ONLY security_orchestration_policy_rule_schedules ALTER COLUMN id SET DEFAULT nextval('security_orchestration_policy_rule_schedules_id_seq'::regclass);
+
 ALTER TABLE ONLY security_scans ALTER COLUMN id SET DEFAULT nextval('security_scans_id_seq'::regclass);
 
 ALTER TABLE ONLY self_managed_prometheus_alert_events ALTER COLUMN id SET DEFAULT nextval('self_managed_prometheus_alert_events_id_seq'::regclass);
@@ -21410,6 +21446,9 @@ ALTER TABLE ONLY security_findings
 ALTER TABLE ONLY security_orchestration_policy_configurations
     ADD CONSTRAINT security_orchestration_policy_configurations_pkey PRIMARY KEY (id);
 
+ALTER TABLE ONLY security_orchestration_policy_rule_schedules
+    ADD CONSTRAINT security_orchestration_policy_rule_schedules_pkey PRIMARY KEY (id);
+
 ALTER TABLE ONLY security_scans
     ADD CONSTRAINT security_scans_pkey PRIMARY KEY (id);
 
@@ -22085,6 +22124,8 @@ CREATE INDEX index_badges_on_group_id ON badges USING btree (group_id);
 CREATE INDEX index_badges_on_project_id ON badges USING btree (project_id);
 
 CREATE INDEX index_batched_jobs_by_batched_migration_id_and_id ON batched_background_migration_jobs USING btree (batched_background_migration_id, id);
+
+CREATE INDEX index_batched_jobs_on_batched_migration_id_and_status ON batched_background_migration_jobs USING btree (batched_background_migration_id, status);
 
 CREATE INDEX index_batched_migrations_on_job_table_and_column_name ON batched_background_migrations USING btree (job_class_name, table_name, column_name);
 
@@ -23256,6 +23297,8 @@ CREATE INDEX index_metrics_dashboard_annotations_on_timespan_end ON metrics_dash
 
 CREATE INDEX index_metrics_users_starred_dashboards_on_project_id ON metrics_users_starred_dashboards USING btree (project_id);
 
+CREATE INDEX index_migration_jobs_on_migration_id_and_finished_at ON batched_background_migration_jobs USING btree (batched_background_migration_id, finished_at);
+
 CREATE INDEX index_milestone_releases_on_release_id ON milestone_releases USING btree (release_id);
 
 CREATE INDEX index_milestones_on_description_trigram ON milestones USING gin (description gin_trgm_ops);
@@ -24070,6 +24113,10 @@ CREATE UNIQUE INDEX index_sop_configs_on_project_id ON security_orchestration_po
 
 CREATE INDEX index_sop_configurations_project_id_policy_project_id ON security_orchestration_policy_configurations USING btree (security_policy_management_project_id, project_id);
 
+CREATE INDEX index_sop_schedules_on_sop_configuration_id ON security_orchestration_policy_rule_schedules USING btree (security_orchestration_policy_configuration_id);
+
+CREATE INDEX index_sop_schedules_on_user_id ON security_orchestration_policy_rule_schedules USING btree (user_id);
+
 CREATE INDEX index_spam_logs_on_user_id ON spam_logs USING btree (user_id);
 
 CREATE INDEX index_sprints_iterations_cadence_id ON sprints USING btree (iterations_cadence_id);
@@ -24781,6 +24828,8 @@ CREATE TRIGGER trigger_69523443cc10 BEFORE INSERT OR UPDATE ON events FOR EACH R
 CREATE TRIGGER trigger_8485e97c00e3 BEFORE INSERT OR UPDATE ON ci_sources_pipelines FOR EACH ROW EXECUTE PROCEDURE trigger_8485e97c00e3();
 
 CREATE TRIGGER trigger_be1804f21693 BEFORE INSERT OR UPDATE ON ci_job_artifacts FOR EACH ROW EXECUTE PROCEDURE trigger_be1804f21693();
+
+CREATE TRIGGER trigger_cf2f9e35f002 BEFORE INSERT OR UPDATE ON ci_build_trace_chunks FOR EACH ROW EXECUTE PROCEDURE trigger_cf2f9e35f002();
 
 CREATE TRIGGER trigger_has_external_issue_tracker_on_delete AFTER DELETE ON services FOR EACH ROW WHEN ((((old.category)::text = 'issue_tracker'::text) AND (old.active = true) AND (old.project_id IS NOT NULL))) EXECUTE PROCEDURE set_has_external_issue_tracker();
 
@@ -25666,6 +25715,9 @@ ALTER TABLE ONLY analytics_cycle_analytics_project_stages
 
 ALTER TABLE ONLY packages_build_infos
     ADD CONSTRAINT fk_rails_17a9a0dffc FOREIGN KEY (pipeline_id) REFERENCES ci_pipelines(id) ON DELETE SET NULL;
+
+ALTER TABLE ONLY security_orchestration_policy_rule_schedules
+    ADD CONSTRAINT fk_rails_17ade83f17 FOREIGN KEY (security_orchestration_policy_configuration_id) REFERENCES security_orchestration_policy_configurations(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY clusters_applications_jupyter
     ADD CONSTRAINT fk_rails_17df21c98c FOREIGN KEY (cluster_id) REFERENCES clusters(id) ON DELETE CASCADE;
@@ -26905,6 +26957,9 @@ ALTER TABLE ONLY label_priorities
 
 ALTER TABLE ONLY fork_network_members
     ADD CONSTRAINT fk_rails_efccadc4ec FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY security_orchestration_policy_rule_schedules
+    ADD CONSTRAINT fk_rails_efe1d9b133 FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY prometheus_alerts
     ADD CONSTRAINT fk_rails_f0e8db86aa FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE;

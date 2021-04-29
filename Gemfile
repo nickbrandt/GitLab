@@ -422,7 +422,7 @@ group :test do
   gem 'rspec_profiling', '~> 0.0.6'
   gem 'rspec-parameterized', require: false
 
-  gem 'capybara', '~> 3.34.0'
+  gem 'capybara', '~> 3.35.3'
   gem 'capybara-screenshot', '~> 1.0.22'
   gem 'selenium-webdriver', '~> 3.142'
 
@@ -482,7 +482,7 @@ gem 'gitaly', '~> 13.11.0.pre.rc1'
 
 gem 'grpc', '~> 1.30.2'
 
-gem 'google-protobuf', '~> 3.14.0'
+gem 'google-protobuf', '~> 3.15.8'
 
 gem 'toml-rb', '~> 1.0.0'
 

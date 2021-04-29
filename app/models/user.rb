@@ -96,6 +96,12 @@ class User < ApplicationRecord
   # Virtual attribute for impersonator
   attr_accessor :impersonator
 
+  attr_writer :max_access_for_group
+
+  def max_access_for_group
+    @max_access_for_group ||= {}
+  end
+
   #
   # Relations
   #
@@ -425,7 +431,7 @@ class User < ApplicationRecord
 
   def preferred_language
     read_attribute('preferred_language') ||
-      I18n.default_locale.to_s.presence_in(Gitlab::I18n::AVAILABLE_LANGUAGES.keys) ||
+      I18n.default_locale.to_s.presence_in(Gitlab::I18n.available_locales) ||
       'en'
   end
 
@@ -1677,6 +1683,12 @@ class User < ApplicationRecord
 
   def invalidate_issue_cache_counts
     Rails.cache.delete(['users', id, 'assigned_open_issues_count'])
+
+    if Feature.enabled?(:assigned_open_issues_cache, default_enabled: :yaml)
+      run_after_commit do
+        Users::UpdateOpenIssueCountWorker.perform_async(self.id)
+      end
+    end
   end
 
   def invalidate_merge_request_cache_counts

@@ -196,9 +196,6 @@ Rails/SaveBang:
     - 'spec/models/jira_import_state_spec.rb'
     - 'spec/models/key_spec.rb'
     - 'spec/models/lfs_objects_project_spec.rb'
-    - 'spec/models/member_spec.rb'
-    - 'spec/models/members/group_member_spec.rb'
-    - 'spec/models/members/project_member_spec.rb'
     - 'spec/models/merge_request_spec.rb'
     - 'spec/models/milestone_spec.rb'
     - 'spec/models/namespace_spec.rb'
@@ -387,25 +384,10 @@ RSpec/EmptyLineAfterFinalLetItBe:
   Exclude:
     - ee/spec/controllers/subscriptions_controller_spec.rb
     - ee/spec/features/ci_shared_runner_warnings_spec.rb
-    - ee/spec/features/groups/groups_security_credentials_spec.rb
-    - ee/spec/features/groups/hooks/user_edits_hooks_spec.rb
-    - ee/spec/features/groups/iterations/user_edits_iteration_spec.rb
-    - ee/spec/features/groups/usage_quotas_spec.rb
     - ee/spec/features/integrations/jira/jira_issues_list_spec.rb
-    - ee/spec/features/issues/bulk_assignment_epic_spec.rb
-    - ee/spec/features/issues/user_uses_quick_actions_spec.rb
     - ee/spec/features/markdown/metrics_spec.rb
     - ee/spec/features/registrations/group_invites_during_signup_flow_spec.rb
     - ee/spec/features/subscriptions_spec.rb
-    - ee/spec/helpers/ee/graph_helper_spec.rb
-    - ee/spec/helpers/ee/issues_helper_spec.rb
-    - ee/spec/helpers/ee/projects/incidents_helper_spec.rb
-    - ee/spec/helpers/ee/projects/security/api_fuzzing_configuration_helper_spec.rb
-    - ee/spec/helpers/ee/projects/security/configuration_helper_spec.rb
-    - ee/spec/helpers/ee/projects/security/sast_configuration_helper_spec.rb
-    - ee/spec/helpers/ee/trial_helper_spec.rb
-    - ee/spec/helpers/ee/user_callouts_helper_spec.rb
-    - ee/spec/helpers/vulnerabilities_helper_spec.rb
     - ee/spec/lib/ee/api/entities/user_with_admin_spec.rb
     - ee/spec/lib/ee/api/entities/vulnerability_spec.rb
     - ee/spec/lib/ee/event_filter_spec.rb
@@ -491,8 +473,6 @@ RSpec/EmptyLineAfterFinalLetItBe:
     - ee/spec/services/alert_management/process_prometheus_alert_service_spec.rb
     - ee/spec/services/approval_rules/create_service_spec.rb
     - ee/spec/services/audit_event_service_spec.rb
-    - ee/spec/services/award_emojis/add_service_spec.rb
-    - ee/spec/services/award_emojis/destroy_service_spec.rb
     - ee/spec/services/billable_members/destroy_service_spec.rb
     - ee/spec/services/boards/epic_boards/destroy_service_spec.rb
     - ee/spec/services/clusters/agent_tokens/create_service_spec.rb
@@ -1566,6 +1546,7 @@ Gitlab/NamespacedClass:
     - 'app/models/concerns/uniquify.rb'
     - 'app/models/container_expiration_policy.rb'
     - 'app/models/container_repository.rb'
+    - 'app/models/context_commits_diff.rb'
     - 'app/models/custom_emoji.rb'
     - 'app/models/data_list.rb'
     - 'app/models/deploy_key.rb'
@@ -1980,6 +1961,7 @@ Gitlab/NamespacedClass:
     - 'app/serializers/container_repository_entity.rb'
     - 'app/serializers/container_tag_entity.rb'
     - 'app/serializers/container_tags_serializer.rb'
+    - 'app/serializers/context_commits_diff_entity.rb'
     - 'app/serializers/current_board_entity.rb'
     - 'app/serializers/current_board_serializer.rb'
     - 'app/serializers/current_user_entity.rb'

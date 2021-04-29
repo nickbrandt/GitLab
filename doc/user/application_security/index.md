@@ -106,26 +106,6 @@ When [Auto DevOps](../../topics/autodevops/) is enabled, all GitLab Security sca
 
 While you cannot directly customize Auto DevOps, you can [include the Auto DevOps template in your project's `.gitlab-ci.yml` file](../../topics/autodevops/customize.md#customizing-gitlab-ciyml).
 
-## Maintenance and update of the vulnerabilities database
-
-The scanning tools and vulnerabilities database are updated regularly.
-
-| Secure scanning tool                                         | Vulnerabilities database updates          |
-|:-------------------------------------------------------------|-------------------------------------------|
-| [Container Scanning](container_scanning/index.md)            | Uses `clair`. The latest `clair-db` version is used for each job by running the [`latest` Docker image tag](https://gitlab.com/gitlab-org/gitlab/blob/438a0a56dc0882f22bdd82e700554525f552d91b/lib/gitlab/ci/templates/Security/Container-Scanning.gitlab-ci.yml#L37). The `clair-db` database [is updated daily according to the author](https://github.com/arminc/clair-local-scan#clair-server-or-local). |
-| [Dependency Scanning](dependency_scanning/index.md)          | Relies on `bundler-audit` (for Ruby gems), `retire.js` (for npm packages), and `gemnasium` (the GitLab tool for all libraries). Both `bundler-audit` and `retire.js` fetch their vulnerabilities data from GitHub repositories, so vulnerabilities added to `ruby-advisory-db` and `retire.js` are immediately available. The tools themselves are updated once per month if there's a new version. The [Gemnasium DB](https://gitlab.com/gitlab-org/security-products/gemnasium-db) is updated at least once a week. See our [current measurement of time from CVE being issued to our product being updated](https://about.gitlab.com/handbook/engineering/development/performance-indicators/#cve-issue-to-update). |
-| [Dynamic Application Security Testing (DAST)](dast/index.md) | The scanning engine is updated on a periodic basis. See the [version of the underlying tool `zaproxy`](https://gitlab.com/gitlab-org/security-products/dast/blob/master/Dockerfile#L1). The scanning rules are downloaded at scan runtime. |
-| [Static Application Security Testing (SAST)](sast/index.md)  | Relies exclusively on [the tools GitLab wraps](sast/index.md#supported-languages-and-frameworks). The underlying analyzers are updated at least once per month if a relevant update is available. The vulnerabilities database is updated by the upstream tools. |
-
-Currently, you do not have to update GitLab to benefit from the latest vulnerabilities definitions.
-The security tools are released as Docker images. The vendored job definitions that enable them use
-major release tags according to [Semantic Versioning](https://semver.org/). Each new release of the
-tools overrides these tags.
-The Docker images are updated to match the previous GitLab releases, so users automatically get the
-latest versions of the scanning tools without having to do anything. There are some known issues
-with this approach, however, and there is a
-[plan to resolve them](https://gitlab.com/gitlab-org/gitlab/-/issues/9725).
-
 ## View security scan information in merge requests **(FREE)**
 
 > - [Introduced](https://gitlab.com/groups/gitlab-org/-/epics/4393) in GitLab Free 13.5.
@@ -138,45 +118,6 @@ reports are available to download. To download a report, click on the
 **Download results** dropdown, and select the desired report.
 
 ![Security widget](img/security_widget_v13_7.png)
-
-## View details of a DAST vulnerability
-
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/36332) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 13.1.
-
-Vulnerabilities detected by DAST occur in the live web application. Rectification of these types of
-vulnerabilities requires specific information. DAST provides the information required to
-investigate and rectify the underlying cause.
-
-To view details of DAST vulnerabilities:
-
-1. To see all vulnerabilities detected:
-   - In a project, go to the project's **{shield}** **Security & Compliance** page.
-   - Only in a merge request, go the merge request's **Security** tab.
-
-1. Select the vulnerability's description. The following details are provided:
-
-| Field            | Description                                                        |
-|:-----------------|:------------------------------------------------------------------ |
-| Description      | Description of the vulnerability.                                  |
-| Project          | Namespace and project in which the vulnerability was detected.     |
-| Method           | HTTP method used to detect the vulnerability.                      |
-| URL              | URL at which the vulnerability was detected.                       |
-| Request Headers  | Headers of the request.                                            |
-| Response Status  | Response status received from the application.                     |
-| Response Headers | Headers of the response received from the application.             |
-| Evidence         | Evidence of the data found that verified the vulnerability. Often a snippet of the request or response, this can be used to help verify that the finding is a vulnerability. |
-| Identifiers      | Identifiers of the vulnerability.                                  |
-| Severity         | Severity of the vulnerability.                                     |
-| Scanner Type     | Type of vulnerability report.                                      |
-| Links            | Links to further details of the detected vulnerability.            |
-| Solution         | Details of a recommended solution to the vulnerability (optional). |
-
-### Hide sensitive information in headers
-
-HTTP request and response headers may contain sensitive information, including cookies and
-authorization credentials. By default, content of specific headers are masked in DAST vulnerability
-reports. You can specify the list of all headers to be masked. For details, see
-[Hide sensitive information](dast/index.md#hide-sensitive-information).
 
 ## Addressing vulnerabilities
 
@@ -297,7 +238,7 @@ rating.
 
 ### Enabling Security Approvals within a project
 
-To enable the `Vulnerability-Check` or `License-Check` Security Approvals, a [project approval rule](../project/merge_requests/merge_request_approvals.md#adding--editing-a-default-approval-rule)
+To enable the `Vulnerability-Check` or `License-Check` Security Approvals, a [project approval rule](../project/merge_requests/approvals/rules.md#adding--editing-a-default-approval-rule)
 must be created. A [security scanner job](#security-scanning-tools) must be enabled for
 `Vulnerability-Check`, and a [license scanning](../compliance/license_compliance/index.md#configuration)
 job must be enabled for `License-Check`. When the proper jobs aren't configured, the following
