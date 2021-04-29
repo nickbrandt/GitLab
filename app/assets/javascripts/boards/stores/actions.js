@@ -265,9 +265,8 @@ export default {
     commit(types.TOGGLE_LIST_COLLAPSED, { listId, collapsed });
   },
 
-  removeList: ({ state, commit }, listId) => {
-    const { issuableType } = state;
-    const listsBackup = { ...state.boardLists };
+  removeList: ({ state: { issuableType, boardLists }, commit }, listId) => {
+    const listsBackup = { ...boardLists };
 
     commit(types.REMOVE_LIST, listId);
 
