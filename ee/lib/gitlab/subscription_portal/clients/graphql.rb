@@ -44,6 +44,9 @@ module Gitlab
             else
               error(response['errors'])
             end
+          rescue Gitlab::HTTP::BlockedUrlError, HTTParty::Error, Errno::ECONNREFUSED, Errno::ECONNRESET, SocketError, Timeout::Error => e
+            Gitlab::ErrorTracking.log_exception(e)
+            error(CONNECTIVITY_ERROR)
           end
 
           def plan_upgrade_offer(namespace_id)
