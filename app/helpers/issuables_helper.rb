@@ -279,7 +279,16 @@ module IssuablesHelper
   end
 
   def issuables_count_for_state(issuable_type, state)
-    Gitlab::IssuablesCountForState.new(finder)[state]
+    if @group && issuable_type == :merge_requests && request_params_default?
+      Groups::MergeRequestsCountService.new(@group, current_user).count(state)
+    else
+      Gitlab::IssuablesCountForState.new(finder)[state]
+    end
+  end
+
+  # are request params supplied default only (i.e. not queryable params from finder)
+  def request_params_default?
+    !finder.class.scalar_params.any? { |p| params[p].present? } && !finder.class.array_params.any? { |p| params[p].present? }
   end
 
   def close_issuable_path(issuable)

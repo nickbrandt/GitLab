@@ -101,7 +101,12 @@ module GroupsHelper
     count_service = issuables_count_service_class(type)
     return unless count_service.present?
 
-    issuables_count = count_service.new(group, current_user).count
+    issuables_count = if type == :merge_requests
+                        count_service.new(group, current_user).count('opened')
+                      else
+                        count_service.new(group, current_user).count
+                      end
+
     format_issuables_count(count_service, issuables_count)
   end
 
