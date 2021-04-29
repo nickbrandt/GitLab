@@ -182,7 +182,7 @@ RSpec.describe 'Epic boards sidebar', :js do
       end
     end
 
-    it 'shows toggle as on then as off as user toggles to subscribe and unsubscribe', :aggregate_failures do
+    it 'shows toggle as on then as off as user toggles to subscribe and unsubscribe', :aggregate_failures, quarantine: 'https://gitlab.com/gitlab-org/gitlab/-/issues/329292' do
       click_card(card)
 
       click_button 'Notifications'
