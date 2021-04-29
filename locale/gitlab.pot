@@ -6023,9 +6023,6 @@ msgstr ""
 msgid "Changes to the title have not been saved"
 msgstr ""
 
-msgid "Changes won't take place until the index is %{link_start}recreated%{link_end}."
-msgstr ""
-
 msgid "Changing group URL can have unintended side effects."
 msgstr ""
 
@@ -16243,13 +16240,7 @@ msgstr ""
 msgid "How many days need to pass between marking entity for deletion and actual removing it."
 msgstr ""
 
-msgid "How many replicas each Elasticsearch shard has."
-msgstr ""
-
 msgid "How many seconds an IP will be counted towards the limit"
-msgstr ""
-
-msgid "How many shards to split the Elasticsearch index over."
 msgstr ""
 
 msgid "How many users will be evaluating the trial?"
@@ -17246,6 +17237,9 @@ msgid "Increase"
 msgstr ""
 
 msgid "Indent"
+msgstr ""
+
+msgid "Index"
 msgstr ""
 
 msgid "Index all projects"
@@ -18990,6 +18984,9 @@ msgid "Learn more about deploying to a cluster"
 msgstr ""
 
 msgid "Learn more about group-level project templates"
+msgstr ""
+
+msgid "Learn more about shards and replicas in the %{configuration_link_start}Advanced search configuration%{configuration_link_end} documentation. Changes won't take place until the index is %{recreated_link_start}recreated%{recreated_link_end}."
 msgstr ""
 
 msgid "Learn more about signing commits"
@@ -22307,10 +22304,7 @@ msgstr ""
 msgid "Number of %{itemTitle}"
 msgstr ""
 
-msgid "Number of Elasticsearch replicas"
-msgstr ""
-
-msgid "Number of Elasticsearch shards"
+msgid "Number of Elasticsearch shards and replicas (per index)"
 msgstr ""
 
 msgid "Number of Git pushes after which 'git gc' is run."
@@ -22347,6 +22341,12 @@ msgid "Number of events for this project: %{total_count}."
 msgstr ""
 
 msgid "Number of files touched"
+msgstr ""
+
+msgid "Number of replicas"
+msgstr ""
+
+msgid "Number of shards"
 msgstr ""
 
 msgid "OK"
