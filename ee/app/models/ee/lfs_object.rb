@@ -26,7 +26,6 @@ module EE
       def replicables_for_current_secondary(primary_key_in)
         node = ::Gitlab::Geo.current_node
         node.lfs_objects(primary_key_in: primary_key_in)
-          .merge(selective_sync_scope(node))
           .merge(object_storage_scope(node))
       end
 
@@ -36,12 +35,6 @@ module EE
         return all if node.sync_object_storage?
 
         with_files_stored_locally
-      end
-
-      def selective_sync_scope(node)
-        return all unless node.selective_sync?
-
-        project_id_in(node.projects)
       end
     end
 
