@@ -30,7 +30,7 @@ export default {
     },
   },
   methods: {
-    ...mapActions(['toggleBoardItem', 'setActiveEpicConfidential']),
+    ...mapActions(['toggleBoardItem', 'setActiveItemConfidential']),
     handleClose() {
       this.toggleBoardItem({ boardItem: this.activeBoardItem, sidebarType: this.sidebarType });
     },
@@ -67,7 +67,7 @@ export default {
         :iid="activeBoardItem.iid"
         :full-path="fullPath"
         issuable-type="epic"
-        @confidentialityUpdated="setActiveEpicConfidential($event)"
+        @confidentialityUpdated="setActiveItemConfidential($event)"
       />
       <board-sidebar-subscription class="subscriptions" />
     </template>
