@@ -31226,9 +31226,6 @@ msgstr ""
 msgid "TagsPage|Repository has no tags yet."
 msgstr ""
 
-msgid "TagsPage|Sort by"
-msgstr ""
-
 msgid "TagsPage|Tags"
 msgstr ""
 
