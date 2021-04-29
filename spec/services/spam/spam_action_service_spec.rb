@@ -222,6 +222,38 @@ RSpec.describe Spam::SpamActionService do
           end
         end
 
+        context 'spam verdict service advises to block the user' do
+          before do
+            allow(fake_verdict_service).to receive(:execute).and_return(BLOCK_USER)
+          end
+
+          context 'when allow_possible_spam feature flag is false' do
+            before do
+              stub_feature_flags(allow_possible_spam: false)
+            end
+
+            it_behaves_like 'only checks for spam if a request is provided'
+
+            it 'marks as spam' do
+              response = subject
+
+              expect(response.message).to match(expected_service_check_response_message)
+              expect(issue).to be_spam
+            end
+          end
+
+          context 'when allow_possible_spam feature flag is true' do
+            it_behaves_like 'only checks for spam if a request is provided'
+
+            it 'does not mark as spam' do
+              response = subject
+
+              expect(response.message).to match(expected_service_check_response_message)
+              expect(issue).not_to be_spam
+            end
+          end
+        end
+
         context 'when spam verdict service conditionally allows' do
           before do
             allow(fake_verdict_service).to receive(:execute).and_return(CONDITIONAL_ALLOW)

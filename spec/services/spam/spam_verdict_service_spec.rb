@@ -18,7 +18,7 @@ RSpec.describe Spam::SpamVerdictService do
 
   let(:check_for_spam) { true }
   let_it_be(:user) { create(:user) }
-  let(:issue) { build(:issue, author: user) }
+  let_it_be(:issue) { create(:issue, author: user) }
   let(:service) do
     described_class.new(user: user, target: issue, request: request, options: {})
   end
@@ -155,43 +155,63 @@ RSpec.describe Spam::SpamVerdictService do
 
     context 'if a Spam Check endpoint enabled and set to a URL' do
       let(:spam_check_body) { {} }
-      let(:spam_check_http_status) { nil }
+      let(:endpoint_url) { "grpc://www.spamcheckurl.com/spam_check" }
+
+      let(:spam_client) do
+        Gitlab::Spamcheck::Client.new
+      end
 
       before do
         stub_application_setting(spam_check_endpoint_enabled: true)
-        stub_application_setting(spam_check_endpoint_url: "http://www.spamcheckurl.com/spam_check")
-        stub_request(:post, /.*spamcheckurl.com.*/).to_return( body: spam_check_body.to_json, status: spam_check_http_status )
+        stub_application_setting(spam_check_endpoint_url: endpoint_url)
       end
 
       context 'if the endpoint is accessible' do
-        let(:spam_check_http_status) { 200 }
-        let(:error) { nil }
+        let(:error) { '' }
         let(:verdict) { nil }
-        let(:spam_check_body) do
-          { verdict: verdict, error: error }
+
+        before do
+          allow(service).to receive(:spamcheck_client).and_return(spam_client)
+          allow(spam_client).to receive(:issue_spam?).and_return([verdict, error])
         end
 
         context 'the result is a valid verdict' do
-          let(:verdict) { 'allow' }
+          let(:verdict) { ALLOW }
 
           it 'returns the verdict' do
             expect(subject).to eq ALLOW
           end
         end
 
-        context 'the verdict is an unexpected string' do
-          let(:verdict) { 'this is fine' }
+        context 'the verdict is CONDITIONAL_ALLOW' do
+          let(:verdict) { CONDITIONAL_ALLOW }
 
-          it 'returns the string' do
-            expect(subject).to eq verdict
+          context 'when recaptcha is enabled' do
+            before do
+              allow(Recaptcha).to receive(:enabled?).and_return(true)
+            end
+
+            it 'returns ALLOW' do
+              expect(subject).to eq CONDITIONAL_ALLOW
+            end
+          end
+
+          context 'when recaptcha is disabled' do
+            before do
+              allow(Recaptcha).to receive(:enabled?).and_return(false)
+            end
+
+            it 'returns the verdict' do
+              expect(subject).to eq CONDITIONAL_ALLOW
+            end
           end
         end
 
-        context 'the JSON is malformed' do
-          let(:spam_check_body) { 'this is fine' }
+        context 'the verdict is an unexpected value' do
+          let(:verdict) { :this_is_fine }
 
-          it 'returns allow' do
-            expect(subject).to eq ALLOW
+          it 'returns the string' do
+            expect(subject).to eq verdict
           end
         end
 
@@ -219,11 +239,13 @@ RSpec.describe Spam::SpamVerdictService do
           end
         end
 
-        context 'the HTTP status is not 200' do
-          let(:spam_check_http_status) { 500 }
+        context 'the requested is aborted' do
+          before do
+            allow(spam_client).to receive(:issue_spam?).and_raise(GRPC::Aborted)
+          end
 
           it 'returns nil' do
-            expect(subject).to be_nil
+            expect(subject).to be(ALLOW)
           end
         end
 
@@ -239,11 +261,11 @@ RSpec.describe Spam::SpamVerdictService do
 
       context 'if the endpoint times out' do
         before do
-          stub_request(:post, /.*spamcheckurl.com.*/).to_timeout
+          allow(spam_client).to receive(:issue_spam?).and_raise(GRPC::DeadlineExceeded)
         end
 
         it 'returns nil' do
-          expect(subject).to be_nil
+          expect(subject).to be(ALLOW)
         end
       end
     end
