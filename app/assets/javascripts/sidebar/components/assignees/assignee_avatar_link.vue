@@ -72,7 +72,8 @@ export default {
   },
   computed: {
     cannotMerge() {
-      return this.issuableType === 'merge_request' && !this.user.can_merge;
+      const canMerge = this.user.mergeRequestInteraction.canMerge || this.user.can_merge;
+      return this.issuableType === 'merge_request' && !canMerge;
     },
     tooltipTitle() {
       const { name = '', availability = '' } = this.user;
