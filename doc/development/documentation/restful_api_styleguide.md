@@ -33,8 +33,8 @@ In the Markdown doc for a resource (AKA endpoint):
 
 ## API topic template
 
-The following can be used as a template to get started:
-Note: ensure to list the required attributes on top.
+The following can be used as a template to get started.
+Ensure to list the required attributes on top:
 
 ````markdown
 ## Descriptive title
