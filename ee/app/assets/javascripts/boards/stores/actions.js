@@ -1,5 +1,4 @@
 import {
-  formatBoardLists,
   formatListIssues,
   formatListsPageInfo,
   fullBoardId,
@@ -36,7 +35,6 @@ import {
 } from '../constants';
 import epicQuery from '../graphql/epic.query.graphql';
 import createEpicBoardListMutation from '../graphql/epic_board_list_create.mutation.graphql';
-import epicBoardListsQuery from '../graphql/epic_board_lists.query.graphql';
 import epicMoveListMutation from '../graphql/epic_move_list.mutation.graphql';
 import epicsSwimlanesQuery from '../graphql/epics_swimlanes.query.graphql';
 import groupBoardAssigneesQuery from '../graphql/group_board_assignees.query.graphql';
@@ -164,7 +162,7 @@ export default {
       dispatch('resetEpics');
       dispatch('resetIssues');
       dispatch('fetchEpicsSwimlanes');
-      dispatch('fetchIssueLists');
+      dispatch('fetchLists');
     } else if (gon.features.graphqlBoardLists || getters.isEpicBoard) {
       dispatch('fetchLists');
       dispatch('resetIssues');
@@ -354,7 +352,7 @@ export default {
         }),
       );
       dispatch('fetchEpicsSwimlanes');
-      dispatch('fetchIssueLists');
+      dispatch('fetchLists');
     } else if (!gon.features.graphqlBoardLists) {
       historyPushState(removeParams(['group_by']), window.location.href, true);
       boardsStore.create();
@@ -539,35 +537,6 @@ export default {
       .catch(() =>
         commit(types.MOVE_EPIC_FAILURE, { originalEpic, fromListId, toListId, originalIndex }),
       );
-  },
-
-  fetchLists: ({ getters, dispatch }) => {
-    if (!getters.isEpicBoard) {
-      dispatch('fetchIssueLists');
-    } else {
-      dispatch('fetchEpicLists');
-    }
-  },
-
-  fetchEpicLists: ({ commit, state }) => {
-    const { filterParams, fullPath, boardId } = state;
-
-    const variables = {
-      fullPath,
-      boardId: fullEpicBoardId(boardId),
-      filters: filterParams,
-    };
-
-    return gqlClient
-      .query({
-        query: epicBoardListsQuery,
-        variables,
-      })
-      .then(({ data }) => {
-        const { lists } = data.group?.epicBoard;
-        commit(types.RECEIVE_BOARD_LISTS_SUCCESS, formatBoardLists(lists));
-      })
-      .catch(() => commit(types.RECEIVE_BOARD_LISTS_FAILURE));
   },
 
   fetchMilestones({ state, commit }, searchTerm) {

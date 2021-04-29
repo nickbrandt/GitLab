@@ -2,7 +2,6 @@ import * as Sentry from '@sentry/browser';
 import issueMoveListMutation from 'ee_else_ce/boards/graphql/issue_move_list.mutation.graphql';
 import testAction from 'helpers/vuex_action_helper';
 import {
-  fullBoardId,
   formatListIssues,
   formatBoardLists,
   formatIssueInput,
@@ -132,20 +131,12 @@ describe('setActiveId', () => {
 });
 
 describe('fetchLists', () => {
-  it('should dispatch fetchIssueLists action', () => {
-    testAction({
-      action: actions.fetchLists,
-      expectedActions: [{ type: 'fetchIssueLists' }],
-    });
-  });
-});
-
-describe('fetchIssueLists', () => {
   const state = {
     fullPath: 'gitlab-org',
-    boardId: '1',
+    fullBoardId: 'gid://gitlab/Board/1',
     filterParams: {},
     boardType: 'group',
+    issuableType: 'issue',
   };
 
   let queryResponse = {
@@ -167,7 +158,7 @@ describe('fetchIssueLists', () => {
     jest.spyOn(gqlClient, 'query').mockResolvedValue(queryResponse);
 
     testAction(
-      actions.fetchIssueLists,
+      actions.fetchLists,
       {},
       state,
       [
@@ -185,7 +176,7 @@ describe('fetchIssueLists', () => {
     jest.spyOn(gqlClient, 'query').mockResolvedValue(Promise.reject());
 
     testAction(
-      actions.fetchIssueLists,
+      actions.fetchLists,
       {},
       state,
       [
@@ -214,7 +205,7 @@ describe('fetchIssueLists', () => {
     jest.spyOn(gqlClient, 'query').mockResolvedValue(queryResponse);
 
     testAction(
-      actions.fetchIssueLists,
+      actions.fetchLists,
       {},
       state,
       [
@@ -248,7 +239,7 @@ describe('createIssueList', () => {
   beforeEach(() => {
     state = {
       fullPath: 'gitlab-org',
-      boardId: '1',
+      fullBoardId: 'gid://gitlab/Board/1',
       boardType: 'group',
       disabled: false,
       boardLists: [{ type: 'closed' }],
@@ -378,7 +369,7 @@ describe('moveList', () => {
 
     const state = {
       fullPath: 'gitlab-org',
-      boardId: '1',
+      fullBoardId: 'gid://gitlab/Board/1',
       boardType: 'group',
       disabled: false,
       boardLists: initialBoardListsState,
@@ -421,7 +412,7 @@ describe('moveList', () => {
 
     const state = {
       fullPath: 'gitlab-org',
-      boardId: '1',
+      fullBoardId: 'gid://gitlab/Board/1',
       boardType: 'group',
       disabled: false,
       boardLists: initialBoardListsState,
@@ -455,7 +446,7 @@ describe('updateList', () => {
 
     const state = {
       fullPath: 'gitlab-org',
-      boardId: '1',
+      fullBoardId: 'gid://gitlab/Board/1',
       boardType: 'group',
       disabled: false,
       boardLists: [{ type: 'closed' }],
@@ -573,7 +564,7 @@ describe('fetchItemsForList', () => {
 
   const state = {
     fullPath: 'gitlab-org',
-    boardId: '1',
+    fullBoardId: 'gid://gitlab/Board/1',
     filterParams: {},
     boardType: 'group',
   };
@@ -960,7 +951,7 @@ describe('updateIssueOrder', () => {
 
   const state = {
     boardItems: issues,
-    boardId: 'gid://gitlab/Board/1',
+    fullBoardId: 'gid://gitlab/Board/1',
   };
 
   const moveData = {
@@ -974,7 +965,7 @@ describe('updateIssueOrder', () => {
       mutation: issueMoveListMutation,
       variables: {
         projectPath: getProjectPath(mockIssue.referencePath),
-        boardId: fullBoardId(state.boardId),
+        boardId: state.fullBoardId,
         iid: mockIssue.iid,
         fromListId: 1,
         toListId: 2,
