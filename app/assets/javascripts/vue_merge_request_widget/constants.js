@@ -4,6 +4,7 @@ export const SUCCESS = 'success';
 export const WARNING = 'warning';
 export const DANGER = 'danger';
 export const INFO = 'info';
+export const CONFIRM = 'confirm';
 
 export const WARNING_MESSAGE_CLASS = 'warning_message';
 export const DANGER_MESSAGE_CLASS = 'danger_message';
