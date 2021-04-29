@@ -137,7 +137,7 @@ export default {
       <div class="gl-pt-5 gl-text-center">
         <p>
           {{ __('You can also create a project from the command line.') }}
-          <a ref="clipTip" href="#" class="push-new-project-tip" @click.prevent>
+          <a ref="clipTip" href="#" @click.prevent>
             {{ __('Show command') }}
           </a>
           <new-project-push-tip-popover :target="() => $refs.clipTip" />
