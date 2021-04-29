@@ -18,7 +18,7 @@ RSpec.describe UpdateInvalidWebHooks do
     web_hooks.create!(group_id: group.id, project_id: project.id, type: 'ProjectHook')
   end
 
-  it 'removes group hooks where the referenced group does not exist', :aggregate_failures do
+  it 'clears group_id when ProjectHook type and project_id are present', :aggregate_failures do
     expect(web_hooks.where.not(group_id: nil).where.not(project_id: nil).count).to eq(1)
 
     migrate!
