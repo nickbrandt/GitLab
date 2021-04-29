@@ -267,7 +267,7 @@ module Gitlab
           if deprecated?(object, owner)
             render_deprecation(object, owner, context)
           else
-            render_description_of(object, owner)
+            render_description_of(object, owner, context)
           end
         end
 
@@ -278,7 +278,7 @@ module Gitlab
           deprecations.key?(key)
         end
 
-        def render_description_of(object, owner)
+        def render_description_of(object, owner, context = nil)
           desc = if object[:is_edge]
                    base = object[:name].chomp('Edge')
                    "The edge type for [`#{base}`](##{base.downcase})."
@@ -294,7 +294,7 @@ module Gitlab
           desc += '.' unless desc.ends_with?('.')
           see = doc_reference(object, owner)
           desc += " #{see}" if see
-          desc += " (see [Connections](#connections))" if connection?(object)
+          desc += " (see [Connections](#connections))" if connection?(object) && context != :block
           desc
         end
 
