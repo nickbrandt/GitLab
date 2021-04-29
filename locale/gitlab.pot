@@ -35709,6 +35709,9 @@ msgstr ""
 msgid "We don't have enough data to show this stage."
 msgstr ""
 
+msgid "We encountered an error and our team has been notified. Please try again."
+msgstr ""
+
 msgid "We have found the following errors:"
 msgstr ""
 
