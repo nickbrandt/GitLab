@@ -503,6 +503,7 @@ describe('removeList', () => {
   beforeEach(() => {
     state = {
       boardLists: mockListsById,
+      issuableType: 'issue',
     };
   });
 
