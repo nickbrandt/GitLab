@@ -38471,6 +38471,9 @@ msgid_plural "points"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "previously merged commits"
+msgstr ""
+
 msgid "private"
 msgstr ""
 
