@@ -7,61 +7,77 @@ module QA
       let!(:user) { Resource::User.fabricate_via_api! { |usr| usr.api_client = api_client } }
       let!(:personal_access_token) { Runtime::API::Client.new(user: user).personal_access_token }
 
-      let(:source_group) do
+      let!(:sandbox) do
+        Resource::Sandbox.fabricate_via_api! do |group|
+          group.api_client = api_client
+        end
+      end
+
+      let!(:source_group) do
         Resource::Sandbox.fabricate_via_api! do |group|
           group.api_client = api_client
           group.path = "source-group-for-import-#{SecureRandom.hex(4)}"
         end
       end
 
-      let(:target_group) do
-        Resource::Sandbox.fabricate_via_api! do |group|
+      let(:imported_group) do
+        Resource::Group.new.tap do |group|
           group.api_client = api_client
-          group.path = "target-group-for-import-#{SecureRandom.hex(4)}"
-        end
+          group.path = source_group.path
+        end.reload!
+      rescue Resource::ApiFabricator::ResourceNotFoundError
+        nil
       end
 
-      let(:imported_group) do
-        Resource::Group.fabricate_via_api! do |group|
-          group.api_client = api_client
-          group.sandbox = target_group
-          group.path = source_group.path
-        end
+      # Return subset of fields for comparing groups
+      #
+      # @param [Resource::Group, nil] group
+      # @return [Hash]
+      def comparable_group(group)
+        group&.api_resource&.except(
+          :id,
+          :web_url,
+          :visibility,
+          :full_name,
+          :full_path,
+          :created_at,
+          :parent_id,
+          :runners_token
+        )
       end
 
       before do
         Runtime::Feature.enable(:bulk_import)
 
+        sandbox.add_member(user, Resource::Members::AccessLevel::MAINTAINER)
         source_group.add_member(user, Resource::Members::AccessLevel::MAINTAINER)
-        target_group.add_member(user, Resource::Members::AccessLevel::MAINTAINER)
 
         Flow::Login.sign_in(as: user)
         Page::Main::Menu.new.go_to_import_group
         Page::Group::New.new.connect_gitlab_instance(Runtime::Scenario.gitlab_address, personal_access_token)
       end
 
-      it "performs bulk group import from another gitlab instance" do
-        import = Page::Group::BulkImport.perform do |import_page|
-          import_page.wait_for_groups_to_load
-          import_page.import_group(source_group.path, target_group.path)
-        end
+      it(
+        "performs bulk group import from another gitlab instance",
+        testcase: "https://gitlab.com/gitlab-org/quality/testcases/-/issues/1785"
+      ) do
+        Page::Group::BulkImport.perform do |import_page|
+          import_page.import_group(source_group.path, sandbox.path)
 
-        aggregate_failures do
-          expect(import).to be_truthy, "Group bulk import did not finish successfully"
-          expect(imported_group.path).to eq(source_group.path)
+          aggregate_failures do
+            expect(import_page).to have_imported_group(source_group.path, wait: 60)
+            expect(comparable_group(imported_group)).to eq(comparable_group(source_group))
+          end
         end
       end
 
       after do
         Runtime::Feature.disable(:bulk_import)
 
-        source_group&.remove_via_api!
-        target_group&.remove_via_api!
-
-        # Imported group might not be immediately removed and 'user' is sole maintainer, so remove might fail
-        QA::Support::Retrier.retry_on_exception do
-          user&.remove_via_api!
-        end
+        # Add additional maintainer to imported group so user is not sole maintainer and can be deleted
+        imported_group&.add_member(Runtime::User.admin, Resource::Members::AccessLevel::MAINTAINER)
+        source_group.remove_via_api!
+        user.remove_via_api!
       end
     end
   end

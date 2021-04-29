@@ -122,6 +122,7 @@ export default {
   <tr
     class="gl-border-gray-200 gl-border-0 gl-border-b-1 gl-border-solid"
     data-qa-selector="import_item"
+    :data-qa-source-group="group.full_path"
   >
     <td class="gl-p-4">
       <gl-link
@@ -166,6 +167,8 @@ export default {
             <gl-dropdown-item
               v-for="ns in availableNamespaces"
               :key="ns.full_path"
+              data-qa-selector="target_group_dropdown_item"
+              :data-qa-group-name="ns.full_path"
               @click="$emit('update-target-namespace', ns.full_path)"
             >
               {{ ns.full_path }}
