@@ -1,9 +1,8 @@
 import $ from 'jquery';
-import initIntegrationsList from '~/integrations/index';
+import Api from '~/api';
 import { loadCSSFile } from '~/lib/utils/css_utils';
 import { select2AxiosTransport } from '~/lib/utils/select2_utils';
 import { s__ } from '~/locale';
-import PersistentUserCallout from '~/persistent_user_callout';
 
 const onLimitCheckboxChange = (checked, $limitByNamespaces, $limitByProjects) => {
   $limitByNamespaces.find('.select2').select2('data', null);
@@ -12,14 +11,14 @@ const onLimitCheckboxChange = (checked, $limitByNamespaces, $limitByProjects) =>
   $limitByProjects.toggleClass('hidden', !checked);
 };
 
-const getDropdownConfig = (placeholder, url) => ({
+const getDropdownConfig = (placeholder, apiPath, textProp) => ({
   placeholder,
   multiple: true,
   initSelection($el, callback) {
     callback($el.data('selected'));
   },
   ajax: {
-    url,
+    url: Api.buildUrl(apiPath),
     dataType: 'JSON',
     quietMillis: 250,
     data(search) {
@@ -30,19 +29,14 @@ const getDropdownConfig = (placeholder, url) => ({
     results(data) {
       return {
         results: data.results.map((entity) => ({
-          id: entity.source_id,
-          text: entity.path,
+          id: entity.id,
+          text: entity[textProp],
         })),
       };
     },
     transport: select2AxiosTransport,
   },
 });
-
-const callout = document.querySelector('.js-admin-integrations-moved');
-PersistentUserCallout.factory(callout);
-
-initIntegrationsList();
 
 // ElasticSearch
 const $container = $('#js-elasticsearch-settings');
@@ -67,7 +61,8 @@ import(/* webpackChunkName: 'select2' */ 'select2/select2')
           .select2(
             getDropdownConfig(
               s__('Elastic|None. Select namespaces to index.'),
-              '/-/autocomplete/namespace_routes.json',
+              Api.namespacesPath,
+              'full_path',
             ),
           );
 
@@ -76,7 +71,8 @@ import(/* webpackChunkName: 'select2' */ 'select2/select2')
           .select2(
             getDropdownConfig(
               s__('Elastic|None. Select projects to index.'),
-              '/-/autocomplete/project_routes.json',
+              Api.projectsPath,
+              'name_with_namespace',
             ),
           );
       })
