@@ -1,4 +1,4 @@
-import { GlPopover, GlLink, GlIcon } from '@gitlab/ui';
+import { GlPopover, GlLink, GlIcon, GlSprintf } from '@gitlab/ui';
 import { shallowMount } from '@vue/test-utils';
 import GeoNodeLastUpdated from 'ee/geo_nodes_beta/components/header/geo_node_last_updated.vue';
 import {
@@ -8,6 +8,7 @@ import {
 } from 'ee/geo_nodes_beta/constants';
 import { extendedWrapper } from 'helpers/vue_test_utils_helper';
 import { differenceInMilliseconds } from '~/lib/utils/datetime_utility';
+import TimeAgo from '~/vue_shared/components/time_ago_tooltip.vue';
 
 describe('GeoNodeLastUpdated', () => {
   let wrapper;
@@ -27,6 +28,7 @@ describe('GeoNodeLastUpdated', () => {
           ...defaultProps,
           ...props,
         },
+        stubs: { GlSprintf },
       }),
     );
   };
@@ -49,7 +51,9 @@ describe('GeoNodeLastUpdated', () => {
 
       it('renders main text correctly', () => {
         expect(findMainText().exists()).toBe(true);
-        expect(findMainText().text()).toBe('Updated 10 minutes ago');
+        expect(findMainText().find(TimeAgo).props('time')).toBe(
+          new Date(staleStatusTime).toString(),
+        );
       });
 
       it('renders the question icon correctly', () => {
@@ -63,7 +67,9 @@ describe('GeoNodeLastUpdated', () => {
 
       it('renders the popover text correctly', () => {
         expect(findPopoverText().exists()).toBe(true);
-        expect(findPopoverText().text()).toBe("Node's status was updated 10 minutes ago.");
+        expect(findPopoverText().find(TimeAgo).props('time')).toBe(
+          new Date(staleStatusTime).toString(),
+        );
       });
 
       it('renders the popover link always', () => {
