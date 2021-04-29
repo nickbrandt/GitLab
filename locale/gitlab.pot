@@ -4871,6 +4871,9 @@ msgstr ""
 msgid "Background Jobs"
 msgstr ""
 
+msgid "Background Migrations"
+msgstr ""
+
 msgid "Background color"
 msgstr ""
 
@@ -21144,6 +21147,9 @@ msgid "Middleman project with Static Site Editor support"
 msgstr ""
 
 msgid "Migrated %{success_count}/%{total_count} files."
+msgstr ""
+
+msgid "Migration"
 msgstr ""
 
 msgid "Migration has been scheduled to be retried"
