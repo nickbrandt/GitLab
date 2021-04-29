@@ -53,6 +53,7 @@ RSpec.describe Projects::MergeRequestsController do
 
   let_it_be_with_refind(:project) { create(:project, :repository) }
   let_it_be(:author) { create(:user) }
+  let_it_be(:owner) { create(:admin) }
 
   let(:merge_request) { create(:merge_request_with_diffs, source_project: project, author: author) }
   let(:user) { project.creator }
@@ -313,7 +314,8 @@ RSpec.describe Projects::MergeRequestsController do
         let(:merge_request) { create(:merge_request, title: 'This is targeting the fork', source_project: project, target_project: project) }
 
         before do
-          project.add_developer(user)
+          sign_in(owner)
+          project.add_developer(owner)
           project.update!(approvals_before_merge: 0)
         end
 
