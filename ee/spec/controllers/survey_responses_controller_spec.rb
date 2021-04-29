@@ -28,6 +28,8 @@ RSpec.describe SurveyResponsesController do
           action: 'submit_response',
           context: [{ schema: described_class::SURVEY_RESPONSE_SCHEMA_URL, data: { response: 'bar', survey_id: 1 } }]
         )
+
+        match_snowplow_context_schema(schema_path: 'survey_response_schema', context: { :response => 'bar', :survey_id => 1, :instance_id => 2 } )
       end
     end
 

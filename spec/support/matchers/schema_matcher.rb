@@ -13,6 +13,7 @@ module SchemaPath
     end
 
     Rails.root.join(dir.to_s, 'spec', "fixtures/api/schemas/#{schema}.json").to_s
+    Rails.root.join(dir.to_s, 'spec', "fixtures/product_intelligence/#{schema}.json").to_s
   end
 
   def self.validator(schema_path)
@@ -46,13 +47,11 @@ RSpec::Matchers.define :match_response_schema do |schema, dir: nil, **options|
 end
 
 RSpec::Matchers.define :match_snowplow_schema do |schema, dir: nil, **options|
-  match do |response|
+  match do |data|
     schema_path = Pathname.new(SchemaPath.expand(schema, dir))
     validator = SchemaPath.validator(schema_path)
 
-    data = Gitlab::Json.parse(response.body)
-
-    validator.valid?(data)
+    validator.valid?(data.stringify_keys)
   end
 end
 
