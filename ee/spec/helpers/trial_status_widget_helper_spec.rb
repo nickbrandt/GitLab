@@ -4,6 +4,10 @@ require 'spec_helper'
 
 RSpec.describe TrialStatusWidgetHelper do
   describe 'data attributes for mounting Vue components' do
+    let(:today) { Date.parse('2021-01-12') }
+    let(:trial_days_remaining) { 18 }
+    let(:trial_end_date) { Date.current.advance(days: trial_days_remaining) }
+    let(:trial_percentage_complete) { (30 - trial_days_remaining) * 100 / 30 }
     let(:subscription) { instance_double(GitlabSubscription, plan_title: 'Ultimate') }
 
     let(:group) do
@@ -12,9 +16,9 @@ RSpec.describe TrialStatusWidgetHelper do
         name: 'Pants Group',
         to_param: 'pants-group',
         gitlab_subscription: subscription,
-        trial_days_remaining: 12,
-        trial_ends_on: Date.current.advance(days: 18),
-        trial_percentage_complete: 40
+        trial_days_remaining: trial_days_remaining,
+        trial_ends_on: trial_end_date,
+        trial_percentage_complete: trial_percentage_complete
       )
     end
 
@@ -22,26 +26,133 @@ RSpec.describe TrialStatusWidgetHelper do
       {
         container_id: 'trial-status-sidebar-widget',
         plan_name: 'Ultimate',
-        plans_href: '/groups/pants-group/-/billings'
+        plans_href: group_billings_path(group)
       }
     end
 
     before do
-      travel_to Date.parse('2021-01-12')
+      travel_to today
     end
 
     describe '#trial_status_popover_data_attrs' do
+      let_it_be(:user) { create(:user) }
+
+      let(:dismissed_d14_callout) { false }
+      let(:dismissed_d3_callout) { false }
+
+      let(:popover_shared_expected_attrs) do
+        shared_expected_attrs.merge(
+          group_name: group.name,
+          purchase_href: new_subscriptions_path(namespace_id: group.id, plan_id: described_class::ZUORA_ULTIMATE_PLAN_ID),
+          target_id: shared_expected_attrs[:container_id],
+          start_initially_shown: false,
+          trial_end_date: trial_end_date,
+          user_callouts_path: user_callouts_path,
+          user_callouts_feature_id: nil
+        )
+      end
+
+      before do
+        allow(helper).to receive(:current_user).and_return(user)
+        allow(user).to receive(:dismissed_callout?).with(feature_name: described_class::D14_CALLOUT_ID).and_return(dismissed_d14_callout)
+        allow(user).to receive(:dismissed_callout?).with(feature_name: described_class::D3_CALLOUT_ID).and_return(dismissed_d3_callout)
+      end
+
       subject(:data_attrs) { helper.trial_status_popover_data_attrs(group) }
 
-      it 'returns the needed data attributes for mounting the Vue component' do
-        expect(data_attrs).to match(
-          shared_expected_attrs.merge(
-            group_name: 'Pants Group',
-            purchase_href: '/-/subscriptions/new?namespace_id=123&plan_id=2c92a0ff76f0d5250176f2f8c86f305a',
-            target_id: shared_expected_attrs[:container_id],
-            trial_end_date: Date.parse('2021-01-30')
-          )
+      context 'when more than 14 days remain' do
+        where trial_days_remaining: [15, 22, 30]
+
+        with_them do
+          it 'returns the default set of attributes' do
+            expect(data_attrs).to match(popover_shared_expected_attrs)
+          end
+        end
+      end
+
+      context 'when between 7 & 14 days remain' do
+        where trial_days_remaining: [7, 10, 14]
+
+        with_them do
+          context 'and the user has not dismissed the D14 callout' do
+            let(:dismissed_d14_callout) { false }
+
+            it 'returns the default set of attributes' do
+              expect(data_attrs).to match(
+                popover_shared_expected_attrs.merge(
+                  start_initially_shown: true,
+                  user_callouts_feature_id: described_class::D14_CALLOUT_ID
+                )
+              )
+            end
+          end
+
+          context 'but the user has already dismissed the D14 callout' do
+            let(:dismissed_d14_callout) { true }
+
+            it 'returns the default set of attributes' do
+              expect(data_attrs).to match(
+                popover_shared_expected_attrs.merge(
+                  user_callouts_feature_id: described_class::D14_CALLOUT_ID
+                )
+              )
+            end
+          end
+        end
+      end
+
+      context 'when between 4 & 6 days remain' do
+        where(
+          trial_days_remaining: [4, 5, 6],
+          dismissed_d14_callout: [true, false]
         )
+
+        with_them do
+          context 'regardless of whether or not the user dismissed the D14 callout' do
+            it 'returns the default set of attributes' do
+              expect(data_attrs).to match(popover_shared_expected_attrs)
+            end
+          end
+        end
+      end
+
+      context 'when between 0 & 3 days remain' do
+        where trial_days_remaining: [0, 1, 3]
+
+        with_them do
+          context 'and the user has not dismissed the D3 callout' do
+            let(:dismissed_d3_callout) { false }
+
+            it 'returns the default set of attributes' do
+              expect(data_attrs).to match(
+                popover_shared_expected_attrs.merge(
+                  start_initially_shown: true,
+                  user_callouts_feature_id: described_class::D3_CALLOUT_ID
+                )
+              )
+            end
+          end
+
+          context 'but the user has already dismissed the D3 callout' do
+            let(:dismissed_d3_callout) { true }
+
+            it 'returns the default set of attributes' do
+              expect(data_attrs).to match(
+                popover_shared_expected_attrs.merge(
+                  user_callouts_feature_id: described_class::D3_CALLOUT_ID
+                )
+              )
+            end
+          end
+        end
+      end
+
+      context 'when fewer than 0 days remain' do
+        let(:trial_days_remaining) { -1 }
+
+        it 'returns the default set of attributes' do
+          expect(data_attrs).to match(popover_shared_expected_attrs)
+        end
       end
     end
 
@@ -55,9 +166,9 @@ RSpec.describe TrialStatusWidgetHelper do
       it 'returns the needed data attributes for mounting the Vue component' do
         expect(data_attrs).to match(
           shared_expected_attrs.merge(
-            days_remaining: 12,
+            days_remaining: trial_days_remaining,
             nav_icon_image_path: '/image-path/for-file.svg',
-            percentage_complete: 40
+            percentage_complete: trial_percentage_complete
           )
         )
       end

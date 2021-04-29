@@ -43,22 +43,30 @@ export const initTrialStatusPopover = () => {
     planName,
     plansHref,
     purchaseHref,
+    startInitiallyShown,
     targetId,
     trialEndDate,
+    userCalloutsPath,
+    userCalloutsFeatureId,
   } = el.dataset;
 
   return new Vue({
     el,
+    provide: {
+      groupName,
+      planName,
+      plansHref,
+      purchaseHref,
+      startInitiallyShown: startInitiallyShown !== undefined,
+      trialEndDate: new Date(trialEndDate),
+      userCalloutsPath,
+      userCalloutsFeatureId,
+    },
     render: (createElement) =>
       createElement(TrialStatusPopover, {
         props: {
           containerId,
-          groupName,
-          planName,
-          plansHref,
-          purchaseHref,
           targetId,
-          trialEndDate: new Date(trialEndDate),
         },
       }),
   });

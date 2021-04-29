@@ -2,30 +2,22 @@
 import { GlButton, GlPopover, GlSprintf } from '@gitlab/ui';
 import { GlBreakpointInstance as bp } from '@gitlab/ui/dist/utils';
 import { debounce } from 'lodash';
+import axios from '~/lib/utils/axios_utils';
 import { formatDate } from '~/lib/utils/datetime_utility';
-import { s__ } from '~/locale';
+import { s__, sprintf } from '~/locale';
 import Tracking from '~/tracking';
 
 const RESIZE_EVENT_DEBOUNCE_MS = 150;
+const CLICK_BUTTON = 'click_button';
 
 export default {
-  tracking: {
-    event: 'click_button',
-    labels: { upgrade: 'upgrade_to_ultimate', compare: 'compare_all_plans' },
-    property: 'experiment:show_trial_status_in_sidebar',
-  },
   components: {
     GlButton,
     GlPopover,
     GlSprintf,
   },
-  mixins: [Tracking.mixin()],
-  props: {
-    containerId: {
-      type: [String, null],
-      required: false,
-      default: null,
-    },
+  mixins: [Tracking.mixin({ property: 'experiment:show_trial_status_in_sidebar' })],
+  inject: {
     groupName: {
       type: String,
       required: true,
@@ -42,18 +34,41 @@ export default {
       type: String,
       required: true,
     },
-    targetId: {
-      type: String,
-      required: true,
+    startInitiallyShown: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
     trialEndDate: {
       type: Date,
+      required: true,
+    },
+    userCalloutsPath: {
+      type: String,
+      required: false,
+      default: undefined,
+    },
+    userCalloutsFeatureId: {
+      type: String,
+      required: false,
+      default: undefined,
+    },
+  },
+  props: {
+    containerId: {
+      type: String,
+      required: false,
+      default: undefined,
+    },
+    targetId: {
+      type: String,
       required: true,
     },
   },
   data() {
     return {
       disabled: false,
+      forciblyShowing: false,
     };
   },
   i18n: {
@@ -66,14 +81,30 @@ export default {
       Premium if it meets your needs.)`),
     upgradeButtonTitle: s__('Trials|Upgrade %{groupName} to %{planName}'),
   },
+  trackingEvents: {
+    clickCloseBtn: { action: CLICK_BUTTON, label: 'close_popover' },
+    popoverShown: { action: 'popover_shown', label: 'trial_status_popover' },
+    clickUpgradeBtn: { action: CLICK_BUTTON, label: 'upgrade_to_ultimate' },
+    clickCompareBtn: { action: CLICK_BUTTON, label: 'compare_all_plans' },
+  },
   computed: {
     formattedTrialEndDate() {
       return formatDate(this.trialEndDate, 'mmmm d');
+    },
+    upgradeButtonTitle() {
+      return sprintf(this.$options.i18n.upgradeButtonTitle, {
+        groupName: this.groupName,
+        planName: this.planName,
+      });
     },
   },
   created() {
     this.debouncedResize = debounce(() => this.onResize(), RESIZE_EVENT_DEBOUNCE_MS);
     window.addEventListener('resize', this.debouncedResize);
+    if (this.startInitiallyShown) {
+      this.forciblyShowing = true;
+      this.onForciblyShown();
+    }
   },
   mounted() {
     this.onResize();
@@ -82,14 +113,39 @@ export default {
     window.removeEventListener('resize', this.debouncedResize);
   },
   methods: {
+    onForciblyShown() {
+      if (this.userCalloutsPath && this.userCalloutsFeatureId) {
+        axios
+          .post(this.userCalloutsPath, {
+            feature_name: this.userCalloutsFeatureId,
+          })
+          .catch((e) => {
+            // eslint-disable-next-line no-console, @gitlab/require-i18n-strings
+            console.error('Failed to dismiss trial status popover.', e);
+          });
+      }
+    },
+    onClose() {
+      this.$refs.popover.$emit('close');
+      this.forciblyShowing = false;
+
+      const { action, ...options } = this.$options.trackingEvents.clickCloseBtn;
+      this.track(action, options);
+    },
     onResize() {
       this.updateDisabledState();
     },
     onShown() {
-      this.track('popover_shown', {
-        label: 'trial_status_popover',
-        property: 'experiment:show_trial_status_in_sidebar',
-      });
+      const { action, ...options } = this.$options.trackingEvents.popoverShown;
+      this.track(action, options);
+    },
+    onClickUpgradeBtn() {
+      const { action, ...options } = this.$options.trackingEvents.clickUpgradeBtn;
+      this.track(action, options);
+    },
+    onClickCompareBtn() {
+      const { action, ...options } = this.$options.trackingEvents.clickCompareBtn;
+      this.track(action, options);
     },
     updateDisabledState() {
       this.disabled = ['xs', 'sm'].includes(bp.getBreakpointSize());
@@ -100,17 +156,34 @@ export default {
 
 <template>
   <gl-popover
+    ref="popover"
     :container="containerId"
     :target="targetId"
     :disabled="disabled"
     placement="rightbottom"
     boundary="viewport"
     :delay="{ hide: 400 }"
+    :show="forciblyShowing"
+    :triggers="forciblyShowing ? '' : 'hover focus'"
     @shown="onShown"
   >
-    <template #title>
-      {{ $options.i18n.popoverTitle }}
-      <gl-emoji class="gl-vertical-align-baseline font-size-inherit gl-ml-1" data-name="wave" />
+    <template
+      #title
+      class="gl-display-flex flex-direction-row-reverse justify-content-space-between"
+    >
+      <gl-button
+        v-if="forciblyShowing"
+        category="tertiary"
+        class="close"
+        :aria-label="__('Close')"
+        @click.prevent="onClose"
+      >
+        <span class="d-inline-block" aria-hidden="true">&times;</span>
+      </gl-button>
+      <span>
+        {{ $options.i18n.popoverTitle }}
+        <gl-emoji class="gl-vertical-align-baseline font-size-inherit gl-ml-1" data-name="wave" />
+      </span>
     </template>
 
     <gl-sprintf :message="$options.i18n.popoverContent">
@@ -129,16 +202,9 @@ export default {
         class="gl-mb-0"
         block
         data-testid="upgradeBtn"
-        :data-track-event="$options.tracking.event"
-        :data-track-label="$options.tracking.labels.upgrade"
-        :data-track-property="$options.tracking.property"
+        @click="onClickUpgradeBtn"
       >
-        <span class="gl-font-sm">
-          <gl-sprintf :message="$options.i18n.upgradeButtonTitle">
-            <template #groupName>{{ groupName }}</template>
-            <template #planName>{{ planName }}</template>
-          </gl-sprintf>
-        </span>
+        <span class="gl-font-sm">{{ upgradeButtonTitle }}</span>
       </gl-button>
       <gl-button
         :href="plansHref"
@@ -149,9 +215,7 @@ export default {
         block
         data-testid="compareBtn"
         :title="$options.i18n.compareAllButtonTitle"
-        :data-track-event="$options.tracking.event"
-        :data-track-label="$options.tracking.labels.compare"
-        :data-track-property="$options.tracking.property"
+        @click="onClickCompareBtn"
       >
         <span class="gl-font-sm">{{ $options.i18n.compareAllButtonTitle }}</span>
       </gl-button>
