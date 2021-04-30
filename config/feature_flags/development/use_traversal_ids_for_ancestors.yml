@@ -1,6 +1,6 @@
 ---
 name: use_traversal_ids_for_ancestors
-introduced_by_url: https://gitlab.com/gitlab-org/gitlab/-/issues/324749
+introduced_by_url: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/57137
 rollout_issue_url:
 milestone: '13.12'
 type: development
