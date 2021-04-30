@@ -5,7 +5,7 @@ module Gitlab
   module Spamcheck
     class Client
       include ::Spam::SpamConstants
-      DEFAULT_TIMEOUT_SECS = 5
+      DEFAULT_TIMEOUT_SECS = 2
 
       VERDICT_MAPPING = {
         ::Spamcheck::SpamVerdict::Verdict::ALLOW => ALLOW,
