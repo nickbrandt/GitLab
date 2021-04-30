@@ -81,7 +81,9 @@ module IntegrationParams
 
   def integration_params
     dynamic_params = @service.event_channel_names + @service.event_names # rubocop:disable Gitlab/ModuleWithInstanceVariables
-    return_value = params.permit(:id, integration: allowed_integration_params + dynamic_params)
+    allowed = allowed_integration_params + dynamic_params
+    return_value = params.permit(:id, integration: allowed, service: allowed)
+    return_value[:integration] ||= return_value.delete(:service)
     param_values = return_value[:integration]
 
     if param_values.is_a?(ActionController::Parameters)
