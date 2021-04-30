@@ -255,7 +255,7 @@ RSpec.describe GroupsHelper do
 
       context 'linear' do
         before do
-          stub_feature_flags(use_traversal_ids: false)
+          stub_feature_flags(use_traversal_ids: true)
         end
 
         include_examples 'correct ancestor order'
