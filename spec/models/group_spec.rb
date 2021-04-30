@@ -454,7 +454,7 @@ RSpec.describe Group do
       end
 
       describe '#ancestors' do
-        it { expect(group.ancestors.to_sql).to include 'traversal_ids <@' }
+        it { expect(group.ancestors.to_sql).to include "\"namespaces\".\"id\" = #{group.parent_id}" }
 
         it 'hierarchy order' do
           expect(group.ancestors(hierarchy_order: :asc).to_sql).to include 'ORDER BY "depth" ASC'

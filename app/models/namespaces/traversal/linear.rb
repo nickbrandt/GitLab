@@ -45,7 +45,6 @@ module Namespaces
         after_update :sync_traversal_ids, if: -> { sync_traversal_ids? && saved_change_to_parent_id? }
 
         scope :traversal_ids_contains, ->(ids) { where("traversal_ids @> (?)", ids) }
-        scope :traversal_ids_contained_by, ->(ids) { where("traversal_ids <@ (?)", ids) }
       end
 
       def sync_traversal_ids?
@@ -102,7 +101,7 @@ module Namespaces
         end
 
         if bottom
-          skope = skope.traversal_ids_contained_by(sql_array(bottom.traversal_ids))
+          skope = skope.where(id: bottom.traversal_ids[0..-1])
         end
 
         # The original `with_depth` attribute in ObjectHierarchy increments as you
@@ -115,10 +114,6 @@ module Namespaces
         end
 
         skope
-      end
-
-      def sql_array(ids)
-        "{#{ids.join(',')}}"
       end
     end
   end
