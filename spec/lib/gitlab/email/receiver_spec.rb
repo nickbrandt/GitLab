@@ -24,7 +24,7 @@ RSpec.describe Gitlab::Email::Receiver do
 
       stub_incoming_email_setting(enabled: true, address: "incoming+%{key}@appmail.example.com")
 
-      expect(receiver.mail_metadata.keys).to match_array(%i(message_id from_address to_address mail_key references delivered_to envelope_to x_envelope_to))
+      expect(receiver.mail_metadata.keys).to match_array(%i(mail_uid from_address to_address mail_key references delivered_to envelope_to x_envelope_to))
     end
 
     context 'when in a Delivered-To header' do

@@ -26,7 +26,7 @@ module Gitlab
 
       def mail_metadata
         {
-          message_id: mail.message_id,
+          mail_uid: mail.message_id,
           from_address: mail.from,
           to_address: mail.to,
           mail_key: mail_key,
