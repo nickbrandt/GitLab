@@ -84,7 +84,7 @@ class InvitesController < ApplicationController
   def ensure_member_exists
     return if member
 
-    render_404
+    redirect_back_or_default(options: { alert: _("The invitation can not be found with the provided invite token.") })
   end
 
   def authenticate_user!
