@@ -40,8 +40,9 @@ module Gitlab
       def issue_spam?(spam_issue:, user:, context: {})
         issue = build_issue_protobuf(issue: spam_issue, user: user, context: context)
 
-        response = @stub.check_for_spam_issue(issue, metadata:
-                                              { 'authorization' => ENV['SPAMCHECK_APIKEY'] })
+        response = @stub.check_for_spam_issue(issue,
+                                              metadata: { 'authorization' =>
+                                                           Gitlab::CurrentSettings.spam_check_api_key })
         verdict = convert_verdict_to_gitlab_constant(response.verdict)
         [verdict, response.error]
       end
