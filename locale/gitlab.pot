@@ -38231,7 +38231,22 @@ msgstr ""
 msgid "mrWidget|Merged by"
 msgstr ""
 
+msgid "mrWidget|Merging! Changes are being shipped…"
+msgstr ""
+
+msgid "mrWidget|Merging! Changes will land soon…"
+msgstr ""
+
 msgid "mrWidget|Merging! Drum roll, please…"
+msgstr ""
+
+msgid "mrWidget|Merging! Everything's good…"
+msgstr ""
+
+msgid "mrWidget|Merging! This is going to be great…"
+msgstr ""
+
+msgid "mrWidget|Merging! We're almost there…"
 msgstr ""
 
 msgid "mrWidget|More information"
