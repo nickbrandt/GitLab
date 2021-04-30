@@ -524,7 +524,7 @@ class ApplicationSetting < ApplicationRecord
   attr_encrypted :lets_encrypt_private_key, encryption_options_base_32_aes_256_gcm
   attr_encrypted :eks_secret_access_key, encryption_options_base_32_aes_256_gcm
   attr_encrypted :akismet_api_key, encryption_options_base_32_aes_256_gcm
-  attr_encrypted :spam_check_api_key, encryption_options_base_32_aes_256_gcm
+  attr_encrypted :spam_check_api_key, encryption_options_base_32_aes_256_gcm, encode: false
   attr_encrypted :elasticsearch_aws_secret_access_key, encryption_options_base_32_aes_256_gcm
   attr_encrypted :recaptcha_private_key, encryption_options_base_32_aes_256_gcm
   attr_encrypted :recaptcha_site_key, encryption_options_base_32_aes_256_gcm
