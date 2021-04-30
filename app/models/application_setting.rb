@@ -375,7 +375,7 @@ class ApplicationSetting < ApplicationRecord
             if: :external_authorization_service_enabled
 
   validates :spam_check_endpoint_url,
-            addressable_url: true, allow_blank: true
+            addressable_url: { schemes: %w(grpc) }, allow_blank: true
 
   validates :spam_check_endpoint_url,
             presence: true,
