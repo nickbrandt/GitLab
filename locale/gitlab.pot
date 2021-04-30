@@ -35808,6 +35808,15 @@ msgstr ""
 msgid "WebIDE|You need permission to edit files directly in this project. Go to your fork to make changes and submit a merge request."
 msgstr ""
 
+msgid "WebexTeamsService|Send notifications about project events to Webex Teams."
+msgstr ""
+
+msgid "WebexTeamsService|Send notifications about project events to a Webex Teams conversation. %{docs_link}"
+msgstr ""
+
+msgid "WebexTeamsService|Webex Teams"
+msgstr ""
+
 msgid "Webhook"
 msgstr ""
 
