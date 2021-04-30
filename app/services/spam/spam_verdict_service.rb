@@ -14,16 +14,16 @@ module Spam
     end
 
     def execute
-      external_spam_check_result = nil
+      spamcheck_result = nil
 
       external_spam_check_round_trip_time = Benchmark.realtime do
-        external_spam_check_result = external_verdict
+        spamcheck_result = spamcheck_verdict
       end
 
       akismet_result = akismet_verdict
 
       # filter out anything we don't recognise, including nils.
-      valid_results = [external_spam_check_result, akismet_result].compact.select { |r| SUPPORTED_VERDICTS.key?(r) }
+      valid_results = [spamcheck_result, akismet_result].compact.select { |r| SUPPORTED_VERDICTS.key?(r) }
 
       # Treat nils - such as service unavailable - as ALLOW
       return ALLOW unless valid_results.any?
@@ -33,7 +33,7 @@ module Spam
 
       logger.info(source: 'spam_verdict_service.rb',
                   akismet_verdict: akismet_verdict,
-                  spam_check_verdict: external_verdict,
+                  spam_check_verdict: spamcheck_result,
                   spam_check_rtt: external_spam_check_round_trip_time.real,
                   final_verdict: final_verdict,
                   username: user.username,
@@ -57,14 +57,14 @@ module Spam
       end
     end
 
-    def external_verdict
+    def spamcheck_verdict
       return unless Gitlab::CurrentSettings.spam_check_endpoint_enabled
 
       begin
         result, _error = spamcheck_client.issue_spam?(spam_issue: target, user: user, context: context)
         return unless result
 
-        # @TODO log if error is not nil
+        # @TODO log if error is not nil https://gitlab.com/gitlab-org/gitlab/-/issues/329545
 
         if Gitlab::Recaptcha.enabled? && result == CONDITIONAL_ALLOW
           ALLOW

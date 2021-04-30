@@ -7,11 +7,11 @@ RSpec.describe Spam::SpamVerdictService do
 
   let(:fake_ip) { '1.2.3.4' }
   let(:fake_user_agent) { 'fake-user-agent' }
-  let(:fake_referrer) { 'fake-http-referrer' }
+  let(:fake_referer) { 'fake-http-referer' }
   let(:env) do
     { 'action_dispatch.remote_ip' => fake_ip,
       'HTTP_USER_AGENT' => fake_user_agent,
-      'HTTP_REFERRER' => fake_referrer }
+      'HTTP_REFERER' => fake_referer }
   end
 
   let(:request) { double(:request, env: env) }
@@ -28,7 +28,7 @@ RSpec.describe Spam::SpamVerdictService do
 
     before do
       allow(service).to receive(:akismet_verdict).and_return(nil)
-      allow(service).to receive(:external_verdict).and_return(nil)
+      allow(service).to receive(:spamcheck_verdict).and_return(nil)
     end
 
     context 'if all services return nil' do
@@ -63,7 +63,7 @@ RSpec.describe Spam::SpamVerdictService do
       context 'and they are supported' do
         before do
           allow(service).to receive(:akismet_verdict).and_return(DISALLOW)
-          allow(service).to receive(:external_verdict).and_return(BLOCK_USER)
+          allow(service).to receive(:spamcheck_verdict).and_return(BLOCK_USER)
         end
 
         it 'renders the more restrictive verdict' do
@@ -74,7 +74,7 @@ RSpec.describe Spam::SpamVerdictService do
       context 'and one is supported' do
         before do
           allow(service).to receive(:akismet_verdict).and_return('nonsense')
-          allow(service).to receive(:external_verdict).and_return(BLOCK_USER)
+          allow(service).to receive(:spamcheck_verdict).and_return(BLOCK_USER)
         end
 
         it 'renders the more restrictive verdict' do
@@ -85,7 +85,7 @@ RSpec.describe Spam::SpamVerdictService do
       context 'and none are supported' do
         before do
           allow(service).to receive(:akismet_verdict).and_return('nonsense')
-          allow(service).to receive(:external_verdict).and_return('rubbish')
+          allow(service).to receive(:spamcheck_verdict).and_return('rubbish')
         end
 
         it 'renders the more restrictive verdict' do
@@ -150,8 +150,8 @@ RSpec.describe Spam::SpamVerdictService do
     end
   end
 
-  describe '#external_verdict' do
-    subject { service.send(:external_verdict) }
+  describe '#spamcheck_verdict' do
+    subject { service.send(:spamcheck_verdict) }
 
     context 'if a Spam Check endpoint enabled and set to a URL' do
       let(:spam_check_body) { {} }
@@ -191,7 +191,7 @@ RSpec.describe Spam::SpamVerdictService do
               allow(Recaptcha).to receive(:enabled?).and_return(true)
             end
 
-            it 'returns ALLOW' do
+            it 'returns CONDITIONAL_ALLOW' do
               expect(subject).to eq CONDITIONAL_ALLOW
             end
           end

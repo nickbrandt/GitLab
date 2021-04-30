@@ -9,11 +9,11 @@ RSpec.describe Spam::SpamActionService do
   let(:issue) { create(:issue, project: project, author: user) }
   let(:fake_ip) { '1.2.3.4' }
   let(:fake_user_agent) { 'fake-user-agent' }
-  let(:fake_referrer) { 'fake-http-referrer' }
+  let(:fake_referer) { 'fake-http-referer' }
   let(:env) do
     { 'action_dispatch.remote_ip' => fake_ip,
       'HTTP_USER_AGENT' => fake_user_agent,
-      'HTTP_REFERRER' => fake_referrer }
+      'HTTP_REFERER' => fake_referer }
   end
 
   let_it_be(:project) { create(:project, :public) }
@@ -80,7 +80,7 @@ RSpec.describe Spam::SpamActionService do
       {
         ip_address: fake_ip,
         user_agent: fake_user_agent,
-        referrer: fake_referrer
+        referer: fake_referer
       }
     end
 

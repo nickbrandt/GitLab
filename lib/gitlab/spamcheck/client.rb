@@ -40,8 +40,8 @@ module Gitlab
       def issue_spam?(spam_issue:, user:, context: {})
         issue = build_issue_protobuf(issue: spam_issue, user: user, context: context)
 
-        response = @stub.check_for_spam_issue(issue, metadata: 
-                                              {'authorization' => ENV['SPAMCHECK_APIKEY']})
+        response = @stub.check_for_spam_issue(issue, metadata:
+                                              { 'authorization' => ENV['SPAMCHECK_APIKEY'] })
         verdict = convert_verdict_to_gitlab_constant(response.verdict)
         [verdict, response.error]
       end
@@ -52,7 +52,7 @@ module Gitlab
         VERDICT_MAPPING.fetch(::Spamcheck::SpamVerdict::Verdict.resolve(verdict), verdict)
       end
 
-      def build_issue_protobuf(issue:, user:, context: )
+      def build_issue_protobuf(issue:, user:, context:)
         issue_pb = ::Spamcheck::Issue.new
         issue_pb.title = issue.spam_title || ''
         issue_pb.description = issue.spam_description || ''
