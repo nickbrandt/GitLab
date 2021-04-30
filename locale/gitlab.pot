@@ -26491,9 +26491,6 @@ msgstr ""
 msgid "Recent"
 msgstr ""
 
-msgid "Recent Activity"
-msgstr ""
-
 msgid "Recent Deliveries"
 msgstr ""
 
@@ -35147,10 +35144,19 @@ msgstr ""
 msgid "ValueStreamAnalytics|&lt;1m"
 msgstr ""
 
+msgid "ValueStreamAnalytics|Average number of deployments to production per day."
+msgstr ""
+
 msgid "ValueStreamAnalytics|Median time from first commit to issue closed."
 msgstr ""
 
 msgid "ValueStreamAnalytics|Median time from issue created to issue closed."
+msgstr ""
+
+msgid "ValueStreamAnalytics|Number of new issues created."
+msgstr ""
+
+msgid "ValueStreamAnalytics|Total number of deploys to production."
 msgstr ""
 
 msgid "ValueStreamEvent|Stage time (median)"
