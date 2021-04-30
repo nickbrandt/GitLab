@@ -58,8 +58,8 @@ RSpec.describe Gitlab::Spamcheck::Client do
       expect(issue_pb.title).to eq issue.title
       expect(issue_pb.description).to eq issue.description
       expect(issue_pb.user_in_project). to be false
-      expect(issue_pb.created_at).to eq timestamp_to_protobuf_timstampe(issue.created_at)
-      expect(issue_pb.updated_at).to eq timestamp_to_protobuf_timstampe(issue.updated_at)
+      expect(issue_pb.created_at).to eq timestamp_to_protobuf_timestamp(issue.created_at)
+      expect(issue_pb.updated_at).to eq timestamp_to_protobuf_timestamp(issue.updated_at)
       expect(issue_pb.action).to be ::Spamcheck::Action.lookup(::Spamcheck::Action::CREATE)
       expect(issue_pb.user.username).to eq user.username
     end
@@ -70,7 +70,7 @@ RSpec.describe Gitlab::Spamcheck::Client do
       user_pb = described_class.new.send(:build_user_protobuf, user)
       expect(user_pb.username).to eq user.username
       expect(user_pb.org).to eq user.organization
-      expect(user_pb.created_at).to eq timestamp_to_protobuf_timstampe(user.created_at)
+      expect(user_pb.created_at).to eq timestamp_to_protobuf_timestamp(user.created_at)
       expect(user_pb.emails.count).to be 1
       expect(user_pb.emails.first.email).to eq user.email
       expect(user_pb.emails.first.verified).to eq user.confirmed?
@@ -96,7 +96,7 @@ RSpec.describe Gitlab::Spamcheck::Client do
 
   private
 
-  def timestamp_to_protobuf_timstampe(timestamp)
+  def timestamp_to_protobuf_timestamp(timestamp)
     Google::Protobuf::Timestamp.new(seconds: timestamp.to_time.to_i,
                                     nanos: timestamp.to_time.nsec)
   end

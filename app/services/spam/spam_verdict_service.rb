@@ -31,7 +31,7 @@ module Spam
       # Favour the most restrictive result.
       final_verdict = valid_results.min_by { |v| SUPPORTED_VERDICTS[v][:priority] }
 
-      logger.info(source: 'spam_verdict_service.rb',
+      logger.info(class: self.class.name,
                   akismet_verdict: akismet_verdict,
                   spam_check_verdict: spamcheck_result,
                   spam_check_rtt: external_spam_check_round_trip_time.real,
