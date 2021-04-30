@@ -5,7 +5,7 @@ module Types
     # rubocop: disable Graphql/AuthorizeTypes
     class TemplateType < BaseObject
       graphql_name 'CiTemplate'
-      description 'GitLab CI config template.'
+      description 'GitLab CI/CD configuration template.'
 
       field :name, GraphQL::STRING_TYPE, null: false,
         description: 'Name of the CI template.'

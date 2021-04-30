@@ -338,7 +338,7 @@ module Types
           resolver: Resolvers::ProjectPipelineStatisticsResolver
 
     field :ci_template, Types::Ci::TemplateType, null: true,
-          description: 'Find a single CI template by name.',
+          description: 'Find a single CI/CD template by name.',
           resolver: Resolvers::Ci::TemplateResolver
 
     def label(title:)

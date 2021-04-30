@@ -7178,7 +7178,7 @@ Represents the total number of issues and their weights for a particular day.
 
 ### `CiTemplate`
 
-GitLab CI config template.
+GitLab CI/CD configuration template.
 
 #### Fields
 
@@ -10493,7 +10493,7 @@ four standard [pagination arguments](#connection-pagination-arguments):
 
 ##### `Project.ciTemplate`
 
-Find a single CI template by name.
+Find a single CI/CD template by name.
 
 Returns [`CiTemplate`](#citemplate).
 
@@ -10501,7 +10501,7 @@ Returns [`CiTemplate`](#citemplate).
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| <a id="projectcitemplatename"></a>`name` | [`String!`](#string) | Name of the template to search for. |
+| <a id="projectcitemplatename"></a>`name` | [`String!`](#string) | Name of the CI/CD template to search for. |
 
 ##### `Project.clusterAgent`
 
