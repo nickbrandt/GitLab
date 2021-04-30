@@ -66,8 +66,9 @@ module Spam
 
         # @TODO log if error is not nil https://gitlab.com/gitlab-org/gitlab/-/issues/329545
 
-        if Gitlab::Recaptcha.enabled? && result == CONDITIONAL_ALLOW
-          ALLOW
+        # Duplicate logic with Akismet logic in #akismet_verdict
+        if Gitlab::Recaptcha.enabled? && result != ALLOW
+          CONDITIONAL_ALLOW
         else
           result
         end

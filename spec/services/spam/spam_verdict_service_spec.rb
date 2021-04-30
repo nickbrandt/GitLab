@@ -183,26 +183,45 @@ RSpec.describe Spam::SpamVerdictService do
           end
         end
 
-        context 'the verdict is CONDITIONAL_ALLOW' do
-          let(:verdict) { CONDITIONAL_ALLOW }
-
-          context 'when recaptcha is enabled' do
-            before do
-              allow(Recaptcha).to receive(:enabled?).and_return(true)
-            end
-
-            it 'returns CONDITIONAL_ALLOW' do
-              expect(subject).to eq CONDITIONAL_ALLOW
-            end
+        context 'when recaptcha is enabled' do
+          before do
+            allow(Gitlab::Recaptcha).to receive(:enabled?).and_return(true)
           end
 
-          context 'when recaptcha is disabled' do
-            before do
-              allow(Recaptcha).to receive(:enabled?).and_return(false)
-            end
+          using RSpec::Parameterized::TableSyntax
 
-            it 'returns the verdict' do
-              expect(subject).to eq CONDITIONAL_ALLOW
+          # rubocop: disable Lint/BinaryOperatorWithIdenticalOperands
+          where(:verdict_value, :expected) do
+            ::Spam::SpamConstants::ALLOW               | ::Spam::SpamConstants::ALLOW
+            ::Spam::SpamConstants::CONDITIONAL_ALLOW   | ::Spam::SpamConstants::CONDITIONAL_ALLOW
+            ::Spam::SpamConstants::DISALLOW            | ::Spam::SpamConstants::CONDITIONAL_ALLOW
+            ::Spam::SpamConstants::BLOCK_USER          | ::Spam::SpamConstants::CONDITIONAL_ALLOW
+          end
+          # rubocop: enable Lint/BinaryOperatorWithIdenticalOperands
+
+          with_them do
+            let(:verdict) { verdict_value }
+
+            it "returns expected spam constant" do
+              expect(subject).to eq(expected)
+            end
+          end
+        end
+
+        context 'when recaptcha is disabled' do
+          before do
+            allow(Gitlab::Recaptcha).to receive(:enabled?).and_return(false)
+          end
+
+          [::Spam::SpamConstants::ALLOW,
+           ::Spam::SpamConstants::CONDITIONAL_ALLOW,
+           ::Spam::SpamConstants::DISALLOW,
+           ::Spam::SpamConstants::BLOCK_USER].each do |verdict_value|
+            let(:verdict) { verdict_value }
+            let(:expected) { verdict_value }
+
+            it "returns expected spam constant" do
+              expect(subject).to eq(expected)
             end
           end
         end
