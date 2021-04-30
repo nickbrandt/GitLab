@@ -2,11 +2,15 @@
 
 module DevOpsReportHelper
   def devops_score_metrics(metric)
-    {
-      averageScore: average_score_data(metric),
-      cards: devops_score_card_data(metric),
-      createdAt: metric.created_at.strftime('%Y-%m-%d %H:%M')
-    }
+    if metric.blank?
+      {}
+    else
+      {
+        averageScore: average_score_data(metric),
+        cards: devops_score_card_data(metric),
+        createdAt: metric.created_at.strftime('%Y-%m-%d %H:%M')
+      }
+    end
   end
 
   private
