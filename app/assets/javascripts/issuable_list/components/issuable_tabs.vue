@@ -27,7 +27,7 @@ export default {
       return tabName === this.currentTab;
     },
     isTabCountNumeric(tab) {
-      return this.tabCounts ? Number.isInteger(this.tabCounts[tab.name]) : false;
+      return Number.isInteger(this.tabCounts[tab.name]);
     },
   },
 };

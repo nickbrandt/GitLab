@@ -53,10 +53,12 @@ describe('JiraIssuesListRoot', () => {
 
   describe('on mount', () => {
     describe('while loading', () => {
-      it('sets issuesListLoading to `true`', () => {
+      it('sets issuesListLoading to `true`', async () => {
         jest.spyOn(axios, 'get').mockResolvedValue(new Promise(() => {}));
 
         createComponent();
+
+        await wrapper.vm.$nextTick();
 
         const issuableList = findIssuableList();
         expect(issuableList.props('issuablesLoading')).toBe(true);

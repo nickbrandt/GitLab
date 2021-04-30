@@ -51,7 +51,7 @@ export default {
     return {
       jiraLogo,
       issues: [],
-      issuesListLoading: true,
+      issuesListLoading: false,
       issuesListLoadFailed: false,
       totalIssues: 0,
       currentState: this.initialState,
