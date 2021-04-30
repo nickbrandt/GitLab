@@ -1,7 +1,7 @@
 import { shallowMount } from '@vue/test-utils';
 import Vue from 'vue';
 import VueApollo from 'vue-apollo';
-import Component from 'ee/vue_shared/security_reports/components/artifact_download.vue';
+import Component from 'ee/vue_shared/security_reports/components/artifact_downloads/pipeline_artifact_download.vue';
 import {
   REPORT_TYPE_SAST,
   REPORT_TYPE_SECRET_DETECTION,
@@ -9,21 +9,21 @@ import {
 import createMockApollo from 'helpers/mock_apollo_helper';
 import {
   expectedDownloadDropdownProps,
-  securityReportDownloadPathsQueryResponse,
+  securityReportPipelineDownloadPathsQueryResponse,
 } from 'jest/vue_shared/security_reports/mock_data';
 import createFlash from '~/flash';
 import SecurityReportDownloadDropdown from '~/vue_shared/security_reports/components/security_report_download_dropdown.vue';
-import securityReportDownloadPathsQuery from '~/vue_shared/security_reports/queries/security_report_download_paths.query.graphql';
+import securityReportPipelineDownloadPathsQuery from '~/vue_shared/security_reports/queries/security_report_pipeline_download_paths.query.graphql';
 
 jest.mock('~/flash');
 
-describe('Artifact Download', () => {
+describe('Mr Artifact Download', () => {
   let wrapper;
 
   const defaultProps = {
     reportTypes: [REPORT_TYPE_SAST, REPORT_TYPE_SECRET_DETECTION],
     targetProjectFullPath: '/path',
-    mrIid: 123,
+    pipelineIid: 123,
   };
 
   const createWrapper = ({ propsData, options }) => {
@@ -40,11 +40,12 @@ describe('Artifact Download', () => {
   };
 
   const pendingHandler = () => new Promise(() => {});
-  const successHandler = () => Promise.resolve({ data: securityReportDownloadPathsQueryResponse });
+  const successHandler = () =>
+    Promise.resolve({ data: securityReportPipelineDownloadPathsQueryResponse });
   const failureHandler = () => Promise.resolve({ errors: [{ message: 'some error' }] });
   const createMockApolloProvider = (handler) => {
     Vue.use(VueApollo);
-    const requestHandlers = [[securityReportDownloadPathsQuery, handler]];
+    const requestHandlers = [[securityReportPipelineDownloadPathsQuery, handler]];
 
     return createMockApollo(requestHandlers);
   };

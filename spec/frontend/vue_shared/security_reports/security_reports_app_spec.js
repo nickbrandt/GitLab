@@ -9,8 +9,8 @@ import { trimText } from 'helpers/text_helper';
 import waitForPromises from 'helpers/wait_for_promises';
 import {
   expectedDownloadDropdownProps,
-  securityReportDownloadPathsQueryNoArtifactsResponse,
-  securityReportDownloadPathsQueryResponse,
+  securityReportMrDownloadPathsQueryNoArtifactsResponse,
+  securityReportMrDownloadPathsQueryResponse,
   sastDiffSuccessMock,
   secretScanningDiffSuccessMock,
 } from 'jest/vue_shared/security_reports/mock_data';
@@ -22,7 +22,7 @@ import {
   REPORT_TYPE_SAST,
   REPORT_TYPE_SECRET_DETECTION,
 } from '~/vue_shared/security_reports/constants';
-import securityReportDownloadPathsQuery from '~/vue_shared/security_reports/queries/security_report_download_paths.query.graphql';
+import securityReportDownloadPathsQuery from '~/vue_shared/security_reports/queries/security_report_mr_download_paths.query.graphql';
 import SecurityReportsApp from '~/vue_shared/security_reports/security_reports_app.vue';
 
 jest.mock('~/flash');
@@ -59,9 +59,10 @@ describe('Security reports app', () => {
   };
 
   const pendingHandler = () => new Promise(() => {});
-  const successHandler = () => Promise.resolve({ data: securityReportDownloadPathsQueryResponse });
+  const successHandler = () =>
+    Promise.resolve({ data: securityReportMrDownloadPathsQueryResponse });
   const successEmptyHandler = () =>
-    Promise.resolve({ data: securityReportDownloadPathsQueryNoArtifactsResponse });
+    Promise.resolve({ data: securityReportMrDownloadPathsQueryNoArtifactsResponse });
   const failureHandler = () => Promise.resolve({ errors: [{ message: 'some error' }] });
   const createMockApolloProvider = (handler) => {
     const requestHandlers = [[securityReportDownloadPathsQuery, handler]];
