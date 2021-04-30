@@ -37,7 +37,7 @@ module Spam
                   spam_check_rtt: external_spam_check_round_trip_time.real,
                   final_verdict: final_verdict,
                   username: user.username,
-                  user_id: user.user_id,
+                  user_id: user.id,
                   target_type: target.class.to_s,
                   project_id: target.project_id
                  )
