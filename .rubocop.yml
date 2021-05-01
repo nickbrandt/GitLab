@@ -310,6 +310,9 @@ Cop/ActiveRecordAssociationReload:
 Cop/ActiveModelErrorsDirectManipulation:
   Enabled: true
 
+Cop/ActiveModelErrorsRemovedMethods:
+  Enabled: true
+
 Gitlab/AvoidFeatureGet:
   Enabled: true
 
