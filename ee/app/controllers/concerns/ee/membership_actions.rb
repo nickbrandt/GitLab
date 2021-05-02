@@ -8,7 +8,7 @@ module EE
     def leave
       super
 
-      if membershipable == current_user.provisioned_by_group && current_user.authorized_by_provisioned_by_group?
+      if current_user.authorized_by_provisioned_by_group? && membershipable == current_user.provisioned_by_group
         sign_out current_user
       end
     end

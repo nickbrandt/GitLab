@@ -52,7 +52,7 @@ module Gitlab
         def find_by_email
           user = super
 
-          return user if user&.authorized_by_provisining_group? && user&.provisioned_by_group_id == saml_provider.group_id
+          return user if user&.authorized_by_provisioning_group? && user&.provisioned_by_group_id == saml_provider.group_id
 
           false
         end
