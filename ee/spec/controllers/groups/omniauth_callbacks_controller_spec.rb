@@ -115,7 +115,7 @@ RSpec.describe Groups::OmniauthCallbacksController do
       end
     end
 
-    context 'when used to be a member of a group' do
+    context 'when user used to be a member of a group' do
       before do
         user.provisioned_by_group = group
         user.save!
@@ -148,11 +148,11 @@ RSpec.describe Groups::OmniauthCallbacksController do
         expect(flash[:notice]).to eq('Login to a GitLab account to link with your SAML identity')
       end
 
-      it 'adds linked identity' do
+      it 'does not add linked identity' do
         expect { post provider, params: { group_id: group } }.not_to change(linked_accounts, :count)
       end
 
-      it 'adds group membership' do
+      it 'does not add group membership' do
         expect { post provider, params: { group_id: group } }.not_to change { group.members.count }
       end
     end

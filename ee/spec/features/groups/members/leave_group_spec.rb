@@ -15,7 +15,7 @@ RSpec.describe 'Groups > Members > Leave group' do
   end
 
   context 'with block_password_auth_for_saml_users feature flag switched on' do
-    it 'guest provisoned by this group leaves the group' do
+    it 'guest provisoned by this group leaves the group and is signed off' do
       group.add_guest(user)
       group.add_owner(other_user)
 
@@ -26,7 +26,7 @@ RSpec.describe 'Groups > Members > Leave group' do
       expect(current_path).to eq(new_user_session_path)
     end
 
-    it 'guest leaves the group by url param', :js do
+    it 'guest leaves the group by url param and is signed off', :js do
       group.add_guest(user)
       group.add_owner(other_user)
 
