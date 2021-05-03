@@ -48,5 +48,5 @@ methods, the majority which use the Linux packages:
 
 ## Next steps
 
-Congratulations! By this time, you should have a functional GitLab installation.
-It's now time to further configure your instance, follow the [next steps](next_steps.md).
+After you complete the steps for installing GitLab, you can
+[configure your instance](next_steps.md).
