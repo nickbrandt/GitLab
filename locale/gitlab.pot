@@ -25129,6 +25129,9 @@ msgstr ""
 msgid "Project info:"
 msgstr ""
 
+msgid "Project information"
+msgstr ""
+
 msgid "Project is required when cluster_type is :project"
 msgstr ""
 
