@@ -19,7 +19,13 @@ export default {
   <span>
     <gl-sprintf :message="$options.message">
       <template #link="{ content }">
-        <gl-link :href="helpLink" target="_blank">{{ content }}</gl-link>
+        <gl-link
+          :href="helpLink"
+          target="_blank"
+          data-track-action="click_link"
+          data-track-experiment="in_product_guidance_environments_webide"
+          >{{ content }}</gl-link
+        >
       </template>
     </gl-sprintf>
   </span>
