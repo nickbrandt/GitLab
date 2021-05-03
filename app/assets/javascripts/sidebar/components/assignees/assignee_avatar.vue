@@ -34,7 +34,7 @@ export default {
       return this.issuableType === 'merge_request';
     },
     hasMergeIcon() {
-      const canMerge = this.user.mergeRequestInteraction.canMerge || this.user.can_merge;
+      const canMerge = this.user.mergeRequestInteraction?.canMerge || this.user.can_merge;
       return this.isMergeRequest && !canMerge;
     },
   },

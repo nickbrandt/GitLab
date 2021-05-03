@@ -72,7 +72,7 @@ export default {
   },
   computed: {
     cannotMerge() {
-      const canMerge = this.user.mergeRequestInteraction.canMerge || this.user.can_merge;
+      const canMerge = this.user.mergeRequestInteraction?.canMerge || this.user.can_merge;
       return this.issuableType === 'merge_request' && !canMerge;
     },
     tooltipTitle() {

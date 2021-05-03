@@ -411,9 +411,11 @@ function mountCopyEmailComponent() {
 }
 
 export function mountSidebar(mediator) {
-  // if (gon.features.issueAssigneesWidget) {
-  mountAssigneesComponent();
-  // }
+  if (gon.features.issueAssigneesWidget) {
+    mountAssigneesComponent();
+  } else {
+    mountAssigneesComponentDeprecated(mediator);
+  }
   mountReviewersComponent(mediator);
   mountConfidentialComponent(mediator);
   mountDueDateComponent(mediator);
