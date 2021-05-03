@@ -52,11 +52,16 @@ RSpec.describe 'User visits issue boards', :js do
         board.update!(label_ids: [label.id, scoped_label.id])
       end
 
+      label_params1 = { "label_name" => [label_name] }
+      label_params2 = { "label_name" => [label_name, scoped_label_name] }
+      assignee_param = { "assignee_username" => assignee_username }
+      combined_params = label_params2.merge(assignee_param)
+
       where(:params, :expected_params, :expected_issues) do
-        {} | { "label_name" => [label_name, scoped_label_name] } | [issue_with_all_filters]
-        { "label_name" => [label_name] } | { "label_name" => [label_name, scoped_label_name] } | [issue_with_all_filters]
-        { "label_name" => [label_name, scoped_label_name] } | { "label_name" => [label_name, scoped_label_name] } | [issue_with_all_filters] # rubocop:disable Lint/BinaryOperatorWithIdenticalOperands
-        { "assignee_username" => assignee_username }        | { "label_name" => [label_name, scoped_label_name], "assignee_username" => assignee_username } | [issue_with_all_filters]
+        {}             | label_params2   | [issue_with_all_filters]
+        label_params1  | label_params2   | [issue_with_all_filters]
+        label_params2  | label_params2   | [issue_with_all_filters] # rubocop:disable Lint/BinaryOperatorWithIdenticalOperands
+        assignee_param | combined_params | [issue_with_all_filters]
       end
 
       with_them do
@@ -72,12 +77,14 @@ RSpec.describe 'User visits issue boards', :js do
         board.update!(assignee: assignee)
       end
 
+      scoped_label_param = { "label_name" => [scoped_label_name] }
+      assignee_param = { "assignee_username" => assignee_username }
+      combined_params = scoped_label_param.merge(assignee_param)
+
       where(:params, :expected_params, :expected_issues) do
-        [
-          [{}, { "assignee_username" => assignee_username }, [issue_with_assignee, issue_with_all_filters]],
-          [{ "assignee_username" => assignee_username }, { "assignee_username" => assignee_username }, [issue_with_assignee, issue_with_all_filters]],
-          [{ "label_name" => [scoped_label_name] }, { "assignee_username" => assignee_username, "label_name" => [scoped_label_name] }, [issue_with_all_filters]]
-        ]
+        {}                 | assignee_param  | [issue_with_assignee, issue_with_all_filters]
+        assignee_param     | assignee_param  | [issue_with_assignee, issue_with_all_filters]  # rubocop:disable Lint/BinaryOperatorWithIdenticalOperands
+        scoped_label_param | combined_params | [issue_with_all_filters]
       end
 
       with_them do
