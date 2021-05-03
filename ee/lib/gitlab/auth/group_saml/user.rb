@@ -53,8 +53,6 @@ module Gitlab
           user = super
 
           return user if user&.authorized_by_provisioning_group?(saml_provider.group)
-
-          nil
         end
 
         override :build_new_user
