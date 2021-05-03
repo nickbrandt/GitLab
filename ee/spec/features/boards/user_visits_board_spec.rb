@@ -3,20 +3,25 @@
 require 'spec_helper'
 
 RSpec.describe 'User visits issue boards', :js do
+  using RSpec::Parameterized::TableSyntax
+
   let_it_be(:group) { create_default(:group, :public) }
   let_it_be(:project) { create_default(:project, :public, group: group) }
 
+  # TODO use 'let' when rspec-parameterized supports it.
+  # https://gitlab.com/gitlab-org/gitlab/-/issues/329746
   assignee_username = 'root'
   label_name = 'foobar'
   scoped_label_name = 'workflow::in dev'
-  let_it_be(:label) { create(:group_label, group: group, name: label_name) }
-  let_it_be(:scoped_label) { create(:group_label, group: group, name: scoped_label_name) }
-  let_it_be(:assignee) { create_default(:group_member, :maintainer, user: create(:user, username: assignee_username), group: group ).user }
-
   issue_with_label = "issue with label"
   issue_with_scoped_label = "issue with scoped label"
   issue_with_assignee = "issue with assignee"
   issue_with_all_filters = "issue with all filters"
+
+  let_it_be(:label) { create(:group_label, group: group, name: label_name) }
+  let_it_be(:scoped_label) { create(:group_label, group: group, name: scoped_label_name) }
+  let_it_be(:assignee) { create_default(:group_member, :maintainer, user: create(:user, username: assignee_username), group: group ).user }
+
   before_all do
     create_default(:issue, project: project, title: issue_with_label, labels: [label])
     create_default(:issue, project: project, title: issue_with_scoped_label, labels: [scoped_label])
@@ -48,12 +53,10 @@ RSpec.describe 'User visits issue boards', :js do
       end
 
       where(:params, :expected_params, :expected_issues) do
-        [
-          [{}, { "label_name" => [label_name, scoped_label_name] }, [issue_with_all_filters]],
-          [{ "label_name" => [label_name] }, { "label_name" => [label_name, scoped_label_name] }, [issue_with_all_filters]],
-          [{ "label_name" => [label_name, scoped_label_name] }, { "label_name" => [label_name, scoped_label_name] }, [issue_with_all_filters]],
-          [{ "assignee_username" => assignee_username }, { "label_name" => [label_name, scoped_label_name], "assignee_username" => assignee_username }, [issue_with_all_filters]]
-        ]
+        {} | { "label_name" => [label_name, scoped_label_name] } | [issue_with_all_filters]
+        { "label_name" => [label_name] } | { "label_name" => [label_name, scoped_label_name] } | [issue_with_all_filters]
+        { "label_name" => [label_name, scoped_label_name] } | { "label_name" => [label_name, scoped_label_name] } | [issue_with_all_filters] # rubocop:disable Lint/BinaryOperatorWithIdenticalOperands
+        { "assignee_username" => assignee_username }        | { "label_name" => [label_name, scoped_label_name], "assignee_username" => assignee_username } | [issue_with_all_filters]
       end
 
       with_them do

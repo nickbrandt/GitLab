@@ -3,22 +3,27 @@
 require 'spec_helper'
 
 RSpec.describe 'User visits issue boards', :js do
+  using RSpec::Parameterized::TableSyntax
+
   let_it_be(:group) { create_default(:group, :public) }
   let_it_be(:project) { create_default(:project, :public, group: group) }
 
+  # TODO use 'let' when rspec-parameterized supports it.
+  # https://gitlab.com/gitlab-org/gitlab/-/issues/329746
   label_name1 = 'foobar'
   label_name2 = 'in dev'
   assignee_username = 'root'
-  let_it_be(:label1) { create(:group_label, group: group, name: label_name1) }
-  let_it_be(:label2) { create(:group_label, group: group, name: label_name2) }
-  let_it_be(:assignee) { create_default(:group_member, :maintainer, user: create(:user, username: assignee_username), group: group ).user }
-  let_it_be(:milestone) { create_default(:milestone, project: project, start_date: Date.today - 1, due_date: 7.days.from_now) }
-
   issue_with_label1 = "issue with label1"
   issue_with_label2 = "issue with label2"
   issue_with_assignee = "issue with assignee"
   issue_with_milestone = "issue with milestone"
   issue_with_all_filters = "issue with all filters"
+
+  let_it_be(:label1) { create(:group_label, group: group, name: label_name1) }
+  let_it_be(:label2) { create(:group_label, group: group, name: label_name2) }
+  let_it_be(:assignee) { create_default(:group_member, :maintainer, user: create(:user, username: assignee_username), group: group ).user }
+  let_it_be(:milestone) { create_default(:milestone, project: project, start_date: Date.today - 1, due_date: 7.days.from_now) }
+
   before_all do
     create_default(:issue, project: project, title: issue_with_label1, labels: [label1])
     create_default(:issue, project: project, title: issue_with_label2, labels: [label2])
@@ -29,14 +34,12 @@ RSpec.describe 'User visits issue boards', :js do
 
   shared_examples "visiting board path with search params" do
     where(:params, :expected_issues) do
-      [
-        [{ "label_name" => [label_name1] }, [issue_with_label1, issue_with_all_filters]],
-        [{ "label_name" => [label_name2] }, [issue_with_label2, issue_with_all_filters]],
-        [{ "label_name" => [label_name1, label_name2] }, [issue_with_all_filters]],
-        [{ "assignee_username" => assignee_username }, [issue_with_assignee, issue_with_all_filters]],
-        [{ "milestone_title" => '#started' }, [issue_with_milestone, issue_with_all_filters]],
-        [{ "label_name" => [label_name1, label_name2], "assignee_username" => assignee_username }, [issue_with_all_filters]]
-      ]
+      { "label_name" => [label_name1] }              | [issue_with_label1, issue_with_all_filters]
+      { "label_name" => [label_name2] }              | [issue_with_label2, issue_with_all_filters]
+      { "label_name" => [label_name1, label_name2] } | [issue_with_all_filters]
+      { "assignee_username" => assignee_username }   | [issue_with_assignee, issue_with_all_filters]
+      { "milestone_title" => '#started' }            | [issue_with_milestone, issue_with_all_filters]
+      { "label_name" => [label_name1, label_name2], "assignee_username" => assignee_username } | [issue_with_all_filters]
     end
 
     with_them do
