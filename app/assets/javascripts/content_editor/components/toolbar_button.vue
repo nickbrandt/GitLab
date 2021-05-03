@@ -31,10 +31,10 @@ export default {
       required: false,
       default: '',
     },
-  },
-  computed: {
-    isActive() {
-      return this.tiptapEditor.isActive(this.contentType) && this.tiptapEditor.isFocused;
+    isActive: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   methods: {
