@@ -1,5 +1,6 @@
 <script>
 import { GlTooltipDirective, GlLink } from '@gitlab/ui';
+import { IssuableType } from '~/issue_show/constants';
 import { __, sprintf } from '~/locale';
 import { isUserBusy } from '~/set_status_modal/utils';
 import AssigneeAvatar from './assignee_avatar.vue';
@@ -73,7 +74,7 @@ export default {
   computed: {
     cannotMerge() {
       const canMerge = this.user.mergeRequestInteraction?.canMerge || this.user.can_merge;
-      return this.issuableType === 'merge_request' && !canMerge;
+      return this.issuableType === IssuableType.MergeRequest && !canMerge;
     },
     tooltipTitle() {
       const { name = '', availability = '' } = this.user;

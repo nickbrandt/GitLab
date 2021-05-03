@@ -83,7 +83,6 @@ function mountAssigneesComponentDeprecated(mediator) {
 
 function mountAssigneesComponent() {
   const el = document.getElementById('js-vue-sidebar-assignees');
-  console.log(el);
   if (!el) return;
 
   const { id, iid, fullPath, editable } = getSidebarOptions();

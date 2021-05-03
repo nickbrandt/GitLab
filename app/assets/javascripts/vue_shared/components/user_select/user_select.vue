@@ -247,7 +247,7 @@ export default {
           data-testid="selected-participant"
           @click.stop="unselect(item.username)"
         >
-          <sidebar-participant :user="item" />
+          <sidebar-participant :user="item" :issuable-type="issuableType" />
         </gl-dropdown-item>
         <template v-if="showCurrentUser">
           <gl-dropdown-divider />
