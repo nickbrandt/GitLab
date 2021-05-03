@@ -19,7 +19,7 @@ module Gitlab
     def create_event_file
       raise 'Event definition already exists' if definition_exists? && !force_definition_override?
 
-      template "event_definition.yml", file_path
+      template "event_definition.yml", file_path, force: force_definition_override?
     end
 
     def distributions
