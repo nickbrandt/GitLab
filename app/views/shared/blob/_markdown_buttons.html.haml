@@ -16,7 +16,7 @@
                               data: { "md-tag" => "[{text}](url)", "md-select" => "url", "md-shortcuts": '["mod+k"]' },
                               title: sprintf(s_("MarkdownEditor|Add a link (%{modifier_key}K)") % { modifier_key: modifier_key }) })
 
-  = markdown_toolbar_button({ icon: "chevron-right", 
+  = markdown_toolbar_button({ icon: "details-block", 
                               data: { "md-tag" => "<details><summary>Click to expand</summary>\n{text}\n</details>", "md-prepend" => true, "md-select" => "Click to expand" },
                               title: _("Add a collapsible section") })
 

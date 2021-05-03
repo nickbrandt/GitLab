@@ -234,7 +234,7 @@ export default {
             :prepend="true"
             tag-select="Click to expand"
             :button-title="__('Add a collapsible section')"
-            icon="chevron-right"
+            icon="details-block"
           />
           <toolbar-button
             :prepend="true"
