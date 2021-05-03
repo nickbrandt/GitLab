@@ -5,7 +5,7 @@ module Services
     extend ActiveSupport::Concern
 
     included do
-      belongs_to :integration, foreign_key: :service_id
+      belongs_to :integration, inverse_of: self.name.underscore.to_sym, foreign_key: :service_id
 
       delegate :activated?, to: :integration, allow_nil: true
 
