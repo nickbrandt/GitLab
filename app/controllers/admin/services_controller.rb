@@ -36,7 +36,7 @@ class Admin::ServicesController < Admin::ApplicationController
   # rubocop: disable CodeReuse/ActiveRecord
   def integration
     @integration ||= Service.find_by(id: params[:id], template: true)
-    @service ||= @integration # TODO: remove when we have verified no use of @service in templates
+    @service ||= @integration # TODO: https://gitlab.com/gitlab-org/gitlab/-/issues/329759
   end
   alias_method :service, :integration
   # rubocop: enable CodeReuse/ActiveRecord
