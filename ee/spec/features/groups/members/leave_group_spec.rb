@@ -5,9 +5,10 @@ require 'spec_helper'
 RSpec.describe 'Groups > Members > Leave group' do
   include Spec::Support::Helpers::Features::MembersHelpers
 
+  let_it_be(:other_user) { create(:user) }
+  let_it_be(:group) { create(:group) }
+
   let(:user) { create(:user) }
-  let(:other_user) { create(:user) }
-  let(:group) { create(:group) }
 
   before do
     user.update!(provisioned_by_group: group)

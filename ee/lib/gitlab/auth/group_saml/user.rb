@@ -51,8 +51,9 @@ module Gitlab
         override :find_by_email
         def find_by_email
           user = super
+          return unless user&.authorized_by_provisioning_group?(saml_provider.group)
 
-          return user if user&.authorized_by_provisioning_group?(saml_provider.group)
+          user
         end
 
         override :build_new_user
