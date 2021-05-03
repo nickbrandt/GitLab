@@ -83,7 +83,7 @@ curl "http://127.0.0.1:8500/v1/health/state/critical"
 Consul nodes communicate using the raft protocol. If the current leader goes
 offline, there needs to be a leader election. A leader node must exist to facilitate
 synchronization across the cluster. If too many nodes go offline at the same time,
-the cluster looses quorum and not elect a leader due to
+the cluster loses quorum and doesn't elect a leader due to
 [broken consensus](https://www.consul.io/docs/architecture/consensus).
 
 Consult the [troubleshooting section](#troubleshooting-consul) if the cluster is not
@@ -181,8 +181,8 @@ If you still see the errors, you may have to
 
 ### Consul does not start - multiple private IPs
 
-If a node has multiple private IPs, Consul will be confused about
-which of the private addresses to advertise, and then immediately exit on start.
+If a node has multiple private IPs, Consul doesn't know about
+which of the private addresses to advertise, and then it immediately exits on start.
 
 Messages like the following are output in `gitlab-ctl tail consul`:
 
