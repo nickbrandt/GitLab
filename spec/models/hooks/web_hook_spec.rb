@@ -5,6 +5,10 @@ require 'spec_helper'
 RSpec.describe WebHook do
   let(:hook) { build(:project_hook) }
 
+  around do |example|
+    travel_to(Time.current) { example.run }
+  end
+
   describe 'associations' do
     it { is_expected.to have_many(:web_hook_logs) }
   end
@@ -121,7 +125,7 @@ RSpec.describe WebHook do
         create(:project_hook, project: project, recent_failures: recent_failures, disabled_until: disabled_until)
       end
 
-      expect(described_class.executable).to match_array executables
+      expect(described_class.where(project_id: project.id).executable).to match_array executables
     end
   end
 
