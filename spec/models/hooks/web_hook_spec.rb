@@ -3,10 +3,14 @@
 require 'spec_helper'
 
 RSpec.describe WebHook do
-  let(:hook) { build(:project_hook) }
+  include AfterNextHelpers
+
+  let_it_be(:project) { create(:project) }
+
+  let(:hook) { build(:project_hook, project: project) }
 
   around do |example|
-    travel_to(Time.current) { example.run }
+    freeze_time { example.run }
   end
 
   describe 'associations' do
@@ -73,18 +77,30 @@ RSpec.describe WebHook do
     let(:data) { { key: 'value' } }
     let(:hook_name) { 'project hook' }
 
-    before do
-      expect(WebHookService).to receive(:new).with(hook, data, hook_name).and_call_original
+    it '#execute' do
+      expect_next(WebHookService).to receive(:execute)
+
+      hook.execute(data, hook_name)
     end
 
-    it '#execute' do
-      expect_any_instance_of(WebHookService).to receive(:execute)
+    it 'does not execute non-executable hooks' do
+      hook.update!(disabled_until: 1.day.from_now)
+
+      expect(WebHookService).not_to receive(:new)
 
       hook.execute(data, hook_name)
     end
 
     it '#async_execute' do
-      expect_any_instance_of(WebHookService).to receive(:async_execute)
+      expect_next(WebHookService).to receive(:async_execute)
+
+      hook.async_execute(data, hook_name)
+    end
+
+    it 'does not async execute non-executable hooks' do
+      hook.update!(disabled_until: 1.day.from_now)
+
+      expect(WebHookService).not_to receive(:new)
 
       hook.async_execute(data, hook_name)
     end
@@ -100,10 +116,9 @@ RSpec.describe WebHook do
   end
 
   describe '.executable' do
-    it 'finds the correct set of project hooks' do
-      project = create(:project)
-
+    let(:not_executable) do
       [
+        [0, Time.current],
         [0, 1.minute.from_now],
         [1, 1.minute.from_now],
         [3, 1.minute.from_now],
@@ -113,8 +128,10 @@ RSpec.describe WebHook do
       ].map do |(recent_failures, disabled_until)|
         create(:project_hook, project: project, recent_failures: recent_failures, disabled_until: disabled_until)
       end
+    end
 
-      executables = [
+    let(:executables) do
+      [
         [0, nil],
         [0, 1.day.ago],
         [1, nil],
@@ -124,34 +141,86 @@ RSpec.describe WebHook do
       ].map do |(recent_failures, disabled_until)|
         create(:project_hook, project: project, recent_failures: recent_failures, disabled_until: disabled_until)
       end
+    end
 
+    it 'finds the correct set of project hooks' do
       expect(described_class.where(project_id: project.id).executable).to match_array executables
+    end
+
+    context 'when the feature flag is not enabled' do
+      before do
+        stub_feature_flags(web_hooks_disable_failed: false)
+      end
+
+      it 'is the same as all' do
+        expect(described_class.where(project_id: project.id).executable).to match_array(executables + not_executable)
+      end
     end
   end
 
   describe '#executable?' do
-    where(:recent_failures, :disabled_until, :executable) do
+    let(:web_hook) { create(:project_hook, project: project) }
+
+    where(:recent_failures, :not_until, :executable) do
       [
-        [0, nil,               true],
-        [0, 1.day.ago,         true],
-        [0, 1.minute.from_now, false],
-        [1, nil,               true],
-        [1, 1.day.ago,         true],
-        [1, 1.minute.from_now, false],
-        [3, nil,               true],
-        [3, 1.day.ago,         true],
-        [3, 1.minute.from_now, false],
-        [4, nil,               false],
-        [4, 1.day.ago,         false],
-        [4, 1.minute.from_now, false]
+        [0, :not_set, true],
+        [0, :past,    true],
+        [0, :future,  false],
+        [0, :now,     false],
+        [1, :not_set, true],
+        [1, :past,    true],
+        [1, :future,  false],
+        [3, :not_set, true],
+        [3, :past,    true],
+        [3, :future,  false],
+        [4, :not_set, false],
+        [4, :past,    false],
+        [4, :future,  false]
       ]
     end
 
     with_them do
-      it 'has the correct state' do
-        web_hook = create(:project_hook, recent_failures: recent_failures, disabled_until: disabled_until)
+      # Phasing means we cannot put these values in the where block,
+      # which is not subject to the frozen time context.
+      let(:disabled_until) do
+        case not_until
+        when :not_set
+          nil
+        when :past
+          1.minute.ago
+        when :future
+          1.minute.from_now
+        when :now
+          Time.current
+        end
+      end
 
+      before do
+        web_hook.update!(recent_failures: recent_failures, disabled_until: disabled_until)
+      end
+
+      it 'has the correct state' do
         expect(web_hook.executable?).to eq(executable)
+      end
+
+      context 'when the feature flag is enabled for a project' do
+        before do
+          stub_feature_flags(web_hooks_disable_failed: project)
+        end
+
+        it 'has the expected value' do
+          expect(web_hook.executable?).to eq(executable)
+        end
+      end
+
+      context 'when the feature flag is not enabled' do
+        before do
+          stub_feature_flags(web_hooks_disable_failed: false)
+        end
+
+        it 'is executable' do
+          expect(web_hook).to be_executable
+        end
       end
     end
   end

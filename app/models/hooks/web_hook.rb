@@ -23,9 +23,15 @@ class WebHook < ApplicationRecord
   validates :token, format: { without: /\n/ }
   validates :push_events_branch_filter, branch_filter: true
 
-  scope :executable, -> { where('recent_failures <= ? AND (disabled_until IS NULL OR disabled_until < ?)', FAILURE_THRESHOLD, Time.current) }
+  scope :executable, -> do
+    next all unless Feature.enabled?(:web_hooks_disable_failed)
+
+    where('recent_failures <= ? AND (disabled_until IS NULL OR disabled_until < ?)', FAILURE_THRESHOLD, Time.current)
+  end
 
   def executable?
+    return true unless web_hooks_disable_failed?
+
     recent_failures <= FAILURE_THRESHOLD && (disabled_until.nil? || disabled_until < Time.current)
   end
 
@@ -48,5 +54,11 @@ class WebHook < ApplicationRecord
 
   def help_path
     'user/project/integrations/webhooks'
+  end
+
+  private
+
+  def web_hooks_disable_failed?
+    Feature.enabled?(:web_hooks_disable_failed)
   end
 end
