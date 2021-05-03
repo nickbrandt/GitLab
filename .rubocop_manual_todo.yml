@@ -2726,7 +2726,6 @@ Performance/OpenStruct:
     - 'Guardfile'
     - 'app/finders/snippets_finder.rb'
     - 'app/helpers/application_settings_helper.rb'
-    - 'app/models/cycle_analytics/project_level_stage_adapter.rb'
     - 'ee/lib/gitlab/graphql/aggregations/epics/epic_node.rb'
     - 'ee/lib/gitlab/graphql/aggregations/epics/epic_node.rb'
     - 'lib/api/wikis.rb'
