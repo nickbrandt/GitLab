@@ -17,7 +17,7 @@ module Gitlab
     class_option :ff, type: :boolean, optional: true, default: false, desc: 'Force definition override'
 
     def create_event_file
-      raise 'Event definition already exists' if definition_exists? && !force_definition_override?
+      raise "Event definition already exists at #{file_path}" if definition_exists? && !force_definition_override?
 
       template "event_definition.yml", file_path, force: force_definition_override?
     end
