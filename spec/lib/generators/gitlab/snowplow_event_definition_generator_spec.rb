@@ -32,13 +32,26 @@ RSpec.describe Gitlab::SnowplowEventDefinitionGenerator do
       expect(::Gitlab::Config::Loader::Yaml.new(File.read(event_definition_path)).load_raw!).to eq(sample_event)
     end
 
-    it 'overwrites event definition file using the template' do
-      sample_event = ::Gitlab::Config::Loader::Yaml.new(fixture_file(File.join(sample_event_dir, 'sample_event.yml'))).load_raw!
+    context 'event definition already exists' do
+      before do
+        stub_const('Gitlab::VERSION', '12.11.0-pre')
+        described_class.new([], generator_options).invoke_all
+      end
 
-      described_class.new([], generator_options.merge('ff' => true)).invoke_all
+      it 'overwrites event definition --ff flag set to true' do
+        sample_event = ::Gitlab::Config::Loader::Yaml.new(fixture_file(File.join(sample_event_dir, 'sample_event.yml'))).load_raw!
 
-      event_definition_path = File.join(ce_temp_dir, 'groups__email_campaigns_controller_click.yml')
-      expect(::Gitlab::Config::Loader::Yaml.new(File.read(event_definition_path)).load_raw!).to eq(sample_event)
+        stub_const('Gitlab::VERSION', '13.11.0-pre')
+        described_class.new([], generator_options.merge('ff' => true)).invoke_all
+
+        event_definition_path = File.join(ce_temp_dir, 'groups__email_campaigns_controller_click.yml')
+        expect(::Gitlab::Config::Loader::Yaml.new(File.read(event_definition_path)).load_raw!).to eq(sample_event)
+      end
+
+      it 'raises error when --ff flag set to false' do
+        expect { described_class.new([], generator_options.merge('ff' => false)).invoke_all }
+          .to raise_error(StandardError, /Event definition already exists at/)
+      end
     end
 
     it 'creates EE event definition file using the template' do
