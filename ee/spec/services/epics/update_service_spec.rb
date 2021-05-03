@@ -317,7 +317,7 @@ RSpec.describe Epics::UpdateService do
 
     context 'when Epic has tasks' do
       before do
-        update_epic(description: "- [ ] Task 1\n- [ ] Task 2")
+        update_epic({ description: "- [ ] Task 1\n- [ ] Task 2" })
       end
 
       it { expect(epic.tasks?).to eq(true) }
@@ -329,9 +329,11 @@ RSpec.describe Epics::UpdateService do
       end
 
       context 'when tasks are marked as completed' do
-        it 'creates system note about task status change' do
-          update_epic(description: "- [x] Task 1\n- [X] Task 2")
+        before do
+          update_epic({ description: "- [x] Task 1\n- [X] Task 2" })
+        end
 
+        it 'creates system note about task status change' do
           note1 = find_note('marked the task **Task 1** as completed')
           note2 = find_note('marked the task **Task 2** as completed')
 
@@ -341,23 +343,15 @@ RSpec.describe Epics::UpdateService do
           description_notes = find_notes('description')
           expect(description_notes.length).to eq(1)
         end
-
-        it 'counts the change correctly' do
-          expect(Gitlab::UsageDataCounters::EpicActivityUniqueCounter).to receive(:track_epic_task_checked)
-            .with(author: user).twice
-
-          update_epic(description: "- [x] Task 1\n- [X] Task 2")
-        end
       end
 
       context 'when tasks are marked as incomplete' do
         before do
-          update_epic(description: "- [x] Task 1\n- [X] Task 2")
+          update_epic({ description: "- [x] Task 1\n- [X] Task 2" })
+          update_epic({ description: "- [ ] Task 1\n- [ ] Task 2" })
         end
 
         it 'creates system note about task status change' do
-          update_epic(description: "- [ ] Task 1\n- [ ] Task 2")
-
           note1 = find_note('marked the task **Task 1** as incomplete')
           note2 = find_note('marked the task **Task 2** as incomplete')
 
@@ -366,13 +360,6 @@ RSpec.describe Epics::UpdateService do
 
           description_notes = find_notes('description')
           expect(description_notes.length).to eq(1)
-        end
-
-        it 'counts the change correctly' do
-          expect(Gitlab::UsageDataCounters::EpicActivityUniqueCounter).to receive(:track_epic_task_unchecked)
-            .with(author: user).twice
-
-          update_epic(description: "- [ ] Task 1\n- [ ] Task 2")
         end
       end
     end
