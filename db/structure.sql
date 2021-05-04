@@ -23614,8 +23614,6 @@ CREATE INDEX index_on_pages_metadata_not_migrated ON project_pages_metadata USIN
 
 CREATE UNIQUE INDEX index_on_policy_schedule_status_elapsed_time_escalation_rules ON incident_management_escalation_rules USING btree (policy_id, oncall_schedule_id, status, elapsed_time);
 
-CREATE INDEX index_on_project_escalation_policy ON incident_management_escalation_policies USING btree (project_id);
-
 CREATE INDEX index_on_project_escalation_rule ON incident_management_escalation_rules USING btree (policy_id);
 
 CREATE UNIQUE INDEX index_on_project_id_escalation_policy_name_unique ON incident_management_escalation_policies USING btree (project_id, name);

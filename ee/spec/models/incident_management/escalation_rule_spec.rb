@@ -8,6 +8,8 @@ RSpec.describe IncidentManagement::EscalationRule do
 
   subject { build(:incident_management_escalation_rule, policy: policy) }
 
+  it { is_expected.to be_valid }
+
   describe 'associations' do
     it { is_expected.to belong_to(:policy) }
     it { is_expected.to belong_to(:oncall_schedule) }
@@ -17,6 +19,6 @@ RSpec.describe IncidentManagement::EscalationRule do
     it { is_expected.to validate_presence_of(:status) }
     it { is_expected.to validate_presence_of(:elapsed_time) }
     it { is_expected.to validate_numericality_of(:elapsed_time).is_greater_than_or_equal_to(1).is_less_than_or_equal_to(24.hours) }
-    it { is_expected.to validate_uniqueness_of(:policy_id).scoped_to([:oncall_schedule_id, :status, :elapsed_time] ) }
+    it { is_expected.to validate_uniqueness_of(:policy_id).scoped_to([:oncall_schedule_id, :status, :elapsed_time] ).with_message('Must have a unique policy, status, and elapsed time') }
   end
 end

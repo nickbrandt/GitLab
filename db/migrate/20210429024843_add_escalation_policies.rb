@@ -5,12 +5,11 @@ class AddEscalationPolicies < ActiveRecord::Migration[6.0]
 
   disable_ddl_transaction!
 
-  POLICY_PROJECT_INDEX_NAME = 'index_on_project_escalation_policy'
   UNIQUE_INDEX_NAME = 'index_on_project_id_escalation_policy_name_unique'
 
   def up
     create_table_with_constraints :incident_management_escalation_policies do |t|
-      t.references :project, index: { name: POLICY_PROJECT_INDEX_NAME }, null: false, foreign_key: { on_delete: :cascade }
+      t.references :project, index: false, null: false, foreign_key: { on_delete: :cascade }
       t.text :name, null: false
       t.text :description, null: true
 
