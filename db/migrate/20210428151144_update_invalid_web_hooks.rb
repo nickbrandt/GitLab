@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class UpdateInvalidWebHooks < ActiveRecord::Migration[6.0]
+  disable_ddl_transaction!
+
   class WebHook < ActiveRecord::Base
     include EachBatch
 
