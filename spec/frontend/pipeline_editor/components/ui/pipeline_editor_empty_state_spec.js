@@ -1,6 +1,6 @@
 import { GlButton, GlSprintf } from '@gitlab/ui';
 import { shallowMount } from '@vue/test-utils';
-import BranchSwitcher from '~/pipeline_editor/components/file_nav/branch_switcher.vue';
+import PipelineEditorFileNav from '~/pipeline_editor/components/file_nav/pipeline_editor_file_nav.vue';
 import PipelineEditorEmptyState from '~/pipeline_editor/components/ui/pipeline_editor_empty_state.vue';
 
 describe('Pipeline editor empty state', () => {
@@ -19,7 +19,7 @@ describe('Pipeline editor empty state', () => {
     });
   };
 
-  const findBranchSwitcher = () => wrapper.findComponent(BranchSwitcher);
+  const findFileNav = () => wrapper.findComponent(PipelineEditorFileNav);
   const findSvgImage = () => wrapper.find('img');
   const findTitle = () => wrapper.find('h1');
   const findConfirmButton = () => wrapper.findComponent(GlButton);
@@ -48,8 +48,8 @@ describe('Pipeline editor empty state', () => {
       expect(findDescription().html()).toContain(wrapper.vm.$options.i18n.body);
     });
 
-    it('renders the branch switcher', () => {
-      expect(findBranchSwitcher().exists()).toBe(true);
+    it('renders the file nav', () => {
+      expect(findFileNav().exists()).toBe(true);
     });
 
     describe('with feature flag off', () => {
@@ -84,14 +84,14 @@ describe('Pipeline editor empty state', () => {
     });
 
     describe('with branch switcher feature flag OFF', () => {
-      it('does not render the branch switcher', () => {
+      it('does not render the file nav', () => {
         createComponent({
           provide: {
             glFeatures: { pipelineEditorBranchSwitcher: false },
           },
         });
 
-        expect(findBranchSwitcher().exists()).toBe(false);
+        expect(findFileNav().exists()).toBe(false);
       });
     });
   });

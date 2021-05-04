@@ -2,13 +2,13 @@
 import { GlButton, GlSprintf } from '@gitlab/ui';
 import { __ } from '~/locale';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
-import BranchSwitcher from '../file_nav/branch_switcher.vue';
+import PipelineEditorFileNav from '~/pipeline_editor/components/file_nav/pipeline_editor_file_nav.vue';
 
 export default {
   components: {
-    BranchSwitcher,
     GlButton,
     GlSprintf,
+    PipelineEditorFileNav,
   },
   i18n: {
     title: __('Optimize your workflow with CI/CD Pipelines'),
@@ -24,7 +24,7 @@ export default {
     },
   },
   computed: {
-    showBranchSwitcher() {
+    showFileNav() {
       return this.glFeatures.pipelineEditorBranchSwitcher;
     },
     showCTAButton() {
@@ -41,7 +41,7 @@ export default {
 <template>
   <div>
     <div class="gl-mb-5">
-      <branch-switcher v-if="showBranchSwitcher" v-on="$listeners" />
+      <pipeline-editor-file-nav v-if="showFileNav" v-on="$listeners" />
     </div>
     <div class="gl-display-flex gl-flex-direction-column gl-align-items-center gl-mt-11">
       <img :src="emptyStateIllustrationPath" />
