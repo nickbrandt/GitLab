@@ -5,6 +5,7 @@ class WebHook < ApplicationRecord
 
   FAILURE_THRESHOLD = 3 # three strikes
   INITIAL_BACKOFF = 10.minutes
+  MAX_BACKOFF = 1.day
   BACKOFF_GROWTH_FACTOR = 2.0
 
   attr_encrypted :token,
@@ -59,7 +60,11 @@ class WebHook < ApplicationRecord
   end
 
   def next_backoff
-    INITIAL_BACKOFF * (BACKOFF_GROWTH_FACTOR**backoff_count)
+    return MAX_BACKOFF if backoff_count >= 8 # optimization to prevent expensive exponentiation and possible overflows
+
+    (INITIAL_BACKOFF * (BACKOFF_GROWTH_FACTOR**backoff_count))
+      .clamp(INITIAL_BACKOFF, MAX_BACKOFF)
+      .seconds
   end
 
   def disable!

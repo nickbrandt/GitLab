@@ -255,6 +255,16 @@ RSpec.describe WebHook do
         expect(hook.next_backoff).to eq(80.minutes)
       end
     end
+
+    context 'when the previous backoff was large' do
+      before do
+        hook.backoff_count = 8 # last value before MAX_BACKOFF
+      end
+
+      it 'does not exceed the max backoff value' do
+        expect(hook.next_backoff).to eq(described_class::MAX_BACKOFF)
+      end
+    end
   end
 
   describe '#enable!' do

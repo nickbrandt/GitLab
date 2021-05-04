@@ -461,7 +461,7 @@ module EE
       return unless feature_available?(:group_webhooks)
 
       self_and_ancestor_hooks = GroupHook.where(group_id: self_and_ancestors)
-      self_and_ancestor_hooks.executable.hooks_for(hooks_scope).each do |hook|
+      self_and_ancestor_hooks.hooks_for(hooks_scope).each do |hook|
         hook.async_execute(data, hooks_scope.to_s)
       end
     end

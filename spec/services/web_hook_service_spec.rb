@@ -202,6 +202,16 @@ RSpec.describe WebHookService do
         it 'does not change the disabled_until attribute' do
           expect { service_instance.execute }.not_to change(project_hook, :disabled_until)
         end
+
+        context 'when the hook had previously failed' do
+          before do
+            project_hook.update!(recent_failures: 2)
+          end
+
+          it 'resets the failure count' do
+            expect { service_instance.execute }.to change(project_hook, :recent_failures).to(0)
+          end
+        end
       end
 
       context 'with bad request' do
@@ -260,6 +270,34 @@ RSpec.describe WebHookService do
 
         it 'increases the backoff count' do
           expect { service_instance.execute }.to change(project_hook, :backoff_count).by(1)
+        end
+
+        context 'when the previous cool-off was near the maximum' do
+          before do
+            project_hook.update!(disabled_until: 5.minutes.ago, backoff_count: 8)
+          end
+
+          it 'sets the disabled_until attribute' do
+            expect { service_instance.execute }.to change(project_hook, :disabled_until).to(1.day.from_now)
+          end
+
+          it 'sets the last_backoff attribute' do
+            expect { service_instance.execute }.to change(project_hook, :backoff_count).by(1)
+          end
+        end
+
+        context 'when we have backed-off many many times' do
+          before do
+            project_hook.update!(disabled_until: 5.minutes.ago, backoff_count: 365)
+          end
+
+          it 'sets the disabled_until attribute' do
+            expect { service_instance.execute }.to change(project_hook, :disabled_until).to(1.day.from_now)
+          end
+
+          it 'sets the last_backoff attribute' do
+            expect { service_instance.execute }.to change(project_hook, :backoff_count).by(1)
+          end
         end
       end
 
