@@ -331,30 +331,5 @@ describe('Pipeline editor app component', () => {
       expect(findEmptyState().exists()).toBe(false);
       expect(findEditorHome().exists()).toBe(true);
     });
-
-    it('shows start screen when refetch does not fetch CI file', async () => {
-      mockBlobContentData.mockResolvedValue(mockCiYml);
-      await createComponentWithApollo();
-
-      expect(findEmptyState().exists()).toBe(false);
-      expect(findEditorHome().exists()).toBe(true);
-
-      mockBlobContentData.mockRejectedValue({
-        response: {
-          status: httpStatusCodes.NOT_FOUND,
-        },
-      });
-      await wrapper.vm.$apollo.queries.initialCiFileContent.refetch();
-      await wrapper.vm.handleBlobContentError({
-        networkError: {
-          response: {
-            status: httpStatusCodes.NOT_FOUND,
-          },
-        },
-      });
-
-      expect(findEmptyState().exists()).toBe(true);
-      expect(findEditorHome().exists()).toBe(false);
-    });
   });
 });
