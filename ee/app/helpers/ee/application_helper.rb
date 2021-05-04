@@ -133,10 +133,6 @@ module EE
         s_('This GitLab instance is undergoing maintenance and is operating in read-only mode.')
     end
 
-    def appearance
-      ::Appearance.current
-    end
-
     def db_lag
       @db_lag ||= Rails.cache.fetch('geo:db_lag', expires_in: 20.seconds) do
         ::Gitlab::Geo::HealthCheck.new.db_replication_lag_seconds
