@@ -31895,6 +31895,9 @@ msgstr ""
 msgid "The interval must be one of %{intervals}."
 msgstr ""
 
+msgid "The invitation can not be found with the provided invite token."
+msgstr ""
+
 msgid "The invitation could not be accepted."
 msgstr ""
 
