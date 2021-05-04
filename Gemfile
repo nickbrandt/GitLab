@@ -478,7 +478,7 @@ group :ed25519 do
 end
 
 # Spamcheck GRPC protocol definitions
-gem 'spamcheck', '~> 0.0.5'
+gem 'spamcheck', '~> 0.1.0'
 
 # Gitaly GRPC protocol definitions
 gem 'gitaly', '~> 13.12.0.pre.rc1'
