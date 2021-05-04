@@ -1,6 +1,6 @@
 <script>
 import { GlBadge, GlIcon, GlLink, GlSafeHtmlDirective, GlButton } from '@gitlab/ui';
-import { dateInWords } from '~/lib/utils/datetime_utility';
+import { dateInWords, isValidDate } from '~/lib/utils/datetime_utility';
 
 export default {
   components: {
@@ -22,6 +22,11 @@ export default {
     releaseDate() {
       const { published_at } = this.feature;
       const date = new Date(published_at);
+
+      if (!isValidDate(date) || date.getTime() === 0) {
+        return '';
+      }
+
       return dateInWords(date);
     },
   },
