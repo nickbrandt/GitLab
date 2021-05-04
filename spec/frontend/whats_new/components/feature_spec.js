@@ -19,7 +19,7 @@ describe("What's new single feature", () => {
     release: '13.11',
   };
 
-  const findReleaseDate = () => wrapper.find('[data-testid="release-date"]').text();
+  const findReleaseDate = () => wrapper.find('[data-testid="release-date"]');
 
   const createWrapper = ({ feature } = {}) => {
     wrapper = shallowMount(Feature, {
@@ -34,6 +34,13 @@ describe("What's new single feature", () => {
 
   it('renders the date', () => {
     createWrapper({ feature: exampleFeature });
-    expect(findReleaseDate()).toBe('April 22, 2021');
+    expect(findReleaseDate().text()).toBe('April 22, 2021');
+  });
+
+  describe('when the published_at is null', () => {
+    it("doesn't render the date", () => {
+      createWrapper({ feature: { ...exampleFeature, published_at: null } });
+      expect(findReleaseDate().exists()).toBe(false);
+    });
   });
 });
