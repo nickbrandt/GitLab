@@ -49,7 +49,6 @@ function factory({ props = {}, mockData = {} } = {}, loading = false) {
     propsData: {
       path: 'some_file.js',
       projectPath: 'some/path',
-      hasRichViewer: false,
       ...props,
     },
     mocks: {
@@ -63,7 +62,7 @@ function factory({ props = {}, mockData = {} } = {}, loading = false) {
     },
   });
 
-  wrapper.setData({ blobInfo: mockData });
+  wrapper.setData(mockData);
 }
 
 describe('Blob content viewer component', () => {
@@ -72,7 +71,7 @@ describe('Blob content viewer component', () => {
   const findBlobContent = () => wrapper.find(BlobContent);
 
   beforeEach(() => {
-    factory({ mockData: simpleMockData });
+    factory({ mockData: { blobInfo: simpleMockData } });
   });
 
   afterEach(() => {
@@ -80,7 +79,7 @@ describe('Blob content viewer component', () => {
   });
 
   it('renders a GlLoadingIcon component', () => {
-    factory({ mockData: simpleMockData }, true);
+    factory({ mockData: { blobInfo: simpleMockData } }, true);
 
     expect(findLoadingIcon().exists()).toBe(true);
   });
@@ -108,7 +107,9 @@ describe('Blob content viewer component', () => {
 
   describe('rich viewer', () => {
     beforeEach(() => {
-      factory({ props: { hasRichViewer: true }, mockData: richMockData });
+      factory({
+        mockData: { blobInfo: richMockData, hasRichViewer: true, activeViewerType: 'rich' },
+      });
     });
 
     it('renders a BlobHeader component', () => {
