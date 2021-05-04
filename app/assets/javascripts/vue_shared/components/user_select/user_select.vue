@@ -88,6 +88,8 @@ export default {
       },
     },
     searchUsers: {
+      // TODO Remove error policy
+      // https://gitlab.com/gitlab-org/gitlab/-/issues/329750
       errorPolicy: 'all',
       query: searchUsers,
       variables() {
@@ -98,15 +100,9 @@ export default {
         };
       },
       update(data) {
-        if (!data.workspace?.users?.nodes) return [];
-
-        // TODO this de-duplication is temporary (BE fix required)
-        // Also remove the error policy and related test (mockdata)
-        // https://gitlab.com/gitlab-org/gitlab/-/issues/327822
-        const users = data.workspace?.users?.nodes.filter((x) => x).map(({ user }) => user);
-        return users.reduce((acc, cur) => {
-          return acc.find((u) => u.id === cur.id) ? acc : [...acc, cur];
-        }, []);
+        // TODO Remove null filter (BE fix required)
+        // https://gitlab.com/gitlab-org/gitlab/-/issues/329750
+        return data.workspace?.users?.nodes.filter((x) => x).map(({ user }) => user) || [];
       },
       debounce: ASSIGNEES_DEBOUNCE_DELAY,
       error({ graphQLErrors }) {
@@ -140,15 +136,20 @@ export default {
       if (!this.participants) {
         return [];
       }
-      const mergedSearchResults = this.participants.reduce((acc, current) => {
-        if (
-          !acc.some((user) => current.username === user.username) &&
-          (current.name.includes(this.search) || current.username.includes(this.search))
-        ) {
-          acc.push(current);
-        }
-        return acc;
-      }, this.searchUsers);
+
+      const filteredParticipants = this.participants.filter(
+        (user) => user.name.includes(this.search) || user.username.includes(this.search),
+      );
+
+      // TODO this de-duplication is temporary (BE fix required)
+      // https://gitlab.com/gitlab-org/gitlab/-/issues/327822
+      const mergedSearchResults = filteredParticipants
+        .concat(this.searchUsers)
+        .reduce(
+          (acc, current) => (acc.some((user) => current.id === user.id) ? acc : [...acc, current]),
+          [],
+        );
+
       return this.moveCurrentUserToStart(mergedSearchResults);
     },
     isSearchEmpty() {
