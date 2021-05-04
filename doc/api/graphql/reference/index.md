@@ -283,6 +283,18 @@ four standard [pagination arguments](#connection-pagination-arguments):
 | <a id="queryprojectssearchnamespaces"></a>`searchNamespaces` | [`Boolean`](#boolean) | Include namespace in project search. |
 | <a id="queryprojectssort"></a>`sort` | [`String`](#string) | Sort order of results. |
 
+### `Query.runner`
+
+Find a runner. Available only when feature flag `runner_graphql_query` is enabled.
+
+Returns [`CiRunner`](#cirunner).
+
+#### Arguments
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| <a id="queryrunnerid"></a>`id` | [`CiRunnerID!`](#cirunnerid) | Runner ID. |
+
 ### `Query.runnerPlatforms`
 
 Supported runner platforms.
@@ -7253,6 +7265,28 @@ Represents the total number of issues and their weights for a particular day.
 | <a id="cijobartifactdownloadpath"></a>`downloadPath` | [`String`](#string) | URL for downloading the artifact's file. |
 | <a id="cijobartifactfiletype"></a>`fileType` | [`JobArtifactFileType`](#jobartifactfiletype) | File type of the artifact. |
 
+### `CiRunner`
+
+#### Fields
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| <a id="cirunneraccesslevel"></a>`accessLevel` | [`CiRunnerAccessLevel!`](#cirunneraccesslevel) | Access level of the runner. |
+| <a id="cirunneractive"></a>`active` | [`Boolean!`](#boolean) | Indicates the runner is allowed to receive jobs. |
+| <a id="cirunnercontactedat"></a>`contactedAt` | [`Time`](#time) | Last contact from the runner. |
+| <a id="cirunnerdescription"></a>`description` | [`String`](#string) | Description of the runner. |
+| <a id="cirunnerid"></a>`id` | [`CiRunnerID!`](#cirunnerid) | ID of the runner. |
+| <a id="cirunneripaddress"></a>`ipAddress` | [`String!`](#string) | IP address of the runner. |
+| <a id="cirunnerlocked"></a>`locked` | [`Boolean`](#boolean) | Indicates the runner is locked. |
+| <a id="cirunnermaximumtimeout"></a>`maximumTimeout` | [`Int`](#int) | Maximum timeout (in seconds) for jobs processed by the runner. |
+| <a id="cirunnerrevision"></a>`revision` | [`String!`](#string) | Revision of the runner. |
+| <a id="cirunnerrununtagged"></a>`runUntagged` | [`Boolean!`](#boolean) | Indicates the runner is able to run untagged jobs. |
+| <a id="cirunnerrunnertype"></a>`runnerType` | [`CiRunnerType!`](#cirunnertype) | Type of the runner. |
+| <a id="cirunnershortsha"></a>`shortSha` | [`String`](#string) | First eight characters of the runner's token used to authenticate new job requests. Used as the runner's unique ID. |
+| <a id="cirunnerstatus"></a>`status` | [`CiRunnerStatus!`](#cirunnerstatus) | Status of the runner. |
+| <a id="cirunnertaglist"></a>`tagList` | [`[String!]`](#string) | Tags associated with the runner. |
+| <a id="cirunnerversion"></a>`version` | [`String!`](#string) | Version of the runner. |
+
 ### `CiStage`
 
 #### Fields
@@ -13340,6 +13374,30 @@ Values for YAML processor result.
 | <a id="cijobstatussuccess"></a>`SUCCESS` | A job that is success. |
 | <a id="cijobstatuswaiting_for_resource"></a>`WAITING_FOR_RESOURCE` | A job that is waiting for resource. |
 
+### `CiRunnerAccessLevel`
+
+| Value | Description |
+| ----- | ----------- |
+| <a id="cirunneraccesslevelnot_protected"></a>`NOT_PROTECTED` | A runner that is not protected. |
+| <a id="cirunneraccesslevelref_protected"></a>`REF_PROTECTED` | A runner that is ref protected. |
+
+### `CiRunnerStatus`
+
+| Value | Description |
+| ----- | ----------- |
+| <a id="cirunnerstatusactive"></a>`ACTIVE` | A runner that is active. |
+| <a id="cirunnerstatusoffline"></a>`OFFLINE` | A runner that is offline. |
+| <a id="cirunnerstatusonline"></a>`ONLINE` | A runner that is online. |
+| <a id="cirunnerstatuspaused"></a>`PAUSED` | A runner that is paused. |
+
+### `CiRunnerType`
+
+| Value | Description |
+| ----- | ----------- |
+| <a id="cirunnertypegroup_type"></a>`GROUP_TYPE` | A runner that is group type. |
+| <a id="cirunnertypeinstance_type"></a>`INSTANCE_TYPE` | A runner that is instance type. |
+| <a id="cirunnertypeproject_type"></a>`PROJECT_TYPE` | A runner that is project type. |
+
 ### `CommitActionMode`
 
 Mode of a commit action.
@@ -14444,6 +14502,12 @@ Represents `true` or `false` values.
 A `CiPipelineID` is a global ID. It is encoded as a string.
 
 An example `CiPipelineID` is: `"gid://gitlab/Ci::Pipeline/1"`.
+
+### `CiRunnerID`
+
+A `CiRunnerID` is a global ID. It is encoded as a string.
+
+An example `CiRunnerID` is: `"gid://gitlab/Ci::Runner/1"`.
 
 ### `ClustersAgentID`
 
