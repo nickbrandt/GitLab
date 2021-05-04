@@ -4,7 +4,13 @@ module QA
   RSpec.describe "Manage", :requires_admin do
     describe "Group bulk import" do
       let!(:api_client) { Runtime::API::Client.as_admin }
-      let!(:user) { Resource::User.fabricate_via_api! { |usr| usr.api_client = api_client } }
+      let!(:user) do
+        Resource::User.fabricate_via_api! do |usr|
+          usr.api_client = api_client
+          usr.hard_delete_on_api_removal = true
+        end
+      end
+
       let!(:personal_access_token) { Runtime::API::Client.new(user: user).personal_access_token }
 
       let!(:sandbox) do
@@ -74,10 +80,8 @@ module QA
       after do
         Runtime::Feature.disable(:bulk_import)
 
-        # Add additional maintainer to imported group so user is not sole maintainer and can be deleted
-        imported_group&.add_member(Runtime::User.admin, Resource::Members::AccessLevel::MAINTAINER)
-        source_group.remove_via_api!
         user.remove_via_api!
+        source_group.remove_via_api!
       end
     end
   end
