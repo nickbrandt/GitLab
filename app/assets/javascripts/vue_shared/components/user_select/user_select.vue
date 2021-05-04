@@ -88,6 +88,7 @@ export default {
       },
     },
     searchUsers: {
+      errorPolicy: 'all',
       query: searchUsers,
       variables() {
         return {
@@ -97,10 +98,32 @@ export default {
         };
       },
       update(data) {
-        return data.workspace?.users?.nodes.map(({ user }) => user) || [];
+        if (!data.workspace?.users?.nodes) return [];
+
+        // TODO this de-duplication is temporary (BE fix required)
+        // Also remove the error policy and related test (mockdata)
+        // https://gitlab.com/gitlab-org/gitlab/-/issues/327822
+        const users = data.workspace?.users?.nodes.filter((x) => x).map(({ user }) => user);
+        return users.reduce((acc, cur) => {
+          return acc.find((u) => u.id === cur.id) ? acc : [...acc, cur];
+        }, []);
       },
       debounce: ASSIGNEES_DEBOUNCE_DELAY,
-      error() {
+      error({ graphQLErrors }) {
+        // TODO This error suppression is temporary (BE fix required)
+        // https://gitlab.com/gitlab-org/gitlab/-/issues/329750
+        if (
+          graphQLErrors.length === 1 &&
+          graphQLErrors[0]?.message === 'Cannot return null for non-nullable field GroupMember.user'
+        ) {
+          // eslint-disable-next-line no-console
+          console.error(
+            "Suppressing the error 'Cannot return null for non-nullable field GroupMember.user'. Please see https://gitlab.com/gitlab-org/gitlab/-/issues/329750",
+          );
+          this.isSearching = false;
+          return;
+        }
+
         this.$emit('error');
         this.isSearching = false;
       },

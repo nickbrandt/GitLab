@@ -404,6 +404,21 @@ export const projectMembersResponse = {
       __typename: 'Project',
       users: {
         nodes: [
+          // Remove nulls https://gitlab.com/gitlab-org/gitlab/-/issues/329750
+          null,
+          null,
+          {
+            user: {
+              id: 'gid://gitlab/User/1',
+              avatarUrl:
+                'https://www.gravatar.com/avatar/e64c7d89f26bd1972efa854d13d7dd61?s=80\u0026d=identicon',
+              name: 'Administrator',
+              username: 'root',
+              webUrl: '/root',
+              status: null,
+            },
+          },
+          // This is a duplicated entry https://gitlab.com/gitlab-org/gitlab/-/issues/327822
           {
             user: {
               id: 'gid://gitlab/User/1',
@@ -454,6 +469,16 @@ export const participantsQueryResponse = {
         iid: '1',
         participants: {
           nodes: [
+            {
+              id: 'gid://gitlab/User/1',
+              avatarUrl:
+                'https://www.gravatar.com/avatar/e64c7d89f26bd1972efa854d13d7dd61?s=80\u0026d=identicon',
+              name: 'Administrator',
+              username: 'root',
+              webUrl: '/root',
+              status: null,
+            },
+            // this is a duplicated entry https://gitlab.com/gitlab-org/gitlab/-/issues/327822
             {
               id: 'gid://gitlab/User/1',
               avatarUrl:
