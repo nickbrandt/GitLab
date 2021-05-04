@@ -1100,6 +1100,54 @@ Status: `data_available`
 
 Tiers: `free`
 
+### `counts.g_project_management_users_checking_epic_task_monthly`
+
+Counts of MAU checking epic task
+
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_28d/20210421080207_g_project_management_users_checking_epic_task_monthly.yml)
+
+Group: `group::product planning`
+
+Status: `implemented`
+
+Tiers: `premium`, `ultimate`
+
+### `counts.g_project_management_users_checking_epic_task_weekly`
+
+Counts of WAU checking epic task
+
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_7d/20210421075943_g_project_management_users_checking_epic_task_weekly.yml)
+
+Group: `group::product planning`
+
+Status: `implemented`
+
+Tiers: `premium`, `ultimate`
+
+### `counts.g_project_management_users_unchecking_epic_task_monthly`
+
+Counts of MAU unchecking epic task
+
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_28d/20210421102516_g_project_management_users_unchecking_epic_task_monthly.yml)
+
+Group: `group::product planning`
+
+Status: `implemented`
+
+Tiers: `premium`, `ultimate`
+
+### `counts.g_project_management_users_unchecking_epic_task_weekly`
+
+Counts of WAU unchecking epic task
+
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_7d/20210421102812_g_project_management_users_unchecking_epic_task_weekly.yml)
+
+Group: `group::product planning`
+
+Status: `implemented`
+
+Tiers: `premium`, `ultimate`
+
 ### `counts.geo_event_log_max_id`
 
 Number of replication events on a Geo primary
