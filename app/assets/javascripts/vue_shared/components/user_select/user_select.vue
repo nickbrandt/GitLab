@@ -117,15 +117,13 @@ export default {
       if (!this.participants) {
         return [];
       }
-      const mergedSearchResults = this.participants.reduce((acc, current) => {
-        if (
-          !acc.some((user) => current.username === user.username) &&
-          (current.name.includes(this.search) || current.username.includes(this.search))
-        ) {
-          acc.push(current);
-        }
-        return acc;
-      }, this.searchUsers);
+      const filteredParticipants = this.participants.filter(
+        (user) => user.name.includes(this.search) || user.username.includes(this.search),
+      );
+      const mergedSearchResults = this.searchUsers.reduce(
+        (acc, current) => (acc.some((user) => current.id === user.id) ? acc : [...acc, current]),
+        filteredParticipants,
+      );
       return this.moveCurrentUserToStart(mergedSearchResults);
     },
     isSearchEmpty() {
