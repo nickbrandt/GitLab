@@ -32588,7 +32588,10 @@ msgstr ""
 msgid "This also resolves this thread"
 msgstr ""
 
-msgid "This application was created by %{link_to_owner}."
+msgid "This application was created by %{user_link}."
+msgstr ""
+
+msgid "This application was created for group %{group_link}."
 msgstr ""
 
 msgid "This application will be able to:"
