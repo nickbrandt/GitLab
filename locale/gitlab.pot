@@ -23023,6 +23023,9 @@ msgstr ""
 msgid "Package type must be Debian"
 msgstr ""
 
+msgid "Package type must be Helm"
+msgstr ""
+
 msgid "Package type must be Maven"
 msgstr ""
 
