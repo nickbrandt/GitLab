@@ -19,7 +19,7 @@ const apolloProvider = new VueApollo({
 const viewBlobEl = document.querySelector('#js-view-blob-app');
 
 if (viewBlobEl) {
-  const { blobPath, projectPath, hasRichViewer } = viewBlobEl.dataset;
+  const { blobPath, projectPath } = viewBlobEl.dataset;
 
   // eslint-disable-next-line no-new
   new Vue({
@@ -28,7 +28,6 @@ if (viewBlobEl) {
     render(createElement) {
       return createElement(BlobContentViewer, {
         props: {
-          hasRichViewer: JSON.parse(hasRichViewer),
           path: blobPath,
           projectPath,
         },

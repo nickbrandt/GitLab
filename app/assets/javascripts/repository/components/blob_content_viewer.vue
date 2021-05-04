@@ -23,6 +23,19 @@ export default {
           filePath: this.path,
         };
       },
+      result({ data }) {
+        const [blob] = data?.project?.repository?.blobs?.nodes;
+
+        if (!blob) {
+          return;
+        }
+
+        const hasRichViewer = blob?.richViewer !== null;
+
+        this.hasRichViewer = hasRichViewer;
+        this.activeViewerType =
+          hasRichViewer && !window.location.hash ? RICH_BLOB_VIEWER : SIMPLE_BLOB_VIEWER;
+      },
       error() {
         createFlash({ message: __('An error occurred while loading the file. Please try again.') });
       },
@@ -42,15 +55,11 @@ export default {
       type: String,
       required: true,
     },
-    hasRichViewer: {
-      type: Boolean,
-      required: true,
-    },
   },
   data() {
     return {
-      activeViewerType:
-        this.hasRichViewer && !window.location.hash ? RICH_BLOB_VIEWER : SIMPLE_BLOB_VIEWER,
+      hasRichViewer: false,
+      activeViewerType: SIMPLE_BLOB_VIEWER,
       project: {
         repository: {
           blobs: {
