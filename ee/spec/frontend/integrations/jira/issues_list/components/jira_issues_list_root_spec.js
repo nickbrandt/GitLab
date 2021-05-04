@@ -96,10 +96,12 @@ describe('JiraIssuesListRoot', () => {
         const issuableList = findIssuableList();
         const issuablesProp = issuableList.props('issuables');
 
-        expect(issuableList.props('currentPage')).toBe(resolvedValue.headers['x-page']);
-        expect(issuableList.props('previousPage')).toBe(resolvedValue.headers['x-page'] - 1);
-        expect(issuableList.props('nextPage')).toBe(resolvedValue.headers['x-page'] + 1);
-        expect(issuableList.props('totalItems')).toBe(resolvedValue.headers['x-total']);
+        expect(issuableList.props()).toMatchObject({
+          currentPage: resolvedValue.headers['x-page'],
+          previousPage: resolvedValue.headers['x-page'] - 1,
+          nextPage: resolvedValue.headers['x-page'] + 1,
+          totalItems: resolvedValue.headers['x-total'],
+        });
         expect(issuablesProp).toHaveLength(mockJiraIssues.length);
 
         const firstIssue = convertObjectPropsToCamelCase(mockJiraIssues[0], { deep: true });
@@ -201,9 +203,11 @@ describe('JiraIssuesListRoot', () => {
           with_labels_details: true,
         },
       });
-      expect(issuableList.props('currentPage')).toBe(mockPage);
-      expect(issuableList.props('previousPage')).toBe(mockPage - 1);
-      expect(issuableList.props('nextPage')).toBe(mockPage + 1);
+      expect(issuableList.props()).toMatchObject({
+        currentPage: mockPage,
+        previousPage: mockPage - 1,
+        nextPage: mockPage + 1,
+      });
     });
 
     it('"sort" event executes GET request correctly', async () => {
