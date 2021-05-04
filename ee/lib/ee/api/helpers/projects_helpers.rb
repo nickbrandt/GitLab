@@ -53,7 +53,8 @@ module EE
               :fallback_approvals_required,
               :import_url,
               :issues_template,
-              :merge_requests_template
+              :merge_requests_template,
+              :allow_merge_before_pipeline_completes
             ]
           end
         end

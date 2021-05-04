@@ -859,6 +859,17 @@ RSpec.describe API::Projects do
           expect(json_response['merge_requests_template']).to eq(project_params[:merge_requests_template])
         end
       end
+
+      context 'when updating allow_merge_before_pipeline_completes' do
+        let(:project_params) { { allow_merge_before_pipeline_completes: false } }
+
+        it 'updates the content' do
+          subject
+
+          expect(response).to have_gitlab_http_status(:ok)
+          expect(json_response['allow_merge_before_pipeline_completes']).to be_falsey
+        end
+      end
     end
 
     context 'issuable default templates feature not available' do

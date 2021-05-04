@@ -15,6 +15,10 @@ module EE
           argument :merge_trains_enabled, GraphQL::BOOLEAN_TYPE,
             required: false,
             description: 'Indicates if merge trains are enabled for the project.'
+
+          argument :allow_merge_before_pipeline_completes, GraphQL::BOOLEAN_TYPE,
+            required: false,
+            description: "Indicates if merging (via API or 'merge immediately' button) is allowed before a pipeline completes."
         end
       end
     end

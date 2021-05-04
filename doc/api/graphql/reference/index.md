@@ -767,6 +767,7 @@ Input type: `CiCdSettingsUpdateInput`
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
+| <a id="mutationcicdsettingsupdateallowmergebeforepipelinecompletes"></a>`allowMergeBeforePipelineCompletes` | [`Boolean`](#boolean) | Indicates if merging (via API or 'merge immediately' button) is allowed before a pipeline completes. |
 | <a id="mutationcicdsettingsupdateclientmutationid"></a>`clientMutationId` | [`String`](#string) | A unique identifier for the client performing the mutation. |
 | <a id="mutationcicdsettingsupdatefullpath"></a>`fullPath` | [`ID!`](#id) | Full Path of the project the settings belong to. |
 | <a id="mutationcicdsettingsupdatekeeplatestartifact"></a>`keepLatestArtifact` | [`Boolean`](#boolean) | Indicates if the latest artifact should be kept for this project. |
@@ -11469,6 +11470,7 @@ Returns [`VulnerabilitySeveritiesCount`](#vulnerabilityseveritiescount).
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
+| <a id="projectcicdsettingallowmergebeforepipelinecompletes"></a>`allowMergeBeforePipelineCompletes` | [`Boolean!`](#boolean) | Whether to allow merging (via API or 'merge immediately' button) before a pipeline completes. |
 | <a id="projectcicdsettingkeeplatestartifact"></a>`keepLatestArtifact` | [`Boolean`](#boolean) | Whether to keep the latest builds artifacts. |
 | <a id="projectcicdsettingmergepipelinesenabled"></a>`mergePipelinesEnabled` | [`Boolean`](#boolean) | Whether merge pipelines are enabled. |
 | <a id="projectcicdsettingmergetrainsenabled"></a>`mergeTrainsEnabled` | [`Boolean`](#boolean) | Whether merge trains are enabled. |

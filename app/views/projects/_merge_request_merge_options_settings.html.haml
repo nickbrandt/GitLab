@@ -14,6 +14,10 @@
     = form.label :printing_merge_request_link_enabled, class: 'form-check-label' do
       = s_('ProjectSettings|Show link to create or view a merge request when pushing from the command line')
   .form-check.mb-2
+    = form.check_box :allow_merge_before_pipeline_completes, class: 'form-check-input'
+    = form.label :allow_merge_before_pipeline_completes, class: 'form-check-label' do
+      = s_('ProjectSettings|Allow merge before pipelines complete')
+  .form-check.mb-2
     = form.check_box :remove_source_branch_after_merge, class: 'form-check-input'
     = form.label :remove_source_branch_after_merge, class: 'form-check-label' do
       = s_('ProjectSettings|Enable "Delete source branch" option by default')

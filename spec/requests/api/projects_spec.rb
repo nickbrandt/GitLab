@@ -2007,6 +2007,7 @@ RSpec.describe API::Projects do
         expect(json_response['operations_access_level']).to be_present
         expect(json_response).to have_key('emails_disabled')
         expect(json_response['resolve_outdated_diff_discussions']).to eq(project.resolve_outdated_diff_discussions)
+        expect(json_response['allow_merge_before_pipeline_completes']).to eq(project.allow_merge_before_pipeline_completes)
         expect(json_response['remove_source_branch_after_merge']).to be_truthy
         expect(json_response['container_registry_enabled']).to be_present
         expect(json_response['created_at']).to be_present
