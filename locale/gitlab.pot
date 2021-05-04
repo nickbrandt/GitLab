@@ -11424,6 +11424,9 @@ msgstr ""
 msgid "Disabled"
 msgstr ""
 
+msgid "Disabled by %{parent} owner"
+msgstr ""
+
 msgid "Disabled mirrors can only be enabled by instance owners. It is recommended that you delete them."
 msgstr ""
 
@@ -12828,9 +12831,6 @@ msgid "Error occurred when saving assignees"
 msgstr ""
 
 msgid "Error occurred when saving reviewers"
-msgstr ""
-
-msgid "Error occurred when toggling the notification subscription"
 msgstr ""
 
 msgid "Error occurred while updating the issue status"
@@ -30042,6 +30042,9 @@ msgid "Something went wrong while setting %{issuableType} %{dateType} date."
 msgstr ""
 
 msgid "Something went wrong while setting %{issuableType} confidentiality."
+msgstr ""
+
+msgid "Something went wrong while setting %{issuableType} notifications."
 msgstr ""
 
 msgid "Something went wrong while stopping this environment. Please try again."
