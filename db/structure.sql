@@ -25068,9 +25068,6 @@ ALTER TABLE ONLY approvals
 ALTER TABLE ONLY namespaces
     ADD CONSTRAINT fk_319256d87a FOREIGN KEY (file_template_project_id) REFERENCES projects(id) ON DELETE SET NULL;
 
-ALTER TABLE ONLY merge_requests
-    ADD CONSTRAINT fk_3308fe130c FOREIGN KEY (source_project_id) REFERENCES projects(id) ON DELETE SET NULL;
-
 ALTER TABLE ONLY ci_group_variables
     ADD CONSTRAINT fk_33ae4d58d8 FOREIGN KEY (group_id) REFERENCES namespaces(id) ON DELETE CASCADE;
 
@@ -27158,6 +27155,9 @@ ALTER TABLE ONLY ci_builds_metadata
 
 ALTER TABLE ONLY services
     ADD CONSTRAINT fk_services_inherit_from_id FOREIGN KEY (inherit_from_id) REFERENCES services(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY merge_requests
+    ADD CONSTRAINT fk_source_project FOREIGN KEY (source_project_id) REFERENCES projects(id) ON DELETE SET NULL;
 
 ALTER TABLE ONLY timelogs
     ADD CONSTRAINT fk_timelogs_issues_issue_id FOREIGN KEY (issue_id) REFERENCES issues(id) ON DELETE CASCADE;
