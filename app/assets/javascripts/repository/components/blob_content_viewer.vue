@@ -1,5 +1,5 @@
 <script>
-import { GlLoadingIcon } from '@gitlab/ui';
+import { GlLoadingIcon, GlButtonGroup, GlButton } from '@gitlab/ui';
 import { uniqueId } from 'lodash';
 import BlobContent from '~/blob/components/blob_content.vue';
 import BlobHeader from '~/blob/components/blob_header.vue';
@@ -9,10 +9,15 @@ import { __ } from '~/locale';
 import blobInfoQuery from '../queries/blob_info.query.graphql';
 
 export default {
+  i18n: {
+    lock: __('Lock'),
+  },
   components: {
     BlobHeader,
     BlobContent,
     GlLoadingIcon,
+    GlButtonGroup,
+    GlButton,
   },
   apollo: {
     project: {
@@ -119,7 +124,13 @@ export default {
         :active-viewer-type="viewer.type"
         :has-render-error="hasRenderError"
         @viewer-changed="switchViewer"
-      />
+      >
+        <template #actions>
+          <gl-button-group class="gl-mr-3">
+            <gl-button>{{ $options.i18n.lock }}</gl-button>
+          </gl-button-group>
+        </template>
+      </blob-header>
       <blob-content
         :blob="blobInfo"
         :content="blobInfo.rawTextBlob"
