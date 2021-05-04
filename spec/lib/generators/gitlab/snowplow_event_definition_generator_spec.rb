@@ -40,14 +40,12 @@ RSpec.describe Gitlab::SnowplowEventDefinitionGenerator do
 
       it 'overwrites event definition --ff flag set to true' do
         sample_event = ::Gitlab::Config::Loader::Yaml.new(fixture_file(File.join(sample_event_dir, 'sample_event.yml'))).load_raw!
-        sample_event["label_description"] = "some description"
 
         stub_const('Gitlab::VERSION', '13.11.0-pre')
         described_class.new([], generator_options.merge('ff' => true)).invoke_all
 
         event_definition_path = File.join(ce_temp_dir, 'groups__email_campaigns_controller_click.yml')
         event_data = ::Gitlab::Config::Loader::Yaml.new(File.read(event_definition_path)).load_raw!
-        event_data["label_description"] = "some description"
         expect(event_data).to eq(sample_event)
       end
 
