@@ -63,7 +63,7 @@ export default {
         '\n',
       );
     },
-    mdCollapsibleSection(){
+    mdCollapsibleSection() {
       return ['<details><summary>Click to expand</summary>', `{text}`, '</details>'].join('\n');
     },
     isMac() {
