@@ -2,7 +2,7 @@ import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import Vue from 'vue';
 import Vuex from 'vuex';
-import { GroupByParamType } from 'ee/boards/constants';
+import { BoardType, GroupByParamType, listsQuery, issuableTypes } from 'ee/boards/constants';
 import actions, { gqlClient } from 'ee/boards/stores/actions';
 import boardsStoreEE from 'ee/boards/stores/boards_store_ee';
 import * as types from 'ee/boards/stores/mutation_types';
@@ -150,6 +150,57 @@ describe('performSearch', () => {
       ],
     });
   });
+});
+
+describe('fetchLists', () => {
+  const queryResponse = {
+    data: {
+      group: {
+        board: {
+          hideBacklogList: true,
+          lists: {
+            nodes: [mockLists[1]],
+          },
+        },
+      },
+    },
+  };
+
+  it.each`
+    issuableType          | boardType          | fullBoardId                           | isGroup      | isProject
+    ${issuableTypes.epic} | ${BoardType.group} | ${'gid://gitlab/Boards::EpicBoard/1'} | ${undefined} | ${undefined}
+  `(
+    'calls $issuableType query with correct variables',
+    async ({ issuableType, boardType, fullBoardId, isGroup, isProject }) => {
+      const commit = jest.fn();
+      const dispatch = jest.fn();
+
+      const state = {
+        fullPath: 'gitlab-org',
+        fullBoardId,
+        filterParams: {},
+        boardType,
+        issuableType,
+      };
+
+      const variables = {
+        query: listsQuery[issuableType].query,
+        variables: {
+          fullPath: 'gitlab-org',
+          boardId: fullBoardId,
+          filters: {},
+          isGroup,
+          isProject,
+        },
+      };
+
+      jest.spyOn(gqlClient, 'query').mockResolvedValue(queryResponse);
+
+      await actions.fetchLists({ commit, state, dispatch });
+
+      expect(gqlClient.query).toHaveBeenCalledWith(variables);
+    },
+  );
 });
 
 describe('fetchEpicsSwimlanes', () => {

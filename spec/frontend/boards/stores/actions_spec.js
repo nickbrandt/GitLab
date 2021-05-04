@@ -1,4 +1,12 @@
 import * as Sentry from '@sentry/browser';
+import {
+  inactiveId,
+  ISSUABLE,
+  ListType,
+  issuableTypes,
+  BoardType,
+  listsQuery,
+} from 'ee_else_ce/boards/constants';
 import issueMoveListMutation from 'ee_else_ce/boards/graphql/issue_move_list.mutation.graphql';
 import testAction from 'helpers/vuex_action_helper';
 import {
@@ -8,7 +16,6 @@ import {
   formatIssue,
   getMoveData,
 } from '~/boards/boards_util';
-import { inactiveId, ISSUABLE, ListType, issuableTypes } from '~/boards/constants';
 import destroyBoardListMutation from '~/boards/graphql/board_list_destroy.mutation.graphql';
 import issueCreateMutation from '~/boards/graphql/issue_create.mutation.graphql';
 import actions, { gqlClient } from '~/boards/stores/actions';
@@ -131,7 +138,7 @@ describe('setActiveId', () => {
 });
 
 describe('fetchLists', () => {
-  const state = {
+  let state = {
     fullPath: 'gitlab-org',
     fullBoardId: 'gid://gitlab/Board/1',
     filterParams: {},
@@ -218,6 +225,43 @@ describe('fetchLists', () => {
       done,
     );
   });
+
+  it.each`
+    issuableType           | boardType            | fullBoardId               | isGroup  | isProject
+    ${issuableTypes.issue} | ${BoardType.group}   | ${'gid://gitlab/Board/1'} | ${true}  | ${false}
+    ${issuableTypes.issue} | ${BoardType.project} | ${'gid://gitlab/Board/1'} | ${false} | ${true}
+  `(
+    'calls $issuableType query with correct variables',
+    async ({ issuableType, boardType, fullBoardId, isGroup, isProject }) => {
+      const commit = jest.fn();
+      const dispatch = jest.fn();
+
+      state = {
+        fullPath: 'gitlab-org',
+        fullBoardId,
+        filterParams: {},
+        boardType,
+        issuableType,
+      };
+
+      const variables = {
+        query: listsQuery[issuableType].query,
+        variables: {
+          fullPath: 'gitlab-org',
+          boardId: fullBoardId,
+          filters: {},
+          isGroup,
+          isProject,
+        },
+      };
+
+      jest.spyOn(gqlClient, 'query').mockResolvedValue(queryResponse);
+
+      await actions.fetchLists({ commit, state, dispatch });
+
+      expect(gqlClient.query).toHaveBeenCalledWith(variables);
+    },
+  );
 });
 
 describe('createList', () => {

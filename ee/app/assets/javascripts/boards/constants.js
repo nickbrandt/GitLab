@@ -1,3 +1,4 @@
+/* eslint-disable import/export */
 import { issuableTypes } from '~/boards/constants';
 import destroyBoardListMutation from '~/boards/graphql/board_list_destroy.mutation.graphql';
 import updateBoardListMutation from '~/boards/graphql/board_list_update.mutation.graphql';
@@ -8,6 +9,8 @@ import boardListsQuery from './graphql/board_lists.query.graphql';
 import destroyEpicBoardListMutation from './graphql/epic_board_list_destroy.mutation.graphql';
 import updateEpicBoardListMutation from './graphql/epic_board_list_update.mutation.graphql';
 import epicBoardListsQuery from './graphql/epic_board_lists.query.graphql';
+
+export * from '~/boards/constants';
 
 export const DRAGGABLE_TAG = 'div';
 
@@ -62,9 +65,6 @@ export const ErrorMessages = {
     'Boards|An error occurred while fetching the board epics. Please reload the page.',
   ),
 };
-
-/* eslint-disable import/export */
-export * from '~/boards/constants';
 
 export const listsQuery = {
   [issuableTypes.issue]: {

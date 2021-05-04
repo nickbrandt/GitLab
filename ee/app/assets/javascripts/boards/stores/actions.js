@@ -9,10 +9,9 @@ import {
 import { BoardType, SupportedFilters } from '~/boards/constants';
 import eventHub from '~/boards/eventhub';
 import listsIssuesQuery from '~/boards/graphql/lists_issues.query.graphql';
-import actionsCE from '~/boards/stores/actions';
+import actionsCE, { gqlClient } from '~/boards/stores/actions';
 import boardsStore from '~/boards/stores/boards_store';
 import * as typesCE from '~/boards/stores/mutation_types';
-import createGqClient, { fetchPolicies } from '~/lib/graphql';
 import axios from '~/lib/utils/axios_utils';
 import {
   historyPushState,
@@ -57,13 +56,6 @@ const notImplemented = () => {
   /* eslint-disable-next-line @gitlab/require-i18n-strings */
   throw new Error('Not implemented!');
 };
-
-export const gqlClient = createGqClient(
-  {},
-  {
-    fetchPolicy: fetchPolicies.NO_CACHE,
-  },
-);
 
 const fetchAndFormatListIssues = (state, extraVariables) => {
   const { fullPath, boardId, boardType, filterParams } = state;
@@ -114,6 +106,8 @@ const fetchAndFormatListEpics = (state, extraVariables) => {
       return { listItems: formatListEpics(lists), listPageInfo: formatEpicListsPageInfo(lists) };
     });
 };
+
+export { gqlClient };
 
 export default {
   ...actionsCE,

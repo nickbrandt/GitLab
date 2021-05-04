@@ -11,6 +11,7 @@ import {
   deleteListQueries,
   listsQuery,
   updateListQueries,
+  issuableTypes,
 } from 'ee_else_ce/boards/constants';
 import createBoardListMutation from 'ee_else_ce/boards/graphql/board_list_create.mutation.graphql';
 import issueMoveListMutation from 'ee_else_ce/boards/graphql/issue_move_list.mutation.graphql';
@@ -92,8 +93,10 @@ export default {
       fullPath,
       boardId: fullBoardId,
       filters: filterParams,
-      isGroup: boardType === BoardType.group,
-      isProject: boardType === BoardType.project,
+      ...(issuableType === issuableTypes.issue && {
+        isGroup: boardType === BoardType.group,
+        isProject: boardType === BoardType.project,
+      }),
     };
 
     return gqlClient
