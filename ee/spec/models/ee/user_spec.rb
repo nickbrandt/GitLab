@@ -1109,6 +1109,10 @@ RSpec.describe User do
         end
 
         it { is_expected.to contain_exactly private_group, project_group, minimal_access_group }
+
+        it 'ignores groups with minimal access if with_minimal_access=false' do
+          expect(user.authorized_groups(with_minimal_access: false)).to contain_exactly(private_group, project_group)
+        end
       end
 
       context 'feature available for specific groups only' do
