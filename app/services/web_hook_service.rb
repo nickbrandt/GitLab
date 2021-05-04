@@ -118,13 +118,7 @@ class WebHookService
   end
 
   def log_execution(trigger:, url:, request_data:, response:, execution_duration:, error_message: nil)
-    if response.success? || response.redirection?
-      hook.update!(recent_failures: 0)
-    elsif response.internal_server_error?
-      hook.update!(disabled_until: 1.day.from_now)
-    else
-      hook.update!(recent_failures: hook.recent_failures + 1)
-    end
+    handle_failure(response, hook)
 
     WebHookLog.create(
       web_hook: hook,
@@ -138,6 +132,17 @@ class WebHookService
       response_status: response.code,
       internal_error_message: error_message
     )
+  end
+
+  def handle_failure(response, hook)
+    if response.success? || response.redirection?
+      hook.enable!
+    elsif response.internal_server_error?
+      next_backoff = hook.next_backoff
+      hook.update!(disabled_until: next_backoff.from_now, backoff_count: hook.backoff_count + 1)
+    else
+      hook.update!(recent_failures: hook.recent_failures + 1)
+    end
   end
 
   def build_headers(hook_name)

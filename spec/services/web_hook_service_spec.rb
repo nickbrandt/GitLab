@@ -138,7 +138,7 @@ RSpec.describe WebHookService do
       ]
       exceptions.each do |exception_class|
         exception = exception_class.new('Exception message')
-        project_hook.update!(disabled_until: nil)
+        project_hook.enable!
 
         stub_full_request(project_hook.url, method: :post).to_raise(exception)
         expect(service_instance.execute).to eq({ status: :error, message: exception.to_s })
@@ -254,7 +254,12 @@ RSpec.describe WebHookService do
         end
 
         it 'sets the disabled_until attribute' do
-          expect { service_instance.execute }.to change(project_hook, :disabled_until).to(1.day.from_now)
+          expect { service_instance.execute }
+            .to change(project_hook, :disabled_until).to(project_hook.next_backoff.from_now)
+        end
+
+        it 'increases the backoff count' do
+          expect { service_instance.execute }.to change(project_hook, :backoff_count).by(1)
         end
       end
 

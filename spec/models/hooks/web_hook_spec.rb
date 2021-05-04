@@ -224,4 +224,50 @@ RSpec.describe WebHook do
       end
     end
   end
+
+  describe '#next_backoff' do
+    context 'when there was no last backoff' do
+      before do
+        hook.backoff_count = 0
+      end
+
+      it 'is 10 minutes' do
+        expect(hook.next_backoff).to eq(described_class::INITIAL_BACKOFF)
+      end
+    end
+
+    context 'when we have backed off once' do
+      before do
+        hook.backoff_count = 1
+      end
+
+      it 'is twice the initial value' do
+        expect(hook.next_backoff).to eq(20.minutes)
+      end
+    end
+
+    context 'when we have backed off 3 times' do
+      before do
+        hook.backoff_count = 3
+      end
+
+      it 'grows exponentially' do
+        expect(hook.next_backoff).to eq(80.minutes)
+      end
+    end
+  end
+
+  describe '#enable!' do
+    it 'makes a hook executable' do
+      hook.recent_failures = 1000
+
+      expect { hook.enable! }.to change(hook, :executable?).from(false).to(true)
+    end
+  end
+
+  describe '#disable!' do
+    it 'disables a hook' do
+      expect { hook.disable! }.to change(hook, :executable?).from(true).to(false)
+    end
+  end
 end

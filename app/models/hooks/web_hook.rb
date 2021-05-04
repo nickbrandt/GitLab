@@ -4,6 +4,8 @@ class WebHook < ApplicationRecord
   include Sortable
 
   FAILURE_THRESHOLD = 3 # three strikes
+  INITIAL_BACKOFF = 10.minutes
+  BACKOFF_GROWTH_FACTOR = 2.0
 
   attr_encrypted :token,
                  mode:      :per_attribute_iv,
@@ -54,6 +56,18 @@ class WebHook < ApplicationRecord
 
   def help_path
     'user/project/integrations/webhooks'
+  end
+
+  def next_backoff
+    INITIAL_BACKOFF * (BACKOFF_GROWTH_FACTOR**backoff_count)
+  end
+
+  def disable!
+    update!(recent_failures: FAILURE_THRESHOLD + 1)
+  end
+
+  def enable!
+    update!(recent_failures: 0, disabled_until: nil, backoff_count: 0)
   end
 
   private
