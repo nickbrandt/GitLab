@@ -201,7 +201,24 @@ module API
         options = serializer_options_for(merge_requests).merge(project: user_project)
         options[:project] = user_project
 
-        present merge_requests, options
+        if Feature.enabled?(:api_caching_merge_requests, user_project, type: :development, default_enabled: :yaml)
+          # User-specific context in the simple MR entity is limited to
+          # email address exposure, which we need to check and combine
+          # into the cache context
+          options[:cache_context] = proc do |mr|
+            [
+              mr.author.managed_by?(current_user),
+              mr.assignee.managed_by?(current_user),
+              mr.assignees.map { |u| u.managed_by?(current_user) },
+              [mr.metrics&.merged_by, mr.metrics&.latest_closed_by].compact.map { |u| u.managed_by?(current_user) },
+              options.values_at(:render_html, :with_labels_details, :skip_merge_status_recheck)
+            ]
+          end
+
+          present_cached merge_requests, options
+        else
+          present merge_requests, options
+        end
       end
 
       desc 'Create a merge request' do
