@@ -783,4 +783,4 @@ class MergeRequestDiff < ApplicationRecord
   end
 end
 
-MergeRequestDiff.prepend_mod_with('EE::MergeRequestDiff')
+MergeRequestDiff.prepend_mod_with('MergeRequestDiff')

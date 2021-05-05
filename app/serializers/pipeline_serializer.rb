@@ -70,4 +70,4 @@ class PipelineSerializer < BaseSerializer
   end
 end
 
-PipelineSerializer.prepend_mod_with('EE::PipelineSerializer')
+PipelineSerializer.prepend_mod_with('PipelineSerializer')

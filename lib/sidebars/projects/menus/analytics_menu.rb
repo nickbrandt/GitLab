@@ -92,4 +92,4 @@ module Sidebars
   end
 end
 
-Sidebars::Projects::Menus::AnalyticsMenu.prepend_mod_with('EE::Sidebars::Projects::Menus::AnalyticsMenu')
+Sidebars::Projects::Menus::AnalyticsMenu.prepend_mod_with('Sidebars::Projects::Menus::AnalyticsMenu')

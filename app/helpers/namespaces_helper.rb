@@ -125,4 +125,4 @@ module NamespacesHelper
   end
 end
 
-NamespacesHelper.prepend_mod_with('EE::NamespacesHelper')
+NamespacesHelper.prepend_mod_with('NamespacesHelper')

@@ -560,4 +560,4 @@ class Member < ApplicationRecord
   end
 end
 
-Member.prepend_mod_with('EE::Member')
+Member.prepend_mod_with('Member')

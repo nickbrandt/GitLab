@@ -35,4 +35,4 @@ class ProjectHook < WebHook
   end
 end
 
-ProjectHook.prepend_mod_with('EE::ProjectHook')
+ProjectHook.prepend_mod_with('ProjectHook')

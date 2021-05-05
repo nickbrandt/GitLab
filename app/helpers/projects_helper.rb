@@ -651,4 +651,4 @@ module ProjectsHelper
   end
 end
 
-ProjectsHelper.prepend_mod_with('EE::ProjectsHelper')
+ProjectsHelper.prepend_mod_with('ProjectsHelper')

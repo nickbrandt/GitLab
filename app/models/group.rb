@@ -861,4 +861,4 @@ class Group < Namespace
   end
 end
 
-Group.prepend_mod_with('EE::Group')
+Group.prepend_mod_with('Group')

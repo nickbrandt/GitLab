@@ -2764,4 +2764,4 @@ class Project < ApplicationRecord
   end
 end
 
-Project.prepend_mod_with('EE::Project')
+Project.prepend_mod_with('Project')
