@@ -2,18 +2,18 @@ import { GlButton } from '@gitlab/ui';
 import { mount } from '@vue/test-utils';
 import Vue from 'vue';
 import VueApollo from 'vue-apollo';
-import ManageViaMr from 'ee/security_configuration/components/manage_via_mr.vue';
 import configureDependencyScanningMutation from 'ee/security_configuration/graphql/configure_dependency_scanning.mutation.graphql';
 import configureSecretDetectionMutation from 'ee/security_configuration/graphql/configure_secret_detection.mutation.graphql';
 import createMockApollo from 'helpers/mock_apollo_helper';
 import { extendedWrapper } from 'helpers/vue_test_utils_helper';
 import waitForPromises from 'helpers/wait_for_promises';
+import { buildConfigureSecurityFeatureMockFactory } from 'jest/vue_shared/security_reports/components/apollo_mocks';
 import { redirectTo } from '~/lib/utils/url_utility';
+import ManageViaMr from '~/vue_shared/security_configuration/components/manage_via_mr.vue';
 import {
   REPORT_TYPE_DEPENDENCY_SCANNING,
   REPORT_TYPE_SECRET_DETECTION,
 } from '~/vue_shared/security_reports/constants';
-import { buildConfigureSecurityFeatureMockFactory } from './apollo_mocks';
 
 jest.mock('~/lib/utils/url_utility');
 
@@ -23,15 +23,12 @@ describe('ManageViaMr component', () => {
   let wrapper;
 
   const findButton = () => wrapper.findComponent(GlButton);
-
   describe.each`
-    featureName              | featureType                        | mutation                               | mutationType
-    ${'Dependency Scanning'} | ${REPORT_TYPE_DEPENDENCY_SCANNING} | ${configureDependencyScanningMutation} | ${'configureDependencyScanning'}
-    ${'Secret Detection'}    | ${REPORT_TYPE_SECRET_DETECTION}    | ${configureSecretDetectionMutation}    | ${'configureSecretDetection'}
-  `('$featureType', ({ featureName, featureType, mutation, mutationType }) => {
-    const buildConfigureSecurityFeatureMock = buildConfigureSecurityFeatureMockFactory(
-      mutationType,
-    );
+    featureName              | featureType                        | mutation                               | mutationId
+    ${'SECRET_DETECTION'}    | ${REPORT_TYPE_DEPENDENCY_SCANNING} | ${configureDependencyScanningMutation} | ${'configureDependencyScanning'}
+    ${'DEPENDENCY_SCANNING'} | ${REPORT_TYPE_SECRET_DETECTION}    | ${configureSecretDetectionMutation}    | ${'configureSecretDetection'}
+  `('$featureType', ({ featureName, mutation, featureType, mutationId }) => {
+    const buildConfigureSecurityFeatureMock = buildConfigureSecurityFeatureMockFactory(mutationId);
     const successHandler = async () => buildConfigureSecurityFeatureMock();
     const noSuccessPathHandler = async () =>
       buildConfigureSecurityFeatureMock({
@@ -53,11 +50,14 @@ describe('ManageViaMr component', () => {
       wrapper = extendedWrapper(
         mount(ManageViaMr, {
           apolloProvider: mockApollo,
+          provide: {
+            projectPath: 'testProjectPath',
+          },
           propsData: {
             feature: {
               name: featureName,
-              configured: isFeatureConfigured,
               type: featureType,
+              configured: isFeatureConfigured,
             },
           },
         }),
