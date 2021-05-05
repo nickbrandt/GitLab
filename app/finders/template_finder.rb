@@ -70,4 +70,4 @@ class TemplateFinder
   end
 end
 
-TemplateFinder.prepend_mod_with('::EE::TemplateFinder')
+TemplateFinder.prepend_mod_with('TemplateFinder')
