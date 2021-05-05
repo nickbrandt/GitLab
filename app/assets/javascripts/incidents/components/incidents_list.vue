@@ -334,14 +334,14 @@ export default {
         <gl-table
           :items="incidents.list || []"
           :fields="availableFields"
-          :show-empty="true"
           :busy="loading"
           stacked="md"
           :tbody-tr-class="tbodyTrClass"
-          :no-local-sorting="true"
-          :sort-direction="'desc'"
+          sort-direction="desc"
           :sort-desc.sync="sortDesc"
           :sort-by.sync="sortBy"
+          show-empty
+          no-local-sorting
           sort-icon-left
           fixed
           @row-clicked="navigateToIncidentDetails"
