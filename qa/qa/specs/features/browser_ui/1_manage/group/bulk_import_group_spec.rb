@@ -52,9 +52,11 @@ module QA
         )
       end
 
-      before do
+      before(:all) do
         Runtime::Feature.enable(:bulk_import)
+      end
 
+      before do
         sandbox.add_member(user, Resource::Members::AccessLevel::MAINTAINER)
         source_group.add_member(user, Resource::Members::AccessLevel::MAINTAINER)
 
@@ -78,10 +80,12 @@ module QA
       end
 
       after do
-        Runtime::Feature.disable(:bulk_import)
-
         user.remove_via_api!
         source_group.remove_via_api!
+      end
+
+      after(:all) do
+        Runtime::Feature.disable(:bulk_import)
       end
     end
   end
