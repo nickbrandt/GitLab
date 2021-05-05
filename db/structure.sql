@@ -16025,7 +16025,9 @@ CREATE TABLE plan_limits (
     daily_invites integer DEFAULT 0 NOT NULL,
     rubygems_max_file_size bigint DEFAULT '3221225472'::bigint NOT NULL,
     terraform_module_max_file_size bigint DEFAULT 1073741824 NOT NULL,
-    helm_max_file_size bigint DEFAULT 5242880 NOT NULL
+    helm_max_file_size bigint DEFAULT 5242880 NOT NULL,
+    ci_registered_group_runners integer DEFAULT 1000 NOT NULL,
+    ci_registered_project_runners integer DEFAULT 1000 NOT NULL
 );
 
 CREATE SEQUENCE plan_limits_id_seq
