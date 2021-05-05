@@ -254,17 +254,15 @@ RSpec.describe 'Admin updates settings' do
     context 'when Service Templates are enabled' do
       before do
         stub_feature_flags(disable_service_templates: false)
+        visit general_admin_application_settings_path
       end
 
-      context 'when no service templates are active' do
-        it 'does not show Service Templates link' do
-          expect(page).not_to have_link('Service Templates')
-        end
+      it 'shows Service Templates link' do
+        expect(page).to have_link('Service Templates')
       end
 
       context 'when the Slack Notifications Service template is active' do
         before do
-          stub_feature_flags(disable_service_templates: false)
           create(:service, :template, type: 'SlackService', active: true)
 
           visit general_admin_application_settings_path
