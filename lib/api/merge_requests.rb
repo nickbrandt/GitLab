@@ -208,14 +208,14 @@ module API
           options[:cache_context] = proc do |mr|
             [
               mr.author.managed_by?(current_user),
-              mr.assignee.managed_by?(current_user),
+              mr.assignee&.managed_by?(current_user),
               mr.assignees.map { |u| u.managed_by?(current_user) },
               [mr.metrics&.merged_by, mr.metrics&.latest_closed_by].compact.map { |u| u.managed_by?(current_user) },
               options.values_at(:render_html, :with_labels_details, :skip_merge_status_recheck)
             ]
           end
 
-          present_cached merge_requests, options
+          present_cached merge_requests, **options
         else
           present merge_requests, options
         end
