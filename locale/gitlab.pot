@@ -38715,6 +38715,12 @@ msgstr ""
 msgid "satisfied"
 msgstr ""
 
+msgid "scan-execution-policy: policy not applied, %{policy_path} file is invalid"
+msgstr ""
+
+msgid "scan-execution-policy: policy not applied, %{policy_path} file is missing"
+msgstr ""
+
 msgid "security Reports|There was an error creating the merge request"
 msgstr ""
 
