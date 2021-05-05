@@ -9,7 +9,7 @@ import {
 import createMockApollo from 'helpers/mock_apollo_helper';
 import {
   expectedDownloadDropdownProps,
-  securityReportMrDownloadPathsQueryResponse,
+  securityReportMergeRequestDownloadPathsQueryResponse,
 } from 'jest/vue_shared/security_reports/mock_data';
 import createFlash from '~/flash';
 import SecurityReportDownloadDropdown from '~/vue_shared/security_reports/components/security_report_download_dropdown.vue';
@@ -17,7 +17,7 @@ import securityReportMrDownloadPathsQuery from '~/vue_shared/security_reports/qu
 
 jest.mock('~/flash');
 
-describe('Mr Artifact Download', () => {
+describe('Merge request artifact Download', () => {
   let wrapper;
 
   const defaultProps = {
@@ -41,7 +41,7 @@ describe('Mr Artifact Download', () => {
 
   const pendingHandler = () => new Promise(() => {});
   const successHandler = () =>
-    Promise.resolve({ data: securityReportMrDownloadPathsQueryResponse });
+    Promise.resolve({ data: securityReportMergeRequestDownloadPathsQueryResponse });
   const failureHandler = () => Promise.resolve({ errors: [{ message: 'some error' }] });
   const createMockApolloProvider = (handler) => {
     Vue.use(VueApollo);
@@ -54,7 +54,6 @@ describe('Mr Artifact Download', () => {
 
   afterEach(() => {
     wrapper.destroy();
-    wrapper = null;
   });
 
   describe('given the query is loading', () => {

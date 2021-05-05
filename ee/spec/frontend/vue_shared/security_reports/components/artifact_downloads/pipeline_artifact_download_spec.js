@@ -17,7 +17,7 @@ import securityReportPipelineDownloadPathsQuery from '~/vue_shared/security_repo
 
 jest.mock('~/flash');
 
-describe('Mr Artifact Download', () => {
+describe('Pipeline artifact Download', () => {
   let wrapper;
 
   const defaultProps = {

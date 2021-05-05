@@ -8,7 +8,7 @@ import {
   extractSecurityReportArtifactsFromPipeline,
 } from '~/vue_shared/security_reports/utils';
 import {
-  securityReportMrDownloadPathsQueryResponse,
+  securityReportMergeRequestDownloadPathsQueryResponse,
   securityReportPipelineDownloadPathsQueryResponse,
   sastArtifacts,
   secretDetectionArtifacts,
@@ -34,7 +34,7 @@ describe('extractSecurityReportArtifactsFromMr', () => {
       expect(
         extractSecurityReportArtifactsFromMr(
           reportTypes,
-          securityReportMrDownloadPathsQueryResponse,
+          securityReportMergeRequestDownloadPathsQueryResponse,
         ),
       ).toEqual(expectedArtifacts);
     },

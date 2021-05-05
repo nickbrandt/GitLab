@@ -10,7 +10,7 @@ import waitForPromises from 'helpers/wait_for_promises';
 import {
   expectedDownloadDropdownProps,
   securityReportMrDownloadPathsQueryNoArtifactsResponse,
-  securityReportMrDownloadPathsQueryResponse,
+  securityReportMergeRequestDownloadPathsQueryResponse,
   sastDiffSuccessMock,
   secretScanningDiffSuccessMock,
 } from 'jest/vue_shared/security_reports/mock_data';
@@ -60,7 +60,7 @@ describe('Security reports app', () => {
 
   const pendingHandler = () => new Promise(() => {});
   const successHandler = () =>
-    Promise.resolve({ data: securityReportMrDownloadPathsQueryResponse });
+    Promise.resolve({ data: securityReportMergeRequestDownloadPathsQueryResponse });
   const successEmptyHandler = () =>
     Promise.resolve({ data: securityReportMrDownloadPathsQueryNoArtifactsResponse });
   const failureHandler = () => Promise.resolve({ errors: [{ message: 'some error' }] });

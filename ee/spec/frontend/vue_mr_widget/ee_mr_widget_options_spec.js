@@ -20,7 +20,7 @@ import createMockApollo from 'helpers/mock_apollo_helper';
 import { TEST_HOST } from 'helpers/test_constants';
 import { trimText } from 'helpers/text_helper';
 import waitForPromises from 'helpers/wait_for_promises';
-import { securityReportMrDownloadPathsQueryResponse } from 'jest/vue_shared/security_reports/mock_data';
+import { securityReportMergeRequestDownloadPathsQueryResponse } from 'jest/vue_shared/security_reports/mock_data';
 
 import axios from '~/lib/utils/axios_utils';
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
@@ -1039,7 +1039,7 @@ describe('ee merge request widget options', () => {
           apolloProvider: createMockApollo([
             [
               securityReportMrDownloadPathsQuery,
-              async () => ({ data: securityReportMrDownloadPathsQueryResponse }),
+              async () => ({ data: securityReportMergeRequestDownloadPathsQueryResponse }),
             ],
           ]),
         });

@@ -3,7 +3,7 @@ import MockAdapter from 'axios-mock-adapter';
 import Vue, { nextTick } from 'vue';
 import VueApollo from 'vue-apollo';
 import createMockApollo from 'helpers/mock_apollo_helper';
-import { securityReportMrDownloadPathsQueryResponse } from 'jest/vue_shared/security_reports/mock_data';
+import { securityReportMergeRequestDownloadPathsQueryResponse } from 'jest/vue_shared/security_reports/mock_data';
 import axios from '~/lib/utils/axios_utils';
 import { setFaviconOverlay } from '~/lib/utils/favicon';
 import notify from '~/lib/utils/notify';
@@ -831,7 +831,7 @@ describe('MrWidgetOptions', () => {
           apolloProvider: createMockApollo([
             [
               securityReportMrDownloadPathsQuery,
-              async () => ({ data: securityReportMrDownloadPathsQueryResponse }),
+              async () => ({ data: securityReportMergeRequestDownloadPathsQueryResponse }),
             ],
           ]),
         });
