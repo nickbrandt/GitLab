@@ -25,6 +25,10 @@ Response codes:
 - `4XX`: Not accepted
 - All other codes: accepted and logged
 
+### Result
+
+Pipelines that are not accepted by the external validation service will not be created. In XYZ circumstance an error message stating `Pipeline cannot be run. External validation failed` will be displayed.
+
 ## Configuration
 
 To configure external pipeline validation, add the
