@@ -284,6 +284,29 @@ RSpec.describe 'layouts/nav/sidebar/_project' do
         end
       end
     end
+
+    describe 'Escalation policies' do
+      before do
+        allow(view).to receive(:current_user).and_return(user)
+        stub_licensed_features(oncall_schedules: true, escalation_policies: true)
+      end
+
+      it 'has a link to the escalation policies page' do
+        render
+
+        expect(rendered).to have_link('Escalation policies', href: project_incident_management_escalation_policies_path(project))
+      end
+
+      describe 'when the user does not have access' do
+        let(:user) { nil }
+
+        it 'does not have a link to the escalation policies page' do
+          render
+
+          expect(rendered).not_to have_link('Escalation policies')
+        end
+      end
+    end
   end
 
   describe 'Settings > Operations' do
