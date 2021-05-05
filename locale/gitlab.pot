@@ -5613,6 +5613,9 @@ msgstr ""
 msgid "CICDAnalytics|All time"
 msgstr ""
 
+msgid "CICDAnalytics|Deployment frequency"
+msgstr ""
+
 msgid "CICDAnalytics|Projects with releases"
 msgstr ""
 
