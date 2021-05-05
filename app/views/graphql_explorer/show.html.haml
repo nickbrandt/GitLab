@@ -1,0 +1,13 @@
+%html{ lang: "en" }
+  %head
+    %meta{ content: "text/html; charset=utf-8", "http-equiv" => "Content-Type" }
+    %title
+      GitLab – GraphQL Explorer
+
+    = stylesheet_link_tag('page_bundles/graphql_explorer')
+    = webpack_bundle_tag 'graphql_explorer'
+
+    = Gon::Base.render_data(nonce: content_security_policy_nonce)
+  %body
+    #graphiql{ data: { graphql_path: Gitlab::Utils.append_path(Gitlab.config.gitlab.relative_url_root, '/api/graphql') }}
+      Loading...

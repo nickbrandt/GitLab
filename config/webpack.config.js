@@ -108,6 +108,7 @@ function generateEntries() {
     sentry: './sentry/index.js',
     performance_bar: './performance_bar/index.js',
     jira_connect_app: './jira_connect/index.js',
+    graphql_explorer: './graphql_explorer/index.js',
   };
 
   return Object.assign(manualEntries, incrementalCompiler.filterEntryPoints(autoEntries));
@@ -121,6 +122,8 @@ const alias = {
   images: path.join(ROOT_PATH, 'app/assets/images'),
   vendor: path.join(ROOT_PATH, 'vendor/assets/javascripts'),
   vue$: 'vue/dist/vue.esm.js',
+  'graphql-language-service-interface': 'graphql-language-service-interface/dist/index.js',
+  'graphql-language-service-parser': 'graphql-language-service-parser/dist/index.js',
   jquery$: 'jquery/dist/jquery.slim.js',
   spec: path.join(ROOT_PATH, 'spec/javascripts'),
   jest: path.join(ROOT_PATH, 'spec/frontend'),
