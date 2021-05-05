@@ -72,7 +72,7 @@ export default {
       thClass: `gl-text-right gl-w-eighth`,
       tdClass: `${tdClass} gl-text-right`,
       thAttr: TH_INCIDENT_SLA_TEST_ID,
-      sortKey: 'SLA_DUE_AT',
+      actualSortKey: 'SLA_DUE_AT',
       sortable: true,
       sortDirection: 'asc',
     },
@@ -262,8 +262,8 @@ export default {
       const sortingDirection = sortDesc ? 'DESC' : 'ASC';
 
       // Use `sortKey` if provided, otherwise fall back to existing algorithm
-      if (field?.sortKey) {
-        sortKey = field.sortKey;
+      if (field?.actualSortKey) {
+        sortKey = field.actualSortKey;
       } else {
         sortKey = convertToSnakeCase(sortBy).replace(/_.*/, '').toUpperCase();
       }
