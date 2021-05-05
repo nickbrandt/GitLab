@@ -27,7 +27,7 @@ Response codes:
 
 ### Service Result
 
-Pipelines that are not accepted by the external validation service will not be created and will not be visible in pipeline lists in GitLab UI or API. In XYZ circumstance an error message stating `Pipeline cannot be run. External validation failed` will be displayed.
+Pipelines that are not accepted by the external validation service will not be created and will not be visible in pipeline lists in GitLab UI or API. When creating the pipeline within the GitLab UI an error message stating `Pipeline cannot be run. External validation failed` will be displayed.
 
 ## Configuration
 
