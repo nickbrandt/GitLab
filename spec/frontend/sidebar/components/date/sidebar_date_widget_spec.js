@@ -120,9 +120,11 @@ describe('Sidebar date Widget', () => {
     });
 
     it('uses a correct prop to set the initial date for GlDatePicker', () => {
-      expect(findDatePicker().props('value')).toBe(null);
-      expect(findDatePicker().props('defaultDate')).toEqual(wrapper.vm.parsedDate);
-      expect(findDatePicker().props('autocomplete')).toEqual('off');
+      expect(findDatePicker().props()).toMatchObject({
+        value: null,
+        autocomplete: 'off',
+        defaultDate: expect.any(Object),
+      });
     });
 
     it('renders GlDatePicker', async () => {

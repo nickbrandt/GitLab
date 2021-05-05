@@ -287,7 +287,7 @@ export default {
         class="gl-relative"
         :default-date="parsedDate"
         show-clear-button
-        :autocomplete="'off'"
+        autocomplete="off"
         @input="setDate"
         @clear="setDate(null)"
       />
