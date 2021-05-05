@@ -1,21 +1,16 @@
 <script>
 import { GlButton } from '@gitlab/ui';
+import { featureToMutationMap } from 'ee_else_ce/security_configuration/components/constants';
 import { redirectTo } from '~/lib/utils/url_utility';
 import { sprintf, s__ } from '~/locale';
-import apolloProvider from '../graphql/provider';
-import { featureToMutationMap } from './constants';
+import apolloProvider from '../provider';
 
 export default {
   apolloProvider,
   components: {
     GlButton,
   },
-  inject: {
-    projectPath: {
-      from: 'projectPath',
-      default: '',
-    },
-  },
+  inject: ['projectPath'],
   props: {
     feature: {
       type: Object,
@@ -36,15 +31,9 @@ export default {
     async mutate() {
       this.isLoading = true;
       try {
-        const { data } = await this.$apollo.mutate({
-          mutation: this.featureSettings.mutation,
-          variables: {
-            input: {
-              projectPath: this.projectPath,
-            },
-          },
-        });
-        const { errors, successPath } = data[this.featureSettings.type];
+        const mutation = this.featureSettings;
+        const { data } = await this.$apollo.mutate(mutation.getMutationPayload(this.projectPath));
+        const { errors, successPath } = data[mutation.mutationId];
 
         if (errors.length > 0) {
           throw new Error(errors[0]);
