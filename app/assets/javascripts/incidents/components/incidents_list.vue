@@ -174,7 +174,7 @@ export default {
       redirecting: false,
       incidents: {},
       incidentsCount: {},
-      sort: 'created_desc',
+      sort: 'CREATED_DESC',
       sortBy: 'createdAt',
       sortDesc: true,
       statusFilter: '',
