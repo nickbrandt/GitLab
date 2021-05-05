@@ -73,7 +73,7 @@ export default {
     <template #description>
       <p class="gl-mb-0">{{ __('It may be several days before you see feature usage data.') }}</p>
       <gl-link :href="devopsReportDocsPath">{{
-        __('Our documentation includes an example DevOps Score report.')
+        __('See example DevOps Score page in our documentation.')
       }}</gl-link>
     </template>
   </gl-empty-state>

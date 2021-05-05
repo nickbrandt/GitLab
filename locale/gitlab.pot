@@ -28810,6 +28810,9 @@ msgstr ""
 msgid "SecurityReports|Your feedback is important to us! We will ask again in a week."
 msgstr ""
 
+msgid "See example DevOps Score page in our documentation."
+msgstr ""
+
 msgid "See metrics"
 msgstr ""
 
