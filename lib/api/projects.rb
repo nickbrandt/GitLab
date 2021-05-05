@@ -168,7 +168,11 @@ module API
 
         groups, options = with_custom_attributes(groups, options)
 
-        present paginate(groups), options
+        paginated_groups = paginate(groups)
+
+        options[:visible_groups_ids] = paginated_groups.public_or_visible_to_user(current_user).map(&:id)
+
+        present paginated_groups, options
       end
 
       def translate_params_for_compatibility(params)

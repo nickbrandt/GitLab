@@ -1700,7 +1700,14 @@ RSpec.describe API::Projects do
           expect(response).to have_gitlab_http_status(:ok)
           expect(response).to include_pagination_headers
           expect(json_response).to be_an Array
-          expect(json_response.map { |g| g['name'] }).to match_array(expected_groups.map(&:name))
+
+          received_groups = json_response.map { |g| [g['id'], g] }.to_h
+
+          expect(received_groups.keys).to match_array(expected_groups.map(&:id))
+
+          received_groups.each do |id, group|
+            expect(group['visible']).to eq(id.in?(visible_groups.map(&:id)))
+          end
         end
       end
     end
@@ -1717,6 +1724,7 @@ RSpec.describe API::Projects do
 
         it_behaves_like 'successful groups response' do
           let(:expected_groups) { [root_group, project_group] }
+          let(:visible_groups) { [root_group, project_group] }
         end
       end
     end
@@ -1736,10 +1744,12 @@ RSpec.describe API::Projects do
 
         before do
           private_project.add_developer(user)
+          shared_group_with_reporter_access.add_guest(user)
         end
 
         it_behaves_like 'successful groups response' do
           let(:expected_groups) { [root_group, project_group] }
+          let(:visible_groups) { [root_group, project_group] }
         end
 
         context 'when search by root group name' do
@@ -1747,6 +1757,7 @@ RSpec.describe API::Projects do
 
           it_behaves_like 'successful groups response' do
             let(:expected_groups) { [root_group] }
+            let(:visible_groups) { [root_group] }
           end
         end
 
@@ -1755,6 +1766,7 @@ RSpec.describe API::Projects do
 
           it_behaves_like 'successful groups response' do
             let(:expected_groups) { [root_group, project_group, shared_group_with_dev_access, shared_group_with_reporter_access] }
+            let(:visible_groups) { [root_group, project_group, shared_group_with_reporter_access] }
           end
 
           context 'when shared_min_access_level is set' do
@@ -1762,6 +1774,7 @@ RSpec.describe API::Projects do
 
             it_behaves_like 'successful groups response' do
               let(:expected_groups) { [root_group, project_group, shared_group_with_dev_access] }
+              let(:visible_groups) { [root_group, project_group] }
             end
           end
 
@@ -1770,6 +1783,7 @@ RSpec.describe API::Projects do
 
             it_behaves_like 'successful groups response' do
               let(:expected_groups) { [shared_group_with_dev_access] }
+              let(:visible_groups) { [] }
             end
           end
 
@@ -1778,6 +1792,7 @@ RSpec.describe API::Projects do
 
             it_behaves_like 'successful groups response' do
               let(:expected_groups) { [shared_group_with_reporter_access, project_group] }
+              let(:visible_groups) { [shared_group_with_reporter_access, project_group] }
             end
           end
         end
@@ -1789,6 +1804,7 @@ RSpec.describe API::Projects do
 
       it_behaves_like 'successful groups response' do
         let(:expected_groups) { [root_group, project_group] }
+        let(:visible_groups) { [root_group, project_group] }
       end
     end
   end
