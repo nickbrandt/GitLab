@@ -107,6 +107,12 @@ Sidekiq::Queue.new("background_migration").size
 Sidekiq::ScheduledSet.new.select { |r| r.klass == 'BackgroundMigrationWorker' }.size
 ```
 
+### Batched background migrations
+
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/326760) in GitLab 13.12.
+
+These are a different kind of background migration and the status of these can be checked in the [admin area](../user/admin_area/monitoring/background_migrations.md).
+
 ### What do I do if my background migrations are stuck?
 
 WARNING:
