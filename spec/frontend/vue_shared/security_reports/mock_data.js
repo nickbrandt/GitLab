@@ -339,7 +339,7 @@ export const securityReportDownloadPathsQueryNoArtifactsResponse = {
   },
 };
 
-export const securityReportMrDownloadPathsQueryResponse = {
+export const securityReportMergeRequestDownloadPathsQueryResponse = {
   project: {
     mergeRequest: {
       headPipeline: {
@@ -447,7 +447,7 @@ export const securityReportMrDownloadPathsQueryResponse = {
   },
 };
 
-export const securityReportDownloadPathsQueryResponse = securityReportMrDownloadPathsQueryResponse;
+export const securityReportDownloadPathsQueryResponse = securityReportMergeRequestDownloadPathsQueryResponse;
 
 export const securityReportPipelineDownloadPathsQueryResponse = {
   project: {

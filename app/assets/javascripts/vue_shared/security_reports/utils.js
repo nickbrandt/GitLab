@@ -45,7 +45,7 @@ export const extractSecurityReportArtifactsFromPipeline = (reportTypes, data) =>
   return extractSecurityReportArtifacts(reportTypes, jobs);
 };
 
-export const extractSecurityReportArtifactsFromMr = (reportTypes, data) => {
+export const extractSecurityReportArtifactsFromMergeRequest = (reportTypes, data) => {
   const jobs = data.project?.mergeRequest?.headPipeline?.jobs?.nodes ?? [];
   return extractSecurityReportArtifacts(reportTypes, jobs);
 };
