@@ -1,6 +1,3 @@
-import Document from '@tiptap/extension-document';
-import Dropcursor from '@tiptap/extension-dropcursor';
-import Gapcursor from '@tiptap/extension-gapcursor';
 import { Editor } from '@tiptap/vue-2';
 import { isFunction } from 'lodash';
 import { PROVIDE_SERIALIZER_OR_RENDERER_ERROR } from '../constants';
@@ -9,8 +6,12 @@ import * as Bold from '../extensions/bold';
 import * as BulletList from '../extensions/bullet_list';
 import * as Code from '../extensions/code';
 import * as CodeBlockHighlight from '../extensions/code_block_highlight';
+import * as Document from '../extensions/document';
+import * as Dropcursor from '../extensions/dropcursor';
+import * as Gapcursor from '../extensions/gapcursor';
 import * as HardBreak from '../extensions/hard_break';
 import * as Heading from '../extensions/heading';
+import * as History from '../extensions/history';
 import * as HorizontalRule from '../extensions/horizontal_rule';
 import * as Image from '../extensions/image';
 import * as Italic from '../extensions/italic';
@@ -19,6 +20,7 @@ import * as ListItem from '../extensions/list_item';
 import * as OrderedList from '../extensions/ordered_list';
 import * as Paragraph from '../extensions/paragraph';
 import * as Text from '../extensions/text';
+import buildSerializerConfig from './build_serializer_config';
 import { ContentEditor } from './content_editor';
 import createMarkdownSerializer from './markdown_serializer';
 
@@ -28,12 +30,15 @@ const builtInContentEditorExtensions = [
   BulletList,
   Code,
   CodeBlockHighlight,
-  BulletList,
+  Document,
+  Dropcursor,
+  Gapcursor,
   HardBreak,
   Heading,
+  History,
   HorizontalRule,
-  Italic,
   Image,
+  Italic,
   Link,
   ListItem,
   OrderedList,
@@ -44,30 +49,9 @@ const builtInContentEditorExtensions = [
 const collectTiptapExtensions = (extensions = []) =>
   extensions.map(({ tiptapExtension }) => tiptapExtension);
 
-const buildSerializerSpec = (extensions = []) =>
-  extensions
-    .filter(({ serializer }) => serializer)
-    .reduce(
-      (serializers, { serializer, tiptapExtension: { name, type } }) => {
-        const collection = `${type}s`;
-
-        return {
-          ...serializers,
-          [collection]: {
-            ...serializers[collection],
-            [name]: serializer,
-          },
-        };
-      },
-      {
-        nodes: {},
-        marks: {},
-      },
-    );
-
 const createTiptapEditor = ({ extensions = [], ...options } = {}) =>
   new Editor({
-    extensions: [Dropcursor, Gapcursor, History, Document, ...extensions],
+    extensions: [...extensions],
     editorProps: {
       attributes: {
         class: 'gl-outline-0!',
@@ -84,8 +68,8 @@ export const createContentEditor = ({ renderMarkdown, extensions = [], tiptapOpt
   const allExtensions = [...builtInContentEditorExtensions, ...extensions];
   const tiptapExtensions = collectTiptapExtensions(allExtensions);
   const tiptapEditor = createTiptapEditor({ extensions: tiptapExtensions, ...tiptapOptions });
-  const serializerSpec = buildSerializerSpec(allExtensions);
-  const serializer = createMarkdownSerializer({ render: renderMarkdown, serializerSpec });
+  const serializerConfig = buildSerializerConfig(allExtensions);
+  const serializer = createMarkdownSerializer({ render: renderMarkdown, serializerConfig });
 
   return new ContentEditor({ tiptapEditor, serializer });
 };

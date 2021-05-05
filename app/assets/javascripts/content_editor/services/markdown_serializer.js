@@ -15,7 +15,7 @@ const wrapHtmlPayload = (payload) => `<div>${payload}</div>`;
  * that parses the Markdown and converts it into HTML.
  * @returns a markdown serializer
  */
-export default ({ render = () => null, serializerSpec }) => ({
+export default ({ render = () => null, serializerConfig }) => ({
   /**
    * Converts a Markdown string into a ProseMirror JSONDocument based
    * on a ProseMirror schema.
@@ -49,11 +49,11 @@ export default ({ render = () => null, serializerSpec }) => ({
    * @returns A Markdown string
    */
   serialize: ({ schema, content }) => {
-    const document = schema.nodeFromJSON(content);
-    const { nodes, marks } = serializerSpec;
+    const proseMirrorDocument = schema.nodeFromJSON(content);
+    const { nodes, marks } = serializerConfig;
     const serializer = new ProseMirrorMarkdownSerializer(nodes, marks);
 
-    return serializer.serialize(document, {
+    return serializer.serialize(proseMirrorDocument, {
       tightLists: true,
     });
   },
