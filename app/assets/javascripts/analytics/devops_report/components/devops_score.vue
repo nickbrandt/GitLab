@@ -71,7 +71,7 @@ export default {
     :svg-path="noDataImagePath"
   >
     <template #description>
-      <div>{{ __('It may be several days before you see feature usage data.') }}</div>
+      <p class="gl-mb-0">{{ __('It may be several days before you see feature usage data.') }}</p>
       <gl-link :href="devopsReportDocsPath">{{
         __('Our documentation includes an example DevOps Score report.')
       }}</gl-link>

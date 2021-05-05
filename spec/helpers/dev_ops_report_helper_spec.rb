@@ -9,9 +9,6 @@ RSpec.describe DevOpsReportHelper do
 
   describe '#devops_score_metrics' do
     let(:devops_score_metrics) { helper.devops_score_metrics(subject) }
-    let(:devops_score_metrics_blank) { helper.devops_score_metrics({}) }
-
-    it { expect(devops_score_metrics_blank).to eq({}) }
 
     it { expect(devops_score_metrics[:averageScore]).to eq({ scoreLevel: { icon: "status-alert", label: "Moderate", variant: "warning" }, value: "55.9" } ) }
 
@@ -33,6 +30,12 @@ RSpec.describe DevOpsReportHelper do
       let(:devops_score_metrics) { helper.devops_score_metrics(high_metric) }
 
       it { expect(devops_score_metrics[:averageScore]).to eq({ scoreLevel: { icon: "status_success_solid", label: "High", variant: "success" }, value: "82.0" } ) }
+    end
+
+    describe 'with blank metrics' do
+      let(:devops_score_metrics) { helper.devops_score_metrics({}) }
+
+      it { expect(devops_score_metrics).to eq({}) }
     end
   end
 end

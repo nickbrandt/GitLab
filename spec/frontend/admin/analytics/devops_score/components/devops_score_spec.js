@@ -25,8 +25,8 @@ describe('DevopsScore', () => {
     );
   };
 
-  const findTable = () => wrapper.find(GlTable);
-  const findEmptyState = () => wrapper.find(GlEmptyState);
+  const findTable = () => wrapper.findComponent(GlTable);
+  const findEmptyState = () => wrapper.findComponent(GlEmptyState);
   const findCol = (testId) => findTable().find(`[data-testid="${testId}"]`);
   const findUsageCol = () => findCol('usageCol');
   const findDevopsScoreApp = () => wrapper.findByTestId('devops-score-app');
@@ -48,7 +48,7 @@ describe('DevopsScore', () => {
       });
 
       it('contains a link to the feature documentation', () => {
-        expect(wrapper.find(GlLink).exists()).toBe(true);
+        expect(wrapper.findComponent(GlLink).exists()).toBe(true);
       });
     });
 
@@ -78,7 +78,7 @@ describe('DevopsScore', () => {
       });
 
       it('displays the single stat section', () => {
-        const component = wrapper.find(GlSingleStat);
+        const component = wrapper.findComponent(GlSingleStat);
 
         expect(component.exists()).toBe(true);
         expect(component.props('value')).toBe(devopsScoreMetricsData.averageScore.value);
