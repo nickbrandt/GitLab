@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-RSpec.describe API::MergeRequests do
+RSpec.describe API::MergeRequests, :with_clean_rails_cache do
   include ProjectForksHelper
 
   let_it_be(:base_time) { Time.now }

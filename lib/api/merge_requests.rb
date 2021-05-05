@@ -207,11 +207,10 @@ module API
           # into the cache context
           options[:cache_context] = proc do |mr|
             [
+              options.values_at(:render_html, :with_labels_details, :skip_merge_status_recheck),
               mr.author.managed_by?(current_user),
-              mr.assignee&.managed_by?(current_user),
               mr.assignees.map { |u| u.managed_by?(current_user) },
-              [mr.metrics&.merged_by, mr.metrics&.latest_closed_by].compact.map { |u| u.managed_by?(current_user) },
-              options.values_at(:render_html, :with_labels_details, :skip_merge_status_recheck)
+              [mr.metrics&.merged_by, mr.metrics&.latest_closed_by].compact.map { |u| u.managed_by?(current_user) }
             ]
           end
 
