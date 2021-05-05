@@ -128,9 +128,8 @@ export default {
         })
         .catch((error) => {
           this.issuesListLoadFailed = true;
-          const errorMessage =
-            (error?.response?.data?.errors || [])[0] ||
-            __('An error occurred while loading issues');
+          const errors = error?.response?.data?.errors || [];
+          const errorMessage = errors[0] || __('An error occurred while loading issues');
 
           createFlash({
             message: errorMessage,
