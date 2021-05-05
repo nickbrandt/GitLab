@@ -71,7 +71,7 @@ module QA
           import_page.import_group(source_group.path, sandbox.path)
 
           aggregate_failures do
-            expect(import_page).to have_imported_group(source_group.path, wait: 60)
+            expect(import_page).to have_imported_group(source_group.path, wait: 120)
             expect(comparable_group(imported_group)).to eq(comparable_group(source_group))
           end
         end
