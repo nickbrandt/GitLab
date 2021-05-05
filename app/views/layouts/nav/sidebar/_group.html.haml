@@ -1,6 +1,7 @@
 - issues_count = cached_issuables_count(@group, type: :issues)
 - merge_requests_count = group_open_merge_requests_count(@group)
 - aside_title = @group.subgroup? ? _('Subgroup navigation') : _('Group navigation')
+- list_title = Feature.enabled?(:sidebar_enabled, current_user) ? _('All') : _('List')
 
 %aside.nav-sidebar{ class: ("sidebar-collapsed-desktop" if collapsed_sidebar?), **sidebar_tracking_attributes_by_object(@group), 'aria-label': aside_title }
   .nav-sidebar-inner-scroll
@@ -42,7 +43,7 @@
                   %span
                     = _('Activity')
 
-      = render_if_exists "layouts/nav/ee/epic_link", group: @group
+      = render_if_exists "layouts/nav/ee/epic_link", group: @group, list_title: list_title
 
       - if group_sidebar_link?(:issues)
         = nav_link(path: group_issues_sub_menu_items, unless: -> { current_path?('issues_analytics#show') }) do
@@ -62,9 +63,9 @@
 
             %li.divider.fly-out-top-item
             = nav_link(path: 'groups#issues', html_options: { class: 'home' }) do
-              = link_to issues_group_path(@group), title: _('List') do
+              = link_to issues_group_path(@group), title: list_title do
                 %span
-                  = _('List')
+                  = list_title
 
             - if group_sidebar_link?(:boards)
               = nav_link(path: ['boards#index', 'boards#show']) do
