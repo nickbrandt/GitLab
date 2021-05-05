@@ -4,6 +4,7 @@ module API
   module Entities
     class UserWithAdmin < UserPublic
       expose :admin?, as: :is_admin
+      expose :auditor, as: :is_auditor
       expose :note
     end
   end
