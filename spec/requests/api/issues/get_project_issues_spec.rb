@@ -196,7 +196,6 @@ RSpec.describe API::Issues do
       create(:issue, project: project, milestone: milestone, closed_by: create(:user))
 
       create(:note_on_issue, project: project, noteable: issues[0])
-      create(:note_on_issue, project: project, noteable: issues[0])
       create(:note_on_issue, project: project, noteable: issues[1])
 
       expect do
