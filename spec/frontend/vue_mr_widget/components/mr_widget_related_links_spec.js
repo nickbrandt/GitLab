@@ -56,7 +56,7 @@ describe('MRWidgetRelatedLinks', () => {
       },
     });
 
-    expect(wrapper.text().trim()).toContain('Mentions #7');
+    expect(wrapper.text().trim()).toContain('Mentions issue #7');
     expect(wrapper.text().trim()).not.toContain('Closes');
   });
 
@@ -73,7 +73,7 @@ describe('MRWidgetRelatedLinks', () => {
       .trim();
 
     expect(content).toContain('Closes #7');
-    expect(content).toContain('Mentions #23 and #42');
+    expect(content).toContain('Mentions issue #23 and #42');
   });
 
   it('should have assing issues link', () => {

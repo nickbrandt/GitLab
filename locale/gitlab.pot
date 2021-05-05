@@ -38342,7 +38342,7 @@ msgstr ""
 msgid "mrWidget|Mark as ready"
 msgstr ""
 
-msgid "mrWidget|Mentions"
+msgid "mrWidget|Mentions issue"
 msgstr ""
 
 msgid "mrWidget|Merge"
