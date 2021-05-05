@@ -17,7 +17,18 @@ import {
   metadataArtifacts,
 } from './mock_data';
 
-describe('extractSecurityReportArtifactsFromMr', () => {
+describe.each([
+  [
+    'extractSecurityReportArtifactsFromMrasasd',
+    extractSecurityReportArtifactsFromMr,
+    securityReportMergeRequestDownloadPathsQueryResponse,
+  ],
+  [
+    'extractSecurityReportArtifactsFromPipelinesssa',
+    extractSecurityReportArtifactsFromPipeline,
+    securityReportPipelineDownloadPathsQueryResponse,
+  ],
+])('%s', (funcName, extractFunc, response) => {
   it.each`
     reportTypes                                         | expectedArtifacts
     ${[]}                                               | ${[]}
@@ -31,36 +42,7 @@ describe('extractSecurityReportArtifactsFromMr', () => {
   `(
     'returns the expected artifacts given report types $reportTypes',
     ({ reportTypes, expectedArtifacts }) => {
-      expect(
-        extractSecurityReportArtifactsFromMr(
-          reportTypes,
-          securityReportMergeRequestDownloadPathsQueryResponse,
-        ),
-      ).toEqual(expectedArtifacts);
-    },
-  );
-});
-
-describe('extractSecurityReportArtifactsFromPipeline', () => {
-  it.each`
-    reportTypes                                         | expectedArtifacts
-    ${[]}                                               | ${[]}
-    ${['foo']}                                          | ${[]}
-    ${[REPORT_TYPE_SAST]}                               | ${sastArtifacts}
-    ${[REPORT_TYPE_SECRET_DETECTION]}                   | ${secretDetectionArtifacts}
-    ${[REPORT_TYPE_SAST, REPORT_TYPE_SECRET_DETECTION]} | ${[...secretDetectionArtifacts, ...sastArtifacts]}
-    ${[REPORT_FILE_TYPES.ARCHIVE]}                      | ${archiveArtifacts}
-    ${[REPORT_FILE_TYPES.TRACE]}                        | ${traceArtifacts}
-    ${[REPORT_FILE_TYPES.METADATA]}                     | ${metadataArtifacts}
-  `(
-    'returns the expected artifacts given report types $reportTypes',
-    ({ reportTypes, expectedArtifacts }) => {
-      expect(
-        extractSecurityReportArtifactsFromPipeline(
-          reportTypes,
-          securityReportPipelineDownloadPathsQueryResponse,
-        ),
-      ).toEqual(expectedArtifacts);
+      expect(extractFunc(reportTypes, response)).toEqual(expectedArtifacts);
     },
   );
 });
