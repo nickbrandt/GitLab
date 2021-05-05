@@ -23,6 +23,7 @@ module Gitlab
       EPIC_ISSUE_ADDED = 'g_project_management_epic_issue_added'
       EPIC_ISSUE_REMOVED = 'g_project_management_epic_issue_removed'
       EPIC_ISSUE_MOVED_FROM_PROJECT = 'g_project_management_epic_issue_moved_from_project'
+      EPIC_PARENT_UPDATED = 'g_project_management_users_updating_epic_parent'
       EPIC_CLOSED = 'g_project_management_epic_closed'
       EPIC_REOPENED = 'g_project_management_epic_reopened'
       ISSUE_PROMOTED_TO_EPIC = 'g_project_management_issue_promoted_to_epic'
@@ -96,6 +97,10 @@ module Gitlab
 
         def track_epic_issue_moved_from_project(author:)
           track_unique_action(EPIC_ISSUE_MOVED_FROM_PROJECT, author)
+        end
+
+        def track_epic_parent_updated_action(author:)
+          track_unique_action(EPIC_PARENT_UPDATED, author)
         end
 
         def track_epic_closed_action(author:)
