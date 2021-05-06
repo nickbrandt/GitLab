@@ -986,6 +986,19 @@ RSpec.describe Group do
             group.execute_hooks(data, :member_hooks)
           end
         end
+
+        context 'when a hook is not executable' do
+          before do
+            group_hook.update!(recent_failures: 4)
+          end
+
+          it 'does not execute the disabled hook' do
+            expect(WebHookService).to receive(:new).with(parent_group_hook, anything, anything).and_call_original
+            expect(WebHookService).not_to receive(:new).with(group_hook, anything, anything)
+
+            group.execute_hooks(data, :member_hooks)
+          end
+        end
       end
 
       context 'when group_webhooks feature is disabled' do
