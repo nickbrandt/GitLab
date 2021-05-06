@@ -91,10 +91,13 @@ RSpec.describe 'GitLab Markdown Benchmark', :aggregate_failures do
     result        = nil
 
     pipeline.filters.each do |filter_klass|
+      # store inputs for current filter_klass
+      filter_source[filter_klass] = { input_text: input_text, input_result: result }
+
       filter = filter_klass.new(input_text, context, result)
       output = filter.call
 
-      filter_source[filter_klass] = { input_text: input_text, input_result: result }
+      # save these for the next filter_klass
       input_text = output
       result = filter.result
     end
