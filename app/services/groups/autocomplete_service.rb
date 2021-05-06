@@ -26,24 +26,6 @@ module Groups
     end
     # rubocop: enable CodeReuse/ActiveRecord
 
-    def epics(confidential_only: false)
-      finder_params = { group_id: group.id }
-      finder_params[:confidential] = true if confidential_only.present?
-
-      # TODO: use include_descendant_groups: true optional parameter once frontend supports epics from external groups.
-      # See https://gitlab.com/gitlab-org/gitlab/issues/6837
-      EpicsFinder.new(current_user, finder_params)
-        .execute
-        .select(:iid, :title, :group_id)
-    end
-
-    def vulnerabilities
-      ::Autocomplete::VulnerabilitiesAutocompleteFinder
-        .new(current_user, group, params)
-        .execute
-        .select([:id, :title, :project_id])
-    end
-
     # rubocop: disable CodeReuse/ActiveRecord
     def milestones
       group_ids = group.self_and_ancestors.public_or_visible_to_user(current_user).pluck(:id)
@@ -63,3 +45,5 @@ module Groups
     end
   end
 end
+
+Groups::AutocompleteService.prepend_if_ee('EE::Groups::AutocompleteService')

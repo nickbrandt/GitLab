@@ -16,6 +16,35 @@ RSpec.describe Groups::AutocompleteSourcesController do
     sign_in(user)
   end
 
+  describe '#issues' do
+    using RSpec::Parameterized::TableSyntax
+
+    let_it_be(:project) { create(:project, group: group) }
+    let_it_be(:test_case) { create(:quality_test_case, project: project) }
+
+    where(:issue_types, :expected) do
+      nil         | :test_case
+      ''          | :test_case
+      'invalid'   | []
+      'test_case' | :test_case
+    end
+
+    with_them do
+      it 'returns the correct response', :aggregate_failures do
+        issues = Array(expected).flat_map { |sym| public_send(sym) }
+        params = { group_id: group, issue_types: issue_types }.compact
+
+        get :issues, params: params
+
+        expect(response).to have_gitlab_http_status(:ok)
+        expect(json_response).to be_an(Array)
+        expect(json_response.size).to eq(issues.size)
+        expect(json_response.map { |issue| issue['iid'] })
+          .to match_array(issues.map(&:iid))
+      end
+    end
+  end
+
   describe '#epics' do
     it 'returns 200 status' do
       get :epics, params: { group_id: group }
@@ -54,61 +83,6 @@ RSpec.describe Groups::AutocompleteSourcesController do
       expect(json_response).to be_an(Array)
       expect(json_response.first).to include(
         'id' => vulnerability.id, 'title' => vulnerability.title
-      )
-    end
-  end
-
-  describe '#issues' do
-    using RSpec::Parameterized::TableSyntax
-
-    let_it_be(:project) { create(:project, group: group) }
-    let_it_be(:issue) { create(:issue, project: project) }
-    let_it_be(:incident) { create(:incident, project: project) }
-    let_it_be(:test_case) { create(:quality_test_case, project: project) }
-
-    let(:none) { [] }
-    let(:all) { [issue, incident, test_case] }
-
-    where(:issue_types, :expected) do
-      nil         | :all
-      ''          | :all
-      'invalid'   | :none
-      'issue'     | :issue
-      'incident'  | :incident
-      'test_case' | :test_case
-    end
-
-    with_them do
-      it 'returns the correct response', :aggregate_failures do
-        issues = Array(expected).flat_map { |sym| public_send(sym) }
-        params = { group_id: group, issue_types: issue_types }.compact
-
-        get :issues, params: params
-
-        expect(response).to have_gitlab_http_status(:ok)
-        expect(json_response).to be_an(Array)
-        expect(json_response.size).to eq(issues.size)
-        expect(json_response.map { |issue| issue['iid'] })
-          .to match_array(issues.map(&:iid))
-      end
-    end
-  end
-
-  describe '#milestones' do
-    it 'returns correct response' do
-      parent_group = create(:group, :private)
-      group.update!(parent: parent_group)
-      sub_group = create(:group, :private, parent: sub_group)
-      create(:milestone, group: parent_group)
-      create(:milestone, group: sub_group)
-      group_milestone = create(:milestone, group: group)
-
-      get :milestones, params: { group_id: group }
-
-      expect(response).to have_gitlab_http_status(:ok)
-      expect(json_response.count).to eq(1)
-      expect(json_response.first).to include(
-        'iid' => group_milestone.iid, 'title' => group_milestone.title
       )
     end
   end
