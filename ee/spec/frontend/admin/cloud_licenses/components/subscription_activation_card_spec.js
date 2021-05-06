@@ -1,4 +1,4 @@
-import { GlAlert, GlLink, GlSprintf } from '@gitlab/ui';
+import { GlAlert, GlCard, GlLink, GlSprintf } from '@gitlab/ui';
 import { shallowMount } from '@vue/test-utils';
 import SubscriptionActivationCard, {
   subscriptionActivationHelpLink,
@@ -13,14 +13,20 @@ import { extendedWrapper } from 'helpers/vue_test_utils_helper';
 describe('CloudLicenseApp', () => {
   let wrapper;
 
+  const licenseUploadPath = 'license/upload';
   const findConnectivityErrorAlert = () => wrapper.findComponent(GlAlert);
   const findSubscriptionActivationForm = () => wrapper.findComponent(SubscriptionActivationForm);
+  const findUploadLink = () => wrapper.findByTestId('upload-license-link');
 
-  const createComponent = ({ props = {}, stubs = {} } = {}) => {
+  const createComponent = ({ props = {}, stubs = {}, provide = {} } = {}) => {
     wrapper = extendedWrapper(
       shallowMount(SubscriptionActivationCard, {
         propsData: {
           ...props,
+        },
+        provide: {
+          licenseUploadPath,
+          ...provide,
         },
         stubs,
       }),
@@ -41,6 +47,31 @@ describe('CloudLicenseApp', () => {
 
   it('does not show any alert', () => {
     expect(findConnectivityErrorAlert().exists()).toBe(false);
+  });
+
+  describe('with an upload legacy license link', () => {
+    beforeEach(() => {
+      createComponent({ stubs: { GlCard } });
+    });
+
+    it('shows a link when provided', () => {
+      expect(findUploadLink().text()).toBe('Upload a legacy license');
+    });
+
+    it('provides the correct path', () => {
+      expect(findUploadLink().attributes('href')).toBe(licenseUploadPath);
+    });
+  });
+
+  it('does not show a link when legacy license link is not provided', () => {
+    createComponent({
+      stubs: { GlCard },
+      provide: {
+        licenseUploadPath: '',
+      },
+    });
+
+    expect(findUploadLink().exists()).toBe(false);
   });
 
   describe('when the forms emits a connectivity error', () => {

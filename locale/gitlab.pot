@@ -31127,6 +31127,9 @@ msgstr ""
 msgid "SuperSonics|Type"
 msgstr ""
 
+msgid "SuperSonics|Upload a legacy license"
+msgstr ""
+
 msgid "SuperSonics|Valid From"
 msgstr ""
 
