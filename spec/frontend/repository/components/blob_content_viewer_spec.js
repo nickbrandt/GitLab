@@ -1,5 +1,6 @@
 import { GlLoadingIcon } from '@gitlab/ui';
 import { shallowMount, mount } from '@vue/test-utils';
+import { nextTick } from 'vue';
 import BlobContent from '~/blob/components/blob_content.vue';
 import BlobHeader from '~/blob/components/blob_header.vue';
 import BlobContentViewer from '~/repository/components/blob_content_viewer.vue';
@@ -149,7 +150,7 @@ describe('Blob content viewer component', () => {
       expect(findBlobHeader().props('activeViewerType')).toEqual('rich');
 
       findBlobHeader().vm.$emit('viewer-changed', 'simple');
-      await wrapper.vm.$nextTick();
+      await nextTick();
 
       expect(findBlobHeader().props('activeViewerType')).toEqual('simple');
       expect(findBlobContent().props('activeViewer')).toEqual(
@@ -168,7 +169,7 @@ describe('Blob content viewer component', () => {
           BlobContent: true,
         },
       });
-      await wrapper.vm.$nextTick();
+      await nextTick();
       expect(findBlobHeaderEdit().props('editPath')).toEqual('some_file.js/edit');
     });
 
@@ -179,7 +180,7 @@ describe('Blob content viewer component', () => {
           BlobContent: true,
         },
       });
-      await wrapper.vm.$nextTick();
+      await nextTick();
       expect(findBlobHeaderEdit().props('editPath')).toEqual('some_file.js/edit');
     });
   });
