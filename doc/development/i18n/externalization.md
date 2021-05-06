@@ -493,8 +493,8 @@ To avoid this error, use the applicable HTML entity code (`&lt;` or `&gt;`) inst
 
 ### Numbers
 
-Different locales may use different number formats, to support localization of numbers we use `formatNumber`,
-it leverages [`toLocaleString()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/toLocaleString).
+Different locales may use different number formats. To support localization of numbers, we use `formatNumber`,
+which leverages [`toLocaleString()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/toLocaleString).
 
 `formatNumber` formats numbers as strings using the current user locale by default.
 
