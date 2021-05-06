@@ -10,7 +10,6 @@ import {
   GlIcon,
   GlEmptyState,
 } from '@gitlab/ui';
-import { convertToSnakeCase } from '~/lib/utils/text_utility';
 import { visitUrl, mergeUrlParams, joinPaths } from '~/lib/utils/url_utility';
 import { s__ } from '~/locale';
 import { INCIDENT_SEVERITY } from '~/sidebar/components/severity/constants';
@@ -49,6 +48,7 @@ export default {
       label: s__('IncidentManagement|Severity'),
       thClass: `${thClass} w-15p`,
       tdClass: `${tdClass} sortable-cell`,
+      actualSortKey: 'SEVERITY',
       sortable: true,
       thAttr: TH_SEVERITY_TEST_ID,
     },
@@ -63,6 +63,7 @@ export default {
       label: s__('IncidentManagement|Date created'),
       thClass: `${thClass} gl-w-eighth`,
       tdClass: `${tdClass} sortable-cell`,
+      actualSortKey: 'CREATED',
       sortable: true,
       thAttr: TH_CREATED_AT_TEST_ID,
     },
@@ -87,6 +88,7 @@ export default {
       label: s__('IncidentManagement|Published'),
       thClass: `${thClass} w-15p`,
       tdClass: `${tdClass} sortable-cell`,
+      actualSortKey: 'PUBLISHED',
       sortable: true,
       thAttr: TH_PUBLISHED_TEST_ID,
     },
@@ -175,7 +177,6 @@ export default {
       incidents: {},
       incidentsCount: {},
       sort: 'CREATED_DESC',
-      sortBy: 'createdAt',
       sortDesc: true,
       statusFilter: '',
       filteredByStatus: '',
@@ -256,20 +257,11 @@ export default {
       this.redirecting = true;
     },
     fetchSortedData({ sortBy, sortDesc }) {
-      let sortKey;
-      // In bootstrap-vue v2.17.0, sortKey becomes natively supported and we can eliminate this function
       const field = this.availableFields.find(({ key }) => key === sortBy);
       const sortingDirection = sortDesc ? 'DESC' : 'ASC';
 
-      // Use `sortKey` if provided, otherwise fall back to existing algorithm
-      if (field?.actualSortKey) {
-        sortKey = field.actualSortKey;
-      } else {
-        sortKey = convertToSnakeCase(sortBy).replace(/_.*/, '').toUpperCase();
-      }
-
       this.pagination = initialPaginationState;
-      this.sort = `${sortKey}_${sortingDirection}`;
+      this.sort = `${field.actualSortKey}_${sortingDirection}`;
     },
     getSeverity(severity) {
       return INCIDENT_SEVERITY[severity];
@@ -339,7 +331,7 @@ export default {
           :tbody-tr-class="tbodyTrClass"
           sort-direction="desc"
           :sort-desc.sync="sortDesc"
-          :sort-by.sync="sortBy"
+          sort-by="createdAt"
           show-empty
           no-local-sorting
           sort-icon-left
