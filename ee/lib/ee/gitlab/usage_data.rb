@@ -137,7 +137,7 @@ module EE
         end
 
         def count_approval_rules_with_users(relation)
-          count(relation, batch_size: 10_000, start: minimum_id(ApprovalProjectRule.regular), finish: maximum_id(ApprovalProjectRule.regular)).size
+          count(relation, batch_size: 10_000, start: minimum_id(ApprovalProjectRule.regular), finish: maximum_id(ApprovalProjectRule.regular))
         end
         # rubocop:enable CodeReuse/ActiveRecord, UsageData/LargeTable
 
