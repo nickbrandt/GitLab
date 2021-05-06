@@ -22990,9 +22990,6 @@ msgstr ""
 msgid "Otherwise, click the link below to complete the process:"
 msgstr ""
 
-msgid "Our documentation includes an example DevOps Score report."
-msgstr ""
-
 msgid "Out-of-compliance with this project's policies and should be removed"
 msgstr ""
 
