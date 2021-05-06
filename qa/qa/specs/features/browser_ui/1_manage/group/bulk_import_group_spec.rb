@@ -67,7 +67,8 @@ module QA
 
       it(
         "performs bulk group import from another gitlab instance",
-        testcase: "https://gitlab.com/gitlab-org/quality/testcases/-/issues/1785"
+        testcase: "https://gitlab.com/gitlab-org/quality/testcases/-/issues/1785",
+        exclude: { job: ["ce:relative_url", "ee:relative_url"] }
       ) do
         Page::Group::BulkImport.perform do |import_page|
           import_page.import_group(source_group.path, sandbox.path)
