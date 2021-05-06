@@ -11265,6 +11265,9 @@ msgstr ""
 msgid "DevopsAdoption|Adopted"
 msgstr ""
 
+msgid "DevopsAdoption|Adoption"
+msgstr ""
+
 msgid "DevopsAdoption|An error occurred while removing the group. Please try again."
 msgstr ""
 
