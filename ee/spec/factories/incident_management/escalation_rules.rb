@@ -5,6 +5,6 @@ FactoryBot.define do
     association :policy, factory: :incident_management_escalation_policy
     association :oncall_schedule, factory: :incident_management_oncall_schedule
     status { IncidentManagement::EscalationRule.statuses[:acknowledged] }
-    elapsed_time { 5 }
+    elapsed_time_seconds { 5.minutes }
   end
 end

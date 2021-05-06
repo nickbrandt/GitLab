@@ -13646,7 +13646,7 @@ CREATE TABLE incident_management_escalation_rules (
     policy_id bigint NOT NULL,
     oncall_schedule_id bigint NOT NULL,
     status smallint NOT NULL,
-    elapsed_time integer NOT NULL
+    elapsed_time_seconds integer NOT NULL
 );
 
 CREATE SEQUENCE incident_management_escalation_rules_id_seq
@@ -23612,7 +23612,7 @@ CREATE INDEX index_on_oncall_schedule_escalation_rule ON incident_management_esc
 
 CREATE INDEX index_on_pages_metadata_not_migrated ON project_pages_metadata USING btree (project_id) WHERE ((deployed = true) AND (pages_deployment_id IS NULL));
 
-CREATE UNIQUE INDEX index_on_policy_schedule_status_elapsed_time_escalation_rules ON incident_management_escalation_rules USING btree (policy_id, oncall_schedule_id, status, elapsed_time);
+CREATE UNIQUE INDEX index_on_policy_schedule_status_elapsed_time_escalation_rules ON incident_management_escalation_rules USING btree (policy_id, oncall_schedule_id, status, elapsed_time_seconds);
 
 CREATE INDEX index_on_project_escalation_rule ON incident_management_escalation_rules USING btree (policy_id);
 

@@ -12,9 +12,9 @@ class AddEscalationRules < ActiveRecord::Migration[6.0]
       t.belongs_to :policy, index: { name: RULE_POLICY_INDEX_NAME }, null: false, foreign_key: { on_delete: :cascade, to_table: :incident_management_escalation_policies }
       t.belongs_to :oncall_schedule, index: { name: RULE_SCHEDULE_INDEX_NAME }, null: false, foreign_key: { on_delete: :cascade, to_table: :incident_management_oncall_schedules }
       t.integer :status, null: false, limit: 2
-      t.integer :elapsed_time, null: false, limit: 4
+      t.integer :elapsed_time_seconds, null: false, limit: 4
 
-      t.index [:policy_id, :oncall_schedule_id, :status, :elapsed_time], unique: true, name: UNIQUENESS_INDEX_NAME
+      t.index [:policy_id, :oncall_schedule_id, :status, :elapsed_time_seconds], unique: true, name: UNIQUENESS_INDEX_NAME
     end
   end
 end
