@@ -39,16 +39,17 @@ RSpec.shared_examples 'namespace traversal' do
   end
 
   describe '#ancestors' do
-    let(:group) { create(:group) }
-    let(:nested_group) { create(:group, parent: group) }
-    let(:deep_nested_group) { create(:group, parent: nested_group) }
-    let(:very_deep_nested_group) { create(:group, parent: deep_nested_group) }
+    let_it_be(:group) { create(:group) }
+    let_it_be(:nested_group) { create(:group, parent: group) }
+    let_it_be(:deep_nested_group) { create(:group, parent: nested_group) }
+    let_it_be(:very_deep_nested_group) { create(:group, parent: deep_nested_group) }
 
     it 'returns the correct ancestors' do
-      expect(very_deep_nested_group.ancestors).to include(group, nested_group, deep_nested_group)
-      expect(deep_nested_group.ancestors).to include(group, nested_group)
-      expect(nested_group.ancestors).to include(group)
-      expect(group.ancestors).to eq([])
+      # #reload is called to make sure traversal_ids are reloaded
+      expect(very_deep_nested_group.reload.ancestors).to contain_exactly(group, nested_group, deep_nested_group)
+      expect(deep_nested_group.reload.ancestors).to contain_exactly(group, nested_group)
+      expect(nested_group.reload.ancestors).to contain_exactly(group)
+      expect(group.reload.ancestors).to eq([])
     end
 
     describe '#recursive_ancestors' do
