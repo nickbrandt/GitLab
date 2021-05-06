@@ -630,6 +630,8 @@ GET /user
 }
 ```
 
+Users on GitLab [Premium or higher](https://about.gitlab.com/pricing/) also see the `shared_runners_minutes_limit`, `extra_shared_runners_minutes_limit`, `is_auditor`, and `using_license_seat` parameters.
+
 ## User status
 
 Get the status of the currently signed in user.
