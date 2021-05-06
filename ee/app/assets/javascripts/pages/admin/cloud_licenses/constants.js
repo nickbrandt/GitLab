@@ -37,6 +37,7 @@ export const detailsLabels = {
   startsAt: s__('SuperSonics|Started'),
 };
 
+export const uploadLegacyLicense = s__('SuperSonics|Upload a legacy license');
 export const billableUsersTitle = s__('CloudLicense|Billable users');
 export const maximumUsersTitle = s__('CloudLicense|Maximum users');
 export const usersInSubscriptionTitle = s__('CloudLicense|Users in subscription');

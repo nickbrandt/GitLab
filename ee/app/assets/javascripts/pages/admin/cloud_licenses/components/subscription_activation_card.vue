@@ -7,6 +7,7 @@ import {
   connectivityErrorAlert,
   connectivityIssue,
   howToActivateSubscription,
+  uploadLegacyLicense,
 } from '../constants';
 import SubscriptionActivationForm from './subscription_activation_form.vue';
 
@@ -22,11 +23,7 @@ export default {
     connectivityIssueSubtitle: connectivityErrorAlert.subtitle,
     connectivityIssueHelpText: connectivityErrorAlert.helpText,
     howToActivateSubscription,
-  },
-  links: {
-    adminLicenseUrl,
-    subscriptionActivationHelpLink,
-    troubleshootingHelpLink,
+    uploadLegacyLicense,
   },
   components: {
     GlAlert,
@@ -34,6 +31,12 @@ export default {
     GlLink,
     GlSprintf,
     SubscriptionActivationForm,
+  },
+  inject: ['licenseUploadPath'],
+  links: {
+    adminLicenseUrl,
+    subscriptionActivationHelpLink,
+    troubleshootingHelpLink,
   },
   data() {
     return {
@@ -98,5 +101,13 @@ export default {
       class="gl-p-5"
       @subscription-activation-failure="handleFormActivationFailure"
     />
+    <template #footer>
+      <gl-link
+        v-if="licenseUploadPath"
+        data-testid="upload-license-link"
+        :href="licenseUploadPath"
+        >{{ $options.i18n.uploadLegacyLicense }}</gl-link
+      >
+    </template>
   </gl-card>
 </template>
