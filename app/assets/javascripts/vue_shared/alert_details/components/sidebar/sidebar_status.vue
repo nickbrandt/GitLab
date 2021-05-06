@@ -66,12 +66,8 @@ export default {
 
 <template>
   <div
-    class="alert-status gl-py-5"
-    :class="{
-      'gl-border-b-1': !sidebarCollapsed,
-      'gl-border-b-solid': !sidebarCollapsed,
-      'gl-border-b-gray-100': !sidebarCollapsed,
-    }"
+    class="alert-status gl-py-5 gl-w-70p"
+    :class="{ 'gl-border-b-1 gl-border-b-solid gl-border-b-gray-100': !sidebarCollapsed }"
     style="width: 70%"
   >
     <template v-if="sidebarCollapsed">

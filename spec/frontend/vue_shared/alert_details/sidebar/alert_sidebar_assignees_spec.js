@@ -31,8 +31,10 @@ describe('Alert Details Sidebar Assignees', () => {
     },
   ];
 
+  const findAssigned = () => wrapper.findByTestId('assigned-users');
   const findDropdown = () => wrapper.findComponent(GlDropdownItem);
   const findSidebarIcon = () => wrapper.findByTestId('assignees-icon');
+  const findUnassigned = () => wrapper.findByTestId('unassigned-users');
 
   function mountComponent({
     data,
@@ -76,9 +78,6 @@ describe('Alert Details Sidebar Assignees', () => {
     }
     mock.restore();
   });
-
-  const findAssigned = () => wrapper.find('[data-testid="assigned-users"]');
-  const findUnassigned = () => wrapper.find('[data-testid="unassigned-users"]');
 
   describe('sidebar expanded', () => {
     const mockUpdatedMutationResult = {
