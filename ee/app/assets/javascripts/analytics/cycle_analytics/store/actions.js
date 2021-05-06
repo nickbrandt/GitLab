@@ -31,9 +31,9 @@ export const setFeatureFlags = ({ commit }, featureFlags) =>
 export const setSelectedProjects = ({ commit }, projects) =>
   commit(types.SET_SELECTED_PROJECTS, projects);
 
-export const setSelectedStage = ({ commit }, stage) => {
+export const setSelectedStage = ({ commit, getters: { paginationParams } }, stage) => {
   commit(types.SET_SELECTED_STAGE, stage);
-  commit(types.SET_PAGINATION, { page: 1, hasNextPage: null });
+  commit(types.SET_PAGINATION, { ...paginationParams, page: 1, hasNextPage: null });
 };
 
 export const setDateRange = ({ commit, dispatch }, { skipFetch = false, startDate, endDate }) => {
@@ -77,7 +77,7 @@ export const fetchStageData = ({ dispatch, getters, commit }, stageId) => {
     .then(({ data, headers }) => {
       const { page = null, nextPage = null } = parseIntPagination(normalizeHeaders(headers));
       commit(types.RECEIVE_STAGE_DATA_SUCCESS, data);
-      commit(types.SET_PAGINATION, { page, hasNextPage: Boolean(nextPage) });
+      commit(types.SET_PAGINATION, { ...paginationParams, page, hasNextPage: Boolean(nextPage) });
     })
     .catch((error) => dispatch('receiveStageDataError', error));
 };
@@ -483,8 +483,8 @@ export const setFilters = ({ dispatch }) => {
 
 export const updateStageTablePagination = (
   { commit, dispatch, state: { selectedStage } },
-  { page },
+  paginationParams,
 ) => {
-  commit(types.SET_PAGINATION, { page });
+  commit(types.SET_PAGINATION, paginationParams);
   return dispatch('fetchStageData', selectedStage.id);
 };
