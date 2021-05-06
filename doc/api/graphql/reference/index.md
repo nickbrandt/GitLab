@@ -2604,6 +2604,44 @@ Input type: `JiraImportUsersInput`
 | <a id="mutationjiraimportuserserrors"></a>`errors` | [`[String!]!`](#string) | Errors encountered during execution of the mutation. |
 | <a id="mutationjiraimportusersjirausers"></a>`jiraUsers` | [`[JiraUser!]`](#jirauser) | Users returned from Jira, matched by email and name if possible. |
 
+### `Mutation.jobPlay`
+
+Input type: `JobPlayInput`
+
+#### Arguments
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| <a id="mutationjobplayclientmutationid"></a>`clientMutationId` | [`String`](#string) | A unique identifier for the client performing the mutation. |
+| <a id="mutationjobplayid"></a>`id` | [`CiBuildID!`](#cibuildid) | The ID of the job to mutate. |
+
+#### Fields
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| <a id="mutationjobplayclientmutationid"></a>`clientMutationId` | [`String`](#string) | A unique identifier for the client performing the mutation. |
+| <a id="mutationjobplayerrors"></a>`errors` | [`[String!]!`](#string) | Errors encountered during execution of the mutation. |
+| <a id="mutationjobplayjob"></a>`job` | [`CiJob`](#cijob) | The job after the mutation. |
+
+### `Mutation.jobRetry`
+
+Input type: `JobRetryInput`
+
+#### Arguments
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| <a id="mutationjobretryclientmutationid"></a>`clientMutationId` | [`String`](#string) | A unique identifier for the client performing the mutation. |
+| <a id="mutationjobretryid"></a>`id` | [`CiBuildID!`](#cibuildid) | The ID of the job to mutate. |
+
+#### Fields
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| <a id="mutationjobretryclientmutationid"></a>`clientMutationId` | [`String`](#string) | A unique identifier for the client performing the mutation. |
+| <a id="mutationjobretryerrors"></a>`errors` | [`[String!]!`](#string) | Errors encountered during execution of the mutation. |
+| <a id="mutationjobretryjob"></a>`job` | [`CiJob`](#cijob) | The job after the mutation. |
+
 ### `Mutation.labelCreate`
 
 Input type: `LabelCreateInput`
@@ -14567,6 +14605,12 @@ An example `BoardsEpicListID` is: `"gid://gitlab/Boards::EpicList/1"`.
 ### `Boolean`
 
 Represents `true` or `false` values.
+
+### `CiBuildID`
+
+A `CiBuildID` is a global ID. It is encoded as a string.
+
+An example `CiBuildID` is: `"gid://gitlab/Ci::Build/1"`.
 
 ### `CiPipelineID`
 
