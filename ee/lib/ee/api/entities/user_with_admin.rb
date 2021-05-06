@@ -8,6 +8,7 @@ module EE
 
         prepended do
           expose :using_license_seat?, as: :using_license_seat
+          expose :auditor, as: :is_auditor
         end
       end
     end

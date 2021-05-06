@@ -536,13 +536,6 @@ RSpec.describe API::Users do
       expect(json_response.keys).not_to include 'is_admin'
     end
 
-    it "does not return the user's `is_auditor` flag" do
-      get api("/users/#{user.id}", user)
-
-      expect(response).to match_response_schema('public_api/v4/user/basic')
-      expect(json_response.keys).not_to include 'is_auditor'
-    end
-
     it "does not return the user's `highest_role`" do
       get api("/users/#{user.id}", user)
 
@@ -587,13 +580,6 @@ RSpec.describe API::Users do
 
         expect(response).to match_response_schema('public_api/v4/user/admin')
         expect(json_response['is_admin']).to be(false)
-      end
-
-      it 'includes the `is_auditor` field' do
-        get api("/users/#{user.id}", admin)
-
-        expect(response).to match_response_schema('public_api/v4/user/admin')
-        expect(json_response['is_auditor']).to be(false)
       end
 
       it "includes the `created_at` field for private users" do

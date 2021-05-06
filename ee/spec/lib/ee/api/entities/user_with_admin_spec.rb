@@ -23,4 +23,17 @@ RSpec.describe ::EE::API::Entities::UserWithAdmin do
       end
     end
   end
+  context 'is_auditor' do
+    it 'returns false when user is not an auditor' do
+      expect(subject[:is_auditor]).to be false
+    end
+
+    context 'when user is an auditor' do
+      let(:user) { create(:user, :auditor) }
+
+      it 'returns true' do
+        expect(subject[:is_auditor]).to be true
+      end
+    end
+  end
 end
