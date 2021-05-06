@@ -19052,9 +19052,6 @@ msgstr ""
 msgid "Lead time"
 msgstr ""
 
-msgid "Learn CI/CD syntax"
-msgstr ""
-
 msgid "Learn GitLab"
 msgstr ""
 
