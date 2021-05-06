@@ -39,7 +39,7 @@ RSpec.describe 'Merge request > User sees closing issues message', :js do
     let(:merge_request_description) { "Description\n\nRefers to #{issue_1.to_reference} and #{issue_2.to_reference}" }
 
     it 'does not display closing issue message' do
-      expect(page).to have_content("Mentions #{issue_1.to_reference} and #{issue_2.to_reference}")
+      expect(page).to have_content("Mentions issue #{issue_1.to_reference} and #{issue_2.to_reference}")
     end
   end
 
@@ -48,7 +48,7 @@ RSpec.describe 'Merge request > User sees closing issues message', :js do
 
     it 'does not display closing issue message' do
       expect(page).to have_content("Closes #{issue_1.to_reference}")
-      expect(page).to have_content("Mentions #{issue_2.to_reference}")
+      expect(page).to have_content("Mentions issue #{issue_2.to_reference}")
     end
   end
 
@@ -64,7 +64,7 @@ RSpec.describe 'Merge request > User sees closing issues message', :js do
     let(:merge_request_title) { "Refers to #{issue_1.to_reference} and #{issue_2.to_reference}" }
 
     it 'does not display closing issue message' do
-      expect(page).to have_content("Mentions #{issue_1.to_reference} and #{issue_2.to_reference}")
+      expect(page).to have_content("Mentions issue #{issue_1.to_reference} and #{issue_2.to_reference}")
     end
   end
 
@@ -73,7 +73,7 @@ RSpec.describe 'Merge request > User sees closing issues message', :js do
 
     it 'does not display closing issue message' do
       expect(page).to have_content("Closes #{issue_1.to_reference}")
-      expect(page).to have_content("Mentions #{issue_2.to_reference}")
+      expect(page).to have_content("Mentions issue #{issue_2.to_reference}")
     end
   end
 end
