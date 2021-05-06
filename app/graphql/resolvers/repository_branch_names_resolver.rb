@@ -19,16 +19,7 @@ module Resolvers
       description: 'The number of branch names to return.'
 
     def resolve(search_pattern:, offset:, limit:)
-      names = branch_names(search_pattern)
-      return unless names
-
-      names.lazy.drop(offset).take(limit) # rubocop:disable CodeReuse/ActiveRecord
-    end
-
-    private
-
-    def branch_names(search_pattern)
-      Repositories::BranchNamesFinder.new(object, search: search_pattern).execute
+      Repositories::BranchNamesFinder.new(object, offset: offset, limit: limit, search: search_pattern).execute
     end
   end
 end
