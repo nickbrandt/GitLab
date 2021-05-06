@@ -22993,9 +22993,6 @@ msgstr ""
 msgid "Otherwise, click the link below to complete the process:"
 msgstr ""
 
-msgid "Our documentation includes an example DevOps Score report."
-msgstr ""
-
 msgid "Out-of-compliance with this project's policies and should be removed"
 msgstr ""
 
@@ -28811,6 +28808,9 @@ msgid "SecurityReports|You must sign in as an authorized user to see this report
 msgstr ""
 
 msgid "SecurityReports|Your feedback is important to us! We will ask again in a week."
+msgstr ""
+
+msgid "See example DevOps Score page in our documentation."
 msgstr ""
 
 msgid "See metrics"
