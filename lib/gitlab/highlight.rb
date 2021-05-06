@@ -64,6 +64,8 @@ module Gitlab
       tokens = lexer.lex(text, continue: continue)
       Timeout.timeout(timeout_time) { @formatter.format(tokens, context.merge(tag: tag)).html_safe }
     rescue Timeout::Error => e
+      add_highlight_timeout_metric
+
       Gitlab::ErrorTracking.track_and_raise_for_dev_exception(e)
       highlight_plain(text)
     rescue StandardError
@@ -80,6 +82,19 @@ module Gitlab
 
     def maximum_text_highlight_size
       Gitlab.config.extra['maximum_text_highlight_size_kilobytes']
+    end
+
+    def add_highlight_timeout_metric
+      return unless Feature.enabled?(:track_highlight_timeouts)
+
+      highlight_timeout.increment(source: Gitlab::Runtime.sidekiq? ? "background" : "foreground")
+    end
+
+    def highlight_timeout
+      @highlight_timeout ||= Gitlab::Metrics.counter(
+        :highlight_timeout,
+        'Counts the times highlights have timed out'
+      )
     end
   end
 end
