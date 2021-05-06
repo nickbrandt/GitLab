@@ -108,7 +108,7 @@ describe('Blob content viewer component', () => {
   describe('rich viewer', () => {
     beforeEach(() => {
       factory({
-        mockData: { blobInfo: richMockData, hasRichViewer: true, activeViewerType: 'rich' },
+        mockData: { blobInfo: richMockData, activeViewerType: 'rich' },
       });
     });
 

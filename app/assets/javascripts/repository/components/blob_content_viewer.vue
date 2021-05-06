@@ -23,18 +23,10 @@ export default {
           filePath: this.path,
         };
       },
-      result({ data }) {
-        const [blob] = data?.project?.repository?.blobs?.nodes;
-
-        if (!blob) {
-          return;
-        }
-
-        const hasRichViewer = blob?.richViewer !== null;
-
-        this.hasRichViewer = hasRichViewer;
-        this.activeViewerType =
-          hasRichViewer && !window.location.hash ? RICH_BLOB_VIEWER : SIMPLE_BLOB_VIEWER;
+      result() {
+        this.switchViewer(
+          this.hasRichViewer && !window.location.hash ? RICH_BLOB_VIEWER : SIMPLE_BLOB_VIEWER,
+        );
       },
       error() {
         createFlash({ message: __('An error occurred while loading the file. Please try again.') });
@@ -58,7 +50,6 @@ export default {
   },
   data() {
     return {
-      hasRichViewer: false,
       activeViewerType: SIMPLE_BLOB_VIEWER,
       project: {
         repository: {
@@ -85,7 +76,7 @@ export default {
                 canModifyBlob: true,
                 forkPath: '',
                 simpleViewer: {},
-                richViewer: {},
+                richViewer: null,
               },
             ],
           },
@@ -105,6 +96,9 @@ export default {
     viewer() {
       const { richViewer, simpleViewer } = this.blobInfo;
       return this.activeViewerType === RICH_BLOB_VIEWER ? richViewer : simpleViewer;
+    },
+    hasRichViewer() {
+      return Boolean(this.blobInfo.richViewer);
     },
     hasRenderError() {
       return Boolean(this.viewer.renderError);
