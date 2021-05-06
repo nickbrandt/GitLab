@@ -139,8 +139,8 @@
     "mathjax": "3",
     "mermaid": "^8.9.2",
     "minimatch": "^3.0.4",
-    "monaco-editor": "^0.20.0",
-    "monaco-editor-webpack-plugin": "^1.9.1",
+    "monaco-editor": "^0.23.0",
+    "monaco-editor-webpack-plugin": "^3.0.1",
     "monaco-yaml": "^2.5.1",
     "mousetrap": "1.6.5",
     "pdfjs-dist": "^2.0.943",
@@ -250,8 +250,7 @@
     "bootstrap-vue": "https://docs.gitlab.com/ee/development/fe_guide/dependencies.html#bootstrapvue"
   },
   "resolutions": {
-    "chokidar": "^3.4.0",
-    "monaco-editor": "0.20.0"
+    "chokidar": "^3.4.0"
   },
   "engines": {
     "node": ">=10.13.0",
