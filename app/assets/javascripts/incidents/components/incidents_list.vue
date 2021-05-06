@@ -261,6 +261,12 @@ export default {
       const sortingDirection = sortDesc ? 'DESC' : 'ASC';
 
       this.pagination = initialPaginationState;
+
+      // BootstapVue natively supports a `sortKey` parameter, but using it results in the sorting
+      // icons not being updated properly in the header. We decided to fallback on `actualSortKey`
+      // to bypass BootstrapVue's behavior until the bug is addressed upstream.
+      // Related discussion: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/60926/diffs#note_568020482
+      // Upstream issue: https://github.com/bootstrap-vue/bootstrap-vue/issues/6602
       this.sort = `${field.actualSortKey}_${sortingDirection}`;
     },
     getSeverity(severity) {
