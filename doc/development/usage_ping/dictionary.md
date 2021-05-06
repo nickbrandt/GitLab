@@ -6480,7 +6480,7 @@ Tiers: `free`, `premium`, `ultimate`
 
 TBD
 
-[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/20210216183248_pg_system_id.yml)
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/settings/20210216183248_pg_system_id.yml)
 
 Group: `group::distribution`
 
@@ -6576,7 +6576,7 @@ Tiers: `free`
 
 Missing description
 
-[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/20210216183241_filesystems.yml)
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/settings/20210216183241_filesystems.yml)
 
 Group: ``
 
@@ -6972,7 +6972,7 @@ Tiers: `free`, `premium`, `ultimate`
 
 What Object Storage provider has been configured for Artifacts
 
-[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/20210216180843_provider.yml)
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/settings/20210216180843_provider.yml)
 
 Group: `group::memory`
 
@@ -7032,7 +7032,7 @@ Tiers: `free`, `premium`, `ultimate`
 
 What Object Storage provider has been configured for External Diffs
 
-[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/20210216180852_provider.yml)
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/settings/20210216180852_provider.yml)
 
 Group: `group::memory`
 
@@ -7092,7 +7092,7 @@ Tiers: `free`, `premium`, `ultimate`
 
 What Object Storage provider has been configured for LFS
 
-[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/20210216180902_provider.yml)
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/settings/20210216180902_provider.yml)
 
 Group: `group::memory`
 
@@ -7152,7 +7152,7 @@ Tiers: `free`, `premium`, `ultimate`
 
 What Object Storage provider has been configured for Packages
 
-[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/20210216180920_provider.yml)
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/settings/20210216180920_provider.yml)
 
 Group: `group::memory`
 
@@ -7164,7 +7164,7 @@ Tiers: `free`, `premium`, `ultimate`
 
 Whether Object Storage is enabled for Uploads
 
-[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/20210216180903_enabled.yml)
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/settings/20210216180903_enabled.yml)
 
 Group: `group::memory`
 
@@ -7212,7 +7212,7 @@ Tiers: `free`, `premium`, `ultimate`
 
 What Object Storage provider has been configured for Uploads
 
-[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/20210216180911_provider.yml)
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/settings/20210216180911_provider.yml)
 
 Group: `group::memory`
 
