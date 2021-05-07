@@ -332,6 +332,14 @@ This field returns a [connection](#connections). It accepts the
 four standard [pagination arguments](#connection-pagination-arguments):
 `before: String`, `after: String`, `first: Int`, `last: Int`.
 
+#### Arguments
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| <a id="queryrunnerssort"></a>`sort` | [`String`](#string) | Sort order of results. |
+| <a id="queryrunnersstatus"></a>`status` | [`CiRunnerStatus`](#cirunnerstatus) | Filter runners by status. |
+| <a id="queryrunnerstaglist"></a>`tagList` | [`[String!]`](#string) | Filter by tags associated with the runner (comma-separated or array). |
+
 ### `Query.snippets`
 
 Find Snippets visible to the current user.
