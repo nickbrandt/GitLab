@@ -230,13 +230,6 @@ export default {
         </div>
         <div class="d-inline-block ml-md-2 ml-0">
           <toolbar-button
-            :tag="mdCollapsibleSection"
-            :prepend="true"
-            tag-select="Click to expand"
-            :button-title="__('Add a collapsible section')"
-            icon="details-block"
-          />
-          <toolbar-button
             :prepend="true"
             tag="- "
             :button-title="__('Add a bullet list')"
@@ -253,6 +246,13 @@ export default {
             tag="- [ ] "
             :button-title="__('Add a task list')"
             icon="list-task"
+          />
+          <toolbar-button
+            :tag="mdCollapsibleSection"
+            :prepend="true"
+            tag-select="Click to expand"
+            :button-title="__('Add a collapsible section')"
+            icon="details-block"
           />
           <toolbar-button
             :tag="mdTable"
