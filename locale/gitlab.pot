@@ -1373,6 +1373,9 @@ msgstr ""
 msgid "A Let's Encrypt account will be configured for this GitLab installation using your email address. You will receive emails to warn of expiring certificates."
 msgstr ""
 
+msgid "A banned user cannot:"
+msgstr ""
+
 msgid "A basic page and serverless function that uses AWS Lambda, AWS API Gateway, and GitLab Pages"
 msgstr ""
 
@@ -2435,6 +2438,9 @@ msgstr ""
 msgid "AdminUsers|(Admin)"
 msgstr ""
 
+msgid "AdminUsers|(Banned)"
+msgstr ""
+
 msgid "AdminUsers|(Blocked)"
 msgstr ""
 
@@ -2499,6 +2505,21 @@ msgid "AdminUsers|Are you sure?"
 msgstr ""
 
 msgid "AdminUsers|Automatically marked as default internal user"
+msgstr ""
+
+msgid "AdminUsers|Ban"
+msgstr ""
+
+msgid "AdminUsers|Ban user"
+msgstr ""
+
+msgid "AdminUsers|Ban user %{username}?"
+msgstr ""
+
+msgid "AdminUsers|Banned"
+msgstr ""
+
+msgid "AdminUsers|Banning the user has the following effects:"
 msgstr ""
 
 msgid "AdminUsers|Be added to groups and projects"
@@ -2588,6 +2609,9 @@ msgstr ""
 msgid "AdminUsers|It's you!"
 msgstr ""
 
+msgid "AdminUsers|Learn more about %{link_start}banned users.%{link_end}"
+msgstr ""
+
 msgid "AdminUsers|Log in"
 msgstr ""
 
@@ -2669,6 +2693,15 @@ msgstr ""
 msgid "AdminUsers|To confirm, type %{username}"
 msgstr ""
 
+msgid "AdminUsers|Unban"
+msgstr ""
+
+msgid "AdminUsers|Unban %{username}?"
+msgstr ""
+
+msgid "AdminUsers|Unban user"
+msgstr ""
+
 msgid "AdminUsers|Unblock"
 msgstr ""
 
@@ -2682,6 +2715,9 @@ msgid "AdminUsers|Unlock"
 msgstr ""
 
 msgid "AdminUsers|Unlock user %{username}?"
+msgstr ""
+
+msgid "AdminUsers|User will be blocked"
 msgstr ""
 
 msgid "AdminUsers|User will not be able to access git repositories"
@@ -2720,6 +2756,9 @@ msgstr ""
 msgid "AdminUsers|You are about to permanently delete the user %{username}. This will delete all of the issues, merge requests, and groups linked to them. To avoid data loss, consider using the %{strongStart}block user%{strongEnd} feature instead. Once you %{strongStart}Delete user%{strongEnd}, it cannot be undone or recovered."
 msgstr ""
 
+msgid "AdminUsers|You can always ban their account again if needed."
+msgstr ""
+
 msgid "AdminUsers|You can always block their account again if needed."
 msgstr ""
 
@@ -2727,6 +2766,9 @@ msgid "AdminUsers|You can always deactivate their account again if needed."
 msgstr ""
 
 msgid "AdminUsers|You can always re-activate their account, their data will remain intact."
+msgstr ""
+
+msgid "AdminUsers|You can always unban their account. Their data remains intact."
 msgstr ""
 
 msgid "AdminUsers|You can always unblock their account, their data will remain intact."
@@ -12905,10 +12947,16 @@ msgstr ""
 msgid "Error occurred. A blocked user must be unblocked to be activated"
 msgstr ""
 
+msgid "Error occurred. User was not banned"
+msgstr ""
+
 msgid "Error occurred. User was not blocked"
 msgstr ""
 
 msgid "Error occurred. User was not confirmed"
+msgstr ""
+
+msgid "Error occurred. User was not unbanned"
 msgstr ""
 
 msgid "Error occurred. User was not unblocked"
@@ -31247,6 +31295,9 @@ msgstr ""
 msgid "Successfully approved"
 msgstr ""
 
+msgid "Successfully banned"
+msgstr ""
+
 msgid "Successfully blocked"
 msgstr ""
 
@@ -31269,6 +31320,9 @@ msgid "Successfully scheduled a pipeline to run. Go to the %{pipelines_link_star
 msgstr ""
 
 msgid "Successfully synced %{synced_timeago}."
+msgstr ""
+
+msgid "Successfully unbanned"
 msgstr ""
 
 msgid "Successfully unblocked"
@@ -33375,6 +33429,9 @@ msgid "This user has previously committed to the %{name} project."
 msgstr ""
 
 msgid "This user has the %{access} role in the %{name} project."
+msgstr ""
+
+msgid "This user is banned"
 msgstr ""
 
 msgid "This user is blocked"

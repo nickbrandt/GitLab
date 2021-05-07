@@ -365,6 +365,28 @@ RSpec.describe Admin::UsersController do
     end
   end
 
+  describe 'PUT ban/:id' do
+    it 'bans user' do
+      put :ban, params: { id: user.username }
+
+      user.reload
+      expect(user.banned?).to be_truthy
+      expect(flash[:notice]).to eq _('Successfully banned')
+    end
+
+    context 'when unsuccessful' do
+      let(:user) { create(:user, :blocked) }
+
+      it 'does not ban user' do
+        put :ban, params: { id: user.username }
+
+        user.reload
+        expect(user.banned?).to be_falsey
+        expect(flash[:alert]).to eq _('Error occurred. User was not banned')
+      end
+    end
+  end
+
   describe 'PUT unlock/:id' do
     before do
       request.env["HTTP_REFERER"] = "/"
