@@ -3,12 +3,9 @@
 require 'spec_helper'
 
 RSpec.describe Groups::EpicBoardsController do
-  let_it_be(:public_group) { create(:group, :public) }
-  let_it_be(:private_group) { create(:group, :private) }
+  let_it_be_with_reload(:group) { create(:group, :private) }
   let_it_be(:user) { create(:user) }
   let_it_be(:other_user) { create(:user) }
-
-  let(:group) { public_group }
 
   before do
     stub_licensed_features(epics: true)
@@ -47,8 +44,6 @@ RSpec.describe Groups::EpicBoardsController do
     end
 
     context 'with unauthorized user' do
-      let_it_be(:group) { private_group }
-
       before do
         sign_in(other_user)
       end
@@ -75,6 +70,18 @@ RSpec.describe Groups::EpicBoardsController do
     it_behaves_like 'pushes wip limits to frontend' do
       let(:params) { { group_id: group } }
       let(:parent) { group }
+    end
+
+    it_behaves_like 'tracking unique hll events' do
+      # make sure there is at least one board to list
+      # otherwise a new board would be created as part of
+      # index action and a different redis counter would be
+      # triggered first
+      let_it_be(:board) { create(:epic_board, group: group) }
+      subject(:request) { list_boards }
+
+      let(:target_id) { 'g_project_management_users_viewing_epic_boards' }
+      let(:expected_type) { instance_of(String) }
     end
 
     def list_boards(format: :html)
@@ -116,8 +123,6 @@ RSpec.describe Groups::EpicBoardsController do
       end
 
       context 'with unauthorized user' do
-        let(:group) { private_group }
-
         before do
           # sign in some other user not in the private group
           sign_in(other_user)
@@ -131,10 +136,12 @@ RSpec.describe Groups::EpicBoardsController do
         end
       end
 
-      context 'when user is signed out' do
-        let(:group) { public_group }
+      context 'when group is public' do
+        before_all do
+          group.update!(visibility_level: Gitlab::VisibilityLevel::PUBLIC)
+        end
 
-        it 'does not save visit' do
+        it 'does not save visit for unsigned user' do
           sign_out(user)
 
           # epic board visits not supported yet
@@ -157,6 +164,13 @@ RSpec.describe Groups::EpicBoardsController do
 
     it_behaves_like 'disabled when using an external authorization service' do
       subject { read_board board: board }
+    end
+
+    it_behaves_like 'tracking unique hll events' do
+      subject(:request) { read_board(board: board) }
+
+      let(:target_id) { 'g_project_management_users_viewing_epic_boards' }
+      let(:expected_type) { instance_of(String) }
     end
 
     def read_board(board:, format: :html)
