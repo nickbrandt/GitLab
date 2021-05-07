@@ -158,9 +158,9 @@ RSpec.describe 'Git HTTP requests' do
     let_it_be(:group) { create(:group) }
     let_it_be(:project) { create(:project, :repository, :private, group: group) }
     let_it_be(:user) { create(:user, provisioned_by_group: group) }
+
     let(:env) { { user: user.username, password: user.password } }
     let(:path) { "#{project.full_path}.git" }
-
 
     before do
       project.add_developer(user)
