@@ -1,10 +1,10 @@
 import { shallowMount } from '@vue/test-utils';
-import validation from '~/vue_shared/directives/validation';
+import validation, { initForm } from '~/vue_shared/directives/validation';
 
 describe('validation directive', () => {
   let wrapper;
 
-  const createComponent = ({ inputAttributes, showValidation } = {}) => {
+  const createComponentFactory = ({ inputAttributes, data, inputValidation }) => {
     const defaultInputAttributes = {
       type: 'text',
       required: true,
@@ -17,27 +17,52 @@ describe('validation directive', () => {
       data() {
         return {
           attributes: inputAttributes || defaultInputAttributes,
-          showValidation,
-          form: {
-            state: null,
-            fields: {
-              exampleField: {
-                state: null,
-                feedback: '',
-              },
-            },
-          },
+          ...data,
         };
       },
       template: `
         <form>
-          <input v-validation:[showValidation] name="exampleField" v-bind="attributes" />
+          <input v-validation:[${inputValidation}] name="exampleField" v-bind="attributes" />
         </form>
       `,
     };
 
     wrapper = shallowMount(component, { attachTo: document.body });
   };
+
+  const createComponent = ({ inputAttributes, showValidation } = {}) =>
+    createComponentFactory({
+      inputAttributes,
+      inputValidation: 'showValidation',
+      data: {
+        showValidation,
+        form: {
+          state: null,
+          fields: {
+            exampleField: {
+              state: null,
+              feedback: '',
+            },
+          },
+        },
+      },
+    });
+
+  const createComponentWithInitForm = ({ inputAttributes } = {}) =>
+    createComponentFactory({
+      inputAttributes,
+      inputValidation: 'form.showValidation',
+      data: {
+        form: initForm({
+          fields: {
+            exampleField: {
+              state: null,
+              value: 'lorem',
+            },
+          },
+        }),
+      },
+    });
 
   afterEach(() => {
     wrapper.destroy();
@@ -129,4 +154,86 @@ describe('validation directive', () => {
       });
     },
   );
+
+  describe('component using initForm', () => {
+    it('sets the form fields correctly', () => {
+      createComponentWithInitForm();
+
+      expect(getFormData().state).toBe(false);
+      expect(getFormData().showValidation).toBe(false);
+
+      expect(getFormData().fields.exampleField).toMatchObject({
+        value: 'lorem',
+        state: null,
+        required: true,
+        feedback: expect.any(String),
+      });
+    });
+  });
+});
+
+describe('initForm', () => {
+  const MOCK_FORM = {
+    fields: {
+      name: {
+        value: 'lorem',
+      },
+      description: {
+        value: 'ipsum',
+        required: false,
+        skipValidation: true,
+      },
+    },
+  };
+
+  it('returns form object', () => {
+    expect(initForm(MOCK_FORM)).toMatchObject({
+      state: false,
+      showValidation: false,
+      fields: {
+        name: { value: 'lorem', required: true, state: null, feedback: null },
+        description: { value: 'ipsum', required: false, state: true, feedback: null },
+      },
+    });
+  });
+
+  it('returns form object with additional parameters', () => {
+    const customFormObject = {
+      foo: {
+        bar: 'lorem',
+      },
+    };
+
+    const form = {
+      ...MOCK_FORM,
+      ...customFormObject,
+    };
+
+    expect(initForm(form)).toMatchObject({
+      state: false,
+      showValidation: false,
+      fields: {
+        name: { value: 'lorem', required: true, state: null, feedback: null },
+        description: { value: 'ipsum', required: false, state: true, feedback: null },
+      },
+      ...customFormObject,
+    });
+  });
+
+  it('can override existing state and showValidation values', () => {
+    const form = {
+      ...MOCK_FORM,
+      state: true,
+      showValidation: true,
+    };
+
+    expect(initForm(form)).toMatchObject({
+      state: true,
+      showValidation: true,
+      fields: {
+        name: { value: 'lorem', required: true, state: null, feedback: null },
+        description: { value: 'ipsum', required: false, state: true, feedback: null },
+      },
+    });
+  });
 });
