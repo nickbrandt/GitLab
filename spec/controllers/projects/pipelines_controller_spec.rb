@@ -856,7 +856,11 @@ RSpec.describe Projects::PipelinesController do
     let!(:pipeline) { create(:ci_pipeline, :failed, project: project) }
     let!(:build) { create(:ci_build, :failed, pipeline: pipeline) }
 
+    let(:worker_spy) { class_spy(::Ci::RetryPipelineWorker) }
+
     before do
+      stub_const('::Ci::RetryPipelineWorker', worker_spy)
+
       post :retry, params: {
                      namespace_id: project.namespace,
                      project_id: project,
@@ -865,9 +869,9 @@ RSpec.describe Projects::PipelinesController do
                    format: :json
     end
 
-    it 'retries a pipeline without returning any content' do
+    it 'retries a pipeline in the background without returning any content' do
       expect(response).to have_gitlab_http_status(:no_content)
-      expect(build.reload).to be_retried
+      expect(::Ci::RetryPipelineWorker).to have_received(:perform_async).with(pipeline.id, user.id)
     end
 
     context 'when builds are disabled' do
