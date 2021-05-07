@@ -1006,7 +1006,7 @@ RSpec.describe Gitlab::GitAccess do
         expect { access.check('git-receive-pack', changes) }.not_to exceed_query_limit(control_count).with_threshold(2)
       end
 
-      it 'raises TimeoutError when #check_single_change_access raises a timeout error' do
+      it 'raises TimeoutError when #check_access! raises a timeout error' do
         message = "Push operation timed out\n\nTiming information for debugging purposes:\nRunning checks for ref: wow"
 
         expect_next_instance_of(Gitlab::Checks::ChangeAccess) do |check|
