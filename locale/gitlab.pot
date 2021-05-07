@@ -14538,6 +14538,9 @@ msgstr ""
 msgid "Geo|%{component} synced"
 msgstr ""
 
+msgid "Geo|%{eventId} (%{timeAgo})"
+msgstr ""
+
 msgid "Geo|%{itemTitle} checksum progress"
 msgstr ""
 
@@ -14616,6 +14619,9 @@ msgstr ""
 msgid "Geo|Data type"
 msgstr ""
 
+msgid "Geo|Disabled"
+msgstr ""
+
 msgid "Geo|Discover GitLab Geo"
 msgstr ""
 
@@ -14641,6 +14647,9 @@ msgid "Geo|Geo supports replication of many data types."
 msgstr ""
 
 msgid "Geo|Go to the primary site"
+msgstr ""
+
+msgid "Geo|Healthy"
 msgstr ""
 
 msgid "Geo|If you want to make changes, you must visit the primary site."
@@ -14704,6 +14713,9 @@ msgid "Geo|Nothing to synchronize"
 msgstr ""
 
 msgid "Geo|Number of %{title}"
+msgstr ""
+
+msgid "Geo|Offline"
 msgstr ""
 
 msgid "Geo|Pending synchronization"
@@ -14866,6 +14878,12 @@ msgid "Geo|URL must be a valid url (ex: https://gitlab.com)"
 msgstr ""
 
 msgid "Geo|Undefined"
+msgstr ""
+
+msgid "Geo|Unhealthy"
+msgstr ""
+
+msgid "Geo|Unknown"
 msgstr ""
 
 msgid "Geo|Unknown state"
