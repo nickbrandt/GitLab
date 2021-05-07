@@ -22044,6 +22044,9 @@ msgstr ""
 msgid "No data to display"
 msgstr ""
 
+msgid "No deployments detected. Use environments to control your software's continuous deployment. %{linkStart}Learn more about deployment jobs.%{linkEnd}"
+msgstr ""
+
 msgid "No deployments found"
 msgstr ""
 
