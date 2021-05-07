@@ -52,7 +52,7 @@ RSpec.describe API::MergeRequests, :with_clean_rails_cache do
     end
 
     context 'when authenticated' do
-      it 'avoids N+1 queries' do
+      it 'avoids N+1 queries', :use_sql_query_cache do
         control = ActiveRecord::QueryRecorder.new do
           get api(endpoint_path, user)
         end
