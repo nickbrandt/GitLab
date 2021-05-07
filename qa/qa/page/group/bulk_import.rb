@@ -5,7 +5,7 @@ module QA
     module Group
       class BulkImport < Page::Base
         view "app/assets/javascripts/import_entities/import_groups/components/import_table.vue" do
-          element :import_group_table
+          element :import_table
         end
 
         view "app/assets/javascripts/import_entities/import_groups/components/import_table_row.vue" do
