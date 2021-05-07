@@ -3202,7 +3202,7 @@ RSpec.describe MergeRequest, factory_default: :keep do
 
     context 'when not allowed to merge before pipeline completion' do
       before do
-        pipeline.project.ci_cd_settings.update(allow_merge_before_pipeline_completes: false)
+        pipeline.project.ci_cd_settings.update(merge_before_pipeline_completes_enabled: false)
       end
 
       context 'when pipeline is not complete' do
@@ -3235,7 +3235,7 @@ RSpec.describe MergeRequest, factory_default: :keep do
 
     context 'when allowed to merge before pipeline completion' do
       before do
-        pipeline.project.ci_cd_settings.update(allow_merge_before_pipeline_completes: true)
+        pipeline.project.ci_cd_settings.update(merge_before_pipeline_completes_enabled: true)
       end
 
       context 'when it is only allowed to merge when build is green' do

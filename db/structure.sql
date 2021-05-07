@@ -16354,7 +16354,7 @@ CREATE TABLE project_ci_cd_settings (
     auto_rollback_enabled boolean DEFAULT false NOT NULL,
     keep_latest_artifact boolean DEFAULT true NOT NULL,
     restrict_user_defined_variables boolean DEFAULT false NOT NULL,
-    allow_merge_before_pipeline_completes boolean DEFAULT true NOT NULL
+    merge_before_pipeline_completes_enabled boolean DEFAULT true NOT NULL
 );
 
 CREATE SEQUENCE project_ci_cd_settings_id_seq

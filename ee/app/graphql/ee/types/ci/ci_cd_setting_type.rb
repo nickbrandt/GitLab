@@ -7,9 +7,9 @@ module EE
         extend ActiveSupport::Concern
 
         prepended do
-          field :allow_merge_before_pipeline_completes, GraphQL::BOOLEAN_TYPE, null: false,
-            description: "Whether to allow merging (via API or 'merge immediately' button) before a pipeline completes.",
-            method: :allow_merge_before_pipeline_completes?
+          field :merge_before_pipeline_completes_available, GraphQL::BOOLEAN_TYPE, null: false,
+            description: "Whether merging before pipelines complete is allowed (via API or 'merge immediately' button).",
+            method: :merge_before_pipeline_completes_available?
         end
       end
     end

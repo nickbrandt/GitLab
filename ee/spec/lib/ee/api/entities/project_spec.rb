@@ -28,4 +28,36 @@ RSpec.describe ::EE::API::Entities::Project do
       end
     end
   end
+
+  describe 'merge_before_pipeline_completes_available' do
+    let(:project) { create(:project, merge_before_pipeline_completes_enabled: false) }
+
+    before do
+      stub_licensed_features(merge_before_pipeline_completes_setting: true)
+    end
+
+    it 'exposes merge_before_pipeline_completes_available' do
+      expect(subject[:merge_before_pipeline_completes_available]).to eq(false)
+    end
+
+    context 'when feature is not avalible' do
+      before do
+        stub_licensed_features(merge_before_pipeline_completes_setting: false)
+      end
+
+      it 'exposes merge_before_pipeline_completes_available as true regardless of setting value' do
+        expect(subject[:merge_before_pipeline_completes_available]).to eq(true)
+      end
+    end
+
+    context 'when feature is not enabled' do
+      before do
+        stub_feature_flags(merge_before_pipeline_completes_setting: false)
+      end
+
+      it 'exposes merge_before_pipeline_completes_available as true regardless of setting value' do
+        expect(subject[:merge_before_pipeline_completes_available]).to eq(true)
+      end
+    end
+  end
 end

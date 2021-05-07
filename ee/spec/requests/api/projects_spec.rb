@@ -231,6 +231,34 @@ RSpec.describe API::Projects do
       end
     end
 
+    describe 'merge_before_pipeline_completes_available attribute' do
+      before do
+        project.update!(merge_before_pipeline_completes_enabled: false)
+      end
+
+      context 'when merge_before_pipeline_completes_setting_available?' do
+        before do
+          stub_licensed_features(merge_before_pipeline_completes_setting: true)
+          get api("/projects/#{project.id}", user)
+        end
+
+        it 'returns the value of merge_before_pipeline_completes_enabled' do
+          expect(json_response['merge_before_pipeline_completes_available']).to eq(project.merge_before_pipeline_completes_enabled)
+        end
+      end
+
+      context 'when merge_before_pipeline_completes_setting_available?' do
+        before do
+          allow(project).to receive(:merge_before_pipeline_completes_setting_available?).and_return(false)
+          get api("/projects/#{project.id}", user)
+        end
+
+        it 'returns always returns true' do
+          expect(json_response['merge_before_pipeline_completes_available']).to eq(true)
+        end
+      end
+    end
+
     context 'project soft-deletion' do
       let(:project) do
         create(:project, :public, archived: true, marked_for_deletion_at: 1.day.ago, deleting_user: user)
@@ -860,14 +888,14 @@ RSpec.describe API::Projects do
         end
       end
 
-      context 'when updating allow_merge_before_pipeline_completes' do
-        let(:project_params) { { allow_merge_before_pipeline_completes: false } }
+      context 'when updating merge_before_pipeline_completes_enabled' do
+        let(:project_params) { { merge_before_pipeline_completes_enabled: false } }
 
         it 'updates the content' do
           subject
 
           expect(response).to have_gitlab_http_status(:ok)
-          expect(json_response['allow_merge_before_pipeline_completes']).to be_falsey
+          expect(json_response['merge_before_pipeline_completes_enabled']).to be_falsey
         end
       end
     end

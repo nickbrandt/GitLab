@@ -10,13 +10,13 @@ class AddMergeBeforePipelineSucceedsToCiCdSettings < ActiveRecord::Migration[6.0
 
   def up
     with_lock_retries do
-      add_column :project_ci_cd_settings, :allow_merge_before_pipeline_completes, :boolean, default: true, null: false
+      add_column :project_ci_cd_settings, :merge_before_pipeline_completes_enabled, :boolean, default: true, null: false
     end
   end
 
   def down
     with_lock_retries do
-      remove_column :project_ci_cd_settings, :allow_merge_before_pipeline_completes
+      remove_column :project_ci_cd_settings, :merge_before_pipeline_completes_enabled
     end
   end
 end

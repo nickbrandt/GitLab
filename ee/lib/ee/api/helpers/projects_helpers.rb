@@ -54,7 +54,7 @@ module EE
               :import_url,
               :issues_template,
               :merge_requests_template,
-              :allow_merge_before_pipeline_completes
+              :merge_before_pipeline_completes_enabled
             ]
           end
         end
