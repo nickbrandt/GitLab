@@ -101,9 +101,9 @@ export const buildSortHref = ({
 export const canOverride = () => false;
 
 export const parseDataAttributes = (el) => {
-  const { data } = el.dataset;
+  const { membersData } = el.dataset;
 
-  return convertObjectPropsToCamelCase(JSON.parse(data), {
+  return convertObjectPropsToCamelCase(JSON.parse(membersData), {
     deep: true,
     ignoreKeyNames: ['params'],
   });
