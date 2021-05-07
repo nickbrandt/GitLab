@@ -26999,6 +26999,9 @@ msgstr ""
 msgid "Remove user from project"
 msgstr ""
 
+msgid "Remove..."
+msgstr ""
+
 msgid "Removed"
 msgstr ""
 
@@ -30656,13 +30659,31 @@ msgstr ""
 msgid "StatusCheck|API to check"
 msgstr ""
 
+msgid "StatusCheck|Add status check"
+msgstr ""
+
+msgid "StatusCheck|An error occurred fetching the status checks."
+msgstr ""
+
+msgid "StatusCheck|Check for a status response in Merge Requests. Failures do not block merges. %{link_start}Learn more%{link_end}."
+msgstr ""
+
 msgid "StatusCheck|Invoke an external API as part of the approvals"
+msgstr ""
+
+msgid "StatusCheck|No status checks are defined yet."
 msgstr ""
 
 msgid "StatusCheck|Remove status check"
 msgstr ""
 
 msgid "StatusCheck|Remove status check?"
+msgstr ""
+
+msgid "StatusCheck|Service name"
+msgstr ""
+
+msgid "StatusCheck|Status checks"
 msgstr ""
 
 msgid "StatusCheck|Status to check"
