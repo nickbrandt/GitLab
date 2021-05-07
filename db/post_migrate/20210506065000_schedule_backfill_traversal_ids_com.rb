@@ -13,7 +13,7 @@ class ScheduleBackfillTraversalIdsCom < ActiveRecord::Migration[6.0]
   disable_ddl_transaction!
 
   def up
-    return unless Gitlab.com?
+    return unless Gitlab.staging?
 
     # Personal namespaces and top-level groups
     final_delay = queue_background_migration_jobs_by_range_at_intervals(
