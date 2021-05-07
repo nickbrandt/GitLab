@@ -178,6 +178,38 @@ describe('GroupsList', () => {
           expect(findFirstItem().props('group')).toBe(mockGroup1);
         });
       });
+
+      it.each`
+        userSearchTerm | finalSearchTerm
+        ${'gitl'}      | ${'gitl'}
+        ${'git'}       | ${'git'}
+        ${'gi'}        | ${''}
+        ${'g'}         | ${''}
+        ${''}          | ${''}
+        ${undefined}   | ${undefined}
+      `(
+        'searches for "$finalSearchTerm" when user enters "$userSearchTerm"',
+        async ({ userSearchTerm, finalSearchTerm }) => {
+          fetchGroups.mockResolvedValue({
+            data: [mockGroup1],
+            headers: { 'X-PAGE': 1, 'X-TOTAL': 1 },
+          });
+
+          createComponent();
+          fetchGroups.mockClear();
+
+          const searchBox = findSearchBox();
+
+          searchBox.vm.$emit('input', userSearchTerm);
+          await waitForPromises();
+
+          expect(fetchGroups).toHaveBeenCalledWith(mockGroupsPath, {
+            page: 1,
+            perPage: 10,
+            search: finalSearchTerm,
+          });
+        },
+      );
     });
   });
 
