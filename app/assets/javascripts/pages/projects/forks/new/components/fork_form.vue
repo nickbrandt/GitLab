@@ -20,7 +20,7 @@ import axios from '~/lib/utils/axios_utils';
 import csrf from '~/lib/utils/csrf';
 import { redirectTo } from '~/lib/utils/url_utility';
 import { s__ } from '~/locale';
-import validation from '~/vue_shared/directives/validation';
+import validation, { initForm } from '~/vue_shared/directives/validation';
 
 const PRIVATE_VISIBILITY = 'private';
 const INTERNAL_VISIBILITY = 'internal';
@@ -31,13 +31,6 @@ const ALLOWED_VISIBILITY = {
   internal: [INTERNAL_VISIBILITY, PRIVATE_VISIBILITY],
   public: [INTERNAL_VISIBILITY, PRIVATE_VISIBILITY, PUBLIC_VISIBILITY],
 };
-
-const initFormField = ({ value, required = true, skipValidation = false }) => ({
-  value,
-  required,
-  state: skipValidation ? true : null,
-  feedback: null,
-});
 
 export default {
   components: {
@@ -97,26 +90,25 @@ export default {
     },
   },
   data() {
-    const form = {
-      state: false,
-      showValidation: false,
+    const form = initForm({
       fields: {
-        namespace: initFormField({
+        namespace: {
           value: null,
-        }),
-        name: initFormField({ value: this.projectName }),
-        slug: initFormField({ value: this.projectPath }),
-        description: initFormField({
+        },
+        name: { value: this.projectName },
+        slug: { value: this.projectPath },
+        description: {
           value: this.projectDescription,
           required: false,
           skipValidation: true,
-        }),
-        visibility: initFormField({
+        },
+        visibility: {
           value: this.projectVisibility,
           skipValidation: true,
-        }),
+        },
       },
-    };
+    });
+
     return {
       isSaving: false,
       namespaces: [],
