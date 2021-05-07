@@ -330,9 +330,7 @@ module EE
 
     override :password_based_login_forbidden?
     def password_based_login_forbidden?
-      return true if user_authorized_by_provisioning_group?
-
-      super
+      user_authorized_by_provisioning_group? || super
     end
 
     def user_authorized_by_provisioning_group?

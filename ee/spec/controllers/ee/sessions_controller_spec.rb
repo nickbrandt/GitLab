@@ -130,7 +130,7 @@ RSpec.describe SessionsController, :geo do
     end
 
     context 'when user is not allowed to log in using password' do
-      let(:user) { create(:user, provisioned_by_group: create(:group)) }
+      let_it_be(:user) { create(:user, provisioned_by_group: build(:group)) }
 
       it 'does not authenticate the user' do
         post(:create, params: { user: { login: user.username, password: user.password } })

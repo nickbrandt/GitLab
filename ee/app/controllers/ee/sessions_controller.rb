@@ -7,6 +7,7 @@ module EE
 
     prepended do
       before_action :gitlab_geo_logout, only: [:destroy]
+      before_action :check_forbidden_password_based_login, if: -> { action_name == 'create' && password_based_login? }
     end
 
     override :new
@@ -68,6 +69,13 @@ module EE
       audit_event_service.for_failed_login.unauth_security_event
 
       super
+    end
+
+    def check_forbidden_password_based_login
+      if find_user&.password_based_login_forbidden?
+        flash[:alert] = _('You are not allowed to log in using password')
+        redirect_to new_user_session_path
+      end
     end
   end
 end

@@ -155,15 +155,15 @@ RSpec.describe 'Git HTTP requests' do
   end
 
   describe 'when user cannot use password-based login' do
-    let(:user) { create(:user) }
-    let(:group) { create(:group) }
-    let(:project) { create(:project, :repository, :private, group: group) }
+    let_it_be(:group) { create(:group) }
+    let_it_be(:project) { create(:project, :repository, :private, group: group) }
+    let_it_be(:user) { create(:user, provisioned_by_group: group) }
     let(:env) { { user: user.username, password: user.password } }
     let(:path) { "#{project.full_path}.git" }
 
+
     before do
       project.add_developer(user)
-      user.update!(provisioned_by_group: group)
     end
 
     context 'with feature flag switched off' do
