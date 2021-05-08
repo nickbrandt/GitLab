@@ -9,6 +9,10 @@ module Resolvers
                required: false,
                description: 'Filter runners by status.'
 
+      argument :type, ::Types::Ci::RunnerTypeEnum,
+               required: false,
+               description: 'Filter runners by type.'
+
       argument :tag_list, [GraphQL::STRING_TYPE],
                required: false,
                description: 'Filter by tags associated with the runner (comma-separated or array).'
@@ -28,6 +32,7 @@ module Resolvers
       def runners_finder_params(params)
         {
           status_status: params[:status]&.to_s,
+          type_type: params[:type],
           tag_name: params[:tag_list],
           search: params[:search],
           sort: params[:sort]&.to_s,
