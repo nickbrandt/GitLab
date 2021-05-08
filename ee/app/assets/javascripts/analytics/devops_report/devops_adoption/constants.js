@@ -18,6 +18,17 @@ export const DEVOPS_ADOPTION_ERROR_KEYS = {
   addSegment: 'addSegmentsError',
 };
 
+export const TABLE_HEADER_TEXT = s__(
+  'DevopsAdoption|Feature adoption is based on usage in the current calendar month. Last updated: %{timestamp}.',
+);
+
+export const ADD_REMOVE_BUTTON_TOOLTIP = sprintf(
+  s__('DevopsAdoption|Maximum %{maxSegments} groups allowed'),
+  {
+    maxSegments: MAX_SEGMENTS,
+  },
+);
+
 export const DEVOPS_ADOPTION_GROUP_LEVEL_LABEL = s__('DevopsAdoption|Add/remove sub-groups');
 
 export const DEVOPS_ADOPTION_TABLE_REMOVE_BUTTON_DISABLED = s__(
@@ -36,13 +47,7 @@ export const DEVOPS_ADOPTION_STRINGS = {
       'DevopsAdoption|There was an error enabling the current group. Please refresh the page.',
     ),
     tableHeader: {
-      text: s__(
-        'DevopsAdoption|Feature adoption is based on usage in the current calendar month. Last updated: %{timestamp}.',
-      ),
       button: s__('DevopsAdoption|Add/remove groups'),
-      buttonTooltip: sprintf(s__('DevopsAdoption|Maximum %{maxSegments} groups allowed'), {
-        maxSegments: MAX_SEGMENTS,
-      }),
     },
   },
   emptyState: {
