@@ -336,7 +336,7 @@ four standard [pagination arguments](#connection-pagination-arguments):
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| <a id="queryrunnerssort"></a>`sort` | [`String`](#string) | Sort order of results. |
+| <a id="queryrunnerssort"></a>`sort` | [`CiRunnerSort`](#cirunnersort) | Sort order of results. |
 | <a id="queryrunnersstatus"></a>`status` | [`CiRunnerStatus`](#cirunnerstatus) | Filter runners by status. |
 | <a id="queryrunnerstaglist"></a>`tagList` | [`[String!]`](#string) | Filter by tags associated with the runner (comma-separated or array). |
 
@@ -13575,11 +13575,21 @@ Values for YAML processor result.
 | <a id="cirunneraccesslevelnot_protected"></a>`NOT_PROTECTED` | A runner that is not protected. |
 | <a id="cirunneraccesslevelref_protected"></a>`REF_PROTECTED` | A runner that is ref protected. |
 
+### `CiRunnerSort`
+
+Values for sorting runners.
+
+| Value | Description |
+| ----- | ----------- |
+| <a id="cirunnersortcontacted_asc"></a>`CONTACTED_ASC` | Ordered by contacted_at in ascending order. |
+| <a id="cirunnersortcreated_asc"></a>`CREATED_ASC` | Ordered by created_date in ascending order. |
+
 ### `CiRunnerStatus`
 
 | Value | Description |
 | ----- | ----------- |
 | <a id="cirunnerstatusactive"></a>`ACTIVE` | A runner that is active. |
+| <a id="cirunnerstatusnot_connected"></a>`NOT_CONNECTED` | A runner that is not connected. |
 | <a id="cirunnerstatusoffline"></a>`OFFLINE` | A runner that is offline. |
 | <a id="cirunnerstatusonline"></a>`ONLINE` | A runner that is online. |
 | <a id="cirunnerstatuspaused"></a>`PAUSED` | A runner that is paused. |
