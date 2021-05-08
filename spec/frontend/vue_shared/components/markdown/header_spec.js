@@ -134,6 +134,14 @@ describe('Markdown field header component', () => {
     );
   });
 
+  it('renders collapsible section template', () => {
+    const detailsBlockButton = findToolbarButtonByProp('icon', 'details-block');
+
+    expect(detailsBlockButton.props('tag')).toEqual(
+      '<details><summary>Click to expand</summary>\n{text}\n</details>',
+    );
+  });
+
   it('does not render suggestion button if `canSuggest` is set to false', () => {
     createWrapper({
       canSuggest: false,
