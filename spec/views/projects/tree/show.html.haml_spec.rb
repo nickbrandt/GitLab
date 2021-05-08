@@ -13,6 +13,10 @@ RSpec.describe 'projects/tree/show' do
   let(:tree) { repository.tree(commit.id, path) }
 
   before do
+    # This is temporary as we convert the ref dropdown to Vue
+    # See issue: https://gitlab.com/gitlab-org/gitlab/-/issues/327085
+    stub_feature_flags(vue_ref_dropdown: false)
+
     assign(:project, project)
     assign(:repository, repository)
     assign(:lfs_blob_ids, [])

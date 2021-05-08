@@ -27684,6 +27684,18 @@ msgstr ""
 msgid "RepositorySettingsAccessLevel|Select"
 msgstr ""
 
+msgid "Repository|Branches"
+msgstr ""
+
+msgid "Repository|Select branch/tag"
+msgstr ""
+
+msgid "Repository|Switch branch/tag"
+msgstr ""
+
+msgid "Repository|Tags"
+msgstr ""
+
 msgid "Request Access"
 msgstr ""
 
@@ -32852,6 +32864,9 @@ msgid "There was an error while fetching value stream analytics data."
 msgstr ""
 
 msgid "There was an error while fetching value stream analytics duration data."
+msgstr ""
+
+msgid "There was an error while searching the branch/tag list. Please try again."
 msgstr ""
 
 msgid "There was an error with the reCAPTCHA. Please solve the reCAPTCHA again."

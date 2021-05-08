@@ -16,6 +16,10 @@ RSpec.describe "User browses files" do
   let(:user) { project.owner }
 
   before do
+    # This is temporary as we convert the ref dropdown to Vue
+    # See issue: https://gitlab.com/gitlab-org/gitlab/-/issues/327085
+    stub_feature_flags(vue_ref_dropdown: false)
+
     sign_in(user)
   end
 

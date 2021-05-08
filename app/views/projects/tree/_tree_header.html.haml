@@ -1,6 +1,9 @@
-.tree-ref-container
-  .tree-ref-holder
-    = render 'shared/ref_switcher', destination: 'tree', path: @path, show_create: true
+.tree-ref-container.gl-display-flex.gl-align-items-center
+  - if Feature.enabled?(:vue_ref_dropdown, @project, default_enabled: :yaml)
+    #js-ref-dropdown{ data: { refs_project_path: refs_project_path(@project), current_ref: @ref } }
+  - else
+    .tree-ref-holder
+      = render 'shared/ref_switcher', destination: 'tree', path: @path, show_create: true
 
   #js-repo-breadcrumb{ data: breadcrumb_data_attributes }
 

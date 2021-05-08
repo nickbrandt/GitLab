@@ -20,6 +20,10 @@ RSpec.describe 'User creates branch and merge request on issue page', :js do
 
   context 'when signed in' do
     before do
+      # This is temporary as we convert the ref dropdown to Vue
+      # See issue: https://gitlab.com/gitlab-org/gitlab/-/issues/327085
+      stub_feature_flags(vue_ref_dropdown: false)
+
       project.add_user(user, membership_level)
 
       sign_in(user)
