@@ -152,12 +152,6 @@ RSpec.describe Projects::ProjectMembersHelper do
     let(:collection) { project_members }
     let(:presented_members) { present_members(collection) }
 
-    describe '#project_members_serialized' do
-      it 'matches json schema' do
-        expect(helper.send(:project_members_serialized, project, presented_members).to_json).to match_schema('members')
-      end
-    end
-
     describe '#project_members_list_data_json' do
       let(:allow_admin_project) { true }
       let(:pagination) { {} }
@@ -170,13 +164,16 @@ RSpec.describe Projects::ProjectMembersHelper do
 
       it 'returns expected json' do
         expected = {
-          members: helper.send(:project_members_serialized, project, presented_members),
           member_path: '/foo-bar/-/project_members/:id',
           source_id: project.id,
           can_manage_members: true
         }.as_json
 
         expect(subject).to include(expected)
+      end
+
+      it 'returns `members` property that matches json schema' do
+        expect(subject['members'].to_json).to match_schema('members')
       end
 
       context 'when pagination is not available' do
@@ -217,12 +214,6 @@ RSpec.describe Projects::ProjectMembersHelper do
 
     let(:allow_admin_project) { true }
 
-    describe '#project_group_links_data_json' do
-      it 'matches json schema' do
-        expect(helper.send(:project_group_links_serialized, project_group_links).to_json).to match_schema('group_link/project_group_links')
-      end
-    end
-
     describe '#project_group_links_list_data_json' do
       subject { Gitlab::Json.parse(helper.project_group_links_list_data_json(project, project_group_links)) }
 
@@ -233,7 +224,6 @@ RSpec.describe Projects::ProjectMembersHelper do
 
       it 'returns expected json' do
         expected = {
-          members: helper.send(:project_group_links_serialized, project_group_links),
           pagination: {
             current_page: nil,
             per_page: nil,
@@ -247,6 +237,10 @@ RSpec.describe Projects::ProjectMembersHelper do
         }.as_json
 
         expect(subject).to include(expected)
+      end
+
+      it 'returns `members` property that matches json schema' do
+        expect(subject['members'].to_json).to match_schema('group_link/project_group_links')
       end
     end
   end

@@ -23,60 +23,20 @@ RSpec.describe Groups::GroupMembersHelper do
     end
   end
 
-  describe '#group_group_links_serialized' do
-    include_context 'group_group_link'
-
-    it 'matches json schema' do
-      json = helper.send(:group_group_links_serialized, shared_group.shared_with_group_links).to_json
-
-      expect(json).to match_schema('group_link/group_group_links')
-    end
-  end
-
-  describe '#group_members_serialized' do
-    shared_examples 'members.json' do
-      it 'matches json schema' do
-        json = helper.send(:group_members_serialized, group, present_members([group_member])).to_json
-
-        expect(json).to match_schema('members')
-      end
-    end
-
-    context 'for a group member' do
-      let(:group_member) { create(:group_member, group: group, created_by: current_user) }
-
-      it_behaves_like 'members.json'
-
-      context 'with user status set' do
-        let(:user) { create(:user) }
-        let!(:status) { create(:user_status, user: user) }
-        let(:group_member) { create(:group_member, group: group, user: user, created_by: current_user) }
-
-        it_behaves_like 'members.json'
-      end
-    end
-
-    context 'for an invited group member' do
-      let(:group_member) { create(:group_member, :invited, group: group, created_by: current_user) }
-
-      it_behaves_like 'members.json'
-    end
-
-    context 'for an access request' do
-      let(:group_member) { create(:group_member, :access_request, group: group, created_by: current_user) }
-
-      it_behaves_like 'members.json'
-    end
-  end
-
   describe '#group_members_list_data_json' do
-    let_it_be(:group_members) { create_list(:group_member, 2, group: group, created_by: current_user) }
+    let(:group_members) { create_list(:group_member, 2, group: group, created_by: current_user) }
 
     let(:pagination) { {} }
     let(:collection) { group_members }
     let(:presented_members) { present_members(collection) }
 
     subject { Gitlab::Json.parse(helper.group_members_list_data_json(group, presented_members, pagination)) }
+
+    shared_examples 'members.json' do
+      it 'returns `members` property that matches json schema' do
+        expect(subject['members'].to_json).to match_schema('members')
+      end
+    end
 
     before do
       allow(helper).to receive(:group_group_member_path).with(group, ':id').and_return('/groups/foo-bar/-/group_members/:id')
@@ -85,13 +45,36 @@ RSpec.describe Groups::GroupMembersHelper do
 
     it 'returns expected json' do
       expected = {
-        members: helper.send(:group_members_serialized, group, presented_members),
         member_path: '/groups/foo-bar/-/group_members/:id',
         source_id: group.id,
         can_manage_members: true
       }.as_json
 
       expect(subject).to include(expected)
+    end
+
+    context 'for a group member' do
+      it_behaves_like 'members.json'
+
+      context 'with user status set' do
+        let(:user) { create(:user) }
+        let!(:status) { create(:user_status, user: user) }
+        let(:group_members) { [create(:group_member, group: group, user: user, created_by: current_user)] }
+
+        it_behaves_like 'members.json'
+      end
+    end
+
+    context 'for an invited group member' do
+      let(:group_members) { create_list(:group_member, 2, :invited, group: group, created_by: current_user) }
+
+      it_behaves_like 'members.json'
+    end
+
+    context 'for an access request' do
+      let(:group_members) { create_list(:group_member, 2, :access_request, group: group, created_by: current_user) }
+
+      it_behaves_like 'members.json'
     end
 
     context 'when pagination is not available' do
@@ -144,12 +127,15 @@ RSpec.describe Groups::GroupMembersHelper do
           param_name: nil,
           params: {}
         },
-        members: helper.send(:group_group_links_serialized, shared_group.shared_with_group_links),
         member_path: '/groups/foo-bar/-/group_links/:id',
         source_id: shared_group.id
       }.as_json
 
       expect(subject).to include(expected)
+    end
+
+    it 'returns `members` property that matches json schema' do
+      expect(subject['members'].to_json).to match_schema('group_link/group_group_links')
     end
   end
 end
