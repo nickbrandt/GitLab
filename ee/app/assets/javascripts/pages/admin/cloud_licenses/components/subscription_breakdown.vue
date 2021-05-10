@@ -1,21 +1,24 @@
 <script>
-import { GlButton } from '@gitlab/ui';
+import { GlButton, GlModalDirective } from '@gitlab/ui';
 import { pick, some } from 'lodash';
 import axios from '~/lib/utils/axios_utils';
 import {
+  enterActivationCode,
   licensedToHeaderText,
   manageSubscriptionButtonText,
+  notificationType,
   subscriptionDetailsHeaderText,
   subscriptionType,
   syncSubscriptionButtonText,
-  notificationType,
 } from '../constants';
+import SubscriptionActivationModal from './subscription_activation_modal.vue';
 import SubscriptionDetailsCard from './subscription_details_card.vue';
 import SubscriptionDetailsHistory from './subscription_details_history.vue';
 import SubscriptionDetailsUserInfo from './subscription_details_user_info.vue';
 
 export const subscriptionDetailsFields = ['id', 'plan', 'expiresAt', 'lastSync', 'startsAt'];
 export const licensedToFields = ['name', 'email', 'company'];
+export const modalId = 'subscription-activation-modal';
 
 export default {
   i18n: {
@@ -23,10 +26,18 @@ export default {
     manageSubscriptionButtonText,
     subscriptionDetailsHeaderText,
     syncSubscriptionButtonText,
+    enterActivationCode,
+  },
+  modal: {
+    id: modalId,
   },
   name: 'SubscriptionBreakdown',
+  directives: {
+    GlModal: GlModalDirective,
+  },
   components: {
     GlButton,
+    SubscriptionActivationModal,
     SubscriptionDetailsCard,
     SubscriptionDetailsHistory,
     SubscriptionDetailsUserInfo,
@@ -55,7 +66,7 @@ export default {
     canSyncSubscription() {
       return this.subscriptionSyncPath && this.subscription.type === subscriptionType.CLOUD;
     },
-    canMangeSubscription() {
+    canManageSubscription() {
       return false;
     },
     hasSubscription() {
@@ -65,7 +76,10 @@ export default {
       return Boolean(this.subscriptionList.length);
     },
     shouldShowFooter() {
-      return some(pick(this, ['canSyncSubscription', 'canMangeSubscription']), Boolean);
+      return some(
+        pick(this, ['canSyncSubscription', 'canMangeSubscription', 'hasSubscription']),
+        Boolean,
+      );
     },
     subscriptionHistory() {
       return this.hasSubscriptionHistory ? this.subscriptionList : [this.subscription];
@@ -96,6 +110,7 @@ export default {
 
 <template>
   <div>
+    <subscription-activation-modal v-if="hasSubscription" :modal-id="$options.modal.id" />
     <subscription-sync-notifications
       v-if="notification"
       class="mb-4"
@@ -120,7 +135,16 @@ export default {
             >
               {{ $options.i18n.syncSubscriptionButtonText }}
             </gl-button>
-            <gl-button v-if="canMangeSubscription">
+            <gl-button
+              v-if="hasSubscription"
+              v-gl-modal="$options.modal.id"
+              category="primary"
+              variant="confirm"
+              data-testid="subscription-activation-action"
+            >
+              {{ $options.i18n.enterActivationCode }}
+            </gl-button>
+            <gl-button v-if="canManageSubscription">
               {{ $options.i18n.manageSubscriptionButtonText }}
             </gl-button>
           </template>
