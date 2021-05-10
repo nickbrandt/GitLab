@@ -3286,6 +3286,9 @@ msgstr ""
 msgid "Allowed Geo IP"
 msgstr ""
 
+msgid "Allowed characters: +, 0-9, -, and spaces."
+msgstr ""
+
 msgid "Allowed email domain restriction only permitted for top-level groups"
 msgstr ""
 
