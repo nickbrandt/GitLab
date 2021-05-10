@@ -8,7 +8,7 @@ import MergeRequestNote from 'ee/vue_shared/security_reports/components/merge_re
 import ModalFooter from 'ee/vue_shared/security_reports/components/modal_footer.vue';
 import SolutionCard from 'ee/vue_shared/security_reports/components/solution_card_vuex.vue';
 // import VulnerabilityDetails from 'ee/vue_shared/security_reports/components/vulnerability_details.vue';
-import VulnerabilityDetails from 'ee/vulnerabilities/components/vulnerability.vue';
+import VulnerabilityDetails from 'ee/vulnerabilities/components/vulnerability_details.vue';
 import { __ } from '~/locale';
 import { VULNERABILITY_MODAL_ID } from './constants';
 
