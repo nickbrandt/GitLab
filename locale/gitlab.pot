@@ -1895,6 +1895,9 @@ msgstr ""
 msgid "Add a bullet list"
 msgstr ""
 
+msgid "Add a collapsible section"
+msgstr ""
+
 msgid "Add a comment to this line"
 msgstr ""
 
