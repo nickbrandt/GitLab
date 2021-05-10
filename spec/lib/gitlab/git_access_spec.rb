@@ -731,6 +731,8 @@ RSpec.describe Gitlab::GitAccess do
 
     context 'when LFS is not enabled' do
       it 'does not run LFSIntegrity check' do
+        allow(project).to receive(:lfs_enabled?).and_return(false)
+
         expect(Gitlab::Checks::LfsIntegrity).not_to receive(:new)
 
         push_access_check
