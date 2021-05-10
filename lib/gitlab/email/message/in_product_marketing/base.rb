@@ -8,13 +8,15 @@ module Gitlab
           include Gitlab::Email::Message::InProductMarketing::Helper
           include Gitlab::Routing
 
+          attr_accessor :format
+
           def initialize(group:, series:, format: :html)
+            raise ArgumentError, "Only #{total_series} series available for this track." unless series.between?(0, total_series - 1)
+
             @group = group
             @series = series
             @format = format
           end
-
-          attr_accessor :format
 
           def subject_line
             raise NotImplementedError
@@ -66,9 +68,9 @@ module Gitlab
 
           def progress
             if Gitlab.com?
-              s_('InProductMarketing|This is email %{series} of 3 in the %{track} series.') % { series: series + 1, track: track.to_s.humanize }
+              s_('InProductMarketing|This is email %{current_series} of %{total_series} in the %{track} series.') % { current_series: series + 1, total_series: total_series, track: track.to_s.humanize }
             else
-              s_('InProductMarketing|This is email %{series} of 3 in the %{track} series. To disable notification emails sent by your local GitLab instance, either contact your administrator or %{unsubscribe_link}.') % { series: series + 1, track: track.to_s.humanize, unsubscribe_link: unsubscribe_link }
+              s_('InProductMarketing|This is email %{current_series} of %{total_series} in the %{track} series. To disable notification emails sent by your local GitLab instance, either contact your administrator or %{unsubscribe_link}.') % { current_series: series + 1, total_series: total_series, track: track.to_s.humanize, unsubscribe_link: unsubscribe_link }
             end
           end
 
@@ -102,6 +104,10 @@ module Gitlab
           protected
 
           attr_reader :group, :series
+
+          def total_series
+            3
+          end
 
           private
 

@@ -6,19 +6,12 @@ module Gitlab
       module InProductMarketing
         UnknownTrackError = Class.new(StandardError)
 
+        TRACKS = [:create, :verify, :team, :trial].freeze
+
         def self.for(track)
-          case track
-          when :create
-            Gitlab::Email::Message::InProductMarketing::Create
-          when :verify
-            Gitlab::Email::Message::InProductMarketing::Verify
-          when :team
-            Gitlab::Email::Message::InProductMarketing::Team
-          when :trial
-            Gitlab::Email::Message::InProductMarketing::Trial
-          else
-            raise UnknownTrackError
-          end
+          raise UnknownTrackError unless TRACKS.include?(track)
+
+          "Gitlab::Email::Message::InProductMarketing::#{track.to_s.classify}".constantize
         end
       end
     end

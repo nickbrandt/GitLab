@@ -8,6 +8,26 @@ RSpec.describe Gitlab::Email::Message::InProductMarketing::Base do
   let(:series) { 0 }
   let(:test_class) { Gitlab::Email::Message::InProductMarketing::Create }
 
+  describe 'initialize' do
+    subject { test_class.new(group: group, series: series) }
+
+    context 'when series does not exist' do
+      let(:series) { 3 }
+
+      it 'raises error' do
+        expect { subject }.to raise_error(ArgumentError)
+      end
+    end
+
+    context 'when series exists' do
+      let(:series) { 0 }
+
+      it 'does not raise error' do
+        expect { subject }.not_to raise_error(ArgumentError)
+      end
+    end
+  end
+
   describe '#logo_path' do
     subject { test_class.new(group: group, series: series).logo_path }
 
