@@ -167,7 +167,7 @@ RSpec.describe 'epics list', :js do
 
       wait_for_requests
 
-      expect(page.find('.issuable-details h2.title')).to have_content(epic1.title)
+      expect(page.find('.issuable-details h1.title')).to have_content(epic1.title)
     end
   end
 

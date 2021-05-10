@@ -29,7 +29,7 @@ RSpec.describe 'Profile > SSH Keys' do
 
       expect(page).to have_content("Title: #{attrs[:title]}")
       expect(page).to have_content(attrs[:key])
-      expect(find('.breadcrumbs-sub-title')).to have_link(attrs[:title])
+      expect(find('a.breadcrumbs-sub-title')).to have_content(attrs[:title])
     end
 
     it 'shows a confirmable warning if the key does not start with ssh-' do

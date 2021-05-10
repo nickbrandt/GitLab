@@ -16,7 +16,7 @@ RSpec.describe 'Issue Detail', :js do
 
     it 'shows the issue' do
       page.within('.issuable-details') do
-        expect(find('h2')).to have_content(issue.title)
+        expect(find('h1')).to have_content(issue.title)
       end
     end
   end
@@ -69,7 +69,7 @@ RSpec.describe 'Issue Detail', :js do
 
     it 'shows the issue' do
       page.within('.issuable-details') do
-        expect(find('h2')).to have_content(issue.reload.title)
+        expect(find('h1')).to have_content(issue.reload.title)
       end
     end
   end
