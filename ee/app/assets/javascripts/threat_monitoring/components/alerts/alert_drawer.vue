@@ -122,6 +122,7 @@ export default {
 <template>
   <gl-drawer
     :z-index="252"
+    class="gl-bg-gray-10"
     :open="isAlertDrawerOpen"
     :header-height="$options.HEADER_HEIGHT"
     @close="$emit('deselect-alert')"
