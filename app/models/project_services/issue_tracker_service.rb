@@ -139,7 +139,6 @@ class IssueTrackerService < Service
     Gitlab.config.issues_tracker[to_param]
   end
 
-  # rubocop: disable CodeReuse/ActiveRecord
   def one_issue_tracker
     return if template? || instance?
     return if project.blank?
@@ -148,7 +147,6 @@ class IssueTrackerService < Service
       errors.add(:base, _('Another issue tracker is already in use. Only one issue tracker service can be active at a time'))
     end
   end
-  # rubocop: enable CodeReuse/ActiveRecord
 end
 
 IssueTrackerService.prepend_if_ee('EE::IssueTrackerService')
