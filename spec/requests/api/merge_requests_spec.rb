@@ -2487,25 +2487,6 @@ RSpec.describe API::MergeRequests do
       expect(merge_request.reload.state).to eq('opened')
     end
 
-    it 'does not merge when merge_when_pipeline_succeeds is false and merge_before_pipeline_completes_enabled is false' do
-      project.update!(merge_before_pipeline_completes_enabled: false)
-
-      put api("/projects/#{project.id}/merge_requests/#{merge_request.iid}/merge", user), params: { merge_when_pipeline_succeeds: false }
-
-      expect(response).to have_gitlab_http_status(:method_not_allowed)
-      expect(json_response['message']).to eq('405 Method Not Allowed')
-      expect(merge_request.reload.state).to eq('opened')
-    end
-
-    it 'merges when merge_when_pipeline_succeeds is false and merge_before_pipeline_completes_enabled is true' do
-      project.update!(merge_before_pipeline_completes_enabled: true)
-
-      put api("/projects/#{project.id}/merge_requests/#{merge_request.iid}/merge", user), params: { merge_when_pipeline_succeeds: false }
-
-      expect(response).to have_gitlab_http_status(:ok)
-      expect(json_response['state']).to eq('merged')
-    end
-
     it 'merges if the head pipeline already succeeded and `merge_when_pipeline_succeeds` is passed' do
       create(:ci_pipeline, :success, sha: merge_request.diff_head_sha, merge_requests_as_head_pipeline: [merge_request])
 

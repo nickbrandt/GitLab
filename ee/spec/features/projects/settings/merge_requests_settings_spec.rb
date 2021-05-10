@@ -184,4 +184,56 @@ RSpec.describe 'Project settings > [EE] Merge Requests', :js do
       expect(page).to have_content('Choose your merge method, merge options, merge checks, merge suggestions, and set up a default description template for merge requests.')
     end
   end
+
+  describe 'Allow merge before pipelines complete' do
+    context 'when un-licensed' do
+      before do
+        stub_licensed_features(merge_before_pipeline_completes_setting: false)
+      end
+
+      it 'checkbox is not shown' do
+        visit edit_project_path(project)
+
+        expect(page).not_to have_content('Allow merge before pipelines complete')
+      end
+    end
+
+    context 'when feature flag is disabled' do
+      before do
+        stub_feature_flags(merge_before_pipeline_completes_setting: false)
+      end
+
+      it 'checkbox is not shown' do
+        visit edit_project_path(project)
+
+        expect(page).not_to have_content('Allow merge before pipelines complete')
+      end
+    end
+
+    context 'when licensed and enabled' do
+      before do
+        stub_licensed_features(merge_before_pipeline_completes_setting: true)
+      end
+
+      it 'checkbox is shown' do
+        visit edit_project_path(project)
+
+        expect(page).to have_content('Allow merge before pipelines complete')
+      end
+
+      it 'checkbox update is persisted' do
+        expect(project.merge_before_pipeline_completes_enabled?).to eq(true)
+
+        visit edit_project_path(project)
+
+        page.within '.merge-request-settings-form' do
+          uncheck 'Allow merge before pipelines complete'
+          click_button 'Save changes'
+        end
+
+        expect(page).to have_content('was successfully updated')
+        expect(project.reload.merge_before_pipeline_completes_enabled?).to eq(false)
+      end
+    end
+  end
 end

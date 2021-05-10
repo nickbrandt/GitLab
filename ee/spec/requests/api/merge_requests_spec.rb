@@ -171,11 +171,51 @@ RSpec.describe API::MergeRequests do
   end
 
   describe "PUT /projects/:id/merge_requests/:merge_request_iid/merge" do
+    let(:params) { {} }
+    let(:project) { create(:project, :repository, namespace: user.namespace) }
+    let(:merge_request) { create(:merge_request, :simple, author: user, source_project: project, source_branch: 'markdown', title: 'Test') }
+
+    subject { put api("/projects/#{project.id}/merge_requests/#{merge_request.iid}/merge", user), params: params }
+
+    context 'with merge_before_pipeline_completes_setting_available and merge_when_pipeline_succeeds is false' do
+      let(:params) { { merge_when_pipeline_succeeds: false } }
+
+      before do
+        stub_licensed_features(merge_before_pipeline_completes_setting: true)
+        stub_feature_flags(merge_before_pipeline_completes_setting: true)
+
+        project.update!(merge_before_pipeline_completes_enabled: merge_before_pipeline_completes_enabled)
+      end
+
+      context 'when merge_before_pipeline_completes_enabled is true' do
+        let(:merge_before_pipeline_completes_enabled) { true }
+
+        it 'merges' do
+          subject
+
+          expect(response).to have_gitlab_http_status(:ok)
+          expect(json_response['state']).to eq('merged')
+        end
+      end
+
+      context 'when merge_before_pipeline_completes_enabled is false' do
+        let(:merge_before_pipeline_completes_enabled) { false }
+
+        it 'does not merge' do
+          subject
+
+          expect(response).to have_gitlab_http_status(:method_not_allowed)
+          expect(json_response['message']).to eq('405 Method Not Allowed')
+          expect(merge_request.reload.state).to eq('opened')
+        end
+      end
+    end
+
     it 'returns 405 if merge request was not approved' do
       project.add_developer(create(:user))
       project.update!(approvals_before_merge: 1)
 
-      put api("/projects/#{project.id}/merge_requests/#{merge_request.iid}/merge", user)
+      subject
 
       expect(response).to have_gitlab_http_status(:not_acceptable)
       expect(json_response['message']).to eq('Branch cannot be merged')
@@ -187,7 +227,7 @@ RSpec.describe API::MergeRequests do
       project.update!(approvals_before_merge: 1)
       merge_request.approvals.create!(user: approver)
 
-      put api("/projects/#{project.id}/merge_requests/#{merge_request.iid}/merge", user)
+      subject
 
       expect(response).to have_gitlab_http_status(:ok)
     end
