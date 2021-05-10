@@ -22,7 +22,6 @@ describe('DevopsAdoptionTable', () => {
       propsData: {
         cols: DEVOPS_ADOPTION_TABLE_CONFIGURATION[0].cols,
         segments: devopsAdoptionSegmentsData.nodes,
-        selectedSegment: devopsAdoptionSegmentsData.nodes[0],
       },
       provide,
       directives: {
@@ -37,7 +36,6 @@ describe('DevopsAdoptionTable', () => {
 
   afterEach(() => {
     wrapper.destroy();
-    wrapper = null;
   });
 
   const findTable = () => wrapper.find(GlTable);
@@ -198,6 +196,8 @@ describe('DevopsAdoptionTable', () => {
   describe('delete modal integration', () => {
     beforeEach(() => {
       createComponent();
+
+      wrapper.setData({ selectedSegment: devopsAdoptionSegmentsData.nodes[0] });
     });
 
     it('re emits trackModalOpenState with the given value', async () => {

@@ -81,11 +81,6 @@ export default {
       type: Array,
       required: true,
     },
-    selectedSegment: {
-      type: Object,
-      required: false,
-      default: null,
-    },
     cols: {
       type: Array,
       required: true,
@@ -95,6 +90,7 @@ export default {
     return {
       sortBy: NAME_HEADER,
       sortDesc: false,
+      selectedSegment: null,
     };
   },
   computed: {
@@ -120,7 +116,7 @@ export default {
   },
   methods: {
     setSelectedSegment(segment) {
-      this.$emit('set-selected-segment', segment);
+      this.selectedSegment = segment;
     },
     headerSlotName(key) {
       return `head(${key})`;
