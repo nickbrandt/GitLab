@@ -32,6 +32,12 @@ export default {
     isPipeline() {
       return this.dashboardType === DASHBOARD_TYPES.PIPELINE;
     },
+    isGroupDashboard() {
+      return this.dashboardType === DASHBOARD_TYPES.GROUP;
+    },
+    isInstanceDashboard() {
+      return this.dashboardType === DASHBOARD_TYPES.INSTANCE;
+    },
     shouldShowProjectFilter() {
       return Boolean(this.projects?.length);
     },

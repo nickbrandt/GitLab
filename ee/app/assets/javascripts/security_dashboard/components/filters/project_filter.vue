@@ -7,8 +7,8 @@ import {
 } from '@gitlab/ui';
 import { escapeRegExp } from 'lodash';
 import createFlash from '~/flash';
+import { convertToGraphQLIds } from '~/graphql_shared/utils';
 import { s__, __ } from '~/locale';
-import { PROJECT_ID_PREFIX } from '../../constants';
 import groupProjects from '../../graphql/queries/group_projects.query.graphql';
 import { PROJECT_LOADING_ERROR_MESSAGE, mapProjects } from '../../helpers';
 import FilterBody from './filter_body.vue';
@@ -17,6 +17,7 @@ import StandardFilter from './standard_filter.vue';
 
 const SEARCH_TERM_MINIMUM_LENGTH = 3;
 const SELECTED_PROJECTS_MAX_COUNT = 100;
+const PROJECT_ENTITY_NAME = 'Project';
 
 export default {
   components: {
@@ -80,7 +81,7 @@ export default {
           pageSize: 20,
           fullPath: this.groupFullPath,
           // The IDs have to be in the format "gid://gitlab/Project/${projectId}"
-          ids: this.uncachedIds.map((id) => `${PROJECT_ID_PREFIX}${id}`),
+          ids: convertToGraphQLIds(PROJECT_ENTITY_NAME, this.uncachedIds),
         };
       },
       result({ data }) {
@@ -93,6 +94,7 @@ export default {
         createFlash({ message: PROJECT_LOADING_ERROR_MESSAGE });
       },
       skip() {
+        // Skip if the cache already contains the projects for every querystring ID.
         return !this.uncachedIds.length;
       },
     },
