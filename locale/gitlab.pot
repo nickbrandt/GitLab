@@ -9241,9 +9241,6 @@ msgstr ""
 msgid "Create Project"
 msgstr ""
 
-msgid "Create Value Stream"
-msgstr ""
-
 msgid "Create a GitLab account first, and then connect it to your %{label} account."
 msgstr ""
 
