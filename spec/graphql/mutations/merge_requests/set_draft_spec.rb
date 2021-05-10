@@ -3,8 +3,8 @@
 require 'spec_helper'
 
 RSpec.describe Mutations::MergeRequests::SetDraft do
-  let(:merge_request) { create(:merge_request) }
-  let(:user) { create(:user) }
+  let_it_be(:merge_request) { create(:merge_request) }
+  let_it_be(:user) { create(:user) }
 
   subject(:mutation) { described_class.new(object: nil, context: { current_user: user }, field: nil) }
 
@@ -29,7 +29,7 @@ RSpec.describe Mutations::MergeRequests::SetDraft do
         expect(subject[:errors]).to be_empty
       end
 
-      it 'returns errors merge request could not be updated' do
+      it 'returns errors if/when merge request could not be updated' do
         # Make the merge request invalid
         merge_request.allow_broken = true
         merge_request.update!(source_project: nil)
