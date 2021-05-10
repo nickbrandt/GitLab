@@ -395,18 +395,94 @@ RSpec.describe Group do
       end
     end
 
-    context 'assigning a new parent' do
-      let!(:old_parent) { create(:group) }
-      let!(:new_parent) { create(:group) }
+    context 'assign a new parent' do
       let!(:group) { create(:group, parent: old_parent) }
+      let(:recorded_queries) { ActiveRecord::QueryRecorder.new }
+
+      subject do
+        recorded_queries.record do
+          group.update(parent: new_parent)
+        end
+      end
 
       before do
-        group.update(parent: new_parent)
+        subject
         reload_models(old_parent, new_parent, group)
       end
 
-      it 'updates traversal_ids' do
-        expect(group.traversal_ids).to eq [new_parent.id, group.id]
+      context 'within the same hierarchy' do
+        let!(:root) { create(:group).reload }
+        let!(:old_parent) { create(:group, parent: root) }
+        let!(:new_parent) { create(:group, parent: root) }
+
+        it 'updates traversal_ids' do
+          expect(group.traversal_ids).to eq [root.id, new_parent.id, group.id]
+        end
+
+        it_behaves_like 'hierarchy with traversal_ids'
+        it_behaves_like 'locked row' do
+          let(:row) { root }
+        end
+      end
+
+      context 'to another hierarchy' do
+        let!(:old_parent) { create(:group) }
+        let!(:new_parent) { create(:group) }
+        let!(:group) { create(:group, parent: old_parent) }
+
+        it 'updates traversal_ids' do
+          expect(group.traversal_ids).to eq [new_parent.id, group.id]
+        end
+
+        it_behaves_like 'locked rows' do
+          let(:rows) { [old_parent, new_parent] }
+        end
+
+        context 'old hierarchy' do
+          let(:root) { old_parent.root_ancestor }
+
+          it_behaves_like 'hierarchy with traversal_ids'
+        end
+
+        context 'new hierarchy' do
+          let(:root) { new_parent.root_ancestor }
+
+          it_behaves_like 'hierarchy with traversal_ids'
+        end
+      end
+
+      context 'from being a root ancestor' do
+        let!(:old_parent) { nil }
+        let!(:new_parent) { create(:group) }
+
+        it 'updates traversal_ids' do
+          expect(group.traversal_ids).to eq [new_parent.id, group.id]
+        end
+
+        it_behaves_like 'locked rows' do
+          let(:rows) { [group, new_parent] }
+        end
+
+        it_behaves_like 'hierarchy with traversal_ids' do
+          let(:root) { new_parent }
+        end
+      end
+
+      context 'to being a root ancestor' do
+        let!(:old_parent) { create(:group) }
+        let!(:new_parent) { nil }
+
+        it 'updates traversal_ids' do
+          expect(group.traversal_ids).to eq [group.id]
+        end
+
+        it_behaves_like 'locked rows' do
+          let(:rows) { [old_parent, group] }
+        end
+
+        it_behaves_like 'hierarchy with traversal_ids' do
+          let(:root) { group }
+        end
       end
     end
 
@@ -441,6 +517,10 @@ RSpec.describe Group do
         it { expect(group.self_and_descendants.to_sql).not_to include 'traversal_ids @>' }
       end
 
+      describe '#descendants' do
+        it { expect(group.descendants.to_sql).not_to include 'traversal_ids @>' }
+      end
+
       describe '#ancestors' do
         it { expect(group.ancestors.to_sql).not_to include 'traversal_ids <@' }
       end
@@ -451,6 +531,10 @@ RSpec.describe Group do
 
       describe '#self_and_descendants' do
         it { expect(group.self_and_descendants.to_sql).to include 'traversal_ids @>' }
+      end
+
+      describe '#descendants' do
+        it { expect(group.descendants.to_sql).to include 'traversal_ids @>' }
       end
 
       describe '#ancestors' do
@@ -546,6 +630,16 @@ RSpec.describe Group do
       subject { described_class.non_public_only.to_a }
 
       it { is_expected.to match_array([private_group, internal_group]) }
+    end
+
+    describe 'with_onboarding_progress' do
+      subject { described_class.with_onboarding_progress }
+
+      it 'joins onboarding_progress' do
+        create(:onboarding_progress, namespace: group)
+
+        expect(subject).to eq([group])
+      end
     end
 
     describe 'for_authorized_group_members' do

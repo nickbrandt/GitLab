@@ -487,7 +487,7 @@ Use local includes instead of symbolic links.
 > - It's not recommended for production use.
 > - To use it in GitLab self-managed instances, ask a GitLab administrator to enable it. **(CORE ONLY)**
 
-You can use wildcard paths (`*`) with `include:local`.
+You can use wildcard paths (`*` and `**`) with `include:local`.
 
 Example:
 
@@ -495,7 +495,19 @@ Example:
 include: 'configs/*.yml'
 ```
 
-When the pipeline runs, it adds all `.yml` files in the `configs` folder into the pipeline configuration.
+When the pipeline runs, GitLab:
+
+- Adds all `.yml` files in the `configs` directory into the pipeline configuration.
+- Does not add `.yml` files in subfolders of the `configs` directory. To allow this,
+  add the following configuration:
+
+  ```yaml
+  # This matches all `.yml` files in `configs` and any subfolder in it.
+  include: 'configs/**.yml'
+
+  # This matches all `.yml` files only in subfolders of `configs`.
+  include: 'configs/**/*.yml'
+  ```
 
 The wildcard file paths feature is under development and not ready for production use. It is
 deployed behind a feature flag that is **disabled by default**.
@@ -2958,11 +2970,7 @@ You can specify a [fallback cache key](#fallback-cache-key) to use if the specif
 ##### Multiple caches
 
 > - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/32814) in GitLab 13.10.
-> - [Deployed behind a feature flag](../../user/feature_flags.md), disabled by default.
-> - [Enabled by default](https://gitlab.com/gitlab-org/gitlab/-/issues/321877) in GitLab 13.11.
-> - Enabled on GitLab.com.
-> - Recommended for production use.
-> - For GitLab self-managed instances, GitLab administrators can opt to [disable it](#enable-or-disable-multiple-caches). **(FREE SELF)**
+> - [Feature Flag removed](https://gitlab.com/gitlab-org/gitlab/-/issues/321877), in GitLab 13.12.
 
 You can have a maximum of four caches:
 
@@ -2988,25 +2996,6 @@ test-job:
 
 If multiple caches are combined with a [Fallback cache key](#fallback-cache-key),
 the fallback is fetched multiple times if multiple caches are not found.
-
-##### Enable or disable multiple caches **(FREE SELF)**
-
-The multiple caches feature is under development but ready for production use.
-It is deployed behind a feature flag that is **enabled by default**.
-[GitLab administrators with access to the GitLab Rails console](../../administration/feature_flags.md)
-can opt to disable it.
-
-To enable it:
-
-```ruby
-Feature.enable(:multiple_cache_per_job)
-```
-
-To disable it:
-
-```ruby
-Feature.disable(:multiple_cache_per_job)
-```
 
 #### Fallback cache key
 
@@ -3274,10 +3263,6 @@ If the artifacts of the job that is set as a dependency are
 [expired](#artifactsexpire_in) or
 [deleted](../pipelines/job_artifacts.md#delete-job-artifacts), then
 the dependent job fails.
-
-You can ask your administrator to
-[flip this switch](../../administration/job_artifacts.md#validation-for-dependencies)
-and bring back the old behavior.
 
 #### `artifacts:exclude`
 

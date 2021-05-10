@@ -1674,4 +1674,41 @@ RSpec.describe User do
       end
     end
   end
+
+  describe '#has_required_credit_card_to_run_pipelines?' do
+    let_it_be(:project) { create(:project) }
+
+    subject { user.has_required_credit_card_to_run_pipelines?(project) }
+
+    using RSpec::Parameterized::TableSyntax
+
+    where(:is_saas, :cc_present, :is_free, :is_trial, :free_ff_enabled, :trial_ff_enabled, :result) do
+      # self-hosted
+      false | false | false | false | true  | true  | true  # paid plan
+      false | false | false | true  | true  | true  | true  # missing CC on trial plan
+
+      # saas
+      true  | false | false | false | true  | true  | true  # missing CC on paid plan
+      true  | false | true  | false | true  | true  | false # missing CC on free plan
+      true  | false | true  | false | false | true  | true  # missing CC on free plan - FF off
+      true  | false | false | true  | true  | true  | false # missing CC on trial plan
+      true  | false | false | true  | true  | false | true  # missing CC on trial plan - FF off
+      true  | true  | true  | false | true  | true  | true  # present CC on free plan
+      true  | true  | false | true  | true  | true  | true  # present CC on trial plan
+    end
+
+    with_them do
+      before do
+        allow(::Gitlab).to receive(:com?).and_return(is_saas)
+        allow(user).to receive(:credit_card_validated_at).and_return(Time.current) if cc_present
+        allow(project.namespace).to receive(:free_plan?).and_return(is_free)
+        allow(project.namespace).to receive(:trial?).and_return(is_trial)
+        stub_feature_flags(
+          ci_require_credit_card_on_free_plan: free_ff_enabled,
+          ci_require_credit_card_on_trial_plan: trial_ff_enabled)
+      end
+
+      it { is_expected.to eq(result) }
+    end
+  end
 end

@@ -19,20 +19,41 @@ RSpec.describe 'layouts/nav/sidebar/_project' do
 
   it_behaves_like 'has nav sidebar'
 
-  describe 'Project Overview' do
+  describe 'Project information' do
     it 'has a link to the project path' do
       render
 
-      expect(rendered).to have_link('Project overview', href: project_path(project), class: %w(shortcuts-project rspec-project-link))
-      expect(rendered).to have_selector('[aria-label="Project overview"]')
+      expect(rendered).to have_link('Project information', href: project_path(project), class: %w(shortcuts-project rspec-project-link))
+      expect(rendered).to have_selector('[aria-label="Project information"]')
+    end
+
+    context 'when feature flag :sidebar_refactor is disabled' do
+      it 'has a link to the project path' do
+        stub_feature_flags(sidebar_refactor: false)
+
+        render
+
+        expect(rendered).to have_link('Project overview', href: project_path(project), class: %w(shortcuts-project rspec-project-link))
+        expect(rendered).to have_selector('[aria-label="Project overview"]')
+      end
     end
 
     describe 'Details' do
-      it 'has a link to the projects path' do
+      it 'does not have a link to the details menu' do
         render
 
-        expect(rendered).to have_link('Details', href: project_path(project), class: 'shortcuts-project')
-        expect(rendered).to have_selector('[aria-label="Project details"]')
+        expect(rendered).not_to have_link('Details', href: project_path(project))
+      end
+
+      context 'when feature flag :sidebar_refactor is disabled' do
+        it 'has a link to the projects path' do
+          stub_feature_flags(sidebar_refactor: false)
+
+          render
+
+          expect(rendered).to have_link('Details', href: project_path(project), class: 'shortcuts-project')
+          expect(rendered).to have_selector('[aria-label="Project details"]')
+        end
       end
     end
 
@@ -783,13 +804,39 @@ RSpec.describe 'layouts/nav/sidebar/_project' do
     end
   end
 
-  describe 'wiki entry tab' do
-    let(:can_read_wiki) { true }
+  describe 'Confluence' do
+    let!(:service) { create(:confluence_service, project: project, active: active) }
 
     before do
-      allow(view).to receive(:can?).with(user, :read_wiki, project).and_return(can_read_wiki)
+      render
     end
 
+    context 'when the Confluence integration is active' do
+      let(:active) { true }
+
+      it 'shows the Confluence link' do
+        expect(rendered).to have_link('Confluence', href: project_wikis_confluence_path(project))
+      end
+
+      it 'does not show the GitLab wiki link' do
+        expect(rendered).not_to have_link('Wiki')
+      end
+    end
+
+    context 'when it is disabled' do
+      let(:active) { false }
+
+      it 'does not show the Confluence link' do
+        expect(rendered).not_to have_link('Confluence')
+      end
+
+      it 'shows the GitLab wiki link' do
+        expect(rendered).to have_link('Wiki', href: wiki_path(project.wiki))
+      end
+    end
+  end
+
+  describe 'Wiki' do
     describe 'when wiki is enabled' do
       it 'shows the wiki tab with the wiki internal link' do
         render
@@ -799,9 +846,9 @@ RSpec.describe 'layouts/nav/sidebar/_project' do
     end
 
     describe 'when wiki is disabled' do
-      let(:can_read_wiki) { false }
+      let(:user) { nil }
 
-      it 'does not show the wiki tab' do
+      it 'does not show the wiki link' do
         render
 
         expect(rendered).not_to have_link('Wiki')
@@ -809,7 +856,7 @@ RSpec.describe 'layouts/nav/sidebar/_project' do
     end
   end
 
-  describe 'external wiki entry tab' do
+  describe 'External Wiki' do
     let(:properties) { { 'external_wiki_url' => 'https://gitlab.com' } }
     let(:service_status) { true }
 
@@ -829,7 +876,7 @@ RSpec.describe 'layouts/nav/sidebar/_project' do
     context 'when it is disabled' do
       let(:service_status) { false }
 
-      it 'does not show the external wiki tab' do
+      it 'does not show the external wiki link' do
         render
 
         expect(rendered).not_to have_link('External wiki')
@@ -837,89 +884,247 @@ RSpec.describe 'layouts/nav/sidebar/_project' do
     end
   end
 
-  describe 'confluence tab' do
-    let!(:service) { create(:confluence_service, project: project, active: active) }
-
+  describe 'Snippets' do
     before do
       render
     end
 
-    context 'when the Confluence integration is active' do
-      let(:active) { true }
-
-      it 'shows the Confluence tab' do
-        expect(rendered).to have_link('Confluence', href: project_wikis_confluence_path(project))
-      end
-
-      it 'does not show the GitLab wiki tab' do
-        expect(rendered).not_to have_link('Wiki')
+    context 'when user can access snippets' do
+      it 'shows Snippets link' do
+        expect(rendered).to have_link('Snippets', href: project_snippets_path(project))
       end
     end
 
-    context 'when it is disabled' do
-      let(:active) { false }
+    context 'when user cannot access snippets' do
+      let(:user) { nil }
 
-      it 'does not show the Confluence tab' do
-        expect(rendered).not_to have_link('Confluence')
-      end
-
-      it 'shows the GitLab wiki tab' do
-        expect(rendered).to have_link('Wiki', href: wiki_path(project.wiki))
+      it 'does not show Snippets link' do
+        expect(rendered).not_to have_link('Snippets')
       end
     end
   end
 
-  describe 'operations settings tab' do
-    describe 'archive projects' do
-      before do
-        project.update!(archived: project_archived)
+  describe 'Members' do
+    before do
+      render
+    end
+
+    context 'when user can access members' do
+      it 'show Members link' do
+        expect(rendered).to have_link('Members', href: project_project_members_path(project))
+      end
+    end
+
+    context 'when user cannot access members' do
+      let(:user) { nil }
+
+      it 'show Members link' do
+        expect(rendered).not_to have_link('Members')
+      end
+    end
+  end
+
+  describe 'Settings' do
+    describe 'General' do
+      it 'has a link to the General settings' do
+        render
+
+        expect(rendered).to have_link('General', href: edit_project_path(project))
+      end
+    end
+
+    describe 'Integrations' do
+      it 'has a link to the Integrations settings' do
+        render
+
+        expect(rendered).to have_link('Integrations', href: project_settings_integrations_path(project))
+      end
+    end
+
+    describe 'WebHooks' do
+      it 'has a link to the WebHooks settings' do
+        render
+
+        expect(rendered).to have_link('Webhooks', href: project_hooks_path(project))
+      end
+    end
+
+    describe 'Access Tokens' do
+      context 'self-managed instance' do
+        before do
+          allow(Gitlab).to receive(:com?).and_return(false)
+        end
+
+        it 'has a link to the Access Tokens settings' do
+          render
+
+          expect(rendered).to have_link('Access Tokens', href: project_settings_access_tokens_path(project))
+        end
       end
 
-      context 'when project is archived' do
-        let(:project_archived) { true }
+      context 'gitlab.com' do
+        before do
+          allow(Gitlab).to receive(:com?).and_return(true)
+        end
 
-        it 'does not show the operations settings tab' do
+        it 'has a link to the Access Tokens settings' do
+          render
+
+          expect(rendered).to have_link('Access Tokens', href: project_settings_access_tokens_path(project))
+        end
+      end
+    end
+
+    describe 'Repository' do
+      it 'has a link to the Repository settings' do
+        render
+
+        expect(rendered).to have_link('Repository', href: project_settings_repository_path(project))
+      end
+    end
+
+    describe 'CI/CD' do
+      context 'when project is archived' do
+        before do
+          project.update!(archived: true)
+        end
+
+        it 'does not have a link to the CI/CD settings' do
+          render
+
+          expect(rendered).not_to have_link('CI/CD', href: project_settings_ci_cd_path(project))
+        end
+      end
+
+      context 'when project is not archived' do
+        it 'has a link to the CI/CD settings' do
+          render
+
+          expect(rendered).to have_link('CI/CD', href: project_settings_ci_cd_path(project))
+        end
+      end
+    end
+
+    describe 'Operations' do
+      context 'when project is archived' do
+        before do
+          project.update!(archived: true)
+        end
+
+        it 'does not have a link to the Operations settings' do
           render
 
           expect(rendered).not_to have_link('Operations', href: project_settings_operations_path(project))
         end
       end
 
-      context 'when project is active' do
-        let(:project_archived) { false }
-
-        it 'shows the operations settings tab' do
+      context 'when project is not archived active' do
+        it 'has a link to the Operations settings' do
           render
 
           expect(rendered).to have_link('Operations', href: project_settings_operations_path(project))
         end
       end
     end
-  end
 
-  describe 'project access tokens' do
-    context 'self-managed instance' do
+    describe 'Pages' do
       before do
-        allow(Gitlab).to receive(:com?).and_return(false)
+        stub_config(pages: { enabled: pages_enabled })
       end
 
-      it 'displays "Access Tokens" nav item' do
-        render
+      context 'when pages are enabled' do
+        let(:pages_enabled) { true }
 
-        expect(rendered).to have_link('Access Tokens', href: project_settings_access_tokens_path(project))
+        it 'has a link to the Pages settings' do
+          render
+
+          expect(rendered).to have_link('Pages', href: project_pages_path(project))
+        end
+      end
+
+      context 'when pages are not enabled' do
+        let(:pages_enabled) { false }
+
+        it 'does not have a link to the Pages settings' do
+          render
+
+          expect(rendered).not_to have_link('Pages', href: project_pages_path(project))
+        end
       end
     end
 
-    context 'gitlab.com' do
+    describe 'Packages & Registries' do
       before do
-        allow(Gitlab).to receive(:com?).and_return(true)
+        stub_container_registry_config(enabled: registry_enabled)
       end
 
-      it 'displays "Access Tokens" nav item' do
-        render
+      context 'when registry is enabled' do
+        let(:registry_enabled) { true }
 
-        expect(rendered).to have_link('Access Tokens', href: project_settings_access_tokens_path(project))
+        it 'has a link to the Packages & Registries settings' do
+          render
+
+          expect(rendered).to have_link('Packages & Registries', href: project_settings_packages_and_registries_path(project))
+        end
+
+        context 'when feature flag :sidebar_refactor is disabled' do
+          it 'does not have a link to the Packages & Registries settings' do
+            stub_feature_flags(sidebar_refactor: false)
+
+            render
+
+            expect(rendered).not_to have_link('Packages & Registries', href: project_settings_packages_and_registries_path(project))
+          end
+        end
       end
+
+      context 'when registry is not enabled' do
+        let(:registry_enabled) { false }
+
+        it 'does not have a link to the Packages & Registries settings' do
+          render
+
+          expect(rendered).not_to have_link('Packages & Registries', href: project_settings_packages_and_registries_path(project))
+        end
+      end
+    end
+  end
+
+  describe 'Hidden menus' do
+    it 'has a link to the Activity page' do
+      render
+
+      expect(rendered).to have_link('Activity', href: activity_project_path(project), class: 'shortcuts-project-activity', visible: false)
+    end
+
+    it 'has a link to the Graph page' do
+      render
+
+      expect(rendered).to have_link('Graph', href: project_network_path(project, current_ref), class: 'shortcuts-network', visible: false)
+    end
+
+    it 'has a link to the New Issue page' do
+      render
+
+      expect(rendered).to have_link('Create a new issue', href: new_project_issue_path(project), class: 'shortcuts-new-issue', visible: false)
+    end
+
+    it 'has a link to the Jobs page' do
+      render
+
+      expect(rendered).to have_link('Jobs', href: project_jobs_path(project), class: 'shortcuts-builds', visible: false)
+    end
+
+    it 'has a link to the Commits page' do
+      render
+
+      expect(rendered).to have_link('Commits', href: project_commits_path(project), class: 'shortcuts-commits', visible: false)
+    end
+
+    it 'has a link to the Issue Boards page' do
+      render
+
+      expect(rendered).to have_link('Issue Boards', href: project_boards_path(project), class: 'shortcuts-issue-boards', visible: false)
     end
   end
 

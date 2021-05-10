@@ -82,6 +82,7 @@ export default {
       'enableCustomOrdering',
       'cycleAnalyticsRequestParams',
       'pathNavigationData',
+      'isOverviewStageSelected',
     ]),
     ...mapGetters('customStages', ['customStageFormActive']),
     shouldRenderEmptyState() {
@@ -89,9 +90,6 @@ export default {
     },
     shouldDisplayFilters() {
       return !this.errorCode;
-    },
-    isOverviewStageSelected() {
-      return this.selectedStage?.id === OVERVIEW_STAGE_ID;
     },
     shouldDisplayDurationChart() {
       return (

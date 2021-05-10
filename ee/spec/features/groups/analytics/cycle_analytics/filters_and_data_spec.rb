@@ -139,8 +139,16 @@ RSpec.describe 'Group value stream analytics filters and data', :js do
         expect(page).to have_selector(path_nav_selector)
       end
 
+      it 'each stage will have median values' do
+        stage_medians = page.all('.gl-path-button span').collect(&:text)
+
+        expect(stage_medians).to eq(["-"] * 7)
+      end
+
       it 'displays the default list of stages' do
         path_nav = page.find(path_nav_selector)
+
+        expect(path_nav).to have_content(_("Overview"))
 
         %w[Issue Plan Code Test Review Staging].each do |item|
           string_id = "CycleAnalytics|#{item}"

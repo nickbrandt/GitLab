@@ -24,7 +24,9 @@ Fields that are deprecated are marked with **{warning-solid}**.
 Items (fields, enums, etc) that have been removed according to our [deprecation process](../index.md#deprecation-and-removal-process) can be found
 in [Removed Items](../removed_items.md).
 
-<!-- vale gitlab.Spelling = NO -->
+<!-- vale off -->
+<!-- Docs linting disabled after this line. -->
+<!-- See https://docs.gitlab.com/ee/development/documentation/testing.html#disable-vale-tests -->
 
 ## `Query` type
 
@@ -2602,6 +2604,44 @@ Input type: `JiraImportUsersInput`
 | <a id="mutationjiraimportuserserrors"></a>`errors` | [`[String!]!`](#string) | Errors encountered during execution of the mutation. |
 | <a id="mutationjiraimportusersjirausers"></a>`jiraUsers` | [`[JiraUser!]`](#jirauser) | Users returned from Jira, matched by email and name if possible. |
 
+### `Mutation.jobPlay`
+
+Input type: `JobPlayInput`
+
+#### Arguments
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| <a id="mutationjobplayclientmutationid"></a>`clientMutationId` | [`String`](#string) | A unique identifier for the client performing the mutation. |
+| <a id="mutationjobplayid"></a>`id` | [`CiBuildID!`](#cibuildid) | The ID of the job to mutate. |
+
+#### Fields
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| <a id="mutationjobplayclientmutationid"></a>`clientMutationId` | [`String`](#string) | A unique identifier for the client performing the mutation. |
+| <a id="mutationjobplayerrors"></a>`errors` | [`[String!]!`](#string) | Errors encountered during execution of the mutation. |
+| <a id="mutationjobplayjob"></a>`job` | [`CiJob`](#cijob) | The job after the mutation. |
+
+### `Mutation.jobRetry`
+
+Input type: `JobRetryInput`
+
+#### Arguments
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| <a id="mutationjobretryclientmutationid"></a>`clientMutationId` | [`String`](#string) | A unique identifier for the client performing the mutation. |
+| <a id="mutationjobretryid"></a>`id` | [`CiBuildID!`](#cibuildid) | The ID of the job to mutate. |
+
+#### Fields
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| <a id="mutationjobretryclientmutationid"></a>`clientMutationId` | [`String`](#string) | A unique identifier for the client performing the mutation. |
+| <a id="mutationjobretryerrors"></a>`errors` | [`[String!]!`](#string) | Errors encountered during execution of the mutation. |
+| <a id="mutationjobretryjob"></a>`job` | [`CiJob`](#cijob) | The job after the mutation. |
+
 ### `Mutation.labelCreate`
 
 Input type: `LabelCreateInput`
@@ -2741,6 +2781,27 @@ Input type: `MergeRequestSetAssigneesInput`
 | <a id="mutationmergerequestsetassigneeserrors"></a>`errors` | [`[String!]!`](#string) | Errors encountered during execution of the mutation. |
 | <a id="mutationmergerequestsetassigneesmergerequest"></a>`mergeRequest` | [`MergeRequest`](#mergerequest) | The merge request after mutation. |
 
+### `Mutation.mergeRequestSetDraft`
+
+Input type: `MergeRequestSetDraftInput`
+
+#### Arguments
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| <a id="mutationmergerequestsetdraftclientmutationid"></a>`clientMutationId` | [`String`](#string) | A unique identifier for the client performing the mutation. |
+| <a id="mutationmergerequestsetdraftdraft"></a>`draft` | [`Boolean!`](#boolean) | Whether or not to set the merge request as a draft. |
+| <a id="mutationmergerequestsetdraftiid"></a>`iid` | [`String!`](#string) | The IID of the merge request to mutate. |
+| <a id="mutationmergerequestsetdraftprojectpath"></a>`projectPath` | [`ID!`](#id) | The project the merge request to mutate is in. |
+
+#### Fields
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| <a id="mutationmergerequestsetdraftclientmutationid"></a>`clientMutationId` | [`String`](#string) | A unique identifier for the client performing the mutation. |
+| <a id="mutationmergerequestsetdrafterrors"></a>`errors` | [`[String!]!`](#string) | Errors encountered during execution of the mutation. |
+| <a id="mutationmergerequestsetdraftmergerequest"></a>`mergeRequest` | [`MergeRequest`](#mergerequest) | The merge request after mutation. |
+
 ### `Mutation.mergeRequestSetLabels`
 
 Input type: `MergeRequestSetLabelsInput`
@@ -2827,6 +2888,10 @@ Input type: `MergeRequestSetSubscriptionInput`
 | <a id="mutationmergerequestsetsubscriptionmergerequest"></a>`mergeRequest` | [`MergeRequest`](#mergerequest) | The merge request after mutation. |
 
 ### `Mutation.mergeRequestSetWip`
+
+WARNING:
+**Deprecated** in 13.12.
+Use mergeRequestSetDraft.
 
 Input type: `MergeRequestSetWipInput`
 
@@ -3871,6 +3936,8 @@ Input type: `UpdateNamespacePackageSettingsInput`
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | <a id="mutationupdatenamespacepackagesettingsclientmutationid"></a>`clientMutationId` | [`String`](#string) | A unique identifier for the client performing the mutation. |
+| <a id="mutationupdatenamespacepackagesettingsgenericduplicateexceptionregex"></a>`genericDuplicateExceptionRegex` | [`UntrustedRegexp`](#untrustedregexp) | When generic_duplicates_allowed is false, you can publish duplicate packages with names that match this regex. Otherwise, this setting has no effect. |
+| <a id="mutationupdatenamespacepackagesettingsgenericduplicatesallowed"></a>`genericDuplicatesAllowed` | [`Boolean`](#boolean) | Indicates whether duplicate generic packages are allowed for this namespace. |
 | <a id="mutationupdatenamespacepackagesettingsmavenduplicateexceptionregex"></a>`mavenDuplicateExceptionRegex` | [`UntrustedRegexp`](#untrustedregexp) | When maven_duplicates_allowed is false, you can publish duplicate packages with names that match this regex. Otherwise, this setting has no effect. |
 | <a id="mutationupdatenamespacepackagesettingsmavenduplicatesallowed"></a>`mavenDuplicatesAllowed` | [`Boolean`](#boolean) | Indicates whether duplicate Maven packages are allowed for this namespace. |
 | <a id="mutationupdatenamespacepackagesettingsnamespacepath"></a>`namespacePath` | [`ID!`](#id) | The namespace path where the namespace package setting is located. |
@@ -9005,7 +9072,7 @@ four standard [pagination arguments](#connection-pagination-arguments):
 
 ##### `Group.timelogs`
 
-Time logged on issues in the group and its subgroups.
+Time logged on issues and merge requests in the group and its subgroups.
 
 Returns [`TimelogConnection!`](#timelogconnection).
 
@@ -9626,6 +9693,7 @@ Maven metadata.
 | <a id="mergerequestdiscussions"></a>`discussions` | [`DiscussionConnection!`](#discussionconnection) | All discussions on this noteable. (see [Connections](#connections)) |
 | <a id="mergerequestdivergedfromtargetbranch"></a>`divergedFromTargetBranch` | [`Boolean!`](#boolean) | Indicates if the source branch is behind the target branch. |
 | <a id="mergerequestdownvotes"></a>`downvotes` | [`Int!`](#int) | Number of downvotes for the merge request. |
+| <a id="mergerequestdraft"></a>`draft` | [`Boolean!`](#boolean) | Indicates if the merge request is a draft. |
 | <a id="mergerequestforceremovesourcebranch"></a>`forceRemoveSourceBranch` | [`Boolean`](#boolean) | Indicates if the project settings will lead to source branch deletion after merge. |
 | <a id="mergerequesthasci"></a>`hasCi` | [`Boolean!`](#boolean) | Indicates if the merge request has CI. |
 | <a id="mergerequesthassecurityreports"></a>`hasSecurityReports` | [`Boolean!`](#boolean) | Indicates if the source branch has any security reports. |
@@ -9681,7 +9749,7 @@ Maven metadata.
 | <a id="mergerequestusernotescount"></a>`userNotesCount` | [`Int`](#int) | User notes count of the merge request. |
 | <a id="mergerequestuserpermissions"></a>`userPermissions` | [`MergeRequestPermissions!`](#mergerequestpermissions) | Permissions for the current user on the resource. |
 | <a id="mergerequestweburl"></a>`webUrl` | [`String`](#string) | Web URL of the merge request. |
-| <a id="mergerequestworkinprogress"></a>`workInProgress` | [`Boolean!`](#boolean) | Indicates if the merge request is a draft. |
+| <a id="mergerequestworkinprogress"></a>`workInProgress` **{warning-solid}** | [`Boolean!`](#boolean) | **Deprecated** in 13.12. Use `draft`. |
 
 #### Fields with arguments
 
@@ -10363,6 +10431,7 @@ Represents a package in the Package Registry. Note that this type is in beta and
 | <a id="packagepackagetype"></a>`packageType` | [`PackageTypeEnum!`](#packagetypeenum) | Package type. |
 | <a id="packagepipelines"></a>`pipelines` | [`PipelineConnection`](#pipelineconnection) | Pipelines that built the package. (see [Connections](#connections)) |
 | <a id="packageproject"></a>`project` | [`Project!`](#project) | Project where the package is stored. |
+| <a id="packagestatus"></a>`status` | [`PackageStatus!`](#packagestatus) | Package status. |
 | <a id="packagetags"></a>`tags` | [`PackageTagConnection`](#packagetagconnection) | Package tags. (see [Connections](#connections)) |
 | <a id="packageupdatedat"></a>`updatedAt` | [`Time!`](#time) | Date of most recent update. |
 | <a id="packageversion"></a>`version` | [`String`](#string) | Version string. |
@@ -10397,6 +10466,7 @@ Represents a package details in the Package Registry. Note that this type is in 
 | <a id="packagedetailstypepackagetype"></a>`packageType` | [`PackageTypeEnum!`](#packagetypeenum) | Package type. |
 | <a id="packagedetailstypepipelines"></a>`pipelines` | [`PipelineConnection`](#pipelineconnection) | Pipelines that built the package. (see [Connections](#connections)) |
 | <a id="packagedetailstypeproject"></a>`project` | [`Project!`](#project) | Project where the package is stored. |
+| <a id="packagedetailstypestatus"></a>`status` | [`PackageStatus!`](#packagestatus) | Package status. |
 | <a id="packagedetailstypetags"></a>`tags` | [`PackageTagConnection`](#packagetagconnection) | Package tags. (see [Connections](#connections)) |
 | <a id="packagedetailstypeupdatedat"></a>`updatedAt` | [`Time!`](#time) | Date of most recent update. |
 | <a id="packagedetailstypeversion"></a>`version` | [`String`](#string) | Version string. |
@@ -10446,6 +10516,8 @@ Namespace-level Package Registry settings.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
+| <a id="packagesettingsgenericduplicateexceptionregex"></a>`genericDuplicateExceptionRegex` | [`UntrustedRegexp`](#untrustedregexp) | When generic_duplicates_allowed is false, you can publish duplicate packages with names that match this regex. Otherwise, this setting has no effect. |
+| <a id="packagesettingsgenericduplicatesallowed"></a>`genericDuplicatesAllowed` | [`Boolean!`](#boolean) | Indicates whether duplicate generic packages are allowed for this namespace. |
 | <a id="packagesettingsmavenduplicateexceptionregex"></a>`mavenDuplicateExceptionRegex` | [`UntrustedRegexp`](#untrustedregexp) | When maven_duplicates_allowed is false, you can publish duplicate packages with names that match this regex. Otherwise, this setting has no effect. |
 | <a id="packagesettingsmavenduplicatesallowed"></a>`mavenDuplicatesAllowed` | [`Boolean!`](#boolean) | Indicates whether duplicate Maven packages are allowed for this namespace. |
 
@@ -11714,6 +11786,8 @@ Returns [`[String!]`](#string).
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
+| <a id="repositorybranchnameslimit"></a>`limit` | [`Int!`](#int) | The number of branch names to return. |
+| <a id="repositorybranchnamesoffset"></a>`offset` | [`Int!`](#int) | The number of branch names to skip. |
 | <a id="repositorybranchnamessearchpattern"></a>`searchPattern` | [`String!`](#string) | The pattern to search for branch names by. |
 
 ##### `Repository.tree`
@@ -11744,6 +11818,7 @@ Returns [`Tree`](#tree).
 | <a id="repositoryblobname"></a>`name` | [`String`](#string) | Blob name. |
 | <a id="repositorybloboid"></a>`oid` | [`String!`](#string) | OID of the blob. |
 | <a id="repositoryblobpath"></a>`path` | [`String!`](#string) | Path of the blob. |
+| <a id="repositoryblobplaindata"></a>`plainData` | [`String`](#string) | Blob plain highlighted data. |
 | <a id="repositoryblobrawblob"></a>`rawBlob` | [`String`](#string) | The raw content of the blob. |
 | <a id="repositoryblobrawpath"></a>`rawPath` | [`String`](#string) | Web path to download the raw blob. |
 | <a id="repositoryblobrawsize"></a>`rawSize` | [`Int`](#int) | Size (in bytes) of the blob, or the blob target if stored externally. |
@@ -12498,6 +12573,7 @@ Represents a historically accurate report about the timebox.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | <a id="timelogissue"></a>`issue` | [`Issue`](#issue) | The issue that logged time was added to. |
+| <a id="timelogmergerequest"></a>`mergeRequest` | [`MergeRequest`](#mergerequest) | The merge request that logged time was added to. |
 | <a id="timelognote"></a>`note` | [`Note`](#note) | The note where the quick action to add the logged time was executed. |
 | <a id="timelogspentat"></a>`spentAt` | [`Time`](#time) | Timestamp of when the time tracked was spent at. |
 | <a id="timelogtimespent"></a>`timeSpent` | [`Int!`](#int) | The time spent displayed in seconds. |
@@ -14046,6 +14122,15 @@ Values for sorting package.
 | <a id="packagesortversion_asc"></a>`VERSION_ASC` | Ordered by version in ascending order. |
 | <a id="packagesortversion_desc"></a>`VERSION_DESC` | Ordered by version in descending order. |
 
+### `PackageStatus`
+
+| Value | Description |
+| ----- | ----------- |
+| <a id="packagestatusdefault"></a>`DEFAULT` | Packages with a default status. |
+| <a id="packagestatuserror"></a>`ERROR` | Packages with a error status. |
+| <a id="packagestatushidden"></a>`HIDDEN` | Packages with a hidden status. |
+| <a id="packagestatusprocessing"></a>`PROCESSING` | Packages with a processing status. |
+
 ### `PackageTypeEnum`
 
 | Value | Description |
@@ -14359,6 +14444,7 @@ Name of the feature that the callout is for.
 | <a id="usercalloutfeaturenameenumunfinished_tag_cleanup_callout"></a>`UNFINISHED_TAG_CLEANUP_CALLOUT` | Callout feature name for unfinished_tag_cleanup_callout. |
 | <a id="usercalloutfeaturenameenumwebhooks_moved"></a>`WEBHOOKS_MOVED` | Callout feature name for webhooks_moved. |
 | <a id="usercalloutfeaturenameenumweb_ide_alert_dismissed"></a>`WEB_IDE_ALERT_DISMISSED` | Callout feature name for web_ide_alert_dismissed. |
+| <a id="usercalloutfeaturenameenumweb_ide_ci_environments_guidance"></a>`WEB_IDE_CI_ENVIRONMENTS_GUIDANCE` | Callout feature name for web_ide_ci_environments_guidance. |
 
 ### `UserState`
 
@@ -14553,6 +14639,12 @@ An example `BoardsEpicListID` is: `"gid://gitlab/Boards::EpicList/1"`.
 ### `Boolean`
 
 Represents `true` or `false` values.
+
+### `CiBuildID`
+
+A `CiBuildID` is a global ID. It is encoded as a string.
+
+An example `CiBuildID` is: `"gid://gitlab/Ci::Build/1"`.
 
 ### `CiPipelineID`
 

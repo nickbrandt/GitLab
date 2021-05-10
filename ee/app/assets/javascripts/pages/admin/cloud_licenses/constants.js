@@ -37,6 +37,8 @@ export const detailsLabels = {
   startsAt: s__('SuperSonics|Started'),
 };
 
+export const removeLicense = __('Remove license');
+export const uploadLicense = __('Upload license');
 export const uploadLegacyLicense = s__('SuperSonics|Upload a legacy license');
 export const billableUsersTitle = s__('CloudLicense|Billable users');
 export const maximumUsersTitle = s__('CloudLicense|Maximum users');
@@ -113,6 +115,9 @@ export const buySubscriptionCard = {
 };
 
 export const CONNECTIVITY_ERROR = 'CONNECTIVITY_ERROR';
+export const generalActivationError = s__(
+  'SuperSonics|An error occurred while activating your subscription.',
+);
 export const connectivityErrorAlert = {
   subtitle: s__(
     'CloudLicense|To activate your subscription, connect to GitLab servers through the %{linkStart}Cloud Sync service%{linkEnd}, a hassle-free way to manage your subscription.',

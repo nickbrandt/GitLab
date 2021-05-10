@@ -2,6 +2,7 @@
 class Groups::EpicBoardsController < Groups::ApplicationController
   include BoardsActions
   include RecordUserLastActivity
+  include RedisTracking
   include Gitlab::Utils::StrongMemoize
   extend ::Gitlab::Utils::Override
 
@@ -10,6 +11,8 @@ class Groups::EpicBoardsController < Groups::ApplicationController
     push_frontend_feature_flag(:epic_boards, group, default_enabled: :yaml)
     push_frontend_feature_flag(:boards_filtered_search, group)
   end
+
+  track_redis_hll_event :index, :show, name: 'g_project_management_users_viewing_epic_boards'
 
   feature_category :boards
 

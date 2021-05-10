@@ -8,7 +8,6 @@ import {
   GlLink,
   GlSprintf,
 } from '@gitlab/ui';
-import produce from 'immer';
 import validation from '~/vue_shared/directives/validation';
 import {
   activateLabel,
@@ -16,20 +15,10 @@ import {
   subscriptionActivationForm,
   subscriptionQueries,
 } from '../constants';
-
-const getLicenseFromData = ({
-  data: {
-    gitlabSubscriptionActivate: { license },
-  },
-}) => license;
-
-const getErrorsAsData = ({
-  data: {
-    gitlabSubscriptionActivate: { errors },
-  },
-}) => errors;
+import { getErrorsAsData, updateSubscriptionAppCache } from '../graphql/utils';
 
 export const SUBSCRIPTION_ACTIVATION_FAILURE_EVENT = 'subscription-activation-failure';
+export const SUBSCRIPTION_ACTIVATION_SUCCESS_EVENT = 'subscription-activation-success';
 
 export default {
   name: 'CloudLicenseSubscriptionActivationForm',
@@ -52,7 +41,14 @@ export default {
   directives: {
     validation: validation(),
   },
-  emits: [SUBSCRIPTION_ACTIVATION_FAILURE_EVENT],
+  props: {
+    hideSubmitButton: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+  },
+  emits: [SUBSCRIPTION_ACTIVATION_FAILURE_EVENT, SUBSCRIPTION_ACTIVATION_SUCCESS_EVENT],
   data() {
     const form = {
       state: false,
@@ -101,17 +97,7 @@ export default {
               activationCode: this.form.fields.activationCode.value,
             },
           },
-          update: (cache, mutation) => {
-            const license = getLicenseFromData(mutation);
-            if (!license) {
-              return;
-            }
-            const { query } = subscriptionQueries;
-            const data = produce(license, (draftData) => {
-              draftData.currentLicense = license;
-            });
-            cache.writeQuery({ query, data });
-          },
+          update: this.updateSubscriptionAppCache,
         })
         .then((res) => {
           const errors = getErrorsAsData(res);
@@ -119,6 +105,7 @@ export default {
             const [error] = errors;
             throw new Error(error);
           }
+          this.$emit(SUBSCRIPTION_ACTIVATION_SUCCESS_EVENT);
         })
         .catch((error) => {
           this.$emit(SUBSCRIPTION_ACTIVATION_FAILURE_EVENT, error.message);
@@ -127,6 +114,7 @@ export default {
           this.isLoading = false;
         });
     },
+    updateSubscriptionAppCache,
   },
 };
 </script>
@@ -172,6 +160,7 @@ export default {
       </gl-form-group>
 
       <gl-button
+        v-if="!hideSubmitButton"
         :loading="isRequestingActivation"
         category="primary"
         class="gl-mt-6 js-no-auto-disable"
