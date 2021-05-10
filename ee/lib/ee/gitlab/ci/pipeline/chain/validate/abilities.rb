@@ -18,6 +18,10 @@ module EE
                   return error('Pipeline is disabled for mirror updates')
                 end
 
+                if current_user && !current_user.has_required_credit_card_to_run_pipelines?(project)
+                  return error('Credit card required to be on file in order to create a pipeline', drop_reason: :user_not_verified)
+                end
+
                 super
               end
             end
