@@ -49,7 +49,7 @@ module Namespaces
       end
 
       def sync_traversal_ids?
-        Feature.enabled?(:sync_traversal_ids, root_ancestor, default_enabled: :yaml)
+        Feature.enabled?(:sync_traversal_ids, root_ancestor, default_enabled: true)
       end
 
       def use_traversal_ids?
