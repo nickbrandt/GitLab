@@ -88,6 +88,7 @@ ci_cd_settings:
     - merge_pipelines_enabled
     - merge_trains_enabled
     - auto_rollback_enabled
+    - merge_before_pipeline_completes_enabled
   remapped_attributes:
     default_git_depth: ci_default_git_depth
     forward_deployment_enabled: ci_forward_deployment_enabled
