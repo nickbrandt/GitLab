@@ -52,10 +52,6 @@ FactoryBot.define do
       trial { false }
     end
 
-    trait :cloud do
-      cloud { true }
-    end
-
     data do
       attrs = [:gitlab_license]
       attrs << :trial if trial
