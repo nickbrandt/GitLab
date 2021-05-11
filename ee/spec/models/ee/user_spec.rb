@@ -136,7 +136,7 @@ RSpec.describe User do
 
     it 'returns the user' do
       expect(described_class.find_by_smartcard_identity(smartcard_identity.subject,
-                                             smartcard_identity.issuer))
+                                                        smartcard_identity.issuer))
         .to eq(user)
     end
   end
@@ -1249,7 +1249,7 @@ RSpec.describe User do
         before do
           allow(Gitlab::CurrentSettings)
             .to receive(:should_check_namespace_plan?)
-            .and_return(false)
+                  .and_return(false)
         end
 
         it { is_expected.to contain_exactly private_group, project_group, minimal_access_group }
@@ -1263,7 +1263,7 @@ RSpec.describe User do
         before do
           allow(Gitlab::CurrentSettings)
             .to receive(:should_check_namespace_plan?)
-            .and_return(true)
+                  .and_return(true)
           create(:gitlab_subscription, :ultimate, namespace: minimal_access_group)
           create(:group_member, :minimal_access, user: user, source: create(:group))
         end
@@ -1709,6 +1709,36 @@ RSpec.describe User do
       end
 
       it { is_expected.to eq(result) }
+    end
+  end
+
+  describe "#owns_group_without_trial" do
+    let_it_be(:user) { create(:user) }
+    let_it_be(:group) { create(:group) }
+
+    subject { user.owns_group_without_trial? }
+
+    it 'returns true if owns a group' do
+      group.add_owner(user)
+
+      is_expected.to be(true)
+    end
+
+    it 'returns false if is a member group' do
+      group.add_maintainer(user)
+
+      is_expected.to be(false)
+    end
+
+    it 'returns false if is not a member of any group' do
+      is_expected.to be(false)
+    end
+
+    it 'returns false if owns a group with a plan on a trial with an end date' do
+      group_with_plan = create(:group_with_plan, name: 'trial group', plan: :premium_plan, trial_ends_on: 1.year.from_now)
+      group_with_plan.add_owner(user)
+
+      is_expected.to be(false)
     end
   end
 end
