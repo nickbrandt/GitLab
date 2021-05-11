@@ -17,6 +17,7 @@ export default {
   computed: {
     ...mapState([
       'parentItem',
+      'weightSum',
       'descendantCounts',
       'healthStatus',
       'allowSubEpics',
@@ -30,6 +31,9 @@ export default {
     },
     showHealthStatus() {
       return this.healthStatus && this.allowIssuableHealthStatus;
+    },
+    totalWeight() {
+      return this.weightSum.openedIssues + this.weightSum.closedIssues;
     },
   },
   methods: {
@@ -92,6 +96,10 @@ export default {
             }}
           </span>
         </p>
+        <p class="font-weight-bold m-0">
+          {{ __('Total weight') }} &#8226;
+          <span class="text-secondary-400 font-weight-normal">{{ totalWeight }} </span>
+        </p>
       </gl-tooltip>
       <div
         ref="countBadge"
@@ -104,6 +112,10 @@ export default {
         <span class="d-inline-flex align-items-center" :class="{ 'ml-3': allowSubEpics }">
           <gl-icon name="issues" class="mr-1" />
           {{ totalIssuesCount }}
+        </span>
+        <span class="d-inline-flex align-items-center" :class="{ 'ml-3': allowSubEpics }">
+          <gl-icon name="weight" class="mr-1" />
+          {{ totalWeight }}
         </span>
       </div>
       <epic-health-status v-if="showHealthStatus" :health-status="healthStatus" />
