@@ -33,6 +33,7 @@ describe('Subscription Breakdown', () => {
   const [, legacyLicense] = subscriptionHistory;
   const connectivityHelpURL = 'connectivity/help/url';
   const customersPortalUrl = 'customers.dot';
+  const licenseRemovePath = '/license/remove/';
   const licenseUploadPath = '/license/upload/';
   const subscriptionSyncPath = '/sync/path/';
 
@@ -41,6 +42,7 @@ describe('Subscription Breakdown', () => {
   const findDetailsHistory = () => wrapper.findComponent(SubscriptionDetailsHistory);
   const findDetailsUserInfo = () => wrapper.findComponent(SubscriptionDetailsUserInfo);
   const findLicenseUploadAction = () => wrapper.findByTestId('license-upload-action');
+  const findLicenseRemoveAction = () => wrapper.findByTestId('license-remove-action');
   const findSubscriptionActivationAction = () =>
     wrapper.findByTestId('subscription-activation-action');
   const findSubscriptionMangeAction = () => wrapper.findByTestId('subscription-manage-action');
@@ -64,6 +66,7 @@ describe('Subscription Breakdown', () => {
           connectivityHelpURL,
           customersPortalUrl,
           licenseUploadPath,
+          licenseRemovePath,
           subscriptionSyncPath,
           ...provide,
         },
@@ -154,7 +157,7 @@ describe('Subscription Breakdown', () => {
         ${undefined}            | ${subscriptionType.CLOUD}  | ${false}
         ${undefined}            | ${subscriptionType.LEGACY} | ${false}
       `(
-        'with url is $url and type is $type the sync buttons is shown: $shouldShow',
+        'with url is $url and type is $type the sync button is shown: $shouldShow',
         ({ url, type, shouldShow }) => {
           const provide = { subscriptionSyncPath: url };
           const props = { subscription: { ...license.ULTIMATE, type } };
@@ -174,7 +177,7 @@ describe('Subscription Breakdown', () => {
         ${undefined}         | ${subscriptionType.LEGACY} | ${false}
         ${undefined}         | ${subscriptionType.CLOUD}  | ${false}
       `(
-        'with url is $url and type is $type the upload buttons is shown: $shouldShow',
+        'with url is $url and type is $type the upload button is shown: $shouldShow',
         ({ url, type, shouldShow }) => {
           const provide = { licenseUploadPath: url };
           const props = { subscription: { ...license.ULTIMATE, type } };
@@ -190,7 +193,7 @@ describe('Subscription Breakdown', () => {
         ${customersPortalUrl} | ${true}
         ${''}                 | ${false}
         ${undefined}          | ${false}
-      `('with url is $url the manage buttons is shown: $shouldShow', ({ url, shouldShow }) => {
+      `('with url is $url the manage button is shown: $shouldShow', ({ url, shouldShow }) => {
         const provide = { customersPortalUrl: url };
         const stubs = { GlCard, SubscriptionDetailsCard };
         createComponent({ provide, stubs });
@@ -198,7 +201,25 @@ describe('Subscription Breakdown', () => {
         expect(findSubscriptionMangeAction().exists()).toBe(shouldShow);
       });
 
-      it.todo('should show a remove subscription button');
+      it.each`
+        url                  | type                       | shouldShow
+        ${licenseRemovePath} | ${subscriptionType.LEGACY} | ${true}
+        ${licenseRemovePath} | ${subscriptionType.CLOUD}  | ${false}
+        ${''}                | ${subscriptionType.LEGACY} | ${false}
+        ${''}                | ${subscriptionType.CLOUD}  | ${false}
+        ${undefined}         | ${subscriptionType.LEGACY} | ${false}
+        ${undefined}         | ${subscriptionType.CLOUD}  | ${false}
+      `(
+        'with url is $url and type is $type the remove button is shown: $shouldShow',
+        ({ url, type, shouldShow }) => {
+          const provide = { licenseRemovePath: url };
+          const props = { subscription: { ...license.ULTIMATE, type } };
+          const stubs = { GlCard, SubscriptionDetailsCard };
+          createComponent({ props, provide, stubs });
+
+          expect(findLicenseRemoveAction().exists()).toBe(shouldShow);
+        },
+      );
     });
 
     describe('with a legacy license', () => {
