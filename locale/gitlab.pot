@@ -28821,10 +28821,19 @@ msgstr ""
 msgid "SecurityConfiguration|Available with %{linkStart}upgrade or free trial%{linkEnd}"
 msgstr ""
 
+msgid "SecurityConfiguration|Available with Ultimate"
+msgstr ""
+
 msgid "SecurityConfiguration|By default, all analyzers are applied in order to cover all languages across your project, and only run if the language is detected in the Merge Request."
 msgstr ""
 
+msgid "SecurityConfiguration|Configuration guide"
+msgstr ""
+
 msgid "SecurityConfiguration|Configure"
+msgstr ""
+
+msgid "SecurityConfiguration|Configure %{feature}"
 msgstr ""
 
 msgid "SecurityConfiguration|Configure via Merge Request"
@@ -28840,6 +28849,9 @@ msgid "SecurityConfiguration|Customize common SAST settings to suit your require
 msgstr ""
 
 msgid "SecurityConfiguration|Enable"
+msgstr ""
+
+msgid "SecurityConfiguration|Enable %{feature}"
 msgstr ""
 
 msgid "SecurityConfiguration|Enabled"
