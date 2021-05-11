@@ -199,6 +199,35 @@ BEGIN
 END;
 $$;
 
+CREATE FUNCTION validate_traversal_ids() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+IF array_length(NEW.traversal_ids, 1) > 0 AND
+   NEW.id <> COALESCE(NEW.traversal_ids[array_length(NEW.traversal_ids, 1)], 0)
+THEN
+  RAISE EXCEPTION 'The id (%) must be the last element in traversal_ids %', NEW.id, NEW.traversal_ids;
+END IF;
+
+IF array_length(NEW.traversal_ids, 1) > 0 AND
+   NEW.parent_id IS NULL AND
+   NEW.traversal_ids <> ARRAY[NEW.id]
+THEN
+  RAISE EXCEPTION 'The traversal_ids % must be [%] when parent_id is null', NEW.traversal_ids, NEW.id;
+END IF;
+
+IF array_length(NEW.traversal_ids, 1) > 0 AND
+   NEW.parent_id IS NOT NULL AND
+   NEW.parent_id <> COALESCE(NEW.traversal_ids[array_length(NEW.traversal_ids, 1)-1], 0)
+THEN
+  RAISE EXCEPTION 'The parent_id (%) must be the second last element in traversal_ids %', NEW.parent_id, NEW.traversal_ids;
+END IF;
+
+RETURN NEW;
+
+END
+$$;
+
 CREATE TABLE audit_events (
     id bigint NOT NULL,
     author_id integer NOT NULL,
@@ -25300,6 +25329,10 @@ CREATE TRIGGER trigger_has_external_wiki_on_delete AFTER DELETE ON services FOR 
 CREATE TRIGGER trigger_has_external_wiki_on_insert AFTER INSERT ON services FOR EACH ROW WHEN (((new.active = true) AND ((new.type)::text = 'ExternalWikiService'::text) AND (new.project_id IS NOT NULL))) EXECUTE FUNCTION set_has_external_wiki();
 
 CREATE TRIGGER trigger_has_external_wiki_on_update AFTER UPDATE ON services FOR EACH ROW WHEN ((((new.type)::text = 'ExternalWikiService'::text) AND (old.active <> new.active) AND (new.project_id IS NOT NULL))) EXECUTE FUNCTION set_has_external_wiki();
+
+CREATE CONSTRAINT TRIGGER trigger_validate_traversal_ids_on_insert AFTER INSERT ON namespaces DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION validate_traversal_ids();
+
+CREATE CONSTRAINT TRIGGER trigger_validate_traversal_ids_on_update AFTER UPDATE ON namespaces DEFERRABLE INITIALLY DEFERRED FOR EACH ROW WHEN ((new.parent_id <> old.parent_id)) EXECUTE FUNCTION validate_traversal_ids();
 
 ALTER TABLE ONLY chat_names
     ADD CONSTRAINT fk_00797a2bf9 FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE CASCADE;
