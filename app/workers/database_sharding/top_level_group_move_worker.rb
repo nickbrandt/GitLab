@@ -24,35 +24,29 @@ module DatabaseSharding
     feature_category :sharding
     idempotent!
     HOST = '/home/dylan/workspace/gitlab-development-kit/postgresql'
-    CREATE_REPLICATION_SLOT = "CREATE_REPLICATION_SLOT move_group LOGICAL test_decoding"
+    CREATE_REPLICATION_SLOT = "CREATE_REPLICATION_SLOT move_group LOGICAL test_decoding;"
     DROP_REPLICATION_SLOT = "DROP_REPLICATION_SLOT move_group"
 
     def perform(top_level_group_id)
+
+
+      result = `psql -h #{HOST} "replication=database dbname=gitlabhq_development" -c "#{DROP_REPLICATION_SLOT}"`
+      p result
       # Create a replication slot returning snapshot name
-      stdin, stdout, stderr, wait_thr = Open3.popen3("psql", '-h', HOST, "replication=database db_name=gitlabhq_development", '-c', CREATE_REPLICATION_SLOT)
 
-      p stdout.read
-      p stdout.read
-      p stdout.read
-      p stdout.read
+      replication_connection = PG.connect(ActiveRecord::Base.connection.raw_connection.conninfo_hash.compact.merge(replication: 'database'))
 
-      stdin.close  # stdin, stdout and stderr should be closed explicitly in this form.
-      stdout.close
-      stderr.close
-      exit_status = wait_thr.value
+      result = replication_connection.exec(CREATE_REPLICATION_SLOT)
+      snapshot_name = result[0]['snapshot_name']
+      p "snapshot_name: #{snapshot_name}"
 
-      #result = `psql -h #{HOST} "replication=database dbname=gitlabhq_development" -c "#{CREATE_REPLICATION_SLOT}"`
-      #p result
-      # TODO: Need to keep this connection alive
-
-      # Create a pg_dump using the snapshot name
       # Restore to new database
       # Pause writes
       # Query replication slot => write to new database
       # Move shard location
       # Drop replication slot
       result = `psql -h #{HOST} "replication=database dbname=gitlabhq_development" -c "#{DROP_REPLICATION_SLOT}"`
-      result
+      p result
     end
   end
 end
