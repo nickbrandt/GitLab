@@ -162,7 +162,6 @@ module Backup
       Snippet.id_in(SnippetRepository.for_repository_storage(storage).select(:snippet_id))
     end
 
-
     def restore_object_pools
       PoolRepository.includes(:source_project).find_each do |pool|
         progress.puts " - Object pool #{pool.disk_path}..."
