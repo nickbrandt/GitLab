@@ -43,6 +43,39 @@ RSpec.describe 'Admin views Cloud License', :js do
         expect(page).to have_content('You can no longer sync your subscription details with GitLab. Get help for the most common connectivity issues by troubleshooting the activation code')
       end
     end
+
+    context 'activate another subscription' do
+      before do
+        click_button('Enter activation code')
+      end
+
+      it 'shows the activation modal' do
+        page.within(find('#subscription-activation-modal', match: :first)) do
+          expect(page).to have_content('Activate subscription')
+        end
+      end
+
+      it 'displays an error when the activation fails' do
+        stub_request(:post, EE::SUBSCRIPTIONS_GRAPHQL_URL).to_return(status: 422, body: '', headers: {})
+
+        page.within(find('#subscription-activation-modal', match: :first)) do
+          fill_activation_form
+
+          expect(page).to have_content('An error occurred while activating your subscription.')
+        end
+      end
+
+      it 'displays a connectivity error' do
+        stub_request(:post, EE::SUBSCRIPTIONS_GRAPHQL_URL)
+          .to_return(status: 500, body: '', headers: {})
+
+        page.within(find('#subscription-activation-modal', match: :first)) do
+          fill_activation_form
+
+          expect(page).to have_content('There is a connectivity issue.')
+        end
+      end
+    end
   end
 
   context 'when there is no license' do
@@ -67,5 +100,13 @@ RSpec.describe 'Admin views Cloud License', :js do
         end
       end
     end
+  end
+
+  private
+
+  def fill_activation_form
+    fill_in 'activationCode', with: 'fake-activation-code'
+    check 'subscription-form-terms-check'
+    click_button 'Activate'
   end
 end
