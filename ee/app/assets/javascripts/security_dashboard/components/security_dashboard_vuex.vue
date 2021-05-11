@@ -120,7 +120,7 @@ export default {
                 :pipeline-iid="pipelineIid"
               >
                 <template #label>
-                  <strong class="gl-mb-2">{{ s__('SecurityReports|Download Report') }}</strong>
+                  <strong class="gl-mb-2">{{ s__('SecurityReports|Coverage fuzzing') }}</strong>
                 </template>
               </pipeline-artifact-download>
             </template>
