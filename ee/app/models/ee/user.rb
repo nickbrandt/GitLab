@@ -282,7 +282,7 @@ module EE
       namespace.present? &&
       active? &&
       !namespace.root_ancestor.free_plan? &&
-      namespace.root_ancestor.billed_user_ids.include?(self.id)
+      namespace.root_ancestor.billed_user_ids[:user_ids].include?(self.id)
     end
 
     def group_sso?(group)
