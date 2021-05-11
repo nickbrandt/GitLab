@@ -112,7 +112,7 @@ Unique visitors to /groups/:group/-/analytics/merge_request_analytics
 
 Group: `group::optimize`
 
-Status: `data_available`
+Status: `removed`
 
 Tiers: `free`
 
@@ -7396,7 +7396,7 @@ Missing description
 
 Group: `group::optimize`
 
-Status: `data_available`
+Status: `removed`
 
 Tiers: `free`
 
@@ -7408,7 +7408,7 @@ Missing description
 
 Group: `group::optimize`
 
-Status: `data_available`
+Status: `removed`
 
 Tiers:
 
