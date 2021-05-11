@@ -267,15 +267,13 @@ describe('Members Utils', () => {
     });
 
     it('correctly parses the data attribute', () => {
-      expect(parseDataAttributes(el)).toEqual(
-        expect.objectContaining({
-          members,
-          pagination,
-          sourceId: 234,
-          canManageMembers: true,
-          memberPath: '/groups/foo-bar/-/group_members/:id',
-        }),
-      );
+      expect(parseDataAttributes(el)).toMatchObject({
+        members,
+        pagination,
+        sourceId: 234,
+        canManageMembers: true,
+        memberPath: '/groups/foo-bar/-/group_members/:id',
+      });
     });
   });
 
