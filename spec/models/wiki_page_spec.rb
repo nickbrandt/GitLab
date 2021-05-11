@@ -620,16 +620,12 @@ RSpec.describe WikiPage do
   end
 
   describe "#versions" do
-    include_context 'subject is persisted page'
+    let(:subject) { create_wiki_page }
 
     it "returns an array of all commits for the page" do
-      3.times { |i| subject.update(content: "content #{i}") }
-
-      expect(subject.versions.count).to eq(4)
-    end
-
-    it 'returns instances of WikiPageVersion' do
-      expect(subject.versions).to all( be_a(Gitlab::Git::WikiPageVersion) )
+      expect do
+        3.times { |i| subject.update(content: "content #{i}") }
+      end.to change { subject.versions.count }.by(3)
     end
   end
 
