@@ -350,8 +350,9 @@ To delete a custom value stream:
 
 > - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/21631) in GitLab 12.6.
 > - [Chart median line removed](https://gitlab.com/gitlab-org/gitlab/-/issues/235455) in GitLab 13.4.
+> - [Totals replaced with averages](https://gitlab.com/gitlab-org/gitlab/-/issues/262070) in GitLab 13.12.
 
-This chart visually depicts the total number of days it takes for cycles to be completed. (Totals are being replaced with averages in [this issue](https://gitlab.com/gitlab-org/gitlab/-/issues/262070).)
+This chart visually depicts the average number of days it takes for cycles to be completed.
 
 This chart uses the global page filters for displaying data based on the selected
 group, projects, and time frame. In addition, specific stages can be selected
