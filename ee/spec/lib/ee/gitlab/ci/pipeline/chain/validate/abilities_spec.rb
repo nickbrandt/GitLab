@@ -56,6 +56,18 @@ RSpec.describe Gitlab::Ci::Pipeline::Chain::Validate::Abilities do
           expect(pipeline.errors.to_a)
             .to include('Credit card required to be on file in order to create a pipeline')
         end
+
+        it 'logs the event' do
+          allow(Gitlab).to receive(:com?).and_return(true).at_least(:once)
+
+          expect(Gitlab::AppLogger).to receive(:info).with(
+            message: 'Credit card required to be on file in order to create a pipeline',
+            project_path: project.full_path,
+            user_id: user.id,
+            plan: 'free')
+
+          step.perform!
+        end
       end
 
       context 'when user has credit card for pipelines in project' do
