@@ -1,6 +1,6 @@
 ---
 name: merge_before_pipeline_completes_setting
-introduced_by_url: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/54343
+introduced_by_url: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/61397
 rollout_issue_url: https://gitlab.com/gitlab-org/gitlab/-/issues/329865
 milestone: '13.12'
 type: development

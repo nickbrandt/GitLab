@@ -89,12 +89,10 @@ module API
       def immediately_mergeable?(merge_when_pipeline_succeeds, merge_request)
         if merge_when_pipeline_succeeds
           merge_request.actual_head_pipeline_success?
+        elsif merge_request.source_project.merge_before_pipeline_completes_available?
+          merge_request.mergeable_state?
         else
-          if merge_request.source_project.merge_before_pipeline_completes_available?
-            merge_request.mergeable_state?
-          else
-            false
-          end
+          false
         end
       end
 
