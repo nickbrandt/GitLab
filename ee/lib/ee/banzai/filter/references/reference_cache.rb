@@ -4,12 +4,14 @@ module EE
   module Banzai
     module Filter
       module References
-        module AbstractReferenceFilter
+        module ReferenceCache
           extend ::Gitlab::Utils::Override
 
           override :current_project_namespace_path
           def current_project_namespace_path
-            @current_project_namespace_path ||= (project&.namespace || group)&.full_path
+            strong_memoize(:current_project_namespace_path) do
+              (project&.namespace || group)&.full_path
+            end
           end
         end
       end
