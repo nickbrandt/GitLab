@@ -386,4 +386,4 @@ module Gitlab
   end
 end
 
-Gitlab::Database.prepend_if_ee('EE::Gitlab::Database')
+Gitlab::Database.prepend_mod_with('Gitlab::Database')
