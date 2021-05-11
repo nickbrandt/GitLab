@@ -76,7 +76,7 @@ export default {
       <gl-tooltip :target="() => $refs.countBadge">
         <p v-if="allowSubEpics" class="font-weight-bold m-0">
           {{ __('Epics') }} &#8226;
-          <span class="text-secondary-400 font-weight-normal"
+          <span class="font-weight-normal"
             >{{
               sprintf(__('%{openedEpics} open, %{closedEpics} closed'), {
                 openedEpics: descendantCounts.openedEpics,
@@ -87,7 +87,7 @@ export default {
         </p>
         <p class="font-weight-bold m-0">
           {{ __('Issues') }} &#8226;
-          <span class="text-secondary-400 font-weight-normal"
+          <span class="font-weight-normal"
             >{{
               sprintf(__('%{openedIssues} open, %{closedIssues} closed'), {
                 openedIssues: descendantCounts.openedIssues,
@@ -98,7 +98,7 @@ export default {
         </p>
         <p class="font-weight-bold m-0">
           {{ __('Total weight') }} &#8226;
-          <span class="text-secondary-400 font-weight-normal">{{ totalWeight }} </span>
+          <span class="font-weight-normal">{{ totalWeight }} </span>
         </p>
       </gl-tooltip>
       <div
