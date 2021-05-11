@@ -9,6 +9,7 @@ import ModalFooter from 'ee/vue_shared/security_reports/components/modal_footer.
 import SolutionCard from 'ee/vue_shared/security_reports/components/solution_card_vuex.vue';
 // import VulnerabilityDetails from 'ee/vue_shared/security_reports/components/vulnerability_details.vue';
 import VulnerabilityDetails from 'ee/vulnerabilities/components/vulnerability_details.vue';
+import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 import { __ } from '~/locale';
 import { VULNERABILITY_MODAL_ID } from './constants';
 
@@ -96,6 +97,10 @@ export default {
     },
     vulnerability() {
       return this.modal.vulnerability;
+    },
+    camelCasedVulnerability() {
+      // @TODO: Check this / test this
+      return convertObjectPropsToCamelCase(this.modal.vulnerability, { deep: true });
     },
     issueFeedback() {
       return this.vulnerability?.issue_feedback;
@@ -205,7 +210,10 @@ export default {
     v-bind="$attrs"
   >
     <slot>
-      <vulnerability-details :vulnerability="vulnerability" class="js-vulnerability-details" />
+      <vulnerability-details
+        :vulnerability="camelCasedVulnerability"
+        class="js-vulnerability-details"
+      />
 
       <solution-card
         :solution="solution"
