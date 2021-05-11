@@ -6,8 +6,6 @@ exports[`ee/BoardContentSidebar matches the snapshot 1`] = `
   <board-sidebar-title-stub />
    
   <sidebar-assignees-widget-stub
-    allowmultipleassignees="true"
-    class="assignee"
     fullpath="gitlab-org/gitlab-test"
     iid="27"
     initialassignees="[object Object],[object Object]"
