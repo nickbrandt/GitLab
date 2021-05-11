@@ -85,7 +85,7 @@ Returns [`DesignManagement!`](#designmanagement).
 
 ### `Query.devopsAdoptionSegments`
 
-Get configured DevOps adoption segments on the instance.
+Get configured DevOps adoption segments on the instance. **BETA** This endpoint is subject to change without notice.
 
 Returns [`DevopsAdoptionSegmentConnection`](#devopsadoptionsegmentconnection).
 
@@ -742,6 +742,8 @@ Input type: `BoardListUpdateLimitMetricsInput`
 
 ### `Mutation.bulkFindOrCreateDevopsAdoptionSegments`
 
+**BETA** This endpoint is subject to change without notice.
+
 Input type: `BulkFindOrCreateDevopsAdoptionSegmentsInput`
 
 #### Arguments
@@ -1073,6 +1075,8 @@ Input type: `CreateCustomEmojiInput`
 | <a id="mutationcreatecustomemojierrors"></a>`errors` | [`[String!]!`](#string) | Errors encountered during execution of the mutation. |
 
 ### `Mutation.createDevopsAdoptionSegment`
+
+**BETA** This endpoint is subject to change without notice.
 
 Input type: `CreateDevopsAdoptionSegmentInput`
 
@@ -1654,6 +1658,8 @@ Input type: `DeleteAnnotationInput`
 | <a id="mutationdeleteannotationerrors"></a>`errors` | [`[String!]!`](#string) | Errors encountered during execution of the mutation. |
 
 ### `Mutation.deleteDevopsAdoptionSegment`
+
+**BETA** This endpoint is subject to change without notice.
 
 Input type: `DeleteDevopsAdoptionSegmentInput`
 
