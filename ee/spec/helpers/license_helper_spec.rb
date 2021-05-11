@@ -98,7 +98,8 @@ RSpec.describe LicenseHelper do
                                                        free_trial_path: 'new_trial_url',
                                                        buy_subscription_path: 'subscriptions_plans_url',
                                                        subscription_sync_path: sync_seat_link_admin_license_path,
-                                                       license_upload_path: new_admin_license_path })
+                                                       license_upload_path: new_admin_license_path,
+                                                       license_remove_path: admin_license_path })
       end
     end
 
@@ -111,7 +112,8 @@ RSpec.describe LicenseHelper do
                                                        free_trial_path: 'new_trial_url',
                                                        buy_subscription_path: 'subscriptions_plans_url',
                                                        subscription_sync_path: sync_seat_link_admin_license_path,
-                                                       license_upload_path: new_admin_license_path })
+                                                       license_upload_path: new_admin_license_path,
+                                                       license_remove_path: admin_license_path })
       end
     end
   end
