@@ -17,7 +17,7 @@ module Analytics
     def merge_requests_count
       @merge_requests_count ||=
         # We want to make sure the load of the following query
-        # does not land on the read replica instead of the primary db
+        # lands on the read replica instead of the primary db
         current_load_balancing_session.use_replicas_for_read_queries do
           count_service.new(@group, @current_user, params).count
         end
