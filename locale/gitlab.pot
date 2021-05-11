@@ -32678,6 +32678,9 @@ msgstr ""
 msgid "There was an error fetching configuration for charts"
 msgstr ""
 
+msgid "There was an error fetching content, please refresh the page"
+msgstr ""
+
 msgid "There was an error fetching data for the selected stage"
 msgstr ""
 
@@ -32814,9 +32817,6 @@ msgid "There was an error while fetching value stream analytics duration data."
 msgstr ""
 
 msgid "There was an error with the reCAPTCHA. Please solve the reCAPTCHA again."
-msgstr ""
-
-msgid "There was an error."
 msgstr ""
 
 msgid "These dates affect how your epics appear in the roadmap. Set a fixed date or one inherited from the milestones assigned to issues in this epic."

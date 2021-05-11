@@ -1,4 +1,4 @@
-import { GlAlert, GlDrawer, GlLoadingIcon } from '@gitlab/ui';
+import { GlAlert, GlDrawer, GlSkeletonLoader } from '@gitlab/ui';
 import { createLocalVue } from '@vue/test-utils';
 import VueApollo from 'vue-apollo';
 import AlertDrawer from 'ee/threat_monitoring/components/alerts/alert_drawer.vue';
@@ -21,9 +21,9 @@ describe('Alert Drawer', () => {
   let wrapper;
   const DEFAULT_PROJECT_PATH = '#';
 
-  const mutateSpy = jest
-    .fn()
-    .mockResolvedValue({ data: { createAlertIssue: { errors: [], issue: { iid: '03' } } } });
+  const mutateSpy = jest.fn().mockResolvedValue({
+    data: { createAlertIssue: { errors: [], issue: { webUrl: '/#/-/issues/03' } } },
+  });
   let querySpy;
 
   const createMockApolloProvider = (query) => {
@@ -40,7 +40,7 @@ describe('Alert Drawer', () => {
   const findCreateIssueButton = () => wrapper.findByTestId('create-issue-button');
   const findDrawer = () => wrapper.findComponent(GlDrawer);
   const findIssueLink = () => wrapper.findByTestId('issue-link');
-  const findLoadingIcon = () => wrapper.findComponent(GlLoadingIcon);
+  const findSkeletonLoader = () => wrapper.findComponent(GlSkeletonLoader);
   const findDetails = () => wrapper.findByTestId('details-list');
 
   const createWrapper = ({
@@ -88,9 +88,10 @@ describe('Alert Drawer', () => {
       ${'details list'}          | ${'does display'}     | ${findDetails}           | ${true}  | ${undefined}
       ${'drawer'}                | ${'does display'}     | ${findDrawer}            | ${true}  | ${undefined}
       ${'issue link'}            | ${'does display'}     | ${findIssueLink}         | ${true}  | ${undefined}
-      ${'loading icon'}          | ${'does not display'} | ${findLoadingIcon}       | ${false} | ${mountExtended}
-    `('$status the $component', ({ findComponent, state, mount }) => {
+      ${'skeleton loader'}       | ${'does not display'} | ${findSkeletonLoader}    | ${false} | ${mountExtended}
+    `('$status the $component', async ({ findComponent, state, mount }) => {
       createWrapper({ $apollo: shallowApolloMock({}), mount });
+      await wrapper.vm.$nextTick();
       expect(findComponent().exists()).toBe(state);
     });
   });
@@ -103,7 +104,7 @@ describe('Alert Drawer', () => {
 
   it('displays the loading icon when retrieving the alert details', () => {
     createWrapper({ $apollo: shallowApolloMock({ loading: true }) });
-    expect(findLoadingIcon().exists()).toBe(true);
+    expect(findSkeletonLoader().exists()).toBe(true);
     expect(findDetails().exists()).toBe(false);
   });
 
@@ -121,9 +122,8 @@ describe('Alert Drawer', () => {
       });
       expect(findCreateIssueButton().exists()).toBe(true);
       findCreateIssueButton().vm.$emit('click');
-      await waitForPromises;
+      await waitForPromises();
       expect(mutateSpy).toHaveBeenCalledTimes(1);
-      await wrapper.vm.$nextTick();
       expect(visitUrl).toHaveBeenCalledWith('/#/-/issues/03');
     });
 
@@ -138,11 +138,9 @@ describe('Alert Drawer', () => {
       });
       expect(findCreateIssueButton().exists()).toBe(true);
       findCreateIssueButton().vm.$emit('click');
-      await waitForPromises;
+      await waitForPromises();
       expect(erroredMutateSpy).toHaveBeenCalledTimes(1);
-      await wrapper.vm.$nextTick();
       expect(visitUrl).not.toHaveBeenCalled();
-      await wrapper.vm.$nextTick();
       expect(findAlert().exists()).toBe(true);
     });
   });

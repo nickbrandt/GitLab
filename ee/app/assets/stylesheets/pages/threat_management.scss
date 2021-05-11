@@ -5,3 +5,16 @@
     background-color: $gray-50;
   }
 }
+
+.threat-monitoring-alert-drawer {
+  // Override gl-drawer inline styles
+  top: $header-height !important;
+
+  .gl-drawer-header {
+    align-items: flex-start;
+  }
+}
+
+.with-performance-bar .threat-monitoring-alert-drawer {
+  top: $performance-bar-height + $header-height !important;
+}

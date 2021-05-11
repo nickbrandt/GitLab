@@ -84,3 +84,5 @@ export const HIDDEN_VALUES = [
   'status',
   'todos',
 ];
+
+export const ALERT_DETAILS_LOADING_ROWS = 20;
