@@ -92,11 +92,11 @@ RSpec.describe 'gitlab:app namespace rake task', :delete do
         end
 
         it 'invokes restoration on match' do
-          expect { run_rake_task('gitlab:backup:restore') }.to output.to_stdout
+          expect { run_rake_task('gitlab:backup:restore') }.to output.to_stdout_from_any_process
         end
 
         it 'prints timestamps on messages' do
-          expect { run_rake_task('gitlab:backup:restore') }.to output(/.*\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}\s[-+]\d{4}\s--\s.*/).to_stdout
+          expect { run_rake_task('gitlab:backup:restore') }.to output(/.*\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}\s[-+]\d{4}\s--\s.*/).to_stdout_from_any_process
         end
       end
     end
@@ -108,11 +108,11 @@ RSpec.describe 'gitlab:app namespace rake task', :delete do
       end
 
       it 'removes stale data' do
-        expect { run_rake_task('gitlab:backup:create') }.to output.to_stdout
+        expect { run_rake_task('gitlab:backup:create') }.to output.to_stdout_from_any_process
 
         excluded_project = create(:project, :repository, name: 'mepmep')
 
-        expect { run_rake_task('gitlab:backup:restore') }.to output.to_stdout
+        expect { run_rake_task('gitlab:backup:restore') }.to output.to_stdout_from_any_process
 
         raw_repo = excluded_project.repository.raw
 
@@ -126,7 +126,7 @@ RSpec.describe 'gitlab:app namespace rake task', :delete do
       let!(:included_project) { create(:project, :repository) }
 
       before do
-        expect { run_rake_task('gitlab:backup:create') }.to output.to_stdout
+        expect { run_rake_task('gitlab:backup:create') }.to output.to_stdout_from_any_process
 
         backup_tar = Dir.glob(File.join(Gitlab.config.backup.path, '*_gitlab_backup.tar')).last
         allow(Dir).to receive(:glob).and_return([backup_tar])
@@ -153,7 +153,7 @@ RSpec.describe 'gitlab:app namespace rake task', :delete do
       end
 
       it 'restores the data' do
-        expect { run_rake_task('gitlab:backup:restore') }.to output.to_stdout
+        expect { run_rake_task('gitlab:backup:restore') }.to output.to_stdout_from_any_process
 
         raw_repo = included_project.repository.raw
 
@@ -184,7 +184,7 @@ RSpec.describe 'gitlab:app namespace rake task', :delete do
 
       context 'project uses custom_hooks and successfully creates backup' do
         it 'creates custom_hooks.tar and project bundle' do
-          expect { run_rake_task('gitlab:backup:create') }.to output.to_stdout
+          expect { run_rake_task('gitlab:backup:create') }.to output.to_stdout_from_any_process
 
           tar_contents, exit_status = Gitlab::Popen.popen(%W{tar -tvf #{backup_tar}})
 
@@ -195,8 +195,8 @@ RSpec.describe 'gitlab:app namespace rake task', :delete do
         end
 
         it 'restores files correctly' do
-          expect { run_rake_task('gitlab:backup:create') }.to output.to_stdout
-          expect { run_rake_task('gitlab:backup:restore') }.to output.to_stdout
+          expect { run_rake_task('gitlab:backup:create') }.to output.to_stdout_from_any_process
+          expect { run_rake_task('gitlab:backup:restore') }.to output.to_stdout_from_any_process
 
           repo_path = Gitlab::GitalyClient::StorageSettings.allow_disk_access do
             project.repository.path
@@ -210,7 +210,7 @@ RSpec.describe 'gitlab:app namespace rake task', :delete do
 
         it 'prints a progress message to stdout' do
           task_list.each do |task|
-            expect { run_rake_task("gitlab:backup:#{task}:create") }.to output(/Dumping /).to_stdout
+            expect { run_rake_task("gitlab:backup:#{task}:create") }.to output(/Dumping /).to_stdout_from_any_process
           end
         end
       end
@@ -219,7 +219,7 @@ RSpec.describe 'gitlab:app namespace rake task', :delete do
     context 'tar creation' do
       context 'archive file permissions' do
         it 'sets correct permissions on the tar file' do
-          expect { run_rake_task('gitlab:backup:create') }.to output.to_stdout
+          expect { run_rake_task('gitlab:backup:create') }.to output.to_stdout_from_any_process
 
           expect(File.exist?(backup_tar)).to be_truthy
           expect(File::Stat.new(backup_tar).mode.to_s(8)).to eq('100600')
@@ -231,7 +231,7 @@ RSpec.describe 'gitlab:app namespace rake task', :delete do
           end
 
           it 'uses the custom permissions' do
-            expect { run_rake_task('gitlab:backup:create') }.to output.to_stdout
+            expect { run_rake_task('gitlab:backup:create') }.to output.to_stdout_from_any_process
 
             expect(File::Stat.new(backup_tar).mode.to_s(8)).to eq('100651')
           end
@@ -239,7 +239,7 @@ RSpec.describe 'gitlab:app namespace rake task', :delete do
       end
 
       it 'sets correct permissions on the tar contents' do
-        expect { run_rake_task('gitlab:backup:create') }.to output.to_stdout
+        expect { run_rake_task('gitlab:backup:create') }.to output.to_stdout_from_any_process
 
         tar_contents, exit_status = Gitlab::Popen.popen(
           %W{tar -tvf #{backup_tar} db uploads.tar.gz repositories builds.tar.gz artifacts.tar.gz pages.tar.gz lfs.tar.gz registry.tar.gz}
@@ -258,7 +258,7 @@ RSpec.describe 'gitlab:app namespace rake task', :delete do
       end
 
       it 'deletes temp directories' do
-        expect { run_rake_task('gitlab:backup:create') }.to output.to_stdout
+        expect { run_rake_task('gitlab:backup:create') }.to output.to_stdout_from_any_process
 
         temp_dirs = Dir.glob(
           File.join(Gitlab.config.backup.path, '{db,repositories,uploads,builds,artifacts,pages,lfs,registry}')
@@ -271,7 +271,7 @@ RSpec.describe 'gitlab:app namespace rake task', :delete do
         let(:enable_registry) { false }
 
         it 'does not create registry.tar.gz' do
-          expect { run_rake_task('gitlab:backup:create') }.to output.to_stdout
+          expect { run_rake_task('gitlab:backup:create') }.to output.to_stdout_from_any_process
 
           tar_contents, exit_status = Gitlab::Popen.popen(
             %W{tar -tvf #{backup_tar}}
@@ -311,7 +311,7 @@ RSpec.describe 'gitlab:app namespace rake task', :delete do
           move_repository_to_secondary(project_b)
           move_repository_to_secondary(project_snippet_b)
 
-          expect { run_rake_task('gitlab:backup:create') }.to output.to_stdout
+          expect { run_rake_task('gitlab:backup:create') }.to output.to_stdout_from_any_process
 
           tar_contents, exit_status = Gitlab::Popen.popen(
             %W{tar -tvf #{backup_tar} repositories}
@@ -377,7 +377,7 @@ RSpec.describe 'gitlab:app namespace rake task', :delete do
             .and_call_original
         end
 
-        expect { run_rake_task('gitlab:backup:create') }.to output.to_stdout
+        expect { run_rake_task('gitlab:backup:create') }.to output.to_stdout_from_any_process
       end
 
       it 'passes through concurrency environment variables' do
@@ -390,7 +390,7 @@ RSpec.describe 'gitlab:app namespace rake task', :delete do
             .and_call_original
         end
 
-        expect { run_rake_task('gitlab:backup:create') }.to output.to_stdout
+        expect { run_rake_task('gitlab:backup:create') }.to output.to_stdout_from_any_process
       end
     end
   end
@@ -402,7 +402,7 @@ RSpec.describe 'gitlab:app namespace rake task', :delete do
     end
 
     it "does not contain skipped item" do
-      expect { run_rake_task('gitlab:backup:create') }.to output.to_stdout
+      expect { run_rake_task('gitlab:backup:create') }.to output.to_stdout_from_any_process
 
       tar_contents, _exit_status = Gitlab::Popen.popen(
         %W{tar -tvf #{backup_tar} db uploads.tar.gz repositories builds.tar.gz artifacts.tar.gz pages.tar.gz lfs.tar.gz registry.tar.gz}
@@ -419,7 +419,7 @@ RSpec.describe 'gitlab:app namespace rake task', :delete do
     end
 
     it 'does not invoke repositories restore' do
-      expect { run_rake_task('gitlab:backup:create') }.to output.to_stdout
+      expect { run_rake_task('gitlab:backup:create') }.to output.to_stdout_from_any_process
 
       allow(Rake::Task['gitlab:shell:setup'])
         .to receive(:invoke).and_return(true)
@@ -434,7 +434,7 @@ RSpec.describe 'gitlab:app namespace rake task', :delete do
       expect(Rake::Task['gitlab:backup:lfs:restore']).to receive :invoke
       expect(Rake::Task['gitlab:backup:registry:restore']).to receive :invoke
       expect(Rake::Task['gitlab:shell:setup']).to receive :invoke
-      expect { run_rake_task('gitlab:backup:restore') }.to output.to_stdout
+      expect { run_rake_task('gitlab:backup:restore') }.to output.to_stdout_from_any_process
     end
   end
 
@@ -444,7 +444,7 @@ RSpec.describe 'gitlab:app namespace rake task', :delete do
     end
 
     it 'created files with backup content and no tar archive' do
-      expect { run_rake_task('gitlab:backup:create') }.to output.to_stdout
+      expect { run_rake_task('gitlab:backup:create') }.to output.to_stdout_from_any_process
 
       dir_contents = Dir.children(Gitlab.config.backup.path)
 
@@ -463,7 +463,7 @@ RSpec.describe 'gitlab:app namespace rake task', :delete do
     end
 
     it 'those component files can be restored from' do
-      expect { run_rake_task("gitlab:backup:create") }.to output.to_stdout
+      expect { run_rake_task("gitlab:backup:create") }.to output.to_stdout_from_any_process
 
       allow(Rake::Task['gitlab:shell:setup'])
         .to receive(:invoke).and_return(true)
@@ -478,13 +478,13 @@ RSpec.describe 'gitlab:app namespace rake task', :delete do
       expect(Rake::Task['gitlab:backup:lfs:restore']).to receive :invoke
       expect(Rake::Task['gitlab:backup:registry:restore']).to receive :invoke
       expect(Rake::Task['gitlab:shell:setup']).to receive :invoke
-      expect { run_rake_task("gitlab:backup:restore") }.to output.to_stdout
+      expect { run_rake_task("gitlab:backup:restore") }.to output.to_stdout_from_any_process
     end
   end
 
   describe "Human Readable Backup Name" do
     it 'name has human readable time' do
-      expect { run_rake_task('gitlab:backup:create') }.to output.to_stdout
+      expect { run_rake_task('gitlab:backup:create') }.to output.to_stdout_from_any_process
 
       expect(backup_tar).to match(/\d+_\d{4}_\d{2}_\d{2}_\d+\.\d+\.\d+.*_gitlab_backup.tar$/)
     end
