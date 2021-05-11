@@ -8564,6 +8564,9 @@ msgstr ""
 msgid "ContainerRegistry|%{title} was successfully scheduled for deletion"
 msgstr ""
 
+msgid "ContainerRegistry|-- tags"
+msgstr ""
+
 msgid "ContainerRegistry|Build an image"
 msgstr ""
 
