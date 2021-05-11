@@ -82,6 +82,26 @@ RSpec.describe Gitlab::UsageData, :aggregate_failures do
     end
   end
 
+  context 'with usage_data_instrumentation feature flag off' do
+    it "doesn't use instrumentation classes" do
+      stub_feature_flags(usage_data_instrumentation: false)
+
+      Gitlab::UsageData.uncached_data
+
+      expect(Gitlab::UsageData).not_to receive(:usage_data_metrics)
+    end
+  end
+
+  context 'with usage_data_instrumentation feature flag on' do
+    it "is using instrumentation classes" do
+      stub_feature_flags(usage_data_instrumentation: true)
+
+      Gitlab::UsageData.uncached_data
+
+      expect(Gitlab::UsageData).to receive(:usage_data_metrics)
+    end
+  end
+
   describe 'usage_activity_by_stage_package' do
     it 'includes accurate usage_activity_by_stage data' do
       for_defined_days_back do

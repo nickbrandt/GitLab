@@ -44,7 +44,7 @@ module Gitlab
         clear_memoized
 
         with_finished_at(:recording_ce_finished_at) do
-          license_usage_data
+          usage_data = license_usage_data
             .merge(system_usage_data_license)
             .merge(system_usage_data_settings)
             .merge(system_usage_data)
@@ -61,6 +61,12 @@ module Gitlab
             .merge(search_unique_visits_data)
             .merge(redis_hll_counters)
             .deep_merge(aggregated_metrics_data)
+
+          if Feature.enabled?(:usage_data_instrumentation)
+            usage_data.deep_merge(usage_data_metrics)
+          end
+
+          usage_data
         end
       end
 
@@ -774,6 +780,11 @@ module Gitlab
       end
 
       private
+
+      # Usage data metrics generated using instrumentation classes
+      def usage_data_metrics
+        Gitlab::UsageDataMetrics.uncached_data
+      end
 
       def gitaly_apdex
         with_prometheus_client(verify: false, fallback: FALLBACK) do |client|

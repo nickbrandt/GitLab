@@ -19,6 +19,7 @@ UsageData/LargeTable:
     - :Gitlab::Metrics
     - :Gitlab::Runtime
     - :Gitaly::Server
+    - :Gitlab::UsageDataMetrics
     - :Gitlab::UsageData
     - :Gitlab::UsageDataCounters
     - :Arel::Nodes::NamedFunction

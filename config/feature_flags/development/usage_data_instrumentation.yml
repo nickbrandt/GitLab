@@ -1,0 +1,8 @@
+---
+name: usage_data_instrumentation
+introduced_by_url: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/61359
+rollout_issue_url: https://gitlab.com/gitlab-org/gitlab/-/issues/330518
+milestone: '13.12'
+type: development
+group: group::product intelligence
+default_enabled: false
