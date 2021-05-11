@@ -148,7 +148,11 @@ export default {
         :invalid-feedback="$options.i18n.fieldRequiredMessage"
         data-testid="form-group-terms"
       >
-        <gl-form-checkbox v-model="form.fields.terms.state" :state="isCheckboxValid">
+        <gl-form-checkbox
+          id="subscription-form-terms-check"
+          v-model="form.fields.terms.state"
+          :state="isCheckboxValid"
+        >
           <gl-sprintf :message="$options.i18n.acceptTerms">
             <template #link="{ content }">
               <gl-link href="https://about.gitlab.com/terms/" target="_blank"
