@@ -774,7 +774,7 @@ RSpec.describe WikiPage do
 
   describe '#historical?' do
     let!(:container) { create(:project) }
- 
+
     subject { create_wiki_page }
 
     let(:wiki) { subject.wiki }
