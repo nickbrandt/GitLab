@@ -1,8 +1,12 @@
 <script>
 import { GlAlert, GlLoadingIcon, GlModal, GlSprintf } from '@gitlab/ui';
+import { objectToQuery } from '~/lib/utils/url_utility';
 import { s__, __ } from '~/locale';
 
-const IFRAME_QUERY = 'enable_submit=false&pp=disable';
+const IFRAME_QUERY = Object.freeze({
+  enable_submit: false,
+  user_id: null,
+});
 // 450 is the mininum required height to get all iframe inputs visible
 const IFRAME_MINIMUM_HEIGHT = 450;
 const i18n = Object.freeze({
@@ -44,7 +48,9 @@ export default {
   },
   computed: {
     iframeSrc() {
-      return `${this.iframeUrl}?${IFRAME_QUERY}`;
+      const query = { ...IFRAME_QUERY, user_id: gon.current_user_id };
+
+      return `${this.iframeUrl}?${objectToQuery(query)}`;
     },
     iframeHeight() {
       return IFRAME_MINIMUM_HEIGHT * window.devicePixelRatio;
@@ -75,7 +81,14 @@ export default {
         return;
       }
 
-      this.error = event.data;
+      if (event.data.success) {
+        this.$emit('success');
+      } else {
+        this.error = event.data.msg;
+        this.$refs.zuora.src = this.iframeSrc;
+        this.$emit('error', this.error);
+      }
+
       this.isLoading = false;
     },
     isEventAllowedForOrigin(event) {
@@ -108,12 +121,12 @@ export default {
       </gl-sprintf>
     </p>
 
-    <gl-alert v-if="error" variant="danger">{{ error.msg }}</gl-alert>
+    <gl-alert v-if="error" variant="danger">{{ error }}</gl-alert>
     <gl-loading-icon v-if="isLoading" size="lg" />
     <!-- eslint-disable @gitlab/vue-require-i18n-strings -->
     <iframe
       v-show="!isLoading"
-      id="zuora"
+      ref="zuora"
       :src="iframeSrc"
       style="border: none"
       width="100%"

@@ -18,14 +18,12 @@ export default {
     GlSprintf,
     AccountVerificationModal,
   },
-  props: {
-    iframeUrl: {
-      type: String,
-      required: true,
+  computed: {
+    iframeUrl() {
+      return gon.payment_form_url;
     },
-    allowedOrigin: {
-      type: String,
-      required: true,
+    allowedOrigin() {
+      return gon.subscriptions_url;
     },
   },
   methods: {
@@ -38,7 +36,7 @@ export default {
 </script>
 
 <template>
-  <div class="gl-pt-5">
+  <div>
     <gl-alert
       variant="danger"
       :dismissible="false"

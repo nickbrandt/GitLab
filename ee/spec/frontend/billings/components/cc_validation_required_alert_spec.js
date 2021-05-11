@@ -1,16 +1,13 @@
 import { GlAlert, GlSprintf } from '@gitlab/ui';
 import { shallowMount } from '@vue/test-utils';
 import CreditCardValidationRequiredAlert from 'ee/billings/components/cc_validation_required_alert.vue';
+import { TEST_HOST } from 'helpers/test_constants';
 
 describe('CreditCardValidationRequiredAlert', () => {
   let wrapper;
 
   const createComponent = () => {
     return shallowMount(CreditCardValidationRequiredAlert, {
-      propsData: {
-        iframeUrl: 'about:blank',
-        allowedOrigin: 'about:blank',
-      },
       stubs: {
         GlSprintf,
       },
@@ -18,6 +15,11 @@ describe('CreditCardValidationRequiredAlert', () => {
   };
 
   beforeEach(() => {
+    window.gon = {
+      subscriptions_url: TEST_HOST,
+      payment_form_url: TEST_HOST,
+    };
+
     wrapper = createComponent();
   });
 
