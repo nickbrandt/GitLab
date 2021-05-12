@@ -741,7 +741,7 @@ RSpec.describe MergeRequestsFinder do
         end
 
         it_behaves_like 'a finder with cached count by state' do
-          let(:cache_key) { ['project', project.id, 'merge_requests_count_by_state'] }
+          let(:cache_key) { ['count_by_state', 'merge_request', 'project', project.id] }
         end
       end
 
@@ -755,7 +755,7 @@ RSpec.describe MergeRequestsFinder do
         end
 
         it_behaves_like 'a finder with cached count by state' do
-          let(:cache_key) { ['group', group.id, 'merge_requests_count_by_state'] }
+          let(:cache_key) { ['count_by_state', 'merge_request', 'group', group.id] }
         end
       end
     end
@@ -763,12 +763,12 @@ RSpec.describe MergeRequestsFinder do
     describe '#count_by_state_cache_key' do
       it 'returns correct key with project parent' do
         expect(described_class.new(user, { project_id: project1.id }).count_by_state_cache_key)
-          .to eq(['project', project1.id, 'merge_requests_count_by_state'])
+          .to eq(['count_by_state', 'merge_request', 'project', project1.id])
       end
 
       it 'returns correct key with group parent' do
         expect(described_class.new(user, { group_id: group.id }).count_by_state_cache_key)
-          .to eq(['group', group.id, 'merge_requests_count_by_state'])
+          .to eq(['count_by_state', 'merge_request', 'group', group.id])
       end
     end
 

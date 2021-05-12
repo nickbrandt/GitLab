@@ -93,8 +93,7 @@ class EpicsFinder < IssuableFinder
   end
 
   def count_by_state_cache_key
-    type = can_read_all_epics_in_related_groups?(permissioned_related_groups) ? 'total' : 'public'
-    super << "#{type}_epics_count_by_state"
+    super.append(can_read_all_epics_in_related_groups?(permissioned_related_groups) ? 'total' : 'public')
   end
 
   private

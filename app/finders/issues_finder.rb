@@ -68,8 +68,7 @@ class IssuesFinder < IssuableFinder
   # rubocop: enable CodeReuse/ActiveRecord
 
   def count_by_state_cache_key
-    type = current_user_has_confidential_access? ? 'total' : 'public'
-    super << "#{type}_issues_count_by_state"
+    super.append(current_user_has_confidential_access? ? 'total' : 'public')
   end
 
   private

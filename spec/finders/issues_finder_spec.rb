@@ -994,7 +994,7 @@ RSpec.describe IssuesFinder, :clean_gitlab_redis_shared_state do
     context 'when filtering by project id' do
       let(:project) { project1 }
       let(:params) { { project_id: project.id } }
-      let(:cache_key) { ['project', project.id, "public_issues_count_by_state"] }
+      let(:cache_key) { ['count_by_state', 'issue', 'project', project.id, 'public'] }
 
       it 'returns correct counts' do
         results = described_class.new(user, params).count_by_state
@@ -1007,7 +1007,7 @@ RSpec.describe IssuesFinder, :clean_gitlab_redis_shared_state do
 
     context 'when filtering by group id' do
       let(:params) { { group_id: group.id } }
-      let(:cache_key) { ['group', group.id, "public_issues_count_by_state"] }
+      let(:cache_key) { ['count_by_state', 'issue', 'group', group.id, 'public'] }
 
       it 'returns correct counts' do
         results = described_class.new(user, params).count_by_state
@@ -1020,18 +1020,18 @@ RSpec.describe IssuesFinder, :clean_gitlab_redis_shared_state do
   end
 
   describe '#count_by_state_cache_key' do
-    shared_examples 'specific key for parent' do |key|
+    shared_examples 'specific key for parent' do |visibility|
       context 'when parent is a project' do
         it 'returns correct key' do
           expect(described_class.new(current_user, { project_id: project1.id }).count_by_state_cache_key)
-            .to eq(['project', project1.id, key])
+            .to eq(['count_by_state', 'issue', 'project', project1.id, visibility])
         end
       end
 
       context 'when parent is a group' do
         it 'returns correct key' do
           expect(described_class.new(current_user, { group_id: group.id }).count_by_state_cache_key)
-            .to eq(['group', group.id, key])
+            .to eq(['count_by_state', 'issue', 'group', group.id, visibility])
         end
       end
     end
@@ -1039,19 +1039,19 @@ RSpec.describe IssuesFinder, :clean_gitlab_redis_shared_state do
     context 'with no user' do
       let(:current_user) { nil }
 
-      it_behaves_like 'specific key for parent', 'public_issues_count_by_state'
+      it_behaves_like 'specific key for parent', 'public'
     end
 
     context 'when user has no confidential access' do
       let(:current_user) { create(:user) }
 
-      it_behaves_like 'specific key for parent', 'public_issues_count_by_state'
+      it_behaves_like 'specific key for parent', 'public'
     end
 
     context 'when user has confidential access', :enable_admin_mode do
       let(:current_user) { create(:user, :admin) }
 
-      it_behaves_like 'specific key for parent', 'total_issues_count_by_state'
+      it_behaves_like 'specific key for parent', 'total'
     end
   end
 

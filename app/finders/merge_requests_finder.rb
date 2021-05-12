@@ -79,10 +79,6 @@ class MergeRequestsFinder < IssuableFinder
     by_negated_target_branch(items)
   end
 
-  def count_by_state_cache_key
-    super << 'merge_requests_count_by_state'
-  end
-
   private
 
   def by_commit(items)

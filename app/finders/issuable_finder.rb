@@ -230,12 +230,11 @@ class IssuableFinder
   end
 
   def count_by_state_cache_key
+    key = ['count_by_state', klass.name.underscore]
     if params.group?
-      ['group', params.group_id]
+      key + ['group', params.group_id]
     elsif params.project?
-      ['project', params.project_id]
-    else
-      []
+      key + ['project', params.project_id]
     end
   end
 

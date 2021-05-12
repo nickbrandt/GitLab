@@ -33,8 +33,7 @@ module OptimizedIssuableLabelFilter
     count_params = params.merge(state: nil, sort: nil, force_cte: true)
     finder = self.class.new(current_user, count_params)
 
-    if Feature.enabled?(:cached_issuable_count_by_state, default_enabled: :yaml) &&
-      !filters_set?(finder, count_params)
+    if enabled_counts_caching?(finder, count_params)
       cached_state_counts(finder)
     else
       uncached_state_counts(finder)
@@ -43,9 +42,14 @@ module OptimizedIssuableLabelFilter
 
   private
 
+  def enabled_counts_caching?(finder, params)
+    Feature.enabled?(:cached_issuable_count_by_state, default_enabled: :yaml) &&
+      !filters_set?(finder, params)
+  end
+
   def filters_set?(finder, params)
-    scalar_and_array_filters = finder.class.scalar_params + finder.class.array_params.keys
-    scalar_and_array_filters.any? { |filter| params.with_indifferent_access.include?(filter) }
+    filters = self.class.valid_params.collect { |item| item.is_a?(Hash) ? item.keys : item }.flatten
+    params.slice(*filters).any?
   end
 
   def uncached_state_counts(finder)
