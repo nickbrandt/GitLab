@@ -41,7 +41,7 @@ RSpec.describe Backup::Repositories do
       end
 
       describe 'command failure' do
-        it 'dump_group raises an error' do
+        it 'enqueue_group raises an error' do
           allow(strategy).to receive(:enqueue).with(anything, Gitlab::GlRepository::WIKI).and_raise(IOError)
 
           expect { subject.dump(max_concurrency: 1, max_storage_concurrency: 1) }.to raise_error(IOError)

@@ -13,7 +13,7 @@ module Backup
       strategy.start(:create)
 
       if max_concurrency <= 1 && max_storage_concurrency <= 1
-        return dump_consecutive
+        return enqueue_consecutive
       end
 
       check_valid_storages!
@@ -24,7 +24,7 @@ module Backup
       threads = Gitlab.config.repositories.storages.keys.map do |storage|
         Thread.new do
           Rails.application.executor.wrap do
-            dump_storage(storage, semaphore, max_storage_concurrency: max_storage_concurrency)
+            enqueue_storage(storage, semaphore, max_storage_concurrency: max_storage_concurrency)
           rescue StandardError => e
             errors << e
           end
@@ -42,7 +42,7 @@ module Backup
 
     def restore
       strategy.start(:restore)
-      dump_consecutive
+      enqueue_consecutive
 
     ensure
       strategy.wait
@@ -67,22 +67,22 @@ module Backup
       [ProjectRepository, SnippetRepository]
     end
 
-    def dump_consecutive
-      dump_consecutive_projects
-      dump_consecutive_snippets
+    def enqueue_consecutive
+      enqueue_consecutive_projects
+      enqueue_consecutive_snippets
     end
 
-    def dump_consecutive_projects
+    def enqueue_consecutive_projects
       project_relation.find_each(batch_size: 1000) do |project|
-        dump_project(project)
+        enqueue_project(project)
       end
     end
 
-    def dump_consecutive_snippets
-      Snippet.find_each(batch_size: 1000) { |snippet| dump_snippet(snippet) }
+    def enqueue_consecutive_snippets
+      Snippet.find_each(batch_size: 1000) { |snippet| enqueue_snippet(snippet) }
     end
 
-    def dump_storage(storage, semaphore, max_storage_concurrency:)
+    def enqueue_storage(storage, semaphore, max_storage_concurrency:)
       errors = Queue.new
       queue = InterlockSizedQueue.new(1)
 
@@ -95,7 +95,7 @@ module Backup
               end
 
               begin
-                dump_container(container)
+                enqueue_container(container)
               rescue StandardError => e
                 errors << e
                 break
@@ -117,22 +117,22 @@ module Backup
       end
     end
 
-    def dump_container(container)
+    def enqueue_container(container)
       case container
       when Project
-        dump_project(container)
+        enqueue_project(container)
       when Snippet
-        dump_snippet(container)
+        enqueue_snippet(container)
       end
     end
 
-    def dump_project(project)
+    def enqueue_project(project)
       strategy.enqueue(project, Gitlab::GlRepository::PROJECT)
       strategy.enqueue(project, Gitlab::GlRepository::WIKI)
       strategy.enqueue(project, Gitlab::GlRepository::DESIGN)
     end
 
-    def dump_snippet(snippet)
+    def enqueue_snippet(snippet)
       strategy.enqueue(snippet, Gitlab::GlRepository::SNIPPET)
     end
 

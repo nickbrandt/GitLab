@@ -54,7 +54,7 @@ RSpec.describe Backup::Repositories do
       end
 
       describe 'command failure' do
-        it 'dump_project raises an error' do
+        it 'enqueue_project raises an error' do
           allow(strategy).to receive(:enqueue).with(anything, Gitlab::GlRepository::PROJECT).and_raise(IOError)
 
           expect { subject.dump(max_concurrency: 1, max_storage_concurrency: 1) }.to raise_error(IOError)
@@ -117,7 +117,7 @@ RSpec.describe Backup::Repositories do
         end
 
         describe 'command failure' do
-          it 'dump_project raises an error' do
+          it 'enqueue_project raises an error' do
             allow(strategy).to receive(:enqueue).and_raise(IOError)
 
             expect { subject.dump(max_concurrency: 1, max_storage_concurrency: max_storage_concurrency) }.to raise_error(IOError)
