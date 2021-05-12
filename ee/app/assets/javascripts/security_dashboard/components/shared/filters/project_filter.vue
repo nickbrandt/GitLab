@@ -1,16 +1,18 @@
 <script>
 import {
   GlDropdownDivider,
-  GlLoadingIcon,
   GlDropdownText,
+  GlLoadingIcon,
   GlSafeHtmlDirective as SafeHtml,
 } from '@gitlab/ui';
-import { escapeRegExp } from 'lodash';
+import { escapeRegExp, has, xorBy } from 'lodash';
+import { DASHBOARD_TYPES } from 'ee/security_dashboard/store/constants';
 import createFlash from '~/flash';
 import { convertToGraphQLIds } from '~/graphql_shared/utils';
-import { s__, __ } from '~/locale';
-import groupProjects from '../../graphql/queries/group_projects.query.graphql';
-import { PROJECT_LOADING_ERROR_MESSAGE, mapProjects } from '../../helpers';
+import { __, s__ } from '~/locale';
+import groupProjectsQuery from '../../../graphql/queries/group_projects.query.graphql';
+import instanceProjectsQuery from '../../../graphql/queries/instance_projects.query.graphql';
+import { mapProjects, PROJECT_LOADING_ERROR_MESSAGE } from '../../../helpers';
 import FilterBody from './filter_body.vue';
 import FilterItem from './filter_item.vue';
 import StandardFilter from './standard_filter.vue';
@@ -18,6 +20,17 @@ import StandardFilter from './standard_filter.vue';
 const SEARCH_TERM_MINIMUM_LENGTH = 3;
 const SELECTED_PROJECTS_MAX_COUNT = 100;
 const PROJECT_ENTITY_NAME = 'Project';
+
+const QUERY_CONFIGS = {
+  [DASHBOARD_TYPES.GROUP]: {
+    query: groupProjectsQuery,
+    property: 'group',
+  },
+  [DASHBOARD_TYPES.INSTANCE]: {
+    query: instanceProjectsQuery,
+    property: 'instanceSecurityDashboard',
+  },
+};
 
 export default {
   components: {
@@ -29,7 +42,7 @@ export default {
   },
   directives: { SafeHtml },
   extends: StandardFilter,
-  inject: ['groupFullPath'],
+  inject: ['groupFullPath', 'dashboardType'],
   data: () => ({
     projectsCache: {},
     projects: [],
@@ -37,7 +50,8 @@ export default {
   }),
   computed: {
     options() {
-      return Object.values(this.projectsCache);
+      // Return the projects that exist.
+      return Object.values(this.projectsCache).filter(Boolean);
     },
     selectedSet() {
       return new Set(this.selectedOptions.map((x) => x.id));
@@ -58,23 +72,28 @@ export default {
       return this.searchTerm.length > 0;
     },
     showSelectedProjectsSection() {
-      return this.selectedOptions.length && !this.isSearching;
+      return this.selectedOptions?.length && !this.isSearching;
     },
     showAllOption() {
       return !this.isLoadingProjects && !this.isSearching && !this.isMaxProjectsSelected;
     },
     isMaxProjectsSelected() {
-      return this.selectedOptions.length >= SELECTED_PROJECTS_MAX_COUNT;
+      return this.selectedOptions?.length >= SELECTED_PROJECTS_MAX_COUNT;
     },
     uncachedIds() {
       const ids = this.querystringIds.includes(this.filter.allOption.id) ? [] : this.querystringIds;
-      return ids.filter((id) => !this.projectsCache[id]);
+      return ids.filter((id) => !has(this.projectsCache, id));
+    },
+    queryConfig() {
+      return QUERY_CONFIGS[this.dashboardType];
     },
   },
   apollo: {
     // Gets the projects from the project IDs in the querystring and adds them to the cache.
     projectsById: {
-      query: groupProjects,
+      query() {
+        return this.queryConfig.query;
+      },
       manual: true,
       variables() {
         return {
@@ -85,22 +104,34 @@ export default {
         };
       },
       result({ data }) {
-        const projects = mapProjects(data.group.projects.nodes);
+        // Add an entry to the cache for each uncached ID. We need to do this because the backend
+        // won't return a record for invalid IDs, so we need to record which IDs were queried for.
+        this.uncachedIds.forEach((id) => {
+          this.$set(this.projectsCache, id, undefined);
+        });
+
+        const property = data[this.queryConfig.property];
+        const projects = mapProjects(property.projects.nodes);
+        // Save each returned project to the cache.
         projects.forEach((project) => {
           this.$set(this.projectsCache, project.id, project);
         });
+        // Now that we have the project for each uncached ID, set the selected options.
+        this.selectedOptions = this.querystringOptions;
       },
       error() {
         createFlash({ message: PROJECT_LOADING_ERROR_MESSAGE });
       },
       skip() {
-        // Skip if the cache already contains the projects for every querystring ID.
+        // Skip if we've already cached all the projects for every querystring ID.
         return !this.uncachedIds.length;
       },
     },
     // Gets the projects for the group with an optional search, to show as dropdown options.
     projects: {
-      query: groupProjects,
+      query() {
+        return this.queryConfig.query;
+      },
       variables() {
         return {
           fullPath: this.groupFullPath,
@@ -108,7 +139,8 @@ export default {
         };
       },
       update(data) {
-        return mapProjects(data.group.projects.nodes);
+        const property = data[this.queryConfig.property];
+        return mapProjects(property.projects.nodes);
       },
       result() {
         this.projects.forEach((project) => {
@@ -124,6 +156,18 @@ export default {
     },
   },
   methods: {
+    processQuerystringIds() {
+      if (this.uncachedIds.length) {
+        this.emitFilterChanged({ [this.filter.id]: this.querystringIds });
+      } else {
+        this.selectedOptions = this.querystringOptions;
+      }
+    },
+    toggleOption(option) {
+      // Toggle the option's existence in the array.
+      this.selectedOptions = xorBy(this.selectedOptions, [option], (x) => x.id);
+      this.updateQuerystring();
+    },
     setDropdownOpened() {
       this.hasDropdownBeenOpened = true;
     },

@@ -1,5 +1,5 @@
 <script>
-import { debounce } from 'lodash';
+import { debounce, cloneDeep, isEqual } from 'lodash';
 import {
   stateFilter,
   severityFilter,
@@ -9,12 +9,15 @@ import {
   getProjectFilter,
 } from 'ee/security_dashboard/helpers';
 import { DASHBOARD_TYPES } from 'ee/security_dashboard/store/constants';
+import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import ActivityFilter from './activity_filter.vue';
+import ProjectFilter from './project_filter.vue';
 import ScannerFilter from './scanner_filter.vue';
 import StandardFilter from './standard_filter.vue';
 
 export default {
-  components: { StandardFilter, ScannerFilter, ActivityFilter },
+  components: { StandardFilter, ScannerFilter, ActivityFilter, ProjectFilter },
+  mixins: [glFeatureFlagsMixin()],
   inject: ['dashboardType'],
   props: {
     projects: { type: Array, required: false, default: undefined },
@@ -39,7 +42,10 @@ export default {
       return this.dashboardType === DASHBOARD_TYPES.INSTANCE;
     },
     shouldShowProjectFilter() {
-      return Boolean(this.projects?.length);
+      return this.isGroupDashboard || this.isInstanceDashboard;
+    },
+    shouldShowNewProjectFilter() {
+      return this.glFeatures.vulnReportNewProjectFilter && this.shouldShowProjectFilter;
     },
     projectFilter() {
       return getProjectFilter(this.projects);
@@ -47,11 +53,16 @@ export default {
   },
   methods: {
     updateFilterQuery(query) {
+      const oldQuery = cloneDeep(this.filterQuery);
       this.filterQuery = { ...this.filterQuery, ...query };
-      this.emitFilterChange();
+
+      if (!isEqual(oldQuery, this.filterQuery)) {
+        this.emitFilterChange();
+      }
     },
-    // When this component is first shown, every filter will emit its own @filter-changed event at,
-    // which will trigger this method multiple times. We'll debounce it so that it only runs once.
+    // When this component is first shown, every filter will emit its own @filter-changed event at
+    // the same time, which will trigger this method multiple times. We'll debounce it so that it
+    // only runs once.
     emitFilterChange: debounce(function emit() {
       this.$emit('filterChange', this.filterQuery);
     }),
@@ -91,8 +102,14 @@ export default {
       :filter="$options.activityFilter"
       @filter-changed="updateFilterQuery"
     />
+
+    <project-filter
+      v-if="shouldShowNewProjectFilter"
+      :filter="projectFilter"
+      @filter-changed="updateFilterQuery"
+    />
     <standard-filter
-      v-if="shouldShowProjectFilter"
+      v-else-if="shouldShowProjectFilter"
       :filter="projectFilter"
       :data-testid="projectFilter.id"
       @filter-changed="updateFilterQuery"
