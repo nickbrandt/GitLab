@@ -219,3 +219,7 @@
   category: code_review
   aggregation: weekly
   feature_flag: diff_settings_usage_data
+- name: i_code_review_rebase_button_action
+  redis_slot: code_review
+  category: code_review
+  aggregation: weekly

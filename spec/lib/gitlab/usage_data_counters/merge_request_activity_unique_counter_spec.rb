@@ -386,4 +386,12 @@ RSpec.describe Gitlab::UsageDataCounters::MergeRequestActivityUniqueCounter, :cl
       let(:action) { described_class::MR_LABELS_CHANGED_ACTION }
     end
   end
+
+  describe '.track_rebase_button_action' do
+    subject { described_class.track_rebase_button_action(user: user) }
+
+    it_behaves_like 'a tracked merge request unique event' do
+      let(:action) { described_class::MR_REBASE_BUTTON_ACTION }
+    end
+  end
 end

@@ -44,6 +44,7 @@ module Gitlab
       MR_INCLUDING_CI_CONFIG_ACTION = 'o_pipeline_authoring_unique_users_pushing_mr_ciconfigfile'
       MR_MILESTONE_CHANGED_ACTION = 'i_code_review_user_milestone_changed'
       MR_LABELS_CHANGED_ACTION = 'i_code_review_user_labels_changed'
+      MR_REBASE_BUTTON_ACTION = 'i_code_review_rebase_button_action'
 
       class << self
         def track_mr_diffs_action(merge_request:)
@@ -199,6 +200,10 @@ module Gitlab
 
         def track_labels_changed_action(user:)
           track_unique_action_by_user(MR_LABELS_CHANGED_ACTION, user)
+        end
+
+        def track_rebase_button_action(user:)
+          track_unique_action_by_user(MR_REBASE_BUTTON_ACTION, user)
         end
 
         private
