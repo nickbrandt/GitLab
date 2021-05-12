@@ -10753,10 +10753,9 @@ CREATE SEQUENCE ci_namespace_monthly_usages_id_seq
 ALTER SEQUENCE ci_namespace_monthly_usages_id_seq OWNED BY ci_namespace_monthly_usages.id;
 
 CREATE TABLE ci_pending_builds (
-    created_at timestamp with time zone NOT NULL,
-    updated_at timestamp with time zone NOT NULL,
     build_id bigint NOT NULL,
-    project_id bigint NOT NULL
+    project_id bigint NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
 );
 
 CREATE TABLE ci_pipeline_artifacts (
