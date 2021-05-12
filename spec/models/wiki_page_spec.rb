@@ -773,8 +773,11 @@ RSpec.describe WikiPage do
   end
 
   describe '#historical?' do
-    include_context 'subject is persisted page'
+    let!(:container) { create(:project) }
+ 
+    subject { create_wiki_page }
 
+    let(:wiki) { subject.wiki }
     let(:old_version) { subject.versions.last.id }
     let(:old_page) { wiki.find_page(subject.title, old_version) }
     let(:latest_version) { subject.versions.first.id }
