@@ -12,7 +12,7 @@ const parseOptions = (obj) =>
   Object.entries(obj).map(([id, name]) => ({ id: id.toUpperCase(), name }));
 
 export const mapProjects = (projects = []) =>
-  projects.map((p) => ({ id: getIdFromGraphQLId(p.id), name: p.name }));
+  projects.map((p) => ({ id: getIdFromGraphQLId(p.id).toString(), name: p.name }));
 
 const stateOptions = parseOptions(VULNERABILITY_STATES);
 const defaultStateOptions = stateOptions.filter((x) => ['DETECTED', 'CONFIRMED'].includes(x.id));
