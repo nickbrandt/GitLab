@@ -89,7 +89,7 @@ export default {
       isAlertDrawerOpen: false,
       isErrorAlertDismissed: false,
       pageInfo: {},
-      selectedAlert: {},
+      selectedAlert: null,
       sort: 'STARTED_AT_DESC',
       sortBy: 'startedAt',
       sortDesc: true,
@@ -318,6 +318,7 @@ export default {
       <span v-else>&nbsp;</span>
     </gl-intersection-observer>
     <alert-drawer
+      v-if="selectedAlert"
       :is-alert-drawer-open="isAlertDrawerOpen"
       :selected-alert="selectedAlert"
       @deselect-alert="handleAlertDeselect"

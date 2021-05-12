@@ -1,17 +1,18 @@
 <script>
 import { GlAlert, GlButton, GlDrawer, GlLink, GlSkeletonLoader } from '@gitlab/ui';
+import * as Sentry from '@sentry/browser';
 import { capitalizeFirstCharacter, splitCamelCase } from '~/lib/utils/text_utility';
 import { visitUrl } from '~/lib/utils/url_utility';
 import { __ } from '~/locale';
 import createIssueMutation from '~/vue_shared/alert_details/graphql/mutations/alert_issue_create.mutation.graphql';
 import getAlertDetailsQuery from '~/vue_shared/alert_details/graphql/queries/alert_details.query.graphql';
-import { ALERT_DETAILS_LOADING_ROWS, HIDDEN_VALUES } from './constants';
+import { ALERT_DETAILS_LOADING_ROWS, DRAWER_ERRORS, HIDDEN_VALUES } from './constants';
 
 export default {
   ALERT_DETAILS_LOADING_ROWS,
   i18n: {
     CREATE_ISSUE: __('Create incident'),
-    ERROR: __('There was an error fetching content, please refresh the page'),
+    ERRORS: { ...DRAWER_ERRORS },
   },
   components: {
     GlAlert,
@@ -33,8 +34,8 @@ export default {
       update(data) {
         return data?.project?.alertManagementAlerts?.nodes?.[0] ?? null;
       },
-      error() {
-        this.errored = true;
+      error(error) {
+        this.handleAlertError({ type: 'DETAILS', error });
       },
     },
   },
@@ -52,12 +53,13 @@ export default {
     selectedAlert: {
       type: Object,
       required: true,
+      validator: (value) => ['iid', 'title'].every((prop) => value[prop]),
     },
   },
   data() {
     return {
       alertDetails: {},
-      errored: false,
+      errorMessage: '',
       creatingIssue: false,
     };
   },
@@ -72,6 +74,9 @@ export default {
         },
         [],
       );
+    },
+    errored() {
+      return Boolean(this.errorMessage);
     },
     hasIssue() {
       return Boolean(this.selectedAlert.issue);
@@ -98,16 +103,26 @@ export default {
 
         const { errors, issue } = response.data.createAlertIssue;
         if (errors?.length) {
-          throw new Error();
+          throw new Error(errors[0]);
         }
         visitUrl(issue.webUrl);
-      } catch {
-        this.handleAlertError();
+      } catch (error) {
+        this.handleAlertError({ type: 'CREATE_ISSUE', error });
         this.creatingIssue = false;
       }
     },
-    handleAlertError() {
-      this.errored = true;
+    getDrawerHeaderHeight() {
+      const wrapperEl = document.querySelector('.js-threat-monitoring-container-wrapper');
+
+      if (wrapperEl) {
+        return `${wrapperEl.offsetTop}px`;
+      }
+
+      return '';
+    },
+    handleAlertError({ type, error }) {
+      this.errorMessage = this.$options.i18n.ERRORS[type];
+      Sentry.captureException(error);
     },
     humanizeText(text) {
       return capitalizeFirstCharacter(splitCamelCase(text));
@@ -117,6 +132,7 @@ export default {
 </script>
 <template>
   <gl-drawer
+    :header-height="getDrawerHeaderHeight()"
     :z-index="252"
     class="threat-monitoring-alert-drawer gl-bg-gray-10"
     :open="isAlertDrawerOpen"
@@ -132,7 +148,6 @@ export default {
           v-else
           category="primary"
           variant="confirm"
-          :disabled="errored"
           :loading="creatingIssue"
           data-testid="create-issue-button"
           @click="createIssue"
@@ -141,8 +156,8 @@ export default {
         </gl-button>
       </div>
     </template>
-    <gl-alert v-if="errored" variant="danger" :dismissable="false" contained>
-      {{ $options.i18n.ERROR }}
+    <gl-alert v-if="errored" variant="danger" :dismissible="false" contained>
+      {{ errorMessage }}
     </gl-alert>
     <div v-if="isLoadingDetails">
       <div v-for="row in $options.ALERT_DETAILS_LOADING_ROWS" :key="row" class="gl-mb-5">

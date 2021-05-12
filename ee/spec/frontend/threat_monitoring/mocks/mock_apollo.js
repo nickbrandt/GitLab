@@ -21,6 +21,9 @@ export const getAlertDetailsQuerySpy = jest.fn().mockResolvedValue({
   data: { project: { alertManagementAlerts: { nodes: [mockAlertDetails] } } },
 });
 
+export const getAlertDetailsQueryErrorMessage =
+  'Variable $fullPath of type ID! was provided invalid value';
+
 export const erroredGetAlertDetailsQuerySpy = jest.fn().mockResolvedValue({
-  errors: [{ message: 'Variable $fullPath of type ID! was provided invalid value' }],
+  errors: [{ message: getAlertDetailsQueryErrorMessage }],
 });

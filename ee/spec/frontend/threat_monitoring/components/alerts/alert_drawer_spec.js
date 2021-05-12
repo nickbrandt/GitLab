@@ -1,14 +1,20 @@
 import { GlAlert, GlDrawer, GlSkeletonLoader } from '@gitlab/ui';
+import * as Sentry from '@sentry/browser';
 import { createLocalVue } from '@vue/test-utils';
 import VueApollo from 'vue-apollo';
 import AlertDrawer from 'ee/threat_monitoring/components/alerts/alert_drawer.vue';
+import { DRAWER_ERRORS } from 'ee/threat_monitoring/components/alerts/constants';
 import createMockApollo from 'helpers/mock_apollo_helper';
 import { mountExtended, shallowMountExtended } from 'helpers/vue_test_utils_helper';
 import waitForPromises from 'helpers/wait_for_promises';
 import { visitUrl } from '~/lib/utils/url_utility';
 import getAlertDetailsQuery from '~/vue_shared/alert_details/graphql/queries/alert_details.query.graphql';
-import { erroredGetAlertDetailsQuerySpy, getAlertDetailsQuerySpy } from '../../mocks/mock_apollo';
-import { mockAlertDetails } from '../../mocks/mock_data';
+import {
+  erroredGetAlertDetailsQuerySpy,
+  getAlertDetailsQueryErrorMessage,
+  getAlertDetailsQuerySpy,
+} from '../../mocks/mock_apollo';
+import { mockAlertDetails, mockAlerts } from '../../mocks/mock_data';
 
 jest.mock('~/lib/utils/url_utility', () => ({
   visitUrl: jest.fn(),
@@ -80,6 +86,7 @@ describe('Alert Drawer', () => {
       ...apolloOptions,
     });
   };
+
   describe('default', () => {
     it.each`
       component                  | status                | findComponent            | state    | mount
@@ -109,32 +116,38 @@ describe('Alert Drawer', () => {
   });
 
   it('displays the alert when there was an error retrieving alert details', async () => {
+    const errorMessage = `GraphQL error: ${getAlertDetailsQueryErrorMessage}`;
+    const captureExceptionSpy = jest.spyOn(Sentry, 'captureException');
     createWrapper({ apolloSpy: erroredGetAlertDetailsQuerySpy });
     await wrapper.vm.$nextTick();
     expect(findAlert().exists()).toBe(true);
+    expect(findAlert().text()).toBe(DRAWER_ERRORS.DETAILS);
+    expect(captureExceptionSpy).toHaveBeenCalledTimes(1);
+    expect(captureExceptionSpy.mock.calls[0][0].message).toBe(errorMessage);
   });
 
   describe('creating an issue', () => {
     it('navigates to the created issue when the "Create Issue" button is clicked', async () => {
-      createWrapper({
-        $apollo: shallowApolloMock({}),
-        props: { selectedAlert: {} },
-      });
+      const captureExceptionSpy = jest.spyOn(Sentry, 'captureException');
+      createWrapper({ $apollo: shallowApolloMock({}), props: { selectedAlert: mockAlerts[2] } });
       expect(findCreateIssueButton().exists()).toBe(true);
       findCreateIssueButton().vm.$emit('click');
       await waitForPromises();
       expect(mutateSpy).toHaveBeenCalledTimes(1);
+      expect(captureExceptionSpy).not.toHaveBeenCalled();
       expect(visitUrl).toHaveBeenCalledWith('/#/-/issues/03');
     });
 
     it('displays the alert when there was an error creating an issue', async () => {
+      const errorMessage = 'GraphQL error';
+      const captureExceptionSpy = jest.spyOn(Sentry, 'captureException');
       const erroredMutateSpy = jest
         .fn()
-        .mockResolvedValue({ data: { createAlertIssue: { errors: ['test'] } } });
+        .mockResolvedValue({ data: { createAlertIssue: { errors: [errorMessage] } } });
 
       createWrapper({
         $apollo: shallowApolloMock({ mutate: erroredMutateSpy }),
-        props: { selectedAlert: {} },
+        props: { selectedAlert: mockAlerts[2] },
       });
       expect(findCreateIssueButton().exists()).toBe(true);
       findCreateIssueButton().vm.$emit('click');
@@ -142,6 +155,9 @@ describe('Alert Drawer', () => {
       expect(erroredMutateSpy).toHaveBeenCalledTimes(1);
       expect(visitUrl).not.toHaveBeenCalled();
       expect(findAlert().exists()).toBe(true);
+      expect(findAlert().text()).toBe(DRAWER_ERRORS.CREATE_ISSUE);
+      expect(captureExceptionSpy).toHaveBeenCalledTimes(1);
+      expect(captureExceptionSpy.mock.calls[0][0].message).toBe(errorMessage);
     });
   });
 });

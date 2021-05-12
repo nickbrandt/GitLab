@@ -86,3 +86,8 @@ export const HIDDEN_VALUES = [
 ];
 
 export const ALERT_DETAILS_LOADING_ROWS = 20;
+
+export const DRAWER_ERRORS = {
+  DETAILS: __('There was an error fetching content, please refresh the page'),
+  CREATE_ISSUE: s__('ThreatMonitoring|Failed to create incident, please try again.'),
+};

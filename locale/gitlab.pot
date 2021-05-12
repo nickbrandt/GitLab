@@ -33425,6 +33425,9 @@ msgstr ""
 msgid "ThreatMonitoring|Events"
 msgstr ""
 
+msgid "ThreatMonitoring|Failed to create incident, please try again."
+msgstr ""
+
 msgid "ThreatMonitoring|Hide dismissed alerts"
 msgstr ""
 
