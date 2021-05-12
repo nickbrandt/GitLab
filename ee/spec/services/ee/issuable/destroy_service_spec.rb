@@ -20,6 +20,7 @@ RSpec.describe Issuable::DestroyService do
       end
 
       it_behaves_like 'service deleting todos'
+      it_behaves_like 'service deleting label links'
     end
 
     context 'when destroying other issuable type' do
