@@ -10,7 +10,7 @@ module Ci
     include FileStoreMounter
     include Presentable
 
-    FILE_SIZE_LIMIT = 10.megabytes.freeze
+    FILE_SIZE_LIMIT = 50.megabytes.freeze
     EXPIRATION_DATE = 1.week.freeze
 
     DEFAULT_FILE_NAMES = {
