@@ -105,6 +105,8 @@ RSpec.describe 'gitlab:app namespace rake task', :delete do
       before do
         # We only need a backup of the repositories for this test
         stub_env('SKIP', 'db,uploads,builds,artifacts,lfs,registry')
+
+        create(:project, :repository)
       end
 
       it 'removes stale data' do
@@ -169,8 +171,9 @@ RSpec.describe 'gitlab:app namespace rake task', :delete do
       allow(ActiveRecord::Base.connection).to receive(:reconnect!)
     end
 
+    let!(:project) { create(:project, :repository) }
+
     describe 'backup creation and deletion using custom_hooks' do
-      let(:project) { create(:project, :repository) }
       let(:user_backup_path) { "repositories/#{project.disk_path}" }
 
       before do
@@ -399,6 +402,8 @@ RSpec.describe 'gitlab:app namespace rake task', :delete do
   describe "Skipping items" do
     before do
       stub_env('SKIP', 'repositories,uploads')
+
+      create(:project, :repository)
     end
 
     it "does not contain skipped item" do
@@ -441,6 +446,8 @@ RSpec.describe 'gitlab:app namespace rake task', :delete do
   describe 'skipping tar archive creation' do
     before do
       stub_env('SKIP', 'tar')
+
+      create(:project, :repository)
     end
 
     it 'created files with backup content and no tar archive' do
