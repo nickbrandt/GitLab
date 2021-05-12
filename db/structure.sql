@@ -17187,10 +17187,12 @@ ALTER SEQUENCE protected_environment_deploy_access_levels_id_seq OWNED BY protec
 
 CREATE TABLE protected_environments (
     id integer NOT NULL,
-    project_id integer NOT NULL,
+    project_id integer,
     created_at timestamp with time zone NOT NULL,
     updated_at timestamp with time zone NOT NULL,
-    name character varying NOT NULL
+    name character varying NOT NULL,
+    group_id bigint,
+    CONSTRAINT protected_environments_project_or_group_existence CHECK (((project_id IS NULL) <> (group_id IS NULL)))
 );
 
 CREATE SEQUENCE protected_environments_id_seq
@@ -24315,6 +24317,8 @@ CREATE INDEX index_protected_environment_deploy_access_levels_on_group_id ON pro
 
 CREATE INDEX index_protected_environment_deploy_access_levels_on_user_id ON protected_environment_deploy_access_levels USING btree (user_id);
 
+CREATE UNIQUE INDEX index_protected_environments_on_group_id_and_name ON protected_environments USING btree (group_id, name) WHERE (group_id IS NOT NULL);
+
 CREATE INDEX index_protected_environments_on_project_id ON protected_environments USING btree (project_id);
 
 CREATE UNIQUE INDEX index_protected_environments_on_project_id_and_name ON protected_environments USING btree (project_id, name);
@@ -25747,6 +25751,9 @@ ALTER TABLE ONLY issues
 
 ALTER TABLE ONLY epics
     ADD CONSTRAINT fk_9d480c64b2 FOREIGN KEY (start_date_sourcing_epic_id) REFERENCES epics(id) ON DELETE SET NULL;
+
+ALTER TABLE ONLY protected_environments
+    ADD CONSTRAINT fk_9e112565b7 FOREIGN KEY (group_id) REFERENCES namespaces(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY alert_management_alerts
     ADD CONSTRAINT fk_9e49e5c2b7 FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE;
