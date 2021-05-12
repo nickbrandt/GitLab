@@ -8,6 +8,7 @@ RSpec.describe Resolvers::Ci::RunnersResolver do
   let_it_be(:user) { create_default(:user, :admin) }
   let_it_be(:group) { create(:group, :public) }
   let_it_be(:project) { create(:project, :repository, :public) }
+
   let_it_be(:inactive_project_runner) do
     create(:ci_runner, :project, projects: [project], active: false, contacted_at: 1.minute.ago, tag_list: %w(project_runner))
   end
@@ -33,7 +34,7 @@ RSpec.describe Resolvers::Ci::RunnersResolver do
     end
 
     context 'with a sort argument' do
-      context ":contacted_asc" do
+      context "set to :contacted_asc" do
         let(:args) do
           { sort: :contacted_asc }
         end
@@ -41,7 +42,7 @@ RSpec.describe Resolvers::Ci::RunnersResolver do
         it { is_expected.to eq([offline_project_runner, instance_runner, inactive_project_runner, group_runner]) }
       end
 
-      context ":created_date" do
+      context "set to :created_date" do
         let(:args) do
           { sort: :created_date }
         end
@@ -56,7 +57,7 @@ RSpec.describe Resolvers::Ci::RunnersResolver do
       end
 
       context 'to instance runners' do
-        let!(:runner_type) { :instance_type }
+        let(:runner_type) { :instance_type }
 
         it 'returns the instance runner' do
           is_expected.to contain_exactly(instance_runner)
@@ -64,7 +65,7 @@ RSpec.describe Resolvers::Ci::RunnersResolver do
       end
 
       context 'to group runners' do
-        let!(:runner_type) { :group_type }
+        let(:runner_type) { :group_type }
 
         it 'returns the group runner' do
           is_expected.to contain_exactly(group_runner)
@@ -72,7 +73,7 @@ RSpec.describe Resolvers::Ci::RunnersResolver do
       end
 
       context 'to project runners' do
-        let!(:runner_type) { :project_type }
+        let(:runner_type) { :project_type }
 
         it 'returns the project runner' do
           is_expected.to contain_exactly(inactive_project_runner, offline_project_runner)
@@ -86,7 +87,7 @@ RSpec.describe Resolvers::Ci::RunnersResolver do
       end
 
       context 'to active runners' do
-        let!(:runner_status) { :active }
+        let(:runner_status) { :active }
 
         it 'returns the instance and group runners' do
           is_expected.to contain_exactly(offline_project_runner, group_runner, instance_runner)
@@ -94,7 +95,7 @@ RSpec.describe Resolvers::Ci::RunnersResolver do
       end
 
       context 'to offline runners' do
-        let!(:runner_status) { :offline }
+        let(:runner_status) { :offline }
 
         it 'returns the offline project runner' do
           is_expected.to contain_exactly(offline_project_runner)
@@ -108,7 +109,7 @@ RSpec.describe Resolvers::Ci::RunnersResolver do
       end
 
       context 'with "project_runner" tag' do
-        let!(:tag_list) { ['project_runner'] }
+        let(:tag_list) { ['project_runner'] }
 
         it 'returns the project_runner runners' do
           is_expected.to contain_exactly(offline_project_runner, inactive_project_runner)
@@ -116,7 +117,7 @@ RSpec.describe Resolvers::Ci::RunnersResolver do
       end
 
       context 'with "project_runner" and "active_runner" tags as comma-separated string' do
-        let!(:tag_list) { ['project_runner,active_runner'] }
+        let(:tag_list) { ['project_runner,active_runner'] }
 
         it 'returns the offline_project_runner runner' do
           is_expected.to contain_exactly(offline_project_runner)
@@ -124,7 +125,7 @@ RSpec.describe Resolvers::Ci::RunnersResolver do
       end
 
       context 'with "active_runner" and "instance_runner" tags as array' do
-        let!(:tag_list) { %w[instance_runner active_runner] }
+        let(:tag_list) { %w[instance_runner active_runner] }
 
         it 'returns the offline_project_runner runner' do
           is_expected.to contain_exactly(instance_runner)
