@@ -381,7 +381,7 @@ class User < ApplicationRecord
   # Scopes
   scope :admins, -> { where(admin: true) }
   scope :instance_access_request_approvers_to_be_notified, -> { admins.active.order_recent_sign_in.limit(INSTANCE_ACCESS_REQUEST_APPROVERS_TO_BE_NOTIFIED_LIMIT) }
-  scope :blocked, -> { with_states(:blocked, :ldap_blocked, :banned) }
+  scope :blocked, -> { with_states(:blocked, :ldap_blocked) }
   scope :blocked_pending_approval, -> { with_states(:blocked_pending_approval) }
   scope :banned, -> { with_states(:banned) }
   scope :external, -> { where(external: true) }

@@ -736,11 +736,10 @@ RSpec.describe User do
         it 'returns only blocked users' do
           expect(subject).to include(
             blocked_user,
-            banned_user,
             ldap_blocked_user
           )
 
-          expect(subject).not_to include(active_user, blocked_pending_approval_user)
+          expect(subject).not_to include(active_user, blocked_pending_approval_user, banned_user)
         end
       end
 
