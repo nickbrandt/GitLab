@@ -119,6 +119,8 @@ A deactivated user can also activate their account themselves by logging back in
 
 ## Ban and unban users
 
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/327353) in GitLab 13.12.
+
 GitLab administrators can ban users.
 
 NOTE:

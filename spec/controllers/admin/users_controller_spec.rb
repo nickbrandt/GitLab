@@ -366,24 +366,52 @@ RSpec.describe Admin::UsersController do
   end
 
   describe 'PUT ban/:id' do
-    it 'bans user' do
-      put :ban, params: { id: user.username }
+    context 'when ban_user_feature_flag is enabled' do
+      it 'bans user' do
+        put :ban, params: { id: user.username }
 
-      user.reload
-      expect(user.banned?).to be_truthy
-      expect(flash[:notice]).to eq _('Successfully banned')
+        user.reload
+        expect(user.banned?).to be_truthy
+        expect(flash[:notice]).to eq _('Successfully banned')
+      end
+
+      context 'when unsuccessful' do
+        let(:user) { create(:user, :blocked) }
+
+        it 'does not ban user' do
+          put :ban, params: { id: user.username }
+
+          user.reload
+          expect(user.banned?).to be_falsey
+          expect(flash[:alert]).to eq _('Error occurred. User was not banned')
+        end
+      end
     end
 
-    context 'when unsuccessful' do
-      let(:user) { create(:user, :blocked) }
+    context 'when ban_user_feature_flag is not enabled' do
+      before do
+        stub_feature_flags(ban_user_feature_flag: false)
+      end
 
-      it 'does not ban user' do
+      it 'does not ban user, renders 404' do
         put :ban, params: { id: user.username }
 
         user.reload
         expect(user.banned?).to be_falsey
-        expect(flash[:alert]).to eq _('Error occurred. User was not banned')
+        expect(response).to have_gitlab_http_status(:not_found)
       end
+    end
+  end
+
+  describe 'PUT unban/:id' do
+    let(:banned_user) { create(:user, :banned) }
+
+    it 'unbans user' do
+      put :unban, params: { id: banned_user.username }
+
+      banned_user.reload
+      expect(banned_user.banned?).to be_falsey
+      expect(flash[:notice]).to eq _('Successfully unbanned')
     end
   end
 
