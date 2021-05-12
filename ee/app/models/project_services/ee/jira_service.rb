@@ -12,7 +12,7 @@ module EE
     end
 
     def jira_vulnerabilities_integration_available?
-      parent.present? ? parent&.feature_available?(:jira_vulnerabilities_integration) : License.feature_available?(:jira_vulnerabilities_integration)
+      parent.present? ? parent.licensed_feature_available?(:jira_vulnerabilities_integration) : License.feature_available?(:jira_vulnerabilities_integration)
     end
 
     def jira_vulnerabilities_integration_enabled?
