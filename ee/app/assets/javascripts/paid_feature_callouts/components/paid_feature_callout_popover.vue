@@ -9,7 +9,7 @@ const RESIZE_EVENT_DEBOUNCE_MS = 150;
 
 export default {
   tracking: {
-    event: 'click_button',
+    action: 'click_button',
     labels: { upgrade: 'upgrade_to_ultimate', compare: 'compare_all_plans' },
     property: 'experiment:highlight_paid_features_during_active_trial',
   },
@@ -119,7 +119,7 @@ export default {
     onShown() {
       this.track('popover_shown', {
         label: `feature_highlight_popover:${this.featureName}`,
-        property: 'experiment:highlight_paid_features_during_active_trial',
+        property: this.$options.tracking.property,
       });
     },
     updateDisabledState() {
@@ -163,7 +163,7 @@ export default {
         class="gl-mb-0"
         block
         data-testid="upgradeBtn"
-        :data-track-event="$options.tracking.event"
+        :data-track-action="$options.tracking.action"
         :data-track-label="$options.tracking.labels.upgrade"
         :data-track-property="$options.tracking.property"
       >
@@ -178,7 +178,7 @@ export default {
         class="gl-mb-0"
         block
         data-testid="compareBtn"
-        :data-track-event="$options.tracking.event"
+        :data-track-action="$options.tracking.action"
         :data-track-label="$options.tracking.labels.compare"
         :data-track-property="$options.tracking.property"
       >

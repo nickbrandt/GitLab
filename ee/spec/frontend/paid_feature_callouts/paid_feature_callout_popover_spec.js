@@ -163,7 +163,7 @@ describe('PaidFeatureCalloutPopover', () => {
         variant: 'confirm',
         size: 'small',
         block: '',
-        'data-track-event': 'click_button',
+        'data-track-action': 'click_button',
         'data-track-label': 'upgrade_to_ultimate',
         'data-track-property': 'experiment:highlight_paid_features_during_active_trial',
       });
@@ -180,7 +180,7 @@ describe('PaidFeatureCalloutPopover', () => {
         variant: 'confirm',
         size: 'small',
         block: '',
-        'data-track-event': 'click_button',
+        'data-track-action': 'click_button',
         'data-track-label': 'compare_all_plans',
         'data-track-property': 'experiment:highlight_paid_features_during_active_trial',
       });
