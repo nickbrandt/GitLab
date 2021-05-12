@@ -148,6 +148,23 @@ module CommitsHelper
     end
   end
 
+  # This is used to calculate a cache key for the app/views/projects/commits/_commit.html.haml
+  # partial. It takes some of the same parameters as used in the partial and will hash the
+  # current pipeline status.
+  #
+  # This is currently configured only for use on the merge requests commits tab, and will
+  # require expansion for use elsewhere.
+  def commit_partial_cache_key(commit, ref:, request:)
+    [
+      commit,
+      commit.author,
+      ref,
+      hashed_pipeline_status(commit, ref),
+      { xhr: request.xhr? },
+      @path # referred to in #link_to_browse_code
+    ]
+  end
+
   protected
 
   # Private: Returns a link to a person. If the person has a matching user and
@@ -220,5 +237,15 @@ module CommitsHelper
     else
       project_commit_path(project, commit)
     end
+  end
+
+  private
+
+  def hashed_pipeline_status(commit, ref)
+    status = commit.status_for(ref)
+
+    return if status.nil?
+
+    Digest::SHA1.hexdigest(status.to_s)
   end
 end
