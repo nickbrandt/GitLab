@@ -1,12 +1,12 @@
 import { shallowMount } from '@vue/test-utils';
-import MavenSettings from '~/packages_and_registries/settings/group/components/maven_settings.vue';
+import GenericSettings from '~/packages_and_registries/settings/group/components/generic_settings.vue';
 import SettingsTitles from '~/packages_and_registries/settings/group/components/settings_titles.vue';
 
-describe('maven_settings', () => {
+describe('generic_settings', () => {
   let wrapper;
 
   const mountComponent = () => {
-    wrapper = shallowMount(MavenSettings, {
+    wrapper = shallowMount(GenericSettings, {
       scopedSlots: {
         default: '<div data-testid="default-slot">{{props.modelNames}}</div>',
       },
@@ -31,8 +31,8 @@ describe('maven_settings', () => {
       mountComponent();
 
       expect(findSettingsTitle().props()).toMatchObject({
-        title: 'Maven',
-        subTitle: 'Settings for Maven packages',
+        title: 'Generic',
+        subTitle: 'Settings for Generic packages',
       });
     });
   });
@@ -47,8 +47,8 @@ describe('maven_settings', () => {
     it('binds model names', () => {
       mountComponent();
 
-      expect(findDefaultSlot().text()).toContain('mavenDuplicatesAllowed');
-      expect(findDefaultSlot().text()).toContain('mavenDuplicateExceptionRegex');
+      expect(findDefaultSlot().text()).toContain('genericDuplicatesAllowed');
+      expect(findDefaultSlot().text()).toContain('genericDuplicateExceptionRegex');
     });
   });
 });
