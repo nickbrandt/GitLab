@@ -1,0 +1,5 @@
+---
+title: Increased pipeline artifact size limit to 50MB
+merge_request: 61636
+author: gerardo
+type: performance
