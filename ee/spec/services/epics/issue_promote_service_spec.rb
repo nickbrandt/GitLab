@@ -130,6 +130,25 @@ RSpec.describe Epics::IssuePromoteService, :aggregate_failures do
           end
         end
 
+        context 'when issue has resource state event' do
+          let!(:issue_event) { create(:resource_state_event, issue: issue) }
+
+          it 'does not raise error' do
+            expect { subject.execute(issue) }.not_to raise_error
+          end
+
+          it 'promotes issue successfully' do
+            epic = subject.execute(issue)
+
+            resource_state_event = epic.resource_state_events.first
+            expect(epic.title).to eq(issue.title)
+            expect(issue.promoted_to_epic).to eq(epic)
+            expect(resource_state_event.issue_id).to eq(nil)
+            expect(resource_state_event.epic_id).to eq(epic.id)
+            expect(resource_state_event.state).to eq(issue_event.state)
+          end
+        end
+
         context 'when promoting issue to a different group' do
           it 'creates a new epic with correct attributes' do
             epic = subject.execute(issue, new_group)
