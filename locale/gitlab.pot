@@ -2756,7 +2756,7 @@ msgstr ""
 msgid "AdminUsers|You are about to permanently delete the user %{username}. This will delete all of the issues, merge requests, and groups linked to them. To avoid data loss, consider using the %{strongStart}block user%{strongEnd} feature instead. Once you %{strongStart}Delete user%{strongEnd}, it cannot be undone or recovered."
 msgstr ""
 
-msgid "AdminUsers|You can always ban their account again if needed."
+msgid "AdminUsers|You ban their account in the future if necessary."
 msgstr ""
 
 msgid "AdminUsers|You can always block their account again if needed."
@@ -2768,10 +2768,10 @@ msgstr ""
 msgid "AdminUsers|You can always re-activate their account, their data will remain intact."
 msgstr ""
 
-msgid "AdminUsers|You can always unban their account. Their data remains intact."
+msgid "AdminUsers|You can always unblock their account, their data will remain intact."
 msgstr ""
 
-msgid "AdminUsers|You can always unblock their account, their data will remain intact."
+msgid "AdminUsers|You can unban their account in the future. Their data remains intact."
 msgstr ""
 
 msgid "AdminUsers|You cannot remove your own admin rights."
