@@ -3,17 +3,17 @@ import { s__ } from '~/locale';
 import SettingsTitles from '~/packages_and_registries/settings/group/components/settings_titles.vue';
 
 export default {
-  name: 'MavenSettings',
+  name: 'GenericSettings',
   components: {
     SettingsTitles,
   },
   i18n: {
-    title: s__('PackageRegistry|Maven'),
-    subTitle: s__('PackageRegistry|Settings for Maven packages'),
+    title: s__('PackageRegistry|Generic'),
+    subTitle: s__('PackageRegistry|Settings for Generic packages'),
   },
   modelNames: {
-    allowed: 'mavenDuplicatesAllowed',
-    exception: 'mavenDuplicateExceptionRegex',
+    allowed: 'genericDuplicatesAllowed',
+    exception: 'genericDuplicateExceptionRegex',
   },
 };
 </script>
