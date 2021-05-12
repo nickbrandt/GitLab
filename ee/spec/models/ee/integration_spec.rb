@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe Service do
+RSpec.describe Integration do
   describe '.available_services_names' do
     it { expect(described_class.available_services_names).to include('github') }
   end
@@ -17,7 +17,7 @@ RSpec.describe Service do
 
       it do
         expect(described_class.project_specific_services_names)
-          .to include(*described_class::EE_PROJECT_SPECIFIC_SERVICE_NAMES)
+          .to include(*described_class::EE_PROJECT_SPECIFIC_INTEGRATION_NAMES)
       end
     end
 
@@ -26,7 +26,7 @@ RSpec.describe Service do
 
       it do
         expect(described_class.project_specific_services_names)
-          .to include(*described_class::EE_PROJECT_SPECIFIC_SERVICE_NAMES, *Service::EE_COM_PROJECT_SPECIFIC_SERVICE_NAMES)
+          .to include(*described_class::EE_PROJECT_SPECIFIC_INTEGRATION_NAMES, *Integration::EE_COM_PROJECT_SPECIFIC_INTEGRATION_NAMES)
       end
     end
   end
