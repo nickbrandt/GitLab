@@ -114,6 +114,19 @@ RSpec.describe Spam::SpamVerdictService do
         end
       end
     end
+
+    context 'records metrics' do
+      let(:histogram) { double('histogram') }
+
+      before do
+        expect(Gitlab::Metrics).to receive(:histogram).with(:spamcheck_latency_seconds, anything).and_return(histogram)
+      end
+
+      it 'records latency' do
+        expect(histogram).to receive(:observe)
+        subject
+      end
+    end
   end
 
   describe '#akismet_verdict' do
