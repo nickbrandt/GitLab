@@ -168,7 +168,7 @@ module UsersHelper
       method: 'put',
       modal_attributes: {
         title: s_('AdminUsers|Ban user %{username}?') % { username: sanitize_name(user.name) },
-        message: s_('AdminUsers|You can always unban their account. Their data remains intact.'),
+        message: s_('AdminUsers|You can unban their account in the future. Their data remains intact.'),
         okVariant: 'warning',
         okTitle: s_('AdminUsers|Ban')
       }.to_json
@@ -181,7 +181,7 @@ module UsersHelper
       method: 'put',
       modal_attributes: {
         title: s_('AdminUsers|Unban %{username}?') % { username: sanitize_name(user.name) },
-        message: s_('AdminUsers|You can always ban their account again if needed.'),
+        message: s_('AdminUsers|You ban their account in the future if necessary.'),
         okVariant: 'info',
         okTitle: s_('AdminUsers|Unban')
       }.to_json
@@ -195,7 +195,7 @@ module UsersHelper
       concat tag.li s_('AdminUsers|User will be blocked')
     end
 
-    link_start = '<a href="%{url}" target="_blank">'.html_safe % { url: help_page_path("user/admin_area/user_moderation", anchor: "banning-a-user") }
+    link_start = '<a href="%{url}" target="_blank">'.html_safe % { url: help_page_path("user/admin_area/moderate_users", anchor: "ban-a-user") }
     info = tag.p s_('AdminUsers|Learn more about %{link_start}banned users.%{link_end}').html_safe % { link_start: link_start, link_end: '</a>'.html_safe }
 
     header + list + info

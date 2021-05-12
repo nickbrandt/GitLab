@@ -5,7 +5,7 @@ info: To determine the technical writer assigned to the Stage/Group associated w
 type: howto
 ---
 
-# User moderation
+# Moderate users
 
 GitLab administrators can moderate user access by blocking, banning, or deactivating users.
 
@@ -117,7 +117,7 @@ Activating a user changes the user's state to active and consumes a
 NOTE:
 A deactivated user can also activate their account themselves by logging back in via the UI.
 
-## Banning and unbanning users
+## Ban and unban users
 
 GitLab administrators can ban users.
 
@@ -126,12 +126,12 @@ This feature is behind a feature flag that is disabled by default. GitLab admini
 with access to the GitLab Rails console can [enable](../../administration/feature_flags.md)
 this feature for your GitLab instance.
 
-### Banning a user
+### Ban a user
 
-In order to completely block a user and hide the user's comments and issues from other users,
+To completely block a user and hide the user's comments and issues from other users,
 administrators can choose to ban the user.
 
-Users can be banned from the Admin Area. To do this:
+Users can be banned using the Admin Area. To do this:
 
 1. Navigate to  **Admin Area > Overview > Users**.
 1. Select a user.
@@ -150,9 +150,9 @@ This feature is a work in progress. Currently, banning a user
 only blocks them and does not hide their comments or issues.
 This functionality will be implemented in follow up issues.
 
-### Unbanning a user
+### Unban a user
 
-A banned user can be unbanned from the Admin Area. To do this:
+A banned user can be unbanned using the Admin Area. To do this:
 
 1. Navigate to  **Admin Area > Overview > Users**.
 1. Click on the **Banned** tab.

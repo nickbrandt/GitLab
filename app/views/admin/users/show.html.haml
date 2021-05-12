@@ -185,7 +185,7 @@
               %ul
                 %li= _('Log in')
                 %li= _('Access Git repositories')
-              - link_start = '<a href="%{url}" target="_blank">'.html_safe % { url: help_page_path("user/admin_area/user_moderation", anchor: "banning-a-user") }
+              - link_start = '<a href="%{url}" target="_blank">'.html_safe % { url: help_page_path("user/admin_area/moderate_users", anchor: "ban-a-user") }
               = s_('AdminUsers|Learn more about %{link_start}banned users.%{link_end}').html_safe % { link_start: link_start, link_end: '</a>'.html_safe }
               %p
               %button.btn.gl-button.btn-info.js-confirm-modal-button{ data: user_unban_data(@user) }
