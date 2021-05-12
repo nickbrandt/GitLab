@@ -42,6 +42,7 @@ export default {
       :dismissible="false"
       :title="$options.i18n.alertTitle"
       :primary-button-text="$options.i18n.primaryButtonText"
+      data-testid="creditCardValidationRequiredAlert"
       @primaryAction="showModal"
     >
       <gl-sprintf :message="$options.i18n.alertText">
