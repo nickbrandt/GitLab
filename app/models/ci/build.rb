@@ -295,16 +295,16 @@ module Ci
       end
 
       after_transition any => [:pending] do |build|
-        Ci::UpdateBuildQueueService.queue_push!(build)
+        Ci::UpdateBuildQueueService.new.queue_push!(build)
 
         build.run_after_commit do
           BuildQueueWorker.perform_async(id)
         end
       end
 
-      after transition pending: any do |build|
+      after_transition pending: any do |build|
         # TODO ensure that there is no race condition here, add test for this
-        Ci::UpdateBuildQueueService.queue_pop!(build)
+        Ci::UpdateBuildQueueService.new.queue_pop!(build)
       end
 
       after_transition pending: :running do |build|
