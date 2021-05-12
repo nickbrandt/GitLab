@@ -12,4 +12,5 @@ module EE
   SUBSCRIPTION_PORTAL_ADMIN_TOKEN = ENV.fetch('SUBSCRIPTION_PORTAL_ADMIN_TOKEN', 'customer_admin_token')
   CUSTOMER_SUPPORT_URL = 'https://support.gitlab.com'
   CUSTOMER_LICENSE_SUPPORT_URL = 'https://support.gitlab.com/hc/en-us/requests/new?ticket_form_id=360000071293'
+  GITLAB_COM_STATUS_URL = "https://status.gitlab.com"
 end
