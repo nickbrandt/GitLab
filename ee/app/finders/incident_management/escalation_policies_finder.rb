@@ -11,7 +11,7 @@ module IncidentManagement
     def execute
       return IncidentManagement::EscalationPolicy.none unless allowed?
 
-      collection = project.incident_management_escalaton_policies
+      collection = project.incident_management_escalation_policies
       by_id(collection)
     end
 
