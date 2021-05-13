@@ -130,22 +130,13 @@ this feature for your GitLab instance.
 
 ### Ban a user
 
-To completely block a user and hide the user's comments and issues from other users,
-administrators can choose to ban the user.
+To completely block a user, administrators can choose to ban the user.
 
 Users can be banned using the Admin Area. To do this:
 
 1. Navigate to  **Admin Area > Overview > Users**.
 1. Select a user.
 1. Under the **Account** tab, click **Ban user**.
-
-Banning a user is functionally identical to [blocking a user](#blocking-and-unblocking-users),
-with the following differences:
-
-- Comments made by the banned user will be hidden from other users.
-- Issues created by the banned user will be hidden from other users.
-
-Personal projects, and group and user history of the blocked user are left intact.
 
 NOTE:
 This feature is a work in progress. Currently, banning a user
