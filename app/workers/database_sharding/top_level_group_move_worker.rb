@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
 ### SETUP COMMANDS
+# Install postgres plugin https://github.com/michaelpq/pg_plugins/tree/master/decoder_raw
+#   git clone https://github.com/michaelpq/pg_plugins.git
+#   edit the Makefile to only install decoder_raw and remove pg_mark_glibc thing
+#   make install
 # Update Postgres settings:
 #   vim postgresql/data/postgresql.conf
 #
@@ -41,12 +45,12 @@ module DatabaseSharding
     feature_category :sharding
     idempotent!
     HOST = '/home/dylan/workspace/gitlab-development-kit/postgresql'
-    CREATE_REPLICATION_SLOT = "CREATE_REPLICATION_SLOT move_group LOGICAL test_decoding;"
+    CREATE_REPLICATION_SLOT = "CREATE_REPLICATION_SLOT move_group LOGICAL decoder_raw;"
     DROP_REPLICATION_SLOT = "DROP_REPLICATION_SLOT move_group;"
 
     def perform(top_level_group_id)
-      normal_connection = ActiveRecord::Base.connection.raw_connection
-      replication_connection = PG.connect(ActiveRecord::Base.connection.raw_connection.conninfo_hash.compact.merge(replication: 'database'))
+      source_connection = ActiveRecord::Base.connection.raw_connection
+      replication_connection = PG.connect(source_connection.conninfo_hash.compact.merge(replication: 'database'))
 
       # Create a replication slot returning snapshot name
       result = replication_connection.exec(CREATE_REPLICATION_SLOT)
@@ -61,8 +65,6 @@ module DatabaseSharding
 
       tables.each do |table, column_mapping|
         begin
-          table_view_name = "#{table}_move_filter"
-          normal_connection.exec("CREATE OR REPLACE VIEW #{table_view_name} AS SELECT * FROM #{table} WHERE #{column_mapping[0]} IN (#{column_mapping[1].join(",")})")
           tmp = Tempfile.new("replication-#{table}")
           tmp.close
 
@@ -83,12 +85,30 @@ module DatabaseSharding
         end
       end
 
+      # Try to consume some of replication slot to be "almost" caught up
+      destination_connection = PG.connect(source_connection.conninfo_hash.compact.merge(dbname: 'gitlabhq_replication_test'))
+
+      while true
+        updates = source_connection.exec("SELECT * FROM pg_logical_slot_get_changes('move_group', NULL, NULL)")
+        updates.each do |update|
+          query = update['data']
+          next unless tables.any? do |table_name,_|
+            query.start_with?("INSERT INTO public.#{table_name}") || query.start_with?("UPDATE public.#{table_name}")
+          end
+          p query
+          destination_connection.exec(query)
+          break
+        end
+
+        sleep 1
+      end
+
       # Pause writes
       # Query replication slot => write to new database
       # Move shard location
 
-      # Drop replication slot
     ensure
+      # Drop replication slot
       replication_connection&.exec(DROP_REPLICATION_SLOT)
     end
   end
