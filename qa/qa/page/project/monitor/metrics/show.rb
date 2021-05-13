@@ -5,7 +5,7 @@ require 'securerandom'
 module QA
   module Page
     module Project
-      module Operations
+      module Monitor
         module Metrics
           class Show < Page::Base
             EXPECTED_TITLE = 'Memory Usage (Total)'
@@ -134,4 +134,4 @@ module QA
   end
 end
 
-QA::Page::Project::Operations::Metrics::Show.prepend_mod_with('Page::Project::Operations::Metrics::Show', namespace: QA)
+QA::Page::Project::Monitor::Metrics::Show.prepend_mod_with('Page::Project::Monitor::Metrics::Show', namespace: QA)

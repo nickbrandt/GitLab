@@ -4,7 +4,7 @@ module QA
   module EE
     module Page
       module Project
-        module Operations
+        module Monitor
           module Metrics
             module Show
               extend QA::Page::PageConcern

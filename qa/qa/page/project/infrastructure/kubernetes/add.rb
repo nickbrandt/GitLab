@@ -3,7 +3,7 @@
 module QA
   module Page
     module Project
-      module Operations
+      module Infrastructure
         module Kubernetes
           class Add < Page::Base
             view 'app/views/clusters/clusters/new.html.haml' do
