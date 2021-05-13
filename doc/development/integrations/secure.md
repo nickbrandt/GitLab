@@ -69,7 +69,7 @@ so the [`allow_failure`](../../ci/yaml/README.md#allow_failure) parameter should
 
 Scanning jobs must declare a report that corresponds to the type of scanning they perform,
 using the [`artifacts:reports`](../../ci/yaml/README.md#artifactsreports) keyword.
-Valid reports are: `dependency_scanning`, `container_scanning`, `dast`, and `sast`.
+Valid reports are: `dependency_scanning`, `container_scanning`, `dast`, `api_fuzzing`, `coverage_fuzzing`, and `sast`.
 
 For example, here is the definition of a SAST job that generates a file named `gl-sast-report.json`,
 and uploads it as a SAST report:
@@ -290,6 +290,8 @@ You can find the schemas for these scanners here:
 - [DAST](https://gitlab.com/gitlab-org/security-products/security-report-schemas/-/blob/master/dist/dast-report-format.json)
 - [Dependency Scanning](https://gitlab.com/gitlab-org/security-products/security-report-schemas/-/blob/master/dist/dependency-scanning-report-format.json)
 - [Container Scanning](https://gitlab.com/gitlab-org/security-products/security-report-schemas/-/blob/master/dist/container-scanning-report-format.json)
+- [Coverage Fuzzing](https://gitlab.com/gitlab-org/security-products/security-report-schemas/-/blob/master/dist/coverage-fuzzing-report-format.json)
+- [Secret Detection](https://gitlab.com/gitlab-org/security-products/security-report-schemas/-/blob/master/dist/secret-detection-report-format.json)
 
 ### Version
 
