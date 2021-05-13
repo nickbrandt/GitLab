@@ -238,9 +238,8 @@ RSpec.describe Projects::MergeRequests::ConflictsController do
           # creates a new commit on the branch
           expect(original_head_sha).not_to eq(merge_request_with_conflicts.source_branch_head.sha)
           expect(merge_request_with_conflicts.source_branch_head.message).to include('Commit message')
-          # returns an OK response
+
           expect(response).to have_gitlab_http_status(:ok)
-          # it 'tracks the resolve call' do
           expect(Gitlab::UsageDataCounters::MergeRequestActivityUniqueCounter)
             .to have_received(:track_resolve_conflict_action).with(user: user)
         end
@@ -270,13 +269,12 @@ RSpec.describe Projects::MergeRequests::ConflictsController do
 
       it 'handles the error case' do
         aggregate_failures do
-          # returns a 400 error
-          expect(response).to have_gitlab_http_status(:bad_request)
           # has a message with the name of the first missing section
           expect(json_response['message']).to include('6eb14e00385d2fb284765eb1cd8d420d33d63fc9_21_21')
           # does not create a new commit
           expect(original_head_sha).to eq(merge_request_with_conflicts.source_branch_head.sha)
-          # tracks the resolve call
+
+          expect(response).to have_gitlab_http_status(:bad_request)
           expect(Gitlab::UsageDataCounters::MergeRequestActivityUniqueCounter)
             .to have_received(:track_resolve_conflict_action).with(user: user)
         end
@@ -302,13 +300,12 @@ RSpec.describe Projects::MergeRequests::ConflictsController do
 
       it 'handles the error case' do
         aggregate_failures do
-          # returns a 400 error
-          expect(response).to have_gitlab_http_status(:bad_request)
           # has a message with the name of the missing file
           expect(json_response['message']).to include('files/ruby/popen.rb')
           # does not create a new commit
           expect(original_head_sha).to eq(merge_request_with_conflicts.source_branch_head.sha)
-          # tracks the resolve call
+
+          expect(response).to have_gitlab_http_status(:bad_request)
           expect(Gitlab::UsageDataCounters::MergeRequestActivityUniqueCounter)
             .to have_received(:track_resolve_conflict_action).with(user: user)
         end
@@ -342,13 +339,12 @@ RSpec.describe Projects::MergeRequests::ConflictsController do
 
       it 'handles the error case' do
         aggregate_failures do
-          # returns a 400 error
-          expect(response).to have_gitlab_http_status(:bad_request)
           # has a message with the path of the problem file
           expect(json_response['message']).to include('files/ruby/popen.rb')
           # does not create a new commit
           expect(original_head_sha).to eq(merge_request_with_conflicts.source_branch_head.sha)
-          # tracks the resolve call
+
+          expect(response).to have_gitlab_http_status(:bad_request)
           expect(Gitlab::UsageDataCounters::MergeRequestActivityUniqueCounter)
             .to have_received(:track_resolve_conflict_action).with(user: user)
         end
