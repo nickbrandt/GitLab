@@ -59,7 +59,7 @@ To filter results:
 1. Select a parameter to filter by.
 1. Select a value from the autocompleted results, or type to refine the results.
 
-![Value stream analytics filter bar](img/vsa_filter_bar_v13_3.png "Active filter bar for value stream analytics")
+![Value stream analytics filter bar](img/vsa_filter_bar_v13_12.png "Active filter bar for value stream analytics")
 
 ### Date ranges
 
@@ -92,7 +92,7 @@ keep this slight change in mind.
 
 You can learn more about these metrics in our [analytics definitions](../../analytics/index.md).
 
-![Value stream analytics time metrics](img/vsa_time_metrics_v13_0.png "Time metrics for value stream analytics")
+![Value stream analytics time metrics](img/vsa_time_metrics_v13_12.png "Time metrics for value stream analytics")
 
 ## How the stages are measured
 
@@ -290,7 +290,7 @@ To create a value stream:
    - You can [customize the stages](#creating-a-value-stream-with-stages)
 1. Click the **Create Value Stream** button.
 
-![New value stream](img/new_value_stream_v13_3.png "Creating a new value stream")
+![New value stream](img/new_value_stream_v13_12.png "Creating a new value stream")
 
 #### Creating a value stream with stages
 
@@ -327,7 +327,7 @@ To delete a custom value stream:
 1. Click the **Delete (name of value stream)**.
 1. Click the **Delete** button to confirm.
 
-![Delete value stream](img/delete_value_stream_v13_4.png "Deleting a custom value stream")
+![Delete value stream](img/delete_value_stream_v13_12.png "Deleting a custom value stream")
 
 ## Days to completion chart
 
