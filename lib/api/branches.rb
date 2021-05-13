@@ -40,7 +40,7 @@ module API
       get ':id/repository/branches' do
         ff_enabled = Feature.enabled?(:api_caching_rate_limit_branches, user_project, default_enabled: :yaml)
 
-        cache_action_if(ff_enabled, [user_project, :branches, current_user&.cache_key, params], expires_in: 30.seconds) do
+        cache_action_if(ff_enabled, [user_project, :branches, current_user, params], expires_in: 30.seconds) do
           user_project.preload_protected_branches
 
           repository = user_project.repository
