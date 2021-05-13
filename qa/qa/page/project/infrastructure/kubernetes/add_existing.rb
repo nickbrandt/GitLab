@@ -3,7 +3,7 @@
 module QA
   module Page
     module Project
-      module Operations
+      module Infrastructure
         module Kubernetes
           class AddExisting < Page::Base
             view 'app/views/clusters/clusters/user/_form.html.haml' do
@@ -32,7 +32,7 @@ module QA
             end
 
             def add_cluster!
-              click_element :add_kubernetes_cluster_button, Page::Project::Operations::Kubernetes::Show
+              click_element :add_kubernetes_cluster_button, Page::Project::Infrastructure::Kubernetes::Show
             end
 
             def uncheck_rbac!

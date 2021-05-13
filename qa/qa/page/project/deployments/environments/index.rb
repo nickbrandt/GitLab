@@ -3,7 +3,7 @@
 module QA
   module Page
     module Project
-      module Operations
+      module Deployments
         module Environments
           class Index < Page::Base
             view 'app/assets/javascripts/environments/components/environment_item.vue' do
