@@ -8,7 +8,11 @@ import { DEFAULT_FILTERS } from 'ee/threat_monitoring/components/alerts/constant
 import createMockApollo from 'helpers/mock_apollo_helper';
 import { mountExtended } from 'helpers/vue_test_utils_helper';
 import getAlertsQuery from '~/graphql_shared/queries/get_alerts.query.graphql';
-import { defaultQuerySpy, emptyQuerySpy, loadingQuerySpy } from '../../mocks/mock_apollo';
+import {
+  getAlertsQuerySpy,
+  emptyGetAlertsQuerySpy,
+  loadingQuerySpy,
+} from '../../mocks/mock_apollo';
 import { mockAlerts, mockPageInfo } from '../../mocks/mock_data';
 
 let localVue;
@@ -54,7 +58,7 @@ describe('AlertsList component', () => {
   const findGlIntersectionObserver = () => wrapper.findComponent(GlIntersectionObserver);
   const findGlSkeletonLoading = () => wrapper.findComponent(GlSkeletonLoading);
 
-  const createWrapper = ({ $apollo, apolloSpy = defaultQuerySpy, data, stubs = {} } = {}) => {
+  const createWrapper = ({ $apollo, apolloSpy = getAlertsQuerySpy, data, stubs = {} } = {}) => {
     let apolloOptions;
     if ($apollo) {
       apolloOptions = {
@@ -80,6 +84,7 @@ describe('AlertsList component', () => {
         projectPath: DEFAULT_PROJECT_PATH,
       },
       stubs: {
+        AlertDrawer: true,
         AlertStatus: true,
         AlertFilters: true,
         GlAlert: true,
@@ -235,7 +240,7 @@ describe('AlertsList component', () => {
 
   describe('empty state', () => {
     beforeEach(() => {
-      createWrapper({ apolloSpy: emptyQuerySpy });
+      createWrapper({ apolloSpy: emptyGetAlertsQuerySpy });
     });
 
     it('does show the empty state', () => {

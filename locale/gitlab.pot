@@ -9351,6 +9351,9 @@ msgstr ""
 msgid "Create group label"
 msgstr ""
 
+msgid "Create incident"
+msgstr ""
+
 msgid "Create issue"
 msgstr ""
 
@@ -32722,6 +32725,9 @@ msgstr ""
 msgid "There was an error fetching configuration for charts"
 msgstr ""
 
+msgid "There was an error fetching content, please refresh the page"
+msgstr ""
+
 msgid "There was an error fetching data for the selected stage"
 msgstr ""
 
@@ -33461,6 +33467,9 @@ msgid "ThreatMonitoring|Environment"
 msgstr ""
 
 msgid "ThreatMonitoring|Events"
+msgstr ""
+
+msgid "ThreatMonitoring|Failed to create incident, please try again."
 msgstr ""
 
 msgid "ThreatMonitoring|Hide dismissed alerts"
