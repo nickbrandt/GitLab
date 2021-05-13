@@ -2,45 +2,50 @@
 
 module Ci
   class UpdateBuildQueueService
+    InvalidQueueTransition = Class.new(StandardError)
+
+    attr_reader :metrics
+
+    def initialize(metrics = ::Gitlab::Ci::Queue::Metrics)
+      @metrics = metrics
+    end
+
     ##
     # Add a build to the pending builds queue
     #
-    def queue_push!(build, metrics = ::Gitlab::Ci::Queue::Metrics)
-      in_transaction do
-        ::Ci::PendingBuild.create!(build: build, project: project)
+    def push(build, transition)
+      raise InvalidQueueTransition unless transition.to == 'pending'
 
-        # TODO increment pending builds counter
+      transition.within_transaction do
+        ::Ci::PendingBuild.create!(build: build, project: build.project)
       end
+
+      # TODO increment pending builds counter
     end
 
     ##
     # Remove a build from the pending builds queue
     #
-    def queue_pop!(build, metrics = ::Gitlab::Ci::Queue::Metrics)
-      in_transaction do
-        ::Ci::PendingBuild.find(build.id).destroy!
+    def pop(build, transition)
+      raise InvalidQueueTransition unless transition.from == 'pending'
 
-        # TODO decrement pending builds counter
+      transition.within_transaction do
+        ::Ci::PendingBuild.find_by(build_id: build.id)&.destroy! # rubocop:disable CodeReuse/ActiveRecord
       end
+
+      # TODO decrement pending builds counter
     end
 
     ##
     # Unblock runner associated with given project / build
     #
-    def execute(build, metrics = ::Gitlab::Ci::Queue::Metrics)
-      tick_for(build, build.project.all_runners, metrics)
+    def tick(build)
+      tick_for(build, build.project.all_runners)
     end
 
     private
 
-    def in_transaction
-      # TODO ensure that state machine transition transaction is open
-      #
-      yield
-    end
-
-
-    def tick_for(build, runners, metrics)
+    def tick_for(build, runners)
       runners = runners.with_recent_runner_queue
       runners = runners.with_tags if Feature.enabled?(:ci_preload_runner_tags, default_enabled: :yaml)
 

@@ -294,18 +294,20 @@ module Ci
         end
       end
 
-      after_transition any => [:pending] do |build|
-        Ci::UpdateBuildQueueService.new.queue_push!(build)
+      # rubocop:disable CodeReuse/ServiceClass
+      after_transition any => [:pending] do |build, transition|
+        Ci::UpdateBuildQueueService.new.push(build, transition)
 
         build.run_after_commit do
           BuildQueueWorker.perform_async(id)
         end
       end
 
-      after_transition pending: any do |build|
+      after_transition pending: any do |build, transition|
         # TODO ensure that there is no race condition here, add test for this
-        Ci::UpdateBuildQueueService.new.queue_pop!(build)
+        Ci::UpdateBuildQueueService.new.pop(build, transition)
       end
+      # rubocop:enable CodeReuse/ServiceClass
 
       after_transition pending: :running do |build|
         build.deployment&.run
