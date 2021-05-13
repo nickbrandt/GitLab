@@ -386,7 +386,7 @@ It is recommended to reuse the identifiers the GitLab scanners already define:
 | [ELSA](https://linux.oracle.com/security/) | `elsa` | ELSA-2020-0085 |
 
 The generic identifiers listed above are defined in the [common library](https://gitlab.com/gitlab-org/security-products/analyzers/common),
-which is shared by the analyzers that GitLab maintains. You can [contribute](https://gitlab.com/gitlab-org/security-products/analyzers/common/blob/master/issue/identifier.go)
+which is shared by some of the analyzers that GitLab maintains. You can [contribute](https://gitlab.com/gitlab-org/security-products/analyzers/common/blob/master/issue/identifier.go)
 new generic identifiers to if needed. Analyzers may also produce vendor-specific or product-specific
 identifiers, which don't belong in the [common library](https://gitlab.com/gitlab-org/security-products/analyzers/common).
 
