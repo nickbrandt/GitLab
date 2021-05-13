@@ -43,8 +43,8 @@ RSpec.describe Ci::RetryPipelineWorker do
       let(:pipeline_id) { 1234 }
       let(:user_id) { 1234 }
 
-      it 'returns false' do
-        expect(perform).to eq(nil)
+      it 'returns nil' do
+        expect(perform).to be_nil
       end
     end
   end
