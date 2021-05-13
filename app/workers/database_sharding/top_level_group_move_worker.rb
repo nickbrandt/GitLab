@@ -104,7 +104,14 @@ module DatabaseSharding
       end
 
       # Pause writes
-      # Query replication slot => write to new database
+
+      # Acquire a current LSN from source database
+      response = source_connection.exec('SELECT pg_current_wal_lsn();');
+      location = response.first['pg_current_wal_lsn'];
+      p location
+
+      # Consume the rest of the replication slot up to the LSN (using upto_lsn argument to pg_logical_slot_get_changes)
+
       # Move shard location
 
     ensure
