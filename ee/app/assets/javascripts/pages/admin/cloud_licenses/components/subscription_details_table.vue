@@ -1,7 +1,7 @@
 <script>
 import { GlSkeletonLoader, GlTable } from '@gitlab/ui';
-import ClipboardButton from '~/vue_shared/components/clipboard_button.vue';
 import { slugifyWithUnderscore } from '~/lib/utils/text_utility';
+import ClipboardButton from '~/vue_shared/components/clipboard_button.vue';
 import { copySubscriptionIdButtonText } from '../constants';
 
 const placeholderHeightFactor = 32;
