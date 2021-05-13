@@ -77,8 +77,7 @@ module Gitlab
       private
 
       def raw_sql(relation, column, distinct = nil)
-        column ||= relation.primary_key
-        relation.select(relation.all.table[column].count(distinct)).to_sql
+        Gitlab::Usage::Metrics::Query.new.raw_sql(relation, self.class.column, distinct == :distinct)
       end
     end
   end

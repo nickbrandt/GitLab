@@ -47,7 +47,15 @@ module Gitlab
             self.class.metric_relation.call.where(time_constraints)
           end
 
+          def to_sql
+            Gitlab::Usage::Metrics::Query.new.raw_sql(relation, self.class.column, distinct?)
+          end
+
           private
+
+          def distinct?
+            self.class.metric_operation.to_s.include?('distinct')
+          end
 
           def time_constraints
             case time_frame
