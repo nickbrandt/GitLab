@@ -145,6 +145,7 @@ module Gitlab
       encrypted_key
       import_url
       elasticsearch_url
+      elasticsearch_password
       search
       jwt
       otp_attempt

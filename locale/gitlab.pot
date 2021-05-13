@@ -23611,6 +23611,9 @@ msgstr ""
 msgid "Password"
 msgstr ""
 
+msgid "Password (for password-protected Elasticsearch servers)"
+msgstr ""
+
 msgid "Password (optional)"
 msgstr ""
 
@@ -35421,6 +35424,9 @@ msgid "UserProfile|at"
 msgstr ""
 
 msgid "UserProfile|made a private contribution"
+msgstr ""
+
+msgid "Username (for password-protected Elasticsearch servers)"
 msgstr ""
 
 msgid "Username (optional)"
