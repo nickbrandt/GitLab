@@ -129,6 +129,43 @@ export const fetchStageMedianValues = ({ dispatch, commit, getters }) => {
     .catch((error) => dispatch('receiveStageMedianValuesError', error));
 };
 
+const fetchStageCount = ({ groupId, valueStreamId, stageId, params }) =>
+  Api.cycleAnalyticsStageCount({ groupId, valueStreamId, stageId, params }).then(({ data }) => {
+    return {
+      id: stageId,
+      ...(data?.error
+        ? {
+            error: data.error,
+            value: null,
+          }
+        : data),
+    };
+  });
+
+export const fetchStageCountValues = ({ commit, getters }) => {
+  const {
+    currentGroupPath,
+    cycleAnalyticsRequestParams,
+    activeStages,
+    currentValueStreamId,
+  } = getters;
+  const stageIds = activeStages.map((s) => s.slug);
+
+  commit(types.REQUEST_STAGE_COUNTS);
+  return Promise.all(
+    stageIds.map((stageId) =>
+      fetchStageCount({
+        groupId: currentGroupPath,
+        valueStreamId: currentValueStreamId,
+        stageId,
+        params: cycleAnalyticsRequestParams,
+      }),
+    ),
+  )
+    .then((data) => commit(types.RECEIVE_STAGE_COUNTS_SUCCESS, data))
+    .catch((error) => commit(types.RECEIVE_STAGE_COUNTS_ERROR, error));
+};
+
 export const requestCycleAnalyticsData = ({ commit }) => commit(types.REQUEST_VALUE_STREAM_DATA);
 
 export const receiveCycleAnalyticsDataSuccess = ({ commit, dispatch }) => {
@@ -430,11 +467,17 @@ export const receiveValueStreamsSuccess = (
   data = [],
 ) => {
   commit(types.RECEIVE_VALUE_STREAMS_SUCCESS, data);
+
   if (!selectedValueStream && data.length) {
     const [firstStream] = data;
-    return dispatch('setSelectedValueStream', firstStream);
+    return Promise.resolve()
+      .then(() => dispatch('setSelectedValueStream', firstStream))
+      .then(() => dispatch('fetchStageCountValues'));
   }
-  return dispatch(FETCH_VALUE_STREAM_DATA);
+
+  return Promise.resolve()
+    .then(() => dispatch(FETCH_VALUE_STREAM_DATA))
+    .then(() => dispatch('fetchStageCountValues'));
 };
 
 export const fetchValueStreams = ({ commit, dispatch, getters }) => {

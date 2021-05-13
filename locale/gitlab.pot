@@ -267,6 +267,11 @@ msgid_plural "%d issues successfully imported with the label"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "%d item"
+msgid_plural "%d items"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "%d layer"
 msgid_plural "%d layers"
 msgstr[0] ""
@@ -35553,6 +35558,9 @@ msgid "ValueStreamAnalytics|Number of new issues created."
 msgstr ""
 
 msgid "ValueStreamAnalytics|Total number of deploys to production."
+msgstr ""
+
+msgid "ValueStreamEvent|Items in stage"
 msgstr ""
 
 msgid "ValueStreamEvent|Stage time (median)"
