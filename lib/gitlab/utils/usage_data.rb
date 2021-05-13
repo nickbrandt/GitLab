@@ -42,24 +42,7 @@ module Gitlab
       FALLBACK = -1
       HISTOGRAM_FALLBACK = { '-1' => -1 }.freeze
       DISTRIBUTED_HLL_FALLBACK = -2
-      ALL_TIME_TIME_FRAME_NAME = "all"
-      SEVEN_DAYS_TIME_FRAME_NAME = "7d"
-      TWENTY_EIGHT_DAYS_TIME_FRAME_NAME = "28d"
       MAX_BUCKET_SIZE = 100
-
-      def weekly_time_range
-        { start_date: 7.days.ago.to_date, end_date: Date.current }
-      end
-
-      def monthly_time_range
-        { start_date: 4.weeks.ago.to_date, end_date: Date.current }
-      end
-
-      # This time range is skewed for batch counter performance.
-      # See https://gitlab.com/gitlab-org/gitlab/-/merge_requests/42972
-      def batch_counter_monthly_time_range
-        { start_date: 30.days.ago.to_date, end_date: 2.days.ago.to_date }
-      end
 
       def count(relation, column = nil, batch: true, batch_size: nil, start: nil, finish: nil)
         if batch

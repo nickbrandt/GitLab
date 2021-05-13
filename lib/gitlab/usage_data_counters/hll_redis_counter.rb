@@ -38,6 +38,7 @@ module Gitlab
       # * Get unique counts per user: Gitlab::UsageDataCounters::HLLRedisCounter.unique_events(event_names: 'g_compliance_dashboard', start_date: 28.days.ago, end_date: Date.current)
       class << self
         include Gitlab::Utils::UsageData
+        include Gitlab::Usage::TimeFrame
 
         # Track unique events
         #

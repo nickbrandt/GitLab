@@ -33,6 +33,7 @@ module Gitlab
     class << self
       include Gitlab::Utils::UsageData
       include Gitlab::Utils::StrongMemoize
+      include Gitlab::Usage::TimeFrame
 
       def data(force_refresh: false)
         Rails.cache.fetch('usage_data', force: force_refresh, expires_in: 2.weeks) do
@@ -55,7 +56,7 @@ module Gitlab
             .merge(object_store_usage_data)
             .merge(topology_usage_data)
             .merge(usage_activity_by_stage)
-            .merge(usage_activity_by_stage(:usage_activity_by_stage_monthly, last_28_days_time_period))
+            .merge(usage_activity_by_stage(:usage_activity_by_stage_monthly, monthly_time_range_db_params))
             .merge(analytics_unique_visits_data)
             .merge(compliance_unique_visits_data)
             .merge(search_unique_visits_data)
@@ -228,17 +229,17 @@ module Gitlab
         {
           counts_monthly: {
             # rubocop: disable UsageData/LargeTable:
-            deployments: deployment_count(Deployment.where(last_28_days_time_period)),
-            successful_deployments: deployment_count(Deployment.success.where(last_28_days_time_period)),
-            failed_deployments: deployment_count(Deployment.failed.where(last_28_days_time_period)),
+            deployments: deployment_count(Deployment.where(monthly_time_range_db_params)),
+            successful_deployments: deployment_count(Deployment.success.where(monthly_time_range_db_params)),
+            failed_deployments: deployment_count(Deployment.failed.where(monthly_time_range_db_params)),
             # rubocop: enable UsageData/LargeTable:
-            projects: count(Project.where(last_28_days_time_period), start: minimum_id(Project), finish: maximum_id(Project)),
-            packages: count(::Packages::Package.where(last_28_days_time_period)),
-            personal_snippets: count(PersonalSnippet.where(last_28_days_time_period)),
-            project_snippets: count(ProjectSnippet.where(last_28_days_time_period)),
-            projects_with_alerts_created: distinct_count(::AlertManagement::Alert.where(last_28_days_time_period), :project_id)
+            projects: count(Project.where(monthly_time_range_db_params), start: minimum_id(Project), finish: maximum_id(Project)),
+            packages: count(::Packages::Package.where(monthly_time_range_db_params)),
+            personal_snippets: count(PersonalSnippet.where(monthly_time_range_db_params)),
+            project_snippets: count(ProjectSnippet.where(monthly_time_range_db_params)),
+            projects_with_alerts_created: distinct_count(::AlertManagement::Alert.where(monthly_time_range_db_params), :project_id)
           }.merge(
-            snowplow_event_counts(last_28_days_time_period(column: :collector_tstamp))
+            snowplow_event_counts(monthly_time_range_db_params(column: :collector_tstamp))
           ).tap do |data|
             data[:snippets] = add(data[:personal_snippets], data[:project_snippets])
           end
@@ -520,10 +521,6 @@ module Gitlab
         platform = 'raspbian' if ohai_data['platform'] == 'debian' && /armv/.match?(ohai_data['kernel']['machine'])
 
         "#{platform}-#{ohai_data['platform_version']}"
-      end
-
-      def last_28_days_time_period(column: :created_at)
-        { column => batch_counter_monthly_time_range[:start_date]..batch_counter_monthly_time_range[:end_date] }
       end
 
       # Source: https://gitlab.com/gitlab-data/analytics/blob/master/transform/snowflake-dbt/data/ping_metrics_to_stage_mapping_data.csv
