@@ -49,8 +49,6 @@ export default {
       'featureFlags',
       'isLoading',
       'isLoadingStage',
-      // NOTE: we can remove the `isEmptyStage` field when we remove the existing stage table
-      'isEmptyStage',
       'currentGroup',
       'selectedProjects',
       'selectedStage',
