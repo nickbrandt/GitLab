@@ -81,7 +81,7 @@ RSpec.describe PaidFeatureCalloutHelper do
         days_remaining: 12,
         feature_name: 'first feature',
         href_compare_plans: '/groups/test-group/-/billings',
-        href_upgrade_to_paid: '/-/subscriptions/new?namespace_id=123&plan_id=2c92c0f876e0f4cc0176e176a08f1b70',
+        href_upgrade_to_paid: '/-/subscriptions/new?namespace_id=123&plan_id=2c92a00d76f0d5060176f2fb0a5029ff',
         plan_name_for_trial: 'Ultimate',
         plan_name_for_upgrade: 'Premium',
         target_id: 'first-feature-callout'

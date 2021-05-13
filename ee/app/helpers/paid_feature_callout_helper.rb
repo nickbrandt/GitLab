@@ -47,7 +47,14 @@ module PaidFeatureCalloutHelper
   end
 
   def premium_subscription_path_for_group(group)
-    # Hard-coding the plan_id to the Premium plan on production & staging
-    new_subscriptions_path(namespace_id: group.id, plan_id: '2c92c0f876e0f4cc0176e176a08f1b70')
+    # NOTE: We are okay hard-coding the production value for the Premium 1-year
+    # SaaS plan ID while this is all part of an active experiment. If & when the
+    # experiment is deemed a success, part of the clean-up effort will be to
+    # pull the value directly from the CustomersDot API. Value taken from
+    # https://gitlab.com/gitlab-org/customers-gitlab-com/blob/7177f13c478ef623b779d6635c4a58ee650b7884/config/application.yml#L186
+    # Cleanup issue: https://gitlab.com/gitlab-org/gitlab/-/issues/330987
+    zuora_premium_plan_id = '2c92a00d76f0d5060176f2fb0a5029ff'
+
+    new_subscriptions_path(namespace_id: group.id, plan_id: zuora_premium_plan_id)
   end
 end
