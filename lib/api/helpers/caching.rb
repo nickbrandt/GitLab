@@ -81,7 +81,13 @@ module API
       # @return [Gitlab::Json::PrecompiledJson]
       def cache_action(key, **cache_opts)
         json = cache.fetch(key, **apply_default_cache_options(cache_opts)) do
-          Gitlab::Json.dump(yield.as_json)
+          response = yield
+
+          if response.is_a?(Gitlab::Json::PrecompiledJson)
+            response.to_s
+          else
+            Gitlab::Json.dump(response.as_json)
+          end
         end
 
         body Gitlab::Json::PrecompiledJson.new(json)

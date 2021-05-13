@@ -177,6 +177,16 @@ RSpec.describe API::Helpers::Caching, :use_clean_rails_redis_caching do
 
       5.times { perform }
     end
+
+    it "handles nested cache calls" do
+      nested_call = instance.cache_action(cache_key, **kwargs) do
+        instance.cache_action([:nested], **kwargs) do
+          expensive_thing.do_very_expensive_action
+        end
+      end
+
+      expect(nested_call.to_s).to eq(subject.to_s)
+    end
   end
 
   describe "#cache_action_if" do
