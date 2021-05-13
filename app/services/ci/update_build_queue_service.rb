@@ -17,10 +17,10 @@ module Ci
       raise InvalidQueueTransition unless transition.to == 'pending'
 
       transition.within_transaction do
-        ::Ci::PendingBuild.create!(build: build, project: build.project)
+        ::Ci::PendingBuild.create!(build: build, project: build.project).tap do
+          metrics.increment_queue_operation(:build_queue_push)
+        end
       end
-
-      # TODO increment pending builds counter
     end
 
     ##
@@ -30,10 +30,14 @@ module Ci
       raise InvalidQueueTransition unless transition.from == 'pending'
 
       transition.within_transaction do
-        ::Ci::PendingBuild.find_by(build_id: build.id)&.destroy! # rubocop:disable CodeReuse/ActiveRecord
-      end
+        ::Ci::PendingBuild.find_by(build_id: build.id).tap do |queued| # rubocop:disable CodeReuse/ActiveRecord
+          next unless queued.present?
 
-      # TODO decrement pending builds counter
+          queued.destroy!
+
+          metrics.increment_queue_operation(:build_queue_pop)
+        end
+      end
     end
 
     ##

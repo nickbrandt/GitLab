@@ -18,6 +18,18 @@ RSpec.describe Ci::UpdateBuildQueueService do
       expect(queued.project).to eq project
     end
 
+    it 'increments queue push metric' do
+      metrics = spy('metrics')
+      transition = double(to: 'pending')
+      allow(transition).to receive(:within_transaction).and_yield
+
+      described_class.new(metrics).push(build, transition)
+
+      expect(metrics)
+        .to have_received(:increment_queue_operation)
+        .with(:build_queue_push)
+    end
+
     it 'raises an error when invalid transition is detected' do
       transition = double(to: 'created')
 
@@ -27,16 +39,29 @@ RSpec.describe Ci::UpdateBuildQueueService do
   end
 
   describe '#pop' do
-    it 'it removes pending build in a transaction' do
+    it 'removes pending build in a transaction' do
       transition = double(from: 'pending')
       allow(transition).to receive(:within_transaction).and_yield
-      queued = Ci::PendingBuild.create!(build: build, project: project)
+      Ci::PendingBuild.create!(build: build, project: project)
 
       dequeued = subject.pop(build, transition)
 
       expect(dequeued.build).to eq build
       expect(dequeued.project).to eq project
       expect(dequeued).to be_destroyed
+    end
+
+    it 'increments queue pop metric' do
+      metrics = spy('metrics')
+      transition = double(from: 'pending')
+      allow(transition).to receive(:within_transaction).and_yield
+      Ci::PendingBuild.create!(build: build, project: project)
+
+      described_class.new(metrics).pop(build, transition)
+
+      expect(metrics)
+        .to have_received(:increment_queue_operation)
+        .with(:build_queue_pop)
     end
 
     it 'does nothing if there is no pending build to remove' do
@@ -59,13 +84,13 @@ RSpec.describe Ci::UpdateBuildQueueService do
   describe '#tick' do
     shared_examples 'refreshes runner' do
       it 'ticks runner queue value' do
-        expect { subject.tick!(build) }.to change { runner.ensure_runner_queue_value }
+        expect { subject.tick(build) }.to change { runner.ensure_runner_queue_value }
       end
     end
 
     shared_examples 'does not refresh runner' do
       it 'ticks runner queue value' do
-        expect { subject.tick!(build) }.not_to change { runner.ensure_runner_queue_value }
+        expect { subject.tick(build) }.not_to change { runner.ensure_runner_queue_value }
       end
     end
 
