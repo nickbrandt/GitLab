@@ -10,7 +10,6 @@ export default () => ({
   isLoading: false,
   isLoadingStage: false,
 
-  isEmptyStage: false,
   errorCode: null,
 
   isSavingStageOrder: false,
