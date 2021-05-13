@@ -63,6 +63,32 @@ module API
         body Gitlab::Json::PrecompiledJson.new(json)
       end
 
+      # Action caching implementation
+      #
+      # This allows you to wrap an entire API endpoint call in a cache, useful
+      # for short TTL caches to effectively rate-limit an endpoint.
+      #
+      # @param key [Object] any object that can be converted into a cache key
+      # @param expires_in [ActiveSupport::Duration, Integer] an expiry time for the cache entry
+      # @return [Gitlab::Json::PrecompiledJson]
+      def cache_action(key, **cache_opts)
+        json = cache.fetch(key, **cache_opts) do
+          Gitlab::Json.dump(yield.as_json)
+        end
+
+        body Gitlab::Json::PrecompiledJson.new(json)
+      end
+
+      def cache_action_if(conditional, *opts)
+        if conditional
+          cache_action(*opts) do
+            yield
+          end
+        else
+          yield
+        end
+      end
+
       private
 
       # Optionally uses a `Proc` to add context to a cache key
