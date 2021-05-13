@@ -20184,6 +20184,9 @@ msgstr ""
 msgid "Maximum PyPI package file size in bytes"
 msgstr ""
 
+msgid "Maximum Terraform Module package file size in bytes"
+msgstr ""
+
 msgid "Maximum Users"
 msgstr ""
 
