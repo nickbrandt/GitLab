@@ -11,6 +11,11 @@ module API
       # @return [ActiveSupport::Duration]
       DEFAULT_EXPIRY = 1.day
 
+      # @return [Hash]
+      DEFAULT_CACHE_OPTIONS = {
+        race_condition_ttl: 5.seconds
+      }.freeze
+
       # @return [ActiveSupport::Cache::Store]
       def cache
         Rails.cache
@@ -75,7 +80,7 @@ module API
       # @param expires_in [ActiveSupport::Duration, Integer] an expiry time for the cache entry
       # @return [Gitlab::Json::PrecompiledJson]
       def cache_action(key, **cache_opts)
-        json = cache.fetch(key, **cache_opts) do
+        json = cache.fetch(key, **apply_default_cache_options(cache_opts)) do
           Gitlab::Json.dump(yield.as_json)
         end
 
@@ -105,6 +110,10 @@ module API
       end
 
       private
+
+      def apply_default_cache_options(opts = {})
+        DEFAULT_CACHE_OPTIONS.merge(opts)
+      end
 
       # Optionally uses a `Proc` to add context to a cache key
       #
