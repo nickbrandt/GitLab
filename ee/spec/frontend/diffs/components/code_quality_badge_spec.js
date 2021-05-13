@@ -21,46 +21,59 @@ describe('EE CodeQualityBadge', () => {
     ],
   };
 
-  beforeEach(() => {
+  const createComponent = ({ featureFlagEnabled }) => {
     wrapper = shallowMount(CodeQualityBadge, {
       propsData: props,
+      provide: { glFeatures: { codequalityMrDiff: featureFlagEnabled } },
     });
-  });
+  };
 
   afterEach(() => {
     wrapper.destroy();
   });
 
-  it('opens a code quality details modal on click', () => {
-    const modalId = 'codequality-details-index.js';
-    const rootEmit = jest.spyOn(wrapper.vm.$root, '$emit');
-    wrapper.findComponent(GlBadge).trigger('click');
+  describe('with the feature flag enabled', () => {
+    beforeEach(() => createComponent({ featureFlagEnabled: true }));
 
-    expect(rootEmit.mock.calls[0]).toContainEqual(modalId);
+    it('opens a code quality details modal on click', () => {
+      const modalId = 'codequality-details-index.js';
+      const rootEmit = jest.spyOn(wrapper.vm.$root, '$emit');
+      wrapper.findComponent(GlBadge).trigger('click');
+
+      expect(rootEmit.mock.calls[0]).toContainEqual(modalId);
+    });
+
+    it('passes the issue data into the issue components correctly', () => {
+      const issueProps = wrapper
+        .findAllComponents(CodequalityIssueBody)
+        .wrappers.map((w) => w.props());
+
+      expect(issueProps).toEqual([
+        {
+          issue: {
+            path: props.fileName,
+            severity: props.codequalityDiff[0].severity,
+            name: props.codequalityDiff[0].description,
+          },
+          status: 'neutral',
+        },
+        {
+          issue: {
+            path: props.fileName,
+            severity: props.codequalityDiff[1].severity,
+            name: props.codequalityDiff[1].description,
+          },
+          status: 'neutral',
+        },
+      ]);
+    });
   });
 
-  it('passes the issue data into the issue components correctly', () => {
-    const issueProps = wrapper
-      .findAllComponents(CodequalityIssueBody)
-      .wrappers.map((w) => w.props());
+  describe('with the feature flag disabled', () => {
+    beforeEach(() => createComponent({ featureFlagEnabled: false }));
 
-    expect(issueProps).toEqual([
-      {
-        issue: {
-          path: props.fileName,
-          severity: props.codequalityDiff[0].severity,
-          name: props.codequalityDiff[0].description,
-        },
-        status: 'neutral',
-      },
-      {
-        issue: {
-          path: props.fileName,
-          severity: props.codequalityDiff[1].severity,
-          name: props.codequalityDiff[1].description,
-        },
-        status: 'neutral',
-      },
-    ]);
+    it('does not show the badge', () => {
+      expect(wrapper.findComponent(GlBadge).exists()).toBe(false);
+    });
   });
 });
