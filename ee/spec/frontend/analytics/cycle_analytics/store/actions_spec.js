@@ -766,6 +766,37 @@ describe('Value Stream Analytics actions', () => {
     });
   });
 
+  describe('fetchStageCountValues', () => {
+    const fetchCountResponse = activeStages.map(({ slug: id }) => ({ events: [], id }));
+
+    beforeEach(() => {
+      state = {
+        ...state,
+        stages,
+        currentGroup,
+        featureFlags: {
+          ...state.featureFlags,
+          hasPathNavigation: true,
+        },
+      };
+      mock = new MockAdapter(axios);
+      mock.onGet(endpoints.stageCount).reply(httpStatusCodes.OK, { events: [] });
+    });
+
+    it('dispatches receiveStageCountValuesSuccess with received data on success', () => {
+      return testAction(
+        actions.fetchStageCountValues,
+        null,
+        state,
+        [
+          { type: types.REQUEST_STAGE_COUNTS },
+          { type: types.RECEIVE_STAGE_COUNTS_SUCCESS, payload: fetchCountResponse },
+        ],
+        [],
+      );
+    });
+  });
+
   describe('initializeCycleAnalytics', () => {
     let mockDispatch;
     let mockCommit;
@@ -1176,7 +1207,7 @@ describe('Value Stream Analytics actions', () => {
     });
 
     describe('receiveValueStreamsSuccess', () => {
-      it(`with a selectedValueStream in state commits the ${types.RECEIVE_VALUE_STREAMS_SUCCESS} mutation and dispatches 'fetchValueStreamData'`, () => {
+      it(`with a selectedValueStream in state commits the ${types.RECEIVE_VALUE_STREAMS_SUCCESS} mutation and dispatches 'fetchValueStreamData' and 'fetchStageCountValues'`, () => {
         return testAction(
           actions.receiveValueStreamsSuccess,
           valueStreams,
@@ -1187,11 +1218,11 @@ describe('Value Stream Analytics actions', () => {
               payload: valueStreams,
             },
           ],
-          [{ type: 'fetchValueStreamData' }],
+          [{ type: 'fetchValueStreamData' }, { type: 'fetchStageCountValues' }],
         );
       });
 
-      it(`commits the ${types.RECEIVE_VALUE_STREAMS_SUCCESS} mutation and dispatches 'setSelectedValueStream'`, () => {
+      it(`commits the ${types.RECEIVE_VALUE_STREAMS_SUCCESS} mutation and dispatches 'setSelectedValueStream' and 'fetchStageCountValues'`, () => {
         return testAction(
           actions.receiveValueStreamsSuccess,
           valueStreams,
@@ -1205,7 +1236,10 @@ describe('Value Stream Analytics actions', () => {
               payload: valueStreams,
             },
           ],
-          [{ type: 'setSelectedValueStream', payload: selectedValueStream }],
+          [
+            { type: 'setSelectedValueStream', payload: selectedValueStream },
+            { type: 'fetchStageCountValues' },
+          ],
         );
       });
     });

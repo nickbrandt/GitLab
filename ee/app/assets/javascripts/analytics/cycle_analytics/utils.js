@@ -432,14 +432,21 @@ export const formatMedianValuesWithOverview = (medians = []) => {
  *
  * @param {Array} stages - The stages available to the group / project
  * @param {Object} medians - The median values for the stages available to the group / project
+ * @param {Object} stageCounts - The total item count for the stages available
  * @param {Object} selectedStage - The currently selected stage
  * @returns {Array} An array of stages formatted with data required for the path navigation
  */
-export const transformStagesForPathNavigation = ({ stages, medians, selectedStage }) => {
+export const transformStagesForPathNavigation = ({
+  stages,
+  medians,
+  stageCounts,
+  selectedStage,
+}) => {
   const formattedStages = stages.map((stage) => {
     return {
       metric: medians[stage?.id],
       selected: stage.id === selectedStage.id,
+      stageCount: stageCounts[stage?.id],
       icon: null,
       ...stage,
     };

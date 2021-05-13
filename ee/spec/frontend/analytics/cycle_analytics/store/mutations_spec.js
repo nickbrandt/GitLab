@@ -63,6 +63,8 @@ describe('Value Stream Analytics mutations', () => {
     ${types.RECEIVE_DELETE_VALUE_STREAM_SUCCESS} | ${'deleteValueStreamError'}  | ${null}
     ${types.RECEIVE_DELETE_VALUE_STREAM_SUCCESS} | ${'selectedValueStream'}     | ${null}
     ${types.INITIALIZE_VALUE_STREAM_SUCCESS}     | ${'isLoading'}               | ${false}
+    ${types.REQUEST_STAGE_COUNTS}                | ${'stageCounts'}             | ${{}}
+    ${types.RECEIVE_STAGE_COUNTS_ERROR}          | ${'stageCounts'}             | ${{}}
   `('$mutation will set $stateKey=$value', ({ mutation, stateKey, value }) => {
     mutations[mutation](state);
 
@@ -194,6 +196,23 @@ describe('Value Stream Analytics mutations', () => {
 
     it('calculates the overview median', () => {
       expect(state.medians).toMatchObject({ overview: '5d' });
+    });
+  });
+
+  describe(`${types.RECEIVE_STAGE_COUNTS_SUCCESS}`, () => {
+    beforeEach(() => {
+      state = {
+        stageCounts: {},
+      };
+
+      mutations[types.RECEIVE_STAGE_COUNTS_SUCCESS](state, [
+        { id: 1, count: 10 },
+        { id: 2, count: 20 },
+      ]);
+    });
+
+    it('sets each id as a key in the stageCounts object with the corresponding count', () => {
+      expect(state.stageCounts).toMatchObject({ 1: 10, 2: 20 });
     });
   });
 

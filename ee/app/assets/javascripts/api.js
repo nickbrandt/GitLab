@@ -26,6 +26,8 @@ export default {
     '/groups/:id/-/analytics/value_stream_analytics/value_streams/:value_stream_id/stages/:stage_id/records',
   cycleAnalyticsStageMedianPath:
     '/groups/:id/-/analytics/value_stream_analytics/value_streams/:value_stream_id/stages/:stage_id/median',
+  cycleAnalyticsStageCountPath:
+    '/groups/:id/-/analytics/value_stream_analytics/value_streams/:value_stream_id/stages/:stage_id/count',
   cycleAnalyticsStagePath:
     '/groups/:id/-/analytics/value_stream_analytics/value_streams/:value_stream_id/stages/:stage_id',
   cycleAnalyticsDurationChartPath:
@@ -180,6 +182,15 @@ export default {
 
   cycleAnalyticsStageMedian({ groupId, valueStreamId, stageId, params = {} }) {
     const url = Api.buildUrl(this.cycleAnalyticsStageMedianPath)
+      .replace(':id', groupId)
+      .replace(':value_stream_id', valueStreamId)
+      .replace(':stage_id', stageId);
+
+    return axios.get(url, { params });
+  },
+
+  cycleAnalyticsStageCount({ groupId, valueStreamId, stageId, params = {} }) {
+    const url = Api.buildUrl(this.cycleAnalyticsStageCountPath)
       .replace(':id', groupId)
       .replace(':value_stream_id', valueStreamId)
       .replace(':stage_id', stageId);

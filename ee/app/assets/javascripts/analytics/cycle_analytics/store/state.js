@@ -43,4 +43,5 @@ export default () => ({
     sort: PAGINATION_SORT_FIELD_END_EVENT,
     direction: PAGINATION_SORT_DIRECTION_DESC,
   },
+  stageCounts: {},
 });

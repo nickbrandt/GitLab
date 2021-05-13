@@ -77,6 +77,7 @@ export default {
       'cycleAnalyticsRequestParams',
       'pathNavigationData',
       'isOverviewStageSelected',
+      'selectedStageCount',
     ]),
     ...mapGetters('customStages', ['customStageFormActive']),
     shouldRenderEmptyState() {
@@ -262,6 +263,7 @@ export default {
           :is-loading="isLoading || isLoadingStage"
           :stage-events="currentStageEvents"
           :selected-stage="selectedStage"
+          :stage-count="selectedStageCount"
           :empty-state-message="selectedStageError"
           :no-data-svg-path="noDataSvgPath"
           :pagination="pagination"
