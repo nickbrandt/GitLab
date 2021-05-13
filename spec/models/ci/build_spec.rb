@@ -323,8 +323,6 @@ RSpec.describe Ci::Build do
   describe '#enqueue' do
     let(:build) { create(:ci_build, :created) }
 
-    subject { build.enqueue }
-
     before do
       allow(build).to receive(:any_unmet_prerequisites?).and_return(has_prerequisites)
       allow(Ci::PrepareBuildService).to receive(:perform_async)
@@ -334,9 +332,15 @@ RSpec.describe Ci::Build do
       let(:has_prerequisites) { true }
 
       it 'transitions to preparing' do
-        subject
+        build.enqueue
 
         expect(build).to be_preparing
+      end
+
+      it 'does not push build to the queue' do
+        build.enqueue
+
+        expect(::Ci::PendingBuild.all.count).to be_zero
       end
     end
 
@@ -344,9 +348,28 @@ RSpec.describe Ci::Build do
       let(:has_prerequisites) { false }
 
       it 'transitions to pending' do
-        subject
+        build.enqueue
 
         expect(build).to be_pending
+      end
+
+      it 'pushed build to a queue' do
+        build.enqueue
+
+        expect(build.queuing_entry).to be_present
+      end
+
+      context 'when build status transition fails' do
+        before do
+          ::Ci::Build.find(build.id).update_column(:lock_version, 100)
+        end
+
+        it 'does not push build to a queue' do
+          expect { build.enqueue }
+            .to raise_error(ActiveRecord::StaleObjectError)
+
+          expect(build.queuing_entry).not_to be_present
+        end
       end
     end
   end
