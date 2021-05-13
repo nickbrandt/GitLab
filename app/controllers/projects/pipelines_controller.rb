@@ -176,7 +176,7 @@ class Projects::PipelinesController < Projects::ApplicationController
   end
 
   def retry
-    if Feature.enabled?(:background_pipeline_retry_endpoint, @project)
+    if Gitlab::Ci::Features.background_pipeline_retry_endpoint?(@project)
       ::Ci::RetryPipelineWorker.perform_async(pipeline.id, current_user.id) # rubocop:disable CodeReuse/Worker
     else
       pipeline.retry_failed(current_user)

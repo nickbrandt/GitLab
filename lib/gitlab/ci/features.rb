@@ -54,6 +54,10 @@ module Gitlab
       def self.gldropdown_tags_enabled?
         ::Feature.enabled?(:gldropdown_tags, default_enabled: :yaml)
       end
+
+      def self.background_pipeline_retry_endpoint?(project)
+        ::Feature.enabled?(:background_pipeline_retry_endpoint, project)
+      end
     end
   end
 end
