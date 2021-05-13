@@ -2,6 +2,7 @@
 import { GlBadge, GlTooltipDirective, GlModalDirective, GlModal } from '@gitlab/ui';
 import { __, s__ } from '~/locale';
 import CodequalityIssueBody from '~/reports/codequality_report/components/codequality_issue_body.vue';
+import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 
 export default {
   components: {
@@ -13,6 +14,7 @@ export default {
     GlTooltip: GlTooltipDirective,
     GlModal: GlModalDirective,
   },
+  mixins: [glFeatureFlagsMixin()],
   i18n: {
     badgeTitle: s__('CodeQuality|Code quality'),
     badgeTooltip: s__('CodeQuality|Some changes in this file degrade the code quality.'),
@@ -34,6 +36,9 @@ export default {
     },
   },
   computed: {
+    visible() {
+      return this.glFeatures.codequalityMrDiff;
+    },
     degradations() {
       return this.codequalityDiff.map((degradation) => {
         return {
@@ -48,7 +53,7 @@ export default {
 </script>
 
 <template>
-  <span>
+  <span v-if="visible">
     <gl-badge
       v-gl-modal="`codequality-details-${fileName}`"
       v-gl-tooltip
