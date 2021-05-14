@@ -291,12 +291,13 @@ RSpec.describe CommitsHelper do
   end
 
   describe "#commit_partial_cache_key" do
-    subject { helper.commit_partial_cache_key(commit, ref: ref, request: request) }
+    subject { helper.commit_partial_cache_key(commit, ref: ref, merge_request: merge_request, request: request) }
 
     let(:commit) { create(:commit).present(current_user: user) }
     let(:commit_status) { create(:commit_status) }
     let(:user) { create(:user) }
     let(:ref) { "master" }
+    let(:merge_request) { nil }
     let(:request) { double(xhr?: true) }
     let(:current_path) { "test" }
 
@@ -309,8 +310,17 @@ RSpec.describe CommitsHelper do
     it { is_expected.to include(commit) }
     it { is_expected.to include(commit.author) }
     it { is_expected.to include(ref) }
-    it { is_expected.to include({ xhr: true }) }
-    it { is_expected.to include(Digest::SHA1.hexdigest(commit_status.to_s)) }
-    it { is_expected.to include(current_path) }
+
+    it do
+      is_expected.to include(
+        {
+          merge_request: merge_request,
+          pipeline_status: Digest::SHA1.hexdigest(commit_status.to_s),
+          xhr: true,
+          controller: "commits",
+          path: current_path
+        }
+      )
+    end
   end
 end

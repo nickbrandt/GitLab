@@ -152,16 +152,20 @@ module CommitsHelper
   # partial. It takes some of the same parameters as used in the partial and will hash the
   # current pipeline status.
   #
-  # This is currently configured only for use on the merge requests commits tab, and will
-  # require expansion for use elsewhere.
-  def commit_partial_cache_key(commit, ref:, request:)
+  # This includes a keyed hash for values that can be nil, to prevent invalid cache entries
+  # being served if the order should change in future.
+  def commit_partial_cache_key(commit, ref:, merge_request:, request:)
     [
       commit,
       commit.author,
       ref,
-      hashed_pipeline_status(commit, ref),
-      { xhr: request.xhr? },
-      @path # referred to in #link_to_browse_code
+      {
+        merge_request: merge_request,
+        pipeline_status: hashed_pipeline_status(commit, ref),
+        xhr: request.xhr?,
+        controller: controller.controller_path,
+        path: @path # referred to in #link_to_browse_code
+      }
     ]
   end
 

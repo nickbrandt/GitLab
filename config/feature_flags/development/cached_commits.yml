@@ -1,5 +1,5 @@
 ---
-name: cached_mr_commits
+name: cached_commits
 introduced_by_url: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/61617
 rollout_issue_url: https://gitlab.com/gitlab-org/gitlab/-/issues/330968
 milestone: '13.12'
