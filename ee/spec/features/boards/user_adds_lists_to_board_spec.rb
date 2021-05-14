@@ -44,7 +44,7 @@ RSpec.describe 'User adds milestone lists', :js do
       set_cookie('sidebar_collapsed', 'true')
 
       stub_feature_flags(
-        graphql_board_lists: graphql_board_lists_enabled,
+        graphql_board_lists: graphql_board_lists_enabled
       )
 
       if board_type == :project

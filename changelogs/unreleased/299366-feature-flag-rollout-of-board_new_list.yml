@@ -1,0 +1,5 @@
+---
+title: Remove board_new_list feature flag
+merge_request: 59826
+author:
+type: changed

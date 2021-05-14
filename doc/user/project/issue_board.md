@@ -648,7 +648,6 @@ Feature.disable(:graphql_board_lists)
 ### Enable or disable iteration lists in boards **(PREMIUM SELF)**
 
 NOTE:
-When disabling iteration lists in boards, you also need to disable the [new add list form](#enable-or-disable-new-add-list-form).
 
 The iteration list is under development but ready for production use. It is
 deployed behind a feature flag that is **enabled by default**.

@@ -17,6 +17,8 @@ RSpec.describe 'User adds lists', :js do
   let_it_be(:project_label) { create(:label, project: project) }
   let_it_be(:group_backlog_list) { create(:backlog_list, board: group_board) }
   let_it_be(:project_backlog_list) { create(:backlog_list, board: project_board) }
+  let_it_be(:backlog) { create(:group_label, group: group, name: 'Backlog') }
+  let_it_be(:closed) { create(:group_label, group: group, name: 'Closed') }
 
   let_it_be(:issue) { create(:labeled_issue, project: project, labels: [group_label, project_label]) }
 
@@ -39,7 +41,7 @@ RSpec.describe 'User adds lists', :js do
       set_cookie('sidebar_collapsed', 'true')
 
       stub_feature_flags(
-        graphql_board_lists: graphql_board_lists_enabled,
+        graphql_board_lists: graphql_board_lists_enabled
       )
 
       if board_type == :project
@@ -61,6 +63,23 @@ RSpec.describe 'User adds lists', :js do
 
       expect(page).to have_selector('.board', text: group_label.title)
       expect(find('.board:nth-child(2) .board-card')).to have_content(issue.title)
+    end
+
+    it 'creates new list for Backlog and closed labels' do
+      click_button 'Create list'
+      wait_for_requests
+
+      select_label(backlog)
+
+      click_button 'Create list'
+      wait_for_requests
+
+      select_label(closed)
+
+      wait_for_requests
+
+      expect(page).to have_selector('.board', text: backlog.title)
+      expect(find('.board:nth-child(2) .board-card')).to have_content(backlog.title)
     end
   end
 

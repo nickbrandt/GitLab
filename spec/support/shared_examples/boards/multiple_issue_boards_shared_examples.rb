@@ -75,13 +75,11 @@ RSpec.shared_examples 'multiple issue boards' do
         expect(page).to have_content(board2.name)
       end
 
-      click_button 'Add list'
+      click_button 'Create list'
 
-      wait_for_requests
+      page.choose(planning.title)
 
-      page.within '.dropdown-menu-issues-board-new' do
-        click_link planning.title
-      end
+      click_button 'Add to board'
 
       wait_for_requests
 
