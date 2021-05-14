@@ -6456,6 +6456,10 @@ RSpec.describe Project, factory_default: :keep do
       it 'lfs_objects_projects associations are deleted along with project' do
         expect { project.delete }.to change(LfsObjectsProject, :count).by(-2)
       end
+
+      it 'lfs_objects associations are unchanged when the assicated project is removed' do
+        expect { project.delete }.not_to change(LfsObject, :count)
+      end
     end
 
     context 'when project has no associated LFS objects' do
