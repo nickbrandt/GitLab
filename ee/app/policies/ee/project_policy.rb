@@ -18,6 +18,9 @@ module EE
       with_scope :subject
       condition(:requirements_available) { @subject.feature_available?(:requirements) & access_allowed_to?(:requirements) }
 
+      with_scope :subject
+      condition(:quality_management_available) { @subject.feature_available?(:quality_management) }
+
       condition(:compliance_framework_available) { @subject.feature_available?(:compliance_framework, @user) }
 
       with_scope :global
@@ -359,6 +362,7 @@ module EE
 
       rule { compliance_framework_available & can?(:owner_access) }.enable :admin_compliance_framework
       rule { compliance_framework_available & can?(:maintainer_access) & ~custom_compliance_framework_available }.enable :admin_compliance_framework
+      rule { quality_management_available & can?(:reporter_access) & can?(:create_issue) }.enable :create_test_case
 
       rule { status_page_available & can?(:owner_access) }.enable :mark_issue_for_publication
       rule { status_page_available & can?(:developer_access) }.enable :publish_status_page
