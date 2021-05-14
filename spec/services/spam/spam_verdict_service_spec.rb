@@ -131,11 +131,11 @@ RSpec.describe Spam::SpamVerdictService do
 
       with_them do
         before do
-          allow(Gitlab::Metrics).to receive(:histogram).with(:spamcheck_latency_seconds, anything).and_return(histogram)
+          allow(Gitlab::Metrics).to receive(:histogram).with(:gitlab_spamcheck_request_duration_seconds, anything).and_return(histogram)
           allow(service).to receive(:spamcheck_verdict).and_return([verdict, attribs, error])
         end
 
-        it 'records latency with labels' do
+        it 'records duration with labels' do
           expect(histogram).to receive(:observe).with(a_hash_including(result: label), anything)
           subject
         end

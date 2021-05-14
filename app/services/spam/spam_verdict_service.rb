@@ -103,7 +103,7 @@ module Spam
     end
 
     def histogram
-      @histogram ||= Gitlab::Metrics.histogram(:spamcheck_latency_seconds, 'Latency to the Spamcheck service')
+      @histogram ||= Gitlab::Metrics.histogram(:gitlab_spamcheck_request_duration_seconds, 'Request duration to the anti-spam service')
     end
   end
 end
