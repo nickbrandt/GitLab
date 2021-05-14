@@ -1,6 +1,7 @@
 <script>
 import RunnerDescription from '../components/runner_description.vue';
 import RunnerList from '../components/runner_list.vue';
+import RunnerSearchBar from '../components/runner_search_bar.vue';
 import RunnerManualSetupHelp from '../components/runner_manual_setup_help.vue';
 import getRunnersQuery from '../graphql/get_runners.query.graphql';
 
@@ -8,6 +9,7 @@ export default {
   components: {
     RunnerDescription,
     RunnerList,
+    RunnerSearchBar,
     RunnerManualSetupHelp,
   },
   props: {
@@ -41,6 +43,9 @@ export default {
         <runner-manual-setup-help :registration-token="registrationToken" />
       </div>
     </div>
+
+    <!-- TODO Add filter search bar -->
+    <runner-search-bar namespace="admin" />
 
     <!-- TODO Add an empty state for no runners -->
     <runner-list :runners="runners" :loading="$apollo.queries.runners.loading" />
