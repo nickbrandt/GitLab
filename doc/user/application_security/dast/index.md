@@ -1029,7 +1029,6 @@ If a validated site profile's target URL is edited, the site's validation status
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/322609) in GitLab 13.12.
 
-
 If a site profile's validation fails, you can retry it by selecting the **Retry validation** button
 in the profiles list.
 
