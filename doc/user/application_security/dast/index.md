@@ -1030,7 +1030,7 @@ If a validated site profile's target URL is edited, the site's validation status
 If a site profile's validation fails, you can retry it by selecting the **Retry validation** button
 in the profiles list.
 
-When loading the DAST profiles library, passed failed validations are listed above the profiles
+When loading the DAST profiles library, past failed validations are listed above the profiles
 list. You can also retry the validation from there by selecting the **Retry validation** link in
 the alert. You can also dismiss the alert to revoke failed validations.
 
