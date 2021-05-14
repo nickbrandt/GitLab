@@ -3,6 +3,8 @@
 require 'spec_helper'
 
 RSpec.describe 'Projects > Settings > Merge requests' do
+  include ProjectForksHelper
+
   let(:project) { create(:project_empty_repo) }
   let(:user) { create(:user) }
   let(:role) { :maintainer }
@@ -11,13 +13,6 @@ RSpec.describe 'Projects > Settings > Merge requests' do
     project.add_role(user, role)
     sign_in(user)
     visit(project_settings_merge_requests_path(project))
-  end
-
-  context 'for developer' do
-  end
-
-  context 'for maintainer' do
-    let(:role) { :maintainer }
   end
 
   it 'shows "Merge commit" strategy' do
