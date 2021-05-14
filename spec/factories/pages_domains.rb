@@ -2,6 +2,7 @@
 
 FactoryBot.define do
   factory :pages_domain, class: 'PagesDomain' do
+    project
     sequence(:domain) { |n| "my#{n}.domain.com" }
     verified_at { Time.now }
     enabled_until { 1.week.from_now }
@@ -353,10 +354,6 @@ x6zG6WoibsbsJMj70nwseUnPTBQNDP+j61RJjC/r
       wildcard { true }
       scope { :instance }
       usage { :serverless }
-    end
-
-    trait :with_project do
-      association :project
     end
   end
 end

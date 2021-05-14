@@ -5,10 +5,10 @@ require 'spec_helper'
 RSpec.describe PagesDomain do
   using RSpec::Parameterized::TableSyntax
 
-  subject(:pages_domain) { described_class.new }
+  subject(:pages_domain) { build(:pages_domain) }
 
   describe 'associations' do
-    it { is_expected.to belong_to(:project) }
+    it { is_expected.to belong_to(:project).required }
     it { is_expected.to have_many(:serverless_domain_clusters) }
   end
 
@@ -49,16 +49,13 @@ RSpec.describe PagesDomain do
 
       let(:domain) { 'my.domain.com' }
 
-      let(:project) do
-        instance_double(Project, pages_https_only?: pages_https_only)
-      end
-
       let(:pages_domain) do
         build(:pages_domain, certificate: certificate, key: key,
-              auto_ssl_enabled: auto_ssl_enabled).tap do |pd|
-          allow(pd).to receive(:project).and_return(project)
-          pd.valid?
-        end
+              auto_ssl_enabled: auto_ssl_enabled)
+      end
+
+      before do
+        allow(pages_domain.project).to receive(:pages_https_only?).and_return(pages_https_only)
       end
 
       where(:pages_https_only, :certificate, :key, :auto_ssl_enabled, :errors_on) do
@@ -85,6 +82,8 @@ RSpec.describe PagesDomain do
 
       with_them do
         it "is adds the expected errors" do
+          pages_domain.valid?
+
           expect(pages_domain.errors.keys).to eq errors_on
         end
       end
@@ -216,8 +215,6 @@ RSpec.describe PagesDomain do
 
   describe '#verification_domain' do
     subject { pages_domain.verification_domain }
-
-    it { is_expected.to be_nil }
 
     it 'is a well-known subdomain if the domain is present' do
       pages_domain.domain = 'example.com'
@@ -379,10 +376,8 @@ RSpec.describe PagesDomain do
         now = Time.current
         future = now + 1.day
 
-        :project | nil       | :project1 | true
         :project | :project1 | :project1 | false
         :project | :project1 | :project2 | true
-        :project | :project1 | nil       | true
 
         # domain can't be set to nil
         :domain | 'a.com' | 'a.com' | false
