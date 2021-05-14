@@ -65,4 +65,4 @@ module Projects
   end
 end
 
-Projects::Settings::MergeRequestsController.prepend_if_ee('::EE::Projects::Settings::MergeRequestsController')
+Projects::Settings::MergeRequestsController.prepend_mod_with('Projects::Settings::MergeRequestsController')
