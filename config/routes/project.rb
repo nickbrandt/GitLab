@@ -132,7 +132,8 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
 
           resource :packages_and_registries, only: [:show]
 
-          resource :merge_requests, only: [:show]
+          resource :merge_requests, only: [:show, :update] do
+          end
         end
 
         resources :autocomplete_sources, only: [] do
