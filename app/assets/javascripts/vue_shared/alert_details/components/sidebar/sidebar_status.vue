@@ -34,6 +34,11 @@ export default {
       type: Boolean,
       required: false,
     },
+    textClass: {
+      type: String,
+      required: false,
+      default: '',
+    },
   },
   data() {
     return {
@@ -58,6 +63,9 @@ export default {
       }
     },
     handleUpdating(updating) {
+      if (!updating) {
+        this.$emit('alert-update');
+      }
       this.isUpdating = updating;
     },
   },
@@ -66,7 +74,7 @@ export default {
 
 <template>
   <div
-    class="alert-status gl-py-5 gl-w-70p"
+    class="alert-status gl-py-5"
     :class="{ 'gl-border-b-1 gl-border-b-solid gl-border-b-gray-100': !sidebarCollapsed }"
   >
     <template v-if="sidebarCollapsed">
@@ -118,7 +126,7 @@ export default {
         class="value gl-m-0"
         :class="{ 'no-value': !statuses[alert.status] }"
       >
-        <span v-if="statuses[alert.status]" class="gl-text-gray-500" data-testid="status">
+        <span v-if="statuses[alert.status]" :class="textClass" data-testid="status">
           {{ statuses[alert.status] }}
         </span>
         <span v-else>

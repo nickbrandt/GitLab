@@ -8,6 +8,7 @@ import createMockApollo from 'helpers/mock_apollo_helper';
 import { mountExtended, shallowMountExtended } from 'helpers/vue_test_utils_helper';
 import waitForPromises from 'helpers/wait_for_promises';
 import { visitUrl } from '~/lib/utils/url_utility';
+import SidebarStatus from '~/vue_shared/alert_details/components/sidebar/sidebar_status.vue';
 import getAlertDetailsQuery from '~/vue_shared/alert_details/graphql/queries/alert_details.query.graphql';
 import {
   erroredGetAlertDetailsQuerySpy,
@@ -48,6 +49,7 @@ describe('Alert Drawer', () => {
   const findIssueLink = () => wrapper.findByTestId('issue-link');
   const findSkeletonLoader = () => wrapper.findComponent(GlSkeletonLoader);
   const findDetails = () => wrapper.findByTestId('details-list');
+  const findStatus = () => wrapper.findComponent(SidebarStatus);
 
   const createWrapper = ({
     $apollo,
@@ -159,5 +161,13 @@ describe('Alert Drawer', () => {
       expect(captureExceptionSpy).toHaveBeenCalledTimes(1);
       expect(captureExceptionSpy.mock.calls[0][0].message).toBe(errorMessage);
     });
+  });
+
+  it('handles an alert status update', async () => {
+    createWrapper({ props: { selectedAlert: mockAlerts[0] } });
+    expect(wrapper.emitted('alert-update')).toBeUndefined();
+    findStatus().vm.$emit('alert-update');
+    await wrapper.vm.$nextTick();
+    expect(wrapper.emitted('alert-update')).toEqual([[]]);
   });
 });
