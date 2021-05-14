@@ -47,12 +47,20 @@ RSpec.describe 'SAST.gitlab-ci.yml' do
 
       context 'by default' do
         describe 'language detection' do
+          sast_experimental_features = { 'SAST_EXPERIMENTAL_FEATURES' => 'true' }
+          android = 'Android'
+          ios = 'iOS'
+          mobsf_android_build = %w(mobsf-android-sast)
+          mobsf_ios_build = %w(mobsf-ios-sast)
+
           using RSpec::Parameterized::TableSyntax
 
           where(:case_name, :files, :variables, :include_build_names) do
-            'Android'              | { 'AndroidManifest.xml' => '', 'a.java' => '' } | { 'SAST_EXPERIMENTAL_FEATURES' => 'true' } | %w(mobsf-android-sast)
-            'Android'              | { 'app/src/main/AndroidManifest.xml' => '' }    | { 'SAST_EXPERIMENTAL_FEATURES' => 'true' } | %w(mobsf-android-sast)
-            'Android'              | { 'a/b/AndroidManifest.xml' => '' }             | { 'SAST_EXPERIMENTAL_FEATURES' => 'true' } | %w(mobsf-android-sast)
+            android                | { 'AndroidManifest.xml' => '', 'a.java' => '' } | sast_experimental_features                 | mobsf_android_build
+            android                | { 'app/src/main/AndroidManifest.xml' => '' }    | sast_experimental_features                 | mobsf_android_build
+            android                | { 'a/b/AndroidManifest.xml' => '' }             | sast_experimental_features                 | mobsf_android_build
+            android                | { 'a/b/android.apk' => '' }                     | sast_experimental_features                 | mobsf_android_build
+            android                | { 'android.apk' => '' }                         | sast_experimental_features                 | mobsf_android_build
             'Apex'                 | { 'app.cls' => '' }                             | {}                                         | %w(pmd-apex-sast)
             'C'                    | { 'app.c' => '' }                               | {}                                         | %w(flawfinder-sast)
             'C++'                  | { 'app.cpp' => '' }                             | {}                                         | %w(flawfinder-sast)
@@ -60,9 +68,10 @@ RSpec.describe 'SAST.gitlab-ci.yml' do
             'Elixir'               | { 'mix.exs' => '' }                             | {}                                         | %w(sobelow-sast)
             'Golang'               | { 'main.go' => '' }                             | {}                                         | %w(gosec-sast)
             'Groovy'               | { 'app.groovy' => '' }                          | {}                                         | %w(spotbugs-sast)
-            'iOS'                  | { 'a.xcodeproj/x.pbxproj' => '' }               | { 'SAST_EXPERIMENTAL_FEATURES' => 'true' } | %w(mobsf-ios-sast)
+            ios                    | { 'a.xcodeproj/x.pbxproj' => '' }               | sast_experimental_features                 | mobsf_ios_build
+            ios                    | { 'a/b/ios.ipa' => '' }                         | sast_experimental_features                 | mobsf_ios_build
             'Java'                 | { 'app.java' => '' }                            | {}                                         | %w(spotbugs-sast)
-            'Java with MobSF'      | { 'app.java' => '' }                            | { 'SAST_EXPERIMENTAL_FEATURES' => 'true' } | %w(spotbugs-sast)
+            'Java with MobSF'      | { 'app.java' => '' }                            | sast_experimental_features                 | %w(spotbugs-sast)
             'Java without MobSF'   | { 'AndroidManifest.xml' => '', 'a.java' => '' } | {}                                         | %w(spotbugs-sast)
             'Javascript'           | { 'app.js' => '' }                              | {}                                         | %w(eslint-sast semgrep-sast)
             'JSX'                  | { 'app.jsx' => '' }                             | {}                                         | %w(eslint-sast semgrep-sast)
