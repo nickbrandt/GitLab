@@ -1683,32 +1683,43 @@ RSpec.describe User do
 
     using RSpec::Parameterized::TableSyntax
 
-    where(:is_saas, :cc_present, :is_free, :is_trial, :free_ff_enabled, :trial_ff_enabled, :old_users_ff_enabled, :days_from_release, :result, :description) do
+    where(:saas, :cc_present, :shared_runners, :is_free, :is_trial, :free_ff_enabled, :trial_ff_enabled, :old_users_ff_enabled, :days_from_release, :result, :description) do
       # self-hosted
-      false | false | false | false | true  | true  | false | 0 | true | 'self-hosted paid plan'
-      false | false | false | true  | true  | true  | false | 0 | true | 'self-hosted missing CC on trial plan'
+      nil   | false | :enabled | false | false | true  | true  | false | 0  | true  | 'self-hosted paid plan'
+      nil   | false | :enabled | false | true  | true  | true  | false | 0  | true  | 'self-hosted missing CC on trial plan'
 
       # saas
-      true  | false | false | false | true  | true  | false | 0  | true  | 'missing CC on paid plan'
-      true  | false | true  | false | true  | true  | false | 0  | false | 'missing CC on free plan'
-      true  | false | true  | false | true  | true  | false | -1 | true  | 'missing CC on free plan but old user'
-      true  | false | true  | false | true  | true  | true  | -1 | false | 'missing CC on free plan but old user and FF enabled'
-      true  | false | true  | false | false | true  | false | 0  | true  | 'missing CC on free plan - FF off'
-      true  | false | false | true  | true  | true  | false | 0  | false | 'missing CC on trial plan'
-      true  | false | false | true  | true  | true  | false | -1 | true  | 'missing CC on trial plan but old user'
-      true  | false | false | true  | true  | true  | true  | -1 | false | 'missing CC on trial plan but old user and FF enabled'
-      true  | false | false | true  | true  | false | false | 0  | true  | 'missing CC on trial plan - FF off'
-      true  | true  | true  | false | true  | true  | false | 0  | true  | 'present CC on free plan'
-      true  | true  | false | true  | true  | true  | false | 0  | true  | 'present CC on trial plan'
+      :saas | false | :enabled | false | false | true  | true  | false | 0  | true  | 'missing CC on paid plan'
+
+      # free plan
+      :saas | false | :enabled | true  | false | true  | true  | false | 0  | false | 'missing CC on free plan'
+      :saas | false | nil      | true  | false | true  | true  | false | 0  | true  | 'missing CC on free plan and shared runners disabled'
+      :saas | false | :enabled | true  | false | true  | true  | false | -1 | true  | 'missing CC on free plan but old user'
+      :saas | false | :enabled | true  | false | true  | true  | true  | -1 | false | 'missing CC on free plan but old user and FF enabled'
+      :saas | false | nil      | true  | false | true  | true  | true  | -1 | true  | 'missing CC on free plan but old user and FF enabled and shared runners disabled'
+      :saas | true  | :enabled | true  | false | true  | true  | false | 0  | true  | 'present CC on free plan'
+      :saas | false | :enabled | true  | false | false | true  | false | 0  | true  | 'missing CC on free plan - FF off'
+
+      # trial plan
+      :saas | false | :enabled | false | true  | true  | true  | false | 0  | false | 'missing CC on trial plan'
+      :saas | false | nil      | false | true  | true  | true  | false | 0  | true  | 'missing CC on trial plan and shared runners disabled'
+      :saas | false | :enabled | false | true  | true  | true  | false | -1 | true  | 'missing CC on trial plan but old user'
+      :saas | false | :enabled | false | true  | true  | true  | true  | -1 | false | 'missing CC on trial plan but old user and FF enabled'
+      :saas | false | nil      | false | true  | true  | true  | true  | -1 | true  | 'missing CC on trial plan but old user and FF enabled and shared runners disabled'
+      :saas | false | :enabled | false | true  | true  | false | false | 0  | true  | 'missing CC on trial plan - FF off'
+      :saas | true  | :enabled | false | true  | true  | true  | false | 0  | true  | 'present CC on trial plan'
     end
+
+    let(:shared_runners_enabled) { shared_runners == :enabled }
 
     with_them do
       before do
-        allow(::Gitlab).to receive(:com?).and_return(is_saas)
+        allow(::Gitlab).to receive(:com?).and_return(saas == :saas)
         user.created_at = ::Users::CreditCardValidation::RELEASE_DAY + days_from_release.days
         allow(user).to receive(:credit_card_validated_at).and_return(Time.current) if cc_present
         allow(project.namespace).to receive(:free_plan?).and_return(is_free)
         allow(project.namespace).to receive(:trial?).and_return(is_trial)
+        project.update!(shared_runners_enabled: shared_runners_enabled)
         stub_feature_flags(
           ci_require_credit_card_on_free_plan: free_ff_enabled,
           ci_require_credit_card_on_trial_plan: trial_ff_enabled,
