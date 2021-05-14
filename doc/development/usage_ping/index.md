@@ -1027,8 +1027,8 @@ On GitLab.com, we have DangerBot setup to monitor Product Intelligence related f
 On GitLab.com, the Product Intelligence team regularly [monitors Usage Ping](https://gitlab.com/groups/gitlab-org/-/epics/6000).
 They may alert you that your metrics need further optimization to run quicker and with greater success.
 
-In [#g_product_intelligence](https://gitlab.slack.com/archives/CL3A7GFPF) Usage Ping JSON payload for
-GitLab.com is shared every week.
+The Usage Ping JSON payload for GitLab.com is shared in the
+[#g_product_intelligence](https://gitlab.slack.com/archives/CL3A7GFPF) Slack channel every week.
 
 You may also use the [Usage Ping QA dashboard](https://app.periscopedata.com/app/gitlab/632033/Usage-Ping-QA) to check how well your metric performs. The dashboard allows filtering by GitLab version, by "Self-managed" & "SaaS" and shows you how many failures have occurred for each metric. Whenever you notice a high failure rate, you may re-optimize your metric.
 
