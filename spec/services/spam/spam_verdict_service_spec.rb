@@ -118,13 +118,27 @@ RSpec.describe Spam::SpamVerdictService do
     context 'records metrics' do
       let(:histogram) { double('histogram') }
 
-      before do
-        expect(Gitlab::Metrics).to receive(:histogram).with(:spamcheck_latency_seconds, anything).and_return(histogram)
+      using RSpec::Parameterized::TableSyntax
+
+      where(:verdict, :error, :label) do
+        Spam::SpamConstants::ALLOW             |  false |  'ALLOW'
+        Spam::SpamConstants::ALLOW             |  true  |  'ERROR'
+        Spam::SpamConstants::CONDITIONAL_ALLOW |  false |  'CONDITIONAL_ALLOW'
+        Spam::SpamConstants::BLOCK_USER        |  false |  'BLOCK'
+        Spam::SpamConstants::DISALLOW          |  false |  'DISALLOW'
+        Spam::SpamConstants::NOOP              |  false |  'NOOP'
       end
 
-      it 'records latency' do
-        expect(histogram).to receive(:observe)
-        subject
+      with_them do
+        before do
+          allow(Gitlab::Metrics).to receive(:histogram).with(:spamcheck_latency_seconds, anything).and_return(histogram)
+          allow(service).to receive(:spamcheck_verdict).and_return([verdict, attribs, error])
+        end
+
+        it 'records latency with labels' do
+          expect(histogram).to receive(:observe).with(a_hash_including(result: label), anything)
+          subject
+        end
       end
     end
   end
@@ -326,7 +340,7 @@ RSpec.describe Spam::SpamVerdictService do
           end
 
           it 'returns nil' do
-            expect(subject).to eq([ALLOW, attribs])
+            expect(subject).to eq([ALLOW, attribs, true])
           end
         end
 
@@ -348,7 +362,7 @@ RSpec.describe Spam::SpamVerdictService do
         end
 
         it 'returns nil' do
-          expect(subject).to eq([ALLOW, attribs])
+          expect(subject).to eq([ALLOW, attribs, true])
         end
       end
     end

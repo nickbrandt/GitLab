@@ -16,14 +16,17 @@ module Spam
     def execute
       spamcheck_result = nil
       spamcheck_attribs = {}
+      spamcheck_error = false
 
       external_spam_check_round_trip_time = Benchmark.realtime do
-        spamcheck_result, spamcheck_attribs = spamcheck_verdict
+        spamcheck_result, spamcheck_attribs, spamcheck_error = spamcheck_verdict
       end
 
-      histogram.observe( {}, external_spam_check_round_trip_time )
+      label = spamcheck_error ? 'ERROR' : spamcheck_result.to_s.upcase
 
-      # assign result to a var and log it before reassigning to nil when monitorMode is true
+      histogram.observe( { result: label }, external_spam_check_round_trip_time )
+
+      # assign result to a var for logging it before reassigning to nil when monitorMode is true
       original_spamcheck_result = spamcheck_result
 
       spamcheck_result = nil if spamcheck_attribs&.fetch("monitorMode", "false") == "true"
@@ -85,8 +88,9 @@ module Spam
         end
       rescue StandardError => e
         Gitlab::ErrorTracking.log_exception(e)
+
         # Default to ALLOW if any errors occur
-        [ALLOW, attribs]
+        [ALLOW, attribs, true]
       end
     end
 
