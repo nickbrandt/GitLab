@@ -61,9 +61,7 @@ export default {
           id: finding.uuid,
         })),
       result({ data }) {
-        if (data.project) {
-          this.pageInfo = preparePageInfo(data.project.pipeline.securityReportFindings?.pageInfo);
-        }
+        this.pageInfo = preparePageInfo(data.project?.pipeline?.securityReportFindings?.pageInfo);
       },
       error() {
         this.errorLoadingFindings = true;
