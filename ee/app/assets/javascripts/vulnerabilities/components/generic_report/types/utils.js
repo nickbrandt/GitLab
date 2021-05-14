@@ -34,14 +34,6 @@ export const isOfTypeList = isOfType(REPORT_TYPES.list);
 export const isOfTypeNamedList = isOfType(REPORT_TYPES.namedList);
 
 /**
- * Check if the given report is of type text
- *
- * @param {{ type: string } } reportItem
- * @returns boolean
- */
-export const isOfTypeText = isOfType(REPORT_TYPES.text);
-
-/**
  * Check if the current report item is of that list and is not nested deeper than the maximum depth
  *
  * @param {number} maxDepth

@@ -18,8 +18,12 @@ const TEST_DATA = {
     after: 'bar',
   },
   [REPORT_TYPES.text]: {
-    name: 'some-field',
+    name: 'some-string-field',
     value: 'some-value',
+  },
+  [REPORT_TYPES.value]: {
+    name: 'some-numeric-field',
+    value: 15,
   },
 };
 

@@ -6,6 +6,7 @@ export const REPORT_TYPES = {
   diff: 'diff',
   namedList: 'named-list',
   text: 'text',
+  value: 'value',
 };
 
 const REPORT_TYPE_TO_COMPONENT_MAP = {
@@ -13,7 +14,8 @@ const REPORT_TYPE_TO_COMPONENT_MAP = {
   [REPORT_TYPES.url]: () => import('./url.vue'),
   [REPORT_TYPES.diff]: () => import('./diff.vue'),
   [REPORT_TYPES.namedList]: () => import('./named_list.vue'),
-  [REPORT_TYPES.text]: () => import('./text.vue'),
+  [REPORT_TYPES.text]: () => import('./value.vue'),
+  [REPORT_TYPES.value]: () => import('./value.vue'),
 };
 
 export const getComponentNameForType = (reportType) =>
