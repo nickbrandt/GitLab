@@ -47,6 +47,11 @@ module Gitlab
       TWENTY_EIGHT_DAYS_TIME_FRAME_NAME = "28d"
       MAX_BUCKET_SIZE = 100
 
+      # Computes a metric using instrumentation classes
+      def instrument_metric(instrumentation_object)
+        instrumentation_object.value
+      end
+
       def count(relation, column = nil, batch: true, batch_size: nil, start: nil, finish: nil)
         if batch
           Gitlab::Database::BatchCount.batch_count(relation, column, batch_size: batch_size, start: start, finish: finish)

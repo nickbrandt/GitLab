@@ -5,6 +5,10 @@ module Gitlab
   # See https://gitlab.com/gitlab-org/gitlab/-/merge_requests/41091
   class UsageDataQueries < UsageData
     class << self
+      def instrument_metric(instrumentation_object)
+        instrumentation_object.to_sql
+      end
+
       def count(relation, column = nil, *args, **kwargs)
         raw_sql(relation, column)
       end
@@ -77,7 +81,7 @@ module Gitlab
       private
 
       def raw_sql(relation, column, distinct = nil)
-        Gitlab::Usage::Metrics::Query.new.raw_sql(relation, self.class.column, distinct == :distinct)
+        Gitlab::Usage::Metrics::Query.new.raw_sql(relation, column, distinct == :distinct)
       end
     end
   end

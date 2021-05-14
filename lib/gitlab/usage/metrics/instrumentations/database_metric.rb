@@ -48,7 +48,12 @@ module Gitlab
           end
 
           def to_sql
-            Gitlab::Usage::Metrics::Query.new.raw_sql(relation, self.class.column, distinct?)
+            case self.class.metric_operation
+            when :count, :disctinct_count
+              Gitlab::Usage::Metrics::Query.new.raw_sql(relation, self.class.column, distinct?)
+            else
+              raise ArgumentError, 'DatabaseMetric method operation not supported'
+            end
           end
 
           private

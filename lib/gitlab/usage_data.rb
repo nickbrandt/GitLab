@@ -137,7 +137,7 @@ module Gitlab
             in_review_folder: count(::Environment.in_review_folder),
             grafana_integrated_projects: count(GrafanaIntegration.enabled),
             groups: count(Group),
-            issues: count(Issue, start: minimum_id(Issue), finish: maximum_id(Issue)),
+            issues: instrument_metric(Gitlab::Usage::Metrics::Instrumentations::CountIssuesMetric.new(time_frame: 'all')),
             issues_created_from_gitlab_error_tracking_ui: count(SentryIssue),
             issues_with_associated_zoom_link: count(ZoomMeeting.added_to_issue),
             issues_using_zoom_quick_actions: distinct_count(ZoomMeeting, :issue_id),
