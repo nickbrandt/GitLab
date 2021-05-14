@@ -97,7 +97,6 @@ module DatabaseSharding
           end
           p query
           destination_connection.exec(query)
-          break
         end
 
         sleep 1
@@ -114,6 +113,7 @@ module DatabaseSharding
 
       # Move shard location
 
+      # Unpause writes
     ensure
       # Drop replication slot
       replication_connection&.exec(DROP_REPLICATION_SLOT)
