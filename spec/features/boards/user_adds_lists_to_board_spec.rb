@@ -25,15 +25,11 @@ RSpec.describe 'User adds lists', :js do
     group.add_owner(user)
   end
 
-  where(:board_type, :graphql_board_lists_enabled, :board_new_list_enabled) do
-    :project | true  | true
-    :project | false | true
-    :project | true  | false
-    :project | false | false
-    :group   | true  | true
-    :group   | false | true
-    :group   | true  | false
-    :group   | false | false
+  where(:board_type, :graphql_board_lists_enabled) do
+    :project | true
+    :project | false
+    :group   | true
+    :group   | false
   end
 
   with_them do
@@ -44,7 +40,6 @@ RSpec.describe 'User adds lists', :js do
 
       stub_feature_flags(
         graphql_board_lists: graphql_board_lists_enabled,
-        board_new_list: board_new_list_enabled
       )
 
       if board_type == :project
@@ -57,10 +52,10 @@ RSpec.describe 'User adds lists', :js do
     end
 
     it 'creates new column for label containing labeled issue' do
-      click_button button_text(board_new_list_enabled)
+      click_button 'Create list'
       wait_for_all_requests
 
-      select_label(board_new_list_enabled, group_label)
+      select_label(group_label)
 
       wait_for_all_requests
 
@@ -69,27 +64,13 @@ RSpec.describe 'User adds lists', :js do
     end
   end
 
-  def select_label(board_new_list_enabled, label)
-    if board_new_list_enabled
-      click_button 'Select a label'
+  def select_label(label)
+    click_button 'Select a label'
 
-      find('label', text: label.title).click
+    find('label', text: label.title).click
 
-      click_button 'Add to board'
+    click_button 'Add to board'
 
-      wait_for_all_requests
-    else
-      page.within('.dropdown-menu-issues-board-new') do
-        click_link label.title
-      end
-    end
-  end
-
-  def button_text(board_new_list_enabled)
-    if board_new_list_enabled
-      'Create list'
-    else
-      'Add list'
-    end
+    wait_for_all_requests
   end
 end

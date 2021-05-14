@@ -67,8 +67,6 @@ RSpec.describe 'Project issue boards', :js do
     let_it_be(:issue10) { create(:labeled_issue, project: project, title: 'issue +', description: 'A+ great issue', labels: [a_plus]) }
 
     before do
-      stub_feature_flags(board_new_list: false)
-
       visit_project_board_path_without_query_limit(project, board)
 
       wait_for_requests
