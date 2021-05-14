@@ -30676,6 +30676,9 @@ msgstr ""
 msgid "Speed up your pipelines with Needs relationships"
 msgstr ""
 
+msgid "Spent At"
+msgstr ""
+
 msgid "Squash commit message"
 msgstr ""
 
@@ -33574,6 +33577,9 @@ msgstr ""
 msgid "Time"
 msgstr ""
 
+msgid "Time Spent"
+msgstr ""
+
 msgid "Time based: Yes"
 msgstr ""
 
@@ -33623,6 +33629,9 @@ msgid "Time to subtract exceeds the total time spent"
 msgstr ""
 
 msgid "Time tracking"
+msgstr ""
+
+msgid "Time tracking report"
 msgstr ""
 
 msgid "Time until first merge request"
