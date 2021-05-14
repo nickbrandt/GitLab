@@ -1,4 +1,4 @@
-&.page-with-contextual-sidebar {
+.page-with-contextual-sidebar {
   transition: padding-left $sidebar-transition-duration;
 
   @include media-breakpoint-up(md) {
@@ -14,7 +14,7 @@
   }
 }
 
-&.page-with-icon-sidebar {
+.page-with-icon-sidebar {
   @include media-breakpoint-up(md) {
     padding-left: $contextual-sidebar-collapsed-width;
   }

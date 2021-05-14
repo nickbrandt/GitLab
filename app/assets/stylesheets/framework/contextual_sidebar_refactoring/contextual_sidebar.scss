@@ -1,7 +1,7 @@
-.layout-page:not(.sidebar-refactoring) {
+body:not(.sidebar-refactoring) {
   @import 'contextual_sidebar_base';
 }
 
-.layout-page.sidebar-refactoring {
+body.sidebar-refactoring {
   @import 'contextual_sidebar_variant';
 }
