@@ -143,14 +143,14 @@ describe('GroupsList', () => {
         });
 
         it('calls `fetchGroups` with search term', () => {
-          expect(fetchGroups).toHaveBeenCalledWith(mockGroupsPath, {
+          expect(fetchGroups).toHaveBeenLastCalledWith(mockGroupsPath, {
             page: 1,
-            perPage: 10,
+            perPage: DEFAULT_GROUPS_PER_PAGE,
             search: mockSearchTeam,
           });
         });
 
-        it('disables GroupListItems', async () => {
+        it('disables GroupListItems', () => {
           findAllItems().wrappers.forEach((groupListItem) => {
             expect(groupListItem.props('disabled')).toBe(true);
           });
@@ -196,20 +196,55 @@ describe('GroupsList', () => {
           });
 
           createComponent();
-          fetchGroups.mockClear();
-
-          const searchBox = findSearchBox();
-
-          searchBox.vm.$emit('input', userSearchTerm);
           await waitForPromises();
 
-          expect(fetchGroups).toHaveBeenCalledWith(mockGroupsPath, {
+          const searchBox = findSearchBox();
+          searchBox.vm.$emit('input', userSearchTerm);
+
+          expect(fetchGroups).toHaveBeenLastCalledWith(mockGroupsPath, {
             page: 1,
-            perPage: 10,
+            perPage: DEFAULT_GROUPS_PER_PAGE,
             search: finalSearchTerm,
           });
         },
       );
+    });
+
+    describe('when page=2', () => {
+      beforeEach(async () => {
+        const totalItems = DEFAULT_GROUPS_PER_PAGE + 1;
+        const mockGroups = createMockGroups(totalItems);
+        fetchGroups.mockResolvedValue({
+          headers: { 'X-TOTAL': totalItems, 'X-PAGE': 1 },
+          data: mockGroups,
+        });
+        createComponent();
+        await waitForPromises();
+
+        const paginationEl = findPagination();
+        paginationEl.vm.$emit('input', 2);
+      });
+
+      it('should load results for page 2', () => {
+        expect(fetchGroups).toHaveBeenLastCalledWith(mockGroupsPath, {
+          page: 2,
+          perPage: DEFAULT_GROUPS_PER_PAGE,
+          search: '',
+        });
+      });
+
+      it('resets page to 1 on search `input` event', () => {
+        const mockSearchTerm = 'gitlab';
+        const searchBox = findSearchBox();
+
+        searchBox.vm.$emit('input', mockSearchTerm);
+
+        expect(fetchGroups).toHaveBeenLastCalledWith(mockGroupsPath, {
+          page: 1,
+          perPage: DEFAULT_GROUPS_PER_PAGE,
+          search: mockSearchTerm,
+        });
+      });
     });
   });
 
@@ -227,7 +262,6 @@ describe('GroupsList', () => {
         data: mockGroups,
       });
       createComponent();
-
       await waitForPromises();
 
       const paginationEl = findPagination();
@@ -250,13 +284,14 @@ describe('GroupsList', () => {
         await waitForPromises();
       });
 
-      it('executes `fetchGroups` with correct arguments', async () => {
+      it('executes `fetchGroups` with correct arguments', () => {
         const paginationEl = findPagination();
         paginationEl.vm.$emit('input', 2);
 
-        expect(fetchGroups).toHaveBeenCalledWith(mockGroupsPath, {
+        expect(fetchGroups).toHaveBeenLastCalledWith(mockGroupsPath, {
           page: 2,
-          perPage: 10,
+          perPage: DEFAULT_GROUPS_PER_PAGE,
+          search: '',
         });
       });
     });

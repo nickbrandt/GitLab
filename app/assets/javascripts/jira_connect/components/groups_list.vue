@@ -67,7 +67,10 @@ export default {
         });
     },
     onGroupSearch(searchTerm) {
+      // keep a copy of the search term for pagination
       this.searchTerm = searchTerm;
+      // reset the current page
+      this.page = 1;
       return this.loadGroups();
     },
   },
