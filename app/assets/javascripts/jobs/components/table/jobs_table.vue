@@ -11,7 +11,7 @@ const defaultTableClasses = {
   tdClass: 'gl-p-5!',
   thClass: 'gl-bg-transparent! gl-border-b-solid! gl-border-b-gray-100! gl-p-5! gl-border-b-1!',
 };
-
+// eslint-disable-next-line @gitlab/require-i18n-strings
 const coverageTdClasses = `${defaultTableClasses.tdClass} gl-display-none! gl-lg-display-table-cell!`;
 
 export default {
