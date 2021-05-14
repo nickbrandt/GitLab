@@ -8,6 +8,9 @@ import initBlob from '~/pages/projects/init_blob';
 import initWebIdeLink from '~/pages/projects/shared/web_ide_link';
 import commitPipelineStatus from '~/projects/tree/components/commit_pipeline_status_component.vue';
 import BlobContentViewer from '~/repository/components/blob_content_viewer.vue';
+import ReplaceButton from '~/repository/components/replace_blob_button.vue';
+import createRouter from '~/repository/router';
+
 import '~/sourcegraph/load';
 
 Vue.use(VueApollo);
@@ -89,6 +92,25 @@ if (successPipelineEl) {
           ...successPipelineEl.dataset,
         },
       });
+    },
+  });
+}
+
+const replaceBlobApp = document.querySelector('.js-replace-blob-app');
+
+if (replaceBlobApp) {
+  const { projectPath, escapedRef } = replaceBlobApp.dataset;
+  const router = createRouter(projectPath, escapedRef);
+
+  // eslint-disable-next-line no-new
+  new Vue({
+    el: replaceBlobApp,
+    router,
+    provide: {
+      ...replaceBlobApp.dataset,
+    },
+    render(createElement) {
+      return createElement(ReplaceButton);
     },
   });
 }

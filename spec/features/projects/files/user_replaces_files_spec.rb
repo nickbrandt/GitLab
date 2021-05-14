@@ -3,7 +3,6 @@
 require 'spec_helper'
 
 RSpec.describe 'Projects > Files > User replaces files', :js do
-  include DropzoneHelper
 
   let(:fork_message) do
     "You're not allowed to make changes to this project directly. "\
@@ -33,7 +32,7 @@ RSpec.describe 'Projects > Files > User replaces files', :js do
       expect(page).to have_content('.gitignore')
 
       click_on('Replace')
-      drop_in_dropzone(File.join(Rails.root, 'spec', 'fixtures', 'doc_sample.txt'))
+      attach_file('upload_file', File.join(Rails.root, 'spec', 'fixtures', 'doc_sample.txt'), make_visible: true)
 
       page.within('#modal-upload-blob') do
         fill_in(:commit_message, with: 'Replacement file commit message')
@@ -41,6 +40,7 @@ RSpec.describe 'Projects > Files > User replaces files', :js do
 
       click_button('Replace file')
 
+      # So here it's expected the file to be commited directly to master, not a new branch / MR
       expect(page).to have_content('Lorem ipsum dolor sit amet')
       expect(page).to have_content('Sed ut perspiciatis unde omnis')
       expect(page).to have_content('Replacement file commit message')
@@ -69,7 +69,7 @@ RSpec.describe 'Projects > Files > User replaces files', :js do
       expect(page).to have_content(fork_message)
 
       click_on('Replace')
-      drop_in_dropzone(File.join(Rails.root, 'spec', 'fixtures', 'doc_sample.txt'))
+      attach_file('upload_file', File.join(Rails.root, 'spec', 'fixtures', 'doc_sample.txt'), make_visible: true)
 
       page.within('#modal-upload-blob') do
         fill_in(:commit_message, with: 'Replacement file commit message')

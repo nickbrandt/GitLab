@@ -14,7 +14,8 @@
     .btn-group{ role: "group", class: ("gl-ml-3" if current_user) }>
       = render_if_exists 'projects/blob/header_file_locks_link'
       - if current_user
-        = replace_blob_link(@project, @ref, @path, blob: blob)
+        .js-replace-blob-app{ data: { commit_message: "Replace #{blob.name}", modal_title: "Replace #{blob.name}", path: @path, original_branch: @ref, target_branch: patch_branch_name(@ref), project_path: @project.full_path, escaped_ref: ActionDispatch::Journey::Router::Utils.escape_path(@ref) } }
+          = replace_blob_link(@project, @ref, @path, blob: blob)
         = delete_blob_link(@project, @ref, @path, blob: blob)
     .btn-group.gl-ml-3{ role: "group" }
       = copy_blob_source_button(blob) unless blame

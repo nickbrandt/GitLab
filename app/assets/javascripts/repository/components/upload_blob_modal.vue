@@ -75,6 +75,16 @@ export default {
       type: String,
       required: true,
     },
+    title: {
+      type: String,
+      required: false,
+      default: MODAL_TITLE,
+    },
+    uploadButtonText: {
+      type: String,
+      required: false,
+      default: PRIMARY_OPTIONS_TEXT,
+    },
   },
   data() {
     return {
@@ -90,7 +100,7 @@ export default {
   computed: {
     primaryOptions() {
       return {
-        text: PRIMARY_OPTIONS_TEXT,
+        text: this.uploadButtonText,
         attributes: [
           {
             variant: 'confirm',
@@ -175,7 +185,7 @@ export default {
   <gl-form>
     <gl-modal
       :modal-id="modalId"
-      :title="$options.i18n.MODAL_TITLE"
+      :title="title"
       :action-primary="primaryOptions"
       :action-cancel="cancelOptions"
       @primary.prevent="uploadFile"
