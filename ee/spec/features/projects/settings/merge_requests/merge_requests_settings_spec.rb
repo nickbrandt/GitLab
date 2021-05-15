@@ -26,7 +26,6 @@ RSpec.describe 'EE > Projects > Settings > Merge requests', :js do
   end
 
   it 'adds approver' do
-
     open_modal(text: 'Add approval rule', expand: false)
     open_approver_select
 

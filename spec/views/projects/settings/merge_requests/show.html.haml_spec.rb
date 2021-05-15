@@ -37,7 +37,7 @@ RSpec.describe 'projects/settings/merge_requests/show' do
       render
 
       expect(rendered).to have_content _('Merge requests')
-      expect(rendered).to have_content _('Display alerts from all configured monitoring tools.')
+      expect(rendered).to have_content _('Choose your merge method, merge options, merge checks, merge suggestions, and set up a default description template for merge requests.')
     end
   end
 end

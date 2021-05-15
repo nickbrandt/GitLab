@@ -151,6 +151,7 @@ module Sidebars
 
         def merge_requests_menu_item
           return unless Feature.enabled?(:sidebar_refactor, context.current_user)
+          return unless context.project.merge_requests_enabled?
 
           ::Sidebars::MenuItem.new(
             title: _('Merge requests'),

@@ -34,6 +34,7 @@ module Projects
 
       def merge_requests_settings_enabled!
         render_404 unless Feature.enabled?(:sidebar_refactor, current_user)
+        render_404 unless @project.merge_requests_enabled?
       end
 
       def project_params(attributes: [])
