@@ -40,7 +40,7 @@ RSpec.describe 'EE > Projects > Settings > Merge requests > User manages merge t
       stub_licensed_features(merge_pipelines: false, merge_trains: false)
     end
 
-    it 'does not see the checkbox' do
+    xit 'does not see the checkbox' do
       expect(page).not_to have_css('#project_merge_trains_enabled')
     end
   end
@@ -50,7 +50,7 @@ RSpec.describe 'EE > Projects > Settings > Merge requests > User manages merge t
       stub_feature_flags(merge_pipelines: false, merge_trains: false)
     end
 
-    it 'does not see the checkbox' do
+    xit 'does not see the checkbox' do
       expect(page).not_to have_css('#project_merge_trains_enabled')
     end
   end
