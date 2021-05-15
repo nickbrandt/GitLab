@@ -5,14 +5,14 @@ require 'spec_helper'
 RSpec.describe 'Projects > Settings > Merge requests' do
   include ProjectForksHelper
 
-  let(:project) { create(:project_empty_repo) }
   let(:user) { create(:user) }
-  let(:role) { :maintainer }
+  let(:project) { create(:project, :public, namespace: user.namespace, path: 'gitlab', name: 'sample') }
 
   before do
     stub_feature_flags(sidebar_refactor: true)
-    project.add_role(user, role)
+
     sign_in(user)
+
     visit(project_settings_merge_requests_path(project))
   end
 
@@ -73,6 +73,8 @@ RSpec.describe 'Projects > Settings > Merge requests' do
     context 'when Pipelines are initially disabled', :js do
       before do
         project.project_feature.update_attribute('builds_access_level', ProjectFeature::DISABLED)
+
+        visit project_settings_merge_requests_path(project)
       end
 
       it 'shows the Merge Requests settings that do not depend on Builds feature' do
@@ -97,6 +99,8 @@ RSpec.describe 'Projects > Settings > Merge requests' do
   context 'when Merge Request are initially disabled', :js do
     before do
       project.project_feature.update_attribute('merge_requests_access_level', ProjectFeature::DISABLED)
+
+      visit(project_settings_merge_requests_path(project))
     end
 
     it 'does not show the Merge Requests settings' do
