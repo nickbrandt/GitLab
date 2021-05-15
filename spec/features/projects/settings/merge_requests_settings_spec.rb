@@ -10,6 +10,7 @@ RSpec.describe 'Projects > Settings > Merge requests' do
   let(:role) { :maintainer }
 
   before do
+    stub_feature_flags(sidebar_refactor: true)
     project.add_role(user, role)
     sign_in(user)
     visit(project_settings_merge_requests_path(project))
@@ -55,10 +56,14 @@ RSpec.describe 'Projects > Settings > Merge requests' do
         expect(page).to have_content 'Pipelines must succeed'
         expect(page).to have_content 'All discussions must be resolved'
 
+        visit edit_project_path(project)
+
         within('.sharing-permissions-form') do
           find('.project-feature-controls[data-for="project[project_feature_attributes][merge_requests_access_level]"] .gl-toggle').click
           find('input[value="Save changes"]').send_keys(:return)
         end
+
+        visit project_settings_merge_requests_path(project)
 
         expect(page).not_to have_content 'Pipelines must succeed'
         expect(page).not_to have_content 'All discussions must be resolved'
@@ -68,17 +73,20 @@ RSpec.describe 'Projects > Settings > Merge requests' do
     context 'when Pipelines are initially disabled', :js do
       before do
         project.project_feature.update_attribute('builds_access_level', ProjectFeature::DISABLED)
-        visit edit_project_path(project)
       end
 
       it 'shows the Merge Requests settings that do not depend on Builds feature' do
         expect(page).to have_content 'Pipelines must succeed'
         expect(page).to have_content 'All discussions must be resolved'
 
+        visit edit_project_path(project)
+
         within('.sharing-permissions-form') do
           find('.project-feature-controls[data-for="project[project_feature_attributes][builds_access_level]"] .gl-toggle').click
           find('input[value="Save changes"]').send_keys(:return)
         end
+
+        visit project_settings_merge_requests_path(project)
 
         expect(page).to have_content 'Pipelines must succeed'
         expect(page).to have_content 'All discussions must be resolved'
@@ -89,17 +97,20 @@ RSpec.describe 'Projects > Settings > Merge requests' do
   context 'when Merge Request are initially disabled', :js do
     before do
       project.project_feature.update_attribute('merge_requests_access_level', ProjectFeature::DISABLED)
-      visit edit_project_path(project)
     end
 
     it 'does not show the Merge Requests settings' do
       expect(page).not_to have_content 'Pipelines must succeed'
       expect(page).not_to have_content 'All discussions must be resolved'
 
+      visit edit_project_path(project)
+
       within('.sharing-permissions-form') do
         find('.project-feature-controls[data-for="project[project_feature_attributes][merge_requests_access_level]"] .gl-toggle').click
         find('input[value="Save changes"]').send_keys(:return)
       end
+
+      visit project_settings_merge_requests_path(project)
 
       expect(page).to have_content 'Pipelines must succeed'
       expect(page).to have_content 'All discussions must be resolved'
