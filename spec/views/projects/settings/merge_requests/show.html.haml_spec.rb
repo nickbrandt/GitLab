@@ -40,28 +40,4 @@ RSpec.describe 'projects/settings/merge_requests/show' do
       expect(rendered).to have_content _('Display alerts from all configured monitoring tools.')
     end
   end
-
-  describe 'Operations > Prometheus' do
-    context 'when settings_operations_prometheus_service flag is enabled' do
-      it 'renders the Operations Settings page' do
-        render
-
-        expect(rendered).to have_content _('Prometheus')
-        expect(rendered).to have_content _('Link Prometheus monitoring to GitLab.')
-        expect(rendered).to have_content _('To enable the installation of Prometheus on your clusters, deactivate the manual configuration.')
-      end
-    end
-
-    context 'when settings_operations_prometheus_service is disabled' do
-      before do
-        stub_feature_flags(settings_operations_prometheus_service: false)
-      end
-
-      it 'renders the Operations Settings page' do
-        render
-
-        expect(rendered).not_to have_content _('Auto configuration settings are used unless you override their values here.')
-      end
-    end
-  end
 end
