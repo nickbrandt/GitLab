@@ -142,6 +142,12 @@ RSpec.describe 'Project navbar' do
         }
       )
 
+      insert_after_sub_nav_item(
+        _('Repository'),
+        within: _('Settings'),
+        new_sub_nav_item_name: _('Merge requests')
+      )
+
       visit project_path(project)
     end
 
