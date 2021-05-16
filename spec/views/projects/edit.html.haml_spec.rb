@@ -10,6 +10,8 @@ RSpec.describe 'projects/edit' do
   let(:user) { create(:admin) }
 
   before do
+    stub_feature_flags(sidebar_refactor: false)
+
     assign(:project, project)
 
     allow(controller).to receive(:current_user).and_return(user)
@@ -109,6 +111,32 @@ RSpec.describe 'projects/edit' do
 
         expect(rendered).to have_content('Remove fork relationship')
         expect(rendered).to have_link(source_project.full_name, href: project_path(source_project))
+      end
+    end
+  end
+
+  context 'with :sidebar_refactor' do
+    context 'enabled' do
+      before do
+        stub_feature_flags(sidebar_refactor: true)
+      end
+
+      it 'does not render merge request settings' do
+        render
+
+        expect(rendered).not_to have_content('Merge requests')
+      end
+    end
+
+    context 'disabled' do
+      before do
+        stub_feature_flags(sidebar_refactor: false)
+      end
+
+      it 'renders merge request settings' do
+        render
+
+        expect(rendered).to have_content('Merge requests')
       end
     end
   end
