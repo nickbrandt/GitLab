@@ -14731,6 +14731,7 @@ CREATE TABLE merge_requests (
     squash_commit_sha bytea,
     sprint_id bigint,
     merge_ref_sha bytea,
+    draft boolean DEFAULT false NOT NULL,
     CONSTRAINT check_970d272570 CHECK ((lock_version IS NOT NULL))
 );
 
