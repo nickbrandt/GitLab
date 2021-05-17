@@ -257,12 +257,12 @@ rm go1.13.5.linux-amd64.tar.gz
 
 ## 4. Node
 
-In GitLab 8.17 and later, GitLab requires the use of Node to compile JavaScript
+GitLab requires the use of Node to compile JavaScript
 assets, and Yarn to manage JavaScript dependencies. The current minimum
 requirements for these are:
 
-- `node` >= v10.14.2. (We recommend node 14.x as it is faster)
-- `yarn` >= v1.10.0.
+- `node` >= v12.22.1. (We recommend node 14.x as it is faster)
+- `yarn` = v1.22.x (Yarn 2 is not supported yet)
 
 In many distributions,
 the versions provided by the official package repositories are out of date, so
