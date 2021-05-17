@@ -56,8 +56,8 @@ On some systems you may need to install an additional package (for example,
 
 ## Typical failure scenarios
 
-The following is an example of a new GitLab installation failing because the extension hasn't been installed
-first.
+The following is an example of a new GitLab installation failing because the extension hasn't been
+installed first.
 
 ```shell
 ---- Begin output of "bash"  "/tmp/chef-script20210513-52940-d9b1gs" ----
@@ -91,8 +91,8 @@ This query will grant the user superuser permissions, ensuring any database exte
 can be installed through migrations.
 ```
 
-In order to recover from failed migrations, the extension needs to be installed manually using a superuser, and
-the GitLab upgrade completed by [re-running the database migrations](../administration/raketasks/maintenance.md#run-incomplete-database-migrations):
+To recover from failed migrations, the extension must be installed manually by a superuser, and the
+GitLab upgrade completed by [re-running the database migrations](../administration/raketasks/maintenance.md#run-incomplete-database-migrations):
 
 ```shell
 sudo gitlab-rake db:migrate

@@ -143,21 +143,28 @@ but we can't guarantee compatibility.
 
 #### Exclusive use of GitLab databases
 
-Databases created or used for GitLab, Geo, Gitaly Cluster or other components
-should be for the exclusive use of GitLab. Do not make direct changes to the database,
-schemas, users or other properties except when following procedures in the GitLab documentation
-or following the directions of GitLab Support or other GitLab engineers.
+Databases created or used for GitLab, Geo, Gitaly Cluster, or other components should be for the
+exclusive use of GitLab. Do not make direct changes to the database, schemas, users, or other
+properties except when following procedures in the GitLab documentation or following the directions
+of GitLab Support or other GitLab engineers.
 
-- The main GitLab application currently uses three schemas: the default `public` schema, plus it
-will automatically create `gitlab_partitions_static` and `gitlab_partitions_dynamic`.
-No other schemas should be manually created.
-- GitLab may create new schemas as part of Rails database migrations. This will happen when performing
-a GitLab upgrade. The GitLab database account requires access to do this.
-- GitLab creates and modifies tables during the upgrade process, and also as part
-of normal operations to manage partitioned tables.
-- You should not modify the GitLab schema, for example adding triggers, modifying tables.
-Database migrations are tested against the schema definition in the GitLab code base. GitLab version
-upgrades may fail if the schema is modified.
+- The main GitLab application currently uses three schemas:
+
+  - The default `public` schema
+  - `gitlab_partitions_static` (automatically created)
+  - `gitlab_partitions_dynamic` (automatically created)
+
+  No other schemas should be manually created.
+
+- GitLab may create new schemas as part of Rails database migrations. This happens when performing
+  a GitLab upgrade. The GitLab database account requires access to do this.
+
+- GitLab creates and modifies tables during the upgrade process, and also as part of normal
+  operations to manage partitioned tables.
+
+- You should not modify the GitLab schema (for example, adding triggers or modifying tables).
+  Database migrations are tested against the schema definition in the GitLab code base. GitLab
+  version upgrades may fail if the schema is modified.
 
 ## Puma settings
 
