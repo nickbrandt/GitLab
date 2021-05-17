@@ -62,11 +62,11 @@ export default {
         dropdown.show();
       }
     },
-    handleUpdating(updating) {
-      if (!updating) {
+    handleUpdating(isMutationInProgress) {
+      if (!isMutationInProgress) {
         this.$emit('alert-update');
       }
-      this.isUpdating = updating;
+      this.isUpdating = isMutationInProgress;
     },
   },
 };

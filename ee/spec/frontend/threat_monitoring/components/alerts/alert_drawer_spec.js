@@ -167,7 +167,6 @@ describe('Alert Drawer', () => {
     createWrapper({ props: { selectedAlert: mockAlerts[0] } });
     expect(wrapper.emitted('alert-update')).toBeUndefined();
     findStatus().vm.$emit('alert-update');
-    await wrapper.vm.$nextTick();
     expect(wrapper.emitted('alert-update')).toEqual([[]]);
   });
 });

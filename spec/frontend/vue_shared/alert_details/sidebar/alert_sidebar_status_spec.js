@@ -125,7 +125,6 @@ describe('Alert Details Sidebar Status', () => {
         mountComponent({ sidebarCollapsed: false });
         expect(wrapper.emitted('alert-update')).toBeUndefined();
         findAlertStatus().vm.$emit('handle-updating');
-        await wrapper.vm.$nextTick();
         expect(wrapper.emitted('alert-update')).toEqual([[]]);
       });
 
