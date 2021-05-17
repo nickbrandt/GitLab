@@ -252,9 +252,9 @@ RSpec.describe ApplicationSetting do
 
     context "when user accepted let's encrypt terms of service" do
       before do
-        expect {
+        expect do
           setting.update!(lets_encrypt_terms_of_service_accepted: true)
-        }.to raise_error(ActiveRecord::RecordInvalid, "Validation failed: Lets encrypt notification email can't be blank")
+        end.to raise_error(ActiveRecord::RecordInvalid, "Validation failed: Lets encrypt notification email can't be blank")
       end
 
       it { is_expected.not_to allow_value(nil).for(:lets_encrypt_notification_email) }
@@ -304,17 +304,17 @@ RSpec.describe ApplicationSetting do
 
     describe 'default_artifacts_expire_in' do
       it 'sets an error if it cannot parse' do
-        expect {
+        expect do
           setting.update!(default_artifacts_expire_in: 'a')
-        }.to raise_error(ActiveRecord::RecordInvalid, "Validation failed: Default artifacts expire in is not a correct duration")
+        end.to raise_error(ActiveRecord::RecordInvalid, "Validation failed: Default artifacts expire in is not a correct duration")
 
         expect_invalid
       end
 
       it 'sets an error if it is blank' do
-        expect {
+        expect do
           setting.update!(default_artifacts_expire_in: ' ')
-        }.to raise_error(ActiveRecord::RecordInvalid, "Validation failed: Default artifacts expire in can't be blank")
+        end.to raise_error(ActiveRecord::RecordInvalid, "Validation failed: Default artifacts expire in can't be blank")
 
         expect_invalid
       end
@@ -427,9 +427,9 @@ RSpec.describe ApplicationSetting do
 
         context 'with an invalid value' do
           before do
-            expect {
+            expect do
               setting.update!(auto_devops_domain: 'definitelynotahostname')
-            }.to raise_error(ActiveRecord::RecordInvalid, "Validation failed: Auto devops domain is not a fully qualified domain name")
+            end.to raise_error(ActiveRecord::RecordInvalid, "Validation failed: Auto devops domain is not a fully qualified domain name")
           end
 
           it 'is invalid' do

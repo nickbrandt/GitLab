@@ -14,6 +14,7 @@ RSpec.describe ApplicationRecord do
   describe '.safe_ensure_unique' do
     let(:model) { build(:suggestion) }
     let_it_be(:note) { create(:diff_note_on_merge_request) }
+
     let(:klass) { model.class }
 
     before do
