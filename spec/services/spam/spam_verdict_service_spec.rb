@@ -116,7 +116,7 @@ RSpec.describe Spam::SpamVerdictService do
     end
 
     context 'records metrics' do
-      let(:histogram) { double('histogram') }
+      let(:histogram) { instance_double(Prometheus::Client::Histogram) }
 
       using RSpec::Parameterized::TableSyntax
 
