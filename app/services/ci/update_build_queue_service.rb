@@ -14,6 +14,8 @@ module Ci
     # Add a build to the pending builds queue
     #
     def push(build, transition)
+      return unless maintain_pending_builds_queue?
+
       raise InvalidQueueTransition unless transition.to == 'pending'
 
       transition.within_transaction do
@@ -27,6 +29,8 @@ module Ci
     # Remove a build from the pending builds queue
     #
     def pop(build, transition)
+      return unless maintain_pending_builds_queue?
+
       raise InvalidQueueTransition unless transition.from == 'pending'
 
       transition.within_transaction do
@@ -60,6 +64,10 @@ module Ci
 
         runner.pick_build!(build)
       end
+    end
+
+    def maintain_pending_builds_queue?
+      Feature.enabled?(:ci_pending_builds_queue_maintain, default_enabled: :yaml)
     end
   end
 end
