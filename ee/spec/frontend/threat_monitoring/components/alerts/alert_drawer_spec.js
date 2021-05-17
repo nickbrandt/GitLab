@@ -163,7 +163,7 @@ describe('Alert Drawer', () => {
     });
   });
 
-  it('handles an alert status update', async () => {
+  it('handles an alert status update', () => {
     createWrapper({ props: { selectedAlert: mockAlerts[0] } });
     expect(wrapper.emitted('alert-update')).toBeUndefined();
     findStatus().vm.$emit('alert-update');
