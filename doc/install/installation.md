@@ -218,12 +218,6 @@ below to use a system Ruby.
 Linux distributions generally have older versions of Ruby available, so these
 instructions are designed to install Ruby from the official source code.
 
-Remove the old Ruby 1.8 if present:
-
-```shell
-sudo apt-get remove ruby1.8
-```
-
 Download Ruby and compile it:
 
 ```shell
