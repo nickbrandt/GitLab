@@ -912,6 +912,8 @@ In Omnibus installations:
 1. Save the file and [reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure)
    for the changes to take effect.
 
+1. [Migrate existing Pages deployments to object storage.](#migrate-pages-deployments-to-object-storage)
+
 In installations from source:
 
 1. Edit `/home/git/gitlab/config/gitlab.yml` and add or amend the following lines:
@@ -930,6 +932,8 @@ In installations from source:
 
 1. Save the file and [restart GitLab](../restart_gitlab.md#installations-from-source)
    for the changes to take effect.
+
+1. [Migrate existing Pages deployments to object storage.](#migrate-pages-deployments-to-object-storage)
 
 ## ZIP storage
 
@@ -1031,6 +1035,27 @@ If you use [object storage](#using-object-storage), disable local storage:
 1. [Reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
 
 Starting from GitLab 13.12, this setting also disables the [legacy storage](#migrate-legacy-storage-to-zip-storage), so if you were using NFS to serve Pages, you can completely disconnect from it.
+
+## Migrate GitLab Pages to 14.0
+
+In GitLab 14.0 a number of breaking changes are introduced which may require some user intervention.
+The steps below describe the best way to migrate without causing any downtime for your GitLab instance.
+
+If you run GitLab on a single server, then most likely you will not notice any problem after
+upgrading to GitLab 14.0, but it may be safer to follow the steps anyway.
+If you run GitLab on a single server, then most likely the upgrade process to 14.0 will go smoothly for you. Regardless, we recommend everyone follow the migration steps to ensure a successful upgrade.
+If at any point you run into issues, consult the [troubleshooting section](#troubleshooting).
+
+To migrate GitLab Pages to GitLab 14.0:
+
+1. If your current GitLab version is lower than 13.12, then you first need to upgrade to 13.12.
+Upgrading directly to 14.0 may cause downtime for some web-sites hosted on GitLab Pages
+until you finish the following steps.
+1. Enable the [API-based configuration](#gitlab-api-based-configuration), which
+is the default starting from GitLab 14.0. Skip this step if you're already running GitLab 14.0 or above.
+1. If you want to store your pages content in the [object storage](#using-object-storage), make sure to configure it.
+If you want to store the pages content locally or continue using an NFS server, skip this step.
+1. [Migrate legacy storage to ZIP storage.](#migrate-legacy-storage-to-zip-storage)
 
 ## Backup
 
