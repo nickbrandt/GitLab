@@ -19,17 +19,19 @@ module Gitlab
         end
 
         DEFAULT_SIZE_LIMIT = 0
+        DEFAULT_COMPRESION_THRESHOLD_BYTES = 100_000 # 100kb
 
         MODES = [
           TRACK_MODE = 'track',
-          RAISE_MODE = 'raise'
+          COMPRESS_MODE = 'compress'
         ].freeze
 
-        attr_reader :mode, :size_limit
+        attr_reader :mode, :size_limit, :compression_threshold
 
         def initialize(
           worker_class, job,
           mode: ENV['GITLAB_SIDEKIQ_SIZE_LIMITER_MODE'],
+          compression_threshold: ENV['GITLAB_SIDEKIQ_SIZE_LIMITER_COMPRESSION_THRESHOLD_BYTES'],
           size_limit: ENV['GITLAB_SIDEKIQ_SIZE_LIMITER_LIMIT_BYTES']
         )
           @worker_class = worker_class
@@ -41,6 +43,11 @@ module Gitlab
             @mode = TRACK_MODE
           end
 
+          @compression_threshold = (compression_threshold || DEFAULT_COMPRESION_THRESHOLD_BYTES).to_i
+          if @compression_threshold < 0
+            ::Sidekiq.logger.warn "Invalid Sidekiq size limiter compression threshold: #{@compression_threshold}"
+          end
+
           @size_limit = (size_limit || DEFAULT_SIZE_LIMIT).to_i
           if @size_limit < 0
             ::Sidekiq.logger.warn "Invalid Sidekiq size limiter limit: #{@size_limit}"
@@ -49,17 +56,18 @@ module Gitlab
 
         def validate!
           return unless @size_limit > 0
-
           return if allow_big_payload?
-          return if job_size <= @size_limit
 
-          exception = ExceedLimitError.new(@worker_class, job_size, @size_limit)
+          job_args = compress_if_necessary(::Sidekiq.dump_json(@job['args']))
+          return if job_args.bytesize <= @size_limit
+
+          exception = ExceedLimitError.new(@worker_class, job_args.bytesize, @size_limit)
           # This should belong to Gitlab::ErrorTracking. We'll remove this
           # after this epic is done:
           # https://gitlab.com/groups/gitlab-com/gl-infra/-/epics/396
           exception.set_backtrace(backtrace)
 
-          if raise_mode?
+          if compress_mode?
             raise exception
           else
             track(exception)
@@ -68,11 +76,10 @@ module Gitlab
 
         private
 
-        def job_size
-          # This maynot be the optimal solution, but can be acceptable solution
-          # for now. Internally, Sidekiq calls Sidekiq.dump_json everywhere.
-          # There is no clean way to intefere to prevent double serialization.
-          @job_size ||= ::Sidekiq.dump_json(@job).bytesize
+        def compress_if_necessary(job_args)
+          return job_args if !compress_mode? || job_args.bytesize < @compression_threshold
+
+          ::Gitlab::SidekiqMiddleware::SizeLimiter::Compressor.compress(@job, job_args)
         end
 
         def allow_big_payload?
@@ -80,8 +87,8 @@ module Gitlab
           worker_class.respond_to?(:big_payload?) && worker_class.big_payload?
         end
 
-        def raise_mode?
-          @mode == RAISE_MODE
+        def compress_mode?
+          @mode == COMPRESS_MODE
         end
 
         def track(exception)
