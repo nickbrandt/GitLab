@@ -24,33 +24,32 @@ module Tooling
         'config/metrics/schema.json'
       ].freeze
 
-      def add_missing_labels
-        return unless helper.ci?
+      def missing_labels
+        return [] unless helper.ci?
 
         labels = []
         labels << 'product intelligence' unless helper.mr_has_labels?('product intelligence')
         labels << 'product intelligence::review pending' unless helper.mr_has_labels?(WORKFLOW_LABELS)
 
-        return unless labels.any?
-
-        gitlab.api.update_merge_request(gitlab.mr_json['project_id'],
-                                        gitlab.mr_json['iid'],
-                                        add_labels: labels)
-
+        labels
       end
 
-      def matching_changed_files(all_changed_files)
+      def matching_changed_files
         tracking_changed_files = all_changed_files & TRACKING_FILES
         usage_data_changed_files = all_changed_files.grep(%r{(usage_data)})
 
         usage_data_changed_files + tracking_changed_files + metrics_changed_files + dictionary_changed_file + snowplow_changed_files
       end
 
-      def dictionary_changes_empty?
+      def need_dictionary_changes?
         required_dictionary_update_changed_files.any? && dictionary_changed_file.empty?
       end
 
       private
+
+      def all_changed_files
+        helper.all_changed_files
+      end
 
       def dictionary_changed_file
         all_changed_files.grep(%r{(doc/development/usage_ping/dictionary.md)})
