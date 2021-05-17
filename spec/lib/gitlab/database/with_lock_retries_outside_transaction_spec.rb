@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe Gitlab::Database::WithLockRetries do
+RSpec.describe Gitlab::Database::WithLockRetriesOutsideTransaction do
   let(:env) { {} }
   let(:logger) { Gitlab::Database::WithLockRetries::NULL_LOGGER }
   let(:subject) { described_class.new(env: env, logger: logger, timing_configuration: timing_configuration) }
@@ -150,26 +150,12 @@ RSpec.describe Gitlab::Database::WithLockRetries do
           ]
         end
 
-        context 'when there is no outer transaction: disable_ddl_transaction! is set in the migration' do
-          it 'does not disable the lock_timeout' do
-            allow(ActiveRecord::Base.connection).to receive(:transaction_open?).and_return(false)
-            allow(subject).to receive(:run_block_with_lock_timeout).once.and_raise(ActiveRecord::LockWaitTimeout)
+        it 'disables the lock_timeout' do
+          allow(subject).to receive(:run_block_with_lock_timeout).once.and_raise(ActiveRecord::LockWaitTimeout)
 
-            expect(subject).not_to receive(:disable_lock_timeout)
+          expect(subject).to receive(:disable_lock_timeout)
 
-            subject.run {}
-          end
-        end
-
-        context 'when there is outer transaction: disable_ddl_transaction! is not set in the migration' do
-          it 'disables the lock_timeout' do
-            allow(ActiveRecord::Base.connection).to receive(:transaction_open?).and_return(true)
-            allow(subject).to receive(:run_block_with_lock_timeout).once.and_raise(ActiveRecord::LockWaitTimeout)
-
-            expect(subject).to receive(:disable_lock_timeout)
-
-            subject.run {}
-          end
+          subject.run {}
         end
       end
 
@@ -211,16 +197,16 @@ RSpec.describe Gitlab::Database::WithLockRetries do
       end
 
       context 'when statement timeout is reached' do
-        it 'raises QueryCanceled error' do
+        it 'raises StatementInvalid error' do
           lock_acquired = false
-          ActiveRecord::Base.connection.execute("SET LOCAL statement_timeout='100ms'")
+          ActiveRecord::Base.connection.execute("SET statement_timeout='100ms'")
 
           expect do
             subject.run do
               ActiveRecord::Base.connection.execute("SELECT 1 FROM pg_sleep(0.11)") # 110ms
               lock_acquired = true
             end
-          end.to raise_error(ActiveRecord::QueryCanceled)
+          end.to raise_error(ActiveRecord::StatementInvalid)
 
           expect(lock_acquired).to eq(false)
         end
@@ -241,11 +227,9 @@ RSpec.describe Gitlab::Database::WithLockRetries do
   context 'casting durations correctly' do
     let(:timing_configuration) { [[0.015.seconds, 0.025.seconds], [0.015.seconds, 0.025.seconds]] } # 15ms, 25ms
 
-    it 'executes `SET LOCAL lock_timeout` using the configured timeout value in milliseconds' do
-      expect(ActiveRecord::Base.connection).to receive(:execute).with("SAVEPOINT active_record_1").and_call_original
+    it 'executes `SET lock_timeout` using the configured timeout value in milliseconds' do
       expect(ActiveRecord::Base.connection).to receive(:execute).with('RESET idle_in_transaction_session_timeout; RESET lock_timeout').and_call_original
-      expect(ActiveRecord::Base.connection).to receive(:execute).with("SET LOCAL lock_timeout TO '15ms'").and_call_original
-      expect(ActiveRecord::Base.connection).to receive(:execute).with("RELEASE SAVEPOINT active_record_1").and_call_original
+      expect(ActiveRecord::Base.connection).to receive(:execute).with("SET lock_timeout TO '15ms'").and_call_original
 
       subject.run { }
     end
