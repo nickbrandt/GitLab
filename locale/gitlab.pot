@@ -978,6 +978,9 @@ msgstr ""
 msgid "%{user_name} profile page"
 msgstr ""
 
+msgid "%{username} changed the draft status of merge request %{mr_link}"
+msgstr ""
+
 msgid "%{username} has asked for a GitLab account on your instance %{host}:"
 msgstr ""
 
