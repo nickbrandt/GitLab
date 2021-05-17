@@ -6,17 +6,33 @@ info: To determine the technical writer assigned to the Stage/Group associated w
 
 # Queue routing rules **(FREE SELF)**
 
+When the number of Sidekiq jobs increases to a certain scale, the system faces
+some scalability issues. One of them is the length of the queue tends to get
+longer. High-urgency jobs have to wait longer until other less urgent jobs
+finish. This head-of-line blocking situation may eventually affect the
+responsiveness of the system, especially critical actions. In another scenario,
+the performances of some jobs are degraded due to other CPU-intensive jobs
+(computing or rendering ones) in the same machine.
+
+To encounter the aforementioned issues, one effective solution is to split
+Sidekiq jobs into different queues and assign machines handling each queue
+exclusively. For example, all CPU-intensive jobs are routed to `cpu-bound`
+queue and handled by a fleet of AWS CPU optimized instances. The queue topology
+differs between companies depending on the workloads and usage patterns.
+Therefore, GitLab supports a flexible mechanism for the administrator to route
+the jobs based on their characteristics.
+
 Opposed to [Queue selector](extra_sidekiq_processes.md#queue-selector), which
 allows watching a set of workers or queues when starting a Sidekiq cluster,
-GitLab also supports routing a job from a worker to a desirable queue before it
+GitLab also supports routing a job from a worker to the desired queue before it
 is scheduled. Sidekiq clients try to match a job against a configured list of
 routing rules. Rules are evaluated from first to last, and as soon as we find a
 match for a given worker we stop processing for that worker (first match wins).
-If the worker doesn't match any rule, it falls back the queue name generated
+If the worker doesn't match any rule, it falls back to the queue name generated
 from the worker name.
 
 By default, the routing rules are not configured (or denoted with an empty
-array), all the jobs are routed to the queue generated form the worker name.
+array), all the jobs are routed to the queue generated from the worker name.
 
 ## Example configuration
 
@@ -69,10 +85,9 @@ components:
 
 - [Introduced](https://gitlab.com/gitlab-com/gl-infra/scalability/-/issues/261) in GitLab 13.1, `tags`.
 
-From the [list of all available
-attributes](https://gitlab.com/gitlab-org/gitlab/-/blob/master/app/workers/all_queues.yml),
-`queue_selector` or from the workers directly, allows selecting of queues by
-the following attributes:
+Queue matching query works upon the worker attributes, described in [Sidekiq
+style guide](../../development/sidekiq_style_guide.md). We support querying
+based on a subset of worker attributes:
 
 - `feature_category` - the [GitLab feature
   category](https://about.gitlab.com/direction/maturity/#category-maturity) the
@@ -104,6 +119,12 @@ false.
 `!=` checks for disjoint sets. For example, `tags=a,b` selects queues
 that have tags `a`, `b`, or both. `tags!=a,b` selects queues that have
 neither of those tags.
+
+The attributes of each worker are hard-coded in the source code. For
+convenience, we generate [list of all available attributes in
+FOSS](https://gitlab.com/gitlab-org/gitlab/-/blob/master/app/workers/all_queues.yml)
+and [list of all available attributes in
+EE](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/app/workers/all_queues.yml).
 
 ### Available operators
 
