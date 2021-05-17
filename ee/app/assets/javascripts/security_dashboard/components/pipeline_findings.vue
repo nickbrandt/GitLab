@@ -111,7 +111,12 @@ export default {
 
 <template>
   <div>
-    <gl-alert v-if="errorLoadingFindings" class="mb-4" variant="danger" @dismiss="onErrorDismiss">
+    <gl-alert
+      v-if="errorLoadingFindings"
+      class="gl-mb-6"
+      variant="danger"
+      @dismiss="onErrorDismiss"
+    >
       {{
         s__(
           'SecurityReports|Error fetching the vulnerability list. Please check your network connection and try again.',
@@ -127,7 +132,7 @@ export default {
     />
     <gl-intersection-observer
       v-if="pageInfo.hasNextPage"
-      class="text-center"
+      class="gl-text-center"
       @appear="fetchNextPage"
     >
       <gl-loading-icon v-if="isLoadingQuery" size="md" />

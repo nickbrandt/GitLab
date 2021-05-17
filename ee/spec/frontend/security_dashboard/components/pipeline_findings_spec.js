@@ -39,6 +39,12 @@ describe('Pipeline findings', () => {
     });
   };
 
+  const createWrapperWithApollo = (resolver) => {
+    return createWrapper({
+      apolloProvider: createMockApollo([[pipelineFindingsQuery, resolver]]),
+    });
+  };
+
   const findIntersectionObserver = () => wrapper.find(GlIntersectionObserver);
   const findAlert = () => wrapper.find(GlAlert);
   const findVulnerabilityList = () => wrapper.find(VulnerabilityList);
@@ -61,14 +67,10 @@ describe('Pipeline findings', () => {
 
   describe('with findings', () => {
     beforeEach(() => {
-      createWrapper({
-        apolloProvider: createMockApollo([
-          [pipelineFindingsQuery, jest.fn().mockResolvedValue(mockPipelineFindingsResponse())],
-        ]),
-      });
+      createWrapperWithApollo(jest.fn().mockResolvedValue(mockPipelineFindingsResponse()));
     });
 
-    it('does not show the loading state', () => {
+    it('passes false as the loading state prop', () => {
       expect(findVulnerabilityList().props('isLoading')).toBe(false);
     });
 
@@ -86,14 +88,9 @@ describe('Pipeline findings', () => {
 
   describe('with multiple page findings', () => {
     beforeEach(() => {
-      createWrapper({
-        apolloProvider: createMockApollo([
-          [
-            pipelineFindingsQuery,
-            jest.fn().mockResolvedValue(mockPipelineFindingsResponse({ hasNextPage: true })),
-          ],
-        ]),
-      });
+      createWrapperWithApollo(
+        jest.fn().mockResolvedValue(mockPipelineFindingsResponse({ hasNextPage: true })),
+      );
     });
 
     it('shows the insersection loader', () => {
@@ -103,11 +100,7 @@ describe('Pipeline findings', () => {
 
   describe('with failed query', () => {
     beforeEach(() => {
-      createWrapper({
-        apolloProvider: createMockApollo([
-          [pipelineFindingsQuery, jest.fn().mockRejectedValue(new Error('GrahpQL error'))],
-        ]),
-      });
+      createWrapperWithApollo(jest.fn().mockRejectedValue(new Error('GrahpQL error')));
     });
 
     it('does not show the vulnerability list', () => {
