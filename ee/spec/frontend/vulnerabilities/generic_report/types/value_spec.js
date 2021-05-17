@@ -10,7 +10,7 @@ describe('ee/vulnerabilities/components/generic_report/types/value.vue', () => {
     ${'number'}  | ${8}             | ${'8'}
     ${'boolean'} | ${true}          | ${'true'}
     ${'boolean'} | ${false}         | ${'false'}
-  `('with data for $card', ({ fieldType, value, printValue }) => {
+  `('with value of type "$fieldType"', ({ fieldType, value, printValue }) => {
     const createWrapper = () => {
       return shallowMount(Text, {
         propsData: {
@@ -29,7 +29,7 @@ describe('ee/vulnerabilities/components/generic_report/types/value.vue', () => {
       wrapper.destroy();
     });
 
-    it(`renders ${fieldType} type`, () => {
+    it(`renders "${printValue}"`, () => {
       expect(wrapper.text()).toBe(printValue);
     });
   });
