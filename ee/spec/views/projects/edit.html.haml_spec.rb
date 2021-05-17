@@ -7,6 +7,8 @@ RSpec.describe 'projects/edit' do
   let(:user) { create(:admin) }
 
   before do
+    stub_feature_flags(sidebar_refactor: false)
+
     assign(:project, project)
 
     allow(controller).to receive(:current_user).and_return(user)

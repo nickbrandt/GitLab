@@ -10,8 +10,6 @@ RSpec.describe 'EE > Projects > Settings > Merge requests > User manages approva
   let(:project_features) { {} }
 
   before do
-    stub_feature_flags(sidebar_refactor: true)
-
     sign_in(user)
     stub_licensed_features(licensed_features)
 

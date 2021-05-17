@@ -9,8 +9,6 @@ RSpec.describe Projects::Settings::MergeRequestsController do
   let_it_be(:public_project) { create(:project, :public, :repository, namespace: group) }
 
   before do
-    stub_feature_flags(sidebar_refactor: true)
-
     project.add_maintainer(user)
     sign_in(user)
   end

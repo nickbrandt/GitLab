@@ -7,7 +7,6 @@ RSpec.describe 'EE > Projects > Settings > Merge requests > User manages merge p
   let(:user) { create(:user) }
 
   before do
-    stub_feature_flags(sidebar_refactor: true)
     stub_licensed_features(merge_pipelines: true)
 
     project.add_maintainer(user)
