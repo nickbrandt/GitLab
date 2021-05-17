@@ -369,7 +369,7 @@ in a comment or description field.
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/17589) in GitLab 13.3.
 
 Assignees in the sidebar are updated in real time. This feature is **disabled by default**.
-To enable it, you need to enable [ActionCable in-app mode](https://docs.gitlab.com/omnibus/settings/actioncable.html).
+To enable it, you need to enable [Action Cable in-app mode](https://docs.gitlab.com/omnibus/settings/actioncable.html).
 
 ## Similar issues
 
