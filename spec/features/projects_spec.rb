@@ -374,6 +374,8 @@ RSpec.describe 'Project' do
     let(:path) { edit_project_path(project) }
 
     before do
+      stub_feature_flags(sidebar_refactor: false)
+
       project.add_maintainer(user)
       sign_in(user)
       visit path

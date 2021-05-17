@@ -8,6 +8,8 @@ RSpec.describe 'Projects > Settings > User manages merge request settings' do
   let(:project) { create(:project, :public, namespace: user.namespace, path: 'gitlab', name: 'sample') }
 
   before do
+    stub_feature_flags(sidebar_refactor: false)
+
     sign_in(user)
     visit edit_project_path(project)
   end

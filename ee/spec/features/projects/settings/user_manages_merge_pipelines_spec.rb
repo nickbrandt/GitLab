@@ -7,6 +7,7 @@ RSpec.describe 'User manages merge pipelines option', :js do
   let(:user) { create(:user) }
 
   before do
+    stub_feature_flags(sidebar_refactor: false)
     stub_licensed_features(merge_pipelines: true)
 
     project.add_maintainer(user)

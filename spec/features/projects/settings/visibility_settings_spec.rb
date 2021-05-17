@@ -8,6 +8,8 @@ RSpec.describe 'Projects > Settings > Visibility settings', :js do
 
   context 'as owner' do
     before do
+      stub_feature_flags(sidebar_refactor: false)
+
       sign_in(user)
       visit edit_project_path(project)
     end
@@ -77,6 +79,8 @@ RSpec.describe 'Projects > Settings > Visibility settings', :js do
     let(:maintainer_user) { create(:user) }
 
     before do
+      stub_feature_flags(sidebar_refactor: false)
+
       project.add_maintainer(maintainer_user)
       sign_in(maintainer_user)
       visit edit_project_path(project)

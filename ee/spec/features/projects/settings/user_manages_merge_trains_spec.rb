@@ -7,6 +7,7 @@ RSpec.describe 'User manages merge trains option', :js do
   let_it_be(:user) { create(:user) }
 
   before do
+    stub_feature_flags(sidebar_refactor: false)
     stub_licensed_features(merge_pipelines: true, merge_trains: true)
 
     project.update!(merge_pipelines_enabled: true)

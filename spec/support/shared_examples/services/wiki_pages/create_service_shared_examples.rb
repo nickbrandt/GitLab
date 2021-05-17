@@ -40,6 +40,10 @@ RSpec.shared_examples 'WikiPages::CreateService#execute' do |container_type|
   end
 
   shared_examples 'correct event created' do
+    before do
+      stub_feature_flags(sidebar_refactor: false)
+    end
+
     it 'creates appropriate events' do
       # TODO: https://gitlab.com/gitlab-org/gitlab/-/issues/216904
       pending('group wiki support') if container_type == :group

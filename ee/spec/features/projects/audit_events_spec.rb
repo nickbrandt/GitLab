@@ -135,6 +135,8 @@ RSpec.describe 'Projects > Audit Events', :js do
 
   describe 'changing merge request approval permission for authors and reviewers' do
     before do
+      stub_feature_flags(sidebar_refactor: false)
+
       project.add_developer(pete)
     end
 

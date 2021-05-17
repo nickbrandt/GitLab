@@ -10,6 +10,8 @@ RSpec.describe 'EE > Projects > Settings > User manages approval rule settings' 
   let(:project_features) { {} }
 
   before do
+    stub_feature_flags(sidebar_refactor: false)
+
     sign_in(user)
     stub_licensed_features(licensed_features)
 

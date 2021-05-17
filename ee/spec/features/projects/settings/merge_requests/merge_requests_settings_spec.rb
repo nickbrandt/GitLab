@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'spec_helper'
 
 RSpec.describe 'EE > Projects > Settings > Merge requests', :js do
@@ -14,7 +15,6 @@ RSpec.describe 'EE > Projects > Settings > Merge requests', :js do
   let_it_be(:modal_selector) { '#project-settings-approvals-create-modal' }
 
   before do
-    stub_feature_flags(sidebar_refactor: true)
     stub_licensed_features(compliance_approval_gates: true)
 
     sign_in(user)
@@ -90,6 +90,64 @@ RSpec.describe 'EE > Projects > Settings > Merge requests', :js do
       wait_for_requests
 
       expect_avatar(find('.js-members'), [non_group_approver])
+    end
+  end
+
+  xit 'adds a status check' do
+    visit project_settings_merge_requests_path(project)
+
+    open_modal(text: 'Add approval rule', expand: false)
+
+    within('.modal-content') do
+      find('button', text: "Users or groups").click
+      find('button', text: "Status check").click
+
+      find('[data-qa-selector="rule_name_field"]').set('My new rule')
+      find('[data-qa-selector="external_url_field"]').set('https://api.gitlab.com')
+
+      click_button 'Add approval rule'
+    end
+
+    wait_for_requests
+
+    expect(first('.js-name')).to have_content('My new rule')
+  end
+
+  context 'with a status check' do
+    let_it_be(:rule) { create(:external_approval_rule, project: project) }
+
+    xit 'updates the status check' do
+      visit project_settings_merge_requests_path(project)
+
+      expect(first('.js-name')).to have_content(rule.name)
+
+      open_modal(text: 'Edit', expand: false)
+
+      within('.modal-content') do
+        find('[data-qa-selector="rule_name_field"]').set('Something new')
+
+        click_button 'Update approval rule'
+      end
+
+      wait_for_requests
+
+      expect(first('.js-name')).to have_content('Something new')
+    end
+
+    xit 'removes the status check' do
+      visit project_settings_merge_requests_path(project)
+
+      expect(first('.js-name')).to have_content(rule.name)
+
+      first('.js-controls').find('[data-testid="remove-icon"]').click
+
+      within('.modal-content') do
+        click_button 'Remove status check'
+      end
+
+      wait_for_requests
+
+      expect(first('.js-name')).not_to have_content(rule.name)
     end
   end
 

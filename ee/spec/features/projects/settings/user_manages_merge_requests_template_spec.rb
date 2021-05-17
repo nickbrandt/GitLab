@@ -7,6 +7,8 @@ RSpec.describe 'EE > Projects > Settings > User manages merge requests template'
   let(:project) { create(:project, :public, :repository, namespace: user.namespace) }
 
   before do
+    stub_feature_flags(sidebar_refactor: false)
+
     sign_in(user)
     visit edit_project_path(project)
   end

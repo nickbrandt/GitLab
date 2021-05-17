@@ -9,8 +9,6 @@ RSpec.describe 'Projects > Settings > Merge requests' do
   let(:project) { create(:project, :public, namespace: user.namespace, path: 'gitlab', name: 'sample') }
 
   before do
-    stub_feature_flags(sidebar_refactor: true)
-
     sign_in(user)
 
     visit(project_settings_merge_requests_path(project))

@@ -7,7 +7,6 @@ RSpec.describe 'Disable Merge Trains Setting', :js do
   let_it_be(:user) { create(:user) }
 
   before do
-    stub_feature_flags(sidebar_refactor: false)
     stub_licensed_features(merge_pipelines: true, merge_trains: true)
 
     project.add_maintainer(user)
@@ -37,7 +36,7 @@ RSpec.describe 'Disable Merge Trains Setting', :js do
     with_them do
       before do
         project.update!(merge_pipelines_enabled: merge_pipelines_setting, merge_trains_enabled: merge_trains_setting)
-        visit edit_project_path(project)
+        visit project_settings_merge_requests_path(project)
         wait_for_requests
       end
 
@@ -48,7 +47,7 @@ RSpec.describe 'Disable Merge Trains Setting', :js do
   context 'when merge pipelines is enabled' do
     before do
       project.update!(merge_pipelines_enabled: true)
-      visit edit_project_path(project)
+      visit project_settings_merge_requests_path(project)
       wait_for_requests
     end
 
@@ -82,7 +81,7 @@ RSpec.describe 'Disable Merge Trains Setting', :js do
   context 'when merge pipelines is disabled' do
     before do
       project.update!(merge_pipelines_enabled: false)
-      visit edit_project_path(project)
+      visit project_settings_merge_requests_path(project)
       wait_for_requests
     end
 
@@ -106,7 +105,7 @@ RSpec.describe 'Disable Merge Trains Setting', :js do
   context 'when both merge pipelines and merge trains are enabled' do
     before do
       project.update!(merge_pipelines_enabled: true, merge_trains_enabled: true)
-      visit edit_project_path(project)
+      visit project_settings_merge_requests_path(project)
       wait_for_requests
     end
 

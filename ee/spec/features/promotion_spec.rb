@@ -14,6 +14,8 @@ RSpec.describe 'Promotions', :js do
 
   describe 'for merge request improve', :js do
     before do
+      stub_feature_flags(sidebar_refactor: false)
+
       allow(License).to receive(:current).and_return(nil)
       stub_application_setting(check_namespace_plan: false)
 

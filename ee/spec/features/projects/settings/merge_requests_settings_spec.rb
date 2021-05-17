@@ -14,6 +14,7 @@ RSpec.describe 'Project settings > [EE] Merge Requests', :js do
   let_it_be(:modal_selector) { '#project-settings-approvals-create-modal' }
 
   before do
+    stub_feature_flags(sidebar_refactor: false)
     stub_licensed_features(compliance_approval_gates: true)
     sign_in(user)
     project.add_maintainer(user)
