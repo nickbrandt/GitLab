@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-require 'spec_helper'
-require 'rake'
+require 'rake_helper'
 
 RSpec.describe 'gitlab:app namespace rake task', :delete do
   let(:enable_registry) { true }
@@ -24,14 +23,10 @@ RSpec.describe 'gitlab:app namespace rake task', :delete do
 
   before(:all) do
     Rake.application.rake_require 'active_record/railties/databases'
-    Rake.application.rake_require 'tasks/gitlab/helpers'
     Rake.application.rake_require 'tasks/gitlab/backup'
     Rake.application.rake_require 'tasks/gitlab/shell'
     Rake.application.rake_require 'tasks/gitlab/db'
     Rake.application.rake_require 'tasks/cache'
-
-    # empty task as env is already loaded
-    Rake::Task.define_task :environment
   end
 
   before do
@@ -39,6 +34,7 @@ RSpec.describe 'gitlab:app namespace rake task', :delete do
     FileUtils.rm(tars_glob, force: true)
     FileUtils.rm(backup_files, force: true)
     FileUtils.rm_rf(backup_directories, secure: true)
+    FileUtils.mkdir_p('tmp/tests/public/uploads')
     reenable_backup_sub_tasks
     stub_container_registry_config(enabled: enable_registry)
   end
@@ -47,12 +43,7 @@ RSpec.describe 'gitlab:app namespace rake task', :delete do
     FileUtils.rm(tars_glob, force: true)
     FileUtils.rm(backup_files, force: true)
     FileUtils.rm_rf(backup_directories, secure: true)
-  end
-
-  def run_rake_task(task_name)
-    FileUtils.mkdir_p('tmp/tests/public/uploads')
-    Rake::Task[task_name].reenable
-    Rake.application.invoke_task task_name
+    FileUtils.rm_rf('tmp/tests/public/uploads', secure: true)
   end
 
   def reenable_backup_sub_tasks
