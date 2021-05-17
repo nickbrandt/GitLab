@@ -377,8 +377,6 @@ RSpec.describe Ci::Build do
   describe '#enqueue_preparing' do
     let(:build) { create(:ci_build, :preparing) }
 
-    subject { build.enqueue_preparing }
-
     before do
       allow(build).to receive(:any_unmet_prerequisites?).and_return(has_unmet_prerequisites)
     end
@@ -387,9 +385,10 @@ RSpec.describe Ci::Build do
       let(:has_unmet_prerequisites) { false }
 
       it 'transitions to pending' do
-        subject
+        build.enqueue_preparing
 
         expect(build).to be_pending
+        expect(build.queuing_entry).to be_present
       end
     end
 
@@ -397,9 +396,10 @@ RSpec.describe Ci::Build do
       let(:has_unmet_prerequisites) { true }
 
       it 'remains in preparing' do
-        subject
+        build.enqueue_preparing
 
         expect(build).to be_preparing
+        expect(build.queuing_entry).not_to be_present
       end
     end
   end
@@ -425,6 +425,18 @@ RSpec.describe Ci::Build do
         expect(build.actionize).to be false
         expect(build.reload).to be_pending
       end
+    end
+  end
+
+  describe '#run' do
+    let(:build) { create(:ci_build, :created) }
+
+    it 'creates queuing entry and then removes it' do
+      build.enqueue!
+      expect(build.queuing_entry).to be_present
+
+      build.run!
+      expect(build.reload.queuing_entry).not_to be_present
     end
   end
 
