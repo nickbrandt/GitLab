@@ -20,7 +20,7 @@ class CreateIndexOnNotesNote < ActiveRecord::Migration[6.0]
   end
 
   def down
-    remove_concurrent_index_by_name :notes, DUPLICATE_INDEX_NAME
     add_concurrent_index :notes, :note, name: CURRENT_INDEX_NAME, using: :gin, opclass: :gin_trgm_ops
+    remove_concurrent_index_by_name :notes, DUPLICATE_INDEX_NAME
   end
 end
