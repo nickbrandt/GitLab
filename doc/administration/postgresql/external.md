@@ -19,11 +19,12 @@ If you use a cloud-managed service, or provide your own PostgreSQL instance:
    [database requirements document](../../install/requirements.md#database).
 1. Set up a `gitlab` user with a password of your choice, create the `gitlabhq_production` database, and make the user an owner of the database. You can see an example of this setup in the [installation from source documentation](../../install/installation.md#6-database).
 1. If you are using a cloud-managed service, you may need to grant additional
-   roles to your `gitlab` user. This is for the installation of plugins during installation
-   and upgrades. As an alternative, [ensure the plugins are installed manually,
-   and read about the problems that may arise during future GitLab upgrades](../../install/postgresql_extensions.md).
+   roles to your `gitlab` user:
    - Amazon RDS requires the [`rds_superuser`](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Appendix.PostgreSQL.CommonDBATasks.html#Appendix.PostgreSQL.CommonDBATasks.Roles) role.
    - Azure Database for PostgreSQL requires the [`azure_pg_admin`](https://docs.microsoft.com/en-us/azure/postgresql/howto-create-users#how-to-create-additional-admin-users-in-azure-database-for-postgresql) role.
+
+   This is for the installation of plugins during installation and upgrades. As an alternative,
+   [ensure the plugins are installed manually, and read about the problems that may arise during future GitLab upgrades](../../install/postgresql_extensions.md).
 
 1. Configure the GitLab application servers with the appropriate connection details
    for your external PostgreSQL service in your `/etc/gitlab/gitlab.rb` file:
