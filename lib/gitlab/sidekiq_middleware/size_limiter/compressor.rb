@@ -30,18 +30,21 @@ module Gitlab
         def self.decompress(job)
           return unless compressed?(job)
 
+          validate_args!(job)
+
+          job.except!(ORIGINAL_SIZE_KEY, COMPRESSED_KEY)
+          job['args'] = Sidekiq.load_json(Zlib::Inflate.inflate(Base64.strict_decode64(job['args'].first)))
+        rescue Zlib::Error
+          raise PayloadDecompressionError, 'Fail to decompress Sidekiq job payload'
+        end
+
+        def self.validate_args!(job)
           if job['args'] && job['args'].length != 1
             exception = PayloadDecompressionConflictError.new('Sidekiq argument list should include 1 argument.\
                                                               There should be a middleware interferes the job payload.\
                                                               That conflicts with the payload compressor')
             ::Gitlab::ErrorTracking.track_and_raise_for_dev_exception(exception)
           end
-
-          job.delete(ORIGINAL_SIZE_KEY)
-          job.delete(COMPRESSED_KEY)
-          job['args'] = Sidekiq.load_json(Zlib::Inflate.inflate(Base64.strict_decode64(job['args'].first)))
-        rescue Zlib::Error
-          raise PayloadDecompressionError, 'Fail to decompress Sidekiq job payload'
         end
       end
     end
