@@ -895,22 +895,26 @@ When you want to ensure that no event got called, you can use `expect_no_snowplo
   end
 ```
 
-#### Test Snowplow context with the schema
+#### Test Snowplow context against the schema
 
-We added a [snowplow schema matcher](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/60480)
-which accepts `schema path` and the `context`.
+The [Snowplow schema matcher](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/60480)
+helps to reduce validation errors by testing Snowplow context against the JSON schema.
+The schema matcher accepts the following parameters:
 
-We performed following steps to add a schema matcher spec:
+- `schema path`
+- `context`
 
-1. After adding a new schema in [Iglu repository](https://gitlab.com/gitlab-org/iglu),
-copy the same schema to `spec/fixtures/product_intelligence/` directory.
-1. From the schema, remove `"$schema"` key and value. We do not need it for specs
-and spec fails if we keep the key as it tries to look for the schema in the URL.
-1. Use the following snippet to call the matcher:
+To add a schema matcher spec:
 
-```ruby
-match_snowplow_context_schema(schema_path: '<filename from step 1>', context: <Context Hash> )
-```
+1. Add a new schema to the [Iglu repository](https://gitlab.com/gitlab-org/iglu),
+   then copy the same schema to the `spec/fixtures/product_intelligence/` directory.
+1. In the copied schema, remove the `"$schema"` key and value. We do not need it for specs
+   and the spec fails if we keep the key, as it tries to look for the schema in the URL.
+1. Use the following snippet to call the schema matcher:
+
+   ```ruby
+   match_snowplow_context_schema(schema_path: '<filename from step 1>', context: <Context Hash> )
+   ```
 
 ### Table-based / Parameterized tests
 
