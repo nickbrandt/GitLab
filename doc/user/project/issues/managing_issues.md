@@ -62,7 +62,7 @@ When you're creating a new issue, these are the fields you can fill in:
 - Checkbox to make the issue confidential
 - Assignee
 - Weight
-- Epic **(PREMIUM)**
+- [Epic](../../group/epics/index.md)
 - Due date
 - Milestone
 - Labels
@@ -402,5 +402,4 @@ This marks issues as progressing as planned or needs attention to keep on schedu
 After an issue is closed, its health status can't be edited and the **Edit** button becomes disabled
 until the issue is reopened.
 
-You can then see issue statuses in the issues list and the
-[epic tree](../../group/epics/index.md#issue-health-status-in-epic-tree).
+You can then see issue statuses in the issues list and the epic tree.
