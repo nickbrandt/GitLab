@@ -104,16 +104,6 @@ RSpec.describe Gitlab::Analytics::CycleAnalytics::DataCollector do
       expect(round_to_days(data_collector.median.seconds)).to eq(10)
     end
 
-    describe '#duration_chart_data' do
-      subject { data_collector.duration_chart_data }
-
-      it 'loads data ordered by event time' do
-        days = subject.map { |item| round_to_days(item.duration_in_seconds) }
-
-        expect(days).to eq([15, 10, 5])
-      end
-    end
-
     describe '#duration_chart_average_data' do
       subject { data_collector.duration_chart_average_data }
 
