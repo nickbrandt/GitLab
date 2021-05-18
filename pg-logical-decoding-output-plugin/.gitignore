@@ -1,0 +1,22 @@
+# Object files
+*.o
+
+# Libraries
+*.lib
+*.a
+
+# LLVM bitcode
+*.bc
+
+# Shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+*.dylib
+
+# Executables
+*.exe
+*.app
+
+# Dependencies
+.deps
