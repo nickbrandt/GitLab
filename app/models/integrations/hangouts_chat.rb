@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'hangouts_chat'
-
 module Integrations
   class HangoutsChat < BaseChatNotification
     include ActionView::Helpers::UrlHelper
