@@ -91,7 +91,7 @@ RSpec.describe Gitlab::SidekiqMiddleware::SizeLimiter::Compressor do
     context 'job payload is not compressed' do
       let(:payload) { base_payload.merge("args" => ['hello']) }
 
-      it 'reserves the payload after decompression' do
+      it 'preserves the payload after decompression' do
         original_payload = payload.deep_dup
 
         described_class.decompress(payload)

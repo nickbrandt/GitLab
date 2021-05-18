@@ -41,7 +41,7 @@ module Gitlab
         def self.validate_args!(job)
           if job['args'] && job['args'].length != 1
             exception = PayloadDecompressionConflictError.new('Sidekiq argument list should include 1 argument.\
-                                                              There should be a middleware interferes the job payload.\
+                                                              This means that there is another a middleware interfering with the job payload.\
                                                               That conflicts with the payload compressor')
             ::Gitlab::ErrorTracking.track_and_raise_exception(exception)
           end
