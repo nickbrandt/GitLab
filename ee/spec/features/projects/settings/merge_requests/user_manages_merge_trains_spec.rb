@@ -6,8 +6,11 @@ RSpec.describe 'EE > Projects > Settings > Merge requests > User manages merge t
   let_it_be(:project, refind: true) { create(:project) }
   let_it_be(:user) { create(:user) }
 
+  let(:merge_pipelines) { true }
+  let(:merge_trains) { true }
+
   before do
-    stub_licensed_features(merge_pipelines: true, merge_trains: true)
+    stub_licensed_features(merge_pipelines: merge_pipelines, merge_trains: merge_trains)
 
     project.update!(merge_pipelines_enabled: true)
     project.add_maintainer(user)
@@ -35,21 +38,11 @@ RSpec.describe 'EE > Projects > Settings > Merge requests > User manages merge t
   end
 
   context 'when license is insufficient' do
-    before do
-      stub_licensed_features(merge_pipelines: false, merge_trains: false)
-    end
+    let(:merge_pipelines) { false }
+    let(:merge_trains) { false }
 
-    xit 'does not see the checkbox' do
-      expect(page).not_to have_css('#project_merge_trains_enabled')
-    end
-  end
-
-  context 'when feature flag is disabled' do
-    before do
-      stub_feature_flags(merge_pipelines: false, merge_trains: false)
-    end
-
-    xit 'does not see the checkbox' do
+    it 'does not see the checkbox' do
+      binding.pry
       expect(page).not_to have_css('#project_merge_trains_enabled')
     end
   end
