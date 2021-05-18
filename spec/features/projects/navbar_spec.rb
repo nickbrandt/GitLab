@@ -28,6 +28,14 @@ RSpec.describe 'Project navbar' do
         new_sub_nav_item_name: _('Labels')
       )
 
+      insert_after_nav_item(
+        _('Snippets'),
+        new_nav_item: {
+          nav_item: _('Members'),
+          nav_sub_items: []
+        }
+      )
+
       stub_config(registry: { enabled: false })
     end
 
@@ -107,7 +115,8 @@ RSpec.describe 'Project navbar' do
         nav_item: _('Project information'),
         nav_sub_items: [
           _('Activity'),
-          _('Labels')
+          _('Labels'),
+          _('Members')
         ]
       }
     end
