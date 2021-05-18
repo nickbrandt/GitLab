@@ -142,7 +142,7 @@ module EE
         field :incident_management_escalation_policy,
               ::Types::IncidentManagement::EscalationPolicyType,
               null: true,
-              description: 'Incident Management escalation policies of the project.',
+              description: 'Incident Management escalation policy of the project.',
               resolver: ::Resolvers::IncidentManagement::EscalationPoliciesResolver.single
 
         field :api_fuzzing_ci_configuration,
