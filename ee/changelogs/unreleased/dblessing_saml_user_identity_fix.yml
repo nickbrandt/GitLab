@@ -1,5 +1,5 @@
 ---
 title: Remove unncessary group SAML identity assignment
-merge_request:
+merge_request: 61921
 author:
 type: fixed
