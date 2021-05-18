@@ -44,7 +44,7 @@ RSpec.describe Ci::UpdateBuildQueueService do
 
     context 'when duplicate entry exists' do
       before do
-        ::Ci::PendingBuild.create(build: build, project: project)
+        ::Ci::PendingBuild.create!(build: build, project: project)
       end
 
       it 'does nothing and returns updated build id' do
@@ -71,7 +71,7 @@ RSpec.describe Ci::UpdateBuildQueueService do
       it 'removes pending build in a transaction' do
         dequeued = subject.pop(build, transition)
 
-        expect(dequeued).to be true
+        expect(dequeued).to eq build.id
       end
 
       it 'increments queue pop metric' do
@@ -89,7 +89,7 @@ RSpec.describe Ci::UpdateBuildQueueService do
       it 'does nothing if there is no pending build to remove' do
         dequeued = subject.pop(build, transition)
 
-        expect(dequeued).to be false
+        expect(dequeued).to be_nil
       end
     end
 
