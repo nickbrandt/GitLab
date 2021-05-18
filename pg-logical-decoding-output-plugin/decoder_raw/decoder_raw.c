@@ -28,7 +28,7 @@
 #include "utils/relcache.h"
 #include "utils/syscache.h"
 #include "utils/typcache.h"
-
+#include "utils/guc.h"
 
 PG_MODULE_MAGIC;
 
@@ -43,6 +43,7 @@ typedef struct
 {
 	MemoryContext context;
 	bool		include_transaction;
+	int             project_id_filter;
 } DecoderRawData;
 
 static void decoder_raw_startup(LogicalDecodingContext *ctx,
@@ -91,6 +92,7 @@ decoder_raw_startup(LogicalDecodingContext *ctx, OutputPluginOptions *opt,
 										  "Raw decoder context",
 										  ALLOCSET_DEFAULT_SIZES);
 	data->include_transaction = false;
+	data->project_id_filter = 0;
 
 	ctx->output_plugin_private = data;
 
@@ -135,6 +137,17 @@ decoder_raw_startup(LogicalDecodingContext *ctx, OutputPluginOptions *opt,
 						(errcode(ERRCODE_INVALID_PARAMETER_VALUE),
 						 errmsg("Incorrect value \"%s\" for parameter \"%s\"",
 								format, elem->defname)));
+		}
+		else if (strcmp(elem->defname, "project_id_filter") == 0)
+		{
+			/* if option does not provide a value, it means its value is 0 (ignored) */
+			if (elem->arg == NULL)
+				data->project_id_filter = 0;
+			else if (!parse_int(strVal(elem->arg), &data->project_id_filter, 0, NULL))
+				ereport(ERROR,
+						(errcode(ERRCODE_INVALID_PARAMETER_VALUE),
+						 errmsg("could not parse value \"%s\" for parameter \"%s\"",
+								strVal(elem->arg), elem->defname)));
 		}
 		else
 		{
@@ -301,6 +314,40 @@ print_value(StringInfo s, Datum origval, Oid typid, bool isnull)
 		Datum		val;
 		val = PointerGetDatum(PG_DETOAST_DATUM(origval));
 		print_literal(s, typid, OidOutputFunctionCall(typoutput, val));
+	}
+}
+
+static char *string_value_of_datum(Datum origval, Oid typid, bool isnull)
+{
+	Oid					typoutput;
+	bool				typisvarlena;
+
+	/* Query output function */
+	getTypeOutputInfo(typid,
+					  &typoutput, &typisvarlena);
+
+	/* Print value */
+	if (isnull)
+		return "null";
+	else if (typisvarlena && VARATT_IS_EXTERNAL_ONDISK(origval))
+	{
+		/*
+		 * This should not happen, the column and its value can be skipped
+		 * properly. This code is let on purpose to avoid any traps in this
+		 * area in the future, generating useless queries in non-assert
+		 * builds.
+		 */
+		Assert(0);
+		return "unchanged-toast-datum";
+	}
+	else if (!typisvarlena)
+		return OidOutputFunctionCall(typoutput, origval);
+	else
+	{
+		/* Definitely detoasted Datum */
+		Datum		val;
+		val = PointerGetDatum(PG_DETOAST_DATUM(origval));
+		return OidOutputFunctionCall(typoutput, val);
 	}
 }
 
@@ -490,7 +537,8 @@ static void
 decoder_raw_update(StringInfo s,
 				   Relation relation,
 				   HeapTuple oldtuple,
-				   HeapTuple newtuple)
+				   HeapTuple newtuple,
+				   int project_id_filter)
 {
 	TupleDesc		tupdesc = RelationGetDescr(relation);
 	int				natt;
@@ -519,6 +567,7 @@ decoder_raw_update(StringInfo s,
 		if (attr->attisdropped || attr->attnum < 0)
 			continue;
 
+
 		/* Get Datum from tuple */
 		origval = heap_getattr(newtuple, natt + 1, tupdesc, &isnull);
 
@@ -546,6 +595,15 @@ decoder_raw_update(StringInfo s,
 
 		/* Get output function */
 		print_value(s, origval, attr->atttypid, isnull);
+
+		if (strcmp(NameStr(attr->attname), "project_id") == 0) {
+			int project_id = -1;
+			parse_int(string_value_of_datum(origval, attr->atttypid, isnull), &project_id, 0, NULL);
+			if (project_id != project_id_filter) {
+				resetStringInfo(s);
+				return;
+			}
+		}
 	}
 
 	/* Print WHERE clause */
@@ -607,7 +665,9 @@ decoder_raw_change(LogicalDecodingContext *ctx, ReorderBufferTXN *txn,
 				decoder_raw_update(ctx->out,
 								   relation,
 								   oldtuple,
-								   newtuple);
+								   newtuple,
+								   data->project_id_filter
+								   );
 				OutputPluginWrite(ctx, true);
 			}
 			break;
