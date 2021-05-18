@@ -507,11 +507,11 @@ RSpec.describe 'layouts/nav/sidebar/_project' do
     end
   end
 
-  describe 'Operations' do
+  describe 'Monitor' do
     it 'top level navigation link is visible for user with permissions' do
       render
 
-      expect(rendered).to have_link('Operations')
+      expect(rendered).to have_link('Monitor')
     end
 
     describe 'Metrics Dashboard' do
@@ -705,7 +705,7 @@ RSpec.describe 'layouts/nav/sidebar/_project' do
       it 'does not have a link to the environments page' do
         render
 
-        expect(page.at_css('.shortcuts-operations').parent.css('[aria-label="Environments"]')).to be_empty
+        expect(page.at_css('.shortcuts-monitor').parent.css('[aria-label="Environments"]')).to be_empty
       end
 
       context 'when feature flag :sidebar_refactor is disabled' do
@@ -738,7 +738,7 @@ RSpec.describe 'layouts/nav/sidebar/_project' do
       it 'does not have a link to the feature flags page' do
         render
 
-        expect(page.at_css('.shortcuts-operations').parent.css('[aria-label="Feature Flags"]')).to be_empty
+        expect(page.at_css('.shortcuts-monitor').parent.css('[aria-label="Feature Flags"]')).to be_empty
       end
 
       context 'when feature flag :sidebar_refactor is disabled' do
@@ -1173,24 +1173,24 @@ RSpec.describe 'layouts/nav/sidebar/_project' do
       end
     end
 
-    describe 'Operations' do
+    describe 'Monitor' do
       context 'when project is archived' do
         before do
           project.update!(archived: true)
         end
 
-        it 'does not have a link to the Operations settings' do
+        it 'does not have a link to the Monitor settings' do
           render
 
-          expect(rendered).not_to have_link('Operations', href: project_settings_operations_path(project))
+          expect(rendered).not_to have_link('Monitor', href: project_settings_operations_path(project))
         end
       end
 
       context 'when project is not archived active' do
-        it 'has a link to the Operations settings' do
+        it 'has a link to the Monitor settings' do
           render
 
-          expect(rendered).to have_link('Operations', href: project_settings_operations_path(project))
+          expect(rendered).to have_link('Monitor', href: project_settings_operations_path(project))
         end
       end
     end

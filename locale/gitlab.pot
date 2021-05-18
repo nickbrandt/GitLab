@@ -21409,6 +21409,12 @@ msgstr ""
 msgid "Monday"
 msgstr ""
 
+msgid "Monitor"
+msgstr ""
+
+msgid "Monitor Settings"
+msgstr ""
+
 msgid "Monitor your errors by integrating with Sentry."
 msgstr ""
 
