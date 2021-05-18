@@ -248,8 +248,8 @@ properties once, and handle the actual animation with transforms.
 
 ### Prefetching assets
 
-In addition to prefetching data from the [API](./graphql.md#making-initial-queries-early-with-graphql-startup-calls)
-we allow prefetching the named Javascript "chunks" as
+In addition to prefetching data from the [API](graphql.md#making-initial-queries-early-with-graphql-startup-calls)
+we allow prefetching the named JavaScript "chunks" as
 [defined in the Webpack configuration](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/webpack.config.js#L298-359).
 We support two types of prefetching for the chunks:
 
@@ -261,12 +261,12 @@ We support two types of prefetching for the chunks:
 
 Both `prefetch` and `preload` links bring the loading performance benefit to the pages. Both are 
 fetched asynchronously, but contrary to [deferring the loading](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script#attr-defer)
-of the assets which is used for other javascript resources in the product by default, `prefetch` and
-`preload` neither parse nor execute the fetched script unless explicitly imported in any javascript 
+of the assets which is used for other JavaScript resources in the product by default, `prefetch` and
+`preload` neither parse nor execute the fetched script unless explicitly imported in any JavaScript 
 module. This allows to cache the fetched resources without blocking the execution of the 
 remaining page resources.
 
-To prefetch a Javascript chunk in a HAML view, `:prefetch_asset_tags` with the combination of 
+To prefetch a JavaScript chunk in a HAML view, `:prefetch_asset_tags` with the combination of 
 the `webpack_preload_asset_tag` helper is provided:
 
 ```javascript
@@ -281,7 +281,7 @@ This snippet will add a new `<link rel="preload">` element into the resulting HT
 ```
 
 By default, `webpack_preload_asset_tag` will `preload` the chunk. You don't need to worry about 
-`as` and `type` attributes for preloading the Javascript chunks. However, when a chunk is not 
+`as` and `type` attributes for preloading the JavaScript chunks. However, when a chunk is not 
 critical, for the current navigation, one has to explicitly request `prefetch`:
 
 ```javascript
