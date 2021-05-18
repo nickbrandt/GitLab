@@ -96,15 +96,35 @@ RSpec.describe Gitlab::SidekiqMiddleware::SizeLimiter::Validator do
         expect(::Sidekiq.logger).not_to receive(:warn)
 
         described_class.new(TestSizeLimiterWorker, job_payload, compression_threshold: 300)
-        described_class.new(TestSizeLimiterWorker, job_payload, compression_threshold: 0)
+        described_class.new(TestSizeLimiterWorker, job_payload, compression_threshold: 1)
       end
     end
 
-    context 'when the compression threshold is invalid' do
+    context 'when the compression threshold is negative' do
       it 'logs a warning message' do
         expect(::Sidekiq.logger).to receive(:warn).with('Invalid Sidekiq size limiter compression threshold: -1')
 
         described_class.new(TestSizeLimiterWorker, job_payload, compression_threshold: -1)
+      end
+
+      it 'falls back to the default' do
+        validator = described_class.new(TestSizeLimiterWorker, job_payload, compression_threshold: -1)
+
+        expect(validator.compression_threshold).to be(100_000)
+      end
+    end
+
+    context 'when the compression threshold is zero' do
+      it 'logs a warning message' do
+        expect(::Sidekiq.logger).to receive(:warn).with('Invalid Sidekiq size limiter compression threshold: 0')
+
+        described_class.new(TestSizeLimiterWorker, job_payload, compression_threshold: 0)
+      end
+
+      it 'falls back to the default' do
+        validator = described_class.new(TestSizeLimiterWorker, job_payload, compression_threshold: 0)
+
+        expect(validator.compression_threshold).to be(100_000)
       end
     end
 

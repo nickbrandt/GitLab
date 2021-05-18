@@ -119,7 +119,7 @@ RSpec.describe Gitlab::SidekiqMiddleware::SizeLimiter::Compressor do
     context 'job payload is compressed with a different level' do
       let(:payload) do
         base_payload.merge(
-          'args' => ['eNqLVspIzcnJV9JRKs8vyklRigUAMq0FqQ=='],
+          'args' => [Base64.strict_encode64(Zlib::Deflate.deflate(Sidekiq.dump_json(%w[hello world]), 9))],
           'compressed' => true
         )
       end
@@ -141,7 +141,7 @@ RSpec.describe Gitlab::SidekiqMiddleware::SizeLimiter::Compressor do
       end
 
       it 'tracks the conflicting exception' do
-        expect(::Gitlab::ErrorTracking).to receive(:track_and_raise_for_dev_exception).with(
+        expect(::Gitlab::ErrorTracking).to receive(:track_and_raise_exception).with(
           be_a(::Gitlab::SidekiqMiddleware::SizeLimiter::Compressor::PayloadDecompressionConflictError)
         )
 

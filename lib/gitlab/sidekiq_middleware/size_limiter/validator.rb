@@ -73,8 +73,9 @@ module Gitlab
 
         def set_compression_threshold(compression_threshold)
           @compression_threshold = (compression_threshold || DEFAULT_COMPRESION_THRESHOLD_BYTES).to_i
-          if @compression_threshold < 0
+          if @compression_threshold <= 0
             ::Sidekiq.logger.warn "Invalid Sidekiq size limiter compression threshold: #{@compression_threshold}"
+            @compression_threshold = DEFAULT_COMPRESION_THRESHOLD_BYTES
           end
         end
 
@@ -95,7 +96,8 @@ module Gitlab
         end
 
         def compress_if_necessary(job_args)
-          return job_args if !compress_mode? || job_args.bytesize < @compression_threshold
+          return job_args unless compress_mode?
+          return job_args if job_args.bytesize < @compression_threshold
 
           ::Gitlab::SidekiqMiddleware::SizeLimiter::Compressor.compress(@job, job_args)
         end

@@ -43,7 +43,7 @@ module Gitlab
             exception = PayloadDecompressionConflictError.new('Sidekiq argument list should include 1 argument.\
                                                               There should be a middleware interferes the job payload.\
                                                               That conflicts with the payload compressor')
-            ::Gitlab::ErrorTracking.track_and_raise_for_dev_exception(exception)
+            ::Gitlab::ErrorTracking.track_and_raise_exception(exception)
           end
         end
       end
