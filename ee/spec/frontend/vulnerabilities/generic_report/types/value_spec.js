@@ -5,12 +5,12 @@ describe('ee/vulnerabilities/components/generic_report/types/value.vue', () => {
   let wrapper;
 
   describe.each`
-    field type   | value            | printValue
-    ${'string'}  | ${'some string'} | ${'some string'}
-    ${'number'}  | ${8}             | ${'8'}
-    ${'boolean'} | ${true}          | ${'true'}
-    ${'boolean'} | ${false}         | ${'false'}
-  `('with value of type "$fieldType"', ({ fieldType, value, printValue }) => {
+    field type   | value
+    ${'string'}  | ${'some string'}
+    ${'number'}  | ${8}
+    ${'boolean'} | ${true}
+    ${'boolean'} | ${false}
+  `('with value of type "$fieldType"', ({ fieldType, value }) => {
     const createWrapper = () => {
       return shallowMount(Text, {
         propsData: {
@@ -29,8 +29,8 @@ describe('ee/vulnerabilities/components/generic_report/types/value.vue', () => {
       wrapper.destroy();
     });
 
-    it(`renders "${printValue}"`, () => {
-      expect(wrapper.text()).toBe(printValue);
+    it(`renders ${fieldType} type`, () => {
+      expect(wrapper.text()).toBe(value.toString());
     });
   });
 });
