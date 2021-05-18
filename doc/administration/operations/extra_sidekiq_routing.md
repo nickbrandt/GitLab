@@ -11,27 +11,27 @@ some scalability issues. One of them is the length of the queue tends to get
 longer. High-urgency jobs have to wait longer until other less urgent jobs
 finish. This head-of-line blocking situation may eventually affect the
 responsiveness of the system, especially critical actions. In another scenario,
-the performances of some jobs are degraded due to other CPU-intensive jobs
+the performance of some jobs is degraded due to other long running or CPU-intensive jobs
 (computing or rendering ones) in the same machine.
 
-To encounter the aforementioned issues, one effective solution is to split
+To counter the aforementioned issues, one effective solution is to split
 Sidekiq jobs into different queues and assign machines handling each queue
-exclusively. For example, all CPU-intensive jobs are routed to `cpu-bound`
-queue and handled by a fleet of AWS CPU optimized instances. The queue topology
-differs between companies depending on the workloads and usage patterns.
-Therefore, GitLab supports a flexible mechanism for the administrator to route
-the jobs based on their characteristics.
+exclusively. For example, all CPU-intensive jobs could be routed to the
+`cpu-bound` queue and handled by a fleet of CPU optimized instances. The queue
+topology differs between companies depending on the workloads and usage
+patterns. Therefore, GitLab supports a flexible mechanism for the
+administrator to route the jobs based on their characteristics.
 
-Opposed to [Queue selector](extra_sidekiq_processes.md#queue-selector), which
-allows watching a set of workers or queues when starting a Sidekiq cluster,
-GitLab also supports routing a job from a worker to the desired queue before it
+As an alternative to [Queue selector](extra_sidekiq_processes.md#queue-selector), which
+configures Sidekiq cluster to listen to a specific set of workers or queues,
+GitLab also supports routing a job from a worker to the desired queue when it
 is scheduled. Sidekiq clients try to match a job against a configured list of
 routing rules. Rules are evaluated from first to last, and as soon as we find a
 match for a given worker we stop processing for that worker (first match wins).
 If the worker doesn't match any rule, it falls back to the queue name generated
 from the worker name.
 
-By default, the routing rules are not configured (or denoted with an empty
+By default, if the routing rules are not configured (or denoted with an empty
 array), all the jobs are routed to the queue generated from the worker name.
 
 ## Example configuration
@@ -64,11 +64,12 @@ is nil, or an empty string, the worker is routed to the queue generated
 by the name of the worker instead.
 
 The query supports wildcard matching `*`, which matches all workers. As a
-result, the wildcard query must stay at the end of the list or the rules behind
+result, the wildcard query must stay at the end of the list or the rules after it
 are ignored.
 
-> Important: Queue routing rules are not compatible with Queue selector. Please
-> consider using either one of them.
+> Important: Mixing queue routing rules and queue selectors requires care to
+> ensure all jobs that are scheduled and picked up by appropriate Sidekiq
+> workers
 
 ## Worker matching query
 
@@ -172,3 +173,11 @@ feature_category=database&urgency=throttled
 # Match default and mailers queues
 queue=default|queue=mailers
 ```
+
+### Migration
+
+After the Sidekiq routing rules are changed, administrators need to take care
+with the migration to avoid losing jobs entirely, especially in a system with
+long queues of jobs. The migration can be done by following the migration steps
+mentioned in [Sidekiq job
+migration](../../raketasks/sidekiq_job_migration.md)
