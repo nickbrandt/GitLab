@@ -5,14 +5,18 @@ module Ci
     extend Gitlab::Ci::Model
 
     belongs_to :project
-    belongs_to :build, class_name: 'Ci::Build', inverse_of: :queuing_entry
+    belongs_to :build, class_name: 'Ci::Build'
 
     def self.upsert!(build)
       entry = self.new(build: build, project: build.project)
 
       raise ArgumentError, 'queuing entry invalid' unless entry.valid?
 
-      upsert({ build_id: entry.build_id, project_id: entry.project_id })
+      attributes = { build_id: entry.build_id, project_id: entry.project_id }
+
+      ActiveRecord::InsertAll
+        .new(self, [attributes], on_duplicate: :skip, returning: %w[build_id])
+        .execute
     end
   end
 end

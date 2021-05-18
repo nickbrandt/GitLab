@@ -10753,10 +10753,20 @@ CREATE SEQUENCE ci_namespace_monthly_usages_id_seq
 ALTER SEQUENCE ci_namespace_monthly_usages_id_seq OWNED BY ci_namespace_monthly_usages.id;
 
 CREATE TABLE ci_pending_builds (
+    id bigint NOT NULL,
     build_id bigint NOT NULL,
     project_id bigint NOT NULL,
     created_at timestamp with time zone DEFAULT now() NOT NULL
 );
+
+CREATE SEQUENCE ci_pending_builds_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE ci_pending_builds_id_seq OWNED BY ci_pending_builds.id;
 
 CREATE TABLE ci_pipeline_artifacts (
     id bigint NOT NULL,
@@ -19474,6 +19484,8 @@ ALTER TABLE ONLY ci_job_variables ALTER COLUMN id SET DEFAULT nextval('ci_job_va
 
 ALTER TABLE ONLY ci_namespace_monthly_usages ALTER COLUMN id SET DEFAULT nextval('ci_namespace_monthly_usages_id_seq'::regclass);
 
+ALTER TABLE ONLY ci_pending_builds ALTER COLUMN id SET DEFAULT nextval('ci_pending_builds_id_seq'::regclass);
+
 ALTER TABLE ONLY ci_pipeline_artifacts ALTER COLUMN id SET DEFAULT nextval('ci_pipeline_artifacts_id_seq'::regclass);
 
 ALTER TABLE ONLY ci_pipeline_chat_data ALTER COLUMN id SET DEFAULT nextval('ci_pipeline_chat_data_id_seq'::regclass);
@@ -20645,7 +20657,7 @@ ALTER TABLE ONLY ci_namespace_monthly_usages
     ADD CONSTRAINT ci_namespace_monthly_usages_pkey PRIMARY KEY (id);
 
 ALTER TABLE ONLY ci_pending_builds
-    ADD CONSTRAINT ci_pending_builds_pkey PRIMARY KEY (build_id);
+    ADD CONSTRAINT ci_pending_builds_pkey PRIMARY KEY (id);
 
 ALTER TABLE ONLY ci_pipeline_artifacts
     ADD CONSTRAINT ci_pipeline_artifacts_pkey PRIMARY KEY (id);
@@ -22533,6 +22545,8 @@ CREATE INDEX index_ci_job_variables_on_job_id ON ci_job_variables USING btree (j
 CREATE UNIQUE INDEX index_ci_job_variables_on_key_and_job_id ON ci_job_variables USING btree (key, job_id);
 
 CREATE UNIQUE INDEX index_ci_namespace_monthly_usages_on_namespace_id_and_date ON ci_namespace_monthly_usages USING btree (namespace_id, date);
+
+CREATE UNIQUE INDEX index_ci_pending_builds_on_build_id ON ci_pending_builds USING btree (build_id);
 
 CREATE INDEX index_ci_pending_builds_on_project_id ON ci_pending_builds USING btree (project_id);
 

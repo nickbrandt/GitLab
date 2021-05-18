@@ -47,10 +47,10 @@ RSpec.describe Ci::UpdateBuildQueueService do
         ::Ci::PendingBuild.create!(build: build, project: project)
       end
 
-      it 'does nothing and returns updated build id' do
+      it 'does nothing and returns nil' do
         queued = subject.push(build, transition)
 
-        expect(queued).to eq build.id
+        expect(queued).to be_nil
       end
     end
   end
