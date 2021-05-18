@@ -444,9 +444,6 @@
 
 .frontend:rules:eslint-as-if-foss:
   rules:
-    - <<: *if-merge-request-title-as-if-foss
-      <<: *exists-ee
-      when: never
     - <<: *if-merge-request
       <<: *exists-ee
       changes: *frontend-patterns
@@ -660,13 +657,10 @@
 .rails:rules:ee-only-migration:minimal:
   rules:
     - <<: *if-merge-request-rspec-minimal-disabled
-      <<: *exists-ee
       when: never
     - <<: *if-merge-request-title-run-all-rspec
-      <<: *exists-ee
       when: never
     - <<: *if-merge-request
-      <<: *exists-ee
       changes: *ci-patterns
       when: never
     - <<: *if-merge-request
@@ -683,13 +677,10 @@
 .rails:rules:ee-only-unit:minimal:
   rules:
     - <<: *if-merge-request-rspec-minimal-disabled
-      <<: *exists-ee
       when: never
     - <<: *if-merge-request-title-run-all-rspec
-      <<: *exists-ee
       when: never
     - <<: *if-merge-request
-      <<: *exists-ee
       changes: *ci-patterns
       when: never
     - <<: *if-merge-request
@@ -706,13 +697,10 @@
 .rails:rules:ee-only-integration:minimal:
   rules:
     - <<: *if-merge-request-rspec-minimal-disabled
-      <<: *exists-ee
       when: never
     - <<: *if-merge-request-title-run-all-rspec
-      <<: *exists-ee
       when: never
     - <<: *if-merge-request
-      <<: *exists-ee
       changes: *ci-patterns
       when: never
     - <<: *if-merge-request
@@ -729,13 +717,10 @@
 .rails:rules:ee-only-system:minimal:
   rules:
     - <<: *if-merge-request-rspec-minimal-disabled
-      <<: *exists-ee
       when: never
     - <<: *if-merge-request-title-run-all-rspec
-      <<: *exists-ee
       when: never
     - <<: *if-merge-request
-      <<: *exists-ee
       changes: *ci-patterns
       when: never
     - <<: *if-merge-request
@@ -759,10 +744,8 @@
 .rails:rules:as-if-foss-migration:minimal:
   rules:
     - <<: *if-merge-request-rspec-minimal-disabled
-      <<: *exists-ee
       when: never
     - <<: *if-merge-request
-      <<: *exists-ee
       changes: *ci-patterns
       when: never
     - <<: *if-security-merge-request
@@ -791,10 +774,8 @@
 .rails:rules:as-if-foss-unit:minimal:
   rules:
     - <<: *if-merge-request-rspec-minimal-disabled
-      <<: *exists-ee
       when: never
     - <<: *if-merge-request
-      <<: *exists-ee
       changes: *ci-patterns
       when: never
     - <<: *if-security-merge-request
@@ -803,8 +784,6 @@
     - <<: *if-merge-request-title-as-if-foss
       <<: *exists-ee
       changes: *backend-patterns
-    - <<: *if-merge-request-title-run-all-rspec
-      <<: *exists-ee
 
 .rails:rules:as-if-foss-integration:
   rules:
@@ -823,10 +802,8 @@
 .rails:rules:as-if-foss-integration:minimal:
   rules:
     - <<: *if-merge-request-rspec-minimal-disabled
-      <<: *exists-ee
       when: never
     - <<: *if-merge-request
-      <<: *exists-ee
       changes: *ci-patterns
       when: never
     - <<: *if-security-merge-request
@@ -855,10 +832,8 @@
 .rails:rules:as-if-foss-system:minimal:
   rules:
     - <<: *if-merge-request-rspec-minimal-disabled
-      <<: *exists-ee
       when: never
     - <<: *if-merge-request
-      <<: *exists-ee
       changes: *ci-patterns
       when: never
     - <<: *if-security-merge-request
@@ -896,7 +871,6 @@
 .rails:rules:rspec-foss-impact:
   rules:
     - <<: *if-merge-request-title-as-if-foss
-      <<: *exists-ee
       when: never
     - <<: *if-security-merge-request
       <<: *exists-ee
