@@ -328,6 +328,11 @@ module EE
       super
     end
 
+    override :password_based_login_forbidden?
+    def password_based_login_forbidden?
+      user_authorized_by_provisioning_group? || super
+    end
+
     def user_authorized_by_provisioning_group?
       user_detail.provisioned_by_group? && ::Feature.enabled?(:block_password_auth_for_saml_users, user_detail.provisioned_by_group, type: :ops)
     end
