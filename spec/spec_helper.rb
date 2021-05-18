@@ -265,6 +265,7 @@ RSpec.configure do |config|
       stub_feature_flags(file_identifier_hash: false)
 
       stub_feature_flags(unified_diff_components: false)
+      stub_feature_flags(diffs_virtual_scrolling: false)
 
       # The following `vue_issues_list` stub can be removed once the
       # Vue issues page has feature parity with the current Haml page
