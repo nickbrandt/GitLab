@@ -188,6 +188,15 @@ RSpec.describe 'Git HTTP requests' do
         end
       end
 
+      context 'when username and personal access token are provided' do
+        let(:user) { create(:user, provisioned_by_group: group) }
+        let(:access_token) { create(:personal_access_token, user: user) }
+        let(:env) { { user: user.username, password: access_token.token } }
+
+        it_behaves_like 'pulls are allowed'
+        it_behaves_like 'pushes are allowed'
+      end
+
       context 'when user has 2FA enabled' do
         let(:user) { create(:user, :two_factor, provisioned_by_group: group) }
         let(:access_token) { create(:personal_access_token, user: user) }
