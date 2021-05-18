@@ -613,6 +613,7 @@ module.exports = {
     stats: 'errors-only',
     hot: DEV_SERVER_LIVERELOAD,
     inline: DEV_SERVER_LIVERELOAD,
+    overlay: true,
   },
 
   devtool: NO_SOURCEMAPS ? false : devtool,
