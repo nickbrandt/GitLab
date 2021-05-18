@@ -1244,7 +1244,7 @@ describe('addListNewIssue', () => {
             type: 'addListItem',
             payload: {
               list: fakeList,
-              item: formatIssue({ ...mockIssue, id: 'tmp' }),
+              item: formatIssue({ ...mockIssue, id: 'tmp', isLoading: true }),
               position: 0,
             },
           },
@@ -1286,7 +1286,7 @@ describe('addListNewIssue', () => {
             type: 'addListItem',
             payload: {
               list: fakeList,
-              item: formatIssue({ ...mockIssue, id: 'tmp' }),
+              item: formatIssue({ ...mockIssue, id: 'tmp', isLoading: true }),
               position: 0,
             },
           },
