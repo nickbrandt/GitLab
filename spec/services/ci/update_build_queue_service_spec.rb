@@ -19,8 +19,7 @@ RSpec.describe Ci::UpdateBuildQueueService do
       it 'creates a new pending build in transaction' do
         queued = subject.push(build, transition)
 
-        expect(queued.build).to eq build
-        expect(queued.project).to eq project
+        expect(queued).to eq build.id
       end
 
       it 'increments queue push metric' do
@@ -42,6 +41,18 @@ RSpec.describe Ci::UpdateBuildQueueService do
           .to raise_error(described_class::InvalidQueueTransition)
       end
     end
+
+    context 'when duplicate entry exists' do
+      before do
+        ::Ci::PendingBuild.create(build: build, project: project)
+      end
+
+      it 'does nothing and returns updated build id' do
+        queued = subject.push(build, transition)
+
+        expect(queued).to eq build.id
+      end
+    end
   end
 
   describe '#pop' do
@@ -60,9 +71,7 @@ RSpec.describe Ci::UpdateBuildQueueService do
       it 'removes pending build in a transaction' do
         dequeued = subject.pop(build, transition)
 
-        expect(dequeued.build).to eq build
-        expect(dequeued.project).to eq project
-        expect(dequeued).to be_destroyed
+        expect(dequeued).to be true
       end
 
       it 'increments queue pop metric' do
@@ -80,7 +89,7 @@ RSpec.describe Ci::UpdateBuildQueueService do
       it 'does nothing if there is no pending build to remove' do
         dequeued = subject.pop(build, transition)
 
-        expect(dequeued).to be_nil
+        expect(dequeued).to be false
       end
     end
 

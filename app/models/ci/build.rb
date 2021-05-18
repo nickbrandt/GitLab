@@ -305,7 +305,6 @@ module Ci
       end
 
       after_transition pending: any do |build, transition|
-        # TODO ensure that there is no race condition here, add test for this
         Ci::UpdateBuildQueueService.new.pop(build, transition)
       end
       # rubocop:enable CodeReuse/ServiceClass

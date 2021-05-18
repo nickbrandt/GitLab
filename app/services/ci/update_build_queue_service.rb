@@ -19,8 +19,14 @@ module Ci
       raise InvalidQueueTransition unless transition.to == 'pending'
 
       transition.within_transaction do
-        ::Ci::PendingBuild.create!(build: build, project: build.project).tap do
+        attributes = { build_id: build.id, project_id: build.project.id }
+
+        ::Ci::PendingBuild.upsert(attributes).then do |result|
+          raise ArgumentError if result.length > 1
+
           metrics.increment_queue_operation(:build_queue_push)
+
+          result.rows.dig(0, 0)
         end
       end
     end
@@ -34,12 +40,12 @@ module Ci
       raise InvalidQueueTransition unless transition.from == 'pending'
 
       transition.within_transaction do
-        ::Ci::PendingBuild.find_by(build_id: build.id).tap do |queued| # rubocop:disable CodeReuse/ActiveRecord
-          next unless queued.present?
+        ::Ci::PendingBuild.where(build_id: build.id).delete_all.then do |removed| # rubocop:disable CodeReuse/ActiveRecord
+          if removed > 0
+            metrics.increment_queue_operation(:build_queue_pop)
+          end
 
-          queued.destroy!
-
-          metrics.increment_queue_operation(:build_queue_pop)
+          removed > 0
         end
       end
     end

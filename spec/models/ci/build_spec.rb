@@ -353,7 +353,7 @@ RSpec.describe Ci::Build do
         expect(build).to be_pending
       end
 
-      it 'pushed build to a queue' do
+      it 'pushes build to a queue' do
         build.enqueue
 
         expect(build.queuing_entry).to be_present
@@ -365,10 +365,33 @@ RSpec.describe Ci::Build do
         end
 
         it 'does not push build to a queue' do
-          expect { build.enqueue }
+          expect { build.enqueue! }
             .to raise_error(ActiveRecord::StaleObjectError)
 
           expect(build.queuing_entry).not_to be_present
+        end
+      end
+
+      context 'when there is a queuing entry already present' do
+        before do
+          ::Ci::PendingBuild.create!(build: build, project: build.project)
+        end
+
+        it 'does not raise an error' do
+          expect { build.enqueue! }.not_to raise_error
+          expect(build.reload.queuing_entry).to be_present
+        end
+      end
+
+      context 'when both failure scenario happen at the same time' do
+        before do
+          ::Ci::Build.find(build.id).update_column(:lock_version, 100)
+          ::Ci::PendingBuild.create!(build: build, project: build.project)
+        end
+
+        it 'raises stale object error exception' do
+          expect { build.enqueue! }
+            .to raise_error(ActiveRecord::StaleObjectError)
         end
       end
     end
@@ -429,14 +452,32 @@ RSpec.describe Ci::Build do
   end
 
   describe '#run' do
-    let(:build) { create(:ci_build, :created) }
+    context 'when build has been just created' do
+      let(:build) { create(:ci_build, :created) }
 
-    it 'creates queuing entry and then removes it' do
-      build.enqueue!
-      expect(build.queuing_entry).to be_present
+      it 'creates queuing entry and then removes it' do
+        build.enqueue!
+        expect(build.queuing_entry).to be_present
 
-      build.run!
-      expect(build.reload.queuing_entry).not_to be_present
+        build.run!
+        expect(build.reload.queuing_entry).not_to be_present
+      end
+    end
+
+    context 'when build status transition fails' do
+      let(:build) { create(:ci_build, :pending) }
+
+      before do
+        ::Ci::PendingBuild.create!(build: build, project: build.project)
+        ::Ci::Build.find(build.id).update_column(:lock_version, 100)
+      end
+
+      it 'does not remove build from a queue' do
+        expect { build.run! }
+          .to raise_error(ActiveRecord::StaleObjectError)
+
+        expect(build.queuing_entry).to be_present
+      end
     end
   end
 
