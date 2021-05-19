@@ -55,6 +55,7 @@ export const devopsAdoptionSegmentsData = {
         pipelineSucceeded: false,
         deploySucceeded: false,
         securityScanSucceeded: false,
+        codeOwnersUsedCount: 0,
         recordedAt: '2020-10-31T23:59:59Z',
         __typename: 'latestSnapshot',
       },
@@ -87,20 +88,25 @@ export const devopsAdoptionTableHeaders = [
   {
     index: 1,
     label: 'Issues',
-    tooltip: 'At least 1 issue opened',
+    tooltip: 'At least one issue opened',
   },
   {
     index: 2,
     label: 'MRs',
-    tooltip: 'At least 1 MR opened',
+    tooltip: 'At least one MR opened',
   },
   {
     index: 3,
     label: 'Approvals',
-    tooltip: 'At least 1 approval on an MR',
+    tooltip: 'At least one approval on an MR',
   },
   {
     index: 4,
+    label: 'Code owners',
+    tooltip: 'Code owners enabled for at least one project',
+  },
+  {
+    index: 5,
     label: '',
     tooltip: null,
   },
