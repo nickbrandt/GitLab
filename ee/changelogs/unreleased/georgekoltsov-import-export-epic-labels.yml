@@ -1,0 +1,5 @@
+---
+title: Preserve epic labels association during Group Import/Export
+merge_request: 62074
+author:
+type: fixed
