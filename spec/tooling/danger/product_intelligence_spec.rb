@@ -109,7 +109,7 @@ RSpec.describe Tooling::Danger::ProductIntelligence do
       end
     end
 
-    context 'with dictonary file not changed' do
+    context 'with dictionary file not changed' do
       it { is_expected.to be_empty }
     end
 
