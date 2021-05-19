@@ -42,7 +42,6 @@ RSpec.describe 'EE > Projects > Settings > Merge requests > User manages merge t
     let(:merge_trains) { false }
 
     it 'does not see the checkbox' do
-      binding.pry
       expect(page).not_to have_css('#project_merge_trains_enabled')
     end
   end
