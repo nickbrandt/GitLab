@@ -1,0 +1,19 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`content_editor/components/toolbar_link_button renders dropdown component 1`] = `
+"<gl-dropdown-stub headertext=\\"\\" hideheaderborder=\\"true\\" text=\\"\\" category=\\"tertiary\\" variant=\\"default\\" size=\\"small\\" icon=\\"link\\" toggleclass=\\"[object Object]\\">
+  <gl-dropdown-form-stub class=\\"gl-px-3!\\">
+    <div placeholder=\\"Link URL\\">
+      <b-input-group-stub tag=\\"div\\">
+        <!---->
+        <b-form-input-stub value=\\"\\" placeholder=\\"Link URL\\" debounce=\\"0\\" type=\\"text\\" class=\\"gl-form-input\\"></b-form-input-stub>
+        <b-input-group-append-stub tag=\\"div\\">
+          <gl-button-stub category=\\"primary\\" variant=\\"confirm\\" size=\\"medium\\" icon=\\"\\" buttontextclasses=\\"\\">Apply</gl-button-stub>
+        </b-input-group-append-stub>
+      </b-input-group-stub>
+    </div>
+  </gl-dropdown-form-stub>
+  <!---->
+  <!---->
+</gl-dropdown-stub>"
+`;
