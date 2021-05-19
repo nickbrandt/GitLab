@@ -25251,7 +25251,7 @@ msgstr ""
 msgid "Profiles|Profile was successfully updated"
 msgstr ""
 
-msgid "Profiles|Public Avatar"
+msgid "Profiles|Public avatar"
 msgstr ""
 
 msgid "Profiles|Public email"
