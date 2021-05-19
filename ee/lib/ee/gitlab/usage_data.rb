@@ -3,6 +3,8 @@
 module EE
   module Gitlab
     module UsageData
+      DEPRECATED_VALUE = -1000
+
       extend ActiveSupport::Concern
 
       EE_MEMOIZED_VALUES = %i(
