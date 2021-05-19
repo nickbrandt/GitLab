@@ -15,6 +15,8 @@ module EE
         end
       end
 
+private
+
       override :check_access!
       def check_access!(build)
         super
