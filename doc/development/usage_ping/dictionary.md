@@ -1126,54 +1126,6 @@ Status: `data_available`
 
 Tiers: `free`
 
-### `counts.g_project_management_users_checking_epic_task_monthly`
-
-Counts of MAU checking epic task
-
-[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_28d/20210421080207_g_project_management_users_checking_epic_task_monthly.yml)
-
-Group: `group::product planning`
-
-Status: `implemented`
-
-Tiers: `premium`, `ultimate`
-
-### `counts.g_project_management_users_checking_epic_task_weekly`
-
-Counts of WAU checking epic task
-
-[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_7d/20210421075943_g_project_management_users_checking_epic_task_weekly.yml)
-
-Group: `group::product planning`
-
-Status: `implemented`
-
-Tiers: `premium`, `ultimate`
-
-### `counts.g_project_management_users_unchecking_epic_task_monthly`
-
-Counts of MAU unchecking epic task
-
-[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_28d/20210421102516_g_project_management_users_unchecking_epic_task_monthly.yml)
-
-Group: `group::product planning`
-
-Status: `implemented`
-
-Tiers: `premium`, `ultimate`
-
-### `counts.g_project_management_users_unchecking_epic_task_weekly`
-
-Counts of WAU unchecking epic task
-
-[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_7d/20210421102812_g_project_management_users_unchecking_epic_task_weekly.yml)
-
-Group: `group::product planning`
-
-Status: `implemented`
-
-Tiers: `premium`, `ultimate`
-
 ### `counts.geo_event_log_max_id`
 
 Number of replication events on a Geo primary
@@ -10690,6 +10642,30 @@ Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
+### `redis_hll_counters.epic_boards_usage.epic_boards_usage_total_unique_counts_monthly`
+
+Missing description
+
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_28d/20210507171840_epic_boards_usage_total_unique_counts_monthly.yml)
+
+Group: ``
+
+Status: `implemented`
+
+Tiers: `ultimate`
+
+### `redis_hll_counters.epic_boards_usage.epic_boards_usage_total_unique_counts_weekly`
+
+Missing description
+
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_7d/20210507171838_epic_boards_usage_total_unique_counts_weekly.yml)
+
+Group: ``
+
+Status: `implemented`
+
+Tiers: `ultimate`
+
 ### `redis_hll_counters.epic_boards_usage.g_project_management_users_creating_epic_boards_monthly`
 
 Count of MAU creating epic boards
@@ -11407,6 +11383,54 @@ Counts of WAU manually updating fixed start date
 Group: `group::product planning`
 
 Status: `data_available`
+
+Tiers: `premium`, `ultimate`
+
+### `redis_hll_counters.epics_usage.project_management_users_checking_epic_task_monthly`
+
+Counts of MAU checking epic task
+
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_28d/20210421080207_g_project_management_users_checking_epic_task_monthly.yml)
+
+Group: `group::product planning`
+
+Status: `implemented`
+
+Tiers: `premium`, `ultimate`
+
+### `redis_hll_counters.epics_usage.project_management_users_checking_epic_task_weekly`
+
+Counts of WAU checking epic task
+
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_7d/20210421075943_g_project_management_users_checking_epic_task_weekly.yml)
+
+Group: `group::product planning`
+
+Status: `implemented`
+
+Tiers: `premium`, `ultimate`
+
+### `redis_hll_counters.epics_usage.project_management_users_unchecking_epic_task_monthly`
+
+Counts of MAU unchecking epic task
+
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_28d/20210421102516_g_project_management_users_unchecking_epic_task_monthly.yml)
+
+Group: `group::product planning`
+
+Status: `implemented`
+
+Tiers: `premium`, `ultimate`
+
+### `redis_hll_counters.epics_usage.project_management_users_unchecking_epic_task_weekly`
+
+Counts of WAU unchecking epic task
+
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_7d/20210421102812_g_project_management_users_unchecking_epic_task_weekly.yml)
+
+Group: `group::product planning`
+
+Status: `implemented`
 
 Tiers: `premium`, `ultimate`
 
@@ -12768,15 +12792,15 @@ Tiers: `free`
 
 ### `redis_hll_counters.pipeline_authoring.o_pipeline_authoring_unique_users_committing_ciconfigfile_weekly`
 
-Missing description
+Monthly unique user count doing commits which contains the CI config file
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_7d/20210216184301_o_pipeline_authoring_unique_users_committing_ciconfigfile_weekly.yml)
 
-Group: ``
+Group: `group::pipeline authoring`
 
 Status: `data_available`
 
-Tiers:
+Tiers: `free`, `premium`, `ultimate`
 
 ### `redis_hll_counters.pipeline_authoring.o_pipeline_authoring_unique_users_pushing_mr_ciconfigfile_monthly`
 
@@ -18073,6 +18097,18 @@ Group: ``
 Status: `data_available`
 
 Tiers: `free`
+
+### `usage_activity_by_stage_monthly.manage.custom_compliance_frameworks`
+
+Monthly count of all custom compliance framework labels
+
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_28d/20210507165054_custom_compliance_frameworks.yml)
+
+Group: `compliance`
+
+Status: `implemented`
+
+Tiers: `premium`, `ultimate`
 
 ### `usage_activity_by_stage_monthly.manage.events`
 
