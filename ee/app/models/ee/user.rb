@@ -328,6 +328,11 @@ module EE
       super
     end
 
+    override :password_based_login_forbidden?
+    def password_based_login_forbidden?
+      user_authorized_by_provisioning_group? || super
+    end
+
     def user_authorized_by_provisioning_group?
       user_detail.provisioned_by_group? && ::Feature.enabled?(:block_password_auth_for_saml_users, user_detail.provisioned_by_group, type: :ops)
     end
@@ -397,23 +402,6 @@ module EE
       !password_automatically_set?
     end
 
-    def has_valid_credit_card?
-      credit_card_validated_at.present?
-    end
-
-    def requires_credit_card_to_run_pipelines?(project)
-      return false unless ::Gitlab.com?
-
-      root_namespace = project.root_namespace
-      if root_namespace.free_plan?
-        ::Feature.enabled?(:ci_require_credit_card_on_free_plan, project, default_enabled: :yaml)
-      elsif root_namespace.trial?
-        ::Feature.enabled?(:ci_require_credit_card_on_trial_plan, project, default_enabled: :yaml)
-      else
-        false
-      end
-    end
-
     def has_required_credit_card_to_run_pipelines?(project)
       has_valid_credit_card? || !requires_credit_card_to_run_pipelines?(project)
     end
@@ -428,6 +416,30 @@ module EE
     end
 
     private
+
+    def created_after_credit_card_release_day?(project)
+      created_at >= ::Users::CreditCardValidation::RELEASE_DAY ||
+        ::Feature.enabled?(:ci_require_credit_card_for_old_users, project, default_enabled: :yaml)
+    end
+
+    def has_valid_credit_card?
+      credit_card_validated_at.present?
+    end
+
+    def requires_credit_card_to_run_pipelines?(project)
+      return false unless ::Gitlab.com?
+      return false unless created_after_credit_card_release_day?(project)
+      return false unless project.shared_runners_enabled
+
+      root_namespace = project.root_namespace
+      if root_namespace.free_plan?
+        ::Feature.enabled?(:ci_require_credit_card_on_free_plan, project, default_enabled: :yaml)
+      elsif root_namespace.trial?
+        ::Feature.enabled?(:ci_require_credit_card_on_trial_plan, project, default_enabled: :yaml)
+      else
+        false
+      end
+    end
 
     def namespace_union_for_owned(select = :id)
       ::Gitlab::SQL::Union.new([

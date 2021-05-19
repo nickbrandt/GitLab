@@ -92,7 +92,7 @@ gem 'net-ldap', '~> 0.16.3'
 
 # API
 gem 'grape', '~> 1.5.2'
-gem 'grape-entity', '~> 0.7.1'
+gem 'grape-entity', '~> 0.9.0'
 gem 'rack-cors', '~> 1.0.6', require: 'rack/cors'
 
 # GraphQL API
@@ -309,12 +309,12 @@ gem 'rack-attack', '~> 6.3.0'
 gem 'sentry-raven', '~> 3.0'
 
 # PostgreSQL query parsing
-gem 'pg_query', '~> 1.3.0'
+gem 'pg_query', '~> 2.0.3'
 
 gem 'premailer-rails', '~> 1.10.3'
 
 # LabKit: Tracing and Correlation
-gem 'gitlab-labkit', '~> 0.16.2'
+gem 'gitlab-labkit', '~> 0.17.1'
 # Thrift is a dependency of gitlab-labkit, we want a version higher than 0.14.0
 # because of https://gitlab.com/gitlab-org/gitlab/-/issues/321900
 gem 'thrift', '>= 0.14.0'
@@ -360,9 +360,9 @@ end
 group :development, :test do
   gem 'deprecation_toolkit', '~> 1.5.1', require: false
   gem 'bullet', '~> 6.1.3'
-  gem 'gitlab-pry-byebug', platform: :mri, require: ['pry-byebug', 'pry-byebug/pry_remote_ext']
+  gem 'pry-byebug'
   gem 'pry-rails', '~> 0.3.9'
-  gem 'pry-remote'
+  gem 'pry-shell', '~> 0.4.0'
 
   gem 'awesome_print', require: false
 
@@ -485,7 +485,7 @@ gem 'gitaly', '~> 13.12.0.pre.rc1'
 
 gem 'grpc', '~> 1.30.2'
 
-gem 'google-protobuf', '~> 3.14.0'
+gem 'google-protobuf', '~> 3.15.8'
 
 gem 'toml-rb', '~> 1.0.0'
 

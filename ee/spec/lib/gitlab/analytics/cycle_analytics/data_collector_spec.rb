@@ -254,9 +254,9 @@ RSpec.describe Gitlab::Analytics::CycleAnalytics::DataCollector do
 
           Sidekiq::Worker.skipping_transaction_check do
             Issues::UpdateService.new(
-              example_class.project,
-              user,
-              label_ids: [example_class.label.id]
+              project: example_class.project,
+              current_user: user,
+              params: { label_ids: [example_class.label.id] }
             ).execute(issue)
           end
 
@@ -265,9 +265,9 @@ RSpec.describe Gitlab::Analytics::CycleAnalytics::DataCollector do
 
         def create_data_for_end_event(resource, example_class)
           Issues::UpdateService.new(
-            example_class.project,
-            user,
-            label_ids: []
+            project: example_class.project,
+            current_user: user,
+            params: { label_ids: [] }
           ).execute(resource)
         end
 
@@ -288,9 +288,9 @@ RSpec.describe Gitlab::Analytics::CycleAnalytics::DataCollector do
 
           Sidekiq::Worker.skipping_transaction_check do
             Issues::UpdateService.new(
-              example_class.project,
-              user,
-              label_ids: [example_class.label.id]
+              project: example_class.project,
+              current_user: user,
+              params: { label_ids: [example_class.label.id] }
             ).execute(issue)
           end
 
@@ -300,9 +300,9 @@ RSpec.describe Gitlab::Analytics::CycleAnalytics::DataCollector do
         def create_data_for_end_event(issue, example_class)
           Sidekiq::Worker.skipping_transaction_check do
             Issues::UpdateService.new(
-              example_class.project,
-              user,
-              label_ids: [example_class.label.id, example_class.other_label.id]
+              project: example_class.project,
+              current_user: user,
+              params: { label_ids: [example_class.label.id, example_class.other_label.id] }
             ).execute(issue)
           end
         end
@@ -342,9 +342,9 @@ RSpec.describe Gitlab::Analytics::CycleAnalytics::DataCollector do
         def create_data_for_end_event(issue, example_class)
           Sidekiq::Worker.skipping_transaction_check do
             Issues::UpdateService.new(
-              example_class.project,
-              user,
-              label_ids: [example_class.label.id]
+              project: example_class.project,
+              current_user: user,
+              params: { label_ids: [example_class.label.id] }
             ).execute(issue)
           end
         end
@@ -359,7 +359,7 @@ RSpec.describe Gitlab::Analytics::CycleAnalytics::DataCollector do
         let(:end_event_identifier) { :merge_request_merged }
 
         def create_data_for_start_event(example_class)
-          create(:merge_request, :closed, source_project: example_class.project)
+          create(:merge_request, :unique_branches, :opened, source_project: example_class.project)
         end
 
         def create_data_for_end_event(mr, example_class)
@@ -374,7 +374,7 @@ RSpec.describe Gitlab::Analytics::CycleAnalytics::DataCollector do
         let(:end_event_identifier) { :merge_request_first_deployed_to_production }
 
         def create_data_for_start_event(example_class)
-          create(:merge_request, :closed, source_project: example_class.project).tap do |mr|
+          create(:merge_request, :unique_branches, :opened, source_project: example_class.project).tap do |mr|
             mr.metrics.update!(merged_at: Time.now)
           end
         end
@@ -391,7 +391,7 @@ RSpec.describe Gitlab::Analytics::CycleAnalytics::DataCollector do
         let(:end_event_identifier) { :merge_request_merged }
 
         def create_data_for_start_event(example_class)
-          create(:merge_request, :merged, source_project: example_class.project).tap do |mr|
+          create(:merge_request, :unique_branches, :opened, source_project: example_class.project).tap do |mr|
             mr.metrics.update!(first_commit_at: Time.now)
           end
         end
@@ -408,7 +408,7 @@ RSpec.describe Gitlab::Analytics::CycleAnalytics::DataCollector do
         let(:end_event_identifier) { :merge_request_last_build_finished }
 
         def create_data_for_start_event(example_class)
-          create(:merge_request, :closed, source_project: example_class.project).tap do |mr|
+          create(:merge_request, :unique_branches, :opened, source_project: example_class.project).tap do |mr|
             mr.metrics.update!(latest_build_started_at: Time.now)
           end
         end
@@ -464,9 +464,9 @@ RSpec.describe Gitlab::Analytics::CycleAnalytics::DataCollector do
 
           Sidekiq::Worker.skipping_transaction_check do
             MergeRequests::UpdateService.new(
-              example_class.project,
-              user,
-              label_ids: [label.id]
+              project: example_class.project,
+              current_user: user,
+              params: { label_ids: [label.id] }
             ).execute(mr)
           end
 
@@ -476,9 +476,9 @@ RSpec.describe Gitlab::Analytics::CycleAnalytics::DataCollector do
         def create_data_for_end_event(mr, example_class)
           Sidekiq::Worker.skipping_transaction_check do
             MergeRequests::UpdateService.new(
-              example_class.project,
-              user,
-              label_ids: []
+              project: example_class.project,
+              current_user: user,
+              params: { label_ids: [] }
             ).execute(mr)
           end
         end
@@ -503,9 +503,9 @@ RSpec.describe Gitlab::Analytics::CycleAnalytics::DataCollector do
 
             Sidekiq::Worker.skipping_transaction_check do
               MergeRequests::UpdateService.new(
-                example_class.project,
-                user,
-                assignees: [user]
+                project: example_class.project,
+                current_user: user,
+                params: { assignees: [user] }
               ).execute(mr)
             end
 
@@ -552,9 +552,9 @@ RSpec.describe Gitlab::Analytics::CycleAnalytics::DataCollector do
 
             Sidekiq::Worker.skipping_transaction_check do
               MergeRequests::UpdateService.new(
-                example_class.project,
-                user,
-                label_ids: [label.id, other_label.id]
+                project: example_class.project,
+                current_user: user,
+                params: { label_ids: [label.id, other_label.id] }
               ).execute(mr)
             end
 
@@ -700,9 +700,9 @@ RSpec.describe Gitlab::Analytics::CycleAnalytics::DataCollector do
 
         before do
           MergeRequests::UpdateService.new(
-            merge_request.project,
-            user,
-            label_ids: [label.id]
+            project: merge_request.project,
+            current_user: user,
+            params: { label_ids: [label.id] }
           ).execute(merge_request)
 
           data_collector_params[:label_name] = [label.name]
@@ -716,9 +716,9 @@ RSpec.describe Gitlab::Analytics::CycleAnalytics::DataCollector do
 
         before do
           MergeRequests::UpdateService.new(
-            merge_request.project,
-            user,
-            label_ids: [label.id]
+            project: merge_request.project,
+            current_user: user,
+            params: { label_ids: [label.id] }
           ).execute(merge_request)
 
           data_collector_params[:label_name] = ['Any']
@@ -733,9 +733,9 @@ RSpec.describe Gitlab::Analytics::CycleAnalytics::DataCollector do
 
         before do
           MergeRequests::UpdateService.new(
-            merge_request.project,
-            user,
-            label_ids: [label1.id, label2.id]
+            project: merge_request.project,
+            current_user: user,
+            params: { label_ids: [label1.id, label2.id] }
           ).execute(merge_request)
 
           data_collector_params[:label_name] = [label1.name, label2.name]

@@ -3653,7 +3653,7 @@ RSpec.describe Ci::Build do
   end
 
   describe 'state transition when build fails' do
-    let(:service) { ::MergeRequests::AddTodoWhenBuildFailsService.new(project, user) }
+    let(:service) { ::MergeRequests::AddTodoWhenBuildFailsService.new(project: project, current_user: user) }
 
     before do
       allow(::MergeRequests::AddTodoWhenBuildFailsService).to receive(:new).and_return(service)
@@ -4697,8 +4697,8 @@ RSpec.describe Ci::Build do
       end
 
       it 'executes services' do
-        allow_next_found_instance_of(Service) do |service|
-          expect(service).to receive(:async_execute)
+        allow_next_found_instance_of(Integration) do |integration|
+          expect(integration).to receive(:async_execute)
         end
 
         build.execute_hooks
@@ -4711,8 +4711,8 @@ RSpec.describe Ci::Build do
       end
 
       it 'does not execute services' do
-        allow_next_found_instance_of(Service) do |service|
-          expect(service).not_to receive(:async_execute)
+        allow_next_found_instance_of(Integration) do |integration|
+          expect(integration).not_to receive(:async_execute)
         end
 
         build.execute_hooks

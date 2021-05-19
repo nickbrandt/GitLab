@@ -50,11 +50,11 @@ describe('Account verification modal', () => {
     });
 
     it('renders the title', () => {
-      expect(wrapper.findComponent(GlModal).attributes('title')).toBe('Verify User Account');
+      expect(wrapper.findComponent(GlModal).attributes('title')).toBe('Validate user account');
     });
 
     it('renders the description', () => {
-      expect(wrapper.find('p').text()).toContain('Your user account has been flagged');
+      expect(wrapper.find('p').text()).toContain('To use free pipeline minutes');
     });
   });
 });

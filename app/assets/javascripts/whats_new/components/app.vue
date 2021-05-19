@@ -63,7 +63,7 @@ export default {
     <gl-drawer
       ref="drawer"
       v-gl-resize-observer="handleResize"
-      class="whats-new-drawer"
+      class="whats-new-drawer gl-reset-line-height"
       :z-index="700"
       :open="open"
       @close="closeDrawer"
@@ -88,6 +88,6 @@ export default {
         <skeleton-loader />
       </div>
     </gl-drawer>
-    <div v-if="open" class="whats-new-modal-backdrop modal-backdrop"></div>
+    <div v-if="open" class="whats-new-modal-backdrop modal-backdrop" @click="closeDrawer"></div>
   </div>
 </template>

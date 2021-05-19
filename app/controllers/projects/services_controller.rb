@@ -11,9 +11,6 @@ class Projects::ServicesController < Projects::ApplicationController
   before_action :web_hook_logs, only: [:edit, :update]
   before_action :set_deprecation_notice_for_prometheus_service, only: [:edit, :update]
   before_action :redirect_deprecated_prometheus_service, only: [:update]
-  before_action only: :edit do
-    push_frontend_feature_flag(:jira_for_vulnerabilities, @project, type: :development, default_enabled: :yaml)
-  end
 
   respond_to :html
 
@@ -22,7 +19,7 @@ class Projects::ServicesController < Projects::ApplicationController
   feature_category :integrations
 
   def edit
-    @default_integration = Service.default_integration(service.type, project)
+    @default_integration = Integration.default_integration(service.type, project)
   end
 
   def update

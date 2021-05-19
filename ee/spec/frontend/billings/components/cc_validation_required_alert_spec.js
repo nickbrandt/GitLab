@@ -6,13 +6,18 @@ import { TEST_HOST } from 'helpers/test_constants';
 describe('CreditCardValidationRequiredAlert', () => {
   let wrapper;
 
-  const createComponent = () => {
+  const createComponent = (data = {}) => {
     return shallowMount(CreditCardValidationRequiredAlert, {
       stubs: {
         GlSprintf,
       },
+      data() {
+        return data;
+      },
     });
   };
+
+  const findGlAlert = () => wrapper.findComponent(GlAlert);
 
   beforeEach(() => {
     window.gon = {
@@ -28,12 +33,20 @@ describe('CreditCardValidationRequiredAlert', () => {
   });
 
   it('renders title', () => {
-    expect(wrapper.findComponent(GlAlert).attributes('title')).toBe('User Verification Required');
+    expect(findGlAlert().attributes('title')).toBe('User validation required');
   });
 
   it('renders description', () => {
-    expect(wrapper.findComponent(GlAlert).text()).toContain(
-      'As a user on a free or trial namespace',
-    );
+    expect(findGlAlert().text()).toContain('To use free pipeline minutes');
+  });
+
+  it('renders danger alert', () => {
+    expect(findGlAlert().attributes('variant')).toBe('danger');
+  });
+
+  it('renders the success alert instead of danger', () => {
+    wrapper = createComponent({ shouldRenderSuccess: true });
+
+    expect(findGlAlert().attributes('variant')).toBe('success');
   });
 });

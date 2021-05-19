@@ -187,6 +187,7 @@ RSpec.describe Ci::CreatePipelineService, '#execute' do
         before do
           allow(::Gitlab).to receive(:com?).and_return(true)
           namespace.gitlab_subscription.update!(hosted_plan: create(:free_plan))
+          user.created_at = ::Users::CreditCardValidation::RELEASE_DAY
         end
 
         context 'when user has credit card' do

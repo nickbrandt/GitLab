@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-Service.available_services_names.each do |service|
+Integration.available_services_names.each do |service|
   RSpec.shared_context service do
     include JiraServiceHelper if service == 'jira'
 
     let(:dashed_service) { service.dasherize }
     let(:service_method) { "#{service}_service".to_sym }
-    let(:service_klass) { Service.service_name_to_model(service) }
+    let(:service_klass) { Integration.service_name_to_model(service) }
     let(:service_instance) { service_klass.new }
     let(:service_fields) { service_instance.fields }
     let(:service_attrs_list) { service_fields.inject([]) {|arr, hash| arr << hash[:name].to_sym } }
@@ -49,8 +49,9 @@ Service.available_services_names.each do |service|
       stub_jira_service_test if service == 'jira'
     end
 
-    def initialize_service(service)
+    def initialize_service(service, attrs = {})
       service_item = project.find_or_initialize_service(service)
+      service_item.attributes = attrs
       service_item.properties = service_attrs
       service_item.save!
       service_item

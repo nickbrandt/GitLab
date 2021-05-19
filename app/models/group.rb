@@ -34,7 +34,7 @@ class Group < Namespace
   has_many :members_and_requesters, as: :source, class_name: 'GroupMember'
 
   has_many :milestones
-  has_many :services
+  has_many :integrations
   has_many :shared_group_links, foreign_key: :shared_with_group_id, class_name: 'GroupGroupLink'
   has_many :shared_with_group_links, foreign_key: :shared_group_id, class_name: 'GroupGroupLink'
   has_many :shared_groups, through: :shared_group_links, source: :shared_group
@@ -165,12 +165,12 @@ class Group < Namespace
     end
 
     def without_integration(integration)
-      services = Service
+      integrations = Integration
         .select('1')
         .where('services.group_id = namespaces.id')
         .where(type: integration.type)
 
-      where('NOT EXISTS (?)', services)
+      where('NOT EXISTS (?)', integrations)
     end
 
     # This method can be used only if all groups have the same top-level
@@ -450,6 +450,20 @@ class Group < Namespace
                .where(source_id: id)
   end
 
+  def authorizable_members_with_parents
+    source_ids =
+      if has_parent?
+        self_and_ancestors.reorder(nil).select(:id)
+      else
+        id
+      end
+
+    group_hierarchy_members = GroupMember.where(source_id: source_ids)
+
+    GroupMember.from_union([group_hierarchy_members,
+                            members_from_self_and_ancestor_group_shares]).authorizable
+  end
+
   def members_with_parents
     # Avoids an unnecessary SELECT when the group has no parents
     source_ids =
@@ -635,7 +649,7 @@ class Group < Namespace
   end
 
   def access_request_approvers_to_be_notified
-    members.owners.order_recent_sign_in.limit(ACCESS_REQUEST_APPROVERS_TO_BE_NOTIFIED_LIMIT)
+    members.owners.connected_to_user.order_recent_sign_in.limit(ACCESS_REQUEST_APPROVERS_TO_BE_NOTIFIED_LIMIT)
   end
 
   def supports_events?

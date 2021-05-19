@@ -17,7 +17,6 @@ class Projects::PipelinesController < Projects::ApplicationController
     push_frontend_feature_flag(:pipeline_filter_jobs, project, default_enabled: :yaml)
     push_frontend_feature_flag(:graphql_pipeline_details, project, type: :development, default_enabled: :yaml)
     push_frontend_feature_flag(:graphql_pipeline_details_users, current_user, type: :development, default_enabled: :yaml)
-    push_frontend_feature_flag(:jira_for_vulnerabilities, project, type: :development, default_enabled: :yaml)
   end
   before_action :ensure_pipeline, only: [:show, :downloadable_artifacts]
 
@@ -58,6 +57,17 @@ class Projects::PipelinesController < Projects::ApplicationController
           e.use {}
           e.try {}
           e.track(:view, value: project.namespace_id)
+        end
+        experiment(:code_quality_walkthrough, namespace: project.root_ancestor) do |e|
+          e.exclude! unless current_user
+          e.exclude! unless can?(current_user, :create_pipeline, project)
+          e.exclude! unless project.root_ancestor.recent?
+          e.exclude! if @pipelines_count.to_i > 0
+          e.exclude! if helpers.has_gitlab_ci?(project)
+
+          e.use {}
+          e.try {}
+          e.track(:view, property: project.root_ancestor.id.to_s)
         end
       end
       format.json do
@@ -166,7 +176,11 @@ class Projects::PipelinesController < Projects::ApplicationController
   end
 
   def retry
-    pipeline.retry_failed(current_user)
+    if Gitlab::Ci::Features.background_pipeline_retry_endpoint?(@project)
+      ::Ci::RetryPipelineWorker.perform_async(pipeline.id, current_user.id) # rubocop:disable CodeReuse/Worker
+    else
+      pipeline.retry_failed(current_user)
+    end
 
     respond_to do |format|
       format.html do
@@ -223,7 +237,7 @@ class Projects::PipelinesController < Projects::ApplicationController
     PipelineSerializer
       .new(project: @project, current_user: @current_user)
       .with_pagination(request, response)
-      .represent(@pipelines, disable_coverage: true, preload: true)
+      .represent(@pipelines, disable_coverage: true, preload: true, code_quality_walkthrough: params[:code_quality_walkthrough].present?)
   end
 
   def render_show
