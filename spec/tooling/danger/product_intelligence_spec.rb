@@ -103,8 +103,9 @@ RSpec.describe Tooling::Danger::ProductIntelligence do
 
       context 'when ruby file changed' do
         let(:changed_lines) { ['+ Gitlab::Tracking.event'] }
+        let(:changed_files) { ['dashboard/todos_controller.rb', 'admin/groups/_form.html.haml'] }
 
-        it { is_expected.to match_array(['dashboard/todos_controller.rb', 'components/welcome.vue']) }
+        it { is_expected.to match_array(['dashboard/todos_controller.rb']) }
       end
     end
 
@@ -112,8 +113,10 @@ RSpec.describe Tooling::Danger::ProductIntelligence do
       it { is_expected.to be_empty }
     end
 
-    context 'with metrics files not changed' do
-      it { is_expected.to be_empty }
+    context 'with metrics files changed' do
+      let(:changed_files) { ['config/metrics/counts_7d/test_metric.yml', 'ee/config/metrics/counts_7d/ee_metric.yml'] }
+
+      it { is_expected.to match_array(changed_files) }
     end
 
     context 'with metrics files not changed' do
