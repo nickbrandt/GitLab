@@ -16917,6 +16917,9 @@ msgstr ""
 msgid "InProductMarketing|%{strong_start}Multiple approval roles%{strong_end} — including code owners and required merge approvals"
 msgstr ""
 
+msgid "InProductMarketing|%{strong_start}Overall, how difficult or easy was it to get started with GitLab?%{strong_end}"
+msgstr ""
+
 msgid "InProductMarketing|*GitLab*, noun: a synonym for efficient teams"
 msgstr ""
 
@@ -16950,6 +16953,9 @@ msgstr ""
 msgid "InProductMarketing|By enabling code owners and required merge approvals the right person will review the right MR. This is a win-win: cleaner code and a more efficient review process."
 msgstr ""
 
+msgid "InProductMarketing|Click on the number below that corresponds with your answer — 1 being very difficult, 5 being very easy."
+msgstr ""
+
 msgid "InProductMarketing|Code owners and required merge approvals are part of the paid tiers of GitLab. You can start a free 30-day trial of GitLab Ultimate and enable these features in less than 5 minutes with no credit card required."
 msgstr ""
 
@@ -16962,7 +16968,16 @@ msgstr ""
 msgid "InProductMarketing|Did you know teams that use GitLab are far more efficient?"
 msgstr ""
 
+msgid "InProductMarketing|Difficult"
+msgstr ""
+
 msgid "InProductMarketing|Dig in and create a project and a repo"
+msgstr ""
+
+msgid "InProductMarketing|Do you have a minute?"
+msgstr ""
+
+msgid "InProductMarketing|Easy"
 msgstr ""
 
 msgid "InProductMarketing|Explore GitLab CI/CD"
@@ -16975,6 +16990,9 @@ msgid "InProductMarketing|Explore the power of GitLab CI/CD"
 msgstr ""
 
 msgid "InProductMarketing|Facebook"
+msgstr ""
+
+msgid "InProductMarketing|Feedback from users like you really improves our product. Thanks for your help!"
 msgstr ""
 
 msgid "InProductMarketing|Feel the need for speed?"
@@ -17103,6 +17121,9 @@ msgstr ""
 msgid "InProductMarketing|Need an alternative to importing?"
 msgstr ""
 
+msgid "InProductMarketing|Neutral"
+msgstr ""
+
 msgid "InProductMarketing|Our tool brings all the things together"
 msgstr ""
 
@@ -17140,6 +17161,9 @@ msgid "InProductMarketing|Stop wondering and use GitLab to answer questions like
 msgstr ""
 
 msgid "InProductMarketing|Streamline code review, know at a glance who's unavailable, communicate in comments or in email and integrate with Slack so everyone's on the same page."
+msgstr ""
+
+msgid "InProductMarketing|Take this 1-question survey!"
 msgstr ""
 
 msgid "InProductMarketing|Take your first steps with GitLab"
@@ -17196,7 +17220,16 @@ msgstr ""
 msgid "InProductMarketing|Use GitLab CI/CD"
 msgstr ""
 
+msgid "InProductMarketing|Very difficult"
+msgstr ""
+
+msgid "InProductMarketing|Very easy"
+msgstr ""
+
 msgid "InProductMarketing|We know a thing or two about efficiency and we don't want to keep that to ourselves. Sign up for a free trial of GitLab Ultimate and your teams will be on it from day one."
+msgstr ""
+
+msgid "InProductMarketing|We want your GitLab experience to be great"
 msgstr ""
 
 msgid "InProductMarketing|What does our value stream timeline look like from product to development to review and production?"

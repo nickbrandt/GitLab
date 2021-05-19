@@ -2446,6 +2446,18 @@ Status: `implemented`
 
 Tiers: `free`, `premium`, `ultimate`
 
+### `counts.in_product_marketing_email_experience_0_sent`
+
+Total sent emails of the experience track's first email
+
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/20210518081225_in_product_marketing_email_experience_0_sent.yml)
+
+Group: `group::activation`
+
+Status: `implemented`
+
+Tiers: `free`, `premium`, `ultimate`
+
 ### `counts.in_review_folder`
 
 Missing description
