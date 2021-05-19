@@ -663,10 +663,10 @@ msgstr ""
 msgid "%{link_start}Read more%{link_end} about role permissions"
 msgstr ""
 
-msgid "%{link_start}Remove the %{draft_or_wip_snippet} prefix%{link_end} from the title to allow this merge request to be merged when it's ready."
+msgid "%{link_start}Remove the %{draft_snippet} prefix%{link_end} from the title to allow this merge request to be merged when it's ready."
 msgstr ""
 
-msgid "%{link_start}Start the title with %{draft_snippet} or %{wip_snippet}%{link_end} to prevent a merge request that is a work in progress from being merged before it's ready."
+msgid "%{link_start}Start the title with %{draft_snippet}%{link_end} to prevent a merge request that is a work in progress from being merged before it's ready."
 msgstr ""
 
 msgid "%{listToShow}, and %{awardsListLength} more."
@@ -978,6 +978,9 @@ msgstr ""
 msgid "%{user_name} profile page"
 msgstr ""
 
+msgid "%{username} changed the draft status of merge request %{mr_link}"
+msgstr ""
+
 msgid "%{username} has asked for a GitLab account on your instance %{host}:"
 msgstr ""
 
@@ -1039,9 +1042,6 @@ msgid "'%{name}' Value Stream deleted"
 msgstr ""
 
 msgid "'%{name}' Value Stream saved"
-msgstr ""
-
-msgid "'%{name}' stage already exists"
 msgstr ""
 
 msgid "'%{source}' is not a import source"
@@ -1528,15 +1528,6 @@ msgstr ""
 msgid "APIFuzzing|$VariableWithUsername"
 msgstr ""
 
-msgid "APIFuzzing|/folder/example_file.har"
-msgstr ""
-
-msgid "APIFuzzing|/folder/example_file.json"
-msgstr ""
-
-msgid "APIFuzzing|/folder/example_file.postman_collection.json"
-msgstr ""
-
 msgid "APIFuzzing|API Fuzzing Configuration"
 msgstr ""
 
@@ -1576,13 +1567,13 @@ msgstr ""
 msgid "APIFuzzing|Enter the name of the variable containing the username. For example, $VariableWithUsername."
 msgstr ""
 
-msgid "APIFuzzing|File path containing APIs to be tested. For example, /folder/example_file.har. HAR files may contain sensitive information such as authentication tokens, API keys, and session cookies. We recommend that you review the HAR files' contents before adding them to a repository."
+msgid "APIFuzzing|File path or URL to APIs to be tested. For example, folder/example_fuzz.har. HAR files may contain sensitive information such as authentication tokens, API keys, and session cookies. We recommend that you review the HAR files' contents before adding them to a repository."
 msgstr ""
 
-msgid "APIFuzzing|File path containing APIs to be tested. For example, /folder/example_file.json."
+msgid "APIFuzzing|File path or URL to OpenAPI specification. For example, folder/openapi.json or http://www.example.com/openapi.json."
 msgstr ""
 
-msgid "APIFuzzing|File path containing requests to be tested. For example, /folder/example_file.postman_collection.json."
+msgid "APIFuzzing|File path or URL to requests to be tested. For example, folder/example.postman_collection.json."
 msgstr ""
 
 msgid "APIFuzzing|Generate code snippet"
@@ -1609,7 +1600,7 @@ msgstr ""
 msgid "APIFuzzing|Target URL"
 msgstr ""
 
-msgid "APIFuzzing|There are two ways to perform scans."
+msgid "APIFuzzing|There are three ways to perform scans."
 msgstr ""
 
 msgid "APIFuzzing|Tip: Insert the following variables anywhere below stages and include"
@@ -1634,6 +1625,15 @@ msgid "APIFuzzing|Username for basic authentication"
 msgstr ""
 
 msgid "APIFuzzing|You may need a maintainer's help to secure your credentials."
+msgstr ""
+
+msgid "APIFuzzing|folder/example.postman_collection.json"
+msgstr ""
+
+msgid "APIFuzzing|folder/example_fuzz.har"
+msgstr ""
+
+msgid "APIFuzzing|folder/openapi.json"
 msgstr ""
 
 msgid "AWS Access Key"
@@ -5099,7 +5099,10 @@ msgstr ""
 msgid "BillingPlan|Upgrade for free"
 msgstr ""
 
-msgid "Billings|To use free pipeline minutes, you'll need to validate your account with a credit card. This is required to discourage and reduce abuse on GitLab infrastructure. %{strongStart}GitLab will not charge or store your credit card, it will only be used for validation.%{strongEnd}"
+msgid "Billings|To use free pipeline minutes on shared runners, you’ll need to validate your account with a credit or debit card. If you prefer not to provide one, you can run pipelines by bringing your own runners and disabling shared runners for your project. This is required to discourage and reduce abuse on GitLab infrastructure. %{strongStart}GitLab will not charge or store your card, it will only be used for validation.%{strongEnd} %{linkStart}Learn more%{linkEnd}."
+msgstr ""
+
+msgid "Billings|To use free pipeline minutes on shared runners, you’ll need to validate your account with a credit or debit card. This is required to discourage and reduce abuse on GitLab infrastructure. %{strongStart}GitLab will not charge or store your card, it will only be used for validation.%{strongEnd}"
 msgstr ""
 
 msgid "Billings|User successfully validated"
@@ -11339,9 +11342,6 @@ msgstr ""
 msgid "DevopsAdoption|Adopted"
 msgstr ""
 
-msgid "DevopsAdoption|Adoption"
-msgstr ""
-
 msgid "DevopsAdoption|An error occurred while removing the group. Please try again."
 msgstr ""
 
@@ -11378,6 +11378,9 @@ msgstr ""
 msgid "DevopsAdoption|Deploys"
 msgstr ""
 
+msgid "DevopsAdoption|Dev"
+msgstr ""
+
 msgid "DevopsAdoption|DevOps adoption tracks the use of key features across your favorite groups. Add a group to the table to begin."
 msgstr ""
 
@@ -11405,6 +11408,9 @@ msgstr ""
 msgid "DevopsAdoption|Not adopted"
 msgstr ""
 
+msgid "DevopsAdoption|Ops"
+msgstr ""
+
 msgid "DevopsAdoption|Pipelines"
 msgstr ""
 
@@ -11426,6 +11432,9 @@ msgstr ""
 msgid "DevopsAdoption|Scanning"
 msgstr ""
 
+msgid "DevopsAdoption|Sec"
+msgstr ""
+
 msgid "DevopsAdoption|There was an error enabling the current group. Please refresh the page."
 msgstr ""
 
@@ -11436,9 +11445,6 @@ msgid "DevopsAdoption|There was an error fetching Groups. Please refresh the pag
 msgstr ""
 
 msgid "DevopsAdoption|You cannot remove the group you are currently in."
-msgstr ""
-
-msgid "DevopsReport|Adoption"
 msgstr ""
 
 msgid "DevopsReport|DevOps Score"
@@ -11797,7 +11803,7 @@ msgstr ""
 msgid "Draft merge requests can't be merged."
 msgstr ""
 
-msgid "Drop or %{linkStart}upload%{linkEnd} designs to attach"
+msgid "Drag your designs here or %{linkStart}click to upload%{linkEnd}."
 msgstr ""
 
 msgid "Drop or %{linkStart}upload%{linkEnd} file to attach"
@@ -16217,7 +16223,7 @@ msgstr ""
 msgid "HAR (HTTP Archive)"
 msgstr ""
 
-msgid "HAR file path"
+msgid "HAR file path or URL"
 msgstr ""
 
 msgid "HTTP Basic: Access denied\\nYou must use a personal access token with 'api' scope for Git over HTTP.\\nYou can generate one at %{profile_personal_access_tokens_url}"
@@ -18354,6 +18360,9 @@ msgid "Issues can be bugs, tasks or ideas to be discussed. Also, issues are sear
 msgstr ""
 
 msgid "Issues closed"
+msgstr ""
+
+msgid "Issues manual ordering is temporarily disabled for technical reasons."
 msgstr ""
 
 msgid "Issues must match this scope to appear in this list."
@@ -21400,6 +21409,12 @@ msgstr ""
 msgid "Monday"
 msgstr ""
 
+msgid "Monitor"
+msgstr ""
+
+msgid "Monitor Settings"
+msgstr ""
+
 msgid "Monitor your errors by integrating with Sentry."
 msgstr ""
 
@@ -23133,7 +23148,7 @@ msgstr ""
 msgid "OpenAPI"
 msgstr ""
 
-msgid "OpenAPI specification file path"
+msgid "OpenAPI Specification file path or URL"
 msgstr ""
 
 msgid "Opened"
@@ -24685,6 +24700,9 @@ msgid "Port"
 msgstr ""
 
 msgid "Postman collection"
+msgstr ""
+
+msgid "Postman collection file path or URL"
 msgstr ""
 
 msgid "Pre-defined push rules."
@@ -28818,10 +28836,19 @@ msgstr ""
 msgid "SecurityConfiguration|Available with %{linkStart}upgrade or free trial%{linkEnd}"
 msgstr ""
 
+msgid "SecurityConfiguration|Available with Ultimate"
+msgstr ""
+
 msgid "SecurityConfiguration|By default, all analyzers are applied in order to cover all languages across your project, and only run if the language is detected in the Merge Request."
 msgstr ""
 
+msgid "SecurityConfiguration|Configuration guide"
+msgstr ""
+
 msgid "SecurityConfiguration|Configure"
+msgstr ""
+
+msgid "SecurityConfiguration|Configure %{feature}"
 msgstr ""
 
 msgid "SecurityConfiguration|Configure via Merge Request"
@@ -28837,6 +28864,9 @@ msgid "SecurityConfiguration|Customize common SAST settings to suit your require
 msgstr ""
 
 msgid "SecurityConfiguration|Enable"
+msgstr ""
+
+msgid "SecurityConfiguration|Enable %{feature}"
 msgstr ""
 
 msgid "SecurityConfiguration|Enabled"
@@ -30734,12 +30764,6 @@ msgid "Stacktrace snippet"
 msgstr ""
 
 msgid "Stage"
-msgstr ""
-
-msgid "Stage data updated"
-msgstr ""
-
-msgid "Stage removed"
 msgstr ""
 
 msgid "StageName|Build"
@@ -32743,12 +32767,6 @@ msgstr ""
 msgid "There was a problem fetching users."
 msgstr ""
 
-msgid "There was a problem refreshing the data, please try again"
-msgstr ""
-
-msgid "There was a problem saving your custom stage, please try again"
-msgstr ""
-
 msgid "There was a problem sending the confirmation email"
 msgstr ""
 
@@ -32842,9 +32860,6 @@ msgstr ""
 msgid "There was an error removing the e-mail."
 msgstr ""
 
-msgid "There was an error removing your custom stage, please try again"
-msgstr ""
-
 msgid "There was an error resetting group pipeline minutes."
 msgstr ""
 
@@ -32885,9 +32900,6 @@ msgid "There was an error updating the dashboard, branch name is invalid."
 msgstr ""
 
 msgid "There was an error updating the dashboard, branch named: %{branch} already exists."
-msgstr ""
-
-msgid "There was an error updating the stage order. Please try reloading the page."
 msgstr ""
 
 msgid "There was an error when reseting email token."
@@ -34125,6 +34137,9 @@ msgid "Too many namespaces enabled. You will need to manage them via the console
 msgstr ""
 
 msgid "Too many projects enabled. You will need to manage them via the console or the API."
+msgstr ""
+
+msgid "TopNav|Switch to..."
 msgstr ""
 
 msgid "Topics (optional)"
@@ -36733,6 +36748,12 @@ msgstr ""
 msgid "WikiPageConflictMessage|Someone edited the page the same time you did. Please check out %{wikiLinkStart}the page%{wikiLinkEnd} and make sure your changes will not unintentionally remove theirs."
 msgstr ""
 
+msgid "WikiPage|An error occured while trying to render the content editor. Please try again later."
+msgstr ""
+
+msgid "WikiPage|Are you sure you want to switch to the old editor?"
+msgstr ""
+
 msgid "WikiPage|Cancel"
 msgstr ""
 
@@ -36751,10 +36772,16 @@ msgstr ""
 msgid "WikiPage|Format"
 msgstr ""
 
+msgid "WikiPage|Keep editing"
+msgstr ""
+
 msgid "WikiPage|More Information."
 msgstr ""
 
 msgid "WikiPage|Page title"
+msgstr ""
+
+msgid "WikiPage|Retry"
 msgstr ""
 
 msgid "WikiPage|Save changes"
@@ -36764,6 +36791,12 @@ msgid "WikiPage|Switch to old editor"
 msgstr ""
 
 msgid "WikiPage|Switching to the old editor will discard any changes you've made in the new editor."
+msgstr ""
+
+msgid "WikiPage|Switching will discard any changes you've made in the new editor."
+msgstr ""
+
+msgid "WikiPage|This editor is in beta and may not display the page's contents properly."
 msgstr ""
 
 msgid "WikiPage|Tip: You can move this page by adding the path to the beginning of the title."
@@ -36785,9 +36818,6 @@ msgid "WikiPage|Use new editor"
 msgstr ""
 
 msgid "WikiPage|Write your content or drag files here…"
-msgstr ""
-
-msgid "WikiPage|You are editing this page with Content Editor. This editor is in beta and may not display the page's contents properly."
 msgstr ""
 
 msgid "Wikis"
@@ -36956,6 +36986,9 @@ msgid "You are going to turn on confidentiality. Only team members with %{strong
 msgstr ""
 
 msgid "You are not allowed to approve a user"
+msgstr ""
+
+msgid "You are not allowed to log in using password"
 msgstr ""
 
 msgid "You are not allowed to push into this branch. Create another branch or open a merge request."
@@ -37634,9 +37667,6 @@ msgid "Your comment could not be updated! Please check your network connection a
 msgstr ""
 
 msgid "Your comment will be discarded."
-msgstr ""
-
-msgid "Your custom stage '%{title}' was created"
 msgstr ""
 
 msgid "Your dashboard has been copied. You can %{web_ide_link_start}edit it here%{web_ide_link_end}."

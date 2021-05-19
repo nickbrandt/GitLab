@@ -9103,12 +9103,11 @@ ALTER SEQUENCE analytics_devops_adoption_segment_selections_id_seq OWNED BY anal
 
 CREATE TABLE analytics_devops_adoption_segments (
     id bigint NOT NULL,
-    name text,
     last_recorded_at timestamp with time zone,
     created_at timestamp with time zone NOT NULL,
     updated_at timestamp with time zone NOT NULL,
     namespace_id integer,
-    CONSTRAINT check_4be7a006fd CHECK ((char_length(name) <= 255))
+    display_namespace_id integer
 );
 
 CREATE SEQUENCE analytics_devops_adoption_segments_id_seq
@@ -9133,7 +9132,8 @@ CREATE TABLE analytics_devops_adoption_snapshots (
     security_scan_succeeded boolean NOT NULL,
     end_time timestamp with time zone NOT NULL,
     total_projects_count integer,
-    code_owners_used_count integer
+    code_owners_used_count integer,
+    namespace_id integer
 );
 
 CREATE SEQUENCE analytics_devops_adoption_snapshots_id_seq
@@ -12050,6 +12050,13 @@ CREATE SEQUENCE dast_site_profiles_id_seq
 
 ALTER SEQUENCE dast_site_profiles_id_seq OWNED BY dast_site_profiles.id;
 
+CREATE TABLE dast_site_profiles_pipelines (
+    dast_site_profile_id bigint NOT NULL,
+    ci_pipeline_id bigint NOT NULL
+);
+
+COMMENT ON TABLE dast_site_profiles_pipelines IS '{"owner":"group::dynamic analysis","description":"Join table between DAST Site Profiles and CI Pipelines"}';
+
 CREATE TABLE dast_site_tokens (
     id bigint NOT NULL,
     project_id bigint NOT NULL,
@@ -14273,7 +14280,8 @@ CREATE TABLE labels (
     description_html text,
     type character varying,
     group_id integer,
-    cached_markdown_version integer
+    cached_markdown_version integer,
+    remove_on_close boolean DEFAULT false NOT NULL
 );
 
 CREATE SEQUENCE labels_id_seq
@@ -14731,6 +14739,7 @@ CREATE TABLE merge_requests (
     squash_commit_sha bytea,
     sprint_id bigint,
     merge_ref_sha bytea,
+    draft boolean DEFAULT false NOT NULL,
     CONSTRAINT check_970d272570 CHECK ((lock_version IS NOT NULL))
 );
 
@@ -18860,7 +18869,9 @@ CREATE TABLE vulnerability_finding_evidence_responses (
     vulnerability_finding_evidence_id bigint NOT NULL,
     status_code integer,
     reason_phrase text,
-    CONSTRAINT check_58b124ab48 CHECK ((char_length(reason_phrase) <= 2048))
+    body text,
+    CONSTRAINT check_58b124ab48 CHECK ((char_length(reason_phrase) <= 2048)),
+    CONSTRAINT check_76bac0c32b CHECK ((char_length(body) <= 2048))
 );
 
 CREATE SEQUENCE vulnerability_finding_evidence_responses_id_seq
@@ -20875,6 +20886,9 @@ ALTER TABLE ONLY dast_scanner_profiles
 ALTER TABLE ONLY dast_site_profile_secret_variables
     ADD CONSTRAINT dast_site_profile_secret_variables_pkey PRIMARY KEY (id);
 
+ALTER TABLE ONLY dast_site_profiles_pipelines
+    ADD CONSTRAINT dast_site_profiles_pipelines_pkey PRIMARY KEY (dast_site_profile_id, ci_pipeline_id);
+
 ALTER TABLE ONLY dast_site_profiles
     ADD CONSTRAINT dast_site_profiles_pkey PRIMARY KEY (id);
 
@@ -22130,6 +22144,12 @@ CREATE INDEX idx_container_repositories_on_exp_cleanup_status_and_start_date ON 
 
 CREATE INDEX idx_deployment_clusters_on_cluster_id_and_kubernetes_namespace ON deployment_clusters USING btree (cluster_id, kubernetes_namespace);
 
+CREATE INDEX idx_devops_adoption_segments_namespace_end_time ON analytics_devops_adoption_snapshots USING btree (namespace_id, end_time);
+
+CREATE INDEX idx_devops_adoption_segments_namespace_recorded_at ON analytics_devops_adoption_snapshots USING btree (namespace_id, recorded_at);
+
+CREATE UNIQUE INDEX idx_devops_adoption_segments_namespaces_pair ON analytics_devops_adoption_segments USING btree (display_namespace_id, namespace_id);
+
 CREATE INDEX idx_eaprpb_external_approval_rule_id ON external_approval_rules_protected_branches USING btree (external_approval_rule_id);
 
 CREATE INDEX idx_elastic_reindexing_slices_on_elastic_reindexing_subtask_id ON elastic_reindexing_slices USING btree (elastic_reindexing_subtask_id);
@@ -22855,6 +22875,8 @@ CREATE UNIQUE INDEX index_dast_scanner_profiles_on_project_id_and_name ON dast_s
 CREATE INDEX index_dast_site_profiles_on_dast_site_id ON dast_site_profiles USING btree (dast_site_id);
 
 CREATE UNIQUE INDEX index_dast_site_profiles_on_project_id_and_name ON dast_site_profiles USING btree (project_id, name);
+
+CREATE UNIQUE INDEX index_dast_site_profiles_pipelines_on_ci_pipeline_id ON dast_site_profiles_pipelines USING btree (ci_pipeline_id);
 
 CREATE INDEX index_dast_site_tokens_on_project_id ON dast_site_tokens USING btree (project_id);
 
@@ -25221,6 +25243,9 @@ ALTER TABLE ONLY project_features
 ALTER TABLE ONLY ci_pipelines
     ADD CONSTRAINT fk_190998ef09 FOREIGN KEY (external_pull_request_id) REFERENCES external_pull_requests(id) ON DELETE SET NULL;
 
+ALTER TABLE ONLY analytics_devops_adoption_segments
+    ADD CONSTRAINT fk_190a24754d FOREIGN KEY (display_namespace_id) REFERENCES namespaces(id) ON DELETE CASCADE;
+
 ALTER TABLE ONLY user_details
     ADD CONSTRAINT fk_190e4fcc88 FOREIGN KEY (provisioned_by_group_id) REFERENCES namespaces(id) ON DELETE SET NULL;
 
@@ -25350,6 +25375,9 @@ ALTER TABLE ONLY alert_management_alerts
 ALTER TABLE ONLY path_locks
     ADD CONSTRAINT fk_5265c98f24 FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE;
 
+ALTER TABLE ONLY dast_site_profiles_pipelines
+    ADD CONSTRAINT fk_53849b0ad5 FOREIGN KEY (ci_pipeline_id) REFERENCES ci_pipelines(id) ON DELETE CASCADE;
+
 ALTER TABLE ONLY clusters_applications_prometheus
     ADD CONSTRAINT fk_557e773639 FOREIGN KEY (cluster_id) REFERENCES clusters(id) ON DELETE CASCADE;
 
@@ -25436,6 +25464,9 @@ ALTER TABLE ONLY users
 
 ALTER TABLE ONLY geo_event_log
     ADD CONSTRAINT fk_78a6492f68 FOREIGN KEY (repository_updated_event_id) REFERENCES geo_repository_updated_events(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY analytics_devops_adoption_snapshots
+    ADD CONSTRAINT fk_78c9eac821 FOREIGN KEY (namespace_id) REFERENCES namespaces(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY lists
     ADD CONSTRAINT fk_7a5553d60f FOREIGN KEY (label_id) REFERENCES labels(id) ON DELETE CASCADE;
@@ -25703,6 +25734,9 @@ ALTER TABLE ONLY experiment_subjects
 
 ALTER TABLE ONLY todos
     ADD CONSTRAINT fk_ccf0373936 FOREIGN KEY (author_id) REFERENCES users(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY dast_site_profiles_pipelines
+    ADD CONSTRAINT fk_cf05cf8fe1 FOREIGN KEY (dast_site_profile_id) REFERENCES dast_site_profiles(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY geo_event_log
     ADD CONSTRAINT fk_cff7185ad2 FOREIGN KEY (reset_checksum_event_id) REFERENCES geo_reset_checksum_events(id) ON DELETE CASCADE;

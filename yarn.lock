@@ -784,10 +784,10 @@
     core-js-pure "^3.0.0"
     regenerator-runtime "^0.13.4"
 
-"@babel/runtime@^7.10.2", "@babel/runtime@^7.10.3", "@babel/runtime@^7.8.4", "@babel/runtime@^7.9.2":
-  version "7.11.2"
-  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.11.2.tgz#f549c13c754cc40b87644b9fa9f09a6a95fe0736"
-  integrity sha512-TeWkU52so0mPtDcaCTxNBI/IHiz0pZgr8VEFqXFtZWpYD08ZB6FaSwVAS8MKRQAP3bYKiVjwysOJgMFY28o6Tw==
+"@babel/runtime@^7.10.2", "@babel/runtime@^7.10.3", "@babel/runtime@^7.13.10", "@babel/runtime@^7.8.4", "@babel/runtime@^7.9.2":
+  version "7.14.0"
+  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.14.0.tgz#46794bc20b612c5f75e62dd071e24dfd95f1cbe6"
+  integrity sha512-JELkvo/DlpNdJ7dlyw/eY7E0suy5i5GQH+Vlxaq1nsNJ+H7f4Vtv3jMeCEgRhZZQFXTjldYfQgv2qmM6M1v5wA==
   dependencies:
     regenerator-runtime "^0.13.4"
 
@@ -898,20 +898,20 @@
     stylelint-declaration-strict-value "1.7.7"
     stylelint-scss "3.18.0"
 
-"@gitlab/svgs@1.196.0":
-  version "1.196.0"
-  resolved "https://registry.yarnpkg.com/@gitlab/svgs/-/svgs-1.196.0.tgz#7905bc66ef9c69ba7b5225326c0eaf4e55d11386"
-  integrity sha512-X/UGCBXIZXBcPqfRy8qaxQG/SYyrZajAazORZjmnVF+cyM9lQTuCiZFi7dHtMQ1XLew+m1NREVngCmBLuuK98g==
+"@gitlab/svgs@1.197.0":
+  version "1.197.0"
+  resolved "https://registry.yarnpkg.com/@gitlab/svgs/-/svgs-1.197.0.tgz#70be3217b4c0c84b494615d0672734f40e3695d4"
+  integrity sha512-fW9EY3D1adWu4bGqo+74uElQ+U7qIxUM/I2np3133AZBeWK8bvW+92/SHpGQeINxcS/DBVOoepUSSUVvQEqroQ==
 
 "@gitlab/tributejs@1.0.0":
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@gitlab/tributejs/-/tributejs-1.0.0.tgz#672befa222aeffc83e7d799b0500a7a4418e59b8"
   integrity sha512-nmKw1+hB6MHvlmPz63yPwVs1qQkycHwsKgxpEbzmky16Y6mL4EJMk3w1b8QlOAF/AIAzjCERPhe/R4MJiohbZw==
 
-"@gitlab/ui@29.25.0":
-  version "29.25.0"
-  resolved "https://registry.yarnpkg.com/@gitlab/ui/-/ui-29.25.0.tgz#535f1e358176fb73d0e7df0315a8f50f7c8fc20b"
-  integrity sha512-Bt9wBj954Ev6UGbAJ0+ViT7ggOBXocyxru8NPDq060G7OAchtm6IQK0bwa4DugF5LxiP9IWXy34Oz55zjymwqw==
+"@gitlab/ui@29.27.0":
+  version "29.27.0"
+  resolved "https://registry.yarnpkg.com/@gitlab/ui/-/ui-29.27.0.tgz#c5cbe1fee2164705ea6a431c85f6fdaa2ff7e166"
+  integrity sha512-VoiYrozWyE9l/ddX308vsu+wQqaJJN3csngIlrJit3DzVZV9Z/OVWU/X9CWV8m/ubyr5ysEMqnrtnsQClR9FiA==
   dependencies:
     "@babel/standalone" "^7.0.0"
     "@gitlab/vue-toasted" "^1.3.0"
@@ -10359,6 +10359,11 @@ schema-utils@^3.0.0:
     ajv "^6.12.5"
     ajv-keywords "^3.5.2"
 
+scrollparent@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/scrollparent/-/scrollparent-2.0.1.tgz#715d5b9cc57760fb22bdccc3befb5bfe06b1a317"
+  integrity sha1-cV1bnMV3YPsivczDvvtb/gaxoxc=
+
 select-hose@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/select-hose/-/select-hose-2.0.0.tgz#625d8658f865af43ec962bfc376a37359a4994ca"
@@ -12126,6 +12131,18 @@ vue-loader@^15.9.6:
     vue-hot-reload-api "^2.3.0"
     vue-style-loader "^4.1.0"
 
+vue-observe-visibility@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/vue-observe-visibility/-/vue-observe-visibility-1.0.0.tgz#17cf1b2caf74022f0f3c95371468ddf2b9573152"
+  integrity sha512-s5TFh3s3h3Mhd3jaz3zGzkVHKHnc/0C/gNr30olO99+yw2hl3WBhK3ng3/f9OF+qkW4+l7GkmwfAzDAcY3lCFg==
+
+vue-resize@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/vue-resize/-/vue-resize-1.0.1.tgz#c120bed4e09938771d622614f57dbcf58a5147ee"
+  integrity sha512-z5M7lJs0QluJnaoMFTIeGx6dIkYxOwHThlZDeQnWZBizKblb99GSejPnK37ZbNE/rVwDcYcHY+Io+AxdpY952w==
+  dependencies:
+    "@babel/runtime" "^7.13.10"
+
 vue-router@3.4.9:
   version "3.4.9"
   resolved "https://registry.yarnpkg.com/vue-router/-/vue-router-3.4.9.tgz#c016f42030ae2932f14e4748b39a1d9a0e250e66"
@@ -12245,10 +12262,10 @@ webidl-conversions@^6.1.0:
   resolved "https://registry.yarnpkg.com/webidl-conversions/-/webidl-conversions-6.1.0.tgz#9111b4d7ea80acd40f5270d666621afa78b69514"
   integrity sha512-qBIvFLGiBpLjfwmYAaHPXsn+ho5xZnGvyGvsarywGNc8VyQJUMHJ8OBKGGrPER0okBeMDaan4mNBlgBROxuI8w==
 
-webpack-bundle-analyzer@^4.4.1:
-  version "4.4.1"
-  resolved "https://registry.yarnpkg.com/webpack-bundle-analyzer/-/webpack-bundle-analyzer-4.4.1.tgz#c71fb2eaffc10a4754d7303b224adb2342069da1"
-  integrity sha512-j5m7WgytCkiVBoOGavzNokBOqxe6Mma13X1asfVYtKWM3wxBiRRu1u1iG0Iol5+qp9WgyhkMmBAcvjEfJ2bdDw==
+webpack-bundle-analyzer@^4.4.2:
+  version "4.4.2"
+  resolved "https://registry.yarnpkg.com/webpack-bundle-analyzer/-/webpack-bundle-analyzer-4.4.2.tgz#39898cf6200178240910d629705f0f3493f7d666"
+  integrity sha512-PIagMYhlEzFfhMYOzs5gFT55DkUdkyrJi/SxJp8EF3YMWhS+T9vvs2EoTetpk5qb6VsCq02eXTlRDOydRhDFAQ==
   dependencies:
     acorn "^8.0.4"
     acorn-walk "^8.0.0"

@@ -68,10 +68,12 @@ starting in GitLab 14.0, GitLab will not check your repository's root for config
 
 ### OpenAPI Specification
 
-The [OpenAPI Specification](https://www.openapis.org/) (formerly the Swagger Specification) is an
-API description format for REST APIs. This section shows you how to configure DAST API by using
-an OpenAPI specification to provide information about the target API to test. OpenAPI specifications
-are provided as a file system resource or URL.
+> Support for OpenAPI Specification using YAML format was
+> [introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/330583) in GitLab 14.0.
+
+The [OpenAPI Specification](https://www.openapis.org/) (formerly the Swagger Specification) is an API description format for REST APIs. 
+This section shows you how to configure API fuzzing using an OpenAPI Specification to provide information about the target API to test. 
+OpenAPI Specifications are provided as a file system resource or URL. Both JSON and YAML OpenAPI formats are supported.
 
 DAST API uses an OpenAPI document to generate the request body. When a request body is required,
 the body generation is limited to these body types:
@@ -594,7 +596,7 @@ can be added, removed, and modified by creating a custom configuration.
 - Application Information Check
 - Cleartext Authentication Check
 - FrameworkDebugModeCheck
-- Html Injection Check
+- HTML Injection Check
 - Insecure Http Methods Check
 - JSON Hijacking Check
 - JSON Injection Check
@@ -602,16 +604,16 @@ can be added, removed, and modified by creating a custom configuration.
 - Session Cookie Check
 - SQL Injection Check
 - Token Check
-- Xml Injection Check
+- XML Injection Check
 
 ##### Full
 
 - Application Information Check
 - Cleartext AuthenticationCheck
-- Cors Check
-- Dns Rebinding Check
+- CORS Check
+- DNS Rebinding Check
 - Framework Debug Mode Check
-- Html Injection Check
+- HTML Injection Check
 - Insecure Http Methods Check
 - JSON Hijacking Check
 - JSON Injection Check
@@ -620,9 +622,9 @@ can be added, removed, and modified by creating a custom configuration.
 - Sensitive Information Check
 - Session Cookie Check
 - SQL Injection Check
-- Tls Configuration Check
+- TLS Configuration Check
 - Token Check
-- Xml Injection Check
+- XML Injection Check
 
 ### Available CI/CD variables
 
@@ -1075,6 +1077,56 @@ The DAST API engine outputs an error message when it cannot establish a connecti
 
 - Remove the `DAST_API_API` variable from the `.gitlab-ci.yml` file. The value will be inherited from the DAST API CI/CD template. We recommend this method instead of manually setting a value.
 - If removing the variable is not possible, check to see if this value has changed in the latest version of the [DAST API CI/CD template](https://gitlab.com/gitlab-org/gitlab/blob/master/lib/gitlab/ci/templates/Security/DAST-API.gitlab-ci.yml). If so, update the value in the `.gitlab-ci.yml` file.
+
+### Application cannot determine the base URL for the target API
+
+The DAST API engine outputs an error message when it cannot determine the target API after inspecting the OpenAPI document. This error message is shown when the target API has not been set in the `.gitlab-ci.yml` file, it is not available in the `environment_url.txt` file, and it could not be computed using the OpenAPI document.
+
+There is a order of precedence in which the DAST API engine tries to get the target API when checking the different sources. First, it will try to use the `DAST_API_TARGET_URL`. If the environment variable has not been set, then the DAST API engine will attempt to use the `environment_url.txt` file. If there is no file `environment_url.txt`, then the DAST API engine will use the OpenAPI document contents and the URL provided in `DAST_API_OPENAPI` (if a URL is provided) to try to compute the target API.
+
+The best-suited solution will depend on whether or not your target API changes for each deployment. In static environments, the target API is the same for each deployment, in this case please refer to the [static environment solution](#static-environment-solution). If the target API changes for each deployment a [dynamic environment solution](#dynamic-environment-solutions) should be applied.
+
+#### Static environment solution
+
+This solution is for pipelines in which the target API URL doesn't change (is static). 
+
+**Add environmental variable**
+
+For environments where the target API remains the same, we recommend you specify the target URL by using the `DAST_API_TARGET_URL` environment variable. In your `.gitlab-ci.yml`, add a variable `DAST_API_TARGET_URL`. The variable must be set to the base URL of API testing target. For example:
+
+```yaml
+include:
+    - template: DAST-API.gitlab-ci.yml
+
+  variables:
+    DAST_API_TARGET_URL: http://test-deployment/
+    DAST_API_OPENAPI: test-api-specification.json
+```
+
+#### Dynamic environment solutions
+
+In a dynamic environment your target API changes for each different deployment. In this case, there is more than one possible solution, we recommend you use the `environment_url.txt` file when dealing with dynamic environments. 
+
+**Use environment_url.txt**
+
+To support dynamic environments in which the target API URL changes during each pipeline, DAST API engine supports the use of an `environment_url.txt` file that contains the URL to use. This file is not checked into the repository, instead it's created during the pipeline by the job that deploys the test target and collected as an artifact that can be used by later jobs in the pipeline. The job that creates the `environment_url.txt` file must run before the DAST API engine job.
+
+1. Modify the test target deployment job adding the base URL in an `environment_url.txt` file at the root of your project.
+1. Modify the test target deployment job collecting the `environment_url.txt` as an artifact.
+
+Example:
+
+```yaml
+deploy-test-target:
+  script:
+    # Perform deployment steps
+    # Create environment_url.txt (example)
+    - echo http://${CI_PROJECT_ID}-${CI_ENVIRONMENT_SLUG}.example.org > environment_url.txt
+
+  artifacts:
+    paths:
+      - environment_url.txt
+```
 
 ## Glossary
 
