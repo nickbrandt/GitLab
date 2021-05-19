@@ -41,7 +41,6 @@ module Projects
         render_404 unless @project.merge_requests_enabled?
       end
 
-
       def project_params(attributes: [])
         params.require(:project)
           .permit(project_params_attributes + attributes)
