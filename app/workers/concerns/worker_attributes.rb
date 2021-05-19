@@ -99,9 +99,14 @@ module WorkerAttributes
       # Since the deduplication should always take into account the latest binary replication pointer into account,
       # not the first one, the deduplication will not work with sticky or delayed.
       # Follow up issue to improve this: https://gitlab.com/gitlab-org/gitlab/-/issues/325291
-      if idempotent? && get_data_consistency != :always
+      if idempotent? && utilizes_load_balancing_capabilities?
         raise ArgumentError, "Class can't be marked as idempotent if data_consistency is not set to :always"
       end
+    end
+
+    # If data_consistency is not set to :always, worker will try to utilize load balancing capabilities and use the replica
+    def utilizes_load_balancing_capabilities?
+      get_data_consistency != :always
     end
 
     def get_data_consistency
