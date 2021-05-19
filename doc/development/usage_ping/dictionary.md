@@ -4086,7 +4086,7 @@ Total count of Terraform Module packages delete events
 
 Group: `group::configure`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -4098,7 +4098,7 @@ Total count of pull Terraform Module packages events
 
 Group: `group::configure`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -4110,7 +4110,7 @@ Total count of push Terraform Module packages events
 
 Group: `group::configure`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -7938,7 +7938,7 @@ Counts visits to DevOps Adoption page per month
 
 Group: `group::optimize`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `premium`, `ultimate`
 
@@ -7950,7 +7950,7 @@ Counts visits to DevOps Adoption page per week
 
 Group: `group::optimize`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `premium`, `ultimate`
 
@@ -10338,7 +10338,7 @@ Number of distinct users authorized via deploy token creating Terraform Module p
 
 Group: `group::configure`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -10350,7 +10350,7 @@ Number of distinct users authorized via deploy token creating Terraform Module p
 
 Group: `group::configure`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -10770,7 +10770,7 @@ Total monthly users count for epics_usage
 
 Group: `group::product planning`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `premium`, `ultimate`
 
@@ -10782,7 +10782,7 @@ Total weekly users count for epics_usage
 
 Group: `group::product planning`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `premium`, `ultimate`
 
@@ -10794,7 +10794,7 @@ Counts of MAU closing epics
 
 Group: `group::product planning`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `premium`, `ultimate`
 
@@ -10866,7 +10866,7 @@ Count of MAU destroying epics
 
 Group: `group::product planning`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `premium`, `ultimate`
 
@@ -10878,7 +10878,7 @@ Count of WAU destroying epics
 
 Group: `group::product planning`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `premium`, `ultimate`
 
@@ -10890,7 +10890,7 @@ Count of MAU adding issues to epics
 
 Group: `group::product planning`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `premium`, `ultimate`
 
@@ -10902,7 +10902,7 @@ Count of WAU adding issues to epics
 
 Group: `group::product planning`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `premium`, `ultimate`
 
@@ -10914,7 +10914,7 @@ Counts of MAU moving epic issues between projects
 
 Group: `group::product planning`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `premium`, `ultimate`
 
@@ -10926,7 +10926,7 @@ Counts of WAU moving epic issues between projects
 
 Group: `group::product planning`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `premium`, `ultimate`
 
@@ -10938,7 +10938,7 @@ Count of MAU removing issues from epics
 
 Group: `group::product planning`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `premium`, `ultimate`
 
@@ -10950,7 +10950,7 @@ Counts of WAU removing issues from epics
 
 Group: `group::product planning`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `premium`, `ultimate`
 
@@ -10962,7 +10962,7 @@ Counts of MAU closing epics
 
 Group: `group::product planning`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `premium`, `ultimate`
 
@@ -10974,7 +10974,7 @@ Counts of WAU re-opening epics
 
 Group: `group::product planning`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `premium`, `ultimate`
 
@@ -10986,7 +10986,7 @@ Count of MAU chaging the epic lables
 
 Group: `group::product planning`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `premium`, `ultimate`
 
@@ -10998,7 +10998,7 @@ Count of WAU chaging the epic lables
 
 Group: `group::product planning`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `premium`, `ultimate`
 
@@ -11010,7 +11010,7 @@ Count of MAU promoting issues to epics
 
 Group: `group::product planning`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `premium`, `ultimate`
 
@@ -11022,7 +11022,7 @@ Counts of WAU promoting issues to epics
 
 Group: `group::product planning`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `premium`, `ultimate`
 
@@ -11082,7 +11082,7 @@ Counts of MAU destroying epic notes
 
 Group: `group::product planning`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `premium`, `ultimate`
 
@@ -11094,7 +11094,7 @@ Counts of WAU destroying epic notes
 
 Group: `group::product planning`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `premium`, `ultimate`
 
@@ -11130,7 +11130,7 @@ Count of MAU making epics confidential
 
 Group: `group::product planning`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `premium`, `ultimate`
 
@@ -11142,7 +11142,7 @@ Count of WAU making epics confidential
 
 Group: `group::product planning`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `premium`, `ultimate`
 
@@ -11154,7 +11154,7 @@ Counts of MAU setting epic due date as inherited
 
 Group: `group::product planning`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `premium`, `ultimate`
 
@@ -11166,7 +11166,7 @@ Counts of WAU setting epic due date as fixed
 
 Group: `group::product planning`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `premium`, `ultimate`
 
@@ -11178,7 +11178,7 @@ Counts of MAU setting epic due date as inherited
 
 Group: `group::product planning`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `premium`, `ultimate`
 
@@ -11190,7 +11190,7 @@ Counts of WAU setting epic due date as inherited
 
 Group: `group::product planning`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `premium`, `ultimate`
 
@@ -11202,7 +11202,7 @@ Counts of MAU setting epic start date as fixed
 
 Group: `group::product planning`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `premium`, `ultimate`
 
@@ -11214,7 +11214,7 @@ Counts of WAU setting epic start date as fixed
 
 Group: `group::product planning`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `premium`, `ultimate`
 
@@ -11226,7 +11226,7 @@ Counts of MAU setting epic start date as inherited
 
 Group: `group::product planning`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `premium`, `ultimate`
 
@@ -11238,7 +11238,7 @@ Counts of WAU setting epic start date as inherited
 
 Group: `group::product planning`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `premium`, `ultimate`
 
@@ -11250,7 +11250,7 @@ Count of MAU making epics visible
 
 Group: `group::product planning`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `premium`, `ultimate`
 
@@ -11262,7 +11262,7 @@ Count of WAU making epics visible
 
 Group: `group::product planning`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `premium`, `ultimate`
 
@@ -11274,7 +11274,7 @@ Counts of MAU changing epic descriptions
 
 Group: `group::product planning`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `premium`, `ultimate`
 
@@ -11286,7 +11286,7 @@ Counts of WAU changing epic descriptions
 
 Group: `group::product planning`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `premium`, `ultimate`
 
@@ -11298,7 +11298,7 @@ Counts of MAU updating epic notes
 
 Group: `group::product planning`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `premium`, `ultimate`
 
@@ -11310,7 +11310,7 @@ Counts of WAU updating epic notes
 
 Group: `group::product planning`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `premium`, `ultimate`
 
@@ -11346,7 +11346,7 @@ Counts of MAU changing epic titles
 
 Group: `group::product planning`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `premium`, `ultimate`
 
@@ -11358,7 +11358,7 @@ Counts of WAU changing epic titles
 
 Group: `group::product planning`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `premium`, `ultimate`
 
@@ -11370,7 +11370,7 @@ Counts of MAU manually updating fixed due date
 
 Group: `group::product planning`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `premium`, `ultimate`
 
@@ -11382,7 +11382,7 @@ Counts of WAU manually updating fixed due date
 
 Group: `group::product planning`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `premium`, `ultimate`
 
@@ -11394,7 +11394,7 @@ Counts of MAU manually updating fixed start date
 
 Group: `group::product planning`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `premium`, `ultimate`
 
@@ -11406,7 +11406,7 @@ Counts of WAU manually updating fixed start date
 
 Group: `group::product planning`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `premium`, `ultimate`
 
@@ -14562,7 +14562,7 @@ Count of expanding the security report widget
 
 Group: `group::static analysis`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -14574,7 +14574,7 @@ Count of expanding the security report widget
 
 Group: `group::static analysis`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -14922,7 +14922,7 @@ Unique users that expand the test summary merge request widget by month
 
 Group: `group::testing`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -14934,7 +14934,7 @@ Unique users that expand the test summary merge request widget by week
 
 Group: `group::testing`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -15018,7 +15018,7 @@ Count of expanding the accessibility report widget
 
 Group: `group::testing`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -15030,7 +15030,7 @@ Count of expanding the accessibility report widget
 
 Group: `group::testing`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -15042,7 +15042,7 @@ Count of expanding the code quality widget
 
 Group: `group::testing`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -15054,7 +15054,7 @@ Count of expanding the code quality widget
 
 Group: `group::testing`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -15354,7 +15354,7 @@ Number of distinct users creating Terraform Module packages in recent 28 days
 
 Group: `group::configure`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -15366,7 +15366,7 @@ Number of distinct users creating Terraform Module packages in recent 7 days
 
 Group: `group::configure`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -15474,7 +15474,7 @@ Gitaly application performance
 
 Group: `group::gitaly`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
