@@ -5,9 +5,10 @@ module Projects
     class MergeRequestsController < Projects::ApplicationController
       layout 'project_settings'
 
+      before_action :merge_requests_settings_enabled!
+      before_action :merge_requests_enabled?
       before_action :present_project, only: [:edit]
       before_action :authorize_admin_project!
-      before_action :merge_requests_settings_enabled!
 
       feature_category :code_review
 
@@ -34,8 +35,12 @@ module Projects
 
       def merge_requests_settings_enabled!
         render_404 unless Feature.enabled?(:sidebar_refactor, current_user)
+      end
+
+      def merge_requests_enabled?
         render_404 unless @project.merge_requests_enabled?
       end
+
 
       def project_params(attributes: [])
         params.require(:project)
