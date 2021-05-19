@@ -7,7 +7,7 @@ module Gitlab
         PayloadDecompressionConflictError = Class.new(StandardError)
         PayloadDecompressionError = Class.new(StandardError)
 
-        # Level 5 is is a good trade-off between space and time
+        # Level 5 is a good trade-off between space and time
         # https://gitlab.com/gitlab-com/gl-infra/scalability/-/issues/1054#note_568129605
         COMPRESS_LEVEL = 5
         ORIGINAL_SIZE_KEY = 'original_job_size_bytes'
