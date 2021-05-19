@@ -2182,6 +2182,18 @@ Status: `implemented`
 
 Tiers: `free`, `premium`, `ultimate`
 
+### `counts.in_product_marketing_email_experience_0_sent`
+
+Total sent emails of the experience track's first email
+
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/20210518081225_in_product_marketing_email_experience_0_sent.yml)
+
+Group: `group::activation`
+
+Status: `implemented`
+
+Tiers: `free`, `premium`, `ultimate`
+
 ### `counts.in_product_marketing_email_team_0_cta_clicked`
 
 Total clicks on the team track's first email
@@ -2391,18 +2403,6 @@ Tiers: `free`, `premium`, `ultimate`
 Total sent emails of the verify track's third email
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/20210510203015_in_product_marketing_email_verify_2_sent.yml)
-
-Group: `group::activation`
-
-Status: `implemented`
-
-Tiers: `free`, `premium`, `ultimate`
-
-### `counts.in_product_marketing_email_experience_0_sent`
-
-Total sent emails of the experience track's first email
-
-[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/20210518081225_in_product_marketing_email_experience_0_sent.yml)
 
 Group: `group::activation`
 
@@ -11946,7 +11946,7 @@ Count of unique users to receive a notification while on-call
 
 Group: `group::monitor`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `premium`, `ultimate`
 
@@ -11958,7 +11958,7 @@ Count of unique users to receive a notification while on-call
 
 Group: `group::monitor`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `premium`, `ultimate`
 
@@ -12780,21 +12780,21 @@ Tiers: `free`, `premium`, `ultimate`
 
 ### `redis_hll_counters.pipeline_authoring.o_pipeline_authoring_unique_users_committing_ciconfigfile_monthly`
 
-Missing description
+Monthly unique user count doing commits which contains the CI config file
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_28d/20210216184303_o_pipeline_authoring_unique_users_committing_ciconfigfile_monthly.yml)
 
-Group: ``
+Group: `group::pipeline authoring`
 
 Status: `data_available`
 
-Tiers: `free`
+Tiers: `free`, `premium`, `ultimate`
 
 ### `redis_hll_counters.pipeline_authoring.o_pipeline_authoring_unique_users_committing_ciconfigfile_weekly`
 
-Monthly unique user count doing commits which contains the CI config file
+Weekly unique user count doing commits which contains the CI config file
 
-[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_7d/20210216184301_o_pipeline_authoring_unique_users_committing_ciconfigfile_weekly.yml)
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_7d/20210216184301_o_pipeline_authoring_unique_users_committing_ciconfigfile_weekly.yml)
 
 Group: `group::pipeline authoring`
 
