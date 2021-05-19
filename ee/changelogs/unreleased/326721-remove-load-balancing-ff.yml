@@ -1,0 +1,5 @@
+---
+title: 'Advanced Search: Allow indexing workers to use replicas'
+merge_request: 61993
+author:
+type: performance
