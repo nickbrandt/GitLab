@@ -19,7 +19,7 @@ module Ci
       raise InvalidQueueTransition unless transition.to == 'pending'
 
       transition.within_transaction do
-        result = ::Ci::PendingBuild.upsert!(build)
+        result = ::Ci::PendingBuild.upsert_from_build!(build)
 
         unless result.empty?
           metrics.increment_queue_operation(:build_queue_push)
