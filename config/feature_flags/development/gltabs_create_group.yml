@@ -2,7 +2,7 @@
 name: gltabs_create_group
 introduced_by_url: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/56431
 rollout_issue_url: https://gitlab.com/gitlab-org/gitlab/-/issues/327379
-milestone: '13.11'
+milestone: '14.0'
 type: development
 group: group::container security
 default_enabled: false
