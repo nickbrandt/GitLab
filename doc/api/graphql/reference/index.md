@@ -10951,6 +10951,7 @@ Represents vulnerability finding of a security report on the pipeline.
 | <a id="pipelinesecurityreportfindingscanner"></a>`scanner` | [`VulnerabilityScanner`](#vulnerabilityscanner) | Scanner metadata for the vulnerability. |
 | <a id="pipelinesecurityreportfindingseverity"></a>`severity` | [`VulnerabilitySeverity`](#vulnerabilityseverity) | Severity of the vulnerability finding. |
 | <a id="pipelinesecurityreportfindingsolution"></a>`solution` | [`String`](#string) | URL to the vulnerability's details page. |
+| <a id="pipelinesecurityreportfindingstate"></a>`state` | [`VulnerabilityState`](#vulnerabilitystate) | The finding status. |
 | <a id="pipelinesecurityreportfindinguuid"></a>`uuid` | [`String`](#string) | Name of the vulnerability finding. |
 
 ### `Project`
