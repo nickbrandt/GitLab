@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe 'Issues' do
+RSpec.describe 'Issues', :js do
   let_it_be(:project) { create(:project, :public) }
   let_it_be(:auditor) { create(:user, auditor: true) }
 

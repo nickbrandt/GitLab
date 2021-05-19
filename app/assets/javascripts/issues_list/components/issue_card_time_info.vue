@@ -117,6 +117,7 @@ export default {
     <weight-count
       class="issuable-weight gl-display-none gl-sm-display-inline-block gl-mr-3"
       :weight="issue.weight"
+      data-testid="weight"
     />
     <issue-health-status
       v-if="showHealthStatus"

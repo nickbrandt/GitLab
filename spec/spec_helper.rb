@@ -279,7 +279,7 @@ RSpec.configure do |config|
 
       # The following `vue_issues_list`/`vue_issuables_list` stubs can be removed
       # once the Vue issues page has feature parity with the current Haml page
-      stub_feature_flags(vue_issues_list: false)
+      # stub_feature_flags(vue_issues_list: false)
       stub_feature_flags(vue_issuables_list: false)
 
       # Disable `refactor_blob_viewer` as we refactor

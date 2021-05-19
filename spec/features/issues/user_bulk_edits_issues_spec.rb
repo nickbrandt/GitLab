@@ -18,8 +18,11 @@ RSpec.describe 'Multiple issue updating from issues#index', :js do
 
       click_button 'Edit issues'
       check 'Select all'
-      click_button 'Select status'
-      click_button 'Closed'
+
+      within('aside[aria-label="Bulk update"]') do
+        click_button 'Select status'
+        click_button 'Closed'
+      end
 
       click_update_issues_button
       expect(page).to have_selector('.issue', count: 0)
@@ -31,8 +34,11 @@ RSpec.describe 'Multiple issue updating from issues#index', :js do
 
       click_button 'Edit issues'
       check 'Select all'
-      click_button 'Select status'
-      click_button 'Open'
+
+      within('aside[aria-label="Bulk update"]') do
+        click_button 'Select status'
+        click_button 'Open'
+      end
 
       click_update_issues_button
       expect(page).to have_selector('.issue', count: 0)

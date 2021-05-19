@@ -13,7 +13,7 @@ RSpec.describe "User creates issue" do
       sign_out(:user)
     end
 
-    it "redirects to signin then back to new issue after signin" do
+    it "redirects to signin then back to new issue after signin", :js do
       create(:issue, project: project)
 
       visit project_issues_path(project)

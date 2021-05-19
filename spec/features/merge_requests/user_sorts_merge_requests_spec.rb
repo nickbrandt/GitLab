@@ -49,7 +49,7 @@ RSpec.describe 'User sorts merge requests' do
     expect(find('.issues-filters a.is-active')).to have_content('Milestone')
   end
 
-  it 'separates remember sorting with issues' do
+  it 'separates remember sorting with issues', :js do
     create(:issue, project: project)
 
     find('.filter-dropdown-container .dropdown').click
