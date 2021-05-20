@@ -30,7 +30,8 @@ export default {
           ],
           token: LabelToken,
           unique: false,
-          symbol: '~',
+          // eslint-disable-next-line @gitlab/require-i18n-strings
+          defaultLabels: [{ value: 'No label', text: __('No label') }],
           fetchLabels: this.fetchLabels,
         },
         {
