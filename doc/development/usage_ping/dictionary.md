@@ -2182,6 +2182,18 @@ Status: `implemented`
 
 Tiers: `free`, `premium`, `ultimate`
 
+### `counts.in_product_marketing_email_experience_0_sent`
+
+Total sent emails of the experience track's first email
+
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/20210518081225_in_product_marketing_email_experience_0_sent.yml)
+
+Group: `group::activation`
+
+Status: `implemented`
+
+Tiers: `free`, `premium`, `ultimate`
+
 ### `counts.in_product_marketing_email_team_0_cta_clicked`
 
 Total clicks on the team track's first email
@@ -2391,18 +2403,6 @@ Tiers: `free`, `premium`, `ultimate`
 Total sent emails of the verify track's third email
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/20210510203015_in_product_marketing_email_verify_2_sent.yml)
-
-Group: `group::activation`
-
-Status: `implemented`
-
-Tiers: `free`, `premium`, `ultimate`
-
-### `counts.in_product_marketing_email_experience_0_sent`
-
-Total sent emails of the experience track's first email
-
-[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/20210518081225_in_product_marketing_email_experience_0_sent.yml)
 
 Group: `group::activation`
 
@@ -11482,54 +11482,6 @@ Status: `implemented`
 
 Tiers: `premium`, `ultimate`
 
-### `redis_hll_counters.epics_usage.project_management_users_checking_epic_task_monthly`
-
-Counts of MAU checking epic task
-
-[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_28d/20210421080207_g_project_management_users_checking_epic_task_monthly.yml)
-
-Group: `group::product planning`
-
-Status: `implemented`
-
-Tiers: `premium`, `ultimate`
-
-### `redis_hll_counters.epics_usage.project_management_users_checking_epic_task_weekly`
-
-Counts of WAU checking epic task
-
-[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_7d/20210421075943_g_project_management_users_checking_epic_task_weekly.yml)
-
-Group: `group::product planning`
-
-Status: `implemented`
-
-Tiers: `premium`, `ultimate`
-
-### `redis_hll_counters.epics_usage.project_management_users_unchecking_epic_task_monthly`
-
-Counts of MAU unchecking epic task
-
-[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_28d/20210421102516_g_project_management_users_unchecking_epic_task_monthly.yml)
-
-Group: `group::product planning`
-
-Status: `implemented`
-
-Tiers: `premium`, `ultimate`
-
-### `redis_hll_counters.epics_usage.project_management_users_unchecking_epic_task_weekly`
-
-Counts of WAU unchecking epic task
-
-[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_7d/20210421102812_g_project_management_users_unchecking_epic_task_weekly.yml)
-
-Group: `group::product planning`
-
-Status: `implemented`
-
-Tiers: `premium`, `ultimate`
-
 ### `redis_hll_counters.ide_edit.g_edit_by_sfe_monthly`
 
 Missing description
@@ -12042,7 +11994,7 @@ Count of unique users to receive a notification while on-call
 
 Group: `group::monitor`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `premium`, `ultimate`
 
@@ -12054,7 +12006,7 @@ Count of unique users to receive a notification while on-call
 
 Group: `group::monitor`
 
-Status: `implemented`
+Status: `data_available`
 
 Tiers: `premium`, `ultimate`
 
