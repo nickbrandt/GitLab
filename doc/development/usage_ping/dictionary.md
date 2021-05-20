@@ -15332,7 +15332,7 @@ Projects with Prometheus alerting enabled
 
 Group: `group::configure`
 
-Status: `data_available`
+Status: `deprecated`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -17170,7 +17170,7 @@ Projects with Prometheus alerting enabled
 
 Group: `group::monitor`
 
-Status: `data_available`
+Status: `deprecated`
 
 Tiers: `free`, `premium`, `ultimate`
 
