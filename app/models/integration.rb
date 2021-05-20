@@ -42,6 +42,7 @@ class Integration < ApplicationRecord
   RENAMED_TO_INTEGRATION = %w[
     asana assembla
     bamboo bugzilla buildkite
+    campfire
   ].to_set.freeze
 
   serialize :properties, JSON # rubocop:disable Cop/ActiveRecordSerialize
