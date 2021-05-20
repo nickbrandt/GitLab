@@ -5,8 +5,8 @@ require 'fast_spec_helper'
 require_relative '../../../../rubocop/cop/usage_data/histogram_with_large_table'
 
 RSpec.describe RuboCop::Cop::UsageData::HistogramWithLargeTable do
-  let(:high_traffic_models) { %i[Issue Ci::Build] }
-  let(:msg) { 'Use one of the count, distinct_count methods for counting on' }
+  let(:high_traffic_models) { %w[Issue Ci::Build] }
+  let(:msg) { 'Avoid histogram method on' }
 
   let(:config) do
     RuboCop::Config.new('UsageData/HistogramWithLargeTable' => {
@@ -17,28 +17,79 @@ RSpec.describe RuboCop::Cop::UsageData::HistogramWithLargeTable do
   subject(:cop) { described_class.new(config) }
 
   context 'with large tables' do
-    context 'when calling histogram(Issue)' do
-      it 'does not register an offense' do
-        expect_no_offenses('count(Issue, :project_id, buckets: 1..100)')
+    context 'with one-level constants' do
+      context 'when calling histogram(Issue)' do
+        it 'registers an offense' do
+          expect_offense(<<~CODE)
+            histogram(Issue, :project_id, buckets: 1..100)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ #{msg} Issue
+          CODE
+        end
+      end
+
+      context 'when calling histogram(::Issue)' do
+        it 'registers an offense' do
+          expect_offense(<<~CODE)
+            histogram(::Issue, :project_id, buckets: 1..100)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ #{msg} Issue
+          CODE
+        end
+      end
+
+      context 'when calling histogram(Issue.closed)' do
+        it 'registers an offense' do
+          expect_offense(<<~CODE)
+            histogram(Issue.closed, :project_id, buckets: 1..100)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ #{msg} Issue
+          CODE
+        end
+      end
+
+      context 'when calling histogram(::Issue.closed)' do
+        it 'registers an offense' do
+          expect_offense(<<~CODE)
+            histogram(::Issue.closed, :project_id, buckets: 1..100)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ #{msg} Issue
+          CODE
+        end
       end
     end
 
-    context 'when calling histogram(::Ci::Build)' do
-      it 'does not register an offense' do
-        expect_offense(<<~CODE)
-          histogram(::Ci::Build.active, buckets: 1..100)
-          ^^^^^^^^^ #{msg} Ci::Build
-        CODE
+    context 'with two-level constants' do
+      context 'when calling histogram(::Ci::Build)' do
+        it 'registers an offense' do
+          expect_offense(<<~CODE)
+            histogram(::Ci::Build, buckets: 1..100)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ #{msg} Ci::Build
+          CODE
+        end
       end
-    end
 
-    context 'when calling histogram(Ci::Build.active)' do
-      it 'does not register an offense' do
-        expect_no_offenses('hist(Ci::Build.active, :project_id, buckets: 1..100)')
-        expect_offense(<<~CODE)
-          histogram(Ci::Build.active)
-          ^^^^^^^^^ #{msg} Ci::Build
-        CODE
+      context 'when calling histogram(::Ci::Build.active)' do
+        it 'registers an offense' do
+          expect_offense(<<~CODE)
+            histogram(::Ci::Build.active, buckets: 1..100)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ #{msg} Ci::Build
+          CODE
+        end
+      end
+
+      context 'when calling histogram(Ci::Build)' do
+        it 'registers an offense' do
+          expect_offense(<<~CODE)
+            histogram(Ci::Build, buckets: 1..100)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ #{msg} Ci::Build
+          CODE
+        end
+      end
+
+      context 'when calling histogram(Ci::Build.active)' do
+        it 'registers an offense' do
+          expect_offense(<<~CODE)
+            histogram(Ci::Build.active, buckets: 1..100)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ #{msg} Ci::Build
+          CODE
+        end
       end
     end
   end
