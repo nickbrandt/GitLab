@@ -1,0 +1,5 @@
+---
+title: Enable pending builds queue parity
+merge_request: 62195
+author:
+type: performance
