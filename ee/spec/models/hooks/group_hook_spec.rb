@@ -29,4 +29,15 @@ RSpec.describe GroupHook do
       expect(hook_ultimate.rate_limit).to be(500)
     end
   end
+
+  describe '#application_context' do
+    let_it_be(:hook) { build(:group_hook) }
+
+    it 'includes the type and group' do
+      expect(hook.application_context).to eq(
+        related_class: 'GroupHook',
+        namespace: hook.group
+      )
+    end
+  end
 end
