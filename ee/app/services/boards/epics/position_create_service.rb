@@ -42,11 +42,15 @@ module Boards
       end
 
       def epics_on_board_list
-        # the positions will be created for all epics with id >= from_id
+        # the positions will be created for all epics in the board list
+        # which don't have position set yet and which appear in the list
+        # before the epic being positioned. Epics w/o position are ordered
+        # by ID in descending order so we need to set position for epics with
+        # id >= from_id
         list_params = { board_id: board_id, id: list_id, from_id: params[:from_id] }
 
         Boards::Epics::ListService.new(parent, current_user, list_params).execute
-          .without_board_position
+          .without_board_position(board_id)
           .select(:id)
           .limit(LIMIT)
       end

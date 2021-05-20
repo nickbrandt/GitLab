@@ -41,7 +41,7 @@ RSpec.describe 'Reposition and move epic between board lists' do
       group.add_developer(current_user)
     end
 
-    it 'raises resource not available error' do
+    it 'raises feature not available error' do
       subject
 
       expect(graphql_errors).to include(a_hash_including('message' => 'epic_boards feature is disabled'))
@@ -154,10 +154,8 @@ RSpec.describe 'Reposition and move epic between board lists' do
           iid,
           relativePosition
           labels {
-            edges {
-              node{
-                title
-              }
+            nodes {
+              title
             }
           }
         }

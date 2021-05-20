@@ -46,7 +46,7 @@ RSpec.describe ::Mutations::Boards::EpicBoards::EpicMoveList do
     end
 
     context 'when user does not have permissions' do
-      it 'moves the epic to another list' do
+      it 'does not allow the move' do
         expect { subject }.to raise_error
       end
     end

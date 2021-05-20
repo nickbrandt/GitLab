@@ -118,15 +118,23 @@ module EE
         reorder('relative_position ASC', 'id DESC')
       end
 
+      scope :join_board_position, ->(board_id) do
+        epics = ::Epic.arel_table
+        positions = ::Boards::EpicBoardPosition.arel_table
+
+        epic_positions = epics.join(positions, Arel::Nodes::OuterJoin)
+          .on(epics[:id].eq(positions[:epic_id]).and(positions[:epic_board_id].eq(board_id)))
+
+        joins(epic_positions.join_sources)
+      end
+
       scope :order_relative_position_on_board, ->(board_id) do
-        left_joins(:epic_board_positions)
-          .where(boards_epic_board_positions: { epic_board_id: [nil, board_id] })
+        join_board_position(board_id)
           .reorder(::Gitlab::Database.nulls_last_order('boards_epic_board_positions.relative_position', 'ASC'), 'epics.id DESC')
       end
 
-      scope :without_board_position, -> do
-        left_joins(:epic_board_positions)
-          .where(boards_epic_board_positions: { relative_position: nil })
+      scope :without_board_position, ->(board_id) do
+        where(boards_epic_board_positions: { relative_position: nil })
       end
 
       scope :with_api_entity_associations, -> { preload(:author, :labels, group: :route) }
