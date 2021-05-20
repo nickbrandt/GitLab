@@ -26,6 +26,8 @@ class SyncSeatLinkRequestWorker
     if response.success?
       reset_license!(response['license']) if response['license']
     else
+      update_undecryptable_license(license_key) if response.unauthorized?
+
       raise RequestError, request_error_message(response)
     end
   end
@@ -58,5 +60,14 @@ class SyncSeatLinkRequestWorker
 
   def request_error_message(response)
     "Seat Link request failed! Code:#{response.code} Body:#{response.body}"
+  end
+
+  def update_undecryptable_license(license_key)
+    license = License.find_by(data: license_key) # rubocop: disable CodeReuse/ActiveRecord
+
+    if license.present?
+      license.decryptable = false
+      license.save(validate: false)
+    end
   end
 end
