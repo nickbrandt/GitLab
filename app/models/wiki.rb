@@ -88,10 +88,6 @@ class Wiki
     repository.create_if_not_exists
     change_head_to_default_branch
 
-    puts "***********"
-    puts "ROOT REF: #{repository.root_ref}"
-    puts "**********"
-
     raise CouldNotCreateWikiError unless repository_exists?
   rescue StandardError => err
     Gitlab::ErrorTracking.track_exception(err, wiki: {
@@ -107,9 +103,7 @@ class Wiki
   def change_head_to_default_branch
     return unless repository.exists?
     return unless repository.empty?
-    puts "*********"
-    puts "CHANGING HEAD TO #{default_branch}"
-    puts "*********"
+
     repository.before_change_head
     repository.raw_repository.write_ref('HEAD', "refs/heads/#{default_branch}")
     repository.after_change_head
@@ -187,7 +181,7 @@ class Wiki
   def create_page(title, content, format = :markdown, message = nil)
     commit = commit_details(:created, message, title)
 
-    wiki.write_page(title, format.to_sym, content, commit)
+    wiki.write_page(title, format.to_sym, default_branch, content, commit)
     after_wiki_activity
 
     true
@@ -199,7 +193,7 @@ class Wiki
   def update_page(page, content:, title: nil, format: :markdown, message: nil)
     commit = commit_details(:updated, message, page.title)
 
-    wiki.update_page(page.path, title || page.name, format.to_sym, content, commit)
+    wiki.update_page(page.path, title || page.name, format.to_sym, default_branch, content, commit)
     after_wiki_activity
 
     true
@@ -262,14 +256,7 @@ class Wiki
 
   override :default_branch
   def default_branch
-    puts "*********************************"
-    puts "DEFAULT REF: #{super}"
-    puts "*********************************"
-    result = super || Gitlab::DefaultBranch.value(object: container)
-    puts "*********************************"
-    puts "Final REF: #{result}"
-    puts "*********************************"
-    result
+    super || Gitlab::DefaultBranch.value(object: container)
   end
 
   def wiki_base_path

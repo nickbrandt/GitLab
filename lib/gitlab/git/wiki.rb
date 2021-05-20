@@ -67,15 +67,15 @@ module Gitlab
         @repository.exists?
       end
 
-      def write_page(name, format, content, commit_details)
+      def write_page(name, format, ref, content, commit_details)
         wrapped_gitaly_errors do
-          gitaly_write_page(name, format, content, commit_details)
+          gitaly_write_page(name, format, ref, content, commit_details)
         end
       end
 
-      def update_page(page_path, title, format, content, commit_details)
+      def update_page(page_path, title, ref, format, content, commit_details)
         wrapped_gitaly_errors do
-          gitaly_update_page(page_path, title, format, content, commit_details)
+          gitaly_update_page(page_path, title, format, ref, content, commit_details)
         end
       end
 
@@ -110,12 +110,12 @@ module Gitlab
         @gitaly_wiki_client ||= Gitlab::GitalyClient::WikiService.new(@repository)
       end
 
-      def gitaly_write_page(name, format, content, commit_details)
-        gitaly_wiki_client.write_page(name, format, content, commit_details)
+      def gitaly_write_page(name, format, ref, content, commit_details)
+        gitaly_wiki_client.write_page(name, format, ref, content, commit_details)
       end
 
-      def gitaly_update_page(page_path, title, format, content, commit_details)
-        gitaly_wiki_client.update_page(page_path, title, format, content, commit_details)
+      def gitaly_update_page(page_path, title, format, ref, content, commit_details)
+        gitaly_wiki_client.update_page(page_path, title, format, ref, content, commit_details)
       end
 
       def gitaly_find_page(title:, version: nil, dir: nil)

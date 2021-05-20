@@ -14,12 +14,13 @@ module Gitlab
         @repository = repository
       end
 
-      def write_page(name, format, content, commit_details)
+      def write_page(name, format, ref, content, commit_details)
         request = Gitaly::WikiWritePageRequest.new(
           repository: @gitaly_repo,
           name: encode_binary(name),
           format: format.to_s,
-          commit_details: gitaly_commit_details(commit_details)
+          commit_details: gitaly_commit_details(commit_details),
+          ref: encode_binary(ref)
         )
 
         strio = binary_io(content)
@@ -40,13 +41,14 @@ module Gitlab
         end
       end
 
-      def update_page(page_path, title, format, content, commit_details)
+      def update_page(page_path, title, format, ref, content, commit_details)
         request = Gitaly::WikiUpdatePageRequest.new(
           repository: @gitaly_repo,
           page_path: encode_binary(page_path),
           title: encode_binary(title),
           format: format.to_s,
-          commit_details: gitaly_commit_details(commit_details)
+          commit_details: gitaly_commit_details(commit_details),
+          ref: encode_binary(ref)
         )
 
         strio = binary_io(content)

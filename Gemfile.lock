@@ -1,4 +1,10 @@
 PATH
+  remote: /Users/fjlopez/Desktop/Gitlab/gdk/gitaly
+  specs:
+    gitaly (13.12.0.pre.rc1)
+      grpc (~> 1.0)
+
+PATH
   remote: vendor/gems/mail-smtp_pool
   specs:
     mail-smtp_pool (0.1.0)
@@ -439,8 +445,6 @@ GEM
       rails (>= 3.2.0)
     git (1.7.0)
       rchardet (~> 1.8)
-    gitaly (13.12.0.pre.rc1)
-      grpc (~> 1.0)
     github-markup (1.7.0)
     gitlab (4.16.1)
       httparty (~> 0.14, >= 0.14.0)
@@ -1473,7 +1477,7 @@ DEPENDENCIES
   gettext (~> 3.3)
   gettext_i18n_rails (~> 1.8.0)
   gettext_i18n_rails_js (~> 1.3)
-  gitaly (~> 13.12.0.pre.rc1)
+  gitaly!
   github-markup (~> 1.7.0)
   gitlab-chronic (~> 0.10.5)
   gitlab-dangerfiles (~> 2.0.0)

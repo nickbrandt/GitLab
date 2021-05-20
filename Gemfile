@@ -481,7 +481,8 @@ end
 gem 'spamcheck', '~> 0.1.0'
 
 # Gitaly GRPC protocol definitions
-gem 'gitaly', '~> 13.12.0.pre.rc1'
+# gem 'gitaly', '~> 13.12.0.pre.rc1'
+gem 'gitaly', path: "/Users/fjlopez/Desktop/Gitlab/gdk/gitaly"
 
 gem 'grpc', '~> 1.30.2'
 
