@@ -13,7 +13,7 @@ RSpec.describe Ci::InitialPipelineProcessWorker do
 
       context 'when there are runners available' do
         before do
-          create(:ci_runner)
+          create(:ci_runner, :online)
         end
 
         it 'marks the pipeline as pending' do

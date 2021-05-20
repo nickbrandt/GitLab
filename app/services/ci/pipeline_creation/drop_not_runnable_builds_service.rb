@@ -30,6 +30,8 @@ module Ci
       def load_runners
         @instance_runners, @private_runners = project
           .all_runners
+          .active
+          .online
           .runner_matchers
           .partition(&:instance_type?)
       end

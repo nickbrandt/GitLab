@@ -13,6 +13,7 @@ RSpec.describe Ci::PipelineCreation::DropNotRunnableBuildsService do
 
   let_it_be(:instance_runner) do
     create(:ci_runner,
+      :online,
       runner_type: :instance_type,
       public_projects_minutes_cost_factor: 0,
       private_projects_minutes_cost_factor: 1)

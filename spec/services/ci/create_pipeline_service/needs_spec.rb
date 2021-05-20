@@ -204,7 +204,7 @@ RSpec.describe Ci::CreatePipelineService do
 
       context 'when there are runners matching the builds' do
         before do
-          create(:ci_runner)
+          create(:ci_runner, :online)
         end
 
         it 'creates a pipeline with build_a and test_b pending; deploy_b manual', :sidekiq_inline do

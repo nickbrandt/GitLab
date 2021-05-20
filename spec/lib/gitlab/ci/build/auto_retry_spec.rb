@@ -8,7 +8,7 @@ RSpec.describe Gitlab::Ci::Build::AutoRetry do
   describe '#allowed?' do
     using RSpec::Parameterized::TableSyntax
 
-    let(:build) { build_stubbed(:ci_build) }
+    let(:build) { create(:ci_build) }
 
     subject { auto_retry.allowed? }
 

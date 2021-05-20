@@ -31,7 +31,7 @@ RSpec.describe Ci::ProcessPipelineService, '#execute' do
 
     context 'when there is a runner available' do
       let_it_be(:runner) do
-        create(:ci_runner, tag_list: %w[ruby postgres mysql])
+        create(:ci_runner, :online, tag_list: %w[ruby postgres mysql])
       end
 
       it 'creates a downstream cross-project pipeline' do
