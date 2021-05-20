@@ -489,8 +489,13 @@ export default {
     });
   },
 
-  addListItem: ({ commit }, { list, item, position }) => {
-    commit(types.ADD_BOARD_ITEM_TO_LIST, { listId: list.id, itemId: item.id, atIndex: position });
+  addListItem: ({ commit }, { list, item, position, inProgress = false }) => {
+    commit(types.ADD_BOARD_ITEM_TO_LIST, {
+      listId: list.id,
+      itemId: item.id,
+      atIndex: position,
+      inProgress,
+    });
     commit(types.UPDATE_BOARD_ITEM, item);
   },
 
@@ -510,7 +515,7 @@ export default {
     }
 
     const placeholderIssue = formatIssue({ ...issueInput, id: placeholderId, isLoading: true });
-    dispatch('addListItem', { list, item: placeholderIssue, position: 0 });
+    dispatch('addListItem', { list, item: placeholderIssue, position: 0, inProgress: true });
 
     gqlClient
       .mutate({
