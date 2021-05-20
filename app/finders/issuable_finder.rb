@@ -50,7 +50,7 @@ class IssuableFinder
   attr_reader :original_params
   attr_writer :parent
 
-  delegate(*%i[assignee milestones], to: :params)
+  delegate(*%i[milestones], to: :params)
 
   class << self
     def scalar_params
