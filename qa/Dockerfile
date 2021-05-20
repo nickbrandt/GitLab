@@ -38,7 +38,7 @@ RUN unzip chromedriver_linux64.zip -d /usr/local/bin
 RUN rm -f chromedriver_linux64.zip
 
 ##
-# Install client certificate - Currently not working due to a bug in chrome headless
+# Install client certificate - Bug in Chrome Headless: https://gitlab.com/gitlab-org/gitlab/-/issues/331492
 #
 # RUN apt install -y libnss3-tools
 # RUN mkdir -p $HOME/.pki/nssdb
