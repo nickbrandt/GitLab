@@ -173,7 +173,7 @@ update-setup-test-env-cache:
   extends:
     - setup-test-env
     - .setup-test-env-cache-push
-    - .shared:rules:update-cache
+    - .shared:rules:update-setup-test-env-cache
   artifacts:
     paths: []  # This job's purpose is only to update the cache.
 
