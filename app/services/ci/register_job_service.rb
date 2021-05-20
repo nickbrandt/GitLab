@@ -300,8 +300,16 @@ module Ci
     end
     # rubocop: enable CodeReuse/ActiveRecord
 
+    def all_builds
+      if Feature.enabled?(:ci_pending_builds_queue_join, runner, default_enabled: :yaml)
+        Ci::Build.joins(:queuing_entry)
+      else
+        Ci::Build.all
+      end
+    end
+
     def new_builds
-      builds = Ci::Build.pending.unstarted
+      builds = all_builds.pending.unstarted
       builds = builds.ref_protected if runner.ref_protected?
       builds
     end

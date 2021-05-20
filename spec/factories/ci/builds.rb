@@ -78,8 +78,15 @@ FactoryBot.define do
     end
 
     trait :pending do
+      queued
       queued_at { 'Di 29. Okt 09:50:59 CET 2013' }
       status { 'pending' }
+    end
+
+    trait :queued do
+      after(:create) do |build|
+        build.create_queuing_entry!
+      end
     end
 
     trait :created do
