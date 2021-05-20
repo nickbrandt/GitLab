@@ -1,4 +1,4 @@
-import { GlFormInputGroup, GlFormInput, GlForm, GlFormRadio } from '@gitlab/ui';
+import { GlFormInputGroup, GlFormInput, GlForm, GlFormRadio, GlFormSelect } from '@gitlab/ui';
 import { mount, shallowMount } from '@vue/test-utils';
 import axios from 'axios';
 import AxiosMockAdapter from 'axios-mock-adapter';
@@ -44,6 +44,7 @@ describe('ForkForm component', () => {
     projectPath: 'project-name',
     projectDescription: 'some project description',
     projectVisibility: 'private',
+    restrictedVisibilityLevels: [],
   };
 
   const mockGetRequest = (data = {}, statusCode = httpStatus.OK) => {
@@ -89,6 +90,7 @@ describe('ForkForm component', () => {
     axiosMock.restore();
   });
 
+  const findFormSelect = () => wrapper.find(GlFormSelect);
   const findPrivateRadio = () => wrapper.find('[data-testid="radio-private"]');
   const findInternalRadio = () => wrapper.find('[data-testid="radio-internal"]');
   const findPublicRadio = () => wrapper.find('[data-testid="radio-public"]');
@@ -229,35 +231,190 @@ describe('ForkForm component', () => {
       expect(wrapper.findAll(GlFormRadio)).toHaveLength(3);
     });
 
-    it.each`
-      project       | namespace     | privateIsDisabled | internalIsDisabled | publicIsDisabled
-      ${'private'}  | ${'private'}  | ${undefined}      | ${'true'}          | ${'true'}
-      ${'private'}  | ${'internal'} | ${undefined}      | ${'true'}          | ${'true'}
-      ${'private'}  | ${'public'}   | ${undefined}      | ${'true'}          | ${'true'}
-      ${'internal'} | ${'private'}  | ${undefined}      | ${'true'}          | ${'true'}
-      ${'internal'} | ${'internal'} | ${undefined}      | ${undefined}       | ${'true'}
-      ${'internal'} | ${'public'}   | ${undefined}      | ${undefined}       | ${'true'}
-      ${'public'}   | ${'private'}  | ${undefined}      | ${'true'}          | ${'true'}
-      ${'public'}   | ${'internal'} | ${undefined}      | ${undefined}       | ${'true'}
-      ${'public'}   | ${'public'}   | ${undefined}      | ${undefined}       | ${undefined}
-    `(
-      'sets appropriate radio button disabled state',
-      async ({ project, namespace, privateIsDisabled, internalIsDisabled, publicIsDisabled }) => {
+    describe('with no restrictedVisibilityLevels', () => {
+      it.each`
+        project       | namespace     | privateIsDisabled | internalIsDisabled | publicIsDisabled
+        ${'private'}  | ${'private'}  | ${undefined}      | ${'true'}          | ${'true'}
+        ${'private'}  | ${'internal'} | ${undefined}      | ${'true'}          | ${'true'}
+        ${'private'}  | ${'public'}   | ${undefined}      | ${'true'}          | ${'true'}
+        ${'internal'} | ${'private'}  | ${undefined}      | ${'true'}          | ${'true'}
+        ${'internal'} | ${'internal'} | ${undefined}      | ${undefined}       | ${'true'}
+        ${'internal'} | ${'public'}   | ${undefined}      | ${undefined}       | ${'true'}
+        ${'public'}   | ${'private'}  | ${undefined}      | ${'true'}          | ${'true'}
+        ${'public'}   | ${'internal'} | ${undefined}      | ${undefined}       | ${'true'}
+        ${'public'}   | ${'public'}   | ${undefined}      | ${undefined}       | ${undefined}
+      `(
+        'sets appropriate radio button disabled state',
+        async ({ project, namespace, privateIsDisabled, internalIsDisabled, publicIsDisabled }) => {
+          mockGetRequest();
+          createComponent(
+            {
+              projectVisibility: project,
+            },
+            {
+              form: { fields: { namespace: { value: { visibility: namespace } } } },
+            },
+          );
+
+          expect(findPrivateRadio().attributes('disabled')).toBe(privateIsDisabled);
+          expect(findInternalRadio().attributes('disabled')).toBe(internalIsDisabled);
+          expect(findPublicRadio().attributes('disabled')).toBe(publicIsDisabled);
+        },
+      );
+    });
+
+    describe('with restrictedVisibilityLevels', () => {
+      it.each`
+        project       | namespace     | privateIsDisabled | internalIsDisabled | publicIsDisabled | restrictedVisibilityLevels
+        ${'private'}  | ${'private'}  | ${undefined}      | ${'true'}          | ${'true'}        | ${[0]}
+        ${'internal'} | ${'internal'} | ${'true'}         | ${undefined}       | ${'true'}        | ${[0]}
+        ${'public'}   | ${'public'}   | ${'true'}         | ${undefined}       | ${undefined}     | ${[0]}
+        ${'private'}  | ${'private'}  | ${undefined}      | ${'true'}          | ${'true'}        | ${[10]}
+        ${'internal'} | ${'internal'} | ${undefined}      | ${'true'}          | ${'true'}        | ${[10]}
+        ${'public'}   | ${'public'}   | ${undefined}      | ${'true'}          | ${undefined}     | ${[10]}
+        ${'private'}  | ${'private'}  | ${undefined}      | ${'true'}          | ${'true'}        | ${[20]}
+        ${'internal'} | ${'internal'} | ${undefined}      | ${undefined}       | ${'true'}        | ${[20]}
+        ${'public'}   | ${'public'}   | ${undefined}      | ${undefined}       | ${'true'}        | ${[20]}
+        ${'private'}  | ${'private'}  | ${undefined}      | ${'true'}          | ${'true'}        | ${[10, 20]}
+        ${'internal'} | ${'internal'} | ${undefined}      | ${'true'}          | ${'true'}        | ${[10, 20]}
+        ${'public'}   | ${'public'}   | ${undefined}      | ${'true'}          | ${'true'}        | ${[10, 20]}
+        ${'private'}  | ${'private'}  | ${undefined}      | ${'true'}          | ${'true'}        | ${[0, 10, 20]}
+        ${'internal'} | ${'internal'} | ${undefined}      | ${'true'}          | ${'true'}        | ${[0, 10, 20]}
+        ${'public'}   | ${'public'}   | ${undefined}      | ${'true'}          | ${'true'}        | ${[0, 10, 20]}
+      `(
+        'sets appropriate radio button disabled state',
+        async ({
+          project,
+          namespace,
+          privateIsDisabled,
+          internalIsDisabled,
+          publicIsDisabled,
+          restrictedVisibilityLevels,
+        }) => {
+          mockGetRequest();
+          createComponent(
+            {
+              projectVisibility: project,
+              restrictedVisibilityLevels,
+            },
+            {
+              form: { fields: { namespace: { value: { visibility: namespace } } } },
+            },
+          );
+
+          expect(findPrivateRadio().attributes('disabled')).toBe(privateIsDisabled);
+          expect(findInternalRadio().attributes('disabled')).toBe(internalIsDisabled);
+          expect(findPublicRadio().attributes('disabled')).toBe(publicIsDisabled);
+        },
+      );
+    });
+
+    describe('another namespace is selected', () => {
+      const namespaces = [
+        {
+          visibility: 'private',
+        },
+        {
+          visibility: 'internal',
+        },
+        {
+          visibility: 'public',
+        },
+      ];
+
+      it.each`
+        project       | namespace | privateIsDisabled | internalIsDisabled | publicIsDisabled | restrictedVisibilityLevels
+        ${'private'}  | ${0}      | ${undefined}      | ${'true'}          | ${'true'}        | ${[]}
+        ${'internal'} | ${0}      | ${undefined}      | ${'true'}          | ${'true'}        | ${[]}
+        ${'public'}   | ${0}      | ${undefined}      | ${'true'}          | ${'true'}        | ${[]}
+        ${'private'}  | ${1}      | ${undefined}      | ${'true'}          | ${'true'}        | ${[]}
+        ${'internal'} | ${1}      | ${undefined}      | ${undefined}       | ${'true'}        | ${[]}
+        ${'public'}   | ${1}      | ${undefined}      | ${undefined}       | ${'true'}        | ${[]}
+        ${'private'}  | ${2}      | ${undefined}      | ${'true'}          | ${'true'}        | ${[]}
+        ${'internal'} | ${2}      | ${undefined}      | ${undefined}       | ${'true'}        | ${[]}
+        ${'public'}   | ${2}      | ${undefined}      | ${undefined}       | ${undefined}     | ${[]}
+        ${'private'}  | ${0}      | ${undefined}      | ${'true'}          | ${'true'}        | ${[0]}
+        ${'private'}  | ${0}      | ${undefined}      | ${'true'}          | ${'true'}        | ${[10]}
+        ${'private'}  | ${0}      | ${undefined}      | ${'true'}          | ${'true'}        | ${[20]}
+        ${'internal'} | ${0}      | ${undefined}      | ${'true'}          | ${'true'}        | ${[0]}
+        ${'internal'} | ${0}      | ${undefined}      | ${'true'}          | ${'true'}        | ${[10]}
+        ${'internal'} | ${0}      | ${undefined}      | ${'true'}          | ${'true'}        | ${[20]}
+        ${'public'}   | ${0}      | ${undefined}      | ${'true'}          | ${'true'}        | ${[0]}
+        ${'public'}   | ${0}      | ${undefined}      | ${'true'}          | ${'true'}        | ${[10]}
+        ${'public'}   | ${0}      | ${undefined}      | ${'true'}          | ${'true'}        | ${[20]}
+        ${'private'}  | ${1}      | ${undefined}      | ${'true'}          | ${'true'}        | ${[0]}
+        ${'private'}  | ${1}      | ${undefined}      | ${'true'}          | ${'true'}        | ${[10]}
+        ${'private'}  | ${1}      | ${undefined}      | ${'true'}          | ${'true'}        | ${[20]}
+        ${'internal'} | ${1}      | ${'true'}         | ${undefined}       | ${'true'}        | ${[0]}
+        ${'internal'} | ${1}      | ${undefined}      | ${'true'}          | ${'true'}        | ${[10]}
+        ${'internal'} | ${1}      | ${undefined}      | ${undefined}       | ${'true'}        | ${[20]}
+        ${'public'}   | ${1}      | ${'true'}         | ${undefined}       | ${'true'}        | ${[0]}
+        ${'public'}   | ${1}      | ${undefined}      | ${'true'}          | ${'true'}        | ${[10]}
+        ${'public'}   | ${1}      | ${undefined}      | ${undefined}       | ${'true'}        | ${[20]}
+        ${'private'}  | ${2}      | ${undefined}      | ${'true'}          | ${'true'}        | ${[0]}
+        ${'private'}  | ${2}      | ${undefined}      | ${'true'}          | ${'true'}        | ${[10]}
+        ${'private'}  | ${2}      | ${undefined}      | ${'true'}          | ${'true'}        | ${[20]}
+        ${'internal'} | ${2}      | ${'true'}         | ${undefined}       | ${'true'}        | ${[0]}
+        ${'internal'} | ${2}      | ${undefined}      | ${'true'}          | ${'true'}        | ${[10]}
+        ${'internal'} | ${2}      | ${undefined}      | ${undefined}       | ${'true'}        | ${[20]}
+        ${'public'}   | ${2}      | ${'true'}         | ${undefined}       | ${undefined}     | ${[0]}
+        ${'public'}   | ${2}      | ${undefined}      | ${'true'}          | ${undefined}     | ${[10]}
+        ${'public'}   | ${2}      | ${undefined}      | ${undefined}       | ${'true'}        | ${[20]}
+      `(
+        'sets appropriate radio button disabled state',
+        async ({
+          project,
+          namespace,
+          privateIsDisabled,
+          internalIsDisabled,
+          publicIsDisabled,
+          restrictedVisibilityLevels,
+        }) => {
+          mockGetRequest();
+          createComponent(
+            {
+              projectVisibility: project,
+              restrictedVisibilityLevels,
+            },
+            {
+              namespaces,
+            },
+          );
+
+          findFormSelect().vm.$emit('input', namespaces[namespace]);
+
+          await wrapper.vm.$nextTick();
+
+          expect(findPrivateRadio().attributes('disabled')).toBe(privateIsDisabled);
+          expect(findInternalRadio().attributes('disabled')).toBe(internalIsDisabled);
+          expect(findPublicRadio().attributes('disabled')).toBe(publicIsDisabled);
+        },
+      );
+
+      it('updates visibility level', async () => {
         mockGetRequest();
         createComponent(
           {
-            projectVisibility: project,
+            projectVisibility: 'public',
           },
           {
-            form: { fields: { namespace: { value: { visibility: namespace } } } },
+            namespaces,
           },
         );
 
-        expect(findPrivateRadio().attributes('disabled')).toBe(privateIsDisabled);
-        expect(findInternalRadio().attributes('disabled')).toBe(internalIsDisabled);
-        expect(findPublicRadio().attributes('disabled')).toBe(publicIsDisabled);
-      },
-    );
+        expect(findPrivateRadio().attributes('disabled')).toBe(undefined);
+        expect(findInternalRadio().attributes('disabled')).toBe(undefined);
+        expect(findPublicRadio().attributes('disabled')).toBe(undefined);
+
+        findFormSelect().vm.$emit('input', namespaces[0]);
+
+        await wrapper.vm.$nextTick();
+
+        expect(findPrivateRadio().attributes('disabled')).toBe(undefined);
+        expect(findInternalRadio().attributes('disabled')).toBe('true');
+        expect(findPublicRadio().attributes('disabled')).toBe('true');
+      });
+    });
   });
 
   describe('onSubmit', () => {

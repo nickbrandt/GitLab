@@ -26,10 +26,16 @@ const PRIVATE_VISIBILITY = 'private';
 const INTERNAL_VISIBILITY = 'internal';
 const PUBLIC_VISIBILITY = 'public';
 
-const ALLOWED_VISIBILITY = {
-  private: [PRIVATE_VISIBILITY],
-  internal: [INTERNAL_VISIBILITY, PRIVATE_VISIBILITY],
-  public: [INTERNAL_VISIBILITY, PRIVATE_VISIBILITY, PUBLIC_VISIBILITY],
+const DEFAULT_DISABLED_STATE = {
+  [PRIVATE_VISIBILITY]: false,
+  [INTERNAL_VISIBILITY]: true,
+  [PUBLIC_VISIBILITY]: true,
+};
+
+const VISIBILITY_LEVEL = {
+  [PRIVATE_VISIBILITY]: 0,
+  [INTERNAL_VISIBILITY]: 10,
+  [PUBLIC_VISIBILITY]: 20,
 };
 
 const initFormField = ({ value, required = true, skipValidation = false }) => ({
@@ -95,6 +101,10 @@ export default {
       type: String,
       required: true,
     },
+    restrictedVisibilityLevels: {
+      type: Array,
+      required: true,
+    },
   },
   data() {
     const form = {
@@ -127,14 +137,26 @@ export default {
     projectUrl() {
       return `${gon.gitlab_url}/`;
     },
-    projectAllowedVisibility() {
-      return ALLOWED_VISIBILITY[this.projectVisibility];
+    projectVisibilityLevel() {
+      return VISIBILITY_LEVEL[this.projectVisibility];
     },
-    namespaceAllowedVisibility() {
-      return (
-        ALLOWED_VISIBILITY[this.form.fields.namespace.value?.visibility] ||
-        ALLOWED_VISIBILITY[PUBLIC_VISIBILITY]
+    namespaceVisibilityLevel() {
+      const visibility = this.form.fields.namespace.value?.visibility || PUBLIC_VISIBILITY;
+      return VISIBILITY_LEVEL[visibility];
+    },
+    visibilityLevelCap() {
+      return Math.min(this.projectVisibilityLevel, this.namespaceVisibilityLevel);
+    },
+    disabledVisibilityState() {
+      const disabledState = Object.fromEntries(
+        Object.keys(DEFAULT_DISABLED_STATE).map((level) => {
+          return [[level], this.isVisibilityLevelDisabled(VISIBILITY_LEVEL[level])];
+        }),
       );
+
+      const isAllDisabled = Object.values(disabledState).every(Boolean);
+
+      return isAllDisabled ? DEFAULT_DISABLED_STATE : disabledState;
     },
     visibilityLevels() {
       return [
@@ -145,21 +167,21 @@ export default {
           help: s__(
             'ForkProject|Project access must be granted explicitly to each user. If this project is part of a group, access will be granted to members of the group.',
           ),
-          disabled: this.isVisibilityLevelDisabled(PRIVATE_VISIBILITY),
+          disabled: this.disabledVisibilityState[PRIVATE_VISIBILITY],
         },
         {
           text: s__('ForkProject|Internal'),
           value: INTERNAL_VISIBILITY,
           icon: 'shield',
           help: s__('ForkProject|The project can be accessed by any logged in user.'),
-          disabled: this.isVisibilityLevelDisabled(INTERNAL_VISIBILITY),
+          disabled: this.disabledVisibilityState[INTERNAL_VISIBILITY],
         },
         {
           text: s__('ForkProject|Public'),
           value: PUBLIC_VISIBILITY,
           icon: 'earth',
           help: s__('ForkProject|The project can be accessed without any authentication.'),
-          disabled: this.isVisibilityLevelDisabled(PUBLIC_VISIBILITY),
+          disabled: this.disabledVisibilityState[PUBLIC_VISIBILITY],
         },
       ];
     },
@@ -168,10 +190,18 @@ export default {
     // eslint-disable-next-line func-names
     'form.fields.namespace.value': function (newVal) {
       const { visibility } = newVal;
+      const visibilityLevel = VISIBILITY_LEVEL[visibility];
 
-      if (this.projectAllowedVisibility.includes(visibility)) {
+      if (
+        this.isVisibilityLevelAllowed(visibilityLevel) &&
+        !this.isVisibilityLevelRestricted(visibilityLevel)
+      ) {
         this.form.fields.visibility.value = visibility;
       }
+
+      // if (this.isVisibilityLevelDisabled(visibilityLevel)) {
+      //   this.form.fields.visibility.value = visibility;
+      // }
     },
     // eslint-disable-next-line func-names
     'form.fields.name.value': function (newVal) {
@@ -187,10 +217,16 @@ export default {
       this.namespaces = data.namespaces;
     },
     isVisibilityLevelDisabled(visibilityLevel) {
-      return !(
-        this.projectAllowedVisibility.includes(visibilityLevel) &&
-        this.namespaceAllowedVisibility.includes(visibilityLevel)
+      return (
+        this.isVisibilityLevelRestricted(visibilityLevel) ||
+        !this.isVisibilityLevelAllowed(visibilityLevel)
       );
+    },
+    isVisibilityLevelRestricted(visibilityLevel) {
+      return this.restrictedVisibilityLevels.includes(visibilityLevel);
+    },
+    isVisibilityLevelAllowed(visibilityLevel) {
+      return visibilityLevel <= this.visibilityLevelCap;
     },
     async onSubmit() {
       this.form.showValidation = true;
