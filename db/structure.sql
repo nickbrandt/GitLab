@@ -14306,7 +14306,8 @@ CREATE TABLE labels (
     description_html text,
     type character varying,
     group_id integer,
-    cached_markdown_version integer
+    cached_markdown_version integer,
+    remove_on_close boolean DEFAULT false NOT NULL
 );
 
 CREATE SEQUENCE labels_id_seq
@@ -23782,7 +23783,7 @@ CREATE INDEX index_notes_on_discussion_id ON notes USING btree (discussion_id);
 
 CREATE INDEX index_notes_on_line_code ON notes USING btree (line_code);
 
-CREATE INDEX index_notes_on_note_trigram ON notes USING gin (note gin_trgm_ops);
+CREATE INDEX index_notes_on_note_gin_trigram ON notes USING gin (note gin_trgm_ops);
 
 CREATE INDEX index_notes_on_noteable_id_and_noteable_type_and_system ON notes USING btree (noteable_id, noteable_type, system);
 
