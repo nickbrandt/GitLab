@@ -50,7 +50,7 @@ RSpec.describe Admin::ElasticsearchController do
         expect(task).to receive(:save).and_return(true)
       end
 
-      post :trigger_reindexing, params: { elastic_reindexing_task: { max_slices_running: 60, slice_multiplier: 2 } }
+      post :trigger_reindexing, params: { elastic_reindexing_task: { elasticsearch_max_slices_running: 60, elasticsearch_slice_multiplier: 2 } }
 
       expect(controller).to set_flash[:notice].to include('reindexing triggered')
       expect(response).to redirect_to advanced_search_admin_application_settings_path(anchor: 'js-elasticsearch-reindexing')
@@ -59,14 +59,14 @@ RSpec.describe Admin::ElasticsearchController do
     it 'does not create a reindexing task if there is another one' do
       allow(Elastic::ReindexingTask).to receive(:current).and_return(build(:elastic_reindexing_task))
 
-      post :trigger_reindexing, params: { elastic_reindexing_task: { max_slices_running: 60, slice_multiplier: 2 } }
+      post :trigger_reindexing, params: { elastic_reindexing_task: { elasticsearch_max_slices_running: 60, elasticsearch_slice_multiplier: 2 } }
 
       expect(controller).to set_flash[:warning].to include('already in progress')
       expect(response).to redirect_to advanced_search_admin_application_settings_path(anchor: 'js-elasticsearch-reindexing')
     end
 
     it 'does not create a reindexing task if a required param is nil' do
-      post :trigger_reindexing, params: { elastic_reindexing_task: { max_slices_running: nil, slice_multiplier: 2 } }
+      post :trigger_reindexing, params: { elastic_reindexing_task: { elasticsearch_max_slices_running: nil, elasticsearch_slice_multiplier: 2 } }
 
       expect(controller).to set_flash[:alert].to include('Elasticsearch reindexing was not started')
       expect(response).to redirect_to advanced_search_admin_application_settings_path(anchor: 'js-elasticsearch-reindexing')
