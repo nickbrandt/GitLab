@@ -363,7 +363,7 @@ project:
 - last_event
 - integrations
 - campfire_integration
-- confluence_service
+- confluence_integration
 - datadog_service
 - discord_service
 - drone_ci_service

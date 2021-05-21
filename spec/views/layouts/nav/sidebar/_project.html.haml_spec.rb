@@ -1005,7 +1005,7 @@ RSpec.describe 'layouts/nav/sidebar/_project' do
   end
 
   describe 'Confluence' do
-    let!(:service) { create(:confluence_service, project: project, active: active) }
+    let!(:service) { create(:confluence_integration, project: project, active: active) }
 
     before do
       render

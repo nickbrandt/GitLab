@@ -67,7 +67,7 @@ RSpec.describe Project, factory_default: :keep do
     it { is_expected.to have_one(:bugzilla_integration) }
     it { is_expected.to have_one(:ewm_service) }
     it { is_expected.to have_one(:external_wiki_service) }
-    it { is_expected.to have_one(:confluence_service) }
+    it { is_expected.to have_one(:confluence_integration) }
     it { is_expected.to have_one(:project_feature) }
     it { is_expected.to have_one(:project_repository) }
     it { is_expected.to have_one(:container_expiration_policy) }

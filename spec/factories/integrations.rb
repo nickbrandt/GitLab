@@ -79,7 +79,7 @@ FactoryBot.define do
     end
   end
 
-  factory :confluence_service, class: 'Integrations::Confluence' do
+  factory :confluence_integration, class: 'Integrations::Confluence' do
     project
     active { true }
     confluence_url { 'https://example.atlassian.net/wiki' }
