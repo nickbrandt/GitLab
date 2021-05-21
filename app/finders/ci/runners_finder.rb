@@ -24,8 +24,9 @@ module Ci
     end
 
     def sort_key
-      if @params[:sort] == 'contacted_asc'
-        'contacted_asc'
+      case @params[:sort]
+      when 'contacted_asc', 'contacted_desc', 'created_at_asc', 'created_at_desc'
+        @params[:sort]
       else
         'created_date'
       end
