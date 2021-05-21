@@ -13,12 +13,6 @@ describe('Pipelines table in Commits and Merge requests', () => {
   let pipeline;
   let mock;
 
-  const defaultProps = {
-    endpoint: 'endpoint.json',
-    emptyStateSvgPath: 'foo',
-    errorStateSvgPath: 'foo',
-  };
-
   const findRunPipelineBtn = () => wrapper.findByTestId('run_pipeline_button');
   const findRunPipelineBtnMobile = () => wrapper.findByTestId('run_pipeline_button_mobile');
   const findLoadingState = () => wrapper.findComponent(GlLoadingIcon);
@@ -27,10 +21,13 @@ describe('Pipelines table in Commits and Merge requests', () => {
   const findTableRows = () => wrapper.findAllByTestId('pipeline-table-row');
   const findModal = () => wrapper.findComponent(GlModal);
 
-  const createComponent = (props = defaultProps) => {
+  const createComponent = (props = {}) => {
     wrapper = extendedWrapper(
       mount(PipelinesTable, {
         propsData: {
+          endpoint: 'endpoint.json',
+          emptyStateSvgPath: 'foo',
+          errorStateSvgPath: 'foo',
           ...props,
         },
       }),
@@ -106,23 +103,21 @@ describe('Pipelines table in Commits and Merge requests', () => {
           expect(wrapper.vm.updateContent).toHaveBeenCalledWith({ page: '2' });
         });
       });
-    });
 
-    describe('pipeline badge counts', () => {
-      it('should receive update-pipelines-count event', (done) => {
-        mock.onGet('endpoint.json').reply(200, [pipeline]);
+      describe('pipeline badge counts', () => {
+        it('should receive update-pipelines-count event', (done) => {
+          const element = document.createElement('div');
+          document.body.appendChild(element);
 
-        const element = document.createElement('div');
-        document.body.appendChild(element);
+          element.addEventListener('update-pipelines-count', (event) => {
+            expect(event.detail.pipelines).toEqual([pipeline]);
+            done();
+          });
 
-        element.addEventListener('update-pipelines-count', (event) => {
-          expect(event.detail.pipelines).toEqual([pipeline]);
-          done();
+          createComponent();
+
+          element.appendChild(wrapper.vm.$el);
         });
-
-        createComponent();
-
-        element.appendChild(wrapper.vm.$el);
       });
     });
   });
@@ -173,7 +168,6 @@ describe('Pipelines table in Commits and Merge requests', () => {
         mock.onGet('endpoint.json').reply(200, [pipelineCopy]);
 
         createComponent({
-          ...defaultProps,
           canRunPipeline: true,
           projectId: '5',
           mergeRequestId: 3,
@@ -213,7 +207,6 @@ describe('Pipelines table in Commits and Merge requests', () => {
         mock.onGet('endpoint.json').reply(200, [pipelineCopy]);
 
         createComponent({
-          ...defaultProps,
           projectId: '5',
           mergeRequestId: 3,
           canCreatePipelineInTargetProject: true,
@@ -252,7 +245,6 @@ describe('Pipelines table in Commits and Merge requests', () => {
     });
 
     it('should render error state', () => {
-      expect(findEmptyState().exists()).toBe(true);
       expect(findEmptyState().text()).toBe(
         'There was an error fetching the pipelines. Try again in a few moments or contact your support team.',
       );
