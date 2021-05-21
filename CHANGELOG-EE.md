@@ -1,3 +1,7 @@
+**NOTE:** This file is no longer used for GitLab Enterprise Edition changelog
+entries. Starting with May 22nd, 2021 all changelog entries are found in
+[CHANGELOG.md](CHANGELOG.md)
+
 Please view this file on the master branch, on stable branches it's out of date.
 
 ## 13.12.0 (2021-05-22)
