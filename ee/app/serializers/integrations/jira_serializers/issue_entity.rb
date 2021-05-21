@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Integrations
-  module Jira
+  module JiraSerializers
     class IssueEntity < Grape::Entity
       include RequestAwareEntity
 

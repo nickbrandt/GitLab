@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 module Integrations
-  module Jira
-    class IssueDetailEntity < ::Integrations::Jira::IssueEntity
+  module JiraSerializers
+    class IssueDetailEntity < ::Integrations::JiraSerializers::IssueEntity
       expose :description_html do |jira_issue|
         jira_gfm_pipeline(jira_issue.renderedFields['description'])
       end
