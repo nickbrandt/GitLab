@@ -201,7 +201,7 @@ class Integration < ApplicationRecord
   def self.find_or_initialize_non_project_specific_integration(name, instance: false, group_id: nil)
     return unless name.in?(available_services_names(include_project_specific: false))
 
-    service_name_to_model(name).find_or_initialize_by(instance: instance, group_id: group_id)
+    integration_name_to_model(name).find_or_initialize_by(instance: instance, group_id: group_id)
   end
 
   def self.find_or_initialize_all_non_project_specific(scope)
@@ -210,7 +210,7 @@ class Integration < ApplicationRecord
 
   def self.build_nonexistent_services_for(scope)
     nonexistent_services_types_for(scope).map do |service_type|
-      service_type_to_model(service_type).new
+      integration_type_to_model(service_type).new
     end
   end
   private_class_method :build_nonexistent_services_for
@@ -235,11 +235,6 @@ class Integration < ApplicationRecord
     service_names.sort_by(&:downcase)
   end
 
-  def self.available_integration_names(**args)
-    available_services_names(**args)
-      .select { RENAMED_TO_INTEGRATION.include?(_1) }
-  end
-
   def self.integration_names
     INTEGRATION_NAMES
   end
@@ -262,45 +257,29 @@ class Integration < ApplicationRecord
   # Example: ["AsanaService", ...]
   def self.available_services_types(include_project_specific: true, include_dev: true)
     available_services_names(include_project_specific: include_project_specific, include_dev: include_dev).map do |service_name|
-      service_name_to_type(service_name)
+      integration_name_to_type(service_name)
     end
-  end
-
-  def self.available_integration_types(include_project_specific: true, include_dev: true)
-    available_integration_names(include_project_specific: include_project_specific, include_dev: include_dev).map do |name|
-      integration_name_to_type(name)
-    end
-  end
-
-  def self.integration_type_for_service_type(type_name)
-    name = type_name.chomp(type_name)
-
-    integration_name_to_type(name) if RENAMED_TO_INTEGRATION.include?(name)
   end
 
   # Returns the model for the given service name.
   # Example: "asana" => Integrations::Asana
-  def self.service_name_to_model(name)
-    type = service_name_to_type(name)
-    service_type_to_model(type)
+  def self.integration_name_to_model(name)
+    type = integration_name_to_type(name)
+    integration_type_to_model(type)
   end
 
   # Returns the STI type for the given service name.
   # Example: "asana" => "AsanaService"
-  def self.service_name_to_type(name)
-    "#{name}_service".camelize
-  end
-
   def self.integration_name_to_type(name)
-    "#{name}_integration".camelize
+    "#{name}_service".camelize
   end
 
   # Returns the model for the given STI type.
   # Example: "AsanaService" => Integrations::Asana
-  def self.service_type_to_model(type)
+  def self.integration_type_to_model(type)
     Gitlab::Integrations::StiType.new.cast(type).constantize
   end
-  private_class_method :service_type_to_model
+  private_class_method :integration_type_to_model
 
   def self.build_from_integration(integration, project_id: nil, group_id: nil)
     new_integration = integration.dup

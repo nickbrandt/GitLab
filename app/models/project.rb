@@ -2645,7 +2645,7 @@ class Project < ApplicationRecord
   end
 
   def build_service(name)
-    Integration.service_name_to_model(name).new(project_id: id)
+    Integration.integration_name_to_model(name).new(project_id: id)
   end
 
   def services_templates
