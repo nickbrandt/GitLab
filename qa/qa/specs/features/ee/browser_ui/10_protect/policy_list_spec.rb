@@ -12,7 +12,7 @@ module QA
         end
       end
 
-      before do       
+      before do
         Flow::Login.sign_in
 
         project.visit!
