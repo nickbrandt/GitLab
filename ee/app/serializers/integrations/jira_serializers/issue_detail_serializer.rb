@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 module Integrations
-  module Jira
+  module JiraSerializers
     class IssueDetailSerializer < BaseSerializer
-      entity ::Integrations::Jira::IssueDetailEntity
+      entity ::Integrations::JiraSerializers::IssueDetailEntity
     end
   end
 end

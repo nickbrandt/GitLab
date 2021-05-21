@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe Integrations::Jira::IssueSerializer do
+RSpec.describe Integrations::JiraSerializers::IssueSerializer do
   let_it_be(:project) { create(:project) }
   let_it_be(:jira_service) { create(:jira_service, project: project) }
 
