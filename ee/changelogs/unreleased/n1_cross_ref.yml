@@ -1,5 +1,0 @@
----
-title: Minimize number of SQL queries on epic autocompletion.
-merge_request: 61885
-author:
-type: performance
