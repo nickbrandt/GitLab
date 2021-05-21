@@ -15,7 +15,6 @@ module Gitlab
 
       return false unless size.to_i > file_size_limit
 
-      puts "HEY #{file_size_limit}"
       over_highlight_size_limit.increment(source: "file size: #{file_size_limit}") if Feature.enabled?(:track_file_size_over_highlight_limit)
 
       true
