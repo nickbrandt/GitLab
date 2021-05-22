@@ -13,23 +13,17 @@ const parseOptions = (obj) =>
 export const mapProjects = (projects) =>
   projects.map((p) => ({ id: p.id.split('/').pop(), name: p.name }));
 
-const stateOptions = parseOptions(VULNERABILITY_STATES);
-const defaultStateOptions = stateOptions.filter((x) => ['DETECTED', 'CONFIRMED'].includes(x.id));
-
 export const stateFilter = {
   name: s__('SecurityReports|Status'),
   id: 'state',
-  options: stateOptions,
-  allOption: BASE_FILTERS.state,
-  defaultOptions: defaultStateOptions,
+  options: [BASE_FILTERS.state, ...parseOptions(VULNERABILITY_STATES)],
+  defaultIds: ['DETECTED', 'CONFIRMED'],
 };
 
 export const severityFilter = {
   name: s__('SecurityReports|Severity'),
   id: 'severity',
-  options: parseOptions(SEVERITY_LEVELS),
-  allOption: BASE_FILTERS.severity,
-  defaultOptions: [],
+  options: [BASE_FILTERS.severity, ...parseOptions(SEVERITY_LEVELS)],
 };
 
 export const createScannerOption = (vendor, reportType) => {
@@ -56,7 +50,6 @@ export const scannerFilter = {
   id: 'scanner',
   options: Object.keys(REPORT_TYPES).map((x) => createScannerOption(DEFAULT_SCANNER, x)),
   allOption: BASE_FILTERS.report_type,
-  defaultOptions: [],
 };
 
 export const activityOptions = {
@@ -68,18 +61,17 @@ export const activityOptions = {
 export const activityFilter = {
   name: s__('Reports|Activity'),
   id: 'activity',
-  options: Object.values(activityOptions),
   allOption: BASE_FILTERS.activity,
-  defaultOptions: [],
+  noActivityOption: activityOptions.NO_ACTIVITY,
+  multiselectOptions: [activityOptions.WITH_ISSUES, activityOptions.NO_LONGER_DETECTED],
 };
 
 export const getProjectFilter = (projects) => {
   return {
     name: s__('SecurityReports|Project'),
     id: 'projectId',
-    options: mapProjects(projects),
+    options: [BASE_FILTERS.project_id, mapProjects(projects)],
     allOption: BASE_FILTERS.project_id,
-    defaultOptions: [],
   };
 };
 

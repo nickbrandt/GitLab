@@ -1,78 +1,73 @@
 <script>
 import { GlDropdownDivider } from '@gitlab/ui';
-import { xor, remove } from 'lodash';
+import { pull } from 'lodash';
 import { activityOptions } from '../../helpers';
 import FilterBody from './filter_body.vue';
 import FilterItem from './filter_item.vue';
 import StandardFilter from './standard_filter.vue';
 
-const { NO_ACTIVITY, WITH_ISSUES, NO_LONGER_DETECTED } = activityOptions;
+const { WITH_ISSUES, NO_LONGER_DETECTED } = activityOptions;
 
 export default {
   components: { FilterBody, FilterItem, GlDropdownDivider },
   extends: StandardFilter,
   computed: {
-    filterObject() {
-      // This is the object used to update the GraphQL query.
-      if (this.isNoOptionsSelected) {
-        return {
-          hasIssues: undefined,
-          hasResolution: undefined,
-        };
-      }
-
-      return {
-        hasIssues: this.isSelected(WITH_ISSUES),
-        hasResolution: this.isSelected(NO_LONGER_DETECTED),
-      };
+    allOptionId() {
+      return this.filter.allOption.id;
     },
-    multiselectOptions() {
-      return [WITH_ISSUES, NO_LONGER_DETECTED];
+    options() {
+      const { allOption, noActivityOption, multiselectOptions } = this.filter;
+      return [allOption, noActivityOption, ...multiselectOptions];
+    },
+    isAllOptionSelected() {
+      return this.selectedSet.has(this.allOptionId);
+    },
+    // This is used as variables for the vulnerability list Apollo query.
+    filterObject() {
+      return {
+        hasIssues: this.isAllOptionSelected ? undefined : this.isSelected(WITH_ISSUES),
+        hasResolution: this.isAllOptionSelected ? undefined : this.isSelected(NO_LONGER_DETECTED),
+      };
     },
   },
   methods: {
-    toggleOption(option) {
-      if (option === NO_ACTIVITY) {
-        this.selectedOptions = this.selectedSet.has(NO_ACTIVITY) ? [] : [NO_ACTIVITY];
-      } else {
-        remove(this.selectedOptions, NO_ACTIVITY);
-        // Toggle the option's existence in the array.
-        this.selectedOptions = xor(this.selectedOptions, [option]);
-      }
-
-      this.updateQuerystring();
+    selectAllOption() {
+      this.selectedIds = [this.allOptionId];
+    },
+    toggleNoActivityOption() {
+      const optionId = this.filter.noActivityOption.id;
+      this.selectedIds = this.selectedSet.has(optionId) ? [this.allOptionId] : [optionId];
+    },
+    toggleMultiselectOption(option) {
+      pull(this.selectedIds, this.filter.noActivityOption.id);
+      this.toggleOption(option);
     },
   },
-  NO_ACTIVITY,
 };
 </script>
 
 <template>
-  <filter-body
-    :name="filter.name"
-    :selected-options="selectedOptionsOrAll"
-    :show-search-box="false"
-  >
+  <filter-body :name="filter.name" :selected-options="selectedOptions">
     <filter-item
-      :is-checked="isNoOptionsSelected"
+      :is-checked="isAllOptionSelected"
       :text="filter.allOption.name"
-      :data-testid="`option:${filter.allOption.name}`"
-      @click="deselectAllOptions"
+      :data-testid="`${filter.id}:${filter.allId}`"
+      @click="selectAllOption"
     />
     <filter-item
-      :is-checked="isSelected($options.NO_ACTIVITY)"
-      :text="$options.NO_ACTIVITY.name"
-      :data-testid="`option:${$options.NO_ACTIVITY.name}`"
-      @click="toggleOption($options.NO_ACTIVITY)"
+      :is-checked="isSelected(filter.noActivityOption)"
+      :text="filter.noActivityOption.name"
+      data-testid="`${filter.id}:${filter.noActivityOption.name}`"
+      @click="toggleNoActivityOption"
     />
     <gl-dropdown-divider />
     <filter-item
-      v-for="option in multiselectOptions"
+      v-for="option in filter.multiselectOptions"
       :key="option.name"
       :is-checked="isSelected(option)"
       :text="option.name"
       :data-testid="`option:${option.name}`"
-      @click="toggleOption(option)"
+      @click="toggleMultiselectOption(option)"
     />
   </filter-body>
 </template>

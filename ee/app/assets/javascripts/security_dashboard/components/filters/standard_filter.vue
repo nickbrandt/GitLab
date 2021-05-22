@@ -1,5 +1,6 @@
 <script>
-import { isEqual, xor } from 'lodash';
+import { isEqual, xor, without } from 'lodash';
+import { ALL } from '../../store/modules/filters/constants';
 import FilterBody from './filter_body.vue';
 import FilterItem from './filter_item.vue';
 
@@ -10,22 +11,11 @@ export default {
       type: Object,
       required: true,
     },
-    // Number of options that must exist for the search box to show.
-    searchBoxShowThreshold: {
-      type: Number,
-      required: false,
-      default: 20,
-    },
-    loading: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
   },
   data() {
     return {
       searchTerm: '',
-      selectedOptions: undefined,
+      selectedIds: [],
     };
   },
   computed: {
@@ -33,102 +23,78 @@ export default {
       return this.filter.options;
     },
     selectedSet() {
-      return new Set(this.selectedOptions);
+      return new Set(this.selectedIds);
     },
-    isNoOptionsSelected() {
-      return this.selectedOptions.length <= 0;
+    selectedOptions() {
+      return this.options.filter((option) => this.selectedSet.has(option.id));
     },
-    selectedOptionsOrAll() {
-      return this.selectedOptions.length ? this.selectedOptions : [this.filter.allOption];
+    selectedIdsWithoutAll() {
+      return without(this.selectedIds, ALL);
     },
+    // This is used as variables for the vulnerability list Apollo query.
     filterObject() {
-      // This is passed to the vulnerability list's GraphQL query as a variable.
-      return { [this.filter.id]: this.selectedOptions.map((x) => x.id) };
-    },
-    filteredOptions() {
-      return this.options.filter((option) =>
-        option.name.toLowerCase().includes(this.searchTerm.toLowerCase()),
-      );
+      return { [this.filter.id]: this.selectedIdsWithoutAll };
     },
     querystringIds() {
       const ids = this.$route?.query[this.filter.id] || [];
-      return Array.isArray(ids) ? ids : [ids];
-    },
-    querystringOptions() {
-      // If the querystring IDs includes the All option, return an empty array. We'll do this even
-      // if there are other IDs because the special All option takes precedence.
-      if (this.querystringIds.includes(this.filter.allOption.id)) {
-        return [];
+      const idArray = Array.isArray(ids) ? ids : [ids];
+      // If there were no querystring IDs, return the default options.
+      if (!idArray.length) {
+        return this.filter.defaultIds || [ALL];
       }
 
-      const options = this.options.filter((x) => this.querystringIds.includes(x.id));
-      // If the querystring IDs didn't match any options, return the default options.
-      if (!options.length) {
-        return this.filter.defaultOptions;
-      }
-
-      return options;
-    },
-    showSearchBox() {
-      return this.options.length >= this.searchBoxShowThreshold;
+      return idArray;
     },
   },
   watch: {
-    selectedOptions() {
-      this.$emit('filter-changed', this.filterObject);
+    selectedIds(newIds, oldIds) {
+      if (!isEqual(newIds, oldIds)) {
+        console.log('selected IDs changed', newIds, oldIds);
+        this.emitFilterChanged(this.filterObject);
+        this.updateQuerystring();
+      }
     },
-  },
-  created() {
-    this.selectedOptions = this.querystringOptions;
-    // When the user clicks the forward/back browser buttons, update the selected options.
-    window.addEventListener('popstate', () => {
-      this.selectedOptions = this.querystringOptions;
-    });
+    querystringIds: {
+      immediate: true,
+      handler() {
+        this.selectedIds = this.querystringIds;
+      },
+    },
   },
   methods: {
-    toggleOption(option) {
-      // Toggle the option's existence in the array.
-      this.selectedOptions = xor(this.selectedOptions, [option]);
-      this.updateQuerystring();
-    },
-    deselectAllOptions() {
-      this.selectedOptions = [];
-      this.updateQuerystring();
-    },
-    updateQuerystring() {
-      const options = this.selectedOptionsOrAll.map((x) => x.id);
-      // To avoid a console error, don't update the querystring if it's the same as the current one.
-      if (!this.$router || isEqual(this.querystringIds, options)) {
-        return;
+    toggleOption({ id }) {
+      console.log('toggle option', id);
+      if (id === ALL) {
+        // If we're toggling the All option, select just the All option.
+        this.selectedIds = [ALL];
+      } else {
+        // Toggle whether the selected option is in the array or not.
+        const ids = xor(this.selectedIdsWithoutAll, [id]);
+        // If the last selected option is unselected, select the All option.
+        this.selectedIds = ids.length ? ids : [ALL];
+        console.log('setting selected IDs to', this.selectedIds);
       }
-
-      const query = { ...this.$route.query, [this.filter.id]: options };
-      this.$router.push({ query });
     },
     isSelected(option) {
-      return this.selectedSet.has(option);
+      return this.selectedSet.has(option.id);
+    },
+    updateQuerystring() {
+      if (this.$router && !isEqual(this.querystringIds, this.selectedIds)) {
+        const query = { ...this.$route.query, [this.filter.id]: this.selectedIds };
+        this.$router.push({ query });
+      }
+    },
+    emitFilterChanged(data) {
+      this.$emit('filter-changed', data);
     },
   },
 };
 </script>
 
 <template>
-  <filter-body
-    v-model.trim="searchTerm"
-    :name="filter.name"
-    :selected-options="selectedOptionsOrAll"
-    :show-search-box="showSearchBox"
-    :loading="loading"
-  >
+  <filter-body v-model.trim="searchTerm" :name="filter.name" :selected-options="selectedOptions">
     <filter-item
-      v-if="filter.allOption && !searchTerm.length"
-      :is-checked="isNoOptionsSelected"
-      :text="filter.allOption.name"
-      data-testid="allOption"
-      @click="deselectAllOptions"
-    />
-    <filter-item
-      v-for="option in filteredOptions"
+      v-for="option in options"
       :key="option.id"
       :is-checked="isSelected(option)"
       :text="option.name"

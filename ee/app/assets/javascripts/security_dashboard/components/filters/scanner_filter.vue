@@ -21,6 +21,9 @@ export default {
     options() {
       return Object.values(this.groups).flatMap((x) => Object.values(x));
     },
+    isAllOptionSelected() {
+      return this.selectedSet.has(this.allOptionId);
+    },
     /**
      * For this computed property, we create an object with the following hierarchy:
      *   {
@@ -75,31 +78,30 @@ export default {
     },
   },
   methods: {
+    selectAllOption() {
+      this.selectedIds = [this.allOptionId];
+    },
     toggleGroup(groupName) {
       const options = Object.values(this.groups[groupName]);
       // If every option is selected, de-select all of them. Otherwise, select all of them.
-      this.selectedOptions = options.every((option) => this.selectedSet.has(option))
+      const newOptions = options.every((option) => this.selectedSet.has(option))
         ? without(this.selectedOptions, ...options)
         : union(this.selectedOptions, options);
 
-      this.updateQuerystring();
+      this.setSelectedOptions(newOptions);
     },
   },
 };
 </script>
 
 <template>
-  <filter-body
-    :name="filter.name"
-    :selected-options="selectedOptionsOrAll"
-    :show-search-box="false"
-  >
+  <filter-body :name="filter.name" :selected-options="selectedOptions">
     <filter-item
       v-if="filter.allOption"
-      :is-checked="isNoOptionsSelected"
+      :is-checked="isAllOptionSelected"
       :text="filter.allOption.name"
       data-testid="all"
-      @click="deselectAllOptions"
+      @click="selectAllOption"
     />
 
     <template v-for="[groupName, groupOptions] in Object.entries(groups)">
