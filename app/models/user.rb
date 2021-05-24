@@ -1706,12 +1706,6 @@ class User < ApplicationRecord
 
   def invalidate_issue_cache_counts
     Rails.cache.delete(['users', id, 'assigned_open_issues_count'])
-
-    if Feature.enabled?(:assigned_open_issues_cache, default_enabled: :yaml)
-      run_after_commit do
-        Users::UpdateOpenIssueCountWorker.perform_async(self.id)
-      end
-    end
   end
 
   def invalidate_merge_request_cache_counts
