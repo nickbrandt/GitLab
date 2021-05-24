@@ -11,6 +11,7 @@ Gitlab::Experiment.configure do |config|
   #  enable migrating into the new SHA2 strategy.
   config.context_hash_strategy = lambda do |source, seed|
     source = source.keys + source.values if source.is_a?(Hash)
-    Digest::MD5.hexdigest(Array(source).map { |v| identify(v) }.unshift(seed).join('|'))
+    data = Array(source).map { |v| (v.respond_to?(:to_global_id) ? v.to_global_id : v).to_s }
+    Digest::MD5.hexdigest(data.unshift(seed).join('|'))
   end
 end
