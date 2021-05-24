@@ -6,7 +6,7 @@ FactoryBot.define do
     type { 'Integration' }
   end
 
-  factory :custom_issue_tracker_service, class: 'Integrations::CustomIssueTracker' do
+  factory :custom_issue_tracker_integration, class: 'Integrations::CustomIssueTracker' do
     project
     active { true }
     issue_tracker

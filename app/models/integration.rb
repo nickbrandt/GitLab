@@ -42,7 +42,7 @@ class Integration < ApplicationRecord
   RENAMED_TO_INTEGRATION = %w[
     asana assembla
     bamboo bugzilla buildkite
-    campfire confluence
+    campfire confluence custom_issue_tracker
   ].to_set.freeze
 
   serialize :properties, JSON # rubocop:disable Cop/ActiveRecordSerialize

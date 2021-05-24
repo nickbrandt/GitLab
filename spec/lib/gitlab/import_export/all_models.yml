@@ -390,7 +390,7 @@ project:
 - jira_service
 - redmine_service
 - youtrack_service
-- custom_issue_tracker_service
+- custom_issue_tracker_integration
 - bugzilla_integration
 - ewm_service
 - external_wiki_service

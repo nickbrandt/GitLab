@@ -63,7 +63,7 @@ RSpec.describe Project, factory_default: :keep do
     it { is_expected.to have_one(:jira_service) }
     it { is_expected.to have_one(:redmine_service) }
     it { is_expected.to have_one(:youtrack_service) }
-    it { is_expected.to have_one(:custom_issue_tracker_service) }
+    it { is_expected.to have_one(:custom_issue_tracker_integration) }
     it { is_expected.to have_one(:bugzilla_integration) }
     it { is_expected.to have_one(:ewm_service) }
     it { is_expected.to have_one(:external_wiki_service) }
@@ -5311,7 +5311,7 @@ RSpec.describe Project, factory_default: :keep do
     it { expect(project.has_active_services?).to be_falsey }
 
     it 'returns true when a matching service exists' do
-      create(:custom_issue_tracker_service, push_events: true, merge_requests_events: false, project: project)
+      create(:custom_issue_tracker_integration, push_events: true, merge_requests_events: false, project: project)
 
       expect(project.has_active_services?(:merge_request_hooks)).to be_falsey
       expect(project.has_active_services?).to be_truthy
