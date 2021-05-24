@@ -2,16 +2,22 @@ import { GlDropdown, GlDropdownItem } from '@gitlab/ui';
 import { shallowMountExtended } from 'helpers/vue_test_utils_helper';
 import ToolbarTextStyleDropdown from '~/content_editor/components/toolbar_text_style_dropdown.vue';
 import { TEXT_STYLE_DROPDOWN_ITEMS } from '~/content_editor/constants';
-import { createContentEditor } from '~/content_editor/services/create_content_editor';
+import { createTestContentEditorExtension, createTestEditor } from '../test_utils';
 
 describe('content_editor/components/toolbar_headings_dropdown', () => {
   let wrapper;
   let tiptapEditor;
+  let commandMocks;
 
   const buildEditor = () => {
-    tiptapEditor = createContentEditor({
-      renderMarkdown: () => true,
-    }).tiptapEditor;
+    const testExtension = createTestContentEditorExtension({
+      commands: TEXT_STYLE_DROPDOWN_ITEMS.map((item) => item.editorCommand),
+    });
+
+    commandMocks = testExtension.commandMocks;
+    tiptapEditor = createTestEditor({
+      extensions: [testExtension.tiptapExtension],
+    });
 
     jest.spyOn(tiptapEditor, 'isActive');
   };
@@ -41,8 +47,8 @@ describe('content_editor/components/toolbar_headings_dropdown', () => {
   it('renders all text styles as dropdown items', () => {
     buildWrapper();
 
-    TEXT_STYLE_DROPDOWN_ITEMS.forEach((heading) => {
-      expect(wrapper.findByText(heading.label).exists()).toBe(true);
+    TEXT_STYLE_DROPDOWN_ITEMS.forEach((textStyle) => {
+      expect(wrapper.findByText(textStyle.label).exists()).toBe(true);
     });
   });
 
@@ -89,6 +95,37 @@ describe('content_editor/components/toolbar_headings_dropdown', () => {
 
     it('sets dropdown toggle text to Text style', () => {
       expect(findDropdown().props().text).toBe('Text style');
+    });
+  });
+
+  describe('when a text style is selected', () => {
+    it('executes the tiptap command related to that text style', () => {
+      buildWrapper();
+
+      TEXT_STYLE_DROPDOWN_ITEMS.forEach((textStyle, index) => {
+        const { editorCommand, commandParams } = textStyle;
+
+        wrapper.findAllComponents(GlDropdownItem).at(index).vm.$emit('click');
+        expect(commandMocks[editorCommand]).toHaveBeenCalledWith(commandParams || {});
+      });
+    });
+
+    it('emits execute event with contentType and value params that indicates the heading level', () => {
+      TEXT_STYLE_DROPDOWN_ITEMS.forEach((textStyle, index) => {
+        buildWrapper();
+        const { contentType, commandParams } = textStyle;
+
+        wrapper.findAllComponents(GlDropdownItem).at(index).vm.$emit('click');
+        expect(wrapper.emitted('execute')).toEqual([
+          [
+            {
+              contentType,
+              value: commandParams?.level,
+            },
+          ],
+        ]);
+        wrapper.destroy();
+      });
     });
   });
 });
