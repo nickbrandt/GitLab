@@ -3,16 +3,12 @@
   "required" : [
     "name",
     "email",
-    "commits",
-    "additions",
-    "deletions"
+    "commits"
   ],
   "properties" : {
     "name": { "type": "string" },
     "email": { "type": "string" },
-    "commits": { "type": "integer" },
-    "additions": { "type": "integer" },
-    "deletions": { "type": "integer" }
+    "commits": { "type": "integer" }
   },
   "additionalProperties": false
 }

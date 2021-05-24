@@ -230,15 +230,11 @@ Example response:
 [{
   "name": "Example User",
   "email": "example@example.com",
-  "commits": 117,
-  "additions": 0,
-  "deletions": 0
+  "commits": 117
 }, {
   "name": "Sample User",
   "email": "sample@example.com",
-  "commits": 33,
-  "additions": 0,
-  "deletions": 0
+  "commits": 33
 }]
 ```
 

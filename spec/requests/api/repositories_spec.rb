@@ -492,8 +492,6 @@ RSpec.describe API::Repositories do
         expect(first_contributor['email']).to eq('tiagonbotelho@hotmail.com')
         expect(first_contributor['name']).to eq('tiagonbotelho')
         expect(first_contributor['commits']).to eq(1)
-        expect(first_contributor['additions']).to eq(0)
-        expect(first_contributor['deletions']).to eq(0)
       end
 
       context 'using sorting' do

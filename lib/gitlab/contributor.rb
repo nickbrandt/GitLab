@@ -2,12 +2,10 @@
 
 module Gitlab
   class Contributor
-    attr_accessor :email, :name, :commits, :additions, :deletions
+    attr_accessor :email, :name, :commits
 
     def initialize
       @commits = 0
-      @additions = 0
-      @deletions = 0
     end
   end
 end
