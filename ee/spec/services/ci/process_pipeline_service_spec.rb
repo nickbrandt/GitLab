@@ -54,7 +54,7 @@ RSpec.describe Ci::ProcessPipelineService, '#execute' do
     end
 
     context 'with no runners' do
-      it 'creates a downstream cross-project pipeline' do
+      it 'creates a failed downstream cross-project pipeline' do
         service.execute
         Sidekiq::Worker.drain_all
 

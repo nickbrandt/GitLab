@@ -17,24 +17,26 @@ RSpec.describe Ci::PipelineCreation::DropNotRunnableBuildsService do
   describe '#execute' do
     subject(:execute) { described_class.new(pipeline).execute }
 
-    context 'when the feature flag is disabled' do
-      before do
-        stub_feature_flags(ci_drop_new_builds_when_ci_quota_exceeded: false)
-      end
-
+    shared_examples 'jobs allowed to run' do
       it 'does not drop the jobs' do
         expect { execute }.not_to change { job.reload.status }
       end
     end
 
-    context 'when the pipeline status is not created' do
+    context 'when the feature flag is disabled' do
+      before do
+        stub_feature_flags(ci_drop_new_builds_when_ci_quota_exceeded: false)
+      end
+
+      it_behaves_like 'jobs allowed to run'
+    end
+
+    context 'when the pipeline status is running' do
       before do
         pipeline.update!(status: :running)
       end
 
-      it 'does not drop the jobs' do
-        expect { execute }.not_to change { job.reload.status }
-      end
+      it_behaves_like 'jobs allowed to run'
     end
 
     context 'when there are no runners available' do
@@ -56,9 +58,7 @@ RSpec.describe Ci::PipelineCreation::DropNotRunnableBuildsService do
         create(:ci_runner, :online, runner_type: :project_type, projects: [project])
       end
 
-      it 'does not drop the jobs' do
-        expect { execute }.not_to change { job.reload.status }
-      end
+      it_behaves_like 'jobs allowed to run'
     end
 
     context 'with group runners' do
@@ -66,9 +66,7 @@ RSpec.describe Ci::PipelineCreation::DropNotRunnableBuildsService do
         create(:ci_runner, :online, runner_type: :group_type, groups: [group])
       end
 
-      it 'does not drop the jobs' do
-        expect { execute }.not_to change { job.reload.status }
-      end
+      it_behaves_like 'jobs allowed to run'
     end
 
     context 'with instance runners' do
@@ -76,9 +74,7 @@ RSpec.describe Ci::PipelineCreation::DropNotRunnableBuildsService do
         create(:ci_runner, :online, runner_type: :instance_type)
       end
 
-      it 'does not drop the jobs' do
-        expect { execute }.not_to change { job.reload.status }
-      end
+      it_behaves_like 'jobs allowed to run'
     end
   end
 end

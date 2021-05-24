@@ -226,7 +226,7 @@ RSpec.describe Ci::CreatePipelineService do
       end
 
       context 'when there are no runners matching the builds' do
-        it 'creates a pipeline with build_a and test_b pending; deploy_b manual', :sidekiq_inline do
+        it 'creates a pipeline but all jobs failed', :sidekiq_inline do
           processables = pipeline.processables
 
           expect(pipeline).to be_created_successfully
