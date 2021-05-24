@@ -652,7 +652,7 @@ RSpec.describe Admin::UsersController do
       end
     end
 
-    context 'when updating validate user account' do
+    context 'when updating credit card validation for user account' do
       let(:params) do
         {
           id: user.to_param,
@@ -715,6 +715,26 @@ RSpec.describe Admin::UsersController do
           it 'does not blow up' do
             expect { post :update, params: params }.not_to change(Users::CreditCardValidation, :count)
           end
+        end
+
+        it_behaves_like 'no credit card validation param'
+      end
+
+      context 'invalid parameters' do
+        let(:user_params) do
+          { credit_card_validation_attributes: { credit_card_validated_at: Time.current.iso8601 } }
+        end
+
+        it_behaves_like 'no credit card validation param'
+      end
+
+      context 'with non permitted params' do
+        let(:user_params) do
+          { credit_card_validation_attributes: { _destroy: true } }
+        end
+
+        before do
+          user.create_credit_card_validation!(credit_card_validated_at: Time.zone.now)
         end
 
         it_behaves_like 'no credit card validation param'
