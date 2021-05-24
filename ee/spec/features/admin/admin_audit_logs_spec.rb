@@ -219,7 +219,7 @@ RSpec.describe 'Admin::AuditLogs', :js do
       click_link type
       click_link name
 
-      find('button[type="button"]:not([name="clear"])').click
+      find('button[type="button"]:not([name="clear"]):not([aria-label="Close"]').click
     end
 
     wait_for_requests
