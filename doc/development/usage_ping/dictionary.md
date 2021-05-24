@@ -4284,7 +4284,7 @@ Tiers: `free`, `premium`, `ultimate`
 
 ### `counts.projects_creating_incidents`
 
-Counts of Projects that have incident issues, regardless of status
+Counts of Projects that have incident issues, regardless of status.
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/20210216180453_projects_creating_incidents.yml)
 
@@ -7664,7 +7664,7 @@ Group: `group::product intelligence`
 
 Status: `data_available`
 
-Tiers: `free`
+Tiers: `free`, `premium`, `ultimate`
 
 ### `prometheus_metrics_enabled`
 
@@ -7676,7 +7676,7 @@ Group: `group::product intelligence`
 
 Status: `data_available`
 
-Tiers: `free`
+Tiers: `free`, `premium`, `ultimate`
 
 ### `recorded_at`
 
