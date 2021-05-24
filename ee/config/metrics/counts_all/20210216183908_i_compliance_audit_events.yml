@@ -1,6 +1,5 @@
 ---
-data_category: Optional
-key_path: redis_hll_counters.compliance.i_compliance_audit_events_weekly
+key_path: compliance_unique_visits.i_compliance_audit_events
 description: 'Unique users that have viewed the instance-level audit events screen'
 product_section: 'dev'
 product_stage: 'manage'
@@ -8,8 +7,8 @@ product_group: 'group::compliance'
 product_category: 'audit_events'
 value_type: number
 status: data_available
-time_frame: 7d
-data_source: redis_hll
+time_frame: all
+data_source: database
 distribution:
 - ee
 tier:
