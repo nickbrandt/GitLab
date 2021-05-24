@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe EE::MergeRequests::ResetApprovalsService do
+RSpec.describe MergeRequests::ResetApprovalsService do
   let(:service) { described_class.new(project: project, current_user: current_user) }
   let(:current_user) { merge_request.author }
   let(:group) { create(:group) }
