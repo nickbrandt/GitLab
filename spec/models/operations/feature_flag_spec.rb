@@ -310,7 +310,7 @@ RSpec.describe Operations::FeatureFlag do
 
     it 'does not execute the hook when feature_flag event is disabled' do
       create(:project_hook, project: project, feature_flag_events: false)
-      expect(WebHookWorker).not_to receive(:perform_async)
+      expect(WebHooks::ExecuteWorker).not_to receive(:perform_async)
 
       feature_flag.execute_hooks(user)
       feature_flag.touch
@@ -318,7 +318,7 @@ RSpec.describe Operations::FeatureFlag do
 
     it 'executes hook when feature_flag event is enabled' do
       hook = create(:project_hook, project: project, feature_flag_events: true)
-      expect(WebHookWorker).to receive(:perform_async).with(hook.id, an_instance_of(Hash), 'feature_flag_hooks')
+      expect(WebHooks::ExecuteWorker).to receive(:perform_async).with(hook.id, an_instance_of(String), 'feature_flag_hooks')
 
       feature_flag.execute_hooks(user)
       feature_flag.touch

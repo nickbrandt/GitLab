@@ -17,7 +17,7 @@ RSpec.describe WebHookService do
   end
 
   let(:data) do
-    { before: 'oldrev', after: 'newrev', ref: 'ref' }
+    { before: 'oldrev', after: 'newrev', ref: 'ref', at: Time.current }
   end
 
   let(:service_instance) { described_class.new(project_hook, data, :push_hooks) }
@@ -83,6 +83,22 @@ RSpec.describe WebHookService do
       expect(WebMock).to have_requested(:post, stubbed_hostname(project_hook.url)).with(
         headers: headers
       ).once
+    end
+
+    context 'when the data is a precompiled fragment' do
+      let(:payload) { { payload: [true, false, ["one", "two", 1, 2.0], nil, Time.current] } }
+      let(:data) { Gitlab::Json::PrecompiledJson.new(Gitlab::Json.dump(payload)) }
+
+      it 'sends the payload as-is' do
+        stub_full_request(project_hook.url, method: :post)
+
+        service_instance.execute
+
+        expect(WebMock).to have_requested(:post, stubbed_hostname(project_hook.url)).with(
+          headers: headers,
+          body: Gitlab::Json.dump(payload)
+        ).once
+      end
     end
 
     context 'when auth credentials are present' do
@@ -330,7 +346,8 @@ RSpec.describe WebHookService do
 
   describe '#async_execute' do
     def expect_to_perform_worker(hook)
-      expect(WebHookWorker).to receive(:perform_async).with(hook.id, data, 'push_hooks')
+      expect(WebHooks::ExecuteWorker)
+        .to receive(:perform_async).with(hook.id, Gitlab::Json.dump(data), 'push_hooks')
     end
 
     def expect_to_rate_limit(hook, threshold:, throttled: false)
@@ -366,6 +383,7 @@ RSpec.describe WebHookService do
 
         it 'does not queue a worker and logs an error' do
           expect(WebHookWorker).not_to receive(:perform_async)
+          expect(WebHooks::ExecuteWorker).not_to receive(:perform_async)
 
           payload = {
             message: 'Webhook rate limit exceeded',
@@ -425,7 +443,7 @@ RSpec.describe WebHookService do
 
     context 'when hook has custom context attributes' do
       it 'includes the attributes in the worker context' do
-        expect(WebHookWorker).to receive(:perform_async) do
+        expect(WebHooks::ExecuteWorker).to receive(:perform_async) do
           expect(Gitlab::ApplicationContext.current).to include(
             'meta.project' => project_hook.project.full_path,
             'meta.root_namespace' => project.root_ancestor.path,

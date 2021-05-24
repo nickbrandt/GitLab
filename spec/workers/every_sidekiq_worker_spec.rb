@@ -450,6 +450,7 @@ RSpec.describe 'Every Sidekiq worker' do
         'VulnerabilityExports::ExportWorker' => 3,
         'WaitForClusterCreationWorker' => 3,
         'WebHookWorker' => 4,
+        'WebHooks::ExecuteWorker' => 4,
         'WebHooks::DestroyWorker' => 3,
         'Wikis::GitGarbageCollectWorker' => false,
         'X509CertificateRevokeWorker' => 3
