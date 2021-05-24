@@ -321,7 +321,7 @@ class User < ApplicationRecord
 
   accepts_nested_attributes_for :user_preference, update_only: true
   accepts_nested_attributes_for :user_detail, update_only: true
-  accepts_nested_attributes_for :credit_card_validation, update_only: true
+  accepts_nested_attributes_for :credit_card_validation, update_only: true, allow_destroy: true
 
   state_machine :state, initial: :active do
     event :block do
