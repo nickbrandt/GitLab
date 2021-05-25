@@ -272,7 +272,7 @@ describe('Tracking', () => {
       checkbox.click(); // unchecking
 
       expect(eventSpy).toHaveBeenCalledWith('_category_', 'toggle_checkbox', {
-        value: false,
+        value: 0,
       });
 
       checkbox.click(); // checking
