@@ -57,6 +57,18 @@ Metric definitions can have one of the following statuses:
 - `deprecated`: Metric is deprecated and possibly planned to be removed.
 - `removed`: Metric was removed, but it may appear in Usage Ping payloads sent from instances running on older versions of GitLab.
 
+### Metric value_type
+
+Metric definitions can have one of the following value_types:
+
+- `boolean`
+- `number`
+- `string`
+- `object`: Metric with `value_type: object` must have `value_json_schema` with the link to the JSON schema for the object.
+In general we want to avoid complex objects and we prefer one of the `boolean`, `number`, `string` value types.
+Example of metric using `value_type: object` is [topology](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/settings/20210323120839_topology.yml)
+with the [related schema](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/objects_schemas/topology_schema.json)
+
 ### Metric name
 
 To improve metric discoverability by a wider audience, each metric with
