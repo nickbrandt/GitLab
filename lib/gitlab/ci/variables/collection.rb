@@ -68,7 +68,7 @@ module Gitlab
         end
 
         def expand_value(value, keep_undefined: false)
-          value.gsub(ExpandVariables::VARIABLES_REGEXP) do
+          value.gsub(Item::VARIABLES_REGEXP) do
             match = Regexp.last_match
             if match[:key]
               # return variable matched, or return original if undefined

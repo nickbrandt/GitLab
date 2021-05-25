@@ -244,6 +244,11 @@ RSpec.describe Gitlab::Ci::Variables::Collection do
             result: 'key$TEST1-test-1',
             keep_undefined: false
           },
+          "complex expansions with escaped characters": {
+            value: 'key_${variable4}_$${HOME}_%%HOME%%',
+            result: 'key__${HOME}_%HOME%',
+            keep_undefined: false
+          },
           "missing variable not keeping original": {
             value: 'key${MISSING_VAR}-${CI_JOB_NAME}',
             result: 'key-test-1',
@@ -253,6 +258,11 @@ RSpec.describe Gitlab::Ci::Variables::Collection do
             value: 'key${MISSING_VAR}-${CI_JOB_NAME}',
             result: 'key${MISSING_VAR}-test-1',
             keep_undefined: true
+          },
+          "escaped characters are resolved correctly": {
+            value: 'key-$TEST1-%%HOME%%-$${HOME}',
+            result: 'key-test-3-%HOME%-${HOME}',
+            keep_undefined: false
           }
         }
       end

@@ -7,6 +7,17 @@ module Gitlab
         class Item
           include Gitlab::Utils::StrongMemoize
 
+          class << self
+            def possible_var_reference?(value)
+              return unless value
+
+              VARIABLE_REF_CHARS.any? { |symbol| value.include?(symbol) }
+            end
+          end
+
+          VARIABLES_REGEXP = /\$(?<escape>\$)|%(?<escape>%)|\$(?<key>[a-zA-Z_][a-zA-Z0-9_]*)|\${\g<key>?}|%\g<key>%/.freeze
+          VARIABLE_REF_CHARS = %w[$ %].freeze
+
           def initialize(key:, value:, public: true, file: false, masked: false, raw: false)
             raise ArgumentError, "`#{key}` must be of type String or nil value, while it was: #{value.class}" unless
               value.is_a?(String) || value.nil?
@@ -34,9 +45,9 @@ module Gitlab
             strong_memoize(:depends_on) do
               next if raw
 
-              next unless ExpandVariables.possible_var_reference?(value)
+              next unless self.class.possible_var_reference?(value)
 
-              value.scan(ExpandVariables::VARIABLES_REGEXP).map(&:last).compact
+              value.scan(VARIABLES_REGEXP).map(&:last).compact
             end
           end
 
