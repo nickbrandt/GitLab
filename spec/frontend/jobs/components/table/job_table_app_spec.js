@@ -104,7 +104,6 @@ describe('Job table app', () => {
           },
           jobs: {
             pageInfo: {
-              hasNextPage: false,
               hasPreviousPage: true,
               startCursor: 'abc',
               endCursor: 'bcd',
@@ -113,12 +112,24 @@ describe('Job table app', () => {
         },
       });
 
+      await wrapper.vm.$nextTick();
+
+      wrapper.setData({
+        jobs: {
+          pageInfo: {
+            hasNextPage: false,
+          },
+        },
+      });
+
+      await wrapper.vm.$nextTick();
+
       expect(findPrevious().exists()).toBe(true);
       expect(findNext().exists()).toBe(true);
       expect(findNext().classes('disabled')).toBe(true);
     });
 
-    it('should disable the preivous page button on the first page', async () => {
+    it('should disable the previous page button on the first page', async () => {
       createComponent({
         handler: successHandler,
         mountFn: mount,
@@ -136,6 +147,8 @@ describe('Job table app', () => {
           },
         },
       });
+
+      await wrapper.vm.$nextTick();
 
       expect(findPrevious().exists()).toBe(true);
       expect(findPrevious().classes('disabled')).toBe(true);

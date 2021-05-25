@@ -1,19 +1,11 @@
 <script>
 import { GlAlert, GlPagination, GlSkeletonLoader } from '@gitlab/ui';
 import { __ } from '~/locale';
-import { GRAPHQL_PAGE_SIZE } from './constants';
+import { GRAPHQL_PAGE_SIZE, initialPaginationState } from './constants';
 import GetJobs from './graphql/queries/get_jobs.query.graphql';
 import JobsTable from './jobs_table.vue';
 import JobsTableEmptyState from './jobs_table_empty_state.vue';
 import JobsTableTabs from './jobs_table_tabs.vue';
-
-const initialPaginationState = {
-  currentPage: 1,
-  prevPageCursor: '',
-  nextPageCursor: '',
-  first: GRAPHQL_PAGE_SIZE,
-  last: null,
-};
 
 export default {
   i18n: {
@@ -79,7 +71,7 @@ export default {
       return this.jobs.pageInfo?.hasNextPage ? this.pagination.currentPage + 1 : null;
     },
     showPaginationControls() {
-      return Boolean(this.prevPage || this.nextPage);
+      return Boolean(this.prevPage || this.nextPage) && !this.$apollo.loading;
     },
   },
   methods: {
@@ -99,8 +91,8 @@ export default {
         };
       } else {
         this.pagination = {
-          lastPageSize: GRAPHQL_PAGE_SIZE,
-          firstPageSize: null,
+          last: GRAPHQL_PAGE_SIZE,
+          first: null,
           prevPageCursor: startCursor,
           currentPage: page,
         };
@@ -147,7 +139,6 @@ export default {
 
     <gl-pagination
       v-if="showPaginationControls"
-      :disabled="$apollo.loading"
       :value="pagination.currentPage"
       :prev-page="prevPage"
       :next-page="nextPage"
