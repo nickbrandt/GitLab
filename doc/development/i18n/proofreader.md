@@ -87,6 +87,7 @@ are very appreciative of the work done by translators and proofreaders!
 - Polish
   - Filip Mech - [GitLab](https://gitlab.com/mehenz), [CrowdIn](https://crowdin.com/profile/mehenz)
   - Maksymilian Roman - [GitLab](https://gitlab.com/villaincandle), [CrowdIn](https://crowdin.com/profile/villaincandle)
+  - Jakub Gładykowski - [GitLab](https://gitlab.com/gladykov), [CrowdIn](https://crowdin.com/profile/gladykov)
 - Portuguese
   - Diogo Trindade - [GitLab](https://gitlab.com/luisdiogo2071317), [CrowdIn](https://crowdin.com/profile/ldiogotrindade)
 - Portuguese, Brazilian
