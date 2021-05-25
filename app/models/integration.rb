@@ -38,6 +38,12 @@ class Integration < ApplicationRecord
     Integrations::BaseSlashCommands
   ].freeze
 
+  # used as part of the renaming effort (https://gitlab.com/groups/gitlab-org/-/epics/2504)
+  RENAMED_TO_INTEGRATION = %w[
+    asana assembla
+    bamboo bugzilla buildkite
+  ].to_set.freeze
+
   serialize :properties, JSON # rubocop:disable Cop/ActiveRecordSerialize
 
   attribute :type, Gitlab::Integrations::StiType.new
@@ -227,9 +233,6 @@ class Integration < ApplicationRecord
 
     service_names.sort_by(&:downcase)
   end
-
-  # used as part of the renaming effort
-  RENAMED_TO_INTEGRATION = %w[asana assembla bamboo bugzilla].freeze
 
   def self.available_integration_names(**args)
     available_services_names(**args)
