@@ -239,8 +239,10 @@ export default {
       <environment-picker />
     </div>
 
-    <div class="gl-mb-5 gl-border-2 gl-border-solid gl-border-gray-50">
-      <gl-form-group class="gl-p-5 gl-mb-0 gl-bg-gray-50">
+    <div class="gl-mb-5 gl-border-1 gl-border-solid gl-border-gray-100 gl-rounded-base">
+      <gl-form-group
+        class="gl-px-5 gl-py-3 gl-mb-0 gl-bg-gray-10 gl-border-b-solid gl-border-b-gray-100 gl-border-b-1"
+      >
         <gl-segmented-control
           data-testid="editor-mode"
           :options="$options.editorModes"
@@ -249,7 +251,7 @@ export default {
         />
       </gl-form-group>
       <div class="gl-display-flex gl-sm-flex-direction-column">
-        <section class="gl-w-full gl-p-5 gl-flex-fill-3 policy-table-left">
+        <section class="gl-w-full gl-p-5 gl-flex-fill-4 policy-table-left">
           <div v-if="shouldShowRuleEditor" data-testid="rule-editor">
             <gl-alert v-if="hasParsingError" data-testid="parsing-alert" :dismissible="false">
               {{ $options.i18n.PARSING_ERROR_MESSAGE }}
@@ -281,7 +283,7 @@ export default {
 
               <template #disabled>
                 <div
-                  class="gl-bg-gray-10 gl-border-solid gl-border-1 gl-border-gray-50 gl-rounded-base gl-p-6"
+                  class="gl-bg-gray-10 gl-border-solid gl-border-1 gl-border-gray-100 gl-rounded-base gl-p-6"
                 ></div>
               </template>
 
@@ -300,7 +302,7 @@ export default {
               />
 
               <div
-                class="gl-p-3 gl-rounded-base gl-border-1 gl-border-solid gl-border-gray-50 gl-mb-5"
+                class="gl-p-3 gl-rounded-base gl-border-1 gl-border-solid gl-border-gray-100 gl-mb-5"
               >
                 <gl-button
                   variant="link"
@@ -325,7 +327,7 @@ export default {
 
               <template #disabled>
                 <div
-                  class="gl-bg-gray-10 gl-border-solid gl-border-1 gl-border-gray-50 gl-rounded-base gl-p-6"
+                  class="gl-bg-gray-10 gl-border-solid gl-border-1 gl-border-gray-100 gl-rounded-base gl-p-6"
                 ></div>
               </template>
 
@@ -344,7 +346,7 @@ export default {
 
         <section
           v-if="shouldShowRuleEditor"
-          class="gl-w-30p gl-p-5 gl-border-l-gray-50 gl-border-l-1 gl-border-l-solid gl-flex-fill-2"
+          class="gl-w-30p gl-p-5 gl-border-l-gray-100 gl-border-l-1 gl-border-l-solid gl-flex-fill-2"
         >
           <dim-disable-container data-testid="policy-preview-container" :disabled="hasParsingError">
             <template #title>
@@ -352,10 +354,7 @@ export default {
             </template>
 
             <template #disabled>
-              <policy-preview
-                :policy-yaml="s__('NetworkPolicies|Unable to parse policy')"
-                policy-description=""
-              />
+              <policy-preview :policy-yaml="s__('NetworkPolicies|Unable to parse policy')" />
             </template>
 
             <policy-preview :policy-yaml="policyYaml" :policy-description="humanizedPolicy" />
