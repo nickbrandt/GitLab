@@ -8,6 +8,7 @@ import ReleasesIndexApolloClientApp from '~/releases/components/app_index_apollo
 import ReleaseBlock from '~/releases/components/release_block.vue';
 import ReleaseSkeletonLoader from '~/releases/components/release_skeleton_loader.vue';
 import ReleasesEmptyState from '~/releases/components/releases_empty_state.vue';
+import ReleasesPaginationApolloClient from '~/releases/components/releases_pagination_apollo_client.vue';
 import { PAGE_SIZE } from '~/releases/constants';
 import allReleasesQuery from '~/releases/graphql/queries/all_releases.query.graphql';
 
@@ -29,6 +30,8 @@ describe('app_index_apollo_client.vue', () => {
   );
   const projectPath = 'project/path';
   const newReleasePath = 'path/to/new/release/page';
+  const before = 'beforeCursor';
+  const after = 'afterCursor';
 
   let wrapper;
   let allReleasesQueryResponse;
@@ -64,6 +67,7 @@ describe('app_index_apollo_client.vue', () => {
   const findNewReleaseButton = () =>
     wrapper.findByText(ReleasesIndexApolloClientApp.i18n.newRelease);
   const findAllReleaseBlocks = () => wrapper.findAllComponents(ReleaseBlock);
+  const findPagination = () => wrapper.findComponent(ReleasesPaginationApolloClient);
 
   // Expectations
   const expectLoadingIndicator = () => {
@@ -119,6 +123,18 @@ describe('app_index_apollo_client.vue', () => {
     });
   };
 
+  const expectPagination = () => {
+    it('renders the pagination buttons', () => {
+      expect(findPagination().exists()).toBe(true);
+    });
+  };
+
+  const expectNoPagination = () => {
+    it('does not render the pagination buttons', () => {
+      expect(findPagination().exists()).toBe(false);
+    });
+  };
+
   // Tests
   describe('when the component is loading data', () => {
     beforeEach(() => {
@@ -130,6 +146,7 @@ describe('app_index_apollo_client.vue', () => {
     expectNoFlashMessage();
     expectNewReleaseButton();
     expectReleases(0);
+    expectNoPagination();
   });
 
   describe('when the data has successfully loaded, but there are no releases', () => {
@@ -143,6 +160,7 @@ describe('app_index_apollo_client.vue', () => {
     expectNoFlashMessage();
     expectNewReleaseButton();
     expectReleases(0);
+    expectPagination();
   });
 
   describe('when an error occurs while loading data', () => {
@@ -155,6 +173,7 @@ describe('app_index_apollo_client.vue', () => {
     expectFlashMessage();
     expectNewReleaseButton();
     expectReleases(0);
+    expectNoPagination();
   });
 
   describe('when the data has successfully loaded', () => {
@@ -167,12 +186,10 @@ describe('app_index_apollo_client.vue', () => {
     expectNoFlashMessage();
     expectNewReleaseButton();
     expectReleases(originalAllReleasesQueryResponse.data.project.releases.nodes.length);
+    expectPagination();
   });
 
   describe('URL parameters', () => {
-    const before = 'beforeCursor';
-    const after = 'afterCursor';
-
     describe('when the URL contains no query parameters', () => {
       beforeEach(() => {
         createComponent();
@@ -239,6 +256,29 @@ describe('app_index_apollo_client.vue', () => {
 
     it('renders the new release button with the correct href', () => {
       expect(findNewReleaseButton().attributes().href).toBe(newReleasePath);
+    });
+  });
+
+  describe('pagination', () => {
+    it('requeries the GraphQL endpoint when a pagination button is clicked', async () => {
+      mockQueryParams = { before };
+
+      createComponent();
+
+      await wrapper.vm.$nextTick();
+
+      expect(allReleasesQueryMock.mock.calls).toEqual([[expect.objectContaining({ before })]]);
+
+      mockQueryParams = { after };
+
+      findPagination().vm.$emit('next', after);
+
+      await wrapper.vm.$nextTick();
+
+      expect(allReleasesQueryMock.mock.calls).toEqual([
+        [expect.objectContaining({ before })],
+        [expect.objectContaining({ after })],
+      ]);
     });
   });
 });
