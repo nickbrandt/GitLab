@@ -82,8 +82,9 @@ export default () => {
     const breadCrumbEls = document.querySelectorAll('nav .js-breadcrumbs-list li');
     const breadCrumbEl = breadCrumbEls[breadCrumbEls.length - 1];
     const crumbs = [breadCrumbEl];
+    const nestedBreadcrumbEl = document.createElement('div');
     return new Vue({
-      el: breadCrumbEl,
+      el: nestedBreadcrumbEl,
       router,
       apolloProvider,
       components: {
