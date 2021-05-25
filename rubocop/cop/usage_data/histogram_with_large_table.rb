@@ -36,11 +36,11 @@ module RuboCop
 
           return unless Array(one_level_matches).any? || Array(two_level_matches).any?
 
-          if two_level_matches
-            class_name = "#{two_level_matches[0].first}::#{two_level_matches[1].first}".to_sym
-          else
-            class_name = one_level_matches[0].first
-          end
+          class_name = if two_level_matches
+                         "#{two_level_matches[0].first}::#{two_level_matches[1].first}".to_sym
+                       else
+                         one_level_matches[0].first
+                       end
 
           if large_table?(class_name)
             add_offense(node, location: :expression, message: format(MSG, model_name: class_name))
