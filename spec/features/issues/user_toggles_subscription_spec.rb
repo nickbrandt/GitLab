@@ -13,7 +13,7 @@ RSpec.describe "User toggles subscription", :js do
       visit(project_issue_path(project, issue))
     end
 
-    it 'toggle does not display' do
+    it 'does not display the Notification toggle' do
       expect(page).not_to have_button('Notifications')
     end
   end

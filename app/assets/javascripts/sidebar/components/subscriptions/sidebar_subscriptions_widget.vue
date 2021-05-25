@@ -104,6 +104,9 @@ export default {
     isLoggedIn() {
       return Boolean(gon.current_user_id);
     },
+    canSubscribe() {
+      return this.emailsDisabled || !this.isLoggedIn;
+    },
   },
   methods: {
     setSubscribed(subscribed) {
@@ -176,7 +179,7 @@ export default {
       <gl-toggle
         :value="subscribed"
         :is-loading="isLoading"
-        :disabled="emailsDisabled || !isLoggedIn"
+        :disabled="canSubscribe"
         class="hide-collapsed gl-ml-auto"
         data-testid="subscription-toggle"
         :label="$options.i18n.notifications"
