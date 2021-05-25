@@ -74,5 +74,28 @@ describe('NewApp component', () => {
       expect(cards.length).toEqual(1);
       expect(cards.at(0).props()).toEqual({ feature: securityFeaturesMock[0] });
     });
+
+    it('should not show latest pipeline link when latestPipelinePath is not defined', () => {
+      expect(findByTestId('latest-pipeline-info').exists()).toBe(false);
+    });
+  });
+
+  describe('when given latestPipelinePath props', () => {
+    beforeEach(() => {
+      createComponent({
+        augmentedSecurityFeatures: securityFeaturesMock,
+        latestPipelinePath: 'test/path',
+      });
+    });
+
+    it('should show latest pipeline info with correct link when latestPipelinePath is defined', () => {
+      expect(findByTestId('latest-pipeline-info').exists()).toBe(true);
+      expect(findByTestId('latest-pipeline-info').text()).toMatchInterpolatedText(
+        "The status of the tools only applies to the default branch and is based on the latest pipeline. Once you've enabled a scan for the default branch, any subsequent feature branch you create will include the scan.",
+      );
+      expect(findByTestId('latest-pipeline-info').find('a').element.href).toEqual(
+        'http://test.host/test/path',
+      );
+    });
   });
 });

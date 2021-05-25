@@ -47,7 +47,11 @@ export default {
         <div class="row">
           <div class="col-lg-5">
             <h2 class="gl-font-size-h2 gl-mt-0">{{ $options.i18n.securityTesting }}</h2>
-            <p v-if="latestPipelinePath" class="gl-line-height-20">
+            <p
+              v-if="latestPipelinePath"
+              data-testid="latest-pipeline-info"
+              class="gl-line-height-20"
+            >
               <gl-sprintf :message="$options.i18n.securityTestingDescription">
                 <template #link="{ content }">
                   <gl-link :href="latestPipelinePath">{{ content }}</gl-link>
