@@ -1,14 +1,58 @@
 import { augmentFeatures } from '~/security_configuration/utils';
-import {
-  mockSecurityFeatures,
-  mockComplianceFeatures,
-  mockFeaturesWithSecondary,
-  mockInvalidCustomFeature,
-  mockValidCustomFeature,
-  expectedOutputCustomFeature,
-  expectedOutputDefault,
-  expectedOutputSecondary,
-} from './utils_mocks';
+
+const mockSecurityFeatures = [
+  {
+    name: 'SAST',
+    type: 'SAST',
+  },
+];
+
+const mockComplianceFeatures = [
+  {
+    name: 'LICENSE_COMPLIANCE',
+    type: 'LICENSE_COMPLIANCE',
+  },
+];
+
+const mockFeaturesWithSecondary = [
+  {
+    name: 'DAST',
+    type: 'DAST',
+    secondary: {
+      type: 'DAST PROFILES',
+      name: 'DAST PROFILES',
+    },
+  },
+];
+
+const mockInvalidCustomFeature = [
+  {
+    foo: 'bar',
+  },
+];
+
+const mockValidCustomFeature = [
+  {
+    name: 'SAST',
+    type: 'SAST',
+    customfield: 'customvalue',
+  },
+];
+
+const expectedOutputDefault = {
+  augmentedSecurityFeatures: mockSecurityFeatures,
+  augmentedComplianceFeatures: mockComplianceFeatures,
+};
+
+const expectedOutputSecondary = {
+  augmentedSecurityFeatures: mockSecurityFeatures,
+  augmentedComplianceFeatures: mockFeaturesWithSecondary,
+};
+
+const expectedOutputCustomFeature = {
+  augmentedSecurityFeatures: mockValidCustomFeature,
+  augmentedComplianceFeatures: mockComplianceFeatures,
+};
 
 describe('augmentFeatures', () => {
   it('augments features array correctly when given an empty array', () => {
