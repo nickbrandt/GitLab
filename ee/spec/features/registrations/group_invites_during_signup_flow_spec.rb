@@ -5,7 +5,7 @@ require 'spec_helper'
 RSpec.describe 'User is able to invite members to group during signup', :js, :experiment do
   include Select2Helper
 
-  let_it_be(:user) { create(:user) }
+  let_it_be(:user) { create(:user, setup_for_company: true) }
   let(:path_params) { {} }
 
   before do

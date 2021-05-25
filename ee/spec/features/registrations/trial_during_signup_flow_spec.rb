@@ -16,7 +16,7 @@ RSpec.describe 'User sees new onboarding flow', :js do
 
     expect(page).to have_content('Welcome to GitLab')
 
-    choose 'Just me'
+    choose 'My company or team'
     click_on 'Continue'
 
     expect(page).to have_content('GitLab Ultimate trial (optional)')
