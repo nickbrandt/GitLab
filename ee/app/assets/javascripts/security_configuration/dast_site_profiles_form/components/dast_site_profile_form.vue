@@ -168,18 +168,12 @@ export default {
       return authFields;
     },
     isTargetAPI() {
-      return (
-        this.glFeatures.securityDastSiteProfilesApiOption &&
-        this.form.fields.targetType.value === TARGET_TYPES.API.value
-      );
+      return this.form.fields.targetType.value === TARGET_TYPES.API.value;
     },
   },
   methods: {
     onSubmit() {
-      const isAuthEnabled =
-        this.glFeatures.securityDastSiteProfilesAdditionalFields &&
-        this.authSection.fields.enabled &&
-        !this.isTargetAPI;
+      const isAuthEnabled = this.authSection.fields.enabled && !this.isTargetAPI;
 
       this.form.showValidation = true;
 
@@ -205,17 +199,13 @@ export default {
           ...(this.isEdit ? { id: this.siteProfile.id } : {}),
           profileName,
           targetUrl,
-          ...(this.glFeatures.securityDastSiteProfilesApiOption && {
-            targetType,
+          targetType,
+          ...(!this.isTargetAPI && { auth: this.serializedAuthFields }),
+          ...(excludedUrls && {
+            excludedUrls: this.parsedExcludedUrls,
           }),
-          ...(this.glFeatures.securityDastSiteProfilesAdditionalFields && {
-            ...(!this.isTargetAPI && { auth: this.serializedAuthFields }),
-            ...(excludedUrls && {
-              excludedUrls: this.parsedExcludedUrls,
-            }),
-            ...(requestHeaders !== REDACTED_REQUEST_HEADERS && {
-              requestHeaders,
-            }),
+          ...(requestHeaders !== REDACTED_REQUEST_HEADERS && {
+            requestHeaders,
           }),
         },
       };
@@ -339,10 +329,7 @@ export default {
 
       <hr class="gl-border-gray-100" />
 
-      <gl-form-group
-        v-if="glFeatures.securityDastSiteProfilesApiOption"
-        :label="s__('DastProfiles|Site type')"
-      >
+      <gl-form-group :label="s__('DastProfiles|Site type')">
         <gl-form-radio-group
           v-model="form.fields.targetType.value"
           :options="targetTypesOptions"
@@ -367,7 +354,7 @@ export default {
         />
       </gl-form-group>
 
-      <div v-if="glFeatures.securityDastSiteProfilesAdditionalFields" class="row">
+      <div class="row">
         <gl-form-group
           :label="s__('DastProfiles|Excluded URLs (Optional)')"
           :invalid-feedback="form.fields.excludedUrls.feedback"
@@ -417,7 +404,7 @@ export default {
     </gl-form-group>
 
     <dast-site-auth-section
-      v-if="glFeatures.securityDastSiteProfilesAdditionalFields && !isTargetAPI"
+      v-if="!isTargetAPI"
       v-model="authSection"
       :disabled="isPolicyProfile"
       :show-validation="form.showValidation"
