@@ -54,20 +54,12 @@ module Types
       object.dast_site.url
     end
 
-    def target_type
-      object.target_type
-    end
-
     def edit_path
       Rails.application.routes.url_helpers.edit_project_security_configuration_dast_scans_dast_site_profile_path(object.project, object)
     end
 
     def auth
       object
-    end
-
-    def excluded_urls
-      object.excluded_urls
     end
 
     def normalized_target_url
