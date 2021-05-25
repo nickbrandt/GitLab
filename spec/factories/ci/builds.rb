@@ -5,7 +5,7 @@ FactoryBot.define do
     name { 'test' }
     add_attribute(:protected) { false }
     created_at { 'Di 29. Okt 09:50:00 CET 2013' }
-    pending
+    created
 
     options do
       {
@@ -79,14 +79,8 @@ FactoryBot.define do
 
     trait :pending do
       queued
-      queued_at { 'Di 29. Okt 09:50:59 CET 2013' }
-      status { 'pending' }
-    end
 
-    trait :queued do
-      after(:create) do |build|
-        build.create_queuing_entry!
-      end
+      status { 'pending' }
     end
 
     trait :created do
@@ -293,6 +287,15 @@ FactoryBot.define do
 
     trait :queued do
       queued_at { Time.now }
+
+      after(:create) do |build|
+        build.create_queuing_entry!
+      end
+    end
+
+    trait :picked do
+      running
+
       runner factory: :ci_runner
     end
 
