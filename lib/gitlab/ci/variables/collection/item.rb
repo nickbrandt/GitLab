@@ -47,7 +47,7 @@ module Gitlab
 
               next unless self.class.possible_var_reference?(value)
 
-              value.scan(VARIABLES_REGEXP).map(&:last).compact
+              value.scan(VARIABLES_REGEXP).filter_map(&:last)
             end
           end
 
