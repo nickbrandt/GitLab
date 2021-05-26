@@ -1483,6 +1483,9 @@ msgstr ""
 msgid "A rebase is already in progress."
 msgstr ""
 
+msgid "A rule must be provided to create an escalation policy"
+msgstr ""
+
 msgid "A secure token that identifies an external storage request."
 msgstr ""
 
@@ -13103,6 +13106,9 @@ msgid "Errors:"
 msgstr ""
 
 msgid "Escalation policies"
+msgstr ""
+
+msgid "Escalation policies are not supported for this project"
 msgstr ""
 
 msgid "EscalationPolicies|+ Add an additional rule"
@@ -37421,6 +37427,9 @@ msgid "You have insufficient permissions to create a Todo for this alert"
 msgstr ""
 
 msgid "You have insufficient permissions to create an HTTP integration for this project"
+msgstr ""
+
+msgid "You have insufficient permissions to create an escalation policy for this project"
 msgstr ""
 
 msgid "You have insufficient permissions to create an on-call schedule for this project"
