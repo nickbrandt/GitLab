@@ -24,9 +24,6 @@ describe('JiraIssuesFields', () => {
       propsData: { ...defaultProps, ...props },
       store,
       stubs: ['jira-issue-creation-vulnerabilities'],
-      computed: {
-        isInheriting: () => isInheriting,
-      },
       ...options,
     });
   };
