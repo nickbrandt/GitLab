@@ -23973,6 +23973,9 @@ msgstr ""
 msgid "PerformanceBar|Gitaly calls"
 msgstr ""
 
+msgid "PerformanceBar|Memory"
+msgstr ""
+
 msgid "PerformanceBar|Redis calls"
 msgstr ""
 
