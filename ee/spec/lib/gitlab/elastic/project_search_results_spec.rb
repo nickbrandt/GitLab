@@ -33,33 +33,46 @@ RSpec.describe Gitlab::Elastic::ProjectSearchResults, :elastic do
   end
 
   describe "search", :sidekiq_inline do
-    let_it_be(:project) { create(:project, :public, :repository, :wiki_repo) }
-    let_it_be(:private_project) { create(:project, :repository, :wiki_repo) }
+    let(:project) { create(:project, :public, :repository, :wiki_repo) }
+    let(:project_2) { create(:project, :public, :repository, :wiki_repo) }
+    let(:private_project) { create(:project, :repository, :wiki_repo) }
 
     before do
-      [project, private_project].each do |project|
-        create(:note, note: 'bla-bla term', project: project)
-        project.wiki.create_page('index_page', 'term')
-        project.wiki.index_wiki_blobs
+      [project, private_project, project_2].each do |p|
+        create(:note, note: 'bla-bla term', project: p)
+        p.wiki.create_page('index_page', 'term')
+        p.wiki.index_wiki_blobs
+        p.repository.index_commits_and_blobs
       end
 
-      project.repository.index_commits_and_blobs
       ensure_elasticsearch_index!
     end
 
-    it "returns correct amounts" do
-      result = described_class.new(user, 'term', project: project)
-      expect(result.notes_count).to eq(1)
-      expect(result.wiki_blobs_count).to eq(1)
-      expect(result.blobs_count).to eq(1)
+    context 'when single project provided' do
+      it "returns correct amounts" do
+        result = described_class.new(user, 'term', project: project)
+        expect(result.notes_count).to eq(1)
+        expect(result.wiki_blobs_count).to eq(1)
+        expect(result.blobs_count).to eq(1)
 
-      result = described_class.new(user, 'initial', project: project)
-      expect(result.commits_count).to eq(1)
+        result = described_class.new(user, 'initial', project: project)
+        expect(result.commits_count).to eq(1)
+      end
+    end
+
+    context 'when multiple projects provided' do
+      it "returns correct amounts" do
+        result = described_class.new(user, 'term', project: [project, project_2])
+        expect(result.notes_count).to eq(2)
+        expect(result.wiki_blobs_count).to eq(2)
+        expect(result.blobs_count).to eq(2)
+
+        result = described_class.new(user, 'initial', project: [project, project_2])
+        expect(result.commits_count).to eq(2)
+      end
     end
 
     context 'visibility checks' do
-      let_it_be(:project) { create(:project, :public, :wiki_repo) }
-
       let(:query) { 'term' }
 
       before do
