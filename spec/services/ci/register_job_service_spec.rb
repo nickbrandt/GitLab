@@ -704,6 +704,22 @@ module Ci
 
         include_examples 'handles runner assignment'
       end
+
+      context 'when joining with pending builds table' do
+        before do
+          stub_feature_flags(ci_pending_builds_queue_join: true)
+        end
+
+        include_examples 'handles runner assignment'
+      end
+
+      context 'when not joining with pending builds table' do
+        before do
+          stub_feature_flags(ci_pending_builds_queue_join: false)
+        end
+
+        include_examples 'handles runner assignment'
+      end
     end
 
     describe '#register_success' do
