@@ -17,17 +17,17 @@ module RuboCop
         # Match one level const as Issue, Gitlab
         def_node_matcher :one_level_node, <<~PATTERN
           (send nil? :histogram
-            `(const {nil? cbase} $...)
-          $...)
+            `(const {nil? cbase} $_)
+          ...)
         PATTERN
 
         # Match two level const as ::Clusters::Cluster, ::Ci::Pipeline
         def_node_matcher :two_level_node, <<~PATTERN
           (send nil? :histogram
             `(const
-              (const {nil? cbase} $...)
-            $...)
-          $...)
+              (const {nil? cbase} $_)
+            $_)
+          ...)
         PATTERN
 
         def on_send(node)
@@ -36,11 +36,7 @@ module RuboCop
 
           return unless Array(one_level_matches).any? || Array(two_level_matches).any?
 
-          class_name = if two_level_matches
-                         "#{two_level_matches[0].first}::#{two_level_matches[1].first}".to_sym
-                       else
-                         one_level_matches[0].first
-                       end
+          class_name = two_level_matches ? two_level_matches.join('::').to_sym : one_level_matches
 
           if large_table?(class_name)
             add_offense(node, location: :expression, message: format(MSG, model_name: class_name))

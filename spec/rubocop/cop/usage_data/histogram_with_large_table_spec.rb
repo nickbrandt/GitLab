@@ -99,4 +99,10 @@ RSpec.describe RuboCop::Cop::UsageData::HistogramWithLargeTable do
       expect_no_offenses('histogram(MergeRequest, buckets: 1..100)')
     end
   end
+
+  context 'with non related method' do
+    it 'does not register an offense' do
+      expect_no_offenses('count(Issue, buckets: 1..100)')
+    end
+  end
 end
