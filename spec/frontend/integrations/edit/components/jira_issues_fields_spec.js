@@ -3,8 +3,10 @@ import { mount } from '@vue/test-utils';
 import JiraIssuesFields from '~/integrations/edit/components/jira_issues_fields.vue';
 import JiraUpgradeCta from '~/integrations/edit/components/jira_upgrade_cta.vue';
 import eventHub from '~/integrations/edit/event_hub';
+import { createStore } from '~/integrations/edit/store';
 
 describe('JiraIssuesFields', () => {
+  let store;
   let wrapper;
 
   const defaultProps = {
@@ -14,8 +16,13 @@ describe('JiraIssuesFields', () => {
   };
 
   const createComponent = ({ isInheriting = false, props, ...options } = {}) => {
+    store = createStore({
+      defaultState: isInheriting ? {} : undefined,
+    });
+
     wrapper = mount(JiraIssuesFields, {
       propsData: { ...defaultProps, ...props },
+      store,
       stubs: ['jira-issue-creation-vulnerabilities'],
       computed: {
         isInheriting: () => isInheriting,
@@ -87,9 +94,11 @@ describe('JiraIssuesFields', () => {
       });
 
       it('renders disabled project_key input', () => {
-        expect(findProjectKey().exists()).toBe(true);
-        expect(findProjectKey().attributes('disabled')).toBe('disabled');
-        expect(findProjectKey().attributes('required')).toBeUndefined();
+        const projectKey = findProjectKey();
+
+        expect(projectKey.exists()).toBe(true);
+        expect(projectKey.attributes('disabled')).toBe('disabled');
+        expect(projectKey.attributes('required')).toBeUndefined();
       });
 
       it('does not show upgrade banner', () => {

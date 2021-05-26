@@ -23,13 +23,14 @@ describe('JiraIssuesFields', () => {
   ];
 
   const createComponent = (mountFn) => ({ isInheriting = false, props } = {}) => {
+    store = createStore({
+      defaultState: isInheriting ? {} : undefined,
+    });
+
     return extendedWrapper(
       mountFn(JiraIssueCreationVulnerabilities, {
         store,
         propsData: { ...defaultProps, ...props },
-        computed: {
-          isInheriting: () => isInheriting,
-        },
       }),
     );
   };
@@ -47,10 +48,6 @@ describe('JiraIssuesFields', () => {
   const findFetchErrorAlert = () => wrapper.findComponent(GlAlert);
   const setEnableJiraVulnerabilitiesChecked = (isChecked) =>
     findEnableJiraVulnerabilities().vm.$emit('input', isChecked);
-
-  beforeEach(() => {
-    store = createStore();
-  });
 
   afterEach(() => {
     wrapper.destroy();
@@ -145,8 +142,8 @@ describe('JiraIssuesFields', () => {
 
     describe('with Jira issues fetching in progress', () => {
       beforeEach(async () => {
-        store.state.isLoadingJiraIssueTypes = true;
         wrapper = createShallowComponent();
+        store.state.isLoadingJiraIssueTypes = true;
         await setEnableJiraVulnerabilitiesChecked(true);
       });
 
@@ -160,8 +157,8 @@ describe('JiraIssuesFields', () => {
 
     describe('with Jira issues fetched', () => {
       beforeEach(async () => {
-        store.state.jiraIssueTypes = TEST_JIRA_ISSUE_TYPES;
         wrapper = createShallowComponent({ props: { projectKey: 'TES' } });
+        store.state.jiraIssueTypes = TEST_JIRA_ISSUE_TYPES;
         await setEnableJiraVulnerabilitiesChecked(true);
       });
 
@@ -186,8 +183,8 @@ describe('JiraIssuesFields', () => {
 
     describe('with Jira issue fetch failure', () => {
       beforeEach(async () => {
-        store.state.loadingJiraIssueTypesErrorMessage = 'something went wrong';
         wrapper = createShallowComponent();
+        store.state.loadingJiraIssueTypesErrorMessage = 'something went wrong';
         await setEnableJiraVulnerabilitiesChecked(true);
       });
 
