@@ -149,18 +149,21 @@ export default {
     handleAlertUpdate(includeAlert) {
       this.policy.annotations = includeAlert ? { 'app.gitlab.com/alert': 'true' } : '';
     },
+    isNotFirstRule(index) {
+      return index > 0;
+    },
     updateEndpointMatchMode(mode) {
       this.policy.endpointMatchMode = mode;
     },
     updateEndpointLabels(labels) {
       this.policy.endpointLabels = labels;
     },
-    updateRuleType(ruleIdx, ruleType) {
-      const rule = this.policy.rules[ruleIdx];
-      this.policy.rules.splice(ruleIdx, 1, buildRule(ruleType, rule));
+    updateRuleType(ruleIndex, ruleType) {
+      const rule = this.policy.rules[ruleIndex];
+      this.policy.rules.splice(ruleIndex, 1, buildRule(ruleType, rule));
     },
-    removeRule(ruleIdx) {
-      this.policy.rules.splice(ruleIdx, 1);
+    removeRule(ruleIndex) {
+      this.policy.rules.splice(ruleIndex, 1);
     },
     loadYaml(manifest) {
       this.yamlEditorValue = manifest;
@@ -288,29 +291,25 @@ export default {
               </template>
 
               <policy-rule-builder
-                v-for="(rule, idx) in policy.rules"
-                :key="idx"
+                v-for="(rule, index) in policy.rules"
+                :key="index"
                 class="gl-mb-4"
                 :rule="rule"
                 :endpoint-match-mode="policy.endpointMatchMode"
                 :endpoint-labels="policy.endpointLabels"
-                :endpoint-selector-disabled="idx > 0"
-                @rule-type-change="updateRuleType(idx, $event)"
+                :endpoint-selector-disabled="isNotFirstRule(index)"
+                @rule-type-change="updateRuleType(index, $event)"
                 @endpoint-match-mode-change="updateEndpointMatchMode"
                 @endpoint-labels-change="updateEndpointLabels"
-                @remove="removeRule(idx)"
+                @remove="removeRule(index)"
               />
 
               <div
                 class="gl-p-3 gl-rounded-base gl-border-1 gl-border-solid gl-border-gray-100 gl-mb-5"
               >
-                <gl-button
-                  variant="link"
-                  category="primary"
-                  data-testid="add-rule"
-                  @click="addRule"
-                  >{{ s__('Network Policy|New rule') }}</gl-button
-                >
+                <gl-button variant="link" data-testid="add-rule" @click="addRule">{{
+                  s__('Network Policy|New rule')
+                }}</gl-button>
               </div>
             </dim-disable-container>
 
@@ -366,7 +365,6 @@ export default {
     <div>
       <gl-button
         type="submit"
-        category="primary"
         variant="success"
         data-testid="save-policy"
         :loading="isUpdatingPolicy"
@@ -382,9 +380,7 @@ export default {
         :loading="isRemovingPolicy"
         >{{ s__('NetworkPolicies|Delete policy') }}</gl-button
       >
-      <gl-button category="secondary" variant="default" :href="threatMonitoringPath">{{
-        __('Cancel')
-      }}</gl-button>
+      <gl-button category="secondary" :href="threatMonitoringPath">{{ __('Cancel') }}</gl-button>
     </div>
     <gl-modal
       modal-id="delete-modal"
