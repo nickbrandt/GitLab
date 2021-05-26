@@ -2,7 +2,7 @@
 
 require 'generator_helper'
 
-RSpec.describe Gitlab::UsageMetricDefinition::RedisHllGenerator do
+RSpec.describe Gitlab::UsageMetricDefinition::RedisHllGenerator, :silence_stdout do
   include UsageDataHelpers
 
   let(:category) { 'test_category' }
