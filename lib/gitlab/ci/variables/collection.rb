@@ -74,8 +74,8 @@ module Gitlab
               # return variable matched, or return original if undefined
               @variables_by_key[match[:key]]&.value || (keep_undefined ? match[0] : nil)
             else
-              # return escaped sequence, the $ or %
-              match[:escape]
+              # we matched escapable sequence, return as-is
+              match[0]
             end
           end
         end

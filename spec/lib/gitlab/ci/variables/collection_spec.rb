@@ -244,11 +244,6 @@ RSpec.describe Gitlab::Ci::Variables::Collection do
             result: 'key$TEST1-test-1',
             keep_undefined: false
           },
-          "complex expansions with escaped characters": {
-            value: 'key_${variable4}_$${HOME}_%%HOME%%',
-            result: 'key__${HOME}_%HOME%',
-            keep_undefined: false
-          },
           "missing variable not keeping original": {
             value: 'key${MISSING_VAR}-${CI_JOB_NAME}',
             result: 'key-test-1',
@@ -259,9 +254,9 @@ RSpec.describe Gitlab::Ci::Variables::Collection do
             result: 'key${MISSING_VAR}-test-1',
             keep_undefined: true
           },
-          "escaped characters are resolved correctly": {
+          "escaped characters are kept intact": {
             value: 'key-$TEST1-%%HOME%%-$${HOME}',
-            result: 'key-test-3-%HOME%-${HOME}',
+            result: 'key-test-3-%%HOME%%-$${HOME}',
             keep_undefined: false
           }
         }
@@ -325,7 +320,7 @@ RSpec.describe Gitlab::Ci::Variables::Collection do
               ],
               keep_undefined: false
             },
-            "complex expansions with escaped characters": {
+            "escaped characters in complex expansions are kept intact": {
               variables: [
                 { key: 'variable3', value: 'key_${variable}_$${HOME}_%%HOME%%' },
                 { key: 'variable', value: '$variable2' },
@@ -433,7 +428,7 @@ RSpec.describe Gitlab::Ci::Variables::Collection do
                 { key: 'variable3', value: 'keyvalueresult' }
               ]
             },
-            "complex expansions with escaped characters keeping undefined": {
+            "escaped characters in complex expansions keeping undefined are kept intact": {
               variables: [
                 { key: 'variable3', value: 'key_${variable}_$${HOME}_%%HOME%%' },
                 { key: 'variable', value: '$variable2' },
@@ -443,18 +438,18 @@ RSpec.describe Gitlab::Ci::Variables::Collection do
               result: [
                 { key: 'variable', value: 'value' },
                 { key: 'variable2', value: 'value' },
-                { key: 'variable3', value: 'key_value_${HOME}_%HOME%' }
+                { key: 'variable3', value: 'key_value_$${HOME}_%%HOME%%' }
               ]
             },
-            "complex expansions with escaped characters discarding undefined": {
+            "escaped characters in complex expansions discarding undefined are kept intact": {
               variables: [
                 { key: 'variable2', value: 'key_${variable4}_$${HOME}_%%HOME%%' },
-                { key: 'variable', value: 'value' }
+                { key: 'variable', value: 'value_$${HOME}_%%HOME%%' }
               ],
               keep_undefined: false,
               result: [
-                { key: 'variable', value: 'value' },
-                { key: 'variable2', value: 'key__${HOME}_%HOME%' }
+                { key: 'variable', value: 'value_$${HOME}_%%HOME%%' },
+                { key: 'variable2', value: 'key__$${HOME}_%%HOME%%' }
               ]
             },
             "out-of-order expansion": {
@@ -530,13 +525,13 @@ RSpec.describe Gitlab::Ci::Variables::Collection do
             "variable value referencing password with special characters": {
               variables: [
                 { key: 'VAR', value: '$PASSWORD' },
-                { key: 'PASSWORD', value: 'my_password%_$_$$_%%_$A', raw: true },
+                { key: 'PASSWORD', value: 'my_password$$_%%_$A' },
                 { key: 'A', value: 'value' }
               ],
               keep_undefined: false,
               result: [
-                { key: 'VAR', value: 'my_password%_$_$$_%%_$A' },
-                { key: 'PASSWORD', value: 'my_password%_$_$$_%%_$A', raw: true },
+                { key: 'VAR', value: 'my_password$$_%%_value' },
+                { key: 'PASSWORD', value: 'my_password$$_%%_value' },
                 { key: 'A', value: 'value' }
               ]
             },
