@@ -5,7 +5,7 @@ FactoryBot.define do
     name { 'test' }
     add_attribute(:protected) { false }
     created_at { 'Di 29. Okt 09:50:00 CET 2013' }
-    created
+    pending
 
     options do
       {
@@ -78,7 +78,7 @@ FactoryBot.define do
     end
 
     trait :pending do
-      queued
+      queued_at { 'Di 29. Okt 09:50:59 CET 2013' }
 
       status { 'pending' }
     end
