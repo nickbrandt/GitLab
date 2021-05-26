@@ -165,7 +165,7 @@ RSpec.describe Gitlab::Ci::Variables::Collection::Item do
     end
 
     it 'supports using an active record resource' do
-      variable = create(:ci_variable, key: 'CI_VAR', value: '123')
+      variable = build(:ci_variable, key: 'CI_VAR', value: '123')
       resource = described_class.fabricate(variable)
 
       expect(resource).to be_a(described_class)
