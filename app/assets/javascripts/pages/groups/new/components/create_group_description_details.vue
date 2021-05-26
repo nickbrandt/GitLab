@@ -7,14 +7,9 @@ export default {
     GlLink,
     GlSprintf,
   },
-  computed: {
-    groupsHelpPath() {
-      return helpPagePath('user/group/index');
-    },
-
-    subgroupsHelpPath() {
-      return helpPagePath('user/group/subgroups/index');
-    },
+  paths: {
+    groupsHelpPath: helpPagePath('user/group/index'),
+    subgroupsHelpPath: helpPagePath('user/group/subgroups/index'),
   },
 };
 </script>
@@ -30,7 +25,7 @@ export default {
         "
       >
         <template #link="{ content }">
-          <gl-link :href="groupsHelpPath" target="_blank">{{ content }}</gl-link>
+          <gl-link :href="$options.paths.groupsHelpPath" target="_blank">{{ content }}</gl-link>
         </template>
       </gl-sprintf>
     </p>
@@ -41,7 +36,7 @@ export default {
         "
       >
         <template #link="{ content }">
-          <gl-link :href="subgroupsHelpPath" target="_blank">{{ content }}</gl-link>
+          <gl-link :href="$options.paths.subgroupsHelpPath" target="_blank">{{ content }}</gl-link>
         </template>
       </gl-sprintf>
     </p>
