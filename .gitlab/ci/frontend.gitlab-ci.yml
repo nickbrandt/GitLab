@@ -360,4 +360,4 @@ compile-storybook:
     expire_in: 31d
     when: always
     paths:
-      - public
+      - storybook/public
