@@ -1697,34 +1697,48 @@ RSpec.describe Project do
     subject { project.latest_pipeline_with_security_reports(only_successful: only_successful) }
 
     context 'when all pipelines are used' do
-      context 'when legacy reports are used' do
+      context 'when the pipeline of `vulnerability_statistic` has been set' do
         before do
-          create(:ee_ci_build, :legacy_sast, pipeline: pipeline_1)
-          create(:ee_ci_build, :legacy_sast, pipeline: pipeline_2)
+          project.create_vulnerability_statistic(pipeline: pipeline_1)
         end
 
-        it 'returns the latest pipeline with security reports' do
-          is_expected.to eq(pipeline_2)
-        end
+        it { is_expected.to eq(pipeline_1) }
       end
 
-      context 'when new reports are used' do
+      context 'when the pipeline of `vulnerability_statistic` has not been set' do
         before do
-          create(:ee_ci_build, :sast, pipeline: pipeline_1)
-          create(:ee_ci_build, :sast, pipeline: pipeline_2)
+          project.vulnerability_statistic&.update!(pipeline: nil)
         end
 
-        it 'returns the latest pipeline with security reports' do
-          is_expected.to eq(pipeline_2)
-        end
-
-        context 'when legacy used' do
+        context 'when legacy reports are used' do
           before do
-            create(:ee_ci_build, :legacy_sast, pipeline: pipeline_3)
+            create(:ee_ci_build, :legacy_sast, pipeline: pipeline_1)
+            create(:ee_ci_build, :legacy_sast, pipeline: pipeline_2)
           end
 
-          it 'prefers the new reports' do
+          it 'returns the latest pipeline with security reports' do
             is_expected.to eq(pipeline_2)
+          end
+        end
+
+        context 'when new reports are used' do
+          before do
+            create(:ee_ci_build, :sast, pipeline: pipeline_1)
+            create(:ee_ci_build, :sast, pipeline: pipeline_2)
+          end
+
+          it 'returns the latest pipeline with security reports' do
+            is_expected.to eq(pipeline_2)
+          end
+
+          context 'when legacy used' do
+            before do
+              create(:ee_ci_build, :legacy_sast, pipeline: pipeline_3)
+            end
+
+            it 'prefers the new reports' do
+              is_expected.to eq(pipeline_2)
+            end
           end
         end
       end

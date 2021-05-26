@@ -305,12 +305,11 @@ module EE
       namespace.store_security_reports_available? || public?
     end
 
+    # The `only_successful` flag is wrong here and will be addressed by
+    # https://gitlab.com/gitlab-org/gitlab/-/issues/331950
+    # We will also remove the fallback to `latest_not_ingested_security_pipeline` method with that issue.
     def latest_pipeline_with_security_reports(only_successful: false)
-      pipeline_scope = all_pipelines.newest_first(ref: default_branch)
-      pipeline_scope = pipeline_scope.success if only_successful
-
-      pipeline_scope.with_reports(::Ci::JobArtifact.security_reports).first ||
-        pipeline_scope.with_legacy_security_reports.first
+      (!only_successful && latest_ingested_security_pipeline) || latest_not_ingested_security_pipeline(only_successful)
     end
 
     def latest_pipeline_with_reports(reports)
@@ -849,6 +848,18 @@ module EE
     # Return the group's setting for delayed deletion, false for user namespace projects
     def group_deletion_mode_configured?
       group && group.namespace_settings.delayed_project_removal?
+    end
+
+    def latest_ingested_security_pipeline
+      vulnerability_statistic&.pipeline
+    end
+
+    def latest_not_ingested_security_pipeline(only_successful)
+      pipeline_scope = all_pipelines.newest_first(ref: default_branch)
+      pipeline_scope = pipeline_scope.success if only_successful
+
+      pipeline_scope.with_reports(::Ci::JobArtifact.security_reports).first ||
+        pipeline_scope.with_legacy_security_reports.first
     end
   end
 end

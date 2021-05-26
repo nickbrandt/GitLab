@@ -4,12 +4,12 @@ require 'spec_helper'
 
 RSpec.describe Security::StoreReportsService do
   let(:user) { create(:user) }
-  let(:group)   { create(:group) }
+  let(:group) { create(:group) }
   let(:project) { create(:project, :public, namespace: group) }
   let(:pipeline) { create(:ci_pipeline, project: project) }
 
   describe '#execute' do
-    subject { described_class.new(pipeline).execute }
+    subject(:execute_service_object) { described_class.new(pipeline).execute }
 
     context 'when there are reports' do
       before do
@@ -30,11 +30,15 @@ RSpec.describe Security::StoreReportsService do
             end
           end
 
-        subject
+        execute_service_object
       end
 
       it 'marks the project as vulnerable' do
-        expect { subject }.to change { project.project_setting.has_vulnerabilities }.from(false).to(true)
+        expect { execute_service_object }.to change { project.project_setting.has_vulnerabilities }.from(false).to(true)
+      end
+
+      it 'updates the `latest_pipeline_id` attribute of the associated `vulnerability_statistic` record' do
+        expect { execute_service_object }.to change { project.vulnerability_statistic&.latest_pipeline_id }.from(nil).to(pipeline.id)
       end
 
       context 'when StoreReportService returns an error for a report' do
