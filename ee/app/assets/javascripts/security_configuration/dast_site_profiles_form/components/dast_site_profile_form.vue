@@ -16,7 +16,6 @@ import { initFormField } from 'ee/security_configuration/utils';
 import { serializeFormObject } from '~/lib/utils/forms';
 import { __, s__, n__, sprintf } from '~/locale';
 import validation from '~/vue_shared/directives/validation';
-import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import tooltipIcon from '../../dast_scanner_profiles/components/tooltip_icon.vue';
 import {
   MAX_CHAR_LIMIT_EXCLUDED_URLS,
@@ -48,7 +47,6 @@ export default {
   directives: {
     validation: validation(),
   },
-  mixins: [glFeatureFlagsMixin()],
   props: {
     fullPath: {
       type: String,

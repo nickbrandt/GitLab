@@ -4,7 +4,6 @@ import {
   TARGET_TYPES,
 } from 'ee/security_configuration/dast_site_profiles_form/constants';
 import { s__ } from '~/locale';
-import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import ProfileSelectorSummaryCell from './summary_cell.vue';
 
 export default {
@@ -23,7 +22,6 @@ export default {
   components: {
     ProfileSelectorSummaryCell,
   },
-  mixins: [glFeatureFlagsMixin()],
   props: {
     profile: {
       type: Object,
