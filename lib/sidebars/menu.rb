@@ -83,6 +83,17 @@ module Sidebars
       insert_element_after(@items, after_item, new_item)
     end
 
+    override :container_html_options
+    def container_html_options
+      super.tap do |html_options|
+        # Flagging menus that can be rendered but without any children
+        # like the merge requests or the requirements menu
+        if render? && has_renderable_items?
+          html_options[:class] = [*html_options[:class], 'has-sub-items'].join(' ')
+        end
+      end
+    end
+
     private
 
     override :index_of
