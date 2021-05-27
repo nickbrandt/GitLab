@@ -8,6 +8,7 @@ import { EMPTY_STATUS_CHECK } from '../constants';
 import Actions from './actions.vue';
 import Branch from './branch.vue';
 import ModalCreate from './modal_create.vue';
+import ModalDelete from './modal_delete.vue';
 import ModalUpdate from './modal_update.vue';
 
 export const i18n = {
@@ -23,10 +24,12 @@ export default {
     Branch,
     GlTable,
     ModalCreate,
+    ModalDelete,
     ModalUpdate,
   },
   data() {
     return {
+      statusCheckToDelete: EMPTY_STATUS_CHECK,
       statusCheckToUpdate: EMPTY_STATUS_CHECK,
     };
   },
@@ -34,6 +37,10 @@ export default {
     ...mapState(['statusChecks']),
   },
   methods: {
+    openDeleteModal(statusCheck) {
+      this.statusCheckToDelete = statusCheck;
+      this.$refs.deleteModal.show();
+    },
     openUpdateModal(statusCheck) {
       this.statusCheckToUpdate = statusCheck;
       this.$refs.updateModal.show();
@@ -80,11 +87,16 @@ export default {
         <branch :branches="item.protectedBranches" />
       </template>
       <template #cell(actions)="{ item }">
-        <actions :status-check="item" @open-update-modal="openUpdateModal" />
+        <actions
+          :status-check="item"
+          @open-delete-modal="openDeleteModal"
+          @open-update-modal="openUpdateModal"
+        />
       </template>
     </gl-table>
 
     <modal-create />
+    <modal-delete ref="deleteModal" :status-check="statusCheckToDelete" />
     <modal-update ref="updateModal" :status-check="statusCheckToUpdate" />
   </div>
 </template>
