@@ -1,6 +1,6 @@
 import $ from 'jquery';
-import trackShowInviteMemberLink from 'ee/projects/track_invite_members';
 import { mockTracking, unmockTracking } from 'helpers/tracking_helper';
+import trackShowInviteMemberLink from '~/sidebar/track_invite_members';
 
 describe('Track user dropdown open', () => {
   let trackingSpy;
@@ -10,7 +10,7 @@ describe('Track user dropdown open', () => {
     document.body.innerHTML = `
       <div id="dummy-wrapper-element">
         <div class="js-sidebar-assignee-dropdown">
-          <div class="js-invite-members-track" data-track-event="_track_event_">
+          <div class="js-invite-members-track" data-track-event="_track_event_" data-track-label="_track_label_">
           </div>
         </div>
       </div>
@@ -31,7 +31,7 @@ describe('Track user dropdown open', () => {
     $(dropdownElement).trigger('shown.bs.dropdown');
 
     expect(trackingSpy).toHaveBeenCalledWith(undefined, '_track_event_', {
-      label: 'edit_assignee',
+      label: '_track_label_',
     });
   });
 });
