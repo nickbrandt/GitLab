@@ -11,11 +11,11 @@ import * as Sentry from '@sentry/browser';
 import { createLocalVue, shallowMount, mount } from '@vue/test-utils';
 import VueApollo from 'vue-apollo';
 
-import SidebarIterationWidget from 'ee/sidebar/components/sidebar_iteration_widget.vue';
-import { iterationSelectTextMap, iterationDisplayState } from 'ee/sidebar/constants';
-import groupIterationsQuery from 'ee/sidebar/queries/group_iterations.query.graphql';
-import projectIssueIterationMutation from 'ee/sidebar/queries/project_issue_iteration.mutation.graphql';
-import projectIssueIterationQuery from 'ee/sidebar/queries/project_issue_iteration.query.graphql';
+import SidebarDropdownWidget from 'ee/sidebar/components/sidebar_dropdown_widget.vue';
+import { IssuableAttributeType } from 'ee/sidebar/constants';
+import groupEpicsQuery from 'ee/sidebar/queries/group_epics.query.graphql';
+import projectIssueEpicMutation from 'ee/sidebar/queries/project_issue_epic.mutation.graphql';
+import projectIssueEpicQuery from 'ee/sidebar/queries/project_issue_epic.query.graphql';
 import createMockApollo from 'helpers/mock_apollo_helper';
 import { extendedWrapper } from 'helpers/vue_test_utils_helper';
 import waitForPromises from 'helpers/wait_for_promises';
@@ -25,36 +25,37 @@ import SidebarEditableItem from '~/sidebar/components/sidebar_editable_item.vue'
 
 import {
   mockIssue,
-  mockGroupIterationsResponse,
-  mockIteration2,
-  mockIterationMutationResponse,
-  emptyGroupIterationsResponse,
-  noCurrentIterationResponse,
+  mockGroupEpicsResponse,
+  noCurrentEpicResponse,
+  mockEpicMutationResponse,
+  mockEpic2,
+  emptyGroupEpicsResponse,
 } from '../mock_data';
 
 jest.mock('~/flash');
 
 const localVue = createLocalVue();
 
-describe('SidebarIterationWidget', () => {
+describe('SidebarDropdownWidget', () => {
   let wrapper;
   let mockApollo;
 
-  const promiseData = { issuableSetIteration: { issue: { iteration: { id: '123' } } } };
+  const promiseData = { issuableSetAttribute: { issue: { attribute: { id: '123' } } } };
   const firstErrorMsg = 'first error';
   const promiseWithErrors = {
     ...promiseData,
-    issuableSetIteration: { ...promiseData.issuableSetIteration, errors: [firstErrorMsg] },
+    issuableSetAttribute: { ...promiseData.issuableSetAttribute, errors: [firstErrorMsg] },
   };
 
   const mutationSuccess = () => jest.fn().mockResolvedValue({ data: promiseData });
-  const mutationError = () => jest.fn().mockRejectedValue();
+  const mutationError = () =>
+    jest.fn().mockRejectedValue('Failed to set epic on this issue. Please try again.');
   const mutationSuccessWithErrors = () => jest.fn().mockResolvedValue({ data: promiseWithErrors });
 
-  const findGlLink = () => wrapper.find(GlLink);
-  const findDropdown = () => wrapper.find(GlDropdown);
-  const findDropdownText = () => wrapper.find(GlDropdownText);
-  const findSearchBox = () => wrapper.find(GlSearchBoxByType);
+  const findGlLink = () => wrapper.findComponent(GlLink);
+  const findDropdown = () => wrapper.findComponent(GlDropdown);
+  const findDropdownText = () => wrapper.findComponent(GlDropdownText);
+  const findSearchBox = () => wrapper.findComponent(GlSearchBoxByType);
   const findAllDropdownItems = () => wrapper.findAll(GlDropdownItem);
   const findDropdownItemWithText = (text) =>
     findAllDropdownItems().wrappers.find((x) => x.text() === text);
@@ -62,9 +63,9 @@ describe('SidebarIterationWidget', () => {
   const findSidebarEditableItem = () => wrapper.findComponent(SidebarEditableItem);
   const findEditButton = () => findSidebarEditableItem().find('[data-testid="edit-button"]');
   const findEditableLoadingIcon = () => findSidebarEditableItem().find(GlLoadingIcon);
-  const findIterationItems = () => wrapper.findByTestId('iteration-items');
-  const findSelectedIteration = () => wrapper.findByTestId('select-iteration');
-  const findNoIterationItem = () => wrapper.findByTestId('no-iteration-item');
+  const findAttributeItems = () => wrapper.findByTestId('epic-items');
+  const findSelectedAttribute = () => wrapper.findByTestId('select-epic');
+  const findNoAttributeItem = () => wrapper.findByTestId('no-epic-item');
   const findLoadingIconDropdown = () => wrapper.findByTestId('loading-icon-dropdown');
 
   const waitForDropdown = async () => {
@@ -87,7 +88,7 @@ describe('SidebarIterationWidget', () => {
 
     await waitForDropdown();
 
-    // We should wait for iterations list to be fetched.
+    // We should wait for attributes list to be fetched.
     await waitForApollo();
   };
 
@@ -100,26 +101,27 @@ describe('SidebarIterationWidget', () => {
 
   const createComponentWithApollo = async ({
     requestHandlers = [],
-    currentIterationSpy = jest.fn().mockResolvedValue(noCurrentIterationResponse),
-    groupIterationsSpy = jest.fn().mockResolvedValue(mockGroupIterationsResponse),
+    groupEpicsSpy = jest.fn().mockResolvedValue(mockGroupEpicsResponse),
+    currentEpicSpy = jest.fn().mockResolvedValue(noCurrentEpicResponse),
   } = {}) => {
     localVue.use(VueApollo);
     mockApollo = createMockApollo([
-      [projectIssueIterationQuery, currentIterationSpy],
-      [groupIterationsQuery, groupIterationsSpy],
+      [groupEpicsQuery, groupEpicsSpy],
+      [projectIssueEpicQuery, currentEpicSpy],
       ...requestHandlers,
     ]);
 
     wrapper = extendedWrapper(
-      mount(SidebarIterationWidget, {
+      mount(SidebarDropdownWidget, {
         localVue,
         provide: { canUpdate: true },
         apolloProvider: mockApollo,
         propsData: {
           workspacePath: mockIssue.projectPath,
-          iterationsWorkspacePath: mockIssue.groupPath,
+          attrWorkspacePath: mockIssue.groupPath,
           iid: mockIssue.iid,
           issuableType: IssuableType.Issue,
+          issuableAttribute: IssuableAttributeType.Epic,
         },
         attachTo: document.body,
       }),
@@ -130,23 +132,24 @@ describe('SidebarIterationWidget', () => {
 
   const createComponent = ({ data = {}, mutationPromise = mutationSuccess, queries = {} } = {}) => {
     wrapper = extendedWrapper(
-      shallowMount(SidebarIterationWidget, {
+      shallowMount(SidebarDropdownWidget, {
         provide: { canUpdate: true },
         data() {
           return data;
         },
         propsData: {
           workspacePath: '',
-          iterationsWorkspacePath: '',
+          attrWorkspacePath: '',
           iid: '',
           issuableType: IssuableType.Issue,
+          issuableAttribute: IssuableAttributeType.Epic,
         },
         mocks: {
           $apollo: {
             mutate: mutationPromise(),
             queries: {
-              currentIteration: { loading: false },
-              iterations: { loading: false },
+              currentAttribute: { loading: false },
+              attributesList: { loading: false },
               ...queries,
             },
           },
@@ -173,7 +176,7 @@ describe('SidebarIterationWidget', () => {
     beforeEach(() => {
       createComponent({
         data: {
-          currentIteration: { id: 'id', title: 'title', webUrl: 'webUrl' },
+          currentAttribute: { id: 'id', title: 'title', webUrl: 'webUrl' },
         },
         stubs: {
           GlDropdown,
@@ -182,48 +185,48 @@ describe('SidebarIterationWidget', () => {
       });
     });
 
-    it('shows the current iteration', () => {
-      expect(findSelectedIteration().text()).toBe('title');
+    it('shows the current attribute', () => {
+      expect(findSelectedAttribute().text()).toBe('title');
     });
 
-    it('links to the current iteration', () => {
+    it('links to the current attribute', () => {
       expect(findGlLink().attributes().href).toBe('webUrl');
     });
 
-    it('does not show a loading spinner next to the iteration heading', () => {
+    it('does not show a loading spinner next to the heading', () => {
       expect(findEditableLoadingIcon().exists()).toBe(false);
     });
 
-    it('shows a loading spinner while fetching the current iteration', () => {
+    it('shows a loading spinner while fetching the current attribute', () => {
       createComponent({
         queries: {
-          currentIteration: { loading: true },
+          currentAttribute: { loading: true },
         },
       });
 
       expect(findEditableLoadingIcon().exists()).toBe(true);
     });
 
-    it('shows the title of the selected iteration while updating', () => {
+    it('shows the loading spinner and the title of the selected attribute while updating', () => {
       createComponent({
         data: {
           updating: true,
-          selectedTitle: 'Some iteration title',
+          selectedTitle: 'Some epic title',
         },
         queries: {
-          currentIteration: { loading: false },
+          currentAttribute: { loading: false },
         },
       });
 
       expect(findEditableLoadingIcon().exists()).toBe(true);
-      expect(findSelectedIteration().text()).toBe('Some iteration title');
+      expect(findSelectedAttribute().text()).toBe('Some epic title');
     });
 
-    describe('when current iteration does not exist', () => {
-      it('renders "None" as the selected iteration title', () => {
+    describe('when current attribute does not exist', () => {
+      it('renders "None" as the selected attribute title', () => {
         createComponent();
 
-        expect(findSelectedIteration().text()).toBe('None');
+        expect(findSelectedAttribute().text()).toBe('None');
       });
     });
   });
@@ -231,10 +234,10 @@ describe('SidebarIterationWidget', () => {
   describe('when a user can edit', () => {
     describe('when user is editing', () => {
       describe('when rendering the dropdown', () => {
-        it('shows a loading spinner while fetching a list of iterations', async () => {
+        it('shows a loading spinner while fetching a list of attributes', async () => {
           createComponent({
             queries: {
-              iterations: { loading: true },
+              attributesList: { loading: true },
             },
           });
 
@@ -249,7 +252,7 @@ describe('SidebarIterationWidget', () => {
 
           beforeEach(async () => {
             createComponent({
-              data: { iterations: [{ id, title }], currentIteration: { id, title } },
+              data: { attributesList: [{ id, title }], currentAttribute: { id, title } },
             });
 
             await toggleDropdown();
@@ -260,7 +263,7 @@ describe('SidebarIterationWidget', () => {
           });
 
           it('renders title $title', () => {
-            expect(findDropdownItemWithText(title).text()).toBe(title);
+            expect(findDropdownItemWithText(title).exists()).toBe(true);
           });
 
           it('checks the correct dropdown item', () => {
@@ -280,26 +283,26 @@ describe('SidebarIterationWidget', () => {
             await toggleDropdown();
           });
 
-          it('finds GlDropdownItem with "No iteration"', () => {
-            expect(findNoIterationItem().text()).toBe('No iteration');
+          it('finds GlDropdownItem with "No epic"', () => {
+            expect(findNoAttributeItem().text()).toBe('No epic');
           });
 
-          it('"No iteration" is checked', () => {
-            expect(findNoIterationItem().props('isChecked')).toBe(true);
+          it('"No epic" is checked', () => {
+            expect(findNoAttributeItem().props('isChecked')).toBe(true);
           });
 
           it('does not render any dropdown item', () => {
-            expect(findIterationItems().exists()).toBe(false);
+            expect(findAttributeItems().exists()).toBe(false);
           });
         });
 
         describe('when clicking on dropdown item', () => {
-          describe('when currentIteration is equal to iteration id', () => {
-            it('does not call setIssueIteration mutation', async () => {
+          describe('when currentAttribute is equal to attribute id', () => {
+            it('does not call setIssueAttribute mutation', async () => {
               createComponent({
                 data: {
-                  iterations: [{ id: 'id', title: 'title' }],
-                  currentIteration: { id: 'id', title: 'title' },
+                  attributesList: [{ id: 'id', title: 'title' }],
+                  currentAttribute: { id: 'id', title: 'title' },
                 },
               });
 
@@ -311,16 +314,16 @@ describe('SidebarIterationWidget', () => {
             });
           });
 
-          describe('when currentIteration is not equal to iteration id', () => {
+          describe('when currentAttribute is not equal to attribute id', () => {
             describe('when error', () => {
               const bootstrapComponent = (mutationResp) => {
                 createComponent({
                   data: {
-                    iterations: [
+                    attributesList: [
                       { id: '123', title: '123' },
                       { id: 'id', title: 'title' },
                     ],
-                    currentIteration: '123',
+                    currentAttribute: '123',
                   },
                   mutationPromise: mutationResp,
                 });
@@ -328,7 +331,7 @@ describe('SidebarIterationWidget', () => {
 
               describe.each`
                 description                 | mutationResp                 | expectedMsg
-                ${'top-level error'}        | ${mutationError}             | ${iterationSelectTextMap.iterationSelectFail}
+                ${'top-level error'}        | ${mutationError}             | ${'Failed to set epic on this issue. Please try again.'}
                 ${'user-recoverable error'} | ${mutationSuccessWithErrors} | ${firstErrorMsg}
               `(`$description`, ({ mutationResp, expectedMsg }) => {
                 beforeEach(async () => {
@@ -341,7 +344,11 @@ describe('SidebarIterationWidget', () => {
 
                 it(`calls createFlash with "${expectedMsg}"`, async () => {
                   await wrapper.vm.$nextTick();
-                  expect(createFlash).toHaveBeenCalledWith(expectedMsg);
+                  expect(createFlash).toHaveBeenCalledWith({
+                    message: expectedMsg,
+                    captureError: true,
+                    error: expectedMsg,
+                  });
                 });
               });
             });
@@ -351,16 +358,16 @@ describe('SidebarIterationWidget', () => {
 
       describe('when a user is searching', () => {
         describe('when search result is not found', () => {
-          it('renders "No iterations found"', async () => {
+          it('renders "No epic found"', async () => {
             createComponent();
 
             await toggleDropdown();
 
-            findSearchBox().vm.$emit('input', 'non existing iterations');
+            findSearchBox().vm.$emit('input', 'non existing epics');
 
             await wrapper.vm.$nextTick();
 
-            expect(findDropdownText().text()).toBe('No iterations found');
+            expect(findDropdownText().text()).toBe('No epic found');
           });
         });
       });
@@ -377,12 +384,12 @@ describe('SidebarIterationWidget', () => {
 
     describe("when issuable type is 'issue'", () => {
       describe('when dropdown is expanded and user can edit', () => {
-        let iterationMutationSpy;
+        let epicMutationSpy;
         beforeEach(async () => {
-          iterationMutationSpy = jest.fn().mockResolvedValue(mockIterationMutationResponse);
+          epicMutationSpy = jest.fn().mockResolvedValue(mockEpicMutationResponse);
 
           await createComponentWithApollo({
-            requestHandlers: [[projectIssueIterationMutation, iterationMutationSpy]],
+            requestHandlers: [[projectIssueEpicMutation, epicMutationSpy]],
           });
 
           await clickEdit();
@@ -396,54 +403,55 @@ describe('SidebarIterationWidget', () => {
           expect(document.activeElement).toEqual(wrapper.find(GlFormInput).element);
         });
 
-        describe('when currentIteration is not equal to iteration id', () => {
+        describe('when currentAttribute is not equal to attribute id', () => {
           describe('when update is successful', () => {
             beforeEach(() => {
-              findDropdownItemWithText(mockIteration2.title).vm.$emit('click');
+              findDropdownItemWithText(mockEpic2.title).vm.$emit('click');
             });
 
-            it('calls setIssueIteration mutation', () => {
-              expect(iterationMutationSpy).toHaveBeenCalledWith({
+            it('calls setIssueAttribute mutation', () => {
+              expect(epicMutationSpy).toHaveBeenCalledWith({
                 iid: mockIssue.iid,
-                iterationId: mockIteration2.id,
+                attributeId: mockEpic2.id,
                 fullPath: mockIssue.projectPath,
               });
             });
 
-            it('sets the value returned from the mutation to currentIteration', async () => {
-              expect(findSelectedIteration().text()).toBe(mockIteration2.title);
+            it('sets the value returned from the mutation to currentAttribute', async () => {
+              expect(findSelectedAttribute().text()).toBe(mockEpic2.title);
             });
           });
         });
 
-        describe('iterations', () => {
-          let groupIterationsSpy;
+        describe('epics', () => {
+          let groupEpicsSpy;
 
-          it('should call createFlash and Sentry if iterations query fails', async () => {
+          it('should call createFlash if epics query fails', async () => {
             await createComponentWithApollo({
-              groupIterationsSpy: jest.fn().mockRejectedValue(error),
+              groupEpicsSpy: jest.fn().mockRejectedValue(error),
             });
 
             await clickEdit();
 
-            expect(createFlash).toHaveBeenNthCalledWith(1, {
-              message: wrapper.vm.$options.i18n.iterationsFetchError,
+            expect(createFlash).toHaveBeenCalledWith({
+              message: wrapper.vm.i18n.listFetchError,
+              captureError: true,
+              error: expect.any(Error),
             });
-            expect(Sentry.captureException.mock.calls[0][0].networkError).toBe(error);
           });
 
-          it('only fetches iterations when dropdown is opened', async () => {
-            groupIterationsSpy = jest.fn().mockResolvedValueOnce(emptyGroupIterationsResponse);
-            await createComponentWithApollo({ groupIterationsSpy });
+          it('only fetches attributes when dropdown is opened', async () => {
+            groupEpicsSpy = jest.fn().mockResolvedValueOnce(emptyGroupEpicsResponse);
+            await createComponentWithApollo({ groupEpicsSpy });
 
-            expect(groupIterationsSpy).not.toHaveBeenCalled();
+            expect(groupEpicsSpy).not.toHaveBeenCalled();
 
             await clickEdit();
 
-            expect(groupIterationsSpy).toHaveBeenNthCalledWith(1, {
+            expect(groupEpicsSpy).toHaveBeenNthCalledWith(1, {
               fullPath: mockIssue.groupPath,
               title: '',
-              state: iterationDisplayState,
+              state: 'opened',
             });
           });
 
@@ -451,39 +459,40 @@ describe('SidebarIterationWidget', () => {
             const mockSearchTerm = 'foobar';
 
             beforeEach(async () => {
-              groupIterationsSpy = jest.fn().mockResolvedValueOnce(emptyGroupIterationsResponse);
-              await createComponentWithApollo({ groupIterationsSpy });
+              groupEpicsSpy = jest.fn().mockResolvedValueOnce(emptyGroupEpicsResponse);
+              await createComponentWithApollo({ groupEpicsSpy });
 
               await clickEdit();
             });
 
-            it('sends a groupIterations query with the entered search term "foo"', async () => {
+            it('sends a groupEpics query with the entered search term "foo"', async () => {
               findSearchBox().vm.$emit('input', mockSearchTerm);
               await wrapper.vm.$nextTick();
 
               // Account for debouncing
               jest.runAllTimers();
 
-              expect(groupIterationsSpy).toHaveBeenNthCalledWith(2, {
+              expect(groupEpicsSpy).toHaveBeenNthCalledWith(2, {
                 fullPath: mockIssue.groupPath,
                 title: mockSearchTerm,
-                state: iterationDisplayState,
+                state: 'opened',
               });
             });
           });
         });
       });
 
-      describe('currentIterations', () => {
-        it('should call createFlash and Sentry if currentIterations query fails', async () => {
+      describe('currentAttributes', () => {
+        it('should call createFlash if currentAttributes query fails', async () => {
           await createComponentWithApollo({
-            currentIterationSpy: jest.fn().mockRejectedValue(error),
+            currentEpicSpy: jest.fn().mockRejectedValue(error),
           });
 
-          expect(createFlash).toHaveBeenNthCalledWith(1, {
-            message: wrapper.vm.$options.i18n.currentIterationFetchError,
+          expect(createFlash).toHaveBeenCalledWith({
+            message: wrapper.vm.i18n.currentFetchError,
+            captureError: true,
+            error: expect.any(Error),
           });
-          expect(Sentry.captureException.mock.calls[0][0].networkError).toBe(error);
         });
       });
     });

@@ -11773,6 +11773,24 @@ msgstr ""
 msgid "Drop your files to start your upload."
 msgstr ""
 
+msgid "DropdownWidget|An error occurred while fetching the assigned %{issuableAttribute} of the selected %{issuableType}."
+msgstr ""
+
+msgid "DropdownWidget|Assign %{issuableAttribute}"
+msgstr ""
+
+msgid "DropdownWidget|Failed to fetch the %{issuableAttribute} for this %{issuableType}. Please try again."
+msgstr ""
+
+msgid "DropdownWidget|Failed to set %{issuableAttribute} on this %{issuableType}. Please try again."
+msgstr ""
+
+msgid "DropdownWidget|No %{issuableAttribute}"
+msgstr ""
+
+msgid "DropdownWidget|No %{issuableAttribute} found"
+msgstr ""
+
 msgid "Due Date"
 msgstr ""
 
@@ -18303,12 +18321,6 @@ msgid "IssueAnalytics|Status"
 msgstr ""
 
 msgid "IssueAnalytics|Weight"
-msgstr ""
-
-msgid "IssueBoards|An error occurred while assigning the selected epic to the issue."
-msgstr ""
-
-msgid "IssueBoards|An error occurred while fetching the assigned epic of the selected issue."
 msgstr ""
 
 msgid "IssueBoards|An error occurred while setting notifications status. Please try again."
