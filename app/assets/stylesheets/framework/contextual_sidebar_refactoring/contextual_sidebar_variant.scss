@@ -210,8 +210,11 @@
 
     &.active {
       > a {
-        background-color: $indigo-900-alpha-008;
         font-weight: $gl-font-weight-bold;
+      }
+
+      > a:not(.has-sub-items) {
+        background-color: $indigo-900-alpha-008;
       }
     }
   }
