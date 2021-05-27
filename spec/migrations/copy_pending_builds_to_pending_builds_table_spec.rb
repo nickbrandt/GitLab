@@ -45,4 +45,40 @@ RSpec.describe CopyPendingBuildsToPendingBuildsTable do
       expect(queue.all.pluck(:build_id)).to match_array([1, 6])
     end
   end
+
+  context 'when there is more than one batch of pending builds to migrate' do
+    before do
+      stub_const("#{described_class}::PENDING_BUILDS_BATCH_SIZE", 1)
+    end
+
+    it 'correctly migrates data and exits after doing that' do
+      migrate!
+
+      expect(queue.all.count).to eq 2
+      expect(queue.all.pluck(:build_id)).to match_array([1, 6])
+    end
+  end
+
+  context 'when batches limit has been exceeded' do
+    before do
+      stub_const("#{described_class}::PENDING_BUILDS_BATCH_SIZE", 1)
+      stub_const("#{described_class}::PENDING_BUILDS_MAX_BATCHES", 1)
+    end
+
+    it 'raises an error' do
+      expect { migrate! }.to raise_error(StandardError, /too many pending builds/)
+    end
+  end
+
+  context 'when there is no data to migrate' do
+    before do
+      builds.all.delete_all
+    end
+
+    it 'does not raise an exception' do
+      expect(builds.all.count).to eq 0
+
+      expect { migrate! }.not_to raise_error
+    end
+  end
 end

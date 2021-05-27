@@ -3,9 +3,14 @@
 class CopyPendingBuildsToPendingBuildsTable < ActiveRecord::Migration[6.0]
   include Gitlab::Database::MigrationHelpers
 
+  PENDING_BUILDS_BATCH_SIZE = 1000
+  PENDING_BUILDS_MAX_BATCHES = 1000
+
+  disable_ddl_transaction!
+
   def up
-    with_lock_retries do
-      execute <<~SQL
+    1.step do |i|
+      inserts = execute <<~SQL
         WITH pending_builds AS (
           SELECT id,
                  project_id
@@ -16,14 +21,23 @@ class CopyPendingBuildsToPendingBuildsTable < ActiveRecord::Migration[6.0]
               SELECT 1 FROM ci_pending_builds
                 WHERE ci_pending_builds.build_id = ci_builds.id
             )
-          FOR UPDATE
+          LIMIT #{PENDING_BUILDS_BATCH_SIZE}
+        ), inserts AS (
+          INSERT INTO ci_pending_builds (build_id, project_id)
+            SELECT id,
+                   project_id
+            FROM pending_builds
+            ON CONFLICT DO NOTHING
+            RETURNING id
         )
-        INSERT INTO ci_pending_builds (build_id, project_id)
-          SELECT id,
-                 project_id
-          FROM pending_builds
-          ON CONFLICT DO NOTHING;
+        SELECT COUNT(*) FROM inserts;
       SQL
+
+      break if inserts.values.flatten.first.to_i == 0
+
+      if i > PENDING_BUILDS_MAX_BATCHES
+        raise 'There are too many pending builds in your database! Aborting.'
+      end
     end
   end
 
