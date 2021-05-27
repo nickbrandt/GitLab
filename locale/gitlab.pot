@@ -14618,9 +14618,6 @@ msgstr ""
 msgid "Geo|%{component} verified"
 msgstr ""
 
-msgid "Geo|%{eventId} (%{timeAgo})"
-msgstr ""
-
 msgid "Geo|%{itemTitle} checksum progress"
 msgstr ""
 
@@ -14646,6 +14643,9 @@ msgid "Geo|%{timeAgoStr} (%{pendingEvents} events)"
 msgstr ""
 
 msgid "Geo|%{title} checksum progress"
+msgstr ""
+
+msgid "Geo|(%{timeAgo})"
 msgstr ""
 
 msgid "Geo|Add site"
