@@ -38902,9 +38902,6 @@ msgstr ""
 msgid "mrWidget|Added to the merge train. There are %{mergeTrainPosition} merge requests waiting to be merged"
 msgstr ""
 
-msgid "mrWidget|Allows commits from members who can merge to the target branch"
-msgstr ""
-
 msgid "mrWidget|An error occurred while removing your approval."
 msgstr ""
 
@@ -38974,9 +38971,6 @@ msgstr ""
 msgid "mrWidget|Fast-forward merge is not possible. To merge this request, first rebase locally."
 msgstr ""
 
-msgid "mrWidget|Fork project merge requests do not create merge request pipelines that validate a post merge result unless invoked by a project member."
-msgstr ""
-
 msgid "mrWidget|If the %{missingBranchName} branch exists in your local repository, you can merge this merge request manually using the command line"
 msgstr ""
 
@@ -38990,6 +38984,9 @@ msgid "mrWidget|Loading deployment statistics"
 msgstr ""
 
 msgid "mrWidget|Mark as ready"
+msgstr ""
+
+msgid "mrWidget|Members who can merge are allowed to add commits."
 msgstr ""
 
 msgid "mrWidget|Mentions"
