@@ -273,6 +273,20 @@ RSpec.describe Ci::Runner do
     end
   end
 
+  describe '.recent' do
+    subject { described_class.recent }
+
+    before do
+      @runner1 = create(:ci_runner, :instance, contacted_at: nil, created_at: 2.months.ago)
+      @runner2 = create(:ci_runner, :instance, contacted_at: nil, created_at: 3.months.ago)
+      @runner3 = create(:ci_runner, :instance, contacted_at: 1.month.ago, created_at: 2.months.ago)
+      @runner4 = create(:ci_runner, :instance, contacted_at: 1.month.ago, created_at: 3.months.ago)
+      @runner5 = create(:ci_runner, :instance, contacted_at: 3.months.ago, created_at: 5.months.ago)
+    end
+
+    it { is_expected.to eq([@runner1, @runner3, @runner4])}
+  end
+
   describe '.online' do
     subject { described_class.online }
 
