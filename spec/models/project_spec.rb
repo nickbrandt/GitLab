@@ -484,6 +484,7 @@ RSpec.describe Project, factory_default: :keep do
 
       it 'returns expected value' do
         expect(project.merge_requests_author_approval).to eq(return_value)
+        expect(project.merge_requests_author_approval?).to eq(return_value)
       end
     end
   end
