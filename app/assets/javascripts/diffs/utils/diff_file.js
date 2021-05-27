@@ -1,4 +1,5 @@
 import { diffViewerModes as viewerModes } from '~/ide/constants';
+import { changeInPercent, numberToHumanSize } from '~/lib/utils/number_utils';
 import { truncateSha } from '~/lib/utils/text_utility';
 import { uuids } from '~/lib/utils/uuids';
 
@@ -86,4 +87,36 @@ export function isCollapsed(file) {
 
 export function getShortShaFromFile(file) {
   return file.content_sha ? truncateSha(String(file.content_sha)) : null;
+}
+
+export function stats(file) {
+  let valid = false;
+  let classes = '';
+  let sign = '';
+  let text = '';
+  let percent = 0;
+  let diff = 0;
+
+  if (file) {
+    percent = changeInPercent(file.old_size, file.new_size);
+    diff = file.new_size - file.old_size;
+    sign = diff >= 0 ? '+' : '';
+    text = `${sign}${numberToHumanSize(diff)} (${sign}${percent}%)`;
+    valid = true;
+
+    if (diff > 0) {
+      classes = 'cgreen';
+    } else if (diff < 0) {
+      classes = 'cred';
+    }
+  }
+
+  return {
+    changed: diff,
+    text,
+    percent,
+    classes,
+    sign,
+    valid,
+  };
 }

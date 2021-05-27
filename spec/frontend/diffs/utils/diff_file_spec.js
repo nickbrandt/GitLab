@@ -1,5 +1,11 @@
-import { prepareRawDiffFile, getShortShaFromFile, isNotDiffable } from '~/diffs/utils/diff_file';
+import {
+  prepareRawDiffFile,
+  getShortShaFromFile,
+  stats,
+  isNotDiffable,
+} from '~/diffs/utils/diff_file';
 import { diffViewerModes } from '~/ide/constants';
+import mockDiffFile from '../mock_data/diff_file';
 
 function getDiffFiles() {
   const loadFull = 'namespace/project/-/merge_requests/12345/diff_for_path?file_identifier=abc';
@@ -153,6 +159,53 @@ describe('diff_file utilities', () => {
       ${'hidogcat'} | ${'hidogcatmorethings'}
     `('returns $response for a file with { content_sha: $cs }', ({ response, cs }) => {
       expect(getShortShaFromFile({ content_sha: cs })).toBe(response);
+    });
+  });
+
+  describe('stats', () => {
+    const noFile = [
+      "returns empty stats when the file isn't provided",
+      undefined,
+      {
+        text: '',
+        percent: 0,
+        changed: 0,
+        classes: '',
+        sign: '',
+        valid: false,
+      },
+    ];
+    const validFile = [
+      'computes the correct stats from a file',
+      mockDiffFile,
+      {
+        changed: 1024,
+        percent: 100,
+        classes: 'cgreen',
+        sign: '+',
+        text: '+1.00 KiB (+100%)',
+        valid: true,
+      },
+    ];
+    const negativeChange = [
+      'computed the correct states from a file with a negative size change',
+      {
+        ...mockDiffFile,
+        new_size: 0,
+        old_size: 1024,
+      },
+      {
+        changed: -1024,
+        percent: -100,
+        classes: 'cred',
+        sign: '',
+        text: '-1.00 KiB (-100%)',
+        valid: true,
+      },
+    ];
+
+    it.each([noFile, validFile, negativeChange])('%s', (_, file, output) => {
+      expect(stats(file)).toEqual(output);
     });
   });
 
