@@ -12,6 +12,8 @@ import validation from '~/vue_shared/directives/validation';
 import {
   activateLabel,
   fieldRequiredMessage,
+  INVALID_CODE_ERROR,
+  INVALID_CODE_ERROR_MESSAGE,
   subscriptionActivationForm,
   subscriptionQueries,
 } from '../constants';
@@ -103,6 +105,9 @@ export default {
           const errors = getErrorsAsData(res);
           if (errors.length) {
             const [error] = errors;
+            if (error.includes(INVALID_CODE_ERROR_MESSAGE)) {
+              throw new Error(INVALID_CODE_ERROR);
+            }
             throw new Error(error);
           }
           this.$emit(SUBSCRIPTION_ACTIVATION_SUCCESS_EVENT);
