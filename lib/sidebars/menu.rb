@@ -86,8 +86,7 @@ module Sidebars
     override :container_html_options
     def container_html_options
       super.tap do |html_options|
-        # Flagging menus that can be rendered but without any children
-        # like the merge requests or the requirements menu
+        # Flagging menus that can be rendered and with renderable menu items
         if render? && has_renderable_items?
           html_options[:class] = [*html_options[:class], 'has-sub-items'].join(' ')
         end

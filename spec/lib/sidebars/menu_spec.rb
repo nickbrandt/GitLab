@@ -191,7 +191,7 @@ RSpec.describe Sidebars::Menu do
         allow(menu).to receive(:render?).and_return(false)
       end
 
-      it 'does not contain "has-sub-items" class' do
+      it 'does not contain special class' do
         expect(menu.container_html_options[:class]).to be_nil
       end
     end
