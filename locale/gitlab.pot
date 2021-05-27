@@ -10006,9 +10006,6 @@ msgstr ""
 msgid "DAG visualization requires at least 3 dependent jobs."
 msgstr ""
 
-msgid "DAST"
-msgstr ""
-
 msgid "DAST Configuration"
 msgstr ""
 
@@ -28481,9 +28478,6 @@ msgid "SAML discovery tokens"
 msgstr ""
 
 msgid "SAML for %{group_name}"
-msgstr ""
-
-msgid "SAST"
 msgstr ""
 
 msgid "SAST Configuration"

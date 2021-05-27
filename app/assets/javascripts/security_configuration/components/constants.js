@@ -18,7 +18,7 @@ import {
  * Translations & helpPagePaths for Static Security Configuration Page
  */
 export const SAST_NAME = __('Static Application Security Testing (SAST)');
-export const SAST_SHORT_NAME = __('SAST');
+export const SAST_SHORT_NAME = s__('ciReport|SAST');
 export const SAST_DESCRIPTION = __('Analyze your source code for known vulnerabilities.');
 export const SAST_HELP_PATH = helpPagePath('user/application_security/sast/index');
 export const SAST_CONFIG_HELP_PATH = helpPagePath('user/application_security/sast/index', {
@@ -26,7 +26,7 @@ export const SAST_CONFIG_HELP_PATH = helpPagePath('user/application_security/sas
 });
 
 export const DAST_NAME = __('Dynamic Application Security Testing (DAST)');
-export const DAST_SHORT_NAME = __('DAST');
+export const DAST_SHORT_NAME = s__('ciReport|DAST');
 export const DAST_DESCRIPTION = __('Analyze a review version of your web application.');
 export const DAST_HELP_PATH = helpPagePath('user/application_security/dast/index');
 export const DAST_CONFIG_HELP_PATH = helpPagePath('user/application_security/dast/index', {
@@ -165,7 +165,7 @@ export const securityFeatures = [
     helpPath: SAST_HELP_PATH,
     configurationHelpPath: SAST_CONFIG_HELP_PATH,
     type: REPORT_TYPE_SAST,
-    // This field is currently hardcoded because SAST is always availabled
+    // This field is currently hardcoded because SAST is always available.
     // It will eventually come from the Backend, the progress is tracked in
     // https://gitlab.com/gitlab-org/gitlab/-/issues/331622
     available: true,

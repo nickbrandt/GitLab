@@ -1,6 +1,13 @@
 import { GlTab, GlTabs } from '@gitlab/ui';
 import { mount } from '@vue/test-utils';
 import { extendedWrapper } from 'helpers/vue_test_utils_helper';
+import {
+  SAST_NAME,
+  SAST_SHORT_NAME,
+  SAST_DESCRIPTION,
+  SAST_HELP_PATH,
+  SAST_CONFIG_HELP_PATH,
+} from '~/security_configuration/components/constants';
 import FeatureCard from '~/security_configuration/components/feature_card.vue';
 import RedesignedSecurityConfigurationApp from '~/security_configuration/components/redesigned_app.vue';
 
@@ -17,18 +24,18 @@ describe('NewApp component', () => {
 
   const findMainHeading = () => wrapper.find('h1');
   const findSubHeading = () => wrapper.find('h2');
-  const findTab = () => wrapper.find(GlTab);
-  const findTabs = () => wrapper.findAll(GlTabs);
+  const findTab = () => wrapper.findComponent(GlTab);
+  const findTabs = () => wrapper.findAllComponents(GlTabs);
   const findByTestId = (id) => wrapper.findByTestId(id);
-  const findFeatureCards = () => wrapper.findAll(FeatureCard);
+  const findFeatureCards = () => wrapper.findAllComponents(FeatureCard);
 
   const securityFeaturesMock = [
     {
-      name: 'Static Application Security Testing (SAST)',
-      shortName: 'SAST',
-      description: 'Analyze your source code for known vulnerabilities.',
-      helpPath: '/help/user/application_security/sast/index',
-      configurationHelpPath: '/help/user/application_security/sast/index#configuration',
+      name: SAST_NAME,
+      shortName: SAST_SHORT_NAME,
+      description: SAST_DESCRIPTION,
+      helpPath: SAST_HELP_PATH,
+      configurationHelpPath: SAST_CONFIG_HELP_PATH,
       type: 'sast',
       available: true,
     },
@@ -66,7 +73,7 @@ describe('NewApp component', () => {
     it('renders sub-heading with correct text', () => {
       const subHeading = findSubHeading();
       expect(subHeading).toExist();
-      expect(subHeading.text()).toContain('Security testing');
+      expect(subHeading.text()).toContain(RedesignedSecurityConfigurationApp.i18n.securityTesting);
     });
 
     it('renders right amount of feature cards for given props with correct props', () => {
@@ -91,11 +98,9 @@ describe('NewApp component', () => {
     it('should show latest pipeline info with correct link when latestPipelinePath is defined', () => {
       expect(findByTestId('latest-pipeline-info').exists()).toBe(true);
       expect(findByTestId('latest-pipeline-info').text()).toMatchInterpolatedText(
-        "The status of the tools only applies to the default branch and is based on the latest pipeline. Once you've enabled a scan for the default branch, any subsequent feature branch you create will include the scan.",
+        RedesignedSecurityConfigurationApp.i18n.securityTestingDescription,
       );
-      expect(findByTestId('latest-pipeline-info').find('a').element.href).toEqual(
-        'http://test.host/test/path',
-      );
+      expect(findByTestId('latest-pipeline-info').find('a').attributes('href')).toBe('test/path');
     });
   });
 });

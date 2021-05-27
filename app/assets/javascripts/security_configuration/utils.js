@@ -18,7 +18,7 @@ export const augmentFeatures = (securityFeatures, complianceFeatures, features =
   };
 
   return {
-    augmentedSecurityFeatures: securityFeatures.map((e) => augmentFeature(e)),
-    augmentedComplianceFeatures: complianceFeatures.map((e) => augmentFeature(e)),
+    augmentedSecurityFeatures: securityFeatures.map((feature) => augmentFeature(feature)),
+    augmentedComplianceFeatures: complianceFeatures.map((feature) => augmentFeature(feature)),
   };
 };
