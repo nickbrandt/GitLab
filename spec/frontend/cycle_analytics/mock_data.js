@@ -1,25 +1,9 @@
-import { getJSONFixture } from 'helpers/fixtures';
-import { transformStagesForPathNavigation } from '~/cycle_analytics/utils';
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
-
-export const fixtureEndpoints = {
-  customizableCycleAnalyticsStagesAndEvents: 'analytics/value_stream_analytics/stages.json', // customizable stages and events endpoint
-  stageEvents: (stage) => `analytics/value_stream_analytics/stages/${stage}/records.json`,
-  stageMedian: (stage) => `analytics/value_stream_analytics/stages/${stage}/median.json`,
-  stageCount: (stage) => `analytics/value_stream_analytics/stages/${stage}/count.json`,
-  recentActivityData: 'analytics/metrics/value_stream_analytics/summary.json',
-  timeMetricsData: 'analytics/metrics/value_stream_analytics/time_summary.json',
-  groupLabels: 'api/group_labels.json',
-};
 
 export const getStageByTitle = (stages, title) =>
   stages.find((stage) => stage.title && stage.title.toLowerCase().trim() === title) || {};
 
 export const defaultStages = ['issue', 'plan', 'review', 'code', 'test', 'staging'];
-export const rawStageMedians = defaultStages.map((id) => ({
-  id,
-  ...getJSONFixture(fixtureEndpoints.stageMedian(id)),
-}));
 
 export const summary = [
   { value: '20', title: 'New Issues' },
@@ -214,26 +198,61 @@ export const convertedEvents = rawEvents.map((ev) =>
 
 export const pathNavIssueMetric = 172800;
 
-export const stageMediansWithNumericIds = rawStageMedians.reduce((acc, { id, value }) => {
-  const { id: stageId } = getStageByTitle(convertedData.stages, id);
-  return {
-    ...acc,
-    [stageId]: value,
-  };
-}, {});
+export const rawStageMedians = [
+  { id: 'issue', value: 172800 },
+  { id: 'plan', value: 86400 },
+  { id: 'review', value: 1036800 },
+  { id: 'code', value: 129600 },
+  { id: 'test', value: 259200 },
+  { id: 'staging', value: 388800 },
+];
 
-export const stageMedians = rawStageMedians.reduce(
-  (acc, { id, value }) => ({
-    ...acc,
-    [id]: value,
-  }),
-  {},
-);
+export const stageMedians = {
+  issue: 172800,
+  plan: 86400,
+  review: 1036800,
+  code: 129600,
+  test: 259200,
+  staging: 388800,
+};
 
 export const allowedStages = [issueStage, planStage, codeStage];
 
-export const transformedProjectStagePathData = transformStagesForPathNavigation({
-  stages: allowedStages,
-  medians: stageMedians,
-  selectedStage: issueStage,
-});
+export const transformedProjectStagePathData = [
+  {
+    metric: 172800,
+    selected: true,
+    stageCount: undefined,
+    icon: null,
+    id: 'issue',
+    title: 'Issue',
+    name: 'issue',
+    legend: '',
+    description: 'Time before an issue gets scheduled',
+    value: null,
+  },
+  {
+    metric: 86400,
+    selected: false,
+    stageCount: undefined,
+    icon: null,
+    id: 'plan',
+    title: 'Plan',
+    name: 'plan',
+    legend: '',
+    description: 'Time before an issue starts implementation',
+    value: 75600,
+  },
+  {
+    metric: 129600,
+    selected: false,
+    stageCount: undefined,
+    icon: null,
+    id: 'code',
+    title: 'Code',
+    name: 'code',
+    legend: '',
+    description: 'Time until first merge request',
+    value: 172800,
+  },
+];

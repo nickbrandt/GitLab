@@ -12,7 +12,7 @@ import {
   convertedData,
   rawEvents,
   allowedStages,
-  stageMediansWithNumericIds,
+  stageMedians,
   pathNavIssueMetric,
   rawStageMedians,
 } from './mock_data';
@@ -95,7 +95,7 @@ describe('Value stream analytics utils', () => {
     const stages = allowedStages;
     const response = transformStagesForPathNavigation({
       stages,
-      medians: stageMediansWithNumericIds,
+      medians: stageMedians,
       selectedStage,
     });
 

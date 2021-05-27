@@ -16,15 +16,20 @@ import {
 import { toYmd } from 'ee/analytics/shared/utils';
 import { getJSONFixture } from 'helpers/fixtures';
 import { TEST_HOST } from 'helpers/test_constants';
-import {
-  getStageByTitle,
-  defaultStages,
-  rawStageMedians,
-  fixtureEndpoints,
-} from 'jest/cycle_analytics/mock_data';
+import { getStageByTitle, defaultStages, rawStageMedians } from 'jest/cycle_analytics/mock_data';
 import { transformStagesForPathNavigation } from '~/cycle_analytics/utils';
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 import { getDateInPast, getDatesInRange } from '~/lib/utils/datetime_utility';
+
+const fixtureEndpoints = {
+  customizableCycleAnalyticsStagesAndEvents: 'analytics/value_stream_analytics/stages.json', // customizable stages and events endpoint
+  stageEvents: (stage) => `analytics/value_stream_analytics/stages/${stage}/records.json`,
+  stageMedian: (stage) => `analytics/value_stream_analytics/stages/${stage}/median.json`,
+  stageCount: (stage) => `analytics/value_stream_analytics/stages/${stage}/count.json`,
+  recentActivityData: 'analytics/metrics/value_stream_analytics/summary.json',
+  timeMetricsData: 'analytics/metrics/value_stream_analytics/time_summary.json',
+  groupLabels: 'api/group_labels.json',
+};
 
 export const endpoints = {
   groupLabels: /groups\/[A-Z|a-z|\d|\-|_]+\/-\/labels.json/,
