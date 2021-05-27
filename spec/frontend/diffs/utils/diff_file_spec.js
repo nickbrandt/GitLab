@@ -1,4 +1,5 @@
-import { prepareRawDiffFile, getShortShaFromFile } from '~/diffs/utils/diff_file';
+import { prepareRawDiffFile, getShortShaFromFile, isNotDiffable } from '~/diffs/utils/diff_file';
+import { diffViewerModes } from '~/ide/constants';
 
 function getDiffFiles() {
   const loadFull = 'namespace/project/-/merge_requests/12345/diff_for_path?file_identifier=abc';
@@ -152,6 +153,28 @@ describe('diff_file utilities', () => {
       ${'hidogcat'} | ${'hidogcatmorethings'}
     `('returns $response for a file with { content_sha: $cs }', ({ response, cs }) => {
       expect(getShortShaFromFile({ content_sha: cs })).toBe(response);
+    });
+  });
+
+  describe('isNotDiffable', () => {
+    it.each`
+      bool     | vw
+      ${true}  | ${diffViewerModes.not_diffable}
+      ${false} | ${diffViewerModes.text}
+      ${false} | ${diffViewerModes.image}
+    `('returns $bool when the viewer is $vw', ({ bool, vw }) => {
+      expect(isNotDiffable({ viewer: { name: vw } })).toBe(bool);
+    });
+
+    it.each`
+      file
+      ${undefined}
+      ${null}
+      ${{}}
+      ${{ viewer: undefined }}
+      ${{ viewer: null }}
+    `('reports `false` when the file is `$file`', ({ file }) => {
+      expect(isNotDiffable(file)).toBe(false);
     });
   });
 });
