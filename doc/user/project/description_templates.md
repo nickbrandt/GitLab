@@ -106,6 +106,7 @@ instance or the project's parent groups.
 ### Set instance-level description templates **(PREMIUM SELF)**
 
 > - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/52360) in GitLab 13.9.
+> - [Feature flag removed](https://gitlab.com/gitlab-org/gitlab/-/issues/321247) in GitLab 14.0.
 
 You can set a description template at the **instance level** for issues
 and merge requests.
@@ -127,6 +128,7 @@ Learn more about [instance template repository](../admin_area/settings/instance_
 ### Set group-level description templates **(PREMIUM)**
 
 > - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/52360) in GitLab 13.9.
+> - [Feature flag removed](https://gitlab.com/gitlab-org/gitlab/-/issues/321247) in GitLab 14.0.
 
 With **group-level** description templates, you can store your templates in a single repository and
 configure the group file templates setting to point to that repository.
