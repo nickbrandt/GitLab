@@ -102,23 +102,9 @@ module Gitlab
         hosts.any? || service_discovery_enabled?
       end
 
+      # Temporarily disabled for FOSS until move from EE to FOSS is complete
       def self.feature_available?
-        # If this method is called in any subscribers listening to
-        # sql.active_record, the SQL call below may cause infinite recursion.
-        # So, the memoization variable must have 3 states
-        # - First call: @feature_available is undefined
-        #   -> Set @feature_available to false
-        #   -> Trigger SQL
-        #   -> SQL subscriber triggers this method again
-        #     -> return false
-        #   -> Set @feature_available  to true
-        #   -> return true
-        # - Second call: return @feature_available right away
-        return @feature_available if defined?(@feature_available)
-
-        @feature_available = false
-        @feature_available = Gitlab::Database.cached_table_exists?('licenses') &&
-                             ::License.feature_available?(:db_load_balancing)
+        Gitlab.ee? || Gitlab::Utils.to_boolean(ENV['ENABLE_LOAD_BALANCING_FOR_FOSS'], default: false)
       end
 
       def self.start_service_discovery
