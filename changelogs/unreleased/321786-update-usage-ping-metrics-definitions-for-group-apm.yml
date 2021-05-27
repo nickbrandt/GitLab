@@ -1,5 +1,0 @@
----
-title: Deprecate projects_with_prometheus_alerts and pod_logs_usages_total metrics
-merge_request: 61872
-author:
-type: deprecated
