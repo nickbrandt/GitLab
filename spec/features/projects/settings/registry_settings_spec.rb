@@ -9,11 +9,11 @@ RSpec.describe 'Project > Settings > CI/CD > Container registry tag expiration p
   let_it_be(:project, reload: true) { create(:project, namespace: user.namespace) }
 
   let(:container_registry_enabled) { true }
-  let(:container_registry_enabled_on_project) { true }
+  let(:container_registry_enabled_on_project) { ProjectFeature::ENABLED }
 
   shared_examples 'an expiration policy form' do
     before do
-      project.update!(container_registry_enabled: container_registry_enabled_on_project)
+      project.project_feature.update!(container_registry_access_level: container_registry_enabled_on_project)
       project.container_expiration_policy.update!(enabled: true)
 
       sign_in(user)
@@ -103,7 +103,7 @@ RSpec.describe 'Project > Settings > CI/CD > Container registry tag expiration p
     end
 
     context 'when container registry is disabled on project' do
-      let(:container_registry_enabled_on_project) { false }
+      let(:container_registry_enabled_on_project) { ProjectFeature::DISABLED }
 
       it 'does not exists' do
         subject
