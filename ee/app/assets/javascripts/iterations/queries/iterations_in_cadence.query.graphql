@@ -1,23 +1,26 @@
 #import "~/graphql_shared/fragments/pageInfo.fragment.graphql"
+#import "./iteration_list_item.fragment.graphql"
 
-query IterationCadences(
+query Iterations(
   $fullPath: ID!
-  $beforeCursor: String = ""
-  $afterCursor: String = ""
+  $iterationCadenceId: ID!
+  $state: IterationState!
+  $beforeCursor: String
+  $afterCursor: String
   $firstPageSize: Int
   $lastPageSize: Int
 ) {
   group(fullPath: $fullPath) {
-    iterationCadences(
+    iterations(
+      iterationCadenceIds: [$iterationCadenceId]
+      state: $state
       before: $beforeCursor
       after: $afterCursor
       first: $firstPageSize
       last: $lastPageSize
     ) {
       nodes {
-        id
-        title
-        durationInWeeks
+        ...IterationListItem
       }
       pageInfo {
         ...PageInfo
