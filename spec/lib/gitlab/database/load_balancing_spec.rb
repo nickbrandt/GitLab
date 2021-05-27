@@ -5,6 +5,10 @@ require 'spec_helper'
 RSpec.describe Gitlab::Database::LoadBalancing do
   include_context 'clear DB Load Balancing configuration'
 
+  before do
+    stub_env('ENABLE_LOAD_BALANCING_FOR_FOSS', 'true')
+  end
+
   describe '.proxy' do
     context 'when configured' do
       before do
@@ -127,8 +131,6 @@ RSpec.describe Gitlab::Database::LoadBalancing do
   end
 
   describe '.enable?' do
-    let!(:license) { create(:license, plan: ::License::PREMIUM_PLAN) }
-
     before do
       clear_load_balancing_configuration
       allow(described_class).to receive(:hosts).and_return(%w(foo))
@@ -181,10 +183,11 @@ RSpec.describe Gitlab::Database::LoadBalancing do
       end
     end
 
-    context 'without a license' do
+    context 'FOSS' do
       before do
-        License.destroy_all # rubocop: disable Cop/DestroyAll
-        clear_load_balancing_configuration
+        allow(Gitlab).to receive(:ee?).and_return(false)
+
+        stub_env('ENABLE_LOAD_BALANCING_FOR_FOSS', 'false')
       end
 
       it 'is disabled' do
@@ -192,16 +195,10 @@ RSpec.describe Gitlab::Database::LoadBalancing do
       end
     end
 
-    context 'with an EES license' do
-      let!(:license) { create(:license, plan: ::License::STARTER_PLAN) }
-
-      it 'is disabled' do
-        expect(described_class.enable?).to eq(false)
+    context 'EE' do
+      before do
+        allow(Gitlab).to receive(:ee?).and_return(true)
       end
-    end
-
-    context 'with an EEP license' do
-      let!(:license) { create(:license, plan: ::License::PREMIUM_PLAN) }
 
       it 'is enabled' do
         allow(described_class).to receive(:hosts).and_return(%w(foo))
@@ -213,8 +210,6 @@ RSpec.describe Gitlab::Database::LoadBalancing do
   end
 
   describe '.configured?' do
-    let!(:license) { create(:license, plan: ::License::PREMIUM_PLAN) }
-
     before do
       clear_load_balancing_configuration
     end
@@ -244,17 +239,6 @@ RSpec.describe Gitlab::Database::LoadBalancing do
         .and_return(false)
 
       expect(described_class.configured?).to eq(false)
-    end
-
-    context 'without a license' do
-      before do
-        License.destroy_all # rubocop: disable Cop/DestroyAll
-        clear_load_balancing_configuration
-      end
-
-      it 'is not configured' do
-        expect(described_class.configured?).to eq(false)
-      end
     end
   end
 
@@ -444,7 +428,6 @@ RSpec.describe Gitlab::Database::LoadBalancing do
       end
 
       before do
-        stub_licensed_features(db_load_balancing: true)
         # Preloading testing class
         model.singleton_class.prepend ::Gitlab::Database::LoadBalancing::ActiveRecordProxy
 
