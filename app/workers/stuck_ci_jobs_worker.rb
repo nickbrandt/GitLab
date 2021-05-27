@@ -23,28 +23,28 @@ class StuckCiJobsWorker # rubocop:disable Scalability/IdempotentWorker
 
     drop(
       status: :running,
-      search_condition: 'ci_builds.created_at < ? AND updated_at < ?',
-      search_condition_params: [BUILD_RUNNING_OUTDATED_TIMEOUT.ago, BUILD_RUNNING_OUTDATED_TIMEOUT.ago],
+      search_condition: 'ci_builds.updated_at < ?',
+      search_condition_params: [BUILD_RUNNING_OUTDATED_TIMEOUT.ago],
       failure_reason: :stuck_or_timeout_failure
     )
 
     drop(
       status: :pending,
-      search_condition: 'ci_builds.created_at < ? AND updated_at < ?',
+      search_condition: 'ci_builds.created_at < ? AND ci_builds.updated_at < ?',
       search_condition_params: [BUILD_PENDING_OUTDATED_TIMEOUT.ago, BUILD_PENDING_OUTDATED_TIMEOUT.ago],
       failure_reason: :stuck_or_timeout_failure
     )
 
     drop(
       status: :scheduled,
-      search_condition: 'scheduled_at IS NOT NULL AND scheduled_at < ?',
+      search_condition: 'ci_builds.scheduled_at IS NOT NULL AND ci_builds.scheduled_at < ?',
       search_condition_params: [BUILD_SCHEDULED_OUTDATED_TIMEOUT.ago],
       failure_reason: :stale_schedule
     )
 
     drop_stuck(
       status: :pending,
-      search_condition: 'ci_builds.created_at < ? AND updated_at < ?',
+      search_condition: 'ci_builds.created_at < ? AND ci_builds.updated_at < ?',
       search_condition_params: [BUILD_PENDING_STUCK_TIMEOUT.ago, BUILD_PENDING_STUCK_TIMEOUT.ago],
       failure_reason: :stuck_or_timeout_failure
     )

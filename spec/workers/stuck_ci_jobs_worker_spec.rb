@@ -178,17 +178,7 @@ RSpec.describe StuckCiJobsWorker do
     context 'when job was updated in less than 1 hour ago' do
       let(:updated_at) { 30.minutes.ago }
 
-      context 'when created_at is the same as updated_at' do
-        let(:created_at) { 30.minutes.ago }
-
-        it_behaves_like 'job is unchanged'
-      end
-
-      context 'when created_at is before updated_at' do
-        let(:created_at) { 30.minutes.ago }
-
-        it_behaves_like 'job is unchanged'
-      end
+      it_behaves_like 'job is unchanged'
     end
   end
 
