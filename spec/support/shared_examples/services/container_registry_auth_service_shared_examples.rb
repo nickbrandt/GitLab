@@ -341,8 +341,8 @@ RSpec.shared_examples 'a container registry auth service' do
       end
     end
 
-    context 'for public project' do
-      let_it_be(:project) { create(:project, :public) }
+    context 'for public project with container_registry ENABLED' do
+      let_it_be(:project) { create(:project, :public, :container_registry_enabled) }
 
       context 'allow anyone to pull images' do
         let(:current_params) do
@@ -390,8 +390,21 @@ RSpec.shared_examples 'a container registry auth service' do
       end
     end
 
-    context 'for internal project' do
-      let_it_be(:project) { create(:project, :internal) }
+    context 'for public project with container_registry PRIVATE' do
+      let_it_be(:project) { create(:project, :public, :container_registry_private) }
+
+      context 'allow anyone to pull images' do
+        let(:current_params) do
+          { scopes: ["repository:#{project.full_path}:pull"] }
+        end
+
+        it_behaves_like 'an inaccessible'
+        it_behaves_like 'not a container repository factory'
+      end
+    end
+
+    context 'for internal project with container_registry ENABLED' do
+      let_it_be(:project) { create(:project, :internal, :container_registry_enabled) }
 
       context 'for internal user' do
         context 'allow anyone to pull images' do
@@ -459,6 +472,21 @@ RSpec.shared_examples 'a container registry auth service' do
 
           let(:current_params) do
             { scopes: ["repository:#{project.full_path}:delete"] }
+          end
+
+          it_behaves_like 'an inaccessible'
+          it_behaves_like 'not a container repository factory'
+        end
+      end
+    end
+
+    context 'for internal project with container_registry PRIVATE' do
+      let_it_be(:project) { create(:project, :internal, :container_registry_private) }
+
+      context 'for internal user' do
+        context 'allow anyone to pull images' do
+          let(:current_params) do
+            { scopes: ["repository:#{project.full_path}:pull"] }
           end
 
           it_behaves_like 'an inaccessible'
@@ -655,11 +683,7 @@ RSpec.shared_examples 'a container registry auth service' do
     end
 
     context 'for project without container registry' do
-      let_it_be(:project) { create(:project, :public, container_registry_enabled: false) }
-
-      before do
-        project.update!(container_registry_enabled: false)
-      end
+      let!(:project) { create(:project, :public, :container_registry_disabled) }
 
       context 'disallow when pulling' do
         let(:current_params) do
@@ -697,7 +721,7 @@ RSpec.shared_examples 'a container registry auth service' do
   end
 
   context 'support for multiple scopes' do
-    let_it_be(:internal_project) { create(:project, :internal) }
+    let_it_be(:internal_project) { create(:project, :internal, :container_registry_enabled) }
     let_it_be(:private_project) { create(:project, :private) }
 
     let(:current_params) do
@@ -776,8 +800,8 @@ RSpec.shared_examples 'a container registry auth service' do
       it_behaves_like 'a forbidden'
     end
 
-    context 'for public project' do
-      let_it_be(:project) { create(:project, :public) }
+    context 'for public project with container registry ENABLED' do
+      let_it_be(:project) { create(:project, :public, :container_registry_enabled) }
 
       context 'when pulling and pushing' do
         let(:current_params) do
@@ -791,6 +815,19 @@ RSpec.shared_examples 'a container registry auth service' do
       context 'when pushing' do
         let(:current_params) do
           { scopes: ["repository:#{project.full_path}:push"] }
+        end
+
+        it_behaves_like 'a forbidden'
+        it_behaves_like 'not a container repository factory'
+      end
+    end
+
+    context 'for public project with container registry PRIVATE' do
+      let_it_be(:project) { create(:project, :public, :container_registry_private) }
+
+      context 'when pulling and pushing' do
+        let(:current_params) do
+          { scopes: ["repository:#{project.full_path}:pull,push"] }
         end
 
         it_behaves_like 'a forbidden'
@@ -899,11 +936,21 @@ RSpec.shared_examples 'a container registry auth service' do
         end
       end
 
-      context 'for public project' do
-        let_it_be(:project) { create(:project, :public) }
+      context 'for public project with container registry ENABLED' do
+        let_it_be(:project) { create(:project, :public, :container_registry_enabled) }
 
         context 'when pulling' do
           it_behaves_like 'a pullable'
+        end
+
+        it_behaves_like 'unable to login'
+      end
+
+      context 'for public project with container registry PRIVATE' do
+        let_it_be(:project) { create(:project, :public, :container_registry_private) }
+
+        context 'when pulling' do
+          it_behaves_like 'an inaccessible'
         end
 
         it_behaves_like 'unable to login'
@@ -940,11 +987,19 @@ RSpec.shared_examples 'a container registry auth service' do
     context 'when deploy token is not related to the project' do
       let_it_be(:current_user) { create(:deploy_token, read_registry: false) }
 
-      context 'for public project' do
-        let_it_be(:project) { create(:project, :public) }
+      context 'for public project with container registry ENABLED' do
+        let_it_be(:project) { create(:project, :public, :container_registry_enabled) }
 
         context 'when pulling' do
           it_behaves_like 'a pullable'
+        end
+      end
+
+      context 'for public project with container registry PRIVATE' do
+        let_it_be(:project) { create(:project, :public, :container_registry_private) }
+
+        context 'when pulling' do
+          it_behaves_like 'an inaccessible'
         end
       end
 
@@ -968,10 +1023,16 @@ RSpec.shared_examples 'a container registry auth service' do
     context 'when deploy token has been revoked' do
       let(:current_user) { create(:deploy_token, :revoked, projects: [project]) }
 
-      context 'for public project' do
-        let_it_be(:project) { create(:project, :public) }
+      context 'for public project with container registry ENABLED' do
+        let_it_be(:project) { create(:project, :public, :container_registry_enabled) }
 
         it_behaves_like 'a pullable'
+      end
+
+      context 'for public project with container registry PRIVATE' do
+        let_it_be(:project) { create(:project, :public, :container_registry_private) }
+
+        it_behaves_like 'an inaccessible'
       end
 
       context 'for internal project' do
