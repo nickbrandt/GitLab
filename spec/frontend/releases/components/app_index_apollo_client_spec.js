@@ -160,7 +160,7 @@ describe('app_index_apollo_client.vue', () => {
     expectNoFlashMessage();
     expectNewReleaseButton();
     expectReleases(0);
-    expectPagination();
+    expectNoPagination();
   });
 
   describe('when an error occurs while loading data', () => {
@@ -176,9 +176,23 @@ describe('app_index_apollo_client.vue', () => {
     expectNoPagination();
   });
 
-  describe('when the data has successfully loaded', () => {
+  describe('when the data has successfully loaded with a single page of results', () => {
     beforeEach(() => {
       createComponent();
+    });
+
+    expectNoLoadingIndicator();
+    expectNoEmptyState();
+    expectNoFlashMessage();
+    expectNewReleaseButton();
+    expectReleases(originalAllReleasesQueryResponse.data.project.releases.nodes.length);
+    expectNoPagination();
+  });
+
+  describe('when the data has successfully loaded with multiple pages of results', () => {
+    beforeEach(() => {
+      allReleasesQueryResponse.data.project.releases.pageInfo.hasNextPage = true;
+      createComponent(Promise.resolve(allReleasesQueryResponse));
     });
 
     expectNoLoadingIndicator();
@@ -260,13 +274,16 @@ describe('app_index_apollo_client.vue', () => {
   });
 
   describe('pagination', () => {
-    it('requeries the GraphQL endpoint when a pagination button is clicked', async () => {
+    beforeEach(async () => {
       mockQueryParams = { before };
 
-      createComponent();
+      allReleasesQueryResponse.data.project.releases.pageInfo.hasNextPage = true;
+      createComponent(Promise.resolve(allReleasesQueryResponse));
 
       await wrapper.vm.$nextTick();
+    });
 
+    it('requeries the GraphQL endpoint when a pagination button is clicked', async () => {
       expect(allReleasesQueryMock.mock.calls).toEqual([[expect.objectContaining({ before })]]);
 
       mockQueryParams = { after };

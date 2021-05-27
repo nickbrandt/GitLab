@@ -13,11 +13,6 @@ export default {
       validator: (info) => isBoolean(info.hasPreviousPage) && isBoolean(info.hasNextPage),
     },
   },
-  computed: {
-    showPagination() {
-      return this.pageInfo.hasPreviousPage || this.pageInfo.hasNextPage;
-    },
-  },
   methods: {
     onPrev(before) {
       historyPushState(buildUrlWithCurrentLocation(`?before=${before}`));
@@ -31,7 +26,6 @@ export default {
 <template>
   <div class="gl-display-flex gl-justify-content-center">
     <gl-keyset-pagination
-      v-if="showPagination"
       v-bind="pageInfo"
       v-on="$listeners"
       @prev="onPrev($event)"

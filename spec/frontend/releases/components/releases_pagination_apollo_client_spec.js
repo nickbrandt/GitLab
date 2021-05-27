@@ -1,4 +1,3 @@
-import { GlKeysetPagination } from '@gitlab/ui';
 import { mountExtended } from 'helpers/vue_test_utils_helper';
 import { historyPushState } from '~/lib/utils/common_utils';
 import ReleasesPaginationApolloClient from '~/releases/components/releases_pagination_apollo_client.vue';
@@ -62,43 +61,30 @@ describe('releases_pagination_apollo_client.vue', () => {
     endCursor,
   };
 
-  const findGlKeysetPagination = () => wrapper.findComponent(GlKeysetPagination);
   const findPrevButton = () => wrapper.findByTestId('prevButton');
   const findNextButton = () => wrapper.findByTestId('nextButton');
 
   describe.each`
-    description                                             | pageInfo               | paginationRendered | prevEnabled | nextEnabled
-    ${'when there is only one page of results'}             | ${singlePageInfo}      | ${false}           | ${'N/A'}    | ${'N/A'}
-    ${'when there is a next page, but not a previous page'} | ${onlyNextPageInfo}    | ${true}            | ${false}    | ${true}
-    ${'when there is a previous page, but not a next page'} | ${onlyPrevPageInfo}    | ${true}            | ${true}     | ${false}
-    ${'when there is both a previous and next page'}        | ${prevAndNextPageInfo} | ${true}            | ${true}     | ${true}
-  `(
-    'component states',
-    ({ description, pageInfo, paginationRendered, prevEnabled, nextEnabled }) => {
-      describe(description, () => {
-        beforeEach(() => {
-          createComponent(pageInfo);
-        });
-
-        it(`does ${paginationRendered ? '' : 'not '}render a GlKeysetPagination`, () => {
-          expect(findGlKeysetPagination().exists()).toBe(paginationRendered);
-        });
-
-        // The remaining tests don't apply if the GlKeysetPagination component is not rendered
-        if (!paginationRendered) {
-          return;
-        }
-
-        it(`renders the "Prev" button as ${prevEnabled ? 'enabled' : 'disabled'}`, () => {
-          expect(findPrevButton().attributes().disabled).toBe(prevEnabled ? undefined : 'disabled');
-        });
-
-        it(`renders the "Next" button as ${nextEnabled ? 'enabled' : 'disabled'}`, () => {
-          expect(findNextButton().attributes().disabled).toBe(nextEnabled ? undefined : 'disabled');
-        });
+    description                                             | pageInfo               | prevEnabled | nextEnabled
+    ${'when there is only one page of results'}             | ${singlePageInfo}      | ${false}    | ${false}
+    ${'when there is a next page, but not a previous page'} | ${onlyNextPageInfo}    | ${false}    | ${true}
+    ${'when there is a previous page, but not a next page'} | ${onlyPrevPageInfo}    | ${true}     | ${false}
+    ${'when there is both a previous and next page'}        | ${prevAndNextPageInfo} | ${true}     | ${true}
+  `('component states', ({ description, pageInfo, prevEnabled, nextEnabled }) => {
+    describe(description, () => {
+      beforeEach(() => {
+        createComponent(pageInfo);
       });
-    },
-  );
+
+      it(`renders the "Prev" button as ${prevEnabled ? 'enabled' : 'disabled'}`, () => {
+        expect(findPrevButton().attributes().disabled).toBe(prevEnabled ? undefined : 'disabled');
+      });
+
+      it(`renders the "Next" button as ${nextEnabled ? 'enabled' : 'disabled'}`, () => {
+        expect(findNextButton().attributes().disabled).toBe(nextEnabled ? undefined : 'disabled');
+      });
+    });
+  });
 
   describe('button behavior', () => {
     beforeEach(() => {

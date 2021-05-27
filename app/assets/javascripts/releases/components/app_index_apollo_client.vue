@@ -108,7 +108,11 @@ export default {
       return this.isLoading && !this.hasError;
     },
     shouldRenderPagination() {
-      return !this.isLoading && !this.hasError;
+      return (
+        !this.isLoading &&
+        !this.hasError &&
+        (this.pageInfo.hasPreviousPage || this.pageInfo.hasNextPage)
+      );
     },
   },
   created() {
