@@ -3,6 +3,16 @@
 // Needed while we serve both *_base and *_variant stylesheets
 // TODO: These have to be removed during the feature flag rollout
 //
+&.gl-dark .nav-sidebar li.active {
+  box-shadow: none;
+}
+
+&.gl-dark .nav-sidebar li a,
+.toggle-sidebar-button .collapse-text,
+.toggle-sidebar-button .icon-chevron-double-lg-left,
+.toggle-sidebar-button .icon-chevron-double-lg-right {
+  color: $gray-darkest;
+}
 
 .nav-sidebar {
   box-shadow: none;
