@@ -9,12 +9,17 @@ RSpec.describe StuckCiJobsWorker do
   let!(:job) { create :ci_build, runner: runner }
   let(:worker_lease_key) { StuckCiJobsWorker::EXCLUSIVE_LEASE_KEY }
   let(:worker_lease_uuid) { SecureRandom.uuid }
+  let(:created_at) { }
+  let(:updated_at) { }
 
   subject(:worker) { described_class.new }
 
   before do
     stub_exclusive_lease(worker_lease_key, worker_lease_uuid)
-    job.update!(status: status, updated_at: updated_at)
+    job_attributes = { status: status }
+    job_attributes[:created_at] = created_at if created_at
+    job_attributes[:updated_at] = updated_at if updated_at
+    job.update!(job_attributes)
   end
 
   shared_examples 'job is dropped' do
@@ -63,22 +68,52 @@ RSpec.describe StuckCiJobsWorker do
         allow_any_instance_of(Ci::Build).to receive(:stuck?).and_return(false)
       end
 
-      context 'when job was not updated for more than 1 day ago' do
-        let(:updated_at) { 2.days.ago }
+      context 'when job was updated_at more than 1 day ago' do
+        let(:updated_at) { 1.5.days.ago }
 
-        it_behaves_like 'job is dropped'
+        context 'when created_at is the same as updated_at' do
+          let(:created_at) { 1.5.days.ago }
+
+          it_behaves_like 'job is dropped'
+        end
+
+        context 'when created_at is before updated_at' do
+          let(:created_at) { 3.days.ago }
+
+          it_behaves_like 'job is dropped'
+        end
       end
 
-      context 'when job was updated in less than 1 day ago' do
+      context 'when job was updated less than 1 day ago' do
         let(:updated_at) { 6.hours.ago }
 
-        it_behaves_like 'job is unchanged'
+        context 'when created_at is the same as updated_at' do
+          let(:created_at) { 1.5.days.ago }
+
+          it_behaves_like 'job is unchanged'
+        end
+
+        context 'when created_at is before updated_at' do
+          let(:created_at) { 3.days.ago }
+
+          it_behaves_like 'job is unchanged'
+        end
       end
 
-      context 'when job was not updated for more than 1 hour ago' do
+      context 'when job was updated more than 1 hour ago' do
         let(:updated_at) { 2.hours.ago }
 
-        it_behaves_like 'job is unchanged'
+        context 'when created_at is the same as updated_at' do
+          let(:created_at) { 2.hours.ago }
+
+          it_behaves_like 'job is unchanged'
+        end
+
+        context 'when created_at is before updated_at' do
+          let(:created_at) { 3.days.ago }
+
+          it_behaves_like 'job is unchanged'
+        end
       end
     end
 
@@ -87,17 +122,36 @@ RSpec.describe StuckCiJobsWorker do
         allow_any_instance_of(Ci::Build).to receive(:stuck?).and_return(true)
       end
 
-      context 'when job was not updated for more than 1 hour ago' do
-        let(:updated_at) { 2.hours.ago }
+      context 'when job was updated_at more than 1 hour ago' do
+        let(:updated_at) { 1.5.hours.ago }
 
-        it_behaves_like 'job is dropped'
+        context 'when created_at is the same as updated_at' do
+          let(:created_at) { 1.5.hours.ago }
+
+          it_behaves_like 'job is dropped'
+        end
+
+        context 'when created_at is before updated_at' do
+          let(:created_at) { 3.days.ago }
+
+          it_behaves_like 'job is dropped'
+        end
       end
 
-      context 'when job was updated in less than 1
-       hour ago' do
+      context 'when job was updated in less than 1 hour ago' do
         let(:updated_at) { 30.minutes.ago }
 
-        it_behaves_like 'job is unchanged'
+        context 'when created_at is the same as updated_at' do
+          let(:created_at) { 30.minutes.ago }
+
+          it_behaves_like 'job is unchanged'
+        end
+
+        context 'when created_at is before updated_at' do
+          let(:created_at) { 2.days.ago }
+
+          it_behaves_like 'job is unchanged'
+        end
       end
     end
   end
@@ -108,13 +162,33 @@ RSpec.describe StuckCiJobsWorker do
     context 'when job was not updated for more than 1 hour ago' do
       let(:updated_at) { 2.hours.ago }
 
-      it_behaves_like 'job is dropped'
+      context 'when created_at is the same as updated_at' do
+        let(:created_at) { 2.hours.ago }
+
+        it_behaves_like 'job is dropped'
+      end
+
+      context 'when created_at is before updated_at' do
+        let(:created_at) { 3.days.ago }
+
+        it_behaves_like 'job is dropped'
+      end
     end
 
     context 'when job was updated in less than 1 hour ago' do
       let(:updated_at) { 30.minutes.ago }
 
-      it_behaves_like 'job is unchanged'
+      context 'when created_at is the same as updated_at' do
+        let(:created_at) { 30.minutes.ago }
+
+        it_behaves_like 'job is unchanged'
+      end
+
+      context 'when created_at is before updated_at' do
+        let(:created_at) { 30.minutes.ago }
+
+        it_behaves_like 'job is unchanged'
+      end
     end
   end
 
@@ -123,7 +197,17 @@ RSpec.describe StuckCiJobsWorker do
       let(:status) { status }
       let(:updated_at) { 2.days.ago }
 
-      it_behaves_like 'job is unchanged'
+      context 'when created_at is the same as updated_at' do
+        let(:created_at) { 2.days.ago }
+
+        it_behaves_like 'job is unchanged'
+      end
+
+      context 'when created_at is before updated_at' do
+        let(:created_at) { 3.days.ago }
+
+        it_behaves_like 'job is unchanged'
+      end
     end
   end
 
