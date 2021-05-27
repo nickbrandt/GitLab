@@ -12,6 +12,10 @@ class CopyPendingBuildsToPendingBuildsTable < ActiveRecord::Migration[6.0]
           FROM ci_builds
           WHERE status = 'pending'
             AND type = 'Ci::Build'
+            AND NOT EXISTS (
+              SELECT 1 FROM ci_pending_builds
+                WHERE ci_pending_builds.build_id = ci_builds.id
+            )
           FOR UPDATE
         )
         INSERT INTO ci_pending_builds (build_id, project_id)
