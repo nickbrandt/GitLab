@@ -270,6 +270,33 @@ RSpec.describe Security::FindingsFinder do
 
           it { is_expected.to match_array(expected_fingerprints) }
         end
+
+        context 'when a build has more than one security report artifacts' do
+          let(:report_types) { :secret_detection }
+          let(:expected_fingerprints) { %w[0cac4e1f5f407998454dd6af2052d548bad058f5] }
+
+          before do
+            scan = create(:security_scan, scan_type: :secret_detection, build: build_sast)
+            report = create(:ci_reports_security_report, pipeline: pipeline, type: :secret_detection)
+            artifact = create(:ee_ci_job_artifact, :secret_detection, job: build_sast)
+            report_content = File.read(artifact.file.path)
+
+            Gitlab::Ci::Parsers::Security::SecretDetection.parse!(report_content, report)
+
+            report.findings.each_with_index do |finding, index|
+              create(:security_finding,
+                     severity: finding.severity,
+                     confidence: finding.confidence,
+                     project_fingerprint: finding.project_fingerprint,
+                     uuid: finding.uuid,
+                     deduplicated: true,
+                     position: index,
+                     scan: scan)
+            end
+          end
+
+          it { is_expected.to match_array(expected_fingerprints) }
+        end
       end
     end
   end
