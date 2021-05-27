@@ -157,12 +157,10 @@ RSpec.describe Sidebars::Menu do
 
       context 'when menu has renderable items' do
         before do
-          allow(menu).to receive(:has_renderable_items?).and_return(true)
+          menu.add_item(Sidebars::MenuItem.new(title: 'foo1', link: 'foo1', active_routes: { path: 'bar' }))
         end
 
         it 'contains the special class' do
-          menu.add_item(Sidebars::MenuItem.new(title: 'foo1', link: 'foo1', active_routes: { path: 'bar' }))
-
           expect(menu.container_html_options[:class]).to eq 'has-sub-items'
         end
 
@@ -176,10 +174,6 @@ RSpec.describe Sidebars::Menu do
       end
 
       context 'when menu does not have renderable items' do
-        before do
-          allow(menu).to receive(:has_renderable_items?).and_return(false)
-        end
-
         it 'does not contain the special class' do
           expect(menu.container_html_options[:class]).to be_nil
         end
