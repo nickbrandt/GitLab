@@ -6,7 +6,7 @@ disqus_identifier: 'https://docs.gitlab.com/ee/user/project/pipelines/job_artifa
 type: reference, howto
 ---
 
-# Job artifacts
+# Job artifacts **(FREE)**
 
 > Introduced in [GitLab 12.4](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/16675), artifacts in internal and private projects can be previewed when [GitLab Pages access control](../../administration/pages/index.md#access-control) is enabled.
 

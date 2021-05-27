@@ -5,7 +5,7 @@ info: To determine the technical writer assigned to the Stage/Group associated w
 type: reference, howto
 ---
 
-# Pipeline artifacts
+# Pipeline artifacts **(FREE)**
 
 Pipeline artifacts are files created by GitLab after a pipeline finishes. These are different than [job artifacts](job_artifacts.md) because they are not explicitly managed by the `.gitlab-ci.yml` definitions.
 
