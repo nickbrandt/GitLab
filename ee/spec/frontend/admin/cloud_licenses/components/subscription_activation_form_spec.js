@@ -8,6 +8,7 @@ import SubscriptionActivationForm, {
 import {
   CONNECTIVITY_ERROR,
   fieldRequiredMessage,
+  INVALID_CODE_ERROR,
   subscriptionQueries,
 } from 'ee/pages/admin/cloud_licenses/constants';
 import createMockApollo from 'helpers/mock_apollo_helper';
@@ -175,6 +176,24 @@ describe('CloudLicenseApp', () => {
       it('emits an failure event with a connectivity error payload', () => {
         expect(wrapper.emitted(SUBSCRIPTION_ACTIVATION_FAILURE_EVENT)).toEqual([
           [CONNECTIVITY_ERROR],
+        ]);
+      });
+    });
+
+    describe('when the mutation is not successful with invalid activation code error', () => {
+      const mutationMock = jest
+        .fn()
+        .mockResolvedValue(activateLicenseMutationResponse.INVALID_CODE_ERROR);
+      beforeEach(async () => {
+        createComponentWithApollo({ mutationMock });
+        await findActivationCodeInput().vm.$emit('input', fakeActivationCode);
+        await findAgreementCheckbox().vm.$emit('input', true);
+        findActivateSubscriptionForm().vm.$emit('submit', createFakeEvent());
+      });
+
+      it('emits an failure event with a connectivity error payload', () => {
+        expect(wrapper.emitted(SUBSCRIPTION_ACTIVATION_FAILURE_EVENT)).toEqual([
+          [INVALID_CODE_ERROR],
         ]);
       });
     });
