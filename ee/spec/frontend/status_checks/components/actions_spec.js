@@ -34,19 +34,19 @@ describe('Status checks actions', () => {
   const findEditBtn = () => wrapper.findByTestId('edit-btn');
   const findRemoveBtn = () => wrapper.findByTestId('remove-btn');
 
-  describe('Edit button', () => {
-    it('renders the edit button', () => {
-      expect(findEditBtn().text()).toBe('Edit');
+  describe.each`
+    text           | button           | event
+    ${'Edit'}      | ${findEditBtn}   | ${'open-update-modal'}
+    ${'Remove...'} | ${findRemoveBtn} | ${'open-delete-modal'}
+  `('$text button', ({ text, button, event }) => {
+    it(`renders the button text as '${text}'`, () => {
+      expect(button().text()).toBe(text);
     });
 
-    it('sends the status check to the update event', () => {
-      findEditBtn().trigger('click');
+    it(`sends the status check with the '${event}' event`, () => {
+      button().trigger('click');
 
-      expect(wrapper.emitted('open-update-modal')[0][0]).toStrictEqual(statusCheck);
+      expect(wrapper.emitted(event)[0][0]).toStrictEqual(statusCheck);
     });
-  });
-
-  it('renders the remove button', () => {
-    expect(findRemoveBtn().text()).toBe('Remove...');
   });
 });
