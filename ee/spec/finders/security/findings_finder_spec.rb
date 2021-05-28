@@ -4,10 +4,10 @@ require 'spec_helper'
 
 RSpec.describe Security::FindingsFinder do
   let_it_be(:pipeline) { create(:ci_pipeline) }
-  let_it_be(:build_ds) { create(:ci_build, :success, name: 'dependency_scanning', pipeline: pipeline) }
-  let_it_be(:build_sast) { create(:ci_build, :success, name: 'sast', pipeline: pipeline) }
-  let_it_be(:artifact_ds) { create(:ee_ci_job_artifact, :dependency_scanning, job: build_ds) }
-  let_it_be(:artifact_sast) { create(:ee_ci_job_artifact, :sast, job: build_sast) }
+  let_it_be(:build_1) { create(:ci_build, :success, name: 'dependency_scanning', pipeline: pipeline) }
+  let_it_be(:build_2) { create(:ci_build, :success, name: 'sast', pipeline: pipeline) }
+  let_it_be(:artifact_ds) { create(:ee_ci_job_artifact, :dependency_scanning, job: build_1) }
+  let_it_be(:artifact_sast) { create(:ee_ci_job_artifact, :sast, job: build_2) }
   let_it_be(:report_ds) { create(:ci_reports_security_report, pipeline: pipeline, type: :dependency_scanning) }
   let_it_be(:report_sast) { create(:ci_reports_security_report, pipeline: pipeline, type: :sast) }
 
@@ -273,17 +273,17 @@ RSpec.describe Security::FindingsFinder do
 
         context 'when a build has more than one security report artifacts' do
           let(:report_types) { :secret_detection }
-          let(:expected_fingerprints) { %w[0cac4e1f5f407998454dd6af2052d548bad058f5] }
+          let(:secret_detection_report) { create(:ci_reports_security_report, pipeline: pipeline, type: :secret_detection) }
+          let(:expected_fingerprints) { secret_detection_report.findings.map(&:project_fingerprint) }
 
           before do
-            scan = create(:security_scan, scan_type: :secret_detection, build: build_sast)
-            report = create(:ci_reports_security_report, pipeline: pipeline, type: :secret_detection)
-            artifact = create(:ee_ci_job_artifact, :secret_detection, job: build_sast)
+            scan = create(:security_scan, scan_type: :secret_detection, build: build_2)
+            artifact = create(:ee_ci_job_artifact, :secret_detection, job: build_2)
             report_content = File.read(artifact.file.path)
 
-            Gitlab::Ci::Parsers::Security::SecretDetection.parse!(report_content, report)
+            Gitlab::Ci::Parsers::Security::SecretDetection.parse!(report_content, secret_detection_report)
 
-            report.findings.each_with_index do |finding, index|
+            secret_detection_report.findings.each_with_index do |finding, index|
               create(:security_finding,
                      severity: finding.severity,
                      confidence: finding.confidence,
