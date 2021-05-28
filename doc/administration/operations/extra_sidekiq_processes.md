@@ -117,7 +117,7 @@ you list:
 > - [Renamed from `experimental_queue_selector` to `queue_selector`](https://gitlab.com/gitlab-com/gl-infra/scalability/-/issues/147) in GitLab 13.6.
 
 In addition to selecting queues by name, as above, the `queue_selector` option
-allows queue groups to be selected in a more general way using [worker matching
+allows queue groups to be selected in a more general way using a [worker matching
 query](extra_sidekiq_routing.md#worker-matching-query). After `queue_selector`
 is set, all `queue_groups` must follow the aforementioned syntax.
 

@@ -7,7 +7,7 @@ info: To determine the technical writer assigned to the Stage/Group associated w
 # Queue routing rules **(FREE SELF)**
 
 When the number of Sidekiq jobs increases to a certain scale, the system faces
-some scalability issues. One of them is the length of the queue tends to get
+some scalability issues. One of them is that the length of the queue tends to get
 longer. High-urgency jobs have to wait longer until other less urgent jobs
 finish. This head-of-line blocking situation may eventually affect the
 responsiveness of the system, especially critical actions. In another scenario,
@@ -55,21 +55,21 @@ sidekiq['routing_rules'] = [
 ```
 
 The routing rules list is an order-matter array of tuples of query and
-corresponding queue.
+corresponding queue:
 
-- The query is following [worker matching query](#worker-matching-query) syntax.
-
-- The queue_name must be a valid Sidekiq queue name. If the queue name
-is nil, or an empty string, the worker is routed to the queue generated
-by the name of the worker instead.
+- The query is following a [worker matching query](#worker-matching-query) syntax.
+- The `<queue_name>` must be a valid Sidekiq queue name. If the queue name
+  is `nil`, or an empty string, the worker is routed to the queue generated
+  by the name of the worker instead.
 
 The query supports wildcard matching `*`, which matches all workers. As a
 result, the wildcard query must stay at the end of the list or the rules after it
 are ignored.
 
-> Important: Mixing queue routing rules and queue selectors requires care to
-> ensure all jobs that are scheduled and picked up by appropriate Sidekiq
-> workers
+NOTE:
+Mixing queue routing rules and queue selectors requires care to
+ensure all jobs that are scheduled and picked up by appropriate Sidekiq
+workers.
 
 ## Worker matching query
 
@@ -84,7 +84,7 @@ components:
 
 ### Available attributes
 
-- [Introduced](https://gitlab.com/gitlab-com/gl-infra/scalability/-/issues/261) in GitLab 13.1, `tags`.
+> [Introduced](https://gitlab.com/gitlab-com/gl-infra/scalability/-/issues/261) in GitLab 13.1 (`tags`).
 
 Queue matching query works upon the worker attributes, described in [Sidekiq
 style guide](../../development/sidekiq_style_guide.md). We support querying
@@ -122,10 +122,10 @@ that have tags `a`, `b`, or both. `tags!=a,b` selects queues that have
 neither of those tags.
 
 The attributes of each worker are hard-coded in the source code. For
-convenience, we generate [list of all available attributes in
-FOSS](https://gitlab.com/gitlab-org/gitlab/-/blob/master/app/workers/all_queues.yml)
-and [list of all available attributes in
-EE](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/app/workers/all_queues.yml).
+convenience, we generate a [list of all available attributes in
+GitLab Community Edition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/app/workers/all_queues.yml)
+and a [list of all available attributes in
+GitLab Enterprise Edition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/app/workers/all_queues.yml).
 
 ### Available operators
 
@@ -154,25 +154,6 @@ have higher precedence than OR.
 [In GitLab 12.9](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/26594) and
 later, as with the standard queue group syntax above, a single `*` as the
 entire queue group selects all queues.
-
-### Example queries
-
-```plaintext
-# Match workers having memory resource boundary
-resource_boundary=memory
-
-# Match low-urgency cpu-intensive workers
-resource_boundary=cpu&urgency=default,low
-
-# Match high-urgency cpu-intensive workers but not the ones require disk IO
-resource_boundary=cpu&urgency=high&tags!=requires_disk_io
-
-# Match throttled workers belong to database feature category
-feature_category=database&urgency=throttled
-
-# Match default and mailers queues
-queue=default|queue=mailers
-```
 
 ### Migration
 
