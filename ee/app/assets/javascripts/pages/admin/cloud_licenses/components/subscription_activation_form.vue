@@ -136,7 +136,7 @@ export default {
         </label>
         <gl-form-input
           id="activation-code-group"
-          v-model="form.fields.activationCode.value"
+          v-model.trim="form.fields.activationCode.value"
           v-validation:[form.showValidation]
           :disabled="isLoading"
           :placeholder="$options.i18n.pasteActivationCode"
