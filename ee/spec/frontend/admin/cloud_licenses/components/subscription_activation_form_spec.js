@@ -23,7 +23,8 @@ localVue.use(VueApollo);
 describe('CloudLicenseApp', () => {
   let wrapper;
 
-  const fakeActivationCode = 'gEg959hDCkvM2d4Der5RyktT';
+  const fakeActivationCode = 'gEg959hDCkvM2d4Der5RyktT ';
+  const fakeActivationCodeTrimmed = 'gEg959hDCkvM2d4Der5RyktT';
 
   const createMockApolloProvider = (resolverMock) => {
     localVue.use(VueApollo);
@@ -134,7 +135,7 @@ describe('CloudLicenseApp', () => {
       it('calls mutate with the correct variables', () => {
         expect(mutationMock).toHaveBeenCalledWith({
           gitlabSubscriptionActivateInput: {
-            activationCode: fakeActivationCode,
+            activationCode: fakeActivationCodeTrimmed,
           },
         });
       });
