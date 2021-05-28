@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 RSpec.describe Vulnerabilities::Statistics::AdjustmentService do
-  let_it_be(:project) { create(:project) }
+  let_it_be_with_reload(:project) { create(:project) }
 
   describe '.execute' do
     let(:project_ids) { [1, 2, 3] }
@@ -23,7 +23,6 @@ RSpec.describe Vulnerabilities::Statistics::AdjustmentService do
   end
 
   describe '#execute' do
-    let(:project) { create(:project) }
     let(:statistics) { project.vulnerability_statistic.reload.as_json(only: expected_statistics.keys) }
     let(:project_ids) { [project.id] }
 
