@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# please require all dependencies below:
+# We need this require for MailRoom
 require_relative 'wrapper' unless defined?(::Gitlab::Redis::Wrapper)
 
 module Gitlab

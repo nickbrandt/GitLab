@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-# please require all dependencies below:
-require_relative 'wrapper' unless defined?(::Gitlab::Redis::Wrapper)
-
 module Gitlab
   module Redis
     class SharedState < ::Gitlab::Redis::Wrapper
