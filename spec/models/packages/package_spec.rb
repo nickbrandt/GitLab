@@ -404,7 +404,8 @@ RSpec.describe Packages::Package, type: :model do
         it { is_expected.not_to allow_value(nil).for(:version) }
         it { is_expected.not_to allow_value('').for(:version) }
         it { is_expected.to allow_value('v1.2.3').for(:version) }
-        it { is_expected.not_to allow_value('1.2.3').for(:version) }
+        it { is_expected.to allow_value('1.2.3').for(:version) }
+        it { is_expected.not_to allow_value('v1.2').for(:version) }
       end
 
       it_behaves_like 'validating version to be SemVer compliant for', :npm_package
