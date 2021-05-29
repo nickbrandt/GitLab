@@ -20,7 +20,11 @@ class ClearSharedRunnersMinutesWorker # rubocop:disable Scalability/IdempotentWo
       start_id = Namespace.minimum(:id)
       last_id = Namespace.maximum(:id)
 
-      execution_offset = TIME_SPREAD / ((last_id - start_id) / BATCH_SIZE)
+      # Uses float division to avoid a ZeroDivisionError
+      # when namespace ID range is lower than BATCH_SIZE
+      # See: https://gitlab.com/gitlab-org/gitlab/-/issues/330068
+      batches = (last_id - start_id).fdiv(BATCH_SIZE)
+      execution_offset = (TIME_SPREAD / batches).to_i
 
       (start_id..last_id).step(BATCH_SIZE).with_index do |batch_start_id, batch_index|
         batch_end_id = batch_start_id + BATCH_SIZE - 1

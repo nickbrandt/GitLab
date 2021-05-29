@@ -133,7 +133,7 @@ RSpec.describe ClearSharedRunnersMinutesWorker do
       end
     end
 
-    context 'when ci_parallel_minutes_reset feature flag is enabled' do
+    context 'when ci_parallel_minutes_reset feature flag is enabled, with batch size lower than namespace count' do
       subject { worker.perform }
 
       before do
@@ -143,6 +143,7 @@ RSpec.describe ClearSharedRunnersMinutesWorker do
           create(:namespace, id: id)
         end
 
+        # Test with a batch size lower than count of namespaces
         stub_const("#{described_class}::BATCH_SIZE", 3)
       end
 
@@ -153,6 +154,26 @@ RSpec.describe ClearSharedRunnersMinutesWorker do
         expect(Ci::BatchResetMinutesWorker).to receive(:perform_in).with(14400.seconds, 8, 10)
         expect(Ci::BatchResetMinutesWorker).to receive(:perform_in).with(21600.seconds, 11, 13)
         expect(Ci::BatchResetMinutesWorker).to receive(:perform_in).with(28800.seconds, 14, 16)
+
+        subject
+      end
+    end
+
+    context 'when ci_parallel_minutes_reset feature flag is enabled, with batch size higher than namespace count' do
+      subject { worker.perform }
+
+      before do
+        stub_feature_flags(ci_parallel_minutes_reset: true)
+        [2, 3, 4, 5, 7, 8, 10, 14].each do |id|
+          create(:namespace, id: id)
+        end
+
+        # Use the default BATCH_SIZE (100_000)
+      end
+
+      it 'runs the worker in a single batch', :aggregate_failures do
+        # Runs a single batch, immediately
+        expect(Ci::BatchResetMinutesWorker).to receive(:perform_in).with(0.seconds, 2, 100_001)
 
         subject
       end
