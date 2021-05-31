@@ -13,10 +13,11 @@ localVue.use(VueApollo);
 describe('Agents', () => {
   let wrapper;
 
-  const propsData = {
+  const provide = {
     emptyStateImage: '/path/to/image',
     defaultBranchName: 'default',
     projectPath: 'path/to/project',
+    kasAddress: 'kas.example.internal',
   };
 
   const createWrapper = ({ agents = [], pageInfo = null, trees = [] }) => {
@@ -36,7 +37,7 @@ describe('Agents', () => {
     wrapper = shallowMount(Agents, {
       localVue,
       apolloProvider,
-      propsData,
+      provide,
     });
 
     return wrapper.vm.$nextTick();
@@ -138,10 +139,6 @@ describe('Agents', () => {
       expect(findAgentTable().exists()).toBe(false);
       expect(findEmptyState().exists()).toBe(true);
     });
-
-    it('should pass the correct project path to empty state component', () => {
-      expect(findEmptyState().props('projectPath')).toEqual('path/to/project');
-    });
   });
 
   describe('when the agent configurations are present', () => {
@@ -184,7 +181,7 @@ describe('Agents', () => {
     };
 
     beforeEach(() => {
-      wrapper = shallowMount(Agents, { mocks, propsData });
+      wrapper = shallowMount(Agents, { mocks, provide });
 
       return wrapper.vm.$nextTick();
     });

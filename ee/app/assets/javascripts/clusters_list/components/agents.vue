@@ -4,8 +4,18 @@ import { MAX_LIST_COUNT } from '../constants';
 import getAgentsQuery from '../graphql/queries/get_agents.query.graphql';
 import AgentEmptyState from './agent_empty_state.vue';
 import AgentTable from './agent_table.vue';
+import InstallAgentModal from './install_agent_modal.vue';
 
 export default {
+  components: {
+    AgentEmptyState,
+    InstallAgentModal,
+    AgentTable,
+    GlAlert,
+    GlKeysetPagination,
+    GlLoadingIcon,
+  },
+  inject: ['defaultBranchName', 'projectPath'],
   apollo: {
     agents: {
       query: getAgentsQuery,
@@ -20,28 +30,6 @@ export default {
         this.updateTreeList(data);
         return data;
       },
-    },
-  },
-  components: {
-    AgentEmptyState,
-    AgentTable,
-    GlAlert,
-    GlKeysetPagination,
-    GlLoadingIcon,
-  },
-  props: {
-    emptyStateImage: {
-      required: true,
-      type: String,
-    },
-    defaultBranchName: {
-      default: '.noBranch',
-      required: false,
-      type: String,
-    },
-    projectPath: {
-      required: true,
-      type: String,
     },
   },
   data() {
@@ -83,6 +71,9 @@ export default {
     },
   },
   methods: {
+    reloadAgents() {
+      this.$apollo.queries.agents.refetch();
+    },
     nextPage() {
       this.cursor = {
         first: MAX_LIST_COUNT,
@@ -124,12 +115,8 @@ export default {
       </div>
     </div>
 
-    <AgentEmptyState
-      v-else
-      :image="emptyStateImage"
-      :project-path="projectPath"
-      :has-configurations="hasConfigurations"
-    />
+    <AgentEmptyState v-else :has-configurations="hasConfigurations" />
+    <InstallAgentModal @agentRegistered="reloadAgents" />
   </section>
 
   <gl-alert v-else variant="danger" :dismissible="false">

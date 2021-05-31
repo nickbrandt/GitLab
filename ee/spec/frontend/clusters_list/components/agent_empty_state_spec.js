@@ -5,9 +5,12 @@ import { shallowMountExtended } from 'helpers/vue_test_utils_helper';
 describe('AgentEmptyStateComponent', () => {
   let wrapper;
 
-  const propsData = {
-    image: '/image/path',
+  const provide = {
+    emptyStateImage: '/image/path',
     projectPath: 'path/to/project',
+  };
+
+  const propsData = {
     hasConfigurations: false,
   };
 
@@ -17,6 +20,7 @@ describe('AgentEmptyStateComponent', () => {
 
   beforeEach(() => {
     wrapper = shallowMountExtended(AgentEmptyState, {
+      provide,
       propsData,
       stubs: { GlEmptyState, GlSprintf },
     });
@@ -43,6 +47,7 @@ describe('AgentEmptyStateComponent', () => {
     beforeEach(() => {
       propsData.hasConfigurations = true;
       wrapper = shallowMountExtended(AgentEmptyState, {
+        provide,
         propsData,
       });
     });

@@ -1,4 +1,4 @@
-import { GlLink } from '@gitlab/ui';
+import { GlButton, GlLink } from '@gitlab/ui';
 import { mount } from '@vue/test-utils';
 import AgentTable from 'ee/clusters_list/components/agent_table.vue';
 
@@ -33,7 +33,7 @@ describe('AgentTable', () => {
   });
 
   it('displays header link', () => {
-    expect(wrapper.find(GlLink).text()).toBe('Learn more about installing the GitLab Agent');
+    expect(wrapper.find(GlButton).text()).toBe('Install a new GitLab Agent');
   });
 
   describe('agent table', () => {

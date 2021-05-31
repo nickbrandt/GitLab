@@ -1,7 +1,9 @@
 <script>
-import { GlButton, GlEmptyState, GlLink, GlSprintf, GlAlert } from '@gitlab/ui';
+import { GlButton, GlEmptyState, GlLink, GlSprintf, GlAlert, GlModalDirective } from '@gitlab/ui';
+import { INSTALL_AGENT_MODAL_ID } from '../constants';
 
 export default {
+  modalId: INSTALL_AGENT_MODAL_ID,
   components: {
     GlButton,
     GlEmptyState,
@@ -9,15 +11,11 @@ export default {
     GlSprintf,
     GlAlert,
   },
+  directives: {
+    GlModalDirective,
+  },
+  inject: ['projectPath', 'emptyStateImage'],
   props: {
-    image: {
-      type: String,
-      required: true,
-    },
-    projectPath: {
-      type: String,
-      required: true,
-    },
     hasConfigurations: {
       type: Boolean,
       required: true,
@@ -33,7 +31,7 @@ export default {
 
 <template>
   <gl-empty-state
-    :svg-path="image"
+    :svg-path="emptyStateImage"
     :title="s__('ClusterAgents|Integrate Kubernetes with a GitLab Agent')"
     class="empty-state--agent"
   >
@@ -104,14 +102,14 @@ export default {
 
     <template #actions>
       <gl-button
+        ref="install-agent"
+        v-gl-modal-directive="$options.modalId"
         :disabled="!hasConfigurations"
         data-testid="integration-primary-button"
         category="primary"
+        class="gl-mr-3"
         variant="success"
-        href="https://docs.gitlab.com/ee/user/clusters/agent/#get-started-with-gitops-and-the-gitlab-agent"
-        target="_blank"
-      >
-        {{ s__('ClusterAgents|Integrate with the GitLab Agent') }}
+        >{{ s__('ClusterAgents|Integrate with the GitLab Agent') }}
       </gl-button>
     </template>
   </gl-empty-state>

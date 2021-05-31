@@ -75,6 +75,10 @@ RSpec.describe ClustersHelper do
     it 'displays project path' do
       expect(subject[:project_path]).to eq(project.full_path)
     end
+
+    it 'displays kas address' do
+      expect(subject[:kas_address]).to eq(Gitlab::Kas.external_url)
+    end
   end
 
   describe '#js_clusters_list_data' do

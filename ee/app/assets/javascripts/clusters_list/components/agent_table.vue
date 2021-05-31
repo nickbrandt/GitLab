@@ -1,11 +1,17 @@
 <script>
-import { GlLink, GlTable } from '@gitlab/ui';
+import { GlButton, GlLink, GlModalDirective, GlTable } from '@gitlab/ui';
 import { s__ } from '~/locale';
+import { INSTALL_AGENT_MODAL_ID } from '../constants';
 
 export default {
+  modalId: INSTALL_AGENT_MODAL_ID,
   components: {
+    GlButton,
     GlLink,
     GlTable,
+  },
+  directives: {
+    GlModalDirective,
   },
   props: {
     agents: {
@@ -33,12 +39,14 @@ export default {
 <template>
   <div>
     <div class="gl-display-block gl-text-right gl-my-3">
-      <gl-link
-        href="https://docs.gitlab.com/ee/user/clusters/agent/#get-started-with-gitops-and-the-gitlab-agent"
-        target="_blank"
-      >
-        {{ s__('ClusterAgents|Learn more about installing the GitLab Agent') }}
-      </gl-link>
+      <gl-button
+        ref="install-agent"
+        v-gl-modal-directive="$options.modalId"
+        class="gl-mr-3"
+        variant="success"
+        category="primary"
+        >{{ s__('ClusterAgents|Install a new GitLab Agent') }}
+      </gl-button>
     </div>
 
     <gl-table :items="agents" :fields="fields" stacked="md" data-testid="cluster-agent-list-table">
