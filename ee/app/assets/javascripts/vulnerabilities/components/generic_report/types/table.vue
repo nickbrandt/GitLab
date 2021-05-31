@@ -8,11 +8,11 @@ export default {
   },
   inheritAttrs: false,
   props: {
-    header: {
+    fields: {
       type: Array,
       required: true,
     },
-    rows: {
+    items: {
       type: Array,
       required: true,
     },
@@ -21,8 +21,8 @@ export default {
 </script>
 <template>
   <gl-table
-    :fields="header"
-    :items="rows"
+    :fields="fields"
+    :items="items"
     bordered
     borderless
     thead-class="gl-border-t-0 gl-border-b-solid gl-border-b-1 gl-border-b-gray-100"
