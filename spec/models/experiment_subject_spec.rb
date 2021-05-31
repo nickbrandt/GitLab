@@ -51,4 +51,22 @@ RSpec.describe ExperimentSubject, type: :model do
       end
     end
   end
+
+  describe '.valid_subject?' do
+    subject(:valid_subject?) { described_class.valid_subject?(subject_class.new) }
+
+    context 'when passing a Group, Namespace, User or Project' do
+      [Group, Namespace, User, Project].each do |subject_class|
+        let(:subject_class) { subject_class }
+
+        it { is_expected.to be(true) }
+      end
+    end
+
+    context 'when passing another object' do
+      let(:subject_class) { Issue }
+
+      it { is_expected.to be(false) }
+    end
+  end
 end

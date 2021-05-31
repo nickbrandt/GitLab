@@ -14,6 +14,10 @@ class ExperimentSubject < ApplicationRecord
 
   enum variant: { GROUP_CONTROL => 0, GROUP_EXPERIMENTAL => 1 }
 
+  def self.valid_subject?(subject)
+    subject.is_a?(Namespace) || subject.is_a?(User) || subject.is_a?(Project)
+  end
+
   private
 
   def must_have_one_subject_present
