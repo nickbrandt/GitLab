@@ -7,10 +7,17 @@ export default {
   title: 'components/todo_button',
 };
 
-export const Primary = () => ({
+const Template = (args, { argTypes }) => ({
   components: { TodoButton },
-  template: '<todo-button />',
-  argTypes: {
-    isTodo: { description: 'True if to-do is unresolved (i.e. not "done")', control: 'boolean' },
-  },
+  props: Object.keys(argTypes),
+  template: '<todo-button v-bind="$props" v-on="$props" />',
 });
+
+export const Default = Template.bind({});
+Default.argTypes = {
+  isTodo: {
+    description: 'True if to-do is unresolved (i.e. not "done")',
+    control: { type: 'boolean' },
+  },
+  click: { action: 'clicked' },
+};

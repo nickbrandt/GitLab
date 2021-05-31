@@ -1,6 +1,7 @@
 pages:
   extends:
     - .default-retry
+    - .pages:rules
   stage: pages
   needs:
     - rspec:coverage
@@ -21,5 +22,3 @@ pages:
     paths:
       - public
     expire_in: 31d
-  rules:
-    - when: manual

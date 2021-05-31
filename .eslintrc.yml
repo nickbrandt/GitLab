@@ -89,9 +89,6 @@ rules:
           group: internal
       alphabetize:
         order: asc
-  filenames/match-regex:
-    - error
-    - "^[a-z_]+(\\.stories|\\.config|\\.documentation|\\.[a-z_]+\\.example|\\.spec)?$"
 overrides:
   - files:
       - '**/spec/**/*'
@@ -110,3 +107,7 @@ overrides:
       import/no-nodejs-modules: off
       filenames/match-regex: off
       no-console: off
+  - files:
+      - '*.stories.js'
+    rules:
+      filenames/match-regex: off
