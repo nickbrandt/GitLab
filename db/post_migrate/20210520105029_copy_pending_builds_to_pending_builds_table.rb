@@ -3,8 +3,9 @@
 class CopyPendingBuildsToPendingBuildsTable < ActiveRecord::Migration[6.0]
   include Gitlab::Database::MigrationHelpers
 
+  BUILDS_MAX_SIZE = 1 << (32 - 1)
   PENDING_BUILDS_BATCH_SIZE = 1000
-  PENDING_BUILDS_MAX_BATCHES = 1000
+  PENDING_BUILDS_MAX_BATCHES = BUILDS_MAX_SIZE / PENDING_BUILDS_BATCH_SIZE
 
   disable_ddl_transaction!
 
