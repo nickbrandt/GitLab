@@ -40,7 +40,7 @@ RSpec.describe 'Issue Boards', :js do
     visit_project_board
   end
 
-  context 'assignee' do
+  context 'assignee', quarantine: 'https://gitlab.com/gitlab-org/gitlab/-/issues/332078' do
     let(:assignees_widget) { '[data-testid="issue-boards-sidebar"] [data-testid="assignees-widget"]' }
 
     it 'updates the issues assignee' do
@@ -65,7 +65,7 @@ RSpec.describe 'Issue Boards', :js do
       expect(card2).to have_selector('.avatar')
     end
 
-    it 'adds multiple assignees', quarantine: 'https://gitlab.com/gitlab-org/gitlab/-/issues/332078' do
+    it 'adds multiple assignees' do
       click_card(card1)
 
       page.within(assignees_widget) do
