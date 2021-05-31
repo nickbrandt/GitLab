@@ -285,8 +285,10 @@
       .sidebar-sub-level-items:not(.is-fly-out-only) {
         display: block;
       }
+
       .badge.badge-pill {
-        @include gl-font-weight-normal;
+        @include gl-font-weight-normal; // TODO: update in `theme_indigo.scss`
+        color: $blue-700; // TODO: update in `theme_indigo.scss`
       }
     }
   }
