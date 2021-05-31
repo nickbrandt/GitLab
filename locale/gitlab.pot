@@ -29319,6 +29319,9 @@ msgstr ""
 msgid "Select a repository"
 msgstr ""
 
+msgid "Select a shared template repository for all projects on this instance."
+msgstr ""
+
 msgid "Select a template repository"
 msgstr ""
 
@@ -29707,9 +29710,6 @@ msgid "Set default and restrict visibility levels. Configure import sources and 
 msgstr ""
 
 msgid "Set due date"
-msgstr ""
-
-msgid "Set instance-wide template repository"
 msgstr ""
 
 msgid "Set iteration"
@@ -31952,6 +31952,9 @@ msgid "Template"
 msgstr ""
 
 msgid "Template to append to all Service Desk issues"
+msgstr ""
+
+msgid "TemplateRepository|Select a repository to make its templates available to all projects. %{link_start}What should the repository contain?%{link_end} "
 msgstr ""
 
 msgid "Templates"
