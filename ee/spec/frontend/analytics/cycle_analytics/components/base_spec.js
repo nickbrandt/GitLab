@@ -11,6 +11,7 @@ import PathNavigation from 'ee/analytics/cycle_analytics/components/path_navigat
 import StageTableNew from 'ee/analytics/cycle_analytics/components/stage_table_new.vue';
 import TypeOfWorkCharts from 'ee/analytics/cycle_analytics/components/type_of_work_charts.vue';
 import ValueStreamSelect from 'ee/analytics/cycle_analytics/components/value_stream_select.vue';
+import { OVERVIEW_STAGE_ID } from 'ee/analytics/cycle_analytics/constants';
 import createStore from 'ee/analytics/cycle_analytics/store';
 import Daterange from 'ee/analytics/shared/components/daterange.vue';
 import ProjectsDropdownFilter from 'ee/analytics/shared/components/projects_dropdown_filter.vue';
@@ -177,8 +178,10 @@ describe('Value Stream Analytics component', () => {
     expect(wrapper.findComponent(TypeOfWorkCharts).exists()).toBe(flag);
   };
 
+  const findPathNavigation = () => wrapper.findComponent(PathNavigation);
+
   const displaysPathNavigation = (flag) => {
-    expect(wrapper.findComponent(PathNavigation).exists()).toBe(flag);
+    expect(findPathNavigation().exists()).toBe(flag);
   };
 
   const displaysFilterBar = (flag) => {
@@ -437,6 +440,48 @@ describe('Value Stream Analytics component', () => {
       expect(await findFlashError().innerText.trim()).toEqual(
         'There was an error fetching median data for stages',
       );
+    });
+  });
+
+  describe('Path navigation', () => {
+    const selectedStage = { title: 'Plan', slug: 2 };
+    const overviewStage = { title: 'Overview', slug: OVERVIEW_STAGE_ID };
+    let actionSpies = {};
+
+    beforeEach(async () => {
+      mock = new MockAdapter(axios);
+      mockRequiredRoutes(mock);
+      wrapper = await createComponent();
+      actionSpies = {
+        setDefaultSelectedStage: jest.spyOn(wrapper.vm, 'setDefaultSelectedStage'),
+        setSelectedStage: jest.spyOn(wrapper.vm, 'setSelectedStage'),
+        updateStageTablePagination: jest.spyOn(wrapper.vm, 'updateStageTablePagination'),
+      };
+    });
+
+    afterEach(() => {
+      wrapper.destroy();
+      mock.restore();
+      wrapper = null;
+    });
+
+    it('when a stage is selected', () => {
+      findPathNavigation().vm.$emit('selected', selectedStage);
+
+      expect(actionSpies.setDefaultSelectedStage).not.toHaveBeenCalled();
+      expect(actionSpies.setSelectedStage).toHaveBeenCalledWith(selectedStage);
+      expect(actionSpies.updateStageTablePagination).toHaveBeenCalledWith({
+        ...mockData.initialPaginationQuery,
+        page: 1,
+      });
+    });
+
+    it('when the overview is selected', () => {
+      findPathNavigation().vm.$emit('selected', overviewStage);
+
+      expect(actionSpies.setSelectedStage).not.toHaveBeenCalled();
+      expect(actionSpies.updateStageTablePagination).not.toHaveBeenCalled();
+      expect(actionSpies.setDefaultSelectedStage).toHaveBeenCalled();
     });
   });
 
