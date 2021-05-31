@@ -55,12 +55,14 @@ module Gitlab
           DEFAULT_REDIS_URL
         end
 
-        # Return the absolute path to a Rails configuration file
-        #
-        # We use this instead of `Rails.root` because for certain tasks
-        # utilizing these classes, `Rails` might not be available.
         def config_file_path(filename)
-          File.expand_path("../../../config/#{filename}", __dir__)
+          File.join(rails_root, 'config', filename)
+        end
+
+        # We need this local implementation of Rails.root because MailRoom
+        # doesn't load Rails.
+        def rails_root
+          File.expand_path('../../..', __dir__)
         end
 
         def config_file_name
