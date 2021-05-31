@@ -37809,7 +37809,7 @@ msgstr ""
 msgid "Your Personal Access Token was revoked"
 msgstr ""
 
-msgid "Your Primary Email will be used for avatar detection."
+msgid "Your Primary Email will be used for avatar detection. It can be changed under your %{openingTag}profile settings%{closingTag}."
 msgstr ""
 
 msgid "Your Projects (default)"
