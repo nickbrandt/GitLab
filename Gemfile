@@ -308,6 +308,11 @@ gem 'rack-attack', '~> 6.3.0'
 gem 'sentry-raven', '~> 3.1'
 
 # PostgreSQL query parsing
+#
+# We need this fork until https://github.com/pganalyze/pg_query/pull/212
+# and https://github.com/pganalyze/pg_query/pull/213 are
+# released. gitlab-labkit will need to be updated to use the pg_query
+# version.
 gem 'gitlab-pg_query', '~> 2.0.4', require: 'pg_query'
 
 gem 'premailer-rails', '~> 1.10.3'
