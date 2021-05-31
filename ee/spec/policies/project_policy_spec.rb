@@ -456,6 +456,28 @@ RSpec.describe ProjectPolicy do
     end
   end
 
+  describe 'access_security_and_compliance' do
+    context 'when the user is auditor' do
+      let(:current_user) { create(:user, :auditor) }
+
+      before do
+        project.project_feature.update!(security_and_compliance_access_level: access_level)
+      end
+
+      context 'when the "Security & Compliance" is not enabled' do
+        let(:access_level) { Featurable::DISABLED }
+
+        it { is_expected.to be_disallowed(:access_security_and_compliance) }
+      end
+
+      context 'when the "Security & Compliance" is enabled' do
+        let(:access_level) { Featurable::PRIVATE }
+
+        it { is_expected.to be_allowed(:access_security_and_compliance) }
+      end
+    end
+  end
+
   describe 'vulnerability feedback permissions' do
     where(permission: %i[
       read_vulnerability_feedback

@@ -266,6 +266,10 @@ module EE
         enable :read_pages
       end
 
+      rule { ~security_and_compliance_disabled & auditor }.policy do
+        enable :access_security_and_compliance
+      end
+
       rule { auditor & security_dashboard_enabled }.policy do
         enable :read_vulnerability
         enable :read_vulnerability_scanner
