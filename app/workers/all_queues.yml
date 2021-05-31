@@ -153,16 +153,6 @@
   :weight: 1
   :idempotent:
   :tags: []
-- :name: cronjob:analytics_instance_statistics_count_job_trigger
-  :worker_name: Analytics::InstanceStatistics::CountJobTriggerWorker
-  :feature_category: :devops_reports
-  :has_external_dependencies:
-  :urgency: :low
-  :resource_boundary: :unknown
-  :weight: 1
-  :idempotent: true
-  :tags:
-  - :exclude_from_kubernetes
 - :name: cronjob:analytics_usage_trends_count_job_trigger
   :worker_name: Analytics::UsageTrends::CountJobTriggerWorker
   :feature_category: :devops_reports
@@ -477,7 +467,7 @@
   :urgency: :low
   :resource_boundary: :unknown
   :weight: 1
-  :idempotent:
+  :idempotent: true
   :tags: []
 - :name: cronjob:repository_archive_cache
   :worker_name: RepositoryArchiveCacheWorker
@@ -1088,15 +1078,6 @@
   :weight: 2
   :idempotent:
   :tags: []
-- :name: incident_management:incident_management_process_alert
-  :worker_name: IncidentManagement::ProcessAlertWorker
-  :feature_category: :incident_management
-  :has_external_dependencies:
-  :urgency: :low
-  :resource_boundary: :unknown
-  :weight: 2
-  :idempotent:
-  :tags: []
 - :name: incident_management:incident_management_process_alert_worker_v2
   :worker_name: IncidentManagement::ProcessAlertWorkerV2
   :feature_category: :incident_management
@@ -1105,15 +1086,6 @@
   :resource_boundary: :unknown
   :weight: 2
   :idempotent: true
-  :tags: []
-- :name: incident_management:incident_management_process_prometheus_alert
-  :worker_name: IncidentManagement::ProcessPrometheusAlertWorker
-  :feature_category: :incident_management
-  :has_external_dependencies:
-  :urgency: :low
-  :resource_boundary: :cpu
-  :weight: 2
-  :idempotent:
   :tags: []
 - :name: jira_connect:jira_connect_sync_branch
   :worker_name: JiraConnect::SyncBranchWorker
@@ -1786,16 +1758,6 @@
   :weight: 1
   :idempotent: true
   :tags: []
-- :name: analytics_instance_statistics_counter_job
-  :worker_name: Analytics::InstanceStatistics::CounterJobWorker
-  :feature_category: :devops_reports
-  :has_external_dependencies:
-  :urgency: :low
-  :resource_boundary: :unknown
-  :weight: 1
-  :idempotent: true
-  :tags:
-  - :exclude_from_kubernetes
 - :name: analytics_usage_trends_counter_job
   :worker_name: Analytics::UsageTrends::CounterJobWorker
   :feature_category: :devops_reports

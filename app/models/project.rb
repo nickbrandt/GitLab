@@ -1717,7 +1717,11 @@ class Project < ApplicationRecord
   end
 
   def shared_runners
-    @shared_runners ||= shared_runners_available? ? Ci::Runner.instance_type : Ci::Runner.none
+    @shared_runners ||= shared_runners_enabled? ? Ci::Runner.instance_type : Ci::Runner.none
+  end
+
+  def available_shared_runners
+    @available_shared_runners ||= shared_runners_available? ? shared_runners : Ci::Runner.none
   end
 
   def group_runners
@@ -1728,9 +1732,13 @@ class Project < ApplicationRecord
     Ci::Runner.from_union([runners, group_runners, shared_runners])
   end
 
+  def all_available_runners
+    Ci::Runner.from_union([runners, group_runners, available_shared_runners])
+  end
+
   def active_runners
     strong_memoize(:active_runners) do
-      all_runners.active
+      all_available_runners.active
     end
   end
 
@@ -2592,10 +2600,6 @@ class Project < ApplicationRecord
     Projects::GitGarbageCollectWorker
   end
 
-  def inherited_issuable_templates_enabled?
-    Feature.enabled?(:inherited_issuable_templates, self, default_enabled: :yaml)
-  end
-
   def activity_path
     Gitlab::Routing.url_helpers.activity_project_path(self)
   end
@@ -2604,6 +2608,10 @@ class Project < ApplicationRecord
     return if pending_delete?
 
     ProjectStatistics.increment_statistic(self, statistic, delta)
+  end
+
+  def merge_requests_author_approval
+    !!read_attribute(:merge_requests_author_approval)
   end
 
   private

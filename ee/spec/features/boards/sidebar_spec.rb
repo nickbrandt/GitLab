@@ -65,7 +65,7 @@ RSpec.describe 'Issue Boards', :js do
       expect(card2).to have_selector('.avatar')
     end
 
-    it 'adds multiple assignees' do
+    it 'adds multiple assignees', quarantine: 'https://gitlab.com/gitlab-org/gitlab/-/issues/332078' do
       click_card(card1)
 
       page.within(assignees_widget) do
@@ -200,7 +200,8 @@ RSpec.describe 'Issue Boards', :js do
       it 'displays name of epic and links to it' do
         click_card(card2)
 
-        expect(epic_widget).to have_link(epic1.title, href: epic_path(epic1))
+        expect(epic_widget).to have_link(epic1.title)
+        expect(find_link(epic1.title)[:href]).to end_with(epic_path(epic1))
       end
 
       it 'updates the epic associated with the issue' do

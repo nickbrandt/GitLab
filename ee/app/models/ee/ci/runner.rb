@@ -18,8 +18,6 @@ module EE
       end
 
       def heartbeat(values)
-        return super unless ::Feature.enabled?(:ci_runner_builds_queue_on_replicas, self, default_enabled: :yaml)
-
         ##
         # We can safely ignore writes performed by a runner heartbeat. We do
         # not want to upgrade database connection proxy to use the primary
@@ -28,17 +26,8 @@ module EE
         ::Gitlab::Database::LoadBalancing::Session.without_sticky_writes { super }
       end
 
-      def minutes_cost_factor(access_level)
-        return 0.0 unless instance_type?
-
-        case access_level
-        when ::Gitlab::VisibilityLevel::PUBLIC
-          public_projects_minutes_cost_factor
-        when ::Gitlab::VisibilityLevel::PRIVATE, ::Gitlab::VisibilityLevel::INTERNAL
-          private_projects_minutes_cost_factor
-        else
-          raise ArgumentError, 'Invalid visibility level'
-        end
+      def minutes_cost_factor(visibility_level)
+        ::Gitlab::Ci::Minutes::CostFactor.new(runner_matcher).for_visibility(visibility_level)
       end
 
       def visibility_levels_without_minutes_quota

@@ -201,7 +201,7 @@ module EE
                 issues_with_health_status: count(::Issue.with_health_status, start: minimum_id(::Issue), finish: maximum_id(::Issue)),
                 ldap_keys: count(::LDAPKey),
                 ldap_users: count(::User.ldap, 'users.id'),
-                pod_logs_usages_total: redis_usage_data { ::Gitlab::UsageCounters::PodLogs.usage_totals[:total] },
+                pod_logs_usages_total: ::Gitlab::UsageData::DEPRECATED_VALUE,
                 merged_merge_requests_using_approval_rules: count(::MergeRequest.merged.joins(:approval_rules), # rubocop: disable CodeReuse/ActiveRecord
                                                                   start: minimum_id(::MergeRequest),
                                                                   finish: maximum_id(::MergeRequest)),
@@ -234,7 +234,7 @@ module EE
           super.merge({
             projects_slack_notifications_active: distinct_count(::Project.with_slack_service.where(time_period), :creator_id),
             projects_slack_slash_active: distinct_count(::Project.with_slack_slash_commands_service.where(time_period), :creator_id),
-            projects_with_prometheus_alerts: distinct_count(::Project.with_prometheus_service.where(time_period), :creator_id)
+            projects_with_prometheus_alerts: ::Gitlab::UsageData::DEPRECATED_VALUE
           })
         end
 
@@ -564,8 +564,8 @@ module EE
 
         def projects_jira_issuelist_active
           # rubocop: disable UsageData/LargeTable:
-          min_id = minimum_id(JiraTrackerData.where(issues_enabled: true), :service_id)
-          max_id = maximum_id(JiraTrackerData.where(issues_enabled: true), :service_id)
+          min_id = minimum_id(::Integrations::JiraTrackerData.where(issues_enabled: true), :service_id)
+          max_id = maximum_id(::Integrations::JiraTrackerData.where(issues_enabled: true), :service_id)
           # rubocop: enable UsageData/LargeTable:
           count(::Integrations::Jira.active.includes(:jira_tracker_data).where(jira_tracker_data: { issues_enabled: true }), start: min_id, finish: max_id)
         end

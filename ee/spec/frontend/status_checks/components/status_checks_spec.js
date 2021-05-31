@@ -5,6 +5,7 @@ import Vuex from 'vuex';
 import Actions from 'ee/status_checks/components/actions.vue';
 import Branch from 'ee/status_checks/components/branch.vue';
 import ModalCreate from 'ee/status_checks/components/modal_create.vue';
+import ModalDelete from 'ee/status_checks/components/modal_delete.vue';
 import ModalUpdate from 'ee/status_checks/components/modal_update.vue';
 import StatusChecks, { i18n } from 'ee/status_checks/components/status_checks.vue';
 import createStore from 'ee/status_checks/store';
@@ -25,6 +26,7 @@ describe('Status checks', () => {
     store = createStore();
     wrapper = mountFn(StatusChecks, { store });
 
+    wrapper.vm.$refs.deleteModal.show = jest.fn();
     wrapper.vm.$refs.updateModal.show = jest.fn();
   };
 
@@ -33,6 +35,7 @@ describe('Status checks', () => {
   });
 
   const findCreateModal = () => wrapper.findComponent(ModalCreate);
+  const findDeleteModal = () => wrapper.findComponent(ModalDelete);
   const findUpdateModal = () => wrapper.findComponent(ModalUpdate);
   const findTable = () => wrapper.findComponent(GlTable);
   const findHeaders = () => findTable().find('thead').find('tr').findAll('th');
@@ -100,6 +103,31 @@ describe('Status checks', () => {
       it('renders the actions', () => {
         expect(findActions(index, 1).props('statusCheck')).toStrictEqual(statusCheck);
       });
+    });
+  });
+
+  describe('Delete modal filling', () => {
+    beforeEach(() => {
+      createWrapper();
+      store.commit(SET_STATUS_CHECKS, statusChecks);
+    });
+
+    it('opens the delete modal with the correct status check when a remove button is clicked', async () => {
+      const statusCheck = findActions(0, 1).props('statusCheck');
+
+      await findActions(0, 1).vm.$emit('open-delete-modal', statusCheck);
+
+      expect(findDeleteModal().props('statusCheck')).toStrictEqual(statusCheck);
+      expect(wrapper.vm.$refs.deleteModal.show).toHaveBeenCalled();
+    });
+
+    it('updates the status check prop for the delete modal when another remove button is clicked', async () => {
+      const statusCheck = findActions(1, 1).props('statusCheck');
+
+      await findActions(0, 1).vm.$emit('open-delete-modal', findActions(0, 1).props('statusCheck'));
+      await findActions(1, 1).vm.$emit('open-delete-modal', statusCheck);
+
+      expect(findDeleteModal().props('statusCheck')).toStrictEqual(statusCheck);
     });
   });
 
