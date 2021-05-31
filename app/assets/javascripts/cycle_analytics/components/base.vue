@@ -64,18 +64,13 @@ export default {
       return selectedStageEvents.length && !isLoadingStage && !isEmptyStage;
     },
     displayNotEnoughData() {
-      const { selectedStage, isEmptyStage, isLoadingStage } = this;
-      return selectedStage && isEmptyStage && !isLoadingStage;
+      return this.selectedStageReady && this.isEmptyStage;
     },
     displayNoAccess() {
-      const { selectedStage } = this;
-      return selectedStage && !selectedStage.isUserAllowed;
+      return this.selectedStageReady && !this.selectedStage.isUserAllowed;
     },
     selectedStageReady() {
-      return !this.hasNoAccessError && this.selectedStage;
-    },
-    shouldDisplayPathNavigation() {
-      return this.selectedStage;
+      return !this.isLoadingStage && this.selectedStage;
     },
   },
   methods: {
@@ -116,7 +111,7 @@ export default {
 <template>
   <div class="cycle-analytics">
     <path-navigation
-      v-if="shouldDisplayPathNavigation"
+      v-if="selectedStageReady"
       class="js-path-navigation gl-w-full gl-pb-2"
       :loading="isLoading"
       :stages="pathNavigationData"
@@ -198,29 +193,29 @@ export default {
           </div>
           <div class="stage-panel-body">
             <section class="stage-events gl-overflow-auto gl-w-full">
-              <gl-loading-icon v-show="isLoadingStage" size="lg" />
-              <template v-if="displayNoAccess">
+              <gl-loading-icon v-if="isLoadingStage" size="lg" />
+              <template v-else>
                 <gl-empty-state
+                  v-if="displayNoAccess"
                   class="js-empty-state"
                   :title="__('You need permission.')"
                   :svg-path="noAccessSvgPath"
                   :description="__('Want to see the data? Please ask an administrator for access.')"
                 />
-              </template>
-              <template v-else>
-                <template v-if="displayNotEnoughData">
+                <template v-else>
                   <gl-empty-state
+                    v-if="displayNotEnoughData"
                     class="js-empty-state"
                     :description="selectedStage.emptyStageText"
                     :svg-path="noDataSvgPath"
                     :title="__('We don\'t have enough data to show this stage.')"
                   />
-                </template>
-                <template v-if="displayStageEvents">
                   <component
                     :is="selectedStage.component"
+                    v-if="displayStageEvents"
                     :stage="selectedStage"
                     :items="selectedStageEvents"
+                    data-testid="stage-table-events"
                   />
                 </template>
               </template>
