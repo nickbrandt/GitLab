@@ -66,15 +66,7 @@ RSpec.describe Mutations::Ci::Runner::Update do
 
       context 'with valid arguments' do
         it 'updates runner with correct values' do
-          expected_attributes = {
-            description: 'updated description',
-            maximum_timeout: 900,
-            access_level: 'ref_protected',
-            active: false,
-            locked: true,
-            run_untagged: false,
-            tag_list: %w(tag1 tag2)
-          }
+          expected_attributes = mutation_params.except(:id)
 
           subject
 
