@@ -13,8 +13,8 @@ RSpec.describe IterationsFinder do
   let_it_be(:closed_iteration) { create(:closed_iteration, :skip_future_date_validation, iterations_cadence: iteration_cadence2, group: iteration_cadence2.group, start_date: 7.days.ago, due_date: 2.days.ago) }
   let_it_be(:started_group_iteration) { create(:started_iteration, :skip_future_date_validation, iterations_cadence: iteration_cadence2, group: iteration_cadence2.group, title: 'one test', start_date: 1.day.ago, due_date: Date.today) }
   let_it_be(:upcoming_group_iteration) { create(:iteration, iterations_cadence: iteration_cadence1, group: iteration_cadence1.group, start_date: 1.day.from_now, due_date: 3.days.from_now) }
-  let_it_be(:root_group_iteration) { create(:started_iteration, iterations_cadence: iteration_cadence3, group: iteration_cadence3.group, start_date: 1.day.from_now, due_date: 2.days.from_now) }
-  let_it_be(:root_closed_iteration) { create(:closed_iteration, iterations_cadence: iteration_cadence3, group: iteration_cadence3.group, start_date: 1.week.ago, due_date: 1.day.ago) }
+  let_it_be(:root_group_iteration) { create(:started_iteration, iterations_cadence: iteration_cadence3, group: iteration_cadence3.group, start_date: 1.day.ago, due_date: 2.days.from_now) }
+  let_it_be(:root_closed_iteration) { create(:closed_iteration, iterations_cadence: iteration_cadence3, group: iteration_cadence3.group, start_date: 1.week.ago, due_date: 2.days.ago) }
 
   let(:parent) { project_1 }
   let(:params) { { parent: parent, include_ancestors: true } }
@@ -132,7 +132,7 @@ RSpec.describe IterationsFinder do
         it 'returns iterations with start_date and due_date between timeframe' do
           params.merge!(start_date: 1.day.ago, end_date: 3.days.from_now)
 
-          expect(subject).to match_array([started_group_iteration, upcoming_group_iteration, root_group_iteration, root_closed_iteration])
+          expect(subject).to match_array([started_group_iteration, upcoming_group_iteration, root_group_iteration])
         end
 
         it 'returns iterations which start before the timeframe' do
