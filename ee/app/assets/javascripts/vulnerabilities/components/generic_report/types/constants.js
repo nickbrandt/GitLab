@@ -9,6 +9,7 @@ export const REPORT_TYPES = {
   value: 'value',
   moduleLocation: 'module-location',
   fileLocation: 'file-location',
+  table: 'table',
 };
 
 const REPORT_TYPE_TO_COMPONENT_MAP = {
@@ -20,6 +21,7 @@ const REPORT_TYPE_TO_COMPONENT_MAP = {
   [REPORT_TYPES.value]: () => import('./value.vue'),
   [REPORT_TYPES.moduleLocation]: () => import('./module_location.vue'),
   [REPORT_TYPES.fileLocation]: () => import('./file_location.vue'),
+  [REPORT_TYPES.table]: () => import('./table.vue'),
 };
 
 export const getComponentNameForType = (reportType) =>
