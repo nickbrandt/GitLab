@@ -39,7 +39,7 @@ RSpec.describe 'Issue Boards', :js do
   end
 
   context 'assignee' do
-    it 'updates the issues assignee' do
+    it 'updates the issues assignee', quarantine: 'https://gitlab.com/gitlab-org/gitlab/-/issues/332078' do
       click_card(card2)
 
       page.within('.assignee') do
