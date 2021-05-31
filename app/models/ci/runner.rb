@@ -60,7 +60,7 @@ module Ci
     scope :active, -> { where(active: true) }
     scope :paused, -> { where(active: false) }
     scope :online, -> { where('contacted_at > ?', online_contact_time_deadline) }
-    scope :recent, -> { where('ci_runners.created_at > :date OR contacted_at > :date', date: 3.months.ago) }
+    scope :recent, -> { where('ci_runners.created_at > :date OR ci_runners.contacted_at > :date', date: 3.months.ago) }
     # The following query using negation is cheaper than using `contacted_at <= ?`
     # because there are less runners online than have been created. The
     # resulting query is quickly finding online ones and then uses the regular
