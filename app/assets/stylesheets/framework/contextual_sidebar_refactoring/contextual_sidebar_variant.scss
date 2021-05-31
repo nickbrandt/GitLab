@@ -212,6 +212,7 @@
       @include gl-display-flex;
       @include gl-align-items-center;
       @include gl-rounded-base;
+      @include gl-w-auto;
       transition: padding $sidebar-transition-duration;
       margin-bottom: 1px;
 
@@ -284,11 +285,15 @@
       .sidebar-sub-level-items:not(.is-fly-out-only) {
         display: block;
       }
+      .badge.badge-pill {
+        @include gl-font-weight-normal;
+      }
     }
   }
 }
 
 .sidebar-sub-level-items {
+  @include gl-pb-0;
   display: none;
 
   &:not(.fly-out-list) {
