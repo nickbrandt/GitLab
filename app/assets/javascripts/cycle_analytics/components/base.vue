@@ -122,7 +122,7 @@ export default {
       :stages="pathNavigationData"
       :selected-stage="selectedStage"
       :with-stage-counts="false"
-      @selected="(ev) => onSelectStage(ev)"
+      @selected="onSelectStage"
     />
     <gl-loading-icon v-if="isLoading" size="lg" />
     <div v-else class="wrapper">
@@ -197,7 +197,7 @@ export default {
             </nav>
           </div>
           <div class="stage-panel-body">
-            <section class="stage-events overflow-auto gl-w-full">
+            <section class="stage-events gl-overflow-auto gl-w-full">
               <gl-loading-icon v-show="isLoadingStage" size="lg" />
               <template v-if="displayNoAccess">
                 <gl-empty-state

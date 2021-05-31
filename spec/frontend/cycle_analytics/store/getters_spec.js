@@ -13,22 +13,4 @@ describe('Value stream analytics getters', () => {
       expect(getters.pathNavigationData(state)).toEqual(transformedProjectStagePathData);
     });
   });
-
-  describe('filterStagesByHiddenStatus', () => {
-    const hiddenStages = [{ title: 'three', hidden: true }];
-    const visibleStages = [
-      { title: 'one', hidden: false },
-      { title: 'two', hidden: false },
-    ];
-    const mockStages = [...visibleStages, ...hiddenStages];
-
-    it.each`
-      isHidden     | result
-      ${false}     | ${visibleStages}
-      ${undefined} | ${hiddenStages}
-      ${true}      | ${hiddenStages}
-    `('with isHidden=$isHidden returns matching stages', ({ isHidden, result }) => {
-      expect(getters.filterStagesByHiddenStatus(mockStages, isHidden)).toEqual(result);
-    });
-  });
 });

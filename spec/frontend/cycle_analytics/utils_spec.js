@@ -5,6 +5,7 @@ import {
   timeSummaryForPathNavigation,
   medianTimeToParsedSeconds,
   formatMedianValues,
+  filterStagesByHiddenStatus,
 } from '~/cycle_analytics/utils';
 import {
   selectedStage,
@@ -102,19 +103,19 @@ describe('Value stream analytics utils', () => {
     describe('transforms the data as expected', () => {
       it('returns an array of stages', () => {
         expect(Array.isArray(response)).toBe(true);
-        expect(response.length).toEqual(stages.length);
+        expect(response.length).toBe(stages.length);
       });
 
       it('selects the correct stage', () => {
         const selected = response.filter((stage) => stage.selected === true)[0];
 
-        expect(selected.title).toEqual(selectedStage.title);
+        expect(selected.title).toBe(selectedStage.title);
       });
 
       it('includes the correct metric for the associated stage', () => {
         const issue = response.filter((stage) => stage.name === 'issue')[0];
 
-        expect(issue.metric).toEqual(pathNavIssueMetric);
+        expect(issue.metric).toBe(pathNavIssueMetric);
       });
     });
   });
@@ -130,7 +131,7 @@ describe('Value stream analytics utils', () => {
       ${'seconds'} | ${10}   | ${'<1m'}
       ${'seconds'} | ${0}    | ${'-'}
     `('will format $value $unit to $result', ({ unit, value, result }) => {
-      expect(timeSummaryForPathNavigation({ [unit]: value })).toEqual(result);
+      expect(timeSummaryForPathNavigation({ [unit]: value })).toBe(result);
     });
   });
 
@@ -146,7 +147,7 @@ describe('Value stream analytics utils', () => {
       ${59}      | ${'<1m'}
       ${0}       | ${'-'}
     `('will correctly parse $value seconds into $result', ({ value, result }) => {
-      expect(medianTimeToParsedSeconds(value)).toEqual(result);
+      expect(medianTimeToParsedSeconds(value)).toBe(result);
     });
   });
 
@@ -157,6 +158,24 @@ describe('Value stream analytics utils', () => {
       rawStageMedians.forEach(({ id, value }) => {
         expect(calculatedMedians).toMatchObject({ [id]: medianTimeToParsedSeconds(value) });
       });
+    });
+  });
+
+  describe('filterStagesByHiddenStatus', () => {
+    const hiddenStages = [{ title: 'three', hidden: true }];
+    const visibleStages = [
+      { title: 'one', hidden: false },
+      { title: 'two', hidden: false },
+    ];
+    const mockStages = [...visibleStages, ...hiddenStages];
+
+    it.each`
+      isHidden     | result
+      ${false}     | ${visibleStages}
+      ${undefined} | ${hiddenStages}
+      ${true}      | ${hiddenStages}
+    `('with isHidden=$isHidden returns matching stages', ({ isHidden, result }) => {
+      expect(filterStagesByHiddenStatus(mockStages, isHidden)).toEqual(result);
     });
   });
 });

@@ -1,4 +1,5 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
+import Vue from 'vue';
 import Vuex from 'vuex';
 import { extendedWrapper } from 'helpers/vue_test_utils_helper';
 import Component from '~/cycle_analytics/components/base.vue';
@@ -8,8 +9,7 @@ import createStore from '~/cycle_analytics/store';
 const noDataSvgPath = 'path/to/no/data';
 const noAccessSvgPath = 'path/to/no/access';
 
-const localVue = createLocalVue();
-localVue.use(Vuex);
+Vue.use(Vuex);
 
 let wrapper;
 
@@ -17,7 +17,6 @@ function createComponent() {
   const store = createStore();
   return extendedWrapper(
     shallowMount(Component, {
-      localVue,
       store,
       propsData: {
         noDataSvgPath,

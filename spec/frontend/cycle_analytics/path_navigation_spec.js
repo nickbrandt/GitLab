@@ -38,6 +38,9 @@ describe('Project PathNavigation', () => {
     findPathNavigationItems().at(index).find('button').trigger('click');
   };
 
+  const pathItemContent = () => findPathNavigationItems().wrappers.map(extendedWrapper);
+  const firstPopover = () => wrapper.findAllByTestId('stage-item-popover').at(0);
+
   beforeEach(() => {
     wrapper = createComponent();
   });
@@ -53,10 +56,9 @@ describe('Project PathNavigation', () => {
     });
 
     it('contains all the expected stages', () => {
-      const html = wrapper.find(GlPath).html();
-
-      transformedProjectStagePathData.forEach((stage) => {
-        expect(html).toContain(stage.title);
+      const stageContent = findPathNavigationTitles();
+      transformedProjectStagePathData.forEach((stage, index) => {
+        expect(stageContent[index]).toContain(stage.title);
       });
     });
 
@@ -89,16 +91,13 @@ describe('Project PathNavigation', () => {
           });
 
           it('renders popovers for all stages', () => {
-            const pathItemContent = findPathNavigationItems().wrappers;
-
-            pathItemContent.forEach((stage) => {
-              expect(stage.find('[data-testid="stage-item-popover"]').exists()).toBe(true);
+            pathItemContent().forEach((stage) => {
+              expect(stage.findByTestId('stage-item-popover').exists()).toBe(true);
             });
           });
 
           it('shows the median stage time for the first stage item', () => {
-            const firstPopover = wrapper.findAll('[data-testid="stage-item-popover"]').at(0);
-            expect(firstPopover.text()).toContain('Stage time (median)');
+            expect(firstPopover().text()).toContain('Stage time (median)');
           });
         });
       });

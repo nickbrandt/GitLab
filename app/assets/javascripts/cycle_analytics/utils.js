@@ -94,7 +94,7 @@ export const transformStagesForPathNavigation = ({
   const formattedStages = stages.map((stage) => {
     return {
       metric: medians[stage?.id],
-      selected: stage.id === selectedStage.id,
+      selected: stage?.id === selectedStage?.id, // Also could null === null cause an issue here?
       stageCount: stageCounts && stageCounts[stage?.id],
       icon: null,
       ...stage,
@@ -155,3 +155,6 @@ export const formatMedianValues = (medians = []) =>
       [id]: value ? medianTimeToParsedSeconds(value) : '-',
     };
   }, {});
+
+export const filterStagesByHiddenStatus = (stages = [], isHidden = true) =>
+  stages.filter(({ hidden = false }) => hidden === isHidden);
