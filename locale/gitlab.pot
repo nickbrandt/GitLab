@@ -9690,6 +9690,12 @@ msgstr ""
 msgid "CredentialsInventory|SSH Keys"
 msgstr ""
 
+msgid "Credit card validated at:"
+msgstr ""
+
+msgid "Credit card validated:"
+msgstr ""
+
 msgid "Critical vulnerabilities present"
 msgstr ""
 
