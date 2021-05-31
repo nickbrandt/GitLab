@@ -30,6 +30,9 @@ module Mutations
       end
 
       def resolve(args)
+        # remove this alias in %14.6
+        args[:state] = 'closed' if args[:state] == 'archived'
+
         project_path = args.delete(:project_path)
         requirement_iid = args.delete(:iid)
         requirement = authorized_find!(project_path: project_path, iid: requirement_iid)

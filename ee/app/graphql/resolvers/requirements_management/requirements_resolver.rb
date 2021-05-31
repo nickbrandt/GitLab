@@ -21,6 +21,9 @@ module Resolvers
                description: 'The state of latest requirement test report.'
 
       def resolve_with_lookahead(**args)
+        # remove this alias in %14.6
+        args[:state] = 'closed' if args[:state] == 'archived'
+
         # The project could have been loaded in batch by `BatchLoader`.
         # At this point we need the `id` of the project to query for issues, so
         # make sure it's loaded and not `nil` before continuing.

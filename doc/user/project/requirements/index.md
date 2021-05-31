@@ -18,7 +18,7 @@ Requirements are long-lived and don't disappear unless manually cleared.
 
 If an industry standard *requires* that your application has a certain feature or behavior, you can
 [create a requirement](#create-a-requirement) to reflect this.
-When a feature is no longer necessary, you can [archive the related requirement](#archive-a-requirement).
+When a feature is no longer necessary, you can [close the related requirement](#close-a-requirement).
 
 <i class="fa fa-youtube-play youtube" aria-hidden="true"></i>
 For an overview, see [GitLab 12.10 Introduces Requirements Management](https://www.youtube.com/watch?v=uSS7oUNSEoU).
@@ -27,22 +27,22 @@ For an overview, see [GitLab 12.10 Introduces Requirements Management](https://w
 For a more in-depth walkthrough using a [demonstration project](https://gitlab.com/gitlab-org/requiremeents-mgmt),
 see [GitLab Requirements Traceability Walkthrough](https://youtu.be/VIiuTQYFVa0) (Feb 2021).
 
-![requirements list view](img/requirements_list_v13_5.png)
+![requirements list view](img/requirements_list_v14_0.png)
 
 ## Create a requirement
 
 A paginated list of requirements is available in each project, and there you
 can create a new requirement.
 
-Users with Reporter or higher [permissions](../../permissions.md) can create requirements.
+Prerequisites:
+
+- A minimum of [Reporter](../../permissions.md) access to a project in GitLab.
 
 To create a requirement:
 
-1. In a project, go to **Requirements**.
-1. Select **New requirement**.
+1. Go to your project and select **Requirements**.
+1. In the upper-right corner, select **New requirement**.
 1. Enter a title and description and select **Create requirement**.
-
-![requirement create view](img/requirement_create_v13_5.png)
 
 You can see the newly created requirement on the top of the list, with the requirements
 list being sorted by creation date, in descending order.
@@ -50,8 +50,6 @@ list being sorted by creation date, in descending order.
 ## View a requirement
 
 You can view a requirement from the list by selecting it.
-
-![requirement view](img/requirement_view_v13_5.png)
 
 To edit a requirement while viewing it, select the **Edit** icon (**{pencil}**)
 next to the requirement title.
@@ -62,37 +60,45 @@ next to the requirement title.
 
 You can edit a requirement from the requirements list page.
 
-Users with Reporter or higher [permissions](../../permissions.md) can edit requirements.
+Prerequisites:
+
+- A minimum of [Reporter](../../permissions.md) access to a project in GitLab.
 
 To edit a requirement:
 
 1. From the requirements list, select the **Edit** icon (**{pencil}**).
-1. Update the title and description in text input field. You can also mark a
+1. In text input field, update the title and description. You can also mark a
    requirement as satisfied in the edit form by using the check box **Satisfied**.
 1. Select **Save changes**.
 
-## Archive a requirement
+## Close a requirement
 
-You can archive an open requirement while
-you're in the **Open** tab.
+> - [Introduced](https://gitlab.com/groups/gitlab-org/-/epics/2703) in GitLab 12.10 as "Archive a
+>   requirement."
+> - In GitLab 14.0 and later [renamed](https://gitlab.com/gitlab-org/gitlab/-/issues/323779) to
+>   "Close a requirement."
 
-Users with Reporter or higher [permissions](../../permissions.md) can archive requirements.
+You can close an open requirement while you're in the **Open** tab.
 
-To archive a requirement, select **Archive** (**{archive}**).
+Prerequisites:
 
-As soon as a requirement is archived, it no longer appears in the **Open** tab.
+- A minimum of [Reporter](../../permissions.md) access to a project in GitLab.
+
+To close a requirement, select **Close** (**{close}**).
+
+As soon as a requirement is closed, it no longer appears in the **Open** tab.
 
 ## Reopen a requirement
 
-You can view the list of archived requirements in the **Archived** tab.
+You can view the list of closed requirements in the **Closed** tab.
 
-Users with Reporter or higher [permissions](../../permissions.md) can reopen archived requirements.
+Prerequisites:
 
-![archived requirements list](img/requirements_archived_list_view_v13_1.png)
+- A minimum of [Reporter](../../permissions.md) access to a project in GitLab.
 
-To reopen an archived requirement, select **Reopen**.
+To reopen a closed requirement, select **Reopen**.
 
-As soon as a requirement is reopened, it no longer appears in the **Archived** tab.
+As soon as a requirement is reopened, it no longer appears in the **Closed** tab.
 
 ## Search for a requirement
 
@@ -107,7 +113,7 @@ You can search for a requirement from the requirements list page based on the fo
 
 To search for a requirement:
 
-1. In a project, go to  **Requirements > List**.
+1. Go to your project and select  **Requirements > List**.
 1. Select the **Search or filter results** field. A dropdown menu appears.
 1. Select the requirement author or status from the dropdown or enter plain text to search by requirement title.
 1. Press <kbd>Enter</kbd> on your keyboard to filter the list.
@@ -210,7 +216,9 @@ with the columns `title` and `description`.
 
 After the import, the user uploading the CSV file is set as the author of the imported requirements.
 
-Users with Reporter or higher [permissions](../../permissions.md) can import requirements.
+Prerequisites:
+
+- A minimum of [Reporter](../../permissions.md) access to a project in GitLab.
 
 ### Import the file
 
@@ -222,7 +230,7 @@ Before you import your file:
 
 To import requirements:
 
-1. In a project, go to **Requirements**.
+1. Go to your project and select **Requirements**.
    - If the project already has existing requirements, select the import icon (**{import}**) in the
      top right.
    - For a project without any requirements, select **Import CSV** in the middle of the page.
@@ -277,11 +285,13 @@ By exporting requirements, you and your team can import them into another tool o
 your customers. Exporting requirements can aid collaboration with higher-level systems, as well as
 audit and regulatory compliance tasks.
 
-Users with Reporter or higher [permissions](../../permissions.md) can export requirements.
+Prerequisites:
+
+- A minimum of [Reporter](../../permissions.md) access to a project in GitLab.
 
 To export requirements:
 
-1. In a project, go to **Requirements**.
+1. Go to your project and select **Requirements**.
 1. In the top right, select the **Export as CSV** icon (**{export}**).
 
    A confirmation modal appears.

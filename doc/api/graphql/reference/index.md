@@ -12246,7 +12246,8 @@ Counts of requirements by their state.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| <a id="requirementstatescountarchived"></a>`archived` | [`Int`](#int) | Number of archived requirements. |
+| <a id="requirementstatescountarchived"></a>`archived` **{warning-solid}** | [`Int`](#int) | **Deprecated** in 14.0. Use `closed`. |
+| <a id="requirementstatescountclosed"></a>`closed` | [`Int`](#int) | Number of closed requirements. |
 | <a id="requirementstatescountopened"></a>`opened` | [`Int`](#int) | Number of opened requirements. |
 
 ### `RootStorageStatistics`
@@ -14625,6 +14626,7 @@ State of a requirement.
 | Value | Description |
 | ----- | ----------- |
 | <a id="requirementstatearchived"></a>`ARCHIVED` |  |
+| <a id="requirementstateclosed"></a>`CLOSED` |  |
 | <a id="requirementstateopened"></a>`OPENED` |  |
 
 ### `RequirementStatusFilter`

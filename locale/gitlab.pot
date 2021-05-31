@@ -4196,9 +4196,6 @@ msgstr ""
 msgid "Architecture not found for OS"
 msgstr ""
 
-msgid "Archive"
-msgstr ""
-
 msgid "Archive jobs"
 msgstr ""
 
@@ -27950,7 +27947,7 @@ msgstr ""
 msgid "Requirement %{reference} has been added"
 msgstr ""
 
-msgid "Requirement %{reference} has been archived"
+msgid "Requirement %{reference} has been closed"
 msgstr ""
 
 msgid "Requirement %{reference} has been reopened"
@@ -30459,7 +30456,7 @@ msgstr ""
 msgid "Something went wrong while applying the suggestion. Please try again."
 msgstr ""
 
-msgid "Something went wrong while archiving a requirement."
+msgid "Something went wrong while closing a requirement."
 msgstr ""
 
 msgid "Something went wrong while closing the epic. Please try again later."
@@ -32862,9 +32859,6 @@ msgstr ""
 msgid "There are no archived projects yet"
 msgstr ""
 
-msgid "There are no archived requirements"
-msgstr ""
-
 msgid "There are no archived test cases"
 msgstr ""
 
@@ -32881,6 +32875,9 @@ msgid "There are no closed issues"
 msgstr ""
 
 msgid "There are no closed merge requests"
+msgstr ""
+
+msgid "There are no closed requirements"
 msgstr ""
 
 msgid "There are no commits yet."

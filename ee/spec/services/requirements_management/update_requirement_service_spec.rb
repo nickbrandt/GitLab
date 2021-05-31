@@ -9,7 +9,7 @@ RSpec.describe RequirementsManagement::UpdateRequirementService do
   let(:params) do
     {
       title: 'foo',
-      state: 'archived',
+      state: 'closed',
       created_at: 2.days.ago,
       author_id: create(:user).id
     }

@@ -16,8 +16,8 @@ RSpec.describe Resolvers::RequirementsManagement::RequirementsResolver do
 
   context 'with a project' do
     let_it_be(:requirement1) { create(:requirement, project: project, state: :opened, created_at: 5.hours.ago, title: 'it needs to do the thing', author: current_user) }
-    let_it_be(:requirement2) { create(:requirement, project: project, state: :archived, created_at: 3.hours.ago, title: 'it needs to not break', author: other_user) }
-    let_it_be(:requirement3) { create(:requirement, project: project, state: :archived, created_at: 4.hours.ago, title: 'do the kubernetes!', author: third_user) }
+    let_it_be(:requirement2) { create(:requirement, project: project, state: :closed, created_at: 3.hours.ago, title: 'it needs to not break', author: other_user) }
+    let_it_be(:requirement3) { create(:requirement, project: project, state: :closed, created_at: 4.hours.ago, title: 'do the kubernetes!', author: third_user) }
 
     before do
       project.add_developer(current_user)
@@ -29,9 +29,16 @@ RSpec.describe Resolvers::RequirementsManagement::RequirementsResolver do
         expect(resolve_requirements).to contain_exactly(requirement1, requirement2, requirement3)
       end
 
-      it 'filters by state' do
-        expect(resolve_requirements(state: 'opened')).to contain_exactly(requirement1)
-        expect(resolve_requirements(state: 'archived')).to contain_exactly(requirement2, requirement3)
+      context 'filter by state' do
+        it 'filters by state' do
+          expect(resolve_requirements(state: 'opened')).to contain_exactly(requirement1)
+          expect(resolve_requirements(state: 'closed')).to contain_exactly(requirement2, requirement3)
+        end
+
+        # remove this in %14.6
+        it 'accepts archived as an alias for closed' do
+          expect(resolve_requirements(state: 'archived')).to contain_exactly(requirement2, requirement3)
+        end
       end
 
       it 'filters by iid' do

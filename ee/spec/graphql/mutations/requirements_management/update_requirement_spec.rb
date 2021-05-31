@@ -22,7 +22,7 @@ RSpec.describe Mutations::RequirementsManagement::UpdateRequirement do
         iid: requirement.iid.to_s,
         title: 'foo',
         description: 'some desc',
-        state: 'archived',
+        state: 'closed',
         last_test_report_state: 'passed'
       )
     end
@@ -43,10 +43,28 @@ RSpec.describe Mutations::RequirementsManagement::UpdateRequirement do
           expect(subject[:requirement]).to have_attributes(
             title: 'foo',
             description: 'some desc',
-            state: 'archived',
+            state: 'closed',
             last_test_report_state: 'passed'
           )
           expect(subject[:errors]).to be_empty
+        end
+
+        context 'when passing state as archived' do
+          subject do
+            mutation.resolve(
+              project_path: project.full_path,
+              iid: requirement.iid.to_s,
+              title: 'foo',
+              description: 'some desc',
+              state: 'archived',
+              last_test_report_state: 'passed'
+            )
+          end
+
+          # remove this in %14.6
+          it 'treats archived as alias for closed' do
+            expect(subject[:errors]).to be_empty
+          end
         end
       end
 

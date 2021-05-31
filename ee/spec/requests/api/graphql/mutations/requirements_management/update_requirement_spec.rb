@@ -9,7 +9,7 @@ RSpec.describe 'Updating a Requirement' do
   let_it_be(:project) { create(:project) }
   let_it_be(:requirement) { create(:requirement, project: project) }
 
-  let(:attributes) { { title: 'title', state: 'ARCHIVED' } }
+  let(:attributes) { { title: 'title', state: 'CLOSED' } }
   let(:mutation) do
     params = { project_path: project.full_path, iid: requirement.iid.to_s }.merge(attributes)
 
@@ -61,7 +61,20 @@ RSpec.describe 'Updating a Requirement' do
 
         requirement_hash = mutation_response['requirement']
         expect(requirement_hash['title']).to eq('title')
-        expect(requirement_hash['state']).to eq('ARCHIVED')
+        expect(requirement_hash['state']).to eq('CLOSED')
+      end
+
+      # remove this in %14.6
+      context 'when using `archived` as an alias for `closed`' do
+        let(:attributes) { { title: 'title', state: 'ARCHIVED' } }
+
+        it 'updates the requirement', :aggregate_failures do
+          post_graphql_mutation(mutation, current_user: current_user)
+
+          requirement_hash = mutation_response['requirement']
+          expect(requirement_hash['title']).to eq('title')
+          expect(requirement_hash['state']).to eq('CLOSED')
+        end
       end
 
       context 'when there are ActiveRecord validation errors' do

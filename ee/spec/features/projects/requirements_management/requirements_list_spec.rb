@@ -10,7 +10,7 @@ RSpec.describe 'Requirements list', :js do
   let_it_be(:requirement1) { create(:requirement, project: project, title: 'Some requirement-1', description: 'Sample description', author: user, created_at: 5.days.ago, updated_at: 2.days.ago) }
   let_it_be(:requirement2) { create(:requirement, project: project, title: 'Some requirement-2', description: 'Sample description', author: user, created_at: 6.days.ago, updated_at: 2.days.ago) }
   let_it_be(:requirement3) { create(:requirement, project: project, title: 'Some requirement-3', description: 'Sample description', author: user, created_at: 7.days.ago, updated_at: 2.days.ago) }
-  let_it_be(:requirement_archived) { create(:requirement, project: project, title: 'Some requirement-3', description: 'Sample description', state: :archived, author: user, created_at: 8.days.ago, updated_at: 2.days.ago) }
+  let_it_be(:requirement_closed) { create(:requirement, :closed, project: project, title: 'Some requirement-3', description: 'Sample description', author: user, created_at: 8.days.ago, updated_at: 2.days.ago) }
 
   def create_requirement(title)
     page.within('.nav-controls') do
@@ -49,8 +49,8 @@ RSpec.describe 'Requirements list', :js do
         expect(page).to have_selector('li > a[data-testid="state-opened"]')
         expect(find('li > a[data-testid="state-opened"] .badge')).to have_content('3')
 
-        expect(page).to have_selector('li > a[data-testid="state-archived"]')
-        expect(find('li > a[data-testid="state-archived"] .badge')).to have_content('1')
+        expect(page).to have_selector('li > a[data-testid="state-closed"]')
+        expect(find('li > a[data-testid="state-closed"] .badge')).to have_content('1')
 
         expect(page).to have_selector('li > a[data-testid="state-all"]')
         expect(find('li > a[data-testid="state-all"] .badge')).to have_content('4')
@@ -163,7 +163,7 @@ RSpec.describe 'Requirements list', :js do
           expect(page.find('.issuable-authored')).to have_content('created 5 days ago by')
           expect(page.find('.author')).to have_content(user.name)
           expect(page.find('.controls')).to have_selector('li.requirement-edit button[title="Edit"]')
-          expect(page.find('.controls')).to have_selector('li.requirement-archive button[title="Archive"]')
+          expect(page.find('.controls')).to have_selector('li.requirement-close button')
           expect(page.find('.issuable-updated-at')).to have_content('updated 2 days ago')
         end
       end
@@ -216,9 +216,9 @@ RSpec.describe 'Requirements list', :js do
         end
       end
 
-      it 'archives a requirement' do
+      it 'closed a requirement' do
         page.within('.requirements-list li.requirement', match: :first) do
-          find('li.requirement-archive button[title="Archive"]').click
+          find('li.requirement-close button').click
 
           wait_for_requests
         end
@@ -226,14 +226,14 @@ RSpec.describe 'Requirements list', :js do
         expect(page.find('.requirements-list-container')).to have_selector('li.requirement', count: 2)
         page.within('.gl-tabs') do
           expect(find('li > a[data-testid="state-opened"] .badge')).to have_content('2')
-          expect(find('li > a[data-testid="state-archived"] .badge')).to have_content('2')
+          expect(find('li > a[data-testid="state-closed"] .badge')).to have_content('2')
         end
       end
     end
 
-    context 'archived tab' do
+    context 'closed tab' do
       before do
-        find('li > a[data-testid="state-archived"]').click
+        find('li > a[data-testid="state-closed"]').click
 
         wait_for_requests
       end
@@ -242,7 +242,7 @@ RSpec.describe 'Requirements list', :js do
         expect(page).not_to have_selector('.nav-controls button.js-new-requirement')
       end
 
-      it 'shows list of all archived requirements' do
+      it 'shows list of all closed requirements' do
         page.within('.requirements-list-container .requirements-list') do
           expect(page).to have_selector('li.requirement', count: 1)
         end
@@ -250,8 +250,8 @@ RSpec.describe 'Requirements list', :js do
 
       it 'shows title, metadata and actions within each requirement item' do
         page.within('.requirements-list li.requirement', match: :first) do
-          expect(page.find('.issuable-reference')).to have_content("REQ-#{requirement_archived.iid}")
-          expect(page.find('.issue-title-text')).to have_content(requirement_archived.title)
+          expect(page.find('.issuable-reference')).to have_content("REQ-#{requirement_closed.iid}")
+          expect(page.find('.issue-title-text')).to have_content(requirement_closed.title)
           expect(page.find('.issuable-authored')).to have_content('created 1 week ago by')
           expect(page.find('.author')).to have_content(user.name)
           expect(page.find('.controls')).to have_selector('li.requirement-reopen button', text: 'Reopen')
@@ -269,7 +269,7 @@ RSpec.describe 'Requirements list', :js do
         expect(page.find('.requirements-list-container')).to have_selector('li.requirement', count: 0)
         page.within('.gl-tabs') do
           expect(find('li > a[data-testid="state-opened"] .badge')).to have_content('4')
-          expect(find('li > a[data-testid="state-archived"] .badge')).to have_content('0')
+          expect(find('li > a[data-testid="state-closed"] .badge')).to have_content('0')
         end
       end
     end

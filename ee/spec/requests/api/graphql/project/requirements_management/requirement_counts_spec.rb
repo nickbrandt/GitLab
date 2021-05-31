@@ -8,14 +8,14 @@ RSpec.describe 'getting requirement counts for a project' do
   let_it_be(:project) { create(:project) }
   let_it_be(:current_user) { create(:user) }
   let_it_be(:requirement1) { create(:requirement, project: project, state: :opened) }
-  let_it_be(:requirement2) { create(:requirement, project: project, state: :archived) }
+  let_it_be(:requirement2) { create(:requirement, :closed, project: project) }
 
   let(:counts) { graphql_data['project']['requirementStatesCount'] }
 
   let(:fields) do
     <<~QUERY
     opened
-    archived
+    closed
     QUERY
   end
 
@@ -52,7 +52,27 @@ RSpec.describe 'getting requirement counts for a project' do
 
       expect(graphql_errors).to be_nil
       expect(counts['opened']).to eq 1
-      expect(counts['archived']).to eq 1
+      expect(counts['closed']).to eq 1
+    end
+
+    # remove this in %14.6
+    context 'using `archived` as alias for `closed`' do
+      let(:fields) do
+        <<~QUERY
+        opened
+        closed
+        archived
+        QUERY
+      end
+
+      it 'returns requirement counts' do
+        post_graphql(query, current_user: current_user)
+
+        expect(graphql_errors).to be_nil
+        expect(counts['opened']).to eq 1
+        expect(counts['closed']).to eq 1
+        expect(counts['archived']).to eq 1
+      end
     end
   end
 
@@ -90,7 +110,7 @@ RSpec.describe 'getting requirement counts for a project' do
 
       expect(graphql_errors).to be_nil
       expect(counts['opened']).to eq 0
-      expect(counts['archived']).to eq 0
+      expect(counts['closed']).to eq 0
     end
   end
 end
