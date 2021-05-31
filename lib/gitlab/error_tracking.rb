@@ -19,7 +19,10 @@ module Gitlab
     PROCESSORS = [
       ::Gitlab::ErrorTracking::Processor::SidekiqProcessor,
       ::Gitlab::ErrorTracking::Processor::GrpcErrorProcessor,
-      ::Gitlab::ErrorTracking::Processor::ContextPayloadProcessor
+      ::Gitlab::ErrorTracking::Processor::ContextPayloadProcessor,
+      # IMPORTANT: this processor must stay at the bottom, right before
+      # sending the event to Sentry.
+      ::Gitlab::ErrorTracking::Processor::SanitizerProcessor
     ].freeze
 
     class << self
@@ -28,14 +31,7 @@ module Gitlab
           config.dsn = sentry_dsn
           config.release = Gitlab.revision
           config.environment = Gitlab.config.sentry.environment
-
-          # Sanitize fields based on those sanitized from Rails.
-          # config.sanitize_fields = Rails.application.config.filter_parameters.map(&:to_s)
-
-          # Sanitize authentication headers
-          # config.sanitize_http_headers = %w[Authorization Private-Token]
           config.before_send = method(:before_send)
-
           config.background_worker_threads = 0
 
           yield config if block_given?
