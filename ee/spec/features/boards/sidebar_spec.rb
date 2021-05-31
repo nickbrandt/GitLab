@@ -65,7 +65,7 @@ RSpec.describe 'Issue Boards', :js do
       expect(card2).to have_selector('.avatar')
     end
 
-    it 'adds multiple assignees' do
+    it 'adds multiple assignees', quarantine: 'https://gitlab.com/gitlab-org/gitlab/-/issues/332078' do
       click_card(card1)
 
       page.within(assignees_widget) do
