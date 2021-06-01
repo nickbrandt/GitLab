@@ -9,7 +9,7 @@ module Gitlab
 
       def self.default_settings_hash
         settings_hash = {
-          'enabled' => true,
+          'enabled' => Rails.env.development? || Rails.env.test?,
           'report_only' => false,
           'directives' => {
             'default_src' => "'self'",
