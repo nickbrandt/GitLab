@@ -34330,6 +34330,12 @@ msgstr ""
 msgid "Too many projects enabled. You will need to manage them via the console or the API."
 msgstr ""
 
+msgid "TopNav|Go back"
+msgstr ""
+
+msgid "TopNav|Menu"
+msgstr ""
+
 msgid "Topics (optional)"
 msgstr ""
 
