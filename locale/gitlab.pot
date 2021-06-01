@@ -17363,6 +17363,9 @@ msgstr ""
 msgid "IncidentManagement|%{minutes} minutes remaining"
 msgstr ""
 
+msgid "IncidentManagement|Achieved SLA"
+msgstr ""
+
 msgid "IncidentManagement|All"
 msgstr ""
 
@@ -17400,6 +17403,9 @@ msgid "IncidentManagement|Low - S4"
 msgstr ""
 
 msgid "IncidentManagement|Medium - S3"
+msgstr ""
+
+msgid "IncidentManagement|Missed SLA"
 msgstr ""
 
 msgid "IncidentManagement|No incidents to display."
