@@ -5,8 +5,8 @@ import Vue, { nextTick } from 'vue';
 import VueApollo from 'vue-apollo';
 import DevopsAdoptionSegmentModal from 'ee/analytics/devops_report/devops_adoption/components/devops_adoption_segment_modal.vue';
 import { DEVOPS_ADOPTION_SEGMENT_MODAL_ID } from 'ee/analytics/devops_report/devops_adoption/constants';
-import bulkFindOrCreateDevopsAdoptionSegmentsMutation from 'ee/analytics/devops_report/devops_adoption/graphql/mutations/bulk_find_or_create_devops_adoption_segments.mutation.graphql';
-import deleteDevopsAdoptionSegmentMutation from 'ee/analytics/devops_report/devops_adoption/graphql/mutations/delete_devops_adoption_segment.mutation.graphql';
+import bulkEnableDevopsAdoptionNamespacesMutation from 'ee/analytics/devops_report/devops_adoption/graphql/mutations/bulk_enable_devops_adoption_namespaces.mutation.graphql';
+import disableDevopsAdoptionNamespaceMutation from 'ee/analytics/devops_report/devops_adoption/graphql/mutations/disable_devops_adoption_namespace.mutation.graphql';
 import createMockApollo from 'helpers/mock_apollo_helper';
 import waitForPromises from 'helpers/wait_for_promises';
 import {
@@ -16,7 +16,7 @@ import {
   genericErrorMessage,
   dataErrorMessage,
   groupNodeLabelValues,
-  devopsAdoptionSegmentsData,
+  devopsAdoptionNamespaceData,
 } from '../mock_data';
 
 const localVue = createLocalVue();
@@ -25,25 +25,25 @@ Vue.use(VueApollo);
 const mockEvent = { preventDefault: jest.fn() };
 const mutate = jest.fn().mockResolvedValue({
   data: {
-    bulkFindOrCreateDevopsAdoptionSegments: {
-      segments: [devopsAdoptionSegmentsData.nodes[0]],
+    bulkEnableDevopsAdoptionNamespaces: {
+      enabledNamespaces: [devopsAdoptionNamespaceData.nodes[0]],
       errors: [],
     },
-    deleteDevopsAdoptionSegment: {
-      segments: [devopsAdoptionSegmentsData.nodes[0]],
+    disableDevopsAdoptionNamespace: {
+      enabledNamespaces: [devopsAdoptionNamespaceData.nodes[0]],
       errors: [],
     },
   },
 });
 const mutateWithDataErrors = jest.fn().mockResolvedValue({
   data: {
-    bulkFindOrCreateDevopsAdoptionSegments: {
+    bulkEnableDevopsAdoptionNamespaces: {
       errors: [dataErrorMessage],
-      segments: [],
+      enabledNamespaces: [],
     },
-    deleteDevopsAdoptionSegment: {
+    disableDevopsAdoptionNamespace: {
       errors: [dataErrorMessage],
-      segments: [],
+      enabledNamespaces: [],
     },
   },
 });
@@ -60,8 +60,8 @@ describe('DevopsAdoptionSegmentModal', () => {
     provide = {},
   } = {}) => {
     const mockApollo = createMockApollo([
-      [deleteDevopsAdoptionSegmentMutation, deleteSegmentsSpy],
-      [bulkFindOrCreateDevopsAdoptionSegmentsMutation, addSegmentsSpy],
+      [disableDevopsAdoptionNamespaceMutation, deleteSegmentsSpy],
+      [bulkEnableDevopsAdoptionNamespacesMutation, addSegmentsSpy],
     ]);
 
     wrapper = shallowMount(DevopsAdoptionSegmentModal, {
@@ -236,7 +236,7 @@ describe('DevopsAdoptionSegmentModal', () => {
     const enableFirstGroup = { checkboxValues: [groupIds[0]] };
     const enableSecondGroup = { checkboxValues: [groupIds[1]] };
     const noEnabledGroups = { checkboxValues: [] };
-    const firstGroupEnabledData = [devopsAdoptionSegmentsData.nodes[0]];
+    const firstGroupEnabledData = [devopsAdoptionNamespaceData.nodes[0]];
     const firstGroupId = [groupIds[0]];
     const firstGroupGid = [groupGids[0]];
     const secondGroupGid = [groupGids[1]];
@@ -311,7 +311,7 @@ describe('DevopsAdoptionSegmentModal', () => {
             it('emits segmentsAdded with the correct variables', () => {
               const [params] = wrapper.emitted().segmentsAdded[0];
 
-              expect(params).toStrictEqual([devopsAdoptionSegmentsData.nodes[0]]);
+              expect(params).toStrictEqual([devopsAdoptionNamespaceData.nodes[0]]);
             });
           }
 

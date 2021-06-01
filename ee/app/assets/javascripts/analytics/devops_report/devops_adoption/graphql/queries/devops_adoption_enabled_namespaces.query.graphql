@@ -1,5 +1,5 @@
-query devopsAdoptionSegments($displayNamespaceId: NamespaceID) {
-  devopsAdoptionSegments(displayNamespaceId: $displayNamespaceId) {
+query devopsAdoptionEnabledNamespaces($displayNamespaceId: NamespaceID) {
+  devopsAdoptionEnabledNamespaces(displayNamespaceId: $displayNamespaceId) {
     nodes {
       id
       latestSnapshot {

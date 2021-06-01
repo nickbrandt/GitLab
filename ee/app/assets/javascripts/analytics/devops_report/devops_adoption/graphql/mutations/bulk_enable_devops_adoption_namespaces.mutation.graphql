@@ -1,8 +1,8 @@
 mutation($namespaceIds: [NamespaceID!]!, $displayNamespaceId: NamespaceID) {
-  bulkFindOrCreateDevopsAdoptionSegments(
+  bulkEnableDevopsAdoptionNamespaces(
     input: { namespaceIds: $namespaceIds, displayNamespaceId: $displayNamespaceId }
   ) {
-    segments {
+    enabledNamespaces {
       id
       latestSnapshot {
         issueOpened
