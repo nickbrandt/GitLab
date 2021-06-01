@@ -33,6 +33,7 @@ module Gitlab
           config.environment = Gitlab.config.sentry.environment
           config.before_send = method(:before_send)
           config.background_worker_threads = 0
+          config.send_default_pii = true
 
           yield config if block_given?
         end
@@ -106,7 +107,7 @@ module Gitlab
       def process_exception(exception, sentry: false, logging: true, extra:)
         context_payload = Gitlab::ErrorTracking::ContextPayloadGenerator.generate(exception, extra)
 
-        # There is a possiblity that this method is called before Sentry is
+        # There is a possibility that this method is called before Sentry is
         # configured. Since Sentry 4.0, some methods of Sentry are forwarded to
         # to `nil`, hence we have to check the client as well.
         if sentry && ::Sentry.get_current_client && ::Sentry.configuration.dsn

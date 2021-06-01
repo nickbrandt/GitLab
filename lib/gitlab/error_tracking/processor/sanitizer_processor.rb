@@ -8,8 +8,8 @@ module Gitlab
         SANITIZED_ATTRIBUTES = %i[user contexts extra tags].freeze
 
         # This processor removes sensitive fields or headers from the event
-        # before sending Sentry versions above 4.0 don't support
-        # sanitized_fileds and sanitized_http_headers anymore. The official
+        # before sending. Sentry versions above 4.0 don't support
+        # sanitized_fields and sanitized_http_headers anymore. The official
         # document recommends using before_send instead.
         #
         # For more information, please visit:
