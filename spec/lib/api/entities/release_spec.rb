@@ -8,8 +8,8 @@ RSpec.describe API::Entities::Release do
   let(:release) { create(:release, project: project) }
   let(:evidence) { release.evidences.first }
   let(:user) { create(:user) }
-  let(:entity) { described_class.new(release, current_user: user, render_html: render_html).as_json }
-  let(:render_html) { false }
+  let(:entity) { described_class.new(release, current_user: user, include_html_description: include_html_description).as_json }
+  let(:include_html_description) { false }
 
   before do
     ::Releases::CreateEvidenceService.new(release).execute
@@ -59,8 +59,8 @@ RSpec.describe API::Entities::Release do
       expect(description_html).to be_nil
     end
 
-    context 'when render_html option is true' do
-      let(:render_html) { true }
+    context 'when include_html_description option is true' do
+      let(:include_html_description) { true }
 
       it 'renders special references if current user has access' do
         project.add_reporter(user)

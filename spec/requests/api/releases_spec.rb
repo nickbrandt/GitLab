@@ -114,9 +114,9 @@ RSpec.describe API::Releases do
         expect(json_response.second['tag_path']).to eq("/#{release_1.project.full_path}/-/tags/#{release_1.tag}")
       end
 
-      context 'when render_html option is true' do
+      context 'when include_html_description option is true' do
         it 'includes description_html field' do
-          get api("/projects/#{project.id}/releases", maintainer), params: { render_html: true }
+          get api("/projects/#{project.id}/releases", maintainer), params: { include_html_description: true }
 
           expect(json_response.map { |h| h['description_html'] })
             .to contain_exactly(instance_of(String), instance_of(String))
@@ -424,9 +424,9 @@ RSpec.describe API::Releases do
         end
       end
 
-      context 'when render_html option is true' do
+      context 'when include_html_description option is true' do
         it 'includes description_html field' do
-          get api("/projects/#{project.id}/releases/v0.1", maintainer), params: { render_html: true }
+          get api("/projects/#{project.id}/releases/v0.1", maintainer), params: { include_html_description: true }
 
           expect(json_response['description_html']).to be_instance_of(String)
         end

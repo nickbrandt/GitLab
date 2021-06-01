@@ -8,7 +8,7 @@ module API
       expose :name
       expose :tag, as: :tag_name, if: ->(_, _) { can_download_code? }
       expose :description
-      expose :description_html, if: -> (_, options) { options[:render_html] } do |entity|
+      expose :description_html, if: -> (_, options) { options[:include_html_description] } do |entity|
         MarkupHelper.markdown_field(entity, :description, current_user: options[:current_user])
       end
       expose :created_at
