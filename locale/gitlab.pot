@@ -14341,6 +14341,9 @@ msgstr ""
 msgid "ForkProject|Please select a namespace"
 msgstr ""
 
+msgid "ForkProject|Please select a visibility level"
+msgstr ""
+
 msgid "ForkProject|Private"
 msgstr ""
 
