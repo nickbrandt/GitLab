@@ -36,7 +36,7 @@ describe('NewApp component', () => {
       description: SAST_DESCRIPTION,
       helpPath: SAST_HELP_PATH,
       configurationHelpPath: SAST_CONFIG_HELP_PATH,
-      type: 'sast',
+      type: REPORT_TYPE_SAST,
       available: true,
     },
   ];
