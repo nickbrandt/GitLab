@@ -21639,6 +21639,9 @@ msgstr ""
 msgid "Multiple uploaders found: %{uploader_types}"
 msgstr ""
 
+msgid "Must be the primary email address of the GitLab account"
+msgstr ""
+
 msgid "Must have a unique policy, status, and elapsed time"
 msgstr ""
 
