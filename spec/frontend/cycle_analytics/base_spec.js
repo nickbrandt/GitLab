@@ -93,8 +93,7 @@ describe('Value stream analytics component', () => {
     });
 
     it('renders the path navigation component with prop `loading` set to true', () => {
-      expect(findPathNavigation().exists()).toBe(true);
-      expect(findPathNavigation().props('loading')).toBe(true);
+      expect(findPathNavigation().html()).toMatchSnapshot();
     });
 
     it('does not render the overview metrics', () => {
@@ -131,10 +130,8 @@ describe('Value stream analytics component', () => {
       });
     });
 
-    it('renders the empty stage with not enough data', () => {
-      const es = findEmptyStage();
-      expect(es.exists()).toBe(true);
-      expect(es.props('title')).toBe("We don't have enough data to show this stage.");
+    it('renders the empty stage with `Not enough data` message', () => {
+      expect(findEmptyStage().html()).toMatchSnapshot();
     });
   });
 
@@ -145,10 +142,8 @@ describe('Value stream analytics component', () => {
       });
     });
 
-    it('renders the empty stage', () => {
-      const es = findEmptyStage();
-      expect(es.exists()).toBe(true);
-      expect(es.props('title')).toBe('You need permission.');
+    it('renders the empty stage with `You need permission` message', () => {
+      expect(findEmptyStage().html()).toMatchSnapshot();
     });
   });
 
