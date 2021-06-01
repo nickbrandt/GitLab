@@ -14341,6 +14341,9 @@ msgstr ""
 msgid "ForkProject|Please select a namespace"
 msgstr ""
 
+msgid "ForkProject|Please select a visibility level"
+msgstr ""
+
 msgid "ForkProject|Private"
 msgstr ""
 
@@ -15745,13 +15748,16 @@ msgstr ""
 msgid "GroupActivityMetrics|Issues opened"
 msgstr ""
 
+msgid "GroupActivityMetrics|Last 90 days"
+msgstr ""
+
 msgid "GroupActivityMetrics|Members added"
 msgstr ""
 
 msgid "GroupActivityMetrics|Merge Requests opened"
 msgstr ""
 
-msgid "GroupActivityMetrics|Recent activity (last 90 days)"
+msgid "GroupActivityMetrics|Recent activity"
 msgstr ""
 
 msgid "GroupImport|Failed to import group."
