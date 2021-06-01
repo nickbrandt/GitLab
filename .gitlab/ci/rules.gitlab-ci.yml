@@ -313,9 +313,9 @@
     - <<: *if-security-schedule
     - <<: *if-merge-request-title-update-caches
 
-.shared:rules:update-setup-test-env-cache:
-  extends: .shared:rules:update-cache
+.shared:rules:update-gitaly-binaries-cache:
   rules:
+    - <<: *if-merge-request-title-update-caches
     - changes: *gitaly-patterns
 
 ######################
