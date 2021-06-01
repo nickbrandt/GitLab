@@ -294,6 +294,15 @@
   :weight: 1
   :idempotent:
   :tags: []
+- :name: cronjob:incident_management_escalations_schedule_escalation_check_cron
+  :worker_name: IncidentManagement::Escalations::ScheduleEscalationCheckCronWorker
+  :feature_category: :incident_management
+  :has_external_dependencies:
+  :urgency: :low
+  :resource_boundary: :unknown
+  :weight: 1
+  :idempotent: true
+  :tags: []
 - :name: cronjob:incident_management_incident_sla_exceeded_check
   :worker_name: IncidentManagement::IncidentSlaExceededCheckWorker
   :feature_category: :incident_management
@@ -1035,6 +1044,15 @@
   :idempotent: true
   :tags:
   - :exclude_from_kubernetes
+- :name: incident_management_escalations_escalation_check
+  :worker_name: IncidentManagement::Escalations::EscalationCheckWorker
+  :feature_category: :incident_management
+  :has_external_dependencies:
+  :urgency: :high
+  :resource_boundary: :unknown
+  :weight: 1
+  :idempotent: true
+  :tags: []
 - :name: incident_management_oncall_rotations_persist_shifts_job
   :worker_name: IncidentManagement::OncallRotations::PersistShiftsJob
   :feature_category: :incident_management
