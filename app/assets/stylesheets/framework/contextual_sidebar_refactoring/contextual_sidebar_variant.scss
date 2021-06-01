@@ -142,6 +142,7 @@
   @include gl-mb-2;
 
   .avatar-container {
+    @include gl-font-weight-normal;
     flex: 0 0 $sidebar-avatar-size;
     border-color: $t-gray-a-08;
   }
