@@ -69,10 +69,11 @@ export default {
 <template>
   <section>
     <header class="my-3">
-      <h2 class="h3 mb-1">
+      <h2 class="h3 mb-1 gl-display-flex gl-align-items-center">
         {{ s__('ThreatMonitoring|Threat Monitoring') }}
         <gl-link
           ref="helpLink"
+          class="gl-ml-3"
           target="_blank"
           :href="documentationPath"
           :aria-label="s__('ThreatMonitoring|Threat Monitoring help page link')"
