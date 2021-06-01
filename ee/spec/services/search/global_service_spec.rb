@@ -24,12 +24,6 @@ RSpec.describe Search::GlobalService do
     it_behaves_like 'search query applies joins based on migrations shared examples', :add_new_data_to_issues_documents
   end
 
-  context 'notes search' do
-    let(:results) { described_class.new(nil, search: '*').execute.objects('notes') }
-
-    it_behaves_like 'search query applies joins based on migrations shared examples', :add_permissions_data_to_notes_documents
-  end
-
   context 'merge_requests search' do
     let(:results) { described_class.new(nil, search: '*').execute.objects('merge_requests') }
 
@@ -128,17 +122,7 @@ RSpec.describe Search::GlobalService do
         end
 
         with_them do
-          context 'when add_permissions_data_to_notes_documents migration is finished' do
-            it_behaves_like 'search respects visibility'
-          end
-
-          context 'when add_permissions_data_to_notes_documents migration is not finished' do
-            before do
-              set_elasticsearch_migration_to :add_permissions_data_to_notes_documents, including: false
-            end
-
-            it_behaves_like 'search respects visibility'
-          end
+          it_behaves_like 'search respects visibility'
         end
       end
 
