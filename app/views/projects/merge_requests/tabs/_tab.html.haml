@@ -1,7 +1,7 @@
 - tab_name = local_assigns.fetch(:name, nil)
 - tab_class = local_assigns.fetch(:class, nil)
 - qa_selector = local_assigns.fetch(:qa_selector, nil)
-- id = local_assigns.fetch(:id, nil)
+- tab_id = local_assigns.fetch(:id, nil)
 
-%li{ class: [tab_class, ("active" if params[:tab] == tab_name)], id: id || tab_class, data: { qa_selector: qa_selector } }
+%li{ (tab_id ? { id: tab_id } : {}), class: [tab_class, ("active" if params[:tab] == tab_name)], data: { qa_selector: qa_selector } }
   = yield

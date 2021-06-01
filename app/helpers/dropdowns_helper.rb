@@ -102,8 +102,7 @@ module DropdownsHelper
 
   def dropdown_filter(placeholder, search_id: nil)
     content_tag :div, class: "dropdown-input" do
-      dropdown_id = search_id || (placeholder&.parameterize || "filter") + "-dropdown-input-" + rand(1..100).to_s
-      filter_output = search_field_tag dropdown_id, nil, data: { qa_selector: "dropdown_input_field" }, class: "dropdown-input-field", placeholder: placeholder, autocomplete: 'off'
+      filter_output = search_field_tag search_id, nil, data: { qa_selector: "dropdown_input_field" }, id: nil, class: "dropdown-input-field", placeholder: placeholder, autocomplete: 'off'
       filter_output << sprite_icon('search', css_class: 'dropdown-input-search')
       filter_output << sprite_icon('close', size: 16, css_class: 'dropdown-input-clear js-dropdown-input-clear')
 
