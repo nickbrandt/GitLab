@@ -9,7 +9,10 @@ import {
   SAST_CONFIG_HELP_PATH,
 } from '~/security_configuration/components/constants';
 import FeatureCard from '~/security_configuration/components/feature_card.vue';
-import RedesignedSecurityConfigurationApp from '~/security_configuration/components/redesigned_app.vue';
+import RedesignedSecurityConfigurationApp, {
+  i18n,
+} from '~/security_configuration/components/redesigned_app.vue';
+import { REPORT_TYPE_SAST } from '~/vue_shared/security_reports/constants';
 
 describe('NewApp component', () => {
   let wrapper;
@@ -73,7 +76,7 @@ describe('NewApp component', () => {
     it('renders sub-heading with correct text', () => {
       const subHeading = findSubHeading();
       expect(subHeading).toExist();
-      expect(subHeading.text()).toContain(RedesignedSecurityConfigurationApp.i18n.securityTesting);
+      expect(subHeading.text()).toContain(i18n.securityTesting);
     });
 
     it('renders right amount of feature cards for given props with correct props', () => {
@@ -98,7 +101,7 @@ describe('NewApp component', () => {
     it('should show latest pipeline info with correct link when latestPipelinePath is defined', () => {
       expect(findByTestId('latest-pipeline-info').exists()).toBe(true);
       expect(findByTestId('latest-pipeline-info').text()).toMatchInterpolatedText(
-        RedesignedSecurityConfigurationApp.i18n.securityTestingDescription,
+        i18n.securityTestingDescription,
       );
       expect(findByTestId('latest-pipeline-info').find('a').attributes('href')).toBe('test/path');
     });

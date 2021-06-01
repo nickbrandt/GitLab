@@ -54,26 +54,26 @@ const expectedOutputCustomFeature = {
   augmentedComplianceFeatures: mockComplianceFeatures,
 };
 
-describe('augmentFeatures', () => {
-  it('augments features array correctly when given an empty array', () => {
+describe('returns an object with augmentedSecurityFeatures and augmentedComplianceFeatures when', () => {
+  it('given an empty array', () => {
     expect(augmentFeatures(mockSecurityFeatures, mockComplianceFeatures, [])).toEqual(
       expectedOutputDefault,
     );
   });
 
-  it('augments features array correctly when given an invalid populated array', () => {
+  it('given an invalid populated array', () => {
     expect(
       augmentFeatures(mockSecurityFeatures, mockComplianceFeatures, mockInvalidCustomFeature),
     ).toEqual(expectedOutputDefault);
   });
 
-  it('augments features array correctly when features have secondary key', () => {
+  it('features have secondary key', () => {
     expect(augmentFeatures(mockSecurityFeatures, mockFeaturesWithSecondary, [])).toEqual(
       expectedOutputSecondary,
     );
   });
 
-  it('augments features array correctly when given a valid populated array', () => {
+  it('given a valid populated array', () => {
     expect(
       augmentFeatures(mockSecurityFeatures, mockComplianceFeatures, mockValidCustomFeature),
     ).toEqual(expectedOutputCustomFeature);

@@ -3,7 +3,20 @@ import { GlTab, GlTabs, GlSprintf, GlLink } from '@gitlab/ui';
 import { __, s__ } from '~/locale';
 import FeatureCard from './feature_card.vue';
 
+export const i18n = {
+  compliance: s__('SecurityConfiguration|Compliance'),
+  securityTesting: s__('SecurityConfiguration|Security testing'),
+  securityTestingDescription: s__(
+    `SecurityConfiguration|The status of the tools only applies to the
+      default branch and is based on the %{linkStart}latest pipeline%{linkEnd}.
+      Once you've enabled a scan for the default branch, any subsequent feature
+      branch you create will include the scan.`,
+  ),
+  securityConfiguration: __('Security Configuration'),
+};
+
 export default {
+  i18n,
   components: {
     GlTab,
     GlLink,
@@ -21,17 +34,6 @@ export default {
       required: false,
       default: '',
     },
-  },
-  i18n: {
-    compliance: s__('SecurityConfiguration|Compliance'),
-    securityTesting: s__('SecurityConfiguration|Security testing'),
-    securityTestingDescription: s__(
-      `SecurityConfiguration|The status of the tools only applies to the
-      default branch and is based on the %{linkStart}latest pipeline%{linkEnd}.
-      Once you've enabled a scan for the default branch, any subsequent feature
-      branch you create will include the scan.`,
-    ),
-    securityConfiguration: __('Security Configuration'),
   },
 };
 </script>
