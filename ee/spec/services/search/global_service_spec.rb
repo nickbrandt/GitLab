@@ -166,38 +166,14 @@ RSpec.describe Search::GlobalService do
       let(:scope) { 'issues' }
       let(:search) { issue.title }
 
-      context 'when add_new_data_to_issues_documents migration is finished' do
-        let!(:issue) { create :issue, project: project }
+      let!(:issue) { create :issue, project: project }
 
-        where(:project_level, :feature_access_level, :membership, :admin_mode, :expected_count) do
-          permission_table_for_guest_feature_access
-        end
-
-        with_them do
-          it_behaves_like 'search respects visibility'
-        end
+      where(:project_level, :feature_access_level, :membership, :admin_mode, :expected_count) do
+        permission_table_for_guest_feature_access
       end
 
-      # Since newly created indices automatically have all migrations as
-      # finished we need a test to verify the old style searches work for
-      # instances which haven't finished the migration yet
-      context 'when add_new_data_to_issues_documents migration is not finished' do
-        before do
-          set_elasticsearch_migration_to :add_new_data_to_issues_documents, including: false
-        end
-
-        # issue cannot be defined prior to the migration mocks because it
-        # will cause the incorrect value to be passed to `use_separate_indices` when creating
-        # the proxy
-        let!(:issue) { create(:issue, project: project) }
-
-        where(:project_level, :feature_access_level, :membership, :admin_mode, :expected_count) do
-          permission_table_for_guest_feature_access
-        end
-
-        with_them do
-          it_behaves_like 'search respects visibility'
-        end
+      with_them do
+        it_behaves_like 'search respects visibility'
       end
     end
 
