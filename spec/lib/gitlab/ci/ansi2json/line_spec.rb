@@ -76,10 +76,25 @@ RSpec.describe Gitlab::Ci::Ansi2json::Line do
   end
 
   describe '#set_section_duration' do
-    it 'sets and formats the section_duration' do
-      subject.set_section_duration(75)
 
-      expect(subject.section_duration).to eq('01:15')
+    shared_examples 'set_section_duration' do
+      it 'sets and formats the section_duration' do
+        subject.set_section_duration(75)
+
+        expect(subject.section_duration).to eq('01:15')
+      end
+    end
+
+    context 'with default timezone' do
+      it_behaves_like 'set_section_duration'
+    end
+
+    context 'with a timezone carrying minutes offset' do
+      before do
+        allow(Time).to receive(:at).with(75).and_return(Time.at(75, in: '+05:30'))
+      end
+
+      it_behaves_like 'set_section_duration'
     end
   end
 
