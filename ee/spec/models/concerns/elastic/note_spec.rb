@@ -162,9 +162,6 @@ RSpec.describe Note, :elastic do
         allow(Elastic::DataMigrationService).to receive(:migration_has_finished?)
                                                   .with(:remove_permissions_data_from_notes_documents)
                                                   .and_return(false)
-        allow(Elastic::DataMigrationService).to receive(:migration_has_finished?)
-                                                  .with(:migrate_notes_to_separate_index)
-                                                  .and_return(false)
 
         expect(note_json).not_to have_key(access_level) if access_level.present?
         expect(note_json).not_to have_key('visibility_level')

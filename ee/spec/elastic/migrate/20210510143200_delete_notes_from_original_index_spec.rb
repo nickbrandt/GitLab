@@ -34,7 +34,6 @@ RSpec.describe DeleteNotesFromOriginalIndex, :elastic, :sidekiq_inline do
     let!(:notes) { Array.new(10).map { create(:note, project: create(:project, :public)) } }
 
     before do
-      set_elasticsearch_migration_to :migrate_notes_to_separate_index, including: false
       ensure_elasticsearch_index!
     end
 
