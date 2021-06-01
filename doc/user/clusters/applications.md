@@ -34,7 +34,7 @@ Despite being deprecated, the recommended way for installing GitLab integrated a
 > - [Deprecated](https://gitlab.com/gitlab-org/gitlab/-/issues/327908) in GitLab 13.12.
 
 WARNING:
-The GitLab Managed Apps CI/CD installation method was [deprecated in 13.12](https://gitlab.com/gitlab-org/gitlab/-/issues/327908). 
+The GitLab Managed Apps CI/CD installation method was [deprecated in 13.12](https://gitlab.com/gitlab-org/gitlab/-/issues/327908).
 Your applications continue to work. However, we no longer support and maintain the GitLab CI/CD template for
 Managed Apps (`Managed-Cluster-Applications.gitlab-ci.yml`).
 As a replacement, we are working on a [cluster management project template](https://gitlab.com/gitlab-org/gitlab/-/issues/327908),
@@ -404,9 +404,9 @@ These values can be specified using [CI/CD variables](../../ci/variables/README.
 - `GITLAB_RUNNER_GITLAB_URL` is used for `gitlabUrl`.
 - `GITLAB_RUNNER_REGISTRATION_TOKEN` is used for `runnerRegistrationToken`
 
-The methods of specifying these values are mutually exclusive. Either specify variables `GITLAB_RUNNER_REGISTRATION_TOKEN` and `GITLAB_RUNNER_TOKEN` as CI variables (recommended) or provide values for `runnerRegistrationToken:` and `runnerToken:` in `.gitlab/managed-apps/gitlab-runner/values.yaml`. If you choose to use CI variables, comment out or remove `runnerRegistrationToken:` and `runnerToken:` from `.gitlab/managed-apps/gitlab-runner/values`.  
+The methods of specifying these values are mutually exclusive. Either specify variables `GITLAB_RUNNER_REGISTRATION_TOKEN` and `GITLAB_RUNNER_TOKEN` as CI variables (recommended) or provide values for `runnerRegistrationToken:` and `runnerToken:` in `.gitlab/managed-apps/gitlab-runner/values.yaml`. If you choose to use CI variables, comment out or remove `runnerRegistrationToken:` and `runnerToken:` from `.gitlab/managed-apps/gitlab-runner/values`.
 
-The runner registration token allows connection to a project by a runner and therefore should be treated as a secret to prevent malicious use and code exfiltration through a runner. For this reason, we recommend that you specify the runner registration token as a [protected variable](../../ci/variables/README.md#protect-a-cicd-variable) and [masked variable](../../ci/variables/README.md#mask-a-cicd-variable) and do not commit them to the Git repository in the `values.yaml` file. 
+The runner registration token allows connection to a project by a runner and therefore should be treated as a secret to prevent malicious use and code exfiltration through a runner. For this reason, we recommend that you specify the runner registration token as a [protected variable](../../ci/variables/README.md#protect-a-cicd-variable) and [masked variable](../../ci/variables/README.md#mask-a-cicd-variable) and do not commit them to the Git repository in the `values.yaml` file.
 
 You can customize the installation of GitLab Runner by defining
 `.gitlab/managed-apps/gitlab-runner/values.yaml` file in your cluster
@@ -1175,7 +1175,7 @@ before deploying one.
 
 The [`runner/gitlab-runner`](https://gitlab.com/gitlab-org/charts/gitlab-runner)
 chart is used to install this application, using
-[a preconfigured `values.yaml`](https://gitlab.com/gitlab-org/charts/gitlab-runner/-/blob/master/values.yaml)
+[a preconfigured `values.yaml`](https://gitlab.com/gitlab-org/charts/gitlab-runner/-/blob/main/values.yaml)
 file. Customizing the installation by modifying this file is not supported. This
 also means you cannot modify `config.toml` file for this Runner. If you want to
 have that possibility and still deploy Runner in Kubernetes, consider using the
