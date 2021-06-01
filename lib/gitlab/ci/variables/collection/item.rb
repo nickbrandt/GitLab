@@ -7,14 +7,6 @@ module Gitlab
         class Item
           include Gitlab::Utils::StrongMemoize
 
-          class << self
-            def possible_var_reference?(value)
-              return unless value
-
-              VARIABLE_REF_CHARS.any? { |symbol| value.include?(symbol) }
-            end
-          end
-
           VARIABLES_REGEXP = /\$\$|%%|\$(?<key>[a-zA-Z_][a-zA-Z0-9_]*)|\${\g<key>?}|%\g<key>%/.freeze.freeze
           VARIABLE_REF_CHARS = %w[$ %].freeze
 
@@ -73,6 +65,12 @@ module Gitlab
             else
               raise ArgumentError, "Unknown `#{resource.class}` variable resource!"
             end
+          end
+
+          def self.possible_var_reference?(value)
+            return unless value
+
+            VARIABLE_REF_CHARS.any? { |symbol| value.include?(symbol) }
           end
 
           def to_s

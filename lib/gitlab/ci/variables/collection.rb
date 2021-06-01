@@ -71,10 +71,14 @@ module Gitlab
           value.gsub(Item::VARIABLES_REGEXP) do
             match = Regexp.last_match
             if match[:key]
-              # return variable matched, or return original if undefined
-              @variables_by_key[match[:key]]&.value || (keep_undefined ? match[0] : nil)
+              # we matched variable
+              if variable = @variables_by_key[match[:key]]
+                variable.value
+              elsif keep_undefined
+                match[0]
+              end
             else
-              # we matched escapable sequence, return as-is
+              # we escape sequence
               match[0]
             end
           end
