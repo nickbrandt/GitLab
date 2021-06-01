@@ -43,19 +43,7 @@
     prefix: "gitaly-binaries"
   paths:
     - tmp/tests/gitaly/_build/bin/
-    - tmp/tests/gitaly/config.toml
-    - tmp/tests/gitaly/gitaly2.config.toml
-    - tmp/tests/gitaly/internal/
-    - tmp/tests/gitaly/internal_gitaly2/
-    - tmp/tests/gitaly/internal_sockets/
-    - tmp/tests/gitaly/Makefile
-    - tmp/tests/gitaly/praefect.config.toml
-    - tmp/tests/gitaly/ruby/
   policy: pull
-
-.gitaly-binaries-cache-push: &gitaly-binaries-cache-push
-  <<: *gitaly-binaries-cache
-  policy: push  # We want to rebuild the cache from scratch to ensure stale dependencies are cleaned up.
 
 .go-pkg-cache: &go-pkg-cache
   key: "go-pkg-v1"
@@ -125,8 +113,12 @@
   cache:
     - *ruby-gems-cache-push
     - *gitaly-ruby-gems-cache-push
-    - *gitaly-binaries-cache-push
     - *go-pkg-cache-push
+
+.gitaly-binaries-cache-push:
+  cache:
+    - <<: *gitaly-binaries-cache
+      policy: push  # We want to rebuild the cache from scratch to ensure stale dependencies are cleaned up.
 
 .rails-cache:
   cache:
