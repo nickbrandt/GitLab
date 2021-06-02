@@ -119,8 +119,7 @@ RSpec.describe Nav::NewDropdownHelper do
                 id: 'general_new_project',
                 title: 'New project',
                 href: '/projects/new',
-                css_class: 'qa-global-new-project-link',
-                data: { track_experiment: 'new_repo', track_event: 'click_link_new_project', track_label: 'plus_menu_dropdown' }
+                data: { track_experiment: 'new_repo', track_event: 'click_link_new_project', track_label: 'plus_menu_dropdown', qa_selector: 'global_new_project_link' }
               )
             )
           )
@@ -158,8 +157,7 @@ RSpec.describe Nav::NewDropdownHelper do
                 id: 'general_new_snippet',
                 title: 'New snippet',
                 href: '/-/snippets/new',
-                css_class: 'qa-global-new-snippet-link',
-                data: { track_event: 'click_link_new_snippet_parent', track_label: 'plus_menu_dropdown' }
+                data: { track_event: 'click_link_new_snippet_parent', track_label: 'plus_menu_dropdown', qa_selector: 'global_new_snippet_link' }
               )
             )
           )
@@ -266,8 +264,7 @@ RSpec.describe Nav::NewDropdownHelper do
                 id: 'new_issue',
                 title: 'New issue',
                 href: "/#{project.path_with_namespace}/-/issues/new",
-                css_class: 'qa-new-issue-link',
-                data: { track_event: 'click_link_new_issue', track_label: 'plus_menu_dropdown' }
+                data: { track_event: 'click_link_new_issue', track_label: 'plus_menu_dropdown', qa_selector: 'new_issue_link' }
               )
             )
           )

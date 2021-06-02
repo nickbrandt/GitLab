@@ -81,8 +81,7 @@ module Nav
             id: 'new_issue',
             title: _('New issue'),
             href: new_project_issue_path(project),
-            css_class: 'qa-new-issue-link',
-            data: { track_event: 'click_link_new_issue', track_label: 'plus_menu_dropdown' }
+            data: { track_event: 'click_link_new_issue', track_label: 'plus_menu_dropdown', qa_selector: 'new_issue_link' }
           )
         )
       end
@@ -132,8 +131,7 @@ module Nav
             id: 'general_new_project',
             title: new_repo_experiment_text,
             href: new_project_path,
-            css_class: 'qa-global-new-project-link',
-            data: { track_experiment: 'new_repo', track_event: 'click_link_new_project', track_label: 'plus_menu_dropdown' }
+            data: { track_experiment: 'new_repo', track_event: 'click_link_new_project', track_label: 'plus_menu_dropdown', qa_selector: 'global_new_project_link' }
           )
         )
       end
@@ -155,8 +153,7 @@ module Nav
             id: 'general_new_snippet',
             title: _('New snippet'),
             href: new_snippet_path,
-            css_class: 'qa-global-new-snippet-link',
-            data: { track_event: 'click_link_new_snippet_parent', track_label: 'plus_menu_dropdown' }
+            data: { track_event: 'click_link_new_snippet_parent', track_label: 'plus_menu_dropdown', qa_selector: 'global_new_snippet_link' }
           )
         )
       end

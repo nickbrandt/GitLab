@@ -118,7 +118,7 @@ module QA
 
         def go_to_new_issue
           click_element :new_menu_toggle
-          click_link 'New issue'
+          click_element(:new_issue_link)
         end
 
         def has_file?(name)
