@@ -22,30 +22,36 @@ class StuckCiJobsWorker # rubocop:disable Scalability/IdempotentWorker
     Gitlab::AppLogger.info "#{self.class}: Cleaning stuck builds"
 
     drop(
-      status: :running,
-      search_condition: 'ci_builds.updated_at < ?',
-      search_condition_params: [BUILD_RUNNING_OUTDATED_TIMEOUT.ago],
+      Ci::Build.running.where( # rubocop: disable CodeReuse/ActiveRecord
+        'ci_builds.updated_at < ?',
+        BUILD_RUNNING_OUTDATED_TIMEOUT.ago
+      ),
       failure_reason: :stuck_or_timeout_failure
     )
 
     drop(
-      status: :pending,
-      search_condition: 'ci_builds.created_at < ? AND ci_builds.updated_at < ?',
-      search_condition_params: [BUILD_PENDING_OUTDATED_TIMEOUT.ago, BUILD_PENDING_OUTDATED_TIMEOUT.ago],
+      Ci::Build.pending.where( # rubocop: disable CodeReuse/ActiveRecord
+        'ci_builds.created_at < ? AND ci_builds.updated_at < ?',
+        BUILD_PENDING_OUTDATED_TIMEOUT.ago,
+        BUILD_PENDING_OUTDATED_TIMEOUT.ago
+      ),
       failure_reason: :stuck_or_timeout_failure
     )
 
     drop(
-      status: :scheduled,
-      search_condition: 'ci_builds.scheduled_at IS NOT NULL AND ci_builds.scheduled_at < ?',
-      search_condition_params: [BUILD_SCHEDULED_OUTDATED_TIMEOUT.ago],
+      Ci::Build.where(status: :scheduled).where( # rubocop: disable CodeReuse/ActiveRecord
+        'ci_builds.scheduled_at IS NOT NULL AND ci_builds.scheduled_at < ?',
+        BUILD_SCHEDULED_OUTDATED_TIMEOUT.ago
+      ),
       failure_reason: :stale_schedule
     )
 
     drop_stuck(
-      status: :pending,
-      search_condition: 'ci_builds.created_at < ? AND ci_builds.updated_at < ?',
-      search_condition_params: [BUILD_PENDING_STUCK_TIMEOUT.ago, BUILD_PENDING_STUCK_TIMEOUT.ago],
+      Ci::Build.pending.where( # rubocop: disable CodeReuse/ActiveRecord
+        'ci_builds.created_at < ? AND ci_builds.updated_at < ?',
+        BUILD_PENDING_STUCK_TIMEOUT.ago,
+        BUILD_PENDING_STUCK_TIMEOUT.ago
+      ),
       failure_reason: :stuck_or_timeout_failure
     )
 
@@ -62,26 +68,24 @@ class StuckCiJobsWorker # rubocop:disable Scalability/IdempotentWorker
     Gitlab::ExclusiveLease.cancel(EXCLUSIVE_LEASE_KEY, @uuid)
   end
 
-  def drop(status:, search_condition:, search_condition_params:, failure_reason:)
-    search(status, search_condition, search_condition_params) do |build|
-      drop_build :outdated, build, status, search_condition_params, failure_reason
+  def drop(builds, failure_reason:)
+    fetch(builds) do |build|
+      drop_build :outdated, build, failure_reason
     end
   end
 
-  def drop_stuck(status:, search_condition:, search_condition_params:, failure_reason:)
-    search(status, search_condition, search_condition_params) do |build|
+  def drop_stuck(builds, failure_reason:)
+    fetch(builds) do |build|
       break unless build.stuck?
 
-      drop_build :stuck, build, status, search_condition_params, failure_reason
+      drop_build :stuck, build, failure_reason
     end
   end
 
   # rubocop: disable CodeReuse/ActiveRecord
-  def search(status, condition, condition_params)
+  def fetch(builds)
     loop do
-      jobs = Ci::Build.where(status: status)
-        .where(condition, *condition_params)
-        .includes(:tags, :runner, project: [:namespace, :route])
+      jobs = builds.includes(:tags, :runner, project: [:namespace, :route])
         .limit(100)
         .to_a
 
@@ -94,8 +98,8 @@ class StuckCiJobsWorker # rubocop:disable Scalability/IdempotentWorker
   end
   # rubocop: enable CodeReuse/ActiveRecord
 
-  def drop_build(type, build, status, condition_params, reason)
-    Gitlab::AppLogger.info "#{self.class}: Dropping #{type} build #{build.id} for runner #{build.runner_id} (status: #{status}, condition_params: #{condition_params}, reason: #{reason})"
+  def drop_build(type, build, reason)
+    Gitlab::AppLogger.info "#{self.class}: Dropping #{type} build #{build.id} for runner #{build.runner_id} (status: #{build.status}, failure_reason: #{reason})"
     Gitlab::OptimisticLocking.retry_lock(build, 3, name: 'stuck_ci_jobs_worker_drop_build') do |b|
       b.drop(reason)
     end

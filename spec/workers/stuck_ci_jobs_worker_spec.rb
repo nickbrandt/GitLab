@@ -159,7 +159,7 @@ RSpec.describe StuckCiJobsWorker do
   context 'when job is running' do
     let(:status) { 'running' }
 
-    context 'when job was not updated for more than 1 hour ago' do
+    context 'when job was updated_at more than an hour ago' do
       let(:updated_at) { 2.hours.ago }
 
       context 'when created_at is the same as updated_at' do
