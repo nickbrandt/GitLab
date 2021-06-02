@@ -5,6 +5,7 @@ import {
   GlDropdown,
   GlDropdownItem,
   GlCard,
+  GlButton,
   GlIcon,
   GlSprintf,
   GlTooltipDirective as GlTooltip,
@@ -24,6 +25,7 @@ export const i18n = {
       noSchedules: s__(
         'EscalationPolicies|A schedule is required for adding an escalation policy. Please create an on-call schedule first.',
       ),
+      removeRuleLabel: s__('EscalationPolicies|Remove escalation rule'),
     },
   },
 };
@@ -38,6 +40,7 @@ export default {
     GlDropdown,
     GlDropdownItem,
     GlCard,
+    GlButton,
     GlIcon,
     GlSprintf,
   },
@@ -111,9 +114,12 @@ export default {
 
 <template>
   <gl-card class="gl-border-gray-400 gl-bg-gray-10 gl-mb-3 gl-relative">
-    <gl-icon
+    <gl-button
       v-if="index !== 0"
-      name="close"
+      category="tertiary"
+      size="small"
+      icon="close"
+      :aria-label="$options.i18n.fields.rules.removeRuleLabel"
       class="gl-absolute rule-close-icon"
       @click="$emit('remove-escalation-rule', index)"
     />
