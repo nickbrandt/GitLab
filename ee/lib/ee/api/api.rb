@@ -54,6 +54,7 @@ module EE
         mount ::API::Ci::Minutes
 
         mount ::API::Internal::AppSec::Dast::SiteValidations
+        mount ::API::Internal::UpcomingReconciliations
       end
     end
   end
