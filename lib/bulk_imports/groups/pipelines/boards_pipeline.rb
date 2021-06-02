@@ -3,10 +3,10 @@
 module BulkImports
   module Groups
     module Pipelines
-      class LabelsPipeline
+      class BoardsPipeline
         include NdjsonPipeline
 
-        relation_name 'labels'
+        relation_name 'boards'
 
         extractor ::BulkImports::Common::Extractors::NdjsonExtractor, relation: relation
       end
