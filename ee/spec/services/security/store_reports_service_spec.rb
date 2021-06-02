@@ -34,7 +34,7 @@ RSpec.describe Security::StoreReportsService do
       end
 
       it 'marks the project as vulnerable' do
-        expect { execute_service_object }.to change { project.project_setting.has_vulnerabilities }.from(false).to(true)
+        expect { execute_service_object }.to change { project.reload.project_setting.has_vulnerabilities }.from(false).to(true)
       end
 
       it 'updates the `latest_pipeline_id` attribute of the associated `vulnerability_statistic` record' do
