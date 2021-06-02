@@ -26,6 +26,7 @@ export default () => {
     projectFullPath,
     pipelineJobsPath,
     canAdminVulnerability,
+    securityReportHelpPageLink,
   } = el.dataset;
 
   const loadingErrorIllustrations = {
@@ -51,6 +52,7 @@ export default () => {
         jobsPath: pipelineJobsPath,
         sourceBranch,
       },
+      securityReportHelpPageLink,
     },
     render(createElement) {
       return createElement(PipelineSecurityDashboard, {

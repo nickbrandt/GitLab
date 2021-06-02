@@ -2,6 +2,7 @@ import { GlEmptyState } from '@gitlab/ui';
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
 import PipelineSecurityDashboard from 'ee/security_dashboard/components/pipeline/pipeline_security_dashboard.vue';
+import ScanErrorsAlert from 'ee/security_dashboard/components/pipeline/scan_errors_alert.vue';
 import SecurityDashboard from 'ee/security_dashboard/components/pipeline/security_dashboard_vuex.vue';
 import SecurityReportsSummary from 'ee/security_dashboard/components/pipeline/security_reports_summary.vue';
 import VulnerabilityReport from 'ee/security_dashboard/components/vulnerability_report.vue';
@@ -28,6 +29,7 @@ describe('Pipeline Security Dashboard component', () => {
 
   const findSecurityDashboard = () => wrapper.findComponent(SecurityDashboard);
   const findVulnerabilityReport = () => wrapper.findComponent(VulnerabilityReport);
+  const findScanErrorsAlert = () => wrapper.findComponent(ScanErrorsAlert);
 
   const factory = ({ data, stubs, provide } = {}) => {
     store = new Vuex.Store({
@@ -136,7 +138,7 @@ describe('Pipeline Security Dashboard component', () => {
     });
 
     it('renders empty state component with correct props', () => {
-      const emptyState = wrapper.find(GlEmptyState);
+      const emptyState = wrapper.findComponent(GlEmptyState);
 
       expect(emptyState.props()).toMatchObject({
         svgPath: '/svgs/empty/svg',
@@ -145,6 +147,35 @@ describe('Pipeline Security Dashboard component', () => {
         primaryButtonLink: '/help/docs',
         primaryButtonText: 'Learn more about setting up your dashboard',
       });
+    });
+  });
+
+  describe('scan errors alert', () => {
+    const securityReportSummary = {
+      dast: {
+        scans: [
+          {
+            name: 'dast',
+            errors: [],
+          },
+        ],
+      },
+    };
+
+    beforeEach(() => {
+      factory({
+        data: {
+          securityReportSummary,
+        },
+      });
+    });
+
+    it('includes the alert', () => {
+      expect(findScanErrorsAlert().exists()).toBe(true);
+    });
+
+    it('passes the security report summary to the alert', () => {
+      expect(findScanErrorsAlert().props('securityReportSummary')).toBe(securityReportSummary);
     });
   });
 
@@ -161,7 +192,7 @@ describe('Pipeline Security Dashboard component', () => {
           securityReportSummary,
         },
       });
-      expect(wrapper.find(SecurityReportsSummary).exists()).toBe(true);
+      expect(wrapper.findComponent(SecurityReportsSummary).exists()).toBe(true);
     });
 
     it('does not show the summary if it is empty', () => {
@@ -170,7 +201,7 @@ describe('Pipeline Security Dashboard component', () => {
           securityReportSummary: null,
         },
       });
-      expect(wrapper.find(SecurityReportsSummary).exists()).toBe(false);
+      expect(wrapper.findComponent(SecurityReportsSummary).exists()).toBe(false);
     });
   });
 });
