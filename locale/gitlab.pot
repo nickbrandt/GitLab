@@ -10620,6 +10620,9 @@ msgstr ""
 msgid "Delete domain"
 msgstr ""
 
+msgid "Delete file"
+msgstr ""
+
 msgid "Delete image repository"
 msgstr ""
 
@@ -23552,6 +23555,9 @@ msgstr ""
 msgid "PackageRegistry|Created by commit %{link} on branch %{branch}"
 msgstr ""
 
+msgid "PackageRegistry|Delete Package File"
+msgstr ""
+
 msgid "PackageRegistry|Delete Package Version"
 msgstr ""
 
@@ -23630,6 +23636,9 @@ msgstr ""
 msgid "PackageRegistry|Package Registry"
 msgstr ""
 
+msgid "PackageRegistry|Package file deleted successfully"
+msgstr ""
+
 msgid "PackageRegistry|Package has %{number} archived update"
 msgstr ""
 
@@ -23693,6 +23702,12 @@ msgstr ""
 msgid "PackageRegistry|Show Yarn commands"
 msgstr ""
 
+msgid "PackageRegistry|Something went wrong while deleting the package file."
+msgstr ""
+
+msgid "PackageRegistry|Something went wrong while deleting the package."
+msgstr ""
+
 msgid "PackageRegistry|Sorry, your filter produced no results"
 msgstr ""
 
@@ -23721,6 +23736,9 @@ msgid "PackageRegistry|Unable to fetch package version information."
 msgstr ""
 
 msgid "PackageRegistry|Unable to load package"
+msgstr ""
+
+msgid "PackageRegistry|You are about to delete %{filename}. This is a destructive action that may render your package unusable. Are you sure?"
 msgstr ""
 
 msgid "PackageRegistry|You are about to delete %{name}, this operation is irreversible, are you sure?"
@@ -30484,9 +30502,6 @@ msgid "Something went wrong while creating a requirement."
 msgstr ""
 
 msgid "Something went wrong while deleting description changes. Please try again."
-msgstr ""
-
-msgid "Something went wrong while deleting the package."
 msgstr ""
 
 msgid "Something went wrong while deleting the source branch. Please try again."
