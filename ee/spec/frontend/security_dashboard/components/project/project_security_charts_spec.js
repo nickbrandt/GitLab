@@ -3,7 +3,7 @@ import { GlLineChart } from '@gitlab/ui/dist/charts';
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import VueApollo from 'vue-apollo';
 import DashboardNotConfigured from 'ee/security_dashboard/components/empty_states/reports_not_configured.vue';
-import ProjectSecurityCharts from 'ee/security_dashboard/components/project_security_charts.vue';
+import ProjectSecurityCharts from 'ee/security_dashboard/components/project/project_security_charts.vue';
 import SecurityChartsLayout from 'ee/security_dashboard/components/security_charts_layout.vue';
 import projectsHistoryQuery from 'ee/security_dashboard/graphql/queries/project_vulnerabilities_by_day_and_count.query.graphql';
 import { useFakeDate } from 'helpers/fake_date';
@@ -11,7 +11,7 @@ import createMockApollo from 'helpers/mock_apollo_helper';
 import {
   mockProjectSecurityChartsWithData,
   mockProjectSecurityChartsWithoutData,
-} from '../mock_data';
+} from '../../mock_data';
 
 const localVue = createLocalVue();
 localVue.use(VueApollo);

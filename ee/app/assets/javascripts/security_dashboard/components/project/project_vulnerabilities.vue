@@ -3,18 +3,18 @@ import { GlAlert, GlLoadingIcon, GlIntersectionObserver } from '@gitlab/ui';
 import produce from 'immer';
 import { difference } from 'lodash';
 import { Portal } from 'portal-vue';
+import securityScannersQuery from 'ee/security_dashboard/graphql/queries/project_security_scanners.query.graphql';
+import vulnerabilitiesQuery from 'ee/security_dashboard/graphql/queries/project_vulnerabilities.query.graphql';
+import { preparePageInfo } from 'ee/security_dashboard/helpers';
+import { VULNERABILITIES_PER_PAGE } from 'ee/security_dashboard/store/constants';
 import { parseBoolean } from '~/lib/utils/common_utils';
 import { __ } from '~/locale';
 import LocalStorageSync from '~/vue_shared/components/local_storage_sync.vue';
-import securityScannersQuery from '../graphql/queries/project_security_scanners.query.graphql';
-import vulnerabilitiesQuery from '../graphql/queries/project_vulnerabilities.query.graphql';
-import { preparePageInfo } from '../helpers';
-import { VULNERABILITIES_PER_PAGE } from '../store/constants';
+import VulnerabilityList from '../vulnerability_list.vue';
 import SecurityScannerAlert from './security_scanner_alert.vue';
-import VulnerabilityList from './vulnerability_list.vue';
 
 export default {
-  name: 'ProjectVulnerabilitiesApp',
+  name: 'ProjectVulnerabilities',
   components: {
     GlAlert,
     GlLoadingIcon,

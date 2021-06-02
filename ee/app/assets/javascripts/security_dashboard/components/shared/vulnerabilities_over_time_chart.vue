@@ -1,6 +1,7 @@
 <script>
 import { GlTooltipDirective, GlTable, GlLoadingIcon } from '@gitlab/ui';
 import { GlSparklineChart } from '@gitlab/ui/dist/charts';
+import { SEVERITY_LEVELS, DAYS } from 'ee/security_dashboard/store/constants';
 import SeverityBadge from 'ee/vue_shared/security_reports/components/severity_badge.vue';
 import { firstAndLastY } from '~/lib/utils/chart_utils';
 import {
@@ -10,8 +11,7 @@ import {
 } from '~/lib/utils/datetime_utility';
 import { formattedChangeInPercent } from '~/lib/utils/number_utils';
 import { s__, sprintf } from '~/locale';
-import { SEVERITY_LEVELS, DAYS } from '../store/constants';
-import ChartButtons from './vulnerability_chart_buttons.vue';
+import ChartButtons from '../vulnerability_chart_buttons.vue';
 
 const ISO_DATE = 'isoDate';
 const TH_CLASS = 'gl-bg-white!';
