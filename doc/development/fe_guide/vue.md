@@ -361,7 +361,7 @@ describe('~/todos/app.vue', () => {
     });
   };
   // Helper methods greatly help test maintainability and readability.
-  const findLoader = () => wrapper.find(GlLoadingIcon);
+  const findLoader = () => wrapper.findComponent(GlLoadingIcon);
   const findAddButton = () => wrapper.findByTestId('add-button');
   const findTextInput = () => wrapper.findByTestId('text-input');
   const findTodoData = () =>

@@ -1097,7 +1097,7 @@ it('renders a loading state', () => {
   const mockApollo = createMockApolloProvider();
   const wrapper = createComponent({ mockApollo });
 
-  expect(wrapper.find(LoadingSpinner).exists()).toBe(true)
+  expect(wrapper.findComponent(LoadingSpinner).exists()).toBe(true)
 });
 
 it('renders designs list', async () => {

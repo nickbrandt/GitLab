@@ -463,7 +463,7 @@ Creating a global, mutable wrapper provides a number of advantages, including th
     let wrapper;
 
     // this can now be reused across tests
-    const findMyComponent = wrapper.find(MyComponent);
+    const findMyComponent = wrapper.findComponent(MyComponent);
     // ...
   })
   ```
