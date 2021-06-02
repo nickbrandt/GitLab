@@ -9,7 +9,7 @@ const ExtendedImage = Image.extend({
         default: null,
         /*
          * GitLab Flavored Markdown provides lazy loading for rendering images. As
-         * as result, the src attribute of the image may content an embedded resource
+         * as result, the src attribute of the image may contain an embedded resource
          * instead of the actual image URL. The image URL is moved to the data-src
          * attribute.
          */
