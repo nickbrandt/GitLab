@@ -18556,10 +18556,19 @@ msgstr ""
 msgid "Iterations|Cadence name"
 msgstr ""
 
+msgid "Iterations|Couldn't find iteration cadence"
+msgstr ""
+
 msgid "Iterations|Create cadence"
 msgstr ""
 
 msgid "Iterations|Duration"
+msgstr ""
+
+msgid "Iterations|Edit cadence"
+msgstr ""
+
+msgid "Iterations|Edit iteration cadence"
 msgstr ""
 
 msgid "Iterations|Error loading iteration cadences."
@@ -18581,6 +18590,9 @@ msgid "Iterations|No iterations in cadence."
 msgstr ""
 
 msgid "Iterations|Number of future iterations you would like to have scheduled"
+msgstr ""
+
+msgid "Iterations|Save cadence"
 msgstr ""
 
 msgid "Iterations|Select duration"
