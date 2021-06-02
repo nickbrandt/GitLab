@@ -121,7 +121,7 @@ export default {
           :tag-display-limit="1"
         />
 
-     <div v-if="packageEntity.package_pipeline_detailed_status" class="ci-status-link gl-ml-3">
+        <div v-if="packageEntity.package_pipeline_detailed_status" class="ci-status-link gl-ml-3">
           <gl-link
             v-gl-tooltip.left
             :href="packageEntity.package_pipeline_detailed_status.details_path"
