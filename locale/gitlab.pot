@@ -13087,6 +13087,9 @@ msgstr ""
 msgid "EscalationPolicies|A schedule is required for adding an escalation policy."
 msgstr ""
 
+msgid "EscalationPolicies|A schedule is required for adding an escalation policy. Please create an on-call schedule first."
+msgstr ""
+
 msgid "EscalationPolicies|Add an escalation policy"
 msgstr ""
 

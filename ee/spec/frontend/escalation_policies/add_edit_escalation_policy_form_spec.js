@@ -29,6 +29,11 @@ describe('AddEscalationPolicyForm', () => {
         provide: {
           projectPath,
         },
+        mocks: {
+          $apollo: {
+            queries: { schedules: { loading: false } },
+          },
+        },
       }),
     );
   };
