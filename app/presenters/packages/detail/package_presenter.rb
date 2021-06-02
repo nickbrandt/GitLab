@@ -50,7 +50,7 @@ module Packages
         }
 
         file_view[:pipelines] = build_pipeline_infos(package_file.pipelines) if package_file.pipelines.present?
-        if package_file.push
+        if package_file.push&.pipeline
           pipeline = package_file.push.pipeline
 
           detailed_status = pipeline.detailed_status(user)
