@@ -721,7 +721,7 @@ must be fulfilled:
 - `use_iam_profile` is `true` in the connection settings.
 - Consolidated object storage settings are in use.
 
-[ETag mismatch errors](#etag-mismatch) occurs if server side
+[ETag mismatch errors](#etag-mismatch) occur if server side
 encryption headers are used without enabling the Workhorse S3 client.
 
 ##### Disabling the feature
