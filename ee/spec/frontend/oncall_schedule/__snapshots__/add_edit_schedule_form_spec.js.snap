@@ -1,15 +1,13 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`AddEditScheduleForm renders modal layout 1`] = `
-<gl-form-stub
-  modalid="modalId"
->
+exports[`AddEditScheduleForm renders form layout 1`] = `
+<gl-form-stub>
   <gl-form-group-stub
     invalid-feedback="Can't be empty"
     label="Name"
     label-for="schedule-name"
     label-size="sm"
-    requried=""
+    required=""
     state="true"
   >
     <gl-form-input-stub
@@ -35,7 +33,7 @@ exports[`AddEditScheduleForm renders modal layout 1`] = `
     label="Timezone"
     label-for="schedule-timezone"
     label-size="sm"
-    requried=""
+    required=""
     state="true"
   >
     <gl-dropdown-stub

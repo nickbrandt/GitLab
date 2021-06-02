@@ -6,15 +6,18 @@ module Analytics
       class FindOrCreateService
         include CommonMethods
 
+        delegate :authorize!, to: :create_service
+
         def initialize(params: {}, current_user:)
           @params = params
           @current_user = current_user
         end
 
+        # rubocop: disable CodeReuse/ActiveRecord
         def execute
           authorize!
 
-          segment = Analytics::DevopsAdoption::Segment.find_by_namespace_id(namespace.id)
+          segment = Analytics::DevopsAdoption::Segment.find_by(namespace_id: namespace.id, display_namespace_id: display_namespace&.id)
 
           if segment
             ServiceResponse.success(payload: { segment: segment })
@@ -22,18 +25,13 @@ module Analytics
             create_service.execute
           end
         end
+        # rubocop: enable CodeReuse/ActiveRecord
 
         def authorize!
           create_service.authorize!
         end
 
         private
-
-        attr_reader :params, :current_user
-
-        def namespace
-          params[:namespace]
-        end
 
         def create_service
           @create_service ||= CreateService.new(current_user: current_user, params: params)

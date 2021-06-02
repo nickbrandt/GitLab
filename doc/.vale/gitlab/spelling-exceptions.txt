@@ -13,6 +13,7 @@ anonymization
 anonymized
 Ansible
 Anthos
+Apdex
 approvers
 architected
 architecting
@@ -207,6 +208,7 @@ formatters
 Fugit
 fuzzer
 Gantt
+Gemfile
 Gemnasium
 Gemojione
 Getter
@@ -281,6 +283,7 @@ jQuery
 jsdom
 Jsonnet
 JupyterHub
+Kaminari
 kanban
 kanbans
 kaniko
@@ -546,6 +549,7 @@ serializer
 serializers
 serializing
 serverless
+severities
 sharded
 sharding
 shfmt

@@ -82,7 +82,7 @@ module EE
     private
 
     def protected_environment_accesses(user)
-      key = "environment:#{self.project_id}:#{self.name}:for:#{user.id}"
+      key = "environment:#{self.id}:for:#{user.id}"
 
       ::Gitlab::SafeRequestStore.fetch(key) do
         associated_protected_environments.group_by do |pe|

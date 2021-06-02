@@ -41,7 +41,7 @@ describe('EpicFilteredSearch', () => {
           ],
           token: LabelToken,
           unique: false,
-          symbol: '~',
+          defaultLabels: [{ value: 'No label', text: 'No label' }],
           fetchLabels: wrapper.vm.fetchLabels,
         },
         {

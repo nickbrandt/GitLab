@@ -185,6 +185,7 @@ describe('RoadmapFilters', () => {
           symbol: '~',
           token: LabelToken,
           operators,
+          recentTokenValuesStorageKey: 'gitlab-org-epics-recent-tokens-label_name',
           fetchLabels: expect.any(Function),
         },
         {
@@ -217,7 +218,6 @@ describe('RoadmapFilters', () => {
           symbol: '&',
           token: EpicToken,
           operators,
-          idProperty: 'iid',
           defaultEpics: [],
           fetchEpics: expect.any(Function),
         },

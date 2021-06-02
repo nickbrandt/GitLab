@@ -44,6 +44,13 @@ module Nav
           **snippets_menu_item_attrs
         )
       end
+
+      builder.add_secondary_menu_item(
+        id: 'help',
+        title: _('Help'),
+        icon: 'question-o',
+        href: help_path
+      )
     end
 
     def build_view_model(builder:, project:, group:)
@@ -132,7 +139,7 @@ module Nav
             active: active_nav_link?(controller: 'admin/sessions'),
             icon: 'lock-open',
             href: destroy_admin_session_path,
-            method: :post
+            data: { method: 'post' }
           )
         elsif current_user.admin?
           builder.add_secondary_menu_item(

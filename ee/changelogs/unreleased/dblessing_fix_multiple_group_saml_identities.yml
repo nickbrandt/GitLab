@@ -1,5 +1,0 @@
----
-title: Fix sign-in when user has multiple group saml identities
-merge_request: 61717
-author:
-type: fixed

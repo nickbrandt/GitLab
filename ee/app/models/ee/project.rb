@@ -359,7 +359,11 @@ module EE
     end
 
     def shared_runners_available?
-      super && !::Ci::Minutes::Quota.new(shared_runners_limit_namespace).minutes_used_up?
+      super && !ci_minutes_quota.minutes_used_up?
+    end
+
+    def shared_runners_enabled_but_unavailable?
+      shared_runners_enabled? && !shared_runners_available?
     end
 
     def link_pool_repository
@@ -668,7 +672,7 @@ module EE
 
       # Index the wiki repository after import of non-forked projects only, the project repository is indexed
       # in ProjectImportState so ElasticSearch will get project repository changes when mirrors are updated
-      ElasticCommitIndexerWorker.perform_async(id, nil, nil, true) if use_elasticsearch? && !forked?
+      ElasticCommitIndexerWorker.perform_async(id, true) if use_elasticsearch? && !forked?
     end
 
     def log_geo_updated_events

@@ -45,6 +45,7 @@ module QA
     autoload :IPAddress, 'qa/runtime/ip_address'
     autoload :Search, 'qa/runtime/search'
     autoload :ApplicationSettings, 'qa/runtime/application_settings'
+    autoload :AllureReport, 'qa/runtime/allure_report'
 
     module API
       autoload :Client, 'qa/runtime/api/client'
@@ -73,7 +74,9 @@ module QA
     autoload :Issue, 'qa/resource/issue'
     autoload :ProjectIssueNote, 'qa/resource/project_issue_note'
     autoload :Project, 'qa/resource/project'
-    autoload :Label, 'qa/resource/label'
+    autoload :LabelBase, 'qa/resource/label_base'
+    autoload :ProjectLabel, 'qa/resource/project_label'
+    autoload :GroupLabel, 'qa/resource/group_label'
     autoload :MergeRequest, 'qa/resource/merge_request'
     autoload :ProjectImportedFromGithub, 'qa/resource/project_imported_from_github'
     autoload :MergeRequestFromFork, 'qa/resource/merge_request_from_fork'

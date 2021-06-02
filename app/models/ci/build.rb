@@ -90,16 +90,6 @@ module Ci
       end
     end
 
-    # Initializing an object instead of fetching `persisted_environment` for avoiding unnecessary queries.
-    # We're planning to introduce a direct relationship between build and environment
-    # in https://gitlab.com/gitlab-org/gitlab/-/issues/326445 to let us to preload
-    # in batch.
-    def instantized_environment
-      return unless has_environment?
-
-      ::Environment.new(project: self.project, name: self.expanded_environment_name)
-    end
-
     serialize :options # rubocop:disable Cop/ActiveRecordSerialize
     serialize :yaml_variables, Gitlab::Serializer::Ci::Variables # rubocop:disable Cop/ActiveRecordSerialize
 
@@ -479,7 +469,13 @@ module Ci
     end
 
     def retryable?
-      !archived? && (success? || failed? || canceled?)
+      if Feature.enabled?(:prevent_retry_of_retried_jobs, project, default_enabled: :yaml)
+        return false if retried? || archived?
+
+        success? || failed? || canceled?
+      else
+        !archived? && (success? || failed? || canceled?)
+      end
     end
 
     def retries_count

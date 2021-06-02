@@ -25,6 +25,9 @@ learn how to proceed to keep your apps up and running:
 - [One-click install method](#install-with-one-click-deprecated)
 - [CI/CD template method](#install-using-gitlab-cicd-deprecated)
 
+NOTE:
+Despite being deprecated, the recommended way for installing GitLab integrated applications is by the GitLab CI/CD method presented below. We are working on a [cluster management project template](https://gitlab.com/gitlab-org/gitlab/-/issues/327908) with a simple upgrade path from the CI/CD based method.
+
 ## Install using GitLab CI/CD (DEPRECATED)
 
 > - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/20822) in GitLab 12.6.
@@ -400,6 +403,10 @@ These values can be specified using [CI/CD variables](../../ci/variables/README.
 
 - `GITLAB_RUNNER_GITLAB_URL` is used for `gitlabUrl`.
 - `GITLAB_RUNNER_REGISTRATION_TOKEN` is used for `runnerRegistrationToken`
+
+The methods of specifying these values are mutually exclusive. Either specify variables `GITLAB_RUNNER_REGISTRATION_TOKEN` and `GITLAB_RUNNER_TOKEN` as CI variables (recommended) or provide values for `runnerRegistrationToken:` and `runnerToken:` in `.gitlab/managed-apps/gitlab-runner/values.yaml`. If you choose to use CI variables, comment out or remove `runnerRegistrationToken:` and `runnerToken:` from `.gitlab/managed-apps/gitlab-runner/values`.  
+
+The runner registration token allows connection to a project by a runner and therefore should be treated as a secret to prevent malicious use and code exfiltration through a runner. For this reason, we recommend that you specify the runner registration token as a [protected variable](../../ci/variables/README.md#protect-a-cicd-variable) and [masked variable](../../ci/variables/README.md#mask-a-cicd-variable) and do not commit them to the Git repository in the `values.yaml` file. 
 
 You can customize the installation of GitLab Runner by defining
 `.gitlab/managed-apps/gitlab-runner/values.yaml` file in your cluster
@@ -1066,7 +1073,6 @@ You can install the following applications with one click:
 - [Knative](#knative)
 - [Crossplane](#crossplane)
 - [Elastic Stack](#elastic-stack)
-- [Fluentd](#fluentd)
 
 With the exception of Knative, the applications are installed in a dedicated
 namespace called `gitlab-managed-apps`.
@@ -1557,27 +1563,6 @@ kubectl port-forward svc/kibana-kibana 5601:5601
 ```
 
 Then, you can visit Kibana at `http://localhost:5601`.
-
-### Fluentd
-
-> Introduced in GitLab 12.10 for project- and group-level clusters.
-
-[Fluentd](https://www.fluentd.org/) is an open source data collector, which enables
-you to unify the data collection and consumption to better use and understand
-your data. Fluentd sends logs in syslog format.
-
-To enable Fluentd:
-
-1. Navigate to **Operations > Kubernetes** and click
-   **Applications**. Enter a host, port, and protocol
-   for sending the WAF logs with syslog.
-1. Provide the host domain name or URL in **SIEM Hostname**.
-1. Provide the host port number in **SIEM Port**.
-1. Select a **SIEM Protocol**.
-1. Select at least one of the available logs (such as WAF or Cilium).
-1. Click **Save changes**.
-
-![Fluentd input fields](img/fluentd_v13_0.png)
 
 ## Upgrading applications
 

@@ -15,19 +15,20 @@ documentation for all current settings and limits on the GitLab.com instance.
 
 ## General
 
-Access the default page for admin area settings by navigating to **Admin Area > Settings > General**:
+Access the default page for Admin Area settings by navigating to **Admin Area > Settings > General**:
 
 | Option | Description |
 | ------ | ----------- |
 | [Visibility and access controls](visibility_and_access_controls.md) | Set default and restrict visibility levels. Configure import sources and Git access protocol. |
-| [Account and limit](account_and_limit_settings.md) **(STARTER)** | Set projects and maximum size limits, session duration, user options, and check feature availability for namespace plan. |
+| [Account and limit](account_and_limit_settings.md) | Set projects and maximum size limits, session duration, user options, and check feature availability for namespace plan. |
 | [Diff limits](../diff_limits.md) | Diff content limits. |
 | [Sign-up restrictions](sign_up_restrictions.md) | Configure the way a user creates a new account. |
 | [Sign in restrictions](sign_in_restrictions.md) | Set requirements for a user to sign in. Enable mandatory two-factor authentication. |
 | [Terms of Service and Privacy Policy](terms.md) | Include a Terms of Service agreement and Privacy Policy that all users must accept. |
 | [External Authentication](external_authorization.md#configuration) | External Classification Policy Authorization |
 | [Web terminal](../../../administration/integration/terminal.md#limiting-websocket-connection-time) | Set max session time for web terminal. |
-| [Web IDE](../../project/web_ide/index.md#enabling-live-preview) | Manage Web IDE Features. |
+| [Web IDE](../../project/web_ide/index.md#enable-live-preview) | Manage Web IDE features. |
+| [FLoC](floc.md) | Enable or disable [Federated Learning of Cohorts (FLoC)](https://en.wikipedia.org/wiki/Federated_Learning_of_Cohorts) tracking. |
 
 ## Integrations
 

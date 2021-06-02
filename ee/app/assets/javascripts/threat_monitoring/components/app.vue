@@ -2,7 +2,6 @@
 import { GlIcon, GlLink, GlPopover, GlTabs, GlTab } from '@gitlab/ui';
 import { mapActions } from 'vuex';
 import { s__ } from '~/locale';
-import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import Alerts from './alerts/alerts.vue';
 import NetworkPolicyList from './network_policy_list.vue';
 import NoEnvironmentEmptyState from './no_environment_empty_state.vue';
@@ -23,15 +22,10 @@ export default {
     NetworkPolicyList,
     NoEnvironmentEmptyState,
   },
-  mixins: [glFeatureFlagsMixin()],
   inject: ['documentationPath'],
   props: {
     defaultEnvironmentId: {
       type: Number,
-      required: true,
-    },
-    wafNoDataSvgPath: {
-      type: String,
       required: true,
     },
     networkPolicyNoDataSvgPath: {
@@ -52,11 +46,6 @@ export default {
       isSetUpMaybe: this.isValidEnvironmentId(this.defaultEnvironmentId),
     };
   },
-  computed: {
-    showAlertsTab() {
-      return this.glFeatures.threatMonitoringAlerts;
-    },
-  },
   created() {
     if (this.isSetUpMaybe) {
       this.setCurrentEnvironmentId(this.defaultEnvironmentId);
@@ -69,15 +58,6 @@ export default {
       return Number.isInteger(id) && id >= 0;
     },
   },
-  chartEmptyStateDescription: s__(
-    `ThreatMonitoring|While it's rare to have no traffic coming to your
-    application, it can happen. In any event, we ask that you double check your
-    settings to make sure you've set up the WAF correctly.`,
-  ),
-  wafChartEmptyStateDescription: s__(
-    `ThreatMonitoring|The firewall is not installed or has been disabled. To view
-     this data, ensure the web application firewall is installed and enabled for your cluster.`,
-  ),
   networkPolicyChartEmptyStateDescription: s__(
     `ThreatMonitoring|Container Network Policies are not installed or have been disabled. To view
      this data, ensure your Network Policies are installed and enabled for your cluster.`,
@@ -106,11 +86,7 @@ export default {
     </header>
 
     <gl-tabs content-class="gl-pt-0">
-      <gl-tab
-        v-if="showAlertsTab"
-        :title="s__('ThreatMonitoring|Alerts')"
-        data-testid="threat-monitoring-alerts-tab"
-      >
+      <gl-tab :title="s__('ThreatMonitoring|Alerts')" data-testid="threat-monitoring-alerts-tab">
         <alerts />
       </gl-tab>
       <gl-tab ref="networkPolicyTab" :title="s__('ThreatMonitoring|Policies')">
@@ -128,23 +104,6 @@ export default {
         <no-environment-empty-state v-if="!isSetUpMaybe" />
         <template v-else>
           <threat-monitoring-filters />
-
-          <threat-monitoring-section
-            ref="wafSection"
-            store-namespace="threatMonitoringWaf"
-            :title="s__('ThreatMonitoring|Web Application Firewall')"
-            :subtitle="s__('ThreatMonitoring|Requests')"
-            :anomalous-title="s__('ThreatMonitoring|Anomalous Requests')"
-            :nominal-title="s__('ThreatMonitoring|Total Requests')"
-            :y-legend="s__('ThreatMonitoring|Requests')"
-            :chart-empty-state-title="s__('ThreatMonitoring|Application firewall not detected')"
-            :chart-empty-state-text="$options.wafChartEmptyStateDescription"
-            :chart-empty-state-svg-path="wafNoDataSvgPath"
-            :documentation-path="documentationPath"
-            documentation-anchor="web-application-firewall"
-          />
-
-          <hr />
 
           <threat-monitoring-section
             ref="networkPolicySection"

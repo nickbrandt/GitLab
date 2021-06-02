@@ -1,6 +1,5 @@
-import { within, fireEvent } from '@testing-library/dom';
+import { within } from '@testing-library/dom';
 import { mount } from '@vue/test-utils';
-import { nextTick } from 'vue';
 import ReportSection from 'ee/vulnerabilities/components/generic_report/report_section.vue';
 import { REPORT_TYPES } from 'ee/vulnerabilities/components/generic_report/types/constants';
 import { extendedWrapper } from 'helpers/vue_test_utils_helper';
@@ -17,10 +16,15 @@ const TEST_DATA = {
       type: REPORT_TYPES.url,
       href: 'http://bar.com',
     },
+    three: {
+      type: REPORT_TYPES.table,
+      header: [],
+      rows: [],
+    },
   },
   unsupportedTypes: {
-    three: {
-      name: 'three',
+    four: {
+      name: 'four',
       type: 'not-supported',
     },
   },
@@ -33,13 +37,14 @@ describe('ee/vulnerabilities/components/generic_report/report_section.vue', () =
     extendedWrapper(
       mount(ReportSection, {
         propsData: {
-          details: { ...TEST_DATA.supportedTypes },
+          details: { ...TEST_DATA.supportedTypes, ...TEST_DATA.unsupportedTypes },
         },
         ...options,
       }),
     );
 
   const withinWrapper = () => within(wrapper.element);
+  const findHeader = () => wrapper.find('header');
   const findHeading = () =>
     withinWrapper().getByRole('heading', {
       name: /evidence/i,
@@ -60,11 +65,10 @@ describe('ee/vulnerabilities/components/generic_report/report_section.vue', () =
         expect(findHeading()).toBeInstanceOf(HTMLElement);
       });
 
-      it('collapses when the heading is clicked', async () => {
+      it('collapses when the header is clicked', async () => {
         expect(findReportsSection().isVisible()).toBe(true);
 
-        fireEvent.click(findHeading());
-        await nextTick();
+        await findHeader().trigger('click');
 
         expect(findReportsSection().isVisible()).toBe(false);
       });

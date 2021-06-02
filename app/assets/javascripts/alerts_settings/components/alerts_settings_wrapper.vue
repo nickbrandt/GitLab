@@ -39,8 +39,8 @@ export default {
   components: {
     IntegrationsList,
     AlertSettingsForm,
-    GlButton,
     GlAlert,
+    GlButton,
   },
   inject: {
     projectPath: {
@@ -167,7 +167,7 @@ export default {
           if (testAfterSubmit) {
             this.viewIntegration(integration, tabIndices.sendTestAlert);
           } else {
-            this.clearCurrentIntegration(type);
+            this.clearCurrentIntegration({ type });
           }
 
           createFlash({

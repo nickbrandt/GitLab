@@ -298,7 +298,7 @@ export default {
       filters: filterParams,
       isGroup: boardType === BoardType.group,
       isProject: boardType === BoardType.project,
-      first: 20,
+      first: 10,
       after: fetchNext ? state.pageInfoByListId[listId].endCursor : undefined,
     };
 
@@ -489,8 +489,13 @@ export default {
     });
   },
 
-  addListItem: ({ commit }, { list, item, position }) => {
-    commit(types.ADD_BOARD_ITEM_TO_LIST, { listId: list.id, itemId: item.id, atIndex: position });
+  addListItem: ({ commit }, { list, item, position, inProgress = false }) => {
+    commit(types.ADD_BOARD_ITEM_TO_LIST, {
+      listId: list.id,
+      itemId: item.id,
+      atIndex: position,
+      inProgress,
+    });
     commit(types.UPDATE_BOARD_ITEM, item);
   },
 
@@ -509,8 +514,8 @@ export default {
       input.projectPath = fullPath;
     }
 
-    const placeholderIssue = formatIssue({ ...issueInput, id: placeholderId });
-    dispatch('addListItem', { list, item: placeholderIssue, position: 0 });
+    const placeholderIssue = formatIssue({ ...issueInput, id: placeholderId, isLoading: true });
+    dispatch('addListItem', { list, item: placeholderIssue, position: 0, inProgress: true });
 
     gqlClient
       .mutate({
@@ -721,7 +726,7 @@ export default {
     }
   },
 
-  setError: ({ commit }, { message, error, captureError = false }) => {
+  setError: ({ commit }, { message, error, captureError = true }) => {
     commit(types.SET_ERROR, message);
 
     if (captureError) {

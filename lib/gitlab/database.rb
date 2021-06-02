@@ -9,7 +9,8 @@ module Gitlab
     #   'old_name' => 'new_name'
     # }.freeze
     TABLES_TO_BE_RENAMED = {
-      'analytics_instance_statistics_measurements' => 'analytics_usage_trends_measurements'
+      'analytics_instance_statistics_measurements' => 'analytics_usage_trends_measurements',
+      'services' => 'integrations'
     }.freeze
 
     # Minimum PostgreSQL version requirement per documentation:
@@ -86,6 +87,11 @@ module Gitlab
       else
         'Unknown'
       end
+    end
+
+    # Disables prepared statements for the current database connection.
+    def self.disable_prepared_statements
+      ActiveRecord::Base.establish_connection(config.merge(prepared_statements: false))
     end
 
     # @deprecated

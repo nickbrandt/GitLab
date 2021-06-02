@@ -660,15 +660,9 @@ module Ci
     # Return a hash of file type => array of 1 job artifact
     def latest_report_artifacts
       ::Gitlab::SafeRequestStore.fetch("pipeline:#{self.id}:latest_report_artifacts") do
-        # Note we use read_attribute(:project_id) to read the project
-        # ID instead of self.project_id. The latter appears to load
-        # the Project model. This extra filter doesn't appear to
-        # affect query plan but included to ensure we don't leak the
-        # wrong informaiton.
         ::Ci::JobArtifact.where(
           id: job_artifacts.with_reports
             .select('max(ci_job_artifacts.id) as id')
-            .where(project_id: self.read_attribute(:project_id))
             .group(:file_type)
         )
           .preload(:job)
@@ -928,6 +922,12 @@ module Ci
       Ci::Build.latest.where(pipeline: self_and_descendants)
     end
 
+    def environments_in_self_and_descendants
+      environment_ids = self_and_descendants.joins(:deployments).select(:'deployments.environment_id')
+
+      Environment.where(id: environment_ids)
+    end
+
     # Without using `unscoped`, caller scope is also included into the query.
     # Using `unscoped` here will be redundant after Rails 6.1
     def self_and_descendants
@@ -994,7 +994,7 @@ module Ci
     end
 
     def latest_test_report_builds
-      latest_report_builds(Ci::JobArtifact.test_reports).preload(:project)
+      latest_report_builds(Ci::JobArtifact.test_reports).preload(:project, :job_variables, :metadata)
     end
 
     def builds_with_coverage
@@ -1250,6 +1250,10 @@ module Ci
           build.collect_security_reports!(security_reports)
         end
       end
+    end
+
+    def build_matchers
+      self.builds.build_matchers(project)
     end
 
     private

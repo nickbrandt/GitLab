@@ -15,7 +15,7 @@ RSpec.describe ElasticCommitIndexerWorker do
     it 'runs indexer' do
       expect_any_instance_of(Gitlab::Elastic::Indexer).to receive(:run)
 
-      subject.perform(project.id, '0000', '0000')
+      subject.perform(project.id, false)
     end
 
     it 'returns true if ES disabled' do
@@ -32,7 +32,7 @@ RSpec.describe ElasticCommitIndexerWorker do
       expect(indexer).to receive(:run)
       expect(Gitlab::Elastic::Indexer).to receive(:new).with(project, wiki: true).and_return(indexer)
 
-      subject.perform(project.id, nil, nil, true)
+      subject.perform(project.id, true)
     end
 
     it 'does not run index when it is locked' do

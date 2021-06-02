@@ -1,5 +1,0 @@
----
-title: Check credit card requirement when retrying a CI build on GitLab.com
-merge_request: 62050
-author:
-type: fixed

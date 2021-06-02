@@ -672,7 +672,7 @@ RSpec.describe Integration do
       expect(described_class.service_name_to_model('asana')).to eq(Integrations::Asana)
       # TODO We can remove this test when all models have been namespaced:
       # https://gitlab.com/gitlab-org/gitlab/-/merge_requests/60968#note_570994955
-      expect(described_class.service_name_to_model('webex_teams')).to eq(WebexTeamsService)
+      expect(described_class.service_name_to_model('pushover')).to eq(PushoverService)
     end
 
     it 'raises an error if service name is invalid' do
@@ -892,20 +892,6 @@ RSpec.describe Integration do
         expect(Gitlab::JsonLogger).to receive(:info).with(arguments)
 
         service.log_info(test_message, additional_argument: 'some argument')
-      end
-    end
-  end
-
-  describe '#external_wiki?' do
-    where(:type, :active, :result) do
-      'ExternalWikiService' | true  | true
-      'ExternalWikiService' | false | false
-      'SlackService'        | true  | false
-    end
-
-    with_them do
-      it 'returns the right result' do
-        expect(build(:service, type: type, active: active).external_wiki?).to eq(result)
       end
     end
   end

@@ -112,6 +112,7 @@ export default {
     v-if="available"
     key="service-level-agreement"
     :title="s__('IncidentSettings|Incident settings')"
+    active
   >
     <gl-form class="gl-pt-3" @submit.prevent="updateServiceLevelAgreementSettings">
       <p class="gl-line-height-20">
@@ -148,7 +149,7 @@ export default {
           {{ $options.i18n.validFeedback }}
         </template>
       </gl-form-group>
-      <gl-button variant="success" type="submit" :disabled="disableSubmit" :loading="loading">
+      <gl-button variant="confirm" type="submit" :disabled="disableSubmit" :loading="loading">
         {{ __('Save changes') }}
       </gl-button>
     </gl-form>

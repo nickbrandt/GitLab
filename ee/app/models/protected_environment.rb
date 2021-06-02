@@ -28,7 +28,7 @@ class ProtectedEnvironment < ApplicationRecord
     def for_environment(environment)
       raise ArgumentError unless environment.is_a?(::Environment)
 
-      key = "protected_environment:for_environment:#{environment.project_id}:#{environment.name}"
+      key = "protected_environment:for_environment:#{environment.id}"
 
       ::Gitlab::SafeRequestStore.fetch(key) do
         where(project: environment.project_id, name: environment.name)

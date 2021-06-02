@@ -2,7 +2,7 @@
 
 source 'https://rubygems.org'
 
-gem 'rails', '~> 6.0.3.6'
+gem 'rails', '~> 6.0.3.7'
 
 gem 'bootsnap', '~> 1.4.6'
 
@@ -185,11 +185,10 @@ gem 'rack-timeout', '~> 0.5.1', require: 'rack/timeout/base'
 
 group :unicorn do
   gem 'unicorn', '~> 5.5'
-  gem 'unicorn-worker-killer', '~> 0.4.4'
 end
 
 group :puma do
-  gem 'puma', '~> 5.1.1', require: false
+  gem 'puma', '~> 5.3.1', require: false
   gem 'puma_worker_killer', '~> 0.3.1', require: false
 end
 
@@ -254,7 +253,7 @@ gem 'flowdock', '~> 0.7'
 gem 'slack-messenger', '~> 2.3.4'
 
 # Hangouts Chat integration
-gem 'hangouts-chat', '~> 0.0.5'
+gem 'hangouts-chat', '~> 0.0.5', require: 'hangouts_chat'
 
 # Asana integration
 gem 'asana', '~> 0.10.3'
@@ -306,15 +305,20 @@ gem 'gitlab-license', '~> 1.5'
 gem 'rack-attack', '~> 6.3.0'
 
 # Sentry integration
-gem 'sentry-raven', '~> 3.0'
+gem 'sentry-raven', '~> 3.1'
 
 # PostgreSQL query parsing
-gem 'pg_query', '~> 2.0.3'
+#
+# We need this fork until https://github.com/pganalyze/pg_query/pull/212
+# and https://github.com/pganalyze/pg_query/pull/213 are
+# released. gitlab-labkit will need to be updated to use the pg_query
+# version.
+gem 'gitlab-pg_query', '~> 2.0.4', require: 'pg_query'
 
 gem 'premailer-rails', '~> 1.10.3'
 
 # LabKit: Tracing and Correlation
-gem 'gitlab-labkit', '~> 0.17.1'
+gem 'gitlab-labkit', '~> 0.18.0'
 # Thrift is a dependency of gitlab-labkit, we want a version higher than 0.14.0
 # because of https://gitlab.com/gitlab-org/gitlab/-/issues/321900
 gem 'thrift', '>= 0.14.0'
@@ -341,7 +345,6 @@ group :metrics do
 
   # Prometheus
   gem 'prometheus-client-mmap', '~> 0.12.0'
-  gem 'raindrops', '~> 0.18'
 end
 
 group :development do
@@ -485,7 +488,7 @@ gem 'gitaly', '~> 13.12.0.pre.rc1'
 
 gem 'grpc', '~> 1.30.2'
 
-gem 'google-protobuf', '~> 3.15.8'
+gem 'google-protobuf', '~> 3.17.1'
 
 gem 'toml-rb', '~> 1.0.0'
 

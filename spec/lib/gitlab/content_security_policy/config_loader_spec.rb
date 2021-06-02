@@ -35,6 +35,7 @@ RSpec.describe Gitlab::ContentSecurityPolicy::ConfigLoader do
 
       expect(directives.has_key?('report_uri')).to be_truthy
       expect(directives['report_uri']).to be_nil
+      expect(directives['child_src']).to eq(directives['frame_src'])
     end
 
     context 'when GITLAB_CDN_HOST is set' do
@@ -46,7 +47,7 @@ RSpec.describe Gitlab::ContentSecurityPolicy::ConfigLoader do
         settings = described_class.default_settings_hash
         directives = settings['directives']
 
-        expect(directives['script_src']).to eq("'strict-dynamic' 'self' 'unsafe-inline' 'unsafe-eval' https://www.recaptcha.net https://apis.google.com https://example.com")
+        expect(directives['script_src']).to eq("'strict-dynamic' 'self' 'unsafe-inline' 'unsafe-eval' https://www.google.com/recaptcha/ https://www.recaptcha.net https://apis.google.com https://example.com")
         expect(directives['style_src']).to eq("'self' 'unsafe-inline' https://example.com")
       end
     end

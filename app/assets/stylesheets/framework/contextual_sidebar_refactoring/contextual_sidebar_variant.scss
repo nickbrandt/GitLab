@@ -1,0 +1,406 @@
+//
+// TEMPORARY OVERRIDES
+// Needed while we serve both *_base and *_variant stylesheets
+// TODO: These have to be removed during the feature flag rollout
+//
+&.gl-dark .nav-sidebar li.active {
+  box-shadow: none;
+}
+
+&.gl-dark .nav-sidebar li a,
+.toggle-sidebar-button .collapse-text,
+.toggle-sidebar-button .icon-chevron-double-lg-left,
+.toggle-sidebar-button .icon-chevron-double-lg-right {
+  color: $gray-darkest;
+}
+
+.nav-sidebar {
+  box-shadow: none;
+
+  li.active {
+    background-color: transparent;
+    box-shadow: none;
+  }
+}
+
+//
+// MIXINS
+//
+
+@mixin collapse-contextual-sidebar-content {
+
+  @include context-header-collapsed;
+
+  .sidebar-top-level-items > li {
+    .sidebar-sub-level-items {
+      &:not(.flyout-list) {
+        display: none;
+      }
+    }
+  }
+
+  .nav-icon-container {
+    margin-right: 0;
+  }
+
+  .toggle-sidebar-button {
+    padding: 16px;
+    width: $contextual-sidebar-collapsed-width - 1px;
+
+    .collapse-text,
+    .icon-chevron-double-lg-left {
+      display: none;
+    }
+
+    .icon-chevron-double-lg-right {
+      display: block;
+      margin: 0;
+    }
+  }
+}
+
+@mixin collapse-contextual-sidebar {
+  width: $contextual-sidebar-collapsed-width;
+
+  .nav-sidebar-inner-scroll {
+    overflow-x: hidden;
+  }
+
+  .badge.badge-pill:not(.fly-out-badge),
+  .nav-item-name {
+    @include gl-sr-only;
+  }
+
+  .sidebar-top-level-items > li > a {
+    min-height: 45px;
+  }
+
+  .fly-out-top-item {
+    display: block;
+  }
+
+  .avatar-container {
+    margin: 0 auto;
+  }
+}
+
+@mixin sub-level-items-flyout {
+  .sidebar-sub-level-items {
+    @include media-breakpoint-up(sm) {
+      position: fixed;
+      top: 0;
+      left: 0;
+      min-width: 150px;
+      margin-top: -1px;
+      padding: 4px 1px;
+      background-color: $white;
+      box-shadow: 2px 1px 3px $dropdown-shadow-color;
+      border: 1px solid $gray-darker;
+      border-left: 0;
+      border-radius: 0 3px 3px 0;
+
+      &::before {
+        content: '';
+        position: absolute;
+        top: -30px;
+        bottom: -30px;
+        left: -10px;
+        right: -30px;
+        z-index: -1;
+      }
+
+      &.is-above {
+        margin-top: 1px;
+      }
+
+      .divider {
+        height: 1px;
+        margin: 4px -1px;
+        padding: 0;
+        background-color: $dropdown-divider-bg;
+      }
+    }
+
+    .fly-out-top-item {
+      > a {
+        display: flex;
+      }
+
+      .fly-out-badge {
+        margin-left: 8px;
+      }
+    }
+
+    .fly-out-top-item-name {
+      flex: 1;
+    }
+  }
+}
+
+//
+// PAGE-LAYOUT
+//
+
+.page-with-contextual-sidebar {
+  transition: padding-left $sidebar-transition-duration;
+
+  @include media-breakpoint-up(md) {
+    padding-left: $contextual-sidebar-collapsed-width;
+  }
+
+  @include media-breakpoint-up(xl) {
+    padding-left: $contextual-sidebar-width;
+  }
+
+  .issues-bulk-update.right-sidebar.right-sidebar-expanded .issuable-sidebar-header {
+    padding: 10px 0 15px;
+  }
+}
+
+.page-with-icon-sidebar {
+  @include media-breakpoint-up(md) {
+    padding-left: $contextual-sidebar-collapsed-width;
+  }
+}
+
+//
+// THE PANEL
+//
+
+.nav-sidebar {
+  transition: width $sidebar-transition-duration, left $sidebar-transition-duration;
+  position: fixed;
+  z-index: 600;
+  width: $contextual-sidebar-width;
+  top: $header-height;
+  bottom: 0;
+  left: 0;
+  background-color: $gray-50;
+  transform: translate3d(0, 0, 0);
+
+  &:not(.sidebar-collapsed-desktop) {
+    @media (min-width: map-get($grid-breakpoints, sm)) and (max-width: map-get($grid-breakpoints, sm)) {
+      box-shadow: inset -1px 0 0 $border-color, 2px 1px 3px $dropdown-shadow-color;
+    }
+  }
+
+  &.sidebar-collapsed-desktop {
+    @include collapse-contextual-sidebar;
+  }
+
+  &.sidebar-expanded-mobile {
+    left: 0;
+  }
+
+  a {
+    @include gl-text-decoration-none;
+    @include gl-line-height-normal;
+    color: $purple-900;
+  }
+
+  li {
+    white-space: nowrap;
+
+    .nav-item-name {
+      flex: 1;
+    }
+
+    > a {
+      @include gl-mx-2;
+      @include gl-px-4;
+      @include gl-py-3;
+      @include gl-display-flex;
+      @include gl-align-items-center;
+      @include gl-rounded-base;
+      @include gl-w-auto;
+      transition: padding $sidebar-transition-duration;
+      margin-bottom: 1px;
+
+      &:hover {
+        background-color: $indigo-900-alpha-008;
+      }
+    }
+
+    &.active {
+      > a {
+        font-weight: $gl-font-weight-bold;
+      }
+
+      > a:not(.has-sub-items) {
+        background-color: $indigo-900-alpha-008;
+      }
+    }
+  }
+
+  ul {
+    padding-left: 0;
+    list-style: none;
+  }
+
+  @include media-breakpoint-down(sm) {
+    left: (-$contextual-sidebar-width);
+  }
+
+  .nav-icon-container {
+    display: flex;
+    margin-right: 8px;
+  }
+
+  .fly-out-top-item {
+    display: none;
+  }
+
+  svg {
+    height: 16px;
+    width: 16px;
+  }
+
+  @media (min-width: map-get($grid-breakpoints, md)) and (max-width: map-get($grid-breakpoints, xl) - 1px) {
+    &:not(.sidebar-expanded-mobile) {
+      @include collapse-contextual-sidebar;
+      @include collapse-contextual-sidebar-content;
+    }
+  }
+}
+
+.nav-sidebar-inner-scroll {
+  height: 100%;
+  width: 100%;
+  overflow: auto;
+}
+
+.sidebar-top-level-items {
+  margin-bottom: 60px;
+
+  > li {
+    .badge.badge-pill {
+      @include gl-rounded-lg;
+      @include gl-py-1;
+      @include gl-px-3;
+      background-color: $blue-100;
+      color: $blue-700;
+    }
+
+    &.active {
+      .sidebar-sub-level-items:not(.is-fly-out-only) {
+        display: block;
+      }
+
+      .badge.badge-pill {
+        @include gl-font-weight-normal; // TODO: update in `theme_indigo.scss`
+        color: $blue-700; // TODO: update in `theme_indigo.scss`
+      }
+    }
+  }
+}
+
+.sidebar-sub-level-items {
+  @include gl-pb-0;
+  display: none;
+
+  &:not(.fly-out-list) {
+    li > a {
+      // The calculation formula:
+      // 12px: normal padding on the menu anchors
+      // +
+      // 16px: the width of the SVG icon in the top-level links
+      // +
+      // 8px: margin-right on the SVG icon in the top-level links
+      // =
+      // 36px (4.5 times the $grid-size)
+      padding-left: $grid-size * 4.5;
+    }
+  }
+}
+
+.is-showing-fly-out {
+  @include sub-level-items-flyout;
+}
+
+//
+// COLLAPSED STATE
+//
+
+.toggle-sidebar-button,
+.close-nav-button {
+  @include side-panel-toggle;
+  background-color: $gray-50;
+  color: $purple-900;
+
+  .collapse-text,
+  .icon-chevron-double-lg-left,
+  .icon-chevron-double-lg-right {
+    color: inherit;
+  }
+}
+
+.toggle-sidebar-button,
+.close-nav-button {
+  position: fixed;
+  bottom: 0;
+  width: $contextual-sidebar-width - 1px;
+  border-top: 1px solid $border-color;
+
+  svg {
+    margin-right: 8px;
+  }
+
+  .icon-chevron-double-lg-right {
+    display: none;
+  }
+}
+
+.collapse-text {
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.sidebar-collapsed-desktop {
+  @include collapse-contextual-sidebar-content;
+}
+
+//
+// MOBILE PANEL
+//
+
+.close-nav-button {
+  display: none;
+}
+
+@include media-breakpoint-down(sm) {
+  .close-nav-button {
+    display: flex;
+  }
+
+  .toggle-sidebar-button {
+    display: none;
+  }
+
+  .mobile-overlay {
+    display: none;
+
+    &.mobile-nav-open {
+      display: block;
+      position: fixed;
+      background-color: $black-transparent;
+      height: 100%;
+      width: 100%;
+      z-index: $zindex-dropdown-menu;
+    }
+  }
+}
+
+//
+// PANELS-SPECIFIC
+// TODO: Check whether we can remove these in favor of the utility-classes
+//
+
+.settings-avatar {
+  background-color: $white;
+
+  svg {
+    fill: $gl-text-color-secondary;
+    margin: auto;
+  }
+}
+

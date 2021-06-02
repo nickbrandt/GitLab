@@ -18,6 +18,7 @@ exports[`PathNavigation displays correctly loading is false matches the snapshot
         aria-hidden="true"
         class="gl-icon s32"
         data-testid="chevron-left-icon"
+        role="img"
       >
         <use
           href="#chevron-left"
@@ -40,6 +41,7 @@ exports[`PathNavigation displays correctly loading is false matches the snapshot
           aria-hidden="true"
           class="gl-mr-2 gl-icon s16"
           data-testid="gl-path-item-icon"
+          role="img"
         >
           <use
             href="#home"
@@ -407,6 +409,7 @@ exports[`PathNavigation displays correctly loading is false matches the snapshot
         aria-hidden="true"
         class="gl-icon s32"
         data-testid="chevron-right-icon"
+        role="img"
       >
         <use
           href="#chevron-right"

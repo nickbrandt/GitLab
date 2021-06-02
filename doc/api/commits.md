@@ -7,7 +7,7 @@ type: reference, api
 
 # Commits API **(FREE)**
 
-This API operates on [repository commits](https://git-scm.com/book/en/v2/Git-Basics-Recording-Changes-to-the-Repository). Read more about [GitLab-specific information](../user/project/repository/index.md#commits) for commits.
+This API operates on [repository commits](https://git-scm.com/book/en/v2/Git-Basics-Recording-Changes-to-the-Repository). Read more about [GitLab-specific information](../user/project/repository/index.md#commit-changes-to-a-repository) for commits.
 
 ## List repository commits
 
@@ -305,6 +305,7 @@ Parameters:
 | `sha` | string | yes | The commit hash  |
 | `branch` | string | yes | The name of the branch  |
 | `dry_run` | boolean | no | Does not commit any changes. Default is false. [Introduced in GitLab 13.3](https://gitlab.com/gitlab-org/gitlab/-/issues/231032) |
+| `message` | string | no | A custom commit message to use for the new commit. [Introduced in GitLab 14.0](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/62481)
 
 ```shell
 curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" --form "branch=master" "https://gitlab.example.com/api/v4/projects/5/repository/commits/master/cherry_pick"

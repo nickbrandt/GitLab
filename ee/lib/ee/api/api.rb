@@ -52,6 +52,8 @@ module EE
         mount ::API::ResourceIterationEvents
         mount ::API::Iterations
         mount ::API::GroupRepositoryStorageMoves
+
+        mount ::API::Internal::AppSec::Dast::SiteValidations
       end
     end
   end

@@ -936,7 +936,7 @@ Tiers: `free`
 
 ### `counts.cycle_analytics_views`
 
-Missing description
+Total visits to VSA (both group- and project-level) all time
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/20210216174832_cycle_analytics_views.yml)
 
@@ -944,7 +944,7 @@ Group: `group::optimize`
 
 Status: `data_available`
 
-Tiers: `free`
+Tiers: `free`, `premium`, `ultimate`
 
 ### `counts.dast_jobs`
 
@@ -3718,6 +3718,18 @@ Status: `data_available`
 
 Tiers: `free`
 
+### `counts.package_events_i_package_helm_pull_package`
+
+Total count of pull Helm packages events
+
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/20210517073546_package_events_i_package_helm_pull_package.yml)
+
+Group: `group::package`
+
+Status: `implemented`
+
+Tiers: `free`, `premium`, `ultimate`
+
 ### `counts.package_events_i_package_maven_delete_package`
 
 Missing description
@@ -4108,9 +4120,9 @@ Count the total number of log views
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/20210216175021_pod_logs_usages_total.yml)
 
-Group: `group::apm`
+Group: `group::monitor`
 
-Status: `data_available`
+Status: `deprecated`
 
 Tiers: `free`
 
@@ -4128,7 +4140,7 @@ Tiers: `free`, `premium`, `ultimate`
 
 ### `counts.productivity_analytics_views`
 
-Missing description
+Total visits to /groups/:group/-/analytics/productivity_analytics all time
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_all/20210216174834_productivity_analytics_views.yml)
 
@@ -4136,7 +4148,7 @@ Group: `group::optimize`
 
 Status: `data_available`
 
-Tiers: `free`
+Tiers: `free`, `premium`, `ultimate`
 
 ### `counts.project_clusters_disabled`
 
@@ -4272,7 +4284,7 @@ Tiers: `free`, `premium`, `ultimate`
 
 ### `counts.projects_creating_incidents`
 
-Counts of Projects that have created incidents
+Counts of Projects that have incident issues, regardless of status.
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/20210216180453_projects_creating_incidents.yml)
 
@@ -5488,9 +5500,9 @@ Projects with Prometheus alerting enabled
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/20210216175019_projects_with_prometheus_alerts.yml)
 
-Group: `group::apm`
+Group: `group::monitor`
 
-Status: `data_available`
+Status: `deprecated`
 
 Tiers: `free`
 
@@ -5630,13 +5642,13 @@ Tiers: `ultimate`
 
 Count of requirements created
 
-[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/20210216175028_requirements_created.yml)
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_all/20210216175028_requirements_created.yml)
 
 Group: `group::certify`
 
 Status: `data_available`
 
-Tiers: `free`
+Tiers: `ultimate`
 
 ### `counts.requirements_with_test_report`
 
@@ -6718,6 +6730,18 @@ Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
+### `counts_monthly.projects`
+
+Count number of projects created monthly
+
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_28d/20210514141518_monthly_projects_creation.yml)
+
+Group: `group::project management`
+
+Status: `implemented`
+
+Tiers: `free`, `premium`, `ultimate`
+
 ### `counts_monthly.projects_with_alerts_created`
 
 Monthly count of unique projects with HTTP alerting enabled
@@ -6948,15 +6972,15 @@ Tiers: `premium`, `ultimate`
 
 ### `git.version`
 
-Missing description
+Information about Git version
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/license/20210216183237_version.yml)
 
-Group: ``
+Group: `group::distribution`
 
 Status: `data_available`
 
-Tiers: `free`
+Tiers: `free`, `premium`, `ultimate`
 
 ### `gitaly.clusters`
 
@@ -7072,11 +7096,11 @@ Whether gravatar is enabled
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/settings/20210204124904_gravatar_enabled.yml)
 
-Group: `group::product intelligence`
+Group: `group::access`
 
 Status: `data_available`
 
-Tiers: `free`
+Tiers: `free`, `premium`, `ultimate`
 
 ### `historical_max_users`
 
@@ -7640,7 +7664,7 @@ Group: `group::product intelligence`
 
 Status: `data_available`
 
-Tiers: `free`
+Tiers: `free`, `premium`, `ultimate`
 
 ### `prometheus_metrics_enabled`
 
@@ -7652,7 +7676,7 @@ Group: `group::product intelligence`
 
 Status: `data_available`
 
-Tiers: `free`
+Tiers: `free`, `premium`, `ultimate`
 
 ### `recorded_at`
 
@@ -10185,6 +10209,30 @@ Group: ``
 Status: `data_available`
 
 Tiers:
+
+### `redis_hll_counters.deploy_token_packages.i_package_helm_deploy_token_monthly`
+
+Distinct Helm pakages deployed in recent 28 days
+
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_28d/20210517074859_i_package_helm_deploy_token_monthly.yml)
+
+Group: `group::package`
+
+Status: `implemented`
+
+Tiers: `free`, `premium`, `ultimate`
+
+### `redis_hll_counters.deploy_token_packages.i_package_helm_deploy_token_weekly`
+
+Distinct Helm pakages deployed in recent 7 days
+
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_7d/20210517074851_i_package_helm_deploy_token_weekly.yml)
+
+Group: `group::package`
+
+Status: `implemented`
+
+Tiers: `free`, `premium`, `ultimate`
 
 ### `redis_hll_counters.deploy_token_packages.i_package_maven_deploy_token_monthly`
 
@@ -12828,21 +12876,21 @@ Tiers: `free`, `premium`, `ultimate`
 
 ### `redis_hll_counters.pipeline_authoring.o_pipeline_authoring_unique_users_committing_ciconfigfile_monthly`
 
-Missing description
+Monthly unique user count doing commits which contains the CI config file
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_28d/20210216184303_o_pipeline_authoring_unique_users_committing_ciconfigfile_monthly.yml)
 
-Group: ``
+Group: `group::pipeline authoring`
 
 Status: `data_available`
 
-Tiers: `free`
+Tiers: `free`, `premium`, `ultimate`
 
 ### `redis_hll_counters.pipeline_authoring.o_pipeline_authoring_unique_users_committing_ciconfigfile_weekly`
 
-Monthly unique user count doing commits which contains the CI config file
+Weekly unique user count doing commits which contains the CI config file
 
-[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_7d/20210216184301_o_pipeline_authoring_unique_users_committing_ciconfigfile_weekly.yml)
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_7d/20210216184301_o_pipeline_authoring_unique_users_committing_ciconfigfile_weekly.yml)
 
 Group: `group::pipeline authoring`
 
@@ -15274,6 +15322,30 @@ Status: `data_available`
 
 Tiers:
 
+### `redis_hll_counters.user_packages.i_package_helm_user_monthly`
+
+Distinct user count events for Helm packages in recent 28 days
+
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_28d/20210517075259_i_package_helm_user_monthly.yml)
+
+Group: `group::package`
+
+Status: `implemented`
+
+Tiers: `free`, `premium`, `ultimate`
+
+### `redis_hll_counters.user_packages.i_package_helm_user_weekly`
+
+Distinct user count events for Helm packages in recent 7 days
+
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_7d/20210517075252_i_package_helm_user_weekly.yml)
+
+Group: `group::package`
+
+Status: `implemented`
+
+Tiers: `free`, `premium`, `ultimate`
+
 ### `redis_hll_counters.user_packages.i_package_maven_user_monthly`
 
 Missing description
@@ -15824,7 +15896,7 @@ Projects with Prometheus alerting enabled
 
 Group: `group::configure`
 
-Status: `data_available`
+Status: `deprecated`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -16548,6 +16620,18 @@ Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
+### `usage_activity_by_stage.manage.project_imports.total`
+
+Count number of projects imported monthly
+
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/20210514141520_project_imports_total.yml)
+
+Group: `group::import`
+
+Status: `implemented`
+
+Tiers: `free`, `premium`, `ultimate`
+
 ### `usage_activity_by_stage.manage.projects_imported.bitbucket`
 
 Distinct count of users that imported projects from Bitbucket Cloud
@@ -16754,15 +16838,15 @@ Tiers: `free`
 
 ### `usage_activity_by_stage.manage.value_stream_management_customized_group_stages`
 
-Missing description
+Number of custom value stream analytics stages.
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_all/20210216180803_value_stream_management_customized_group_stages.yml)
 
-Group: `group::manage`
+Group: `group::optimize`
 
 Status: `data_available`
 
-Tiers:
+Tiers: `premium`, `ultimate`
 
 ### `usage_activity_by_stage.monitor.clusters`
 
@@ -17674,7 +17758,7 @@ Projects with Prometheus alerting enabled
 
 Group: `group::monitor`
 
-Status: `data_available`
+Status: `deprecated`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -18460,7 +18544,7 @@ Tiers: `free`, `premium`, `ultimate`
 
 ### `usage_activity_by_stage_monthly.manage.project_imports.gitlab`
 
-Missing description
+Count of projects imported from GitLab using Project Export/Import
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_28d/20210216183646_gitlab.yml)
 
@@ -18503,6 +18587,18 @@ Missing description
 Group: `group::import`
 
 Status: `data_available`
+
+Tiers: `free`, `premium`, `ultimate`
+
+### `usage_activity_by_stage_monthly.manage.project_imports.total`
+
+Total count of projects imported
+
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_28d/20210520111133_total.yml)
+
+Group: `group::import`
+
+Status: `implemented`
 
 Tiers: `free`, `premium`, `ultimate`
 

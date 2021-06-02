@@ -594,6 +594,18 @@ RSpec.describe Member do
             end
           end
 
+          context 'when called with a known user secondary email' do
+            let(:secondary_email) { create(:email, email: 'secondary@example.com', user: user) }
+
+            it 'adds the user as a member' do
+              expect(source.users).not_to include(user)
+
+              described_class.add_user(source, secondary_email.email, :maintainer)
+
+              expect(source.users.reload).to include(user)
+            end
+          end
+
           context 'when called with an unknown user email' do
             it 'creates an invited member' do
               expect(source.users).not_to include(user)
@@ -778,8 +790,25 @@ RSpec.describe Member do
     let(:invited_member) { create(:project_member, invite_email: "user@example.com", user: nil) }
     let(:requester) { create(:project_member, requested_at: Time.current.utc) }
 
-    it { expect(invited_member).to be_invite }
+    it { expect(invited_member).to be_pending }
     it { expect(requester).to be_pending }
+  end
+
+  describe '#hook_prerequisites_met?' do
+    let(:member) { create(:project_member) }
+
+    context 'when the member does not have an associated user' do
+      it 'returns false' do
+        member.update_column(:user_id, nil)
+        expect(member.reload.hook_prerequisites_met?).to eq(false)
+      end
+    end
+
+    context 'when the member has an associated user' do
+      it 'returns true' do
+        expect(member.hook_prerequisites_met?).to eq(true)
+      end
+    end
   end
 
   describe "#accept_invite!" do
