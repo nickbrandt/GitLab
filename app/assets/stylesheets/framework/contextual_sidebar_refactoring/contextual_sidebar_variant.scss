@@ -14,9 +14,11 @@ $top-level-item-color: $purple-900;
 }
 
 &.gl-dark .nav-sidebar li a,
-.toggle-sidebar-button .collapse-text,
-.toggle-sidebar-button .icon-chevron-double-lg-left,
-.toggle-sidebar-button .icon-chevron-double-lg-right {
+&.gl-dark .toggle-sidebar-button .collapse-text,
+&.gl-dark .toggle-sidebar-button .icon-chevron-double-lg-left,
+&.gl-dark .toggle-sidebar-button .icon-chevron-double-lg-right,
+&.gl-dark .sidebar-top-level-items .context-header a .sidebar-context-title,
+&.gl-dark .nav-sidebar-inner-scroll > div.context-header a .sidebar-context-title {
   color: $gray-darkest;
 }
 
