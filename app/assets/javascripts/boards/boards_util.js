@@ -214,12 +214,13 @@ export const FiltersInfo = {
  */
 const parseFilters = (filters) => {
   /* eslint-disable-next-line @gitlab/require-i18n-strings */
-  const isNegated = (x) => x.slice(0, 4) === 'not[' && x.slice(-1) === ']';
+  const isNegated = (x) => x.startsWith('not[') && x.endsWith(']');
 
-  return Object.keys(filters).map((k) => {
-    const filterKey = isNegated(k) ? k.slice(4, -1) : k;
+  return Object.entries(filters).map(([k, v]) => {
+    const isNot = isNegated(k);
+    const filterKey = isNot ? k.slice(4, -1) : k;
 
-    return [filterKey, filters[k], isNegated(k)];
+    return [filterKey, v, isNot];
   });
 };
 
@@ -227,32 +228,33 @@ const parseFilters = (filters) => {
  * Returns an object of filter key/value pairs used as variables in GraphQL requests.
  * (warning: filter values are not validated)
  *
- * filters - raw filter url params. ex. { search: "foobar", "not[authorUsername]": "root", }
- * issuableType
- * FilterData - data on filters (deals with how to transform, if can be negated)
- * FilterFields - data on what filters are available for given issuableType (based on GraphQL schema)
+ * @param {Object} objParam.filters - filters extracted from url params. ex. { search: "foobar", "not[authorUsername]": "root", }
+ * @param {string} objParam.issuableType - issuable type e.g., issue.
+ * @param {Object} objParam.filterInfo - data on filters such as how to transform filter value, if filter can be negated, etc.
+ * @param {Object} objParam.filterFields - data on what filters are available for given issuableType (based on GraphQL schema)
  */
-export const filterVariables = ({ filters, issuableType, FilterData, FilterFields }) =>
+export const filterVariables = ({ filters, issuableType, filterInfo, filterFields }) =>
   parseFilters(filters)
     .map(([k, v, negated]) => {
       // for legacy reasons, some filters need to be renamed to correct GraphQL fields.
-      const remapAvailable = FilterData[k]?.remap;
-      const remappedKey = remapAvailable ? FilterData[k].remap(k, v) : k;
+      const remapAvailable = filterInfo[k]?.remap;
+      const remappedKey = remapAvailable ? filterInfo[k].remap(k, v) : k;
 
       return [remappedKey, v, negated];
     })
     .filter(([k, , negated]) => {
       // remove unsupported filters (+ check if the filters support negation)
-      const supported = FilterFields[issuableType].includes(k);
+      const supported = filterFields[issuableType].includes(k);
       if (supported) {
-        return negated ? FilterData[k].negatedSupport : true;
+        return negated ? filterInfo[k].negatedSupport : true;
       }
 
       return false;
     })
     .map(([k, v, negated]) => {
       // if the filter value needs a special transformation, apply it (e.g., capitalization)
-      const newVal = FilterData[k]?.transform ? FilterData[k].transform(v) : v;
+      const transform = filterInfo[k]?.transform;
+      const newVal = transform ? transform(v) : v;
 
       return [k, newVal, negated];
     })

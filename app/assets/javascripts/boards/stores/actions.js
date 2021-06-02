@@ -63,7 +63,12 @@ export default {
   setFilters: ({ commit, state: { issuableType } }, filters) => {
     commit(
       types.SET_FILTERS,
-      filterVariables({ filters, issuableType, FilterData: FiltersInfo, FilterFields }),
+      filterVariables({
+        filters,
+        issuableType,
+        filterInfo: FiltersInfo,
+        filterFields: FilterFields,
+      }),
     );
   },
 

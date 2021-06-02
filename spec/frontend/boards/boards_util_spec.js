@@ -74,7 +74,7 @@ describe('filterVariables', () => {
     const result = filterVariables({
       filters,
       issuableType,
-      FilterData: {
+      filterInfo: {
         filterA: {
           negatedSupport: true,
         },
@@ -92,7 +92,7 @@ describe('filterVariables', () => {
           negatedSupport: true,
         },
       },
-      FilterFields: {
+      filterFields: {
         issue: ['filterA', 'filterB', 'filterC', 'filterD'],
         epic: ['filterE'],
       },
