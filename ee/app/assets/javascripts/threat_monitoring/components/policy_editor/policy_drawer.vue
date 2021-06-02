@@ -29,7 +29,10 @@ export default {
       return removeUnnecessaryDashes(this.value);
     },
     enforcementStatusLabel() {
-      return this.policy.isEnabled ? __('Enabled') : __('Disabled');
+      if (this.policy) {
+        return this.policy.isEnabled ? __('Enabled') : __('Disabled');
+      }
+      return null;
     },
   },
 };
