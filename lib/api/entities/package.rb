@@ -46,13 +46,13 @@ module API
 
       expose :package_pipeline_detailed_status, using: ::DetailedStatusEntity do |package|
         # TODO : deep N+1 issue here
-        push = package.package_files
-                 .recent
-                 .first
-                 &.push
-        break nil unless push
+        pipeline = package.package_files
+                     .recent
+                     .first
+                     &.push
+                     &.pipeline
 
-        pipeline = push.pipeline
+        break nil unless pipeline
 
         pipeline.detailed_status(options[:current_user])
       end
