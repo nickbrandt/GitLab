@@ -1687,65 +1687,15 @@ RSpec.describe Project do
   end
 
   describe '#latest_pipeline_with_security_reports' do
-    let(:only_successful) { false }
-
-    let_it_be(:project) { create(:project) }
+    let_it_be(:project, refind: true) { create(:project) }
     let_it_be(:pipeline_1) { create(:ci_pipeline, :success, project: project) }
     let_it_be(:pipeline_2) { create(:ci_pipeline, project: project) }
     let_it_be(:pipeline_3) { create(:ci_pipeline, :success, project: project) }
 
     subject { project.latest_pipeline_with_security_reports(only_successful: only_successful) }
 
-    context 'when all pipelines are used' do
-      context 'when the pipeline of `vulnerability_statistic` has been set' do
-        before do
-          project.create_vulnerability_statistic(pipeline: pipeline_1)
-        end
-
-        it { is_expected.to eq(pipeline_1) }
-      end
-
-      context 'when the pipeline of `vulnerability_statistic` has not been set' do
-        before do
-          project.vulnerability_statistic&.update!(pipeline: nil)
-        end
-
-        context 'when legacy reports are used' do
-          before do
-            create(:ee_ci_build, :legacy_sast, pipeline: pipeline_1)
-            create(:ee_ci_build, :legacy_sast, pipeline: pipeline_2)
-          end
-
-          it 'returns the latest pipeline with security reports' do
-            is_expected.to eq(pipeline_2)
-          end
-        end
-
-        context 'when new reports are used' do
-          before do
-            create(:ee_ci_build, :sast, pipeline: pipeline_1)
-            create(:ee_ci_build, :sast, pipeline: pipeline_2)
-          end
-
-          it 'returns the latest pipeline with security reports' do
-            is_expected.to eq(pipeline_2)
-          end
-
-          context 'when legacy used' do
-            before do
-              create(:ee_ci_build, :legacy_sast, pipeline: pipeline_3)
-            end
-
-            it 'prefers the new reports' do
-              is_expected.to eq(pipeline_2)
-            end
-          end
-        end
-      end
-    end
-
-    context 'when only successful pipelines are used' do
-      let(:only_successful) { true }
+    shared_examples_for 'on-the-fly latest_pipeline_with_security_reports calculation' do |expected:|
+      let(:expected_pipeline) { public_send(expected) }
 
       context 'when legacy reports are used' do
         before do
@@ -1753,8 +1703,8 @@ RSpec.describe Project do
           create(:ee_ci_build, :legacy_sast, pipeline: pipeline_2)
         end
 
-        it "returns the latest succesful pipeline with security reports" do
-          is_expected.to eq(pipeline_1)
+        it 'returns the latest pipeline with security reports' do
+          is_expected.to eq(expected_pipeline)
         end
       end
 
@@ -1764,8 +1714,8 @@ RSpec.describe Project do
           create(:ee_ci_build, :sast, pipeline: pipeline_2)
         end
 
-        it 'returns the latest successful pipeline with security reports' do
-          is_expected.to eq(pipeline_1)
+        it 'returns the latest pipeline with security reports' do
+          is_expected.to eq(expected_pipeline)
         end
 
         context 'when legacy used' do
@@ -1774,10 +1724,46 @@ RSpec.describe Project do
           end
 
           it 'prefers the new reports' do
-            is_expected.to eq(pipeline_1)
+            is_expected.to eq(expected_pipeline)
           end
         end
       end
+    end
+
+    context 'when all pipelines are used' do
+      let(:only_successful) { false }
+
+      context 'when there is no associated `vulnerability_statistic` record with the project' do
+        it_behaves_like 'on-the-fly latest_pipeline_with_security_reports calculation', expected: :pipeline_2
+      end
+
+      context 'when there is an associated `vulnerability_statistic` record with the project' do
+        context 'when the pipeline of `vulnerability_statistic` has not been set' do
+          it_behaves_like 'on-the-fly latest_pipeline_with_security_reports calculation', expected: :pipeline_2 do
+            before do
+              create(:vulnerability_statistic, project: project, pipeline: nil)
+            end
+          end
+        end
+
+        context 'when the pipeline of `vulnerability_statistic` has been set' do
+          before do
+            create(:vulnerability_statistic, project: project, pipeline: pipeline_1)
+          end
+
+          it { is_expected.to eq(pipeline_1) }
+        end
+      end
+    end
+
+    context 'when only successful pipelines are used' do
+      let(:only_successful) { true }
+
+      before do
+        create(:vulnerability_statistic, project: project, pipeline: pipeline_2)
+      end
+
+      it_behaves_like 'on-the-fly latest_pipeline_with_security_reports calculation', expected: :pipeline_1
     end
   end
 
