@@ -46,6 +46,7 @@ class ProcessCommitWorker
 
     close_issues(project, user, author, commit, closed_issues) if closed_issues.any?
     commit.create_cross_references!(author, closed_issues)
+    commit.store_mentions!
   end
 
   def close_issues(project, user, author, commit, issues)
