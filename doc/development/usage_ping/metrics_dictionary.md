@@ -71,9 +71,9 @@ which has a related schema in `/config/metrics/objects_schemas/topology_schema.j
 
 ### Metric time_frame
 
-- `7d`: Data corresponds to recent 7 days. Example number of users creating epics in the last 7 days `ee/config/metrics/counts_28d/20210305144719_g_product_planning_epic_created_monthly.yml`.
-- `28d`: Data corresponds to recent 28 days. Example number of unique users creating issues in last 28 days `config/metrics/counts_28d/20210216181139_issues.yml`.
-- `all`: Data corresponds to all-time interval. Example number of users creating issues `/config/metrics/counts_all/20210216181115_issues.yml`.
+- `7d`: The metric data applies to the most recent 7-day interval. For example, the following metric counts the number of users that create epics over a 7-day interval: `ee/config/metrics/counts_7d/20210305145820_g_product_planning_epic_created_weekly.yml`.
+- `28d`: The metric data applies to the most recent 28-day interval. For example, the following metric counts the number of unique users that create issues over a 28-day interval: `config/metrics/counts_28d/20210216181139_issues.yml`.
+- `all`: The metric data applies for the whole time the metric has been active (all-time interval). For example, the following metric counts all users that create issues: `/config/metrics/counts_all/20210216181115_issues.yml`.
 - `none`: No time interval applicable, used for settings and configurations. Example `uuid` has no time interval applicable `config/metrics/license/20210201124933_uuid.yml`.
 
 ### Metric name
