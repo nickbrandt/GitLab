@@ -278,8 +278,8 @@ RSpec.describe Ci::RunnersFinder do
       subject { described_class.new(current_user: user, group: group, params: params).sort_key }
 
       context 'no params' do
-        it 'returns created_date' do
-          expect(subject).to eq('created_date')
+        it 'returns created_at_desc' do
+          expect(subject).to eq('created_at_desc')
         end
       end
 

@@ -4,8 +4,8 @@ module Ci
   class RunnersFinder < UnionFinder
     include Gitlab::Allowable
 
-    ALLOWED_SORTS = %w[contacted_asc contacted_desc created_at_asc created_at_desc].freeze
-    DEFAULT_SORT = 'created_date'
+    ALLOWED_SORTS = %w[contacted_asc contacted_desc created_at_asc created_at_desc created_date].freeze
+    DEFAULT_SORT = 'created_at_desc'
 
     def initialize(current_user:, group: nil, params:)
       @params = params
