@@ -3,6 +3,7 @@ import { GlButton, GlLink, GlSprintf, GlTooltipDirective, GlTruncate } from '@gi
 import { s__ } from '~/locale';
 import ListItem from '~/vue_shared/components/registry/list_item.vue';
 import timeagoMixin from '~/vue_shared/mixins/timeago';
+import CiIcon from '../../../vue_shared/components/ci_icon.vue';
 import { PACKAGE_ERROR_STATUS, PACKAGE_DEFAULT_STATUS } from '../constants';
 import { getPackageTypeLabel } from '../utils';
 import PackagePath from './package_path.vue';
@@ -20,6 +21,7 @@ export default {
     PackagePath,
     PublishMethod,
     ListItem,
+    CiIcon,
     PackageIconAndName: () =>
       import(/* webpackChunkName: 'package_registry_components' */ './package_icon_and_name.vue'),
     InfrastructureIconAndName: () =>
@@ -118,6 +120,21 @@ export default {
           hide-label
           :tag-display-limit="1"
         />
+
+     <div v-if="packageEntity.package_pipeline_detailed_status" class="ci-status-link gl-ml-3">
+          <gl-link
+            v-gl-tooltip.left
+            :href="packageEntity.package_pipeline_detailed_status.details_path"
+            :title="statusTitle"
+            class="js-commit-pipeline"
+          >
+            <ci-icon
+              :status="packageEntity.package_pipeline_detailed_status"
+              :size="16"
+              :aria-label="statusTitle"
+            />
+          </gl-link>
+        </div>
       </div>
     </template>
     <template #left-secondary>

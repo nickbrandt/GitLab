@@ -44,6 +44,19 @@ module API
 
       expose :versions, using: ::API::Entities::PackageVersion, unless: ->(_, opts) { opts[:collection] }
 
+      expose :package_pipeline_detailed_status, using: ::DetailedStatusEntity do |package|
+        # TODO : deep N+1 issue here
+        push = package.package_files
+                 .recent
+                 .first
+                 &.push
+        break nil unless push
+
+        pipeline = push.pipeline
+
+        pipeline.detailed_status(options[:current_user])
+      end
+
       private
 
       def project_path
