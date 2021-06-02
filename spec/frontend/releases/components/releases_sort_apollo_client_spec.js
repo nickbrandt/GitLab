@@ -1,11 +1,7 @@
-import { GlSorting } from '@gitlab/ui';
+import { GlSorting, GlSortingItem } from '@gitlab/ui';
 import { shallowMountExtended } from 'helpers/vue_test_utils_helper';
 import ReleasesSortApolloClient from '~/releases/components/releases_sort_apollo_client.vue';
 import { RELEASED_AT_ASC, RELEASED_AT_DESC, CREATED_ASC, CREATED_DESC } from '~/releases/constants';
-
-const GlSortingItemStub = {
-  template: '<div><slot></slot></div>',
-};
 
 describe('releases_sort_apollo_client.vue', () => {
   let wrapper;
@@ -16,7 +12,7 @@ describe('releases_sort_apollo_client.vue', () => {
         value: valueProp,
       },
       stubs: {
-        GlSortingItem: GlSortingItemStub,
+        GlSortingItem,
       },
     });
   };
@@ -26,7 +22,7 @@ describe('releases_sort_apollo_client.vue', () => {
   });
 
   const findSorting = () => wrapper.findComponent(GlSorting);
-  const findSortingItems = () => wrapper.findAllComponents(GlSortingItemStub);
+  const findSortingItems = () => wrapper.findAllComponents(GlSortingItem);
   const findReleasedDateItem = () =>
     findSortingItems().wrappers.find((item) => item.text() === 'Released date');
   const findCreatedDateItem = () =>
@@ -94,6 +90,14 @@ describe('releases_sort_apollo_client.vue', () => {
       emittedEvent || 'nothing'
     } when value prop is ${initialValueProp} and the ${itemToClickDescription} is clicked`, () => {
       expect(wrapper.emitted().input?.[0]?.[0]).toEqual(emittedEvent);
+    });
+  });
+
+  describe('prop validation', () => {
+    it('validates that the `value` prop is one of the expected sort strings', () => {
+      expect(() => {
+        createComponent('not a valid value');
+      }).toThrow('Invalid prop: custom validator check failed');
     });
   });
 });

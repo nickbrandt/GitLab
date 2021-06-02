@@ -1,7 +1,7 @@
 <script>
 import { GlSorting, GlSortingItem } from '@gitlab/ui';
 import {
-  ASCENDING_ODER,
+  ASCENDING_ORDER,
   DESCENDING_ORDER,
   SORT_OPTIONS,
   RELEASED_AT,
@@ -36,7 +36,7 @@ export default {
     },
     direction() {
       if (this.value === RELEASED_AT_ASC || this.value === CREATED_ASC) {
-        return ASCENDING_ODER;
+        return ASCENDING_ORDER;
       }
 
       return DESCENDING_ORDER;
@@ -48,12 +48,12 @@ export default {
       return this.sortOptions.find((s) => s.orderBy === this.orderBy).label;
     },
     isDirectionAscending() {
-      return this.direction === ASCENDING_ODER;
+      return this.direction === ASCENDING_ORDER;
     },
   },
   methods: {
     onDirectionChange() {
-      const direction = this.isDirectionAscending ? DESCENDING_ORDER : ASCENDING_ODER;
+      const direction = this.isDirectionAscending ? DESCENDING_ORDER : ASCENDING_ORDER;
       this.emitInputEventIfChanged(this.orderBy, direction);
     },
     onSortItemClick(item) {
