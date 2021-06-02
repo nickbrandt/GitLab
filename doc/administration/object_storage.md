@@ -618,7 +618,7 @@ This can result in some of the following problems:
 
 - If GitLab is using non-secure HTTP to access the object storage, clients may generate
 `https->http` downgrade errors and refuse to process the redirect. The solution to this
-is for GitLab to use HTTPS. LFS, for example, it generates this error:
+is for GitLab to use HTTPS. LFS, for example, generates this error:
 
    ```plaintext
    LFS: lfsapi/client: refusing insecure redirect, https->http
