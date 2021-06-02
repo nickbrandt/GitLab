@@ -8,8 +8,8 @@ import {
   DEVOPS_ADOPTION_SEGMENT_MODAL_ID,
   DEVOPS_ADOPTION_GROUP_LEVEL_LABEL,
 } from '../constants';
-import bulkFindOrCreateDevopsAdoptionSegmentsMutation from '../graphql/mutations/bulk_find_or_create_devops_adoption_segments.mutation.graphql';
-import deleteDevopsAdoptionSegmentMutation from '../graphql/mutations/delete_devops_adoption_segment.mutation.graphql';
+import bulkEnableDevopsAdoptionNamespacesMutation from '../graphql/mutations/bulk_enable_devops_adoption_namespaces.mutation.graphql';
+import disableDevopsAdoptionNamespaceMutation from '../graphql/mutations/disable_devops_adoption_namespace.mutation.graphql';
 
 export default {
   name: 'DevopsAdoptionSegmentModal',
@@ -139,20 +139,20 @@ export default {
           this.loadingAdd = true;
           const {
             data: {
-              bulkFindOrCreateDevopsAdoptionSegments: { errors },
+              bulkEnableDevopsAdoptionNamespaces: { errors },
             },
           } = await this.$apollo.mutate({
-            mutation: bulkFindOrCreateDevopsAdoptionSegmentsMutation,
+            mutation: bulkEnableDevopsAdoptionNamespacesMutation,
             variables: {
               namespaceIds,
               displayNamespaceId: this.groupGid,
             },
             update: (store, { data }) => {
               const {
-                bulkFindOrCreateDevopsAdoptionSegments: { segments, errors: requestErrors },
+                bulkEnableDevopsAdoptionNamespaces: { enabledNamespaces, errors: requestErrors },
               } = data;
 
-              if (!requestErrors.length) this.$emit('segmentsAdded', segments);
+              if (!requestErrors.length) this.$emit('segmentsAdded', enabledNamespaces);
             },
           });
 
@@ -182,16 +182,16 @@ export default {
 
           const {
             data: {
-              deleteDevopsAdoptionSegment: { errors },
+              disableDevopsAdoptionNamespace: { errors },
             },
           } = await this.$apollo.mutate({
-            mutation: deleteDevopsAdoptionSegmentMutation,
+            mutation: disableDevopsAdoptionNamespaceMutation,
             variables: {
               id: removedGroupGids,
             },
             update: (store, { data }) => {
               const {
-                deleteDevopsAdoptionSegment: { errors: requestErrors },
+                disableDevopsAdoptionNamespace: { errors: requestErrors },
               } = data;
 
               if (!requestErrors.length) this.$emit('segmentsRemoved', removedGroupGids);
