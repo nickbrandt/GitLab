@@ -1,9 +1,12 @@
 <script>
 import { GlButton, GlBanner, GlSprintf } from '@gitlab/ui';
+import {
+  SURVEY_BANNER_LOCAL_STORAGE_KEY,
+  SURVEY_BANNER_CURRENT_ID,
+} from 'ee/security_dashboard/constants';
 import { s__, __ } from '~/locale';
 import LocalStorageSync from '~/vue_shared/components/local_storage_sync.vue';
 import showToast from '~/vue_shared/plugins/global_toast';
-import { SURVEY_BANNER_LOCAL_STORAGE_KEY, SURVEY_BANNER_CURRENT_ID } from '../constants';
 
 const SURVEY_LINK = 'https://gitlab.fra1.qualtrics.com/jfe/form/SV_7UMsVhPbjmwCp1k';
 const DAYS_TO_ASK_LATER = 7;

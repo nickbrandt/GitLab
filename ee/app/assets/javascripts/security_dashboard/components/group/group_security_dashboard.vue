@@ -1,28 +1,32 @@
 <script>
 import { GlLoadingIcon } from '@gitlab/ui';
-import instanceProjectsQuery from 'ee/security_dashboard/graphql/queries/instance_projects.query.graphql';
-import vulnerabilityGradesQuery from 'ee/security_dashboard/graphql/queries/instance_vulnerability_grades.query.graphql';
-import vulnerabilityHistoryQuery from 'ee/security_dashboard/graphql/queries/instance_vulnerability_history.query.graphql';
+import groupProjectsQuery from 'ee/security_dashboard/graphql/queries/group_projects.query.graphql';
+import vulnerabilityGradesQuery from 'ee/security_dashboard/graphql/queries/group_vulnerability_grades.query.graphql';
+import vulnerabilityHistoryQuery from 'ee/security_dashboard/graphql/queries/group_vulnerability_history.query.graphql';
 import { PROJECT_LOADING_ERROR_MESSAGE } from 'ee/security_dashboard/helpers';
 import createFlash from '~/flash';
-import DashboardNotConfigured from '../empty_states/instance_dashboard_not_configured.vue';
+import DashboardNotConfigured from '../empty_states/group_dashboard_not_configured.vue';
 import VulnerabilitySeverities from '../first_class_vulnerability_severities.vue';
-import SecurityChartsLayout from '../security_charts_layout.vue';
+import SecurityDashboardLayout from '../shared/security_dashboard_layout.vue';
 import VulnerabilitiesOverTimeChart from '../shared/vulnerabilities_over_time_chart.vue';
 
 export default {
   components: {
     GlLoadingIcon,
     DashboardNotConfigured,
-    SecurityChartsLayout,
+    SecurityDashboardLayout,
     VulnerabilitySeverities,
     VulnerabilitiesOverTimeChart,
   },
+  inject: ['groupFullPath'],
   apollo: {
     projects: {
-      query: instanceProjectsQuery,
+      query: groupProjectsQuery,
+      variables() {
+        return { fullPath: this.groupFullPath };
+      },
       update(data) {
-        return data?.instanceSecurityDashboard?.projects?.nodes ?? [];
+        return data?.group?.projects?.nodes ?? [];
       },
       error() {
         createFlash({ message: PROJECT_LOADING_ERROR_MESSAGE });
@@ -51,7 +55,7 @@ export default {
 </script>
 
 <template>
-  <security-charts-layout>
+  <security-dashboard-layout>
     <template v-if="shouldShowEmptyState" #empty-state>
       <dashboard-not-configured />
     </template>
@@ -62,5 +66,5 @@ export default {
     <template v-else #loading>
       <gl-loading-icon size="lg" class="gl-mt-6" />
     </template>
-  </security-charts-layout>
+  </security-dashboard-layout>
 </template>

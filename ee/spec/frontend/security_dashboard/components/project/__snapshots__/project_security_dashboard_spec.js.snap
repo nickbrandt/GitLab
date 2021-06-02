@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Project Security Charts component when there is history data should display the chart with data 1`] = `
+exports[`Project Security Dashboard component when there is history data should display the chart with data 1`] = `
 Array [
   Object {
     "data": Array [

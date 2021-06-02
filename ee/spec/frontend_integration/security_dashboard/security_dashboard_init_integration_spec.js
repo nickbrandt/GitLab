@@ -1,4 +1,4 @@
-import initSecurityCharts from 'ee/security_dashboard/security_charts_init';
+import initSecurityDashboard from 'ee/security_dashboard/security_dashboard_init';
 import { DASHBOARD_TYPES } from 'ee/security_dashboard/store/constants';
 import { TEST_HOST } from 'helpers/test_constants';
 
@@ -11,7 +11,7 @@ const TEST_DATASET = {
   emptyStateSvgPath: '/test/empty_state.svg',
 };
 
-describe('Security Charts', () => {
+describe('Security Dashboard', () => {
   let vm;
   let root;
 
@@ -36,11 +36,11 @@ describe('Security Charts', () => {
     const el = document.createElement('div');
     Object.assign(el.dataset, { ...TEST_DATASET, ...data });
     root.appendChild(el);
-    vm = initSecurityCharts(el, type);
+    vm = initSecurityDashboard(el, type);
   };
 
   const createEmptyComponent = () => {
-    vm = initSecurityCharts(null, null);
+    vm = initSecurityDashboard(null, null);
   };
 
   describe('default states', () => {

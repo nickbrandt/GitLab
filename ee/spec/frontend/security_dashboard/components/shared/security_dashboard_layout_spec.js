@@ -1,9 +1,9 @@
 import { shallowMount } from '@vue/test-utils';
-import SecurityChartsLayout from 'ee/security_dashboard/components/security_charts_layout.vue';
-import SurveyRequestBanner from 'ee/security_dashboard/components/survey_request_banner.vue';
+import SecurityDashboardLayout from 'ee/security_dashboard/components/shared/security_dashboard_layout.vue';
+import SurveyRequestBanner from 'ee/security_dashboard/components/shared/survey_request_banner.vue';
 import { extendedWrapper } from 'helpers/vue_test_utils_helper';
 
-describe('Security Charts Layout component', () => {
+describe('Security Dashboard Layout component', () => {
   let wrapper;
 
   const DummyComponent = {
@@ -16,7 +16,7 @@ describe('Security Charts Layout component', () => {
   const findSurveyBanner = () => wrapper.findComponent(SurveyRequestBanner);
 
   const createWrapper = (slots) => {
-    wrapper = extendedWrapper(shallowMount(SecurityChartsLayout, { slots }));
+    wrapper = extendedWrapper(shallowMount(SecurityDashboardLayout, { slots }));
   };
 
   afterEach(() => {

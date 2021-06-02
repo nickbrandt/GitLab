@@ -2,8 +2,8 @@ import { GlLoadingIcon } from '@gitlab/ui';
 import { shallowMount } from '@vue/test-utils';
 import DashboardNotConfigured from 'ee/security_dashboard/components/empty_states/instance_dashboard_not_configured.vue';
 import VulnerabilitySeverities from 'ee/security_dashboard/components/first_class_vulnerability_severities.vue';
-import InstanceSecurityCharts from 'ee/security_dashboard/components/instance/instance_security_charts.vue';
-import SecurityChartsLayout from 'ee/security_dashboard/components/security_charts_layout.vue';
+import InstanceSecurityDashboard from 'ee/security_dashboard/components/instance/instance_security_dashboard.vue';
+import SecurityDashboardLayout from 'ee/security_dashboard/components/shared/security_dashboard_layout.vue';
 import VulnerabilitiesOverTimeChart from 'ee/security_dashboard/components/shared/vulnerabilities_over_time_chart.vue';
 import vulnerabilityGradesQuery from 'ee/security_dashboard/graphql/queries/instance_vulnerability_grades.query.graphql';
 import vulnerabilityHistoryQuery from 'ee/security_dashboard/graphql/queries/instance_vulnerability_history.query.graphql';
@@ -21,17 +21,17 @@ jest.mock(
   }),
 );
 
-describe('Instance Security Charts component', () => {
+describe('Instance Security Dashboard component', () => {
   let wrapper;
 
-  const findSecurityChartsLayoutComponent = () => wrapper.find(SecurityChartsLayout);
+  const findSecurityChartsLayoutComponent = () => wrapper.find(SecurityDashboardLayout);
   const findLoadingIcon = () => wrapper.find(GlLoadingIcon);
   const findVulnerabilitiesOverTimeChart = () => wrapper.find(VulnerabilitiesOverTimeChart);
   const findVulnerabilitySeverities = () => wrapper.find(VulnerabilitySeverities);
   const findDashboardNotConfigured = () => wrapper.find(DashboardNotConfigured);
 
   const createWrapper = ({ loading = false } = {}) => {
-    wrapper = shallowMount(InstanceSecurityCharts, {
+    wrapper = shallowMount(InstanceSecurityDashboard, {
       mocks: {
         $apollo: {
           queries: {
@@ -42,7 +42,7 @@ describe('Instance Security Charts component', () => {
         },
       },
       stubs: {
-        SecurityChartsLayout,
+        SecurityDashboardLayout,
       },
     });
   };

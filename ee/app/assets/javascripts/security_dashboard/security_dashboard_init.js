@@ -1,9 +1,9 @@
 import Vue from 'vue';
 import { DASHBOARD_TYPES } from 'ee/security_dashboard/store/constants';
 import { parseBoolean } from '~/lib/utils/common_utils';
-import GroupSecurityCharts from './components/group/group_security_charts.vue';
-import InstanceSecurityCharts from './components/instance/instance_security_charts.vue';
-import ProjectSecurityCharts from './components/project/project_security_charts.vue';
+import GroupSecurityCharts from './components/group/group_security_dashboard.vue';
+import InstanceSecurityCharts from './components/instance/instance_security_dashboard.vue';
+import ProjectSecurityCharts from './components/project/project_security_dashboard.vue';
 import UnavailableState from './components/unavailable_state.vue';
 import apolloProvider from './graphql/provider';
 import createRouter from './router';
