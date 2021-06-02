@@ -52,7 +52,7 @@ module API
                      &.push
                      &.pipeline
 
-        break nil unless pipeline
+        next nil unless pipeline
 
         pipeline.detailed_status(options[:current_user])
       end
