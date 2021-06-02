@@ -8946,6 +8946,9 @@ msgstr ""
 msgid "Copy ID"
 msgstr ""
 
+msgid "Copy IP Address"
+msgstr ""
+
 msgid "Copy KRB5 clone URL"
 msgstr ""
 
@@ -28151,6 +28154,9 @@ msgid "Runners|Download and install binary"
 msgstr ""
 
 msgid "Runners|Download latest binary"
+msgstr ""
+
+msgid "Runners|Enter the number of seconds. This timeout takes precedence over lower timeouts set for the project."
 msgstr ""
 
 msgid "Runners|IP Address"
