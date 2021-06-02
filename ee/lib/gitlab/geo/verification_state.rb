@@ -270,7 +270,7 @@ module Gitlab
         end
       end
 
-      # Overridden by ReplicableRegistry
+      # Overridden by Geo::VerifiableRegistry
       def clear_verification_failure_fields!
         self.verification_retry_count = 0
         self.verification_retry_at = nil
