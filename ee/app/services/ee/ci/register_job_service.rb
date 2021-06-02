@@ -28,16 +28,6 @@ module EE
         end
       end
 
-      def retrieve_queue(queue_query_proc)
-        ##
-        # We want to reset a load balancing session to discard the side
-        # effects of writes that could have happened prior to this moment.
-        #
-        ::Gitlab::Database::LoadBalancing::Session.clear_session
-
-        super
-      end
-
       def builds_for_shared_runner
         # if disaster recovery is enabled, we disable quota
         if ::Feature.enabled?(:ci_queueing_disaster_recovery, runner, type: :ops, default_enabled: :yaml)
