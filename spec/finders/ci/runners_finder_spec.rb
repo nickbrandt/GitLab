@@ -59,27 +59,23 @@ RSpec.describe Ci::RunnersFinder do
           described_class.new(current_user: admin, params: params).execute
         end
 
+        shared_examples 'sorts by created_at descending' do
+          it 'sorts by created_at descending' do
+            is_expected.to eq [runner3, runner2, runner1]
+          end
+        end
+
         context 'without sort param' do
           let(:params) { {} }
 
-          it 'sorts by created_at descending' do
-            is_expected.to eq [runner3, runner2, runner1]
-          end
+          it_behaves_like 'sorts by created_at descending'
         end
 
-        context 'with sort param equal to created_date' do
-          let(:params) { { sort: 'created_date' } }
+        %w(created_date created_at_desc).each do |sort|
+          context "with sort param equal to #{sort}" do
+            let(:params) { { sort: sort } }
 
-          it 'sorts by created_at descending' do
-            is_expected.to eq [runner3, runner2, runner1]
-          end
-        end
-
-        context 'with sort param equal to created_at_desc' do
-          let(:params) { { sort: 'created_at_desc' } }
-
-          it 'sorts by created_at descending' do
-            is_expected.to eq [runner3, runner2, runner1]
+            it_behaves_like 'sorts by created_at descending'
           end
         end
 
@@ -91,21 +87,19 @@ RSpec.describe Ci::RunnersFinder do
           end
         end
 
-        context 'by contacted_at' do
-          context 'with sort param equal to contacted_asc' do
-            let(:params) { { sort: 'contacted_asc' } }
+        context 'with sort param equal to contacted_asc' do
+          let(:params) { { sort: 'contacted_asc' } }
 
-            it 'sorts by contacted_at ascending' do
-              is_expected.to eq [runner2, runner3, runner1]
-            end
+          it 'sorts by contacted_at ascending' do
+            is_expected.to eq [runner2, runner3, runner1]
           end
+        end
 
-          context 'with sort param equal to contacted_desc' do
-            let(:params) { { sort: 'contacted_desc' } }
+        context 'with sort param equal to contacted_desc' do
+          let(:params) { { sort: 'contacted_desc' } }
 
-            it 'sorts by contacted_at descending' do
-              is_expected.to eq [runner1, runner3, runner2]
-            end
+          it 'sorts by contacted_at descending' do
+            is_expected.to eq [runner1, runner3, runner2]
           end
         end
       end

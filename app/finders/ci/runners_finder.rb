@@ -4,6 +4,9 @@ module Ci
   class RunnersFinder < UnionFinder
     include Gitlab::Allowable
 
+    ALLOWED_SORTS = %w[contacted_asc contacted_desc created_at_asc created_at_desc].freeze
+    DEFAULT_SORT = 'created_date'
+
     def initialize(current_user:, group: nil, params:)
       @params = params
       @group = group
@@ -24,12 +27,7 @@ module Ci
     end
 
     def sort_key
-      case @params[:sort]
-      when 'contacted_asc', 'contacted_desc', 'created_at_asc', 'created_at_desc'
-        @params[:sort]
-      else
-        'created_date'
-      end
+      ALLOWED_SORTS.include?(@params[:sort]) ? @params[:sort] : DEFAULT_SORT
     end
 
     private
