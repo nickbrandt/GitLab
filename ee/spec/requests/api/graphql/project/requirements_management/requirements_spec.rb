@@ -191,7 +191,7 @@ RSpec.describe 'getting a requirement list for a project' do
       end
 
       def pagination_results_data(data)
-        data.map { |issue| issue.dig('iid').to_i }
+        data.map { |requirement| requirement.dig('iid') }
       end
 
       context 'when sorting by created_at' do
@@ -206,7 +206,7 @@ RSpec.describe 'getting a requirement list for a project' do
           it_behaves_like 'sorted paginated query' do
             let(:sort_param)       { :CREATED_ASC }
             let(:first_param)      { 2 }
-            let(:expected_results) { [requirement4.iid, requirement3.iid, requirement5.iid, requirement1.iid, requirement2.iid] }
+            let(:expected_results) { [requirement4, requirement3, requirement5, requirement1, requirement2].map(&:requirement_iid) }
           end
         end
 
@@ -214,7 +214,7 @@ RSpec.describe 'getting a requirement list for a project' do
           it_behaves_like 'sorted paginated query' do
             let(:sort_param)       { :CREATED_DESC }
             let(:first_param)      { 2 }
-            let(:expected_results) { [requirement2.iid, requirement1.iid, requirement5.iid, requirement3.iid, requirement4.iid] }
+            let(:expected_results) { [requirement2, requirement1, requirement5, requirement3, requirement4].map(&:requirement_iid) }
           end
         end
       end

@@ -11724,8 +11724,8 @@ Returns [`Requirement`](#requirement).
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | <a id="projectrequirementauthorusername"></a>`authorUsername` | [`[String!]`](#string) | Filter requirements by author username. |
-| <a id="projectrequirementiid"></a>`iid` | [`ID`](#id) | IID of the requirement, e.g., "1". |
-| <a id="projectrequirementiids"></a>`iids` | [`[ID!]`](#id) | List of IIDs of requirements, e.g., [1, 2]. |
+| <a id="projectrequirementiid"></a>`iid` | [`ID`](#id) | IID of the requirement, e.g., "REQ-1". |
+| <a id="projectrequirementiids"></a>`iids` | [`[ID!]`](#id) | List of IIDs of requirements, e.g., ["REQ-1", "REQ-2"]. |
 | <a id="projectrequirementlasttestreportstate"></a>`lastTestReportState` | [`RequirementStatusFilter`](#requirementstatusfilter) | The state of latest requirement test report. |
 | <a id="projectrequirementsearch"></a>`search` | [`String`](#string) | Search query for requirement title. |
 | <a id="projectrequirementsort"></a>`sort` | [`Sort`](#sort) | List requirements by sort order. |
@@ -11746,8 +11746,8 @@ four standard [pagination arguments](#connection-pagination-arguments):
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | <a id="projectrequirementsauthorusername"></a>`authorUsername` | [`[String!]`](#string) | Filter requirements by author username. |
-| <a id="projectrequirementsiid"></a>`iid` | [`ID`](#id) | IID of the requirement, e.g., "1". |
-| <a id="projectrequirementsiids"></a>`iids` | [`[ID!]`](#id) | List of IIDs of requirements, e.g., [1, 2]. |
+| <a id="projectrequirementsiid"></a>`iid` | [`ID`](#id) | IID of the requirement, e.g., "REQ-1". |
+| <a id="projectrequirementsiids"></a>`iids` | [`[ID!]`](#id) | List of IIDs of requirements, e.g., ["REQ-1", "REQ-2"]. |
 | <a id="projectrequirementslasttestreportstate"></a>`lastTestReportState` | [`RequirementStatusFilter`](#requirementstatusfilter) | The state of latest requirement test report. |
 | <a id="projectrequirementssearch"></a>`search` | [`String`](#string) | Search query for requirement title. |
 | <a id="projectrequirementssort"></a>`sort` | [`Sort`](#sort) | List requirements by sort order. |
@@ -12196,7 +12196,7 @@ Represents a requirement.
 | <a id="requirementdescription"></a>`description` | [`String`](#string) | Description of the requirement. |
 | <a id="requirementdescriptionhtml"></a>`descriptionHtml` | [`String`](#string) | The GitLab Flavored Markdown rendering of `description`. |
 | <a id="requirementid"></a>`id` | [`ID!`](#id) | ID of the requirement. |
-| <a id="requirementiid"></a>`iid` | [`ID!`](#id) | Internal ID of the requirement. |
+| <a id="requirementiid"></a>`iid` | [`String!`](#string) | Internal ID of the requirement. Starts with `REQ-`. |
 | <a id="requirementlasttestreportmanuallycreated"></a>`lastTestReportManuallyCreated` | [`Boolean`](#boolean) | Indicates if latest test report was created by user. |
 | <a id="requirementlasttestreportstate"></a>`lastTestReportState` | [`TestReportState`](#testreportstate) | Latest requirement test report state. |
 | <a id="requirementproject"></a>`project` | [`Project!`](#project) | Project to which the requirement belongs. |
