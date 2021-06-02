@@ -39,6 +39,7 @@ module Geo
       extend ::Gitlab::Utils::Override
 
       sha_attribute :verification_checksum_mismatched
+
       scope :available_verifiables, -> { all }
 
       override :clear_verification_failure_fields!
