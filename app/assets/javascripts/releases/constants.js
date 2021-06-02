@@ -15,7 +15,7 @@ export const DEFAULT_ASSET_LINK_TYPE = ASSET_LINK_TYPE.OTHER;
 
 export const PAGE_SIZE = 10;
 
-export const ASCENDING_ODER = 'asc';
+export const ASCENDING_ORDER = 'asc';
 export const DESCENDING_ORDER = 'desc';
 export const RELEASED_AT = 'released_at';
 export const CREATED_AT = 'created_at';
@@ -39,11 +39,11 @@ export const ALL_SORTS = [RELEASED_AT_ASC, RELEASED_AT_DESC, CREATED_ASC, CREATE
 
 export const SORT_MAP = {
   [RELEASED_AT]: {
-    [ASCENDING_ODER]: RELEASED_AT_ASC,
+    [ASCENDING_ORDER]: RELEASED_AT_ASC,
     [DESCENDING_ORDER]: RELEASED_AT_DESC,
   },
   [CREATED_AT]: {
-    [ASCENDING_ODER]: CREATED_ASC,
+    [ASCENDING_ORDER]: CREATED_ASC,
     [DESCENDING_ORDER]: CREATED_DESC,
   },
 };

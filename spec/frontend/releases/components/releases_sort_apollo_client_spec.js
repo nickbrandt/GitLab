@@ -1,6 +1,6 @@
 import { GlSorting } from '@gitlab/ui';
 import { shallowMountExtended } from 'helpers/vue_test_utils_helper';
-import ReleasesSortApolloclient from '~/releases/components/releases_sort_apollo_client.vue';
+import ReleasesSortApolloClient from '~/releases/components/releases_sort_apollo_client.vue';
 import { RELEASED_AT_ASC, RELEASED_AT_DESC, CREATED_ASC, CREATED_DESC } from '~/releases/constants';
 
 const GlSortingItemStub = {
@@ -11,7 +11,7 @@ describe('releases_sort_apollo_client.vue', () => {
   let wrapper;
 
   const createComponent = (valueProp = RELEASED_AT_ASC) => {
-    wrapper = shallowMountExtended(ReleasesSortApolloclient, {
+    wrapper = shallowMountExtended(ReleasesSortApolloClient, {
       propsData: {
         value: valueProp,
       },
