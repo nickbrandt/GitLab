@@ -14,6 +14,8 @@ module Gitlab
       UPDATE_FREQUENCY_DEFAULT = 60.seconds
       UPDATE_FREQUENCY_WHEN_BEING_WATCHED = 3.seconds
 
+      LOAD_BALANCING_STICKING_NAMESPACE = 'ci/build/trace'
+
       ArchiveError = Class.new(StandardError)
       AlreadyArchivedError = Class.new(StandardError)
       LockedError = Class.new(StandardError)
@@ -299,7 +301,7 @@ module Gitlab
       def destroy_stream(build)
         if consistent_archived_trace?(build)
           ::Gitlab::Database::LoadBalancing::Sticking
-            .stick('ci/build/trace', build.id)
+            .stick(LOAD_BALANCING_STICKING_NAMESPACE, build.id)
         end
 
         yield
@@ -308,7 +310,7 @@ module Gitlab
       def read_trace_artifact(build)
         if consistent_archived_trace?(build)
           ::Gitlab::Database::LoadBalancing::Sticking
-            .unstick_or_continue_sticking('ci/build/trace', build.id)
+            .unstick_or_continue_sticking(LOAD_BALANCING_STICKING_NAMESPACE, build.id)
         end
 
         yield

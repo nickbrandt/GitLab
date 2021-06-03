@@ -29,6 +29,34 @@ RSpec.shared_examples 'common trace features' do
     end
   end
 
+  describe '#read' do
+    context 'gitlab_ci_archived_trace_consistent_reads feature flag enabled' do
+      before do
+        stub_feature_flags(gitlab_ci_archived_trace_consistent_reads: trace.job.project)
+      end
+
+      it 'calls ::Gitlab::Database::LoadBalancing::Sticking.unstick_or_continue_sticking' do
+        expect(::Gitlab::Database::LoadBalancing::Sticking).to receive(:unstick_or_continue_sticking)
+          .with(described_class::LOAD_BALANCING_STICKING_NAMESPACE, trace.job.id)
+          .and_call_original
+
+        trace.read { |stream| stream }
+      end
+    end
+
+    context 'gitlab_ci_archived_trace_consistent_reads feature flag disabled' do
+      before do
+        stub_feature_flags(gitlab_ci_archived_trace_consistent_reads: false)
+      end
+
+      it 'does not call ::Gitlab::Database::LoadBalancing::Sticking.unstick_or_continue_sticking' do
+        expect(::Gitlab::Database::LoadBalancing::Sticking).not_to receive(:unstick_or_continue_sticking)
+
+        trace.read { |stream| stream }
+      end
+    end
+  end
+
   describe '#extract_coverage' do
     let(:regex) { '\(\d+.\d+\%\) covered' }
 
@@ -789,6 +817,32 @@ RSpec.shared_examples 'trace with enabled live trace feature' do
         expect(src_checksum)
           .to eq(described_class.hexdigest(build.job_artifacts_trace.file.path))
         expect(build.job_artifacts_trace.file_sha256).to eq(src_checksum)
+      end
+
+      context 'gitlab_ci_archived_trace_consistent_reads feature flag enabled' do
+        before do
+          stub_feature_flags(gitlab_ci_archived_trace_consistent_reads: build.project)
+        end
+
+        it 'calls ::Gitlab::Database::LoadBalancing::Sticking.stick' do
+          expect(::Gitlab::Database::LoadBalancing::Sticking).to receive(:stick)
+            .with(described_class::LOAD_BALANCING_STICKING_NAMESPACE, build.id)
+            .and_call_original
+
+          subject
+        end
+      end
+
+      context 'gitlab_ci_archived_trace_consistent_reads feature flag disabled' do
+        before do
+          stub_feature_flags(gitlab_ci_archived_trace_consistent_reads: false)
+        end
+
+        it 'does not call ::Gitlab::Database::LoadBalancing::Sticking.stick' do
+          expect(::Gitlab::Database::LoadBalancing::Sticking).not_to receive(:stick)
+
+          subject
+        end
       end
     end
 
