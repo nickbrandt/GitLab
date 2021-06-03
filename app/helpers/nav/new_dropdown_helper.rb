@@ -17,7 +17,7 @@ module Nav
 
       {
         title: _("New..."),
-        menu_sections: menu_sections.select { |x| !x.fetch(:menu_items).empty? }
+        menu_sections: menu_sections.select { |x| x.fetch(:menu_items).any? }
       }
     end
 
