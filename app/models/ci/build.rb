@@ -354,6 +354,7 @@ module Ci
 
       after_transition any => [:failed] do |build|
         next unless build.project
+        next if Feature.enabled?(:async_retry_build_on_failure, build.project, default_enabled: :yaml)
 
         if build.auto_retry_allowed?
           begin

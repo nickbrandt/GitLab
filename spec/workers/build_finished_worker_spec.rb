@@ -38,6 +38,27 @@ RSpec.describe BuildFinishedWorker do
 
           subject
         end
+
+        it 'retries build on failure' do
+          expect_next_instance_of(::Ci::RetryBuildOnFailureService) do |retry_service|
+            expect(retry_service)
+              .to receive(:execute)
+          end
+
+          subject
+        end
+
+        context 'when async_retry_build_on_failure disabled' do
+          before do
+            stub_feature_flags(async_retry_build_on_failure: false)
+          end
+
+          it 'does not retry on failure' do
+            expect(::Ci::RetryBuildOnFailureService).not_to receive(:new)
+
+            subject
+          end
+        end
       end
 
       context 'when build has a chat' do

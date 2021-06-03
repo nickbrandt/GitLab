@@ -3726,7 +3726,7 @@ RSpec.describe Ci::Build do
     end
   end
 
-  describe 'state transition when build fails' do
+  describe 'state transition when build fails', :sidekiq_inline do
     let(:service) { ::MergeRequests::AddTodoWhenBuildFailsService.new(project: project, current_user: user) }
 
     before do
@@ -3739,9 +3739,22 @@ RSpec.describe Ci::Build do
 
       it 'retries build and assigns the same user to it' do
         expect(described_class).to receive(:retry)
-          .with(subject, user)
+          .with(subject, user).once
 
         subject.drop!
+      end
+
+      context 'when async_retry_build_on_failure is disabled' do
+        before do
+          stub_feature_flags(async_retry_build_on_failure: false)
+        end
+
+        it 'retries build and assigns the same user to it' do
+          expect(described_class).to receive(:retry)
+            .with(subject, user).once
+
+          subject.drop!
+        end
       end
 
       it 'does not try to create a todo' do

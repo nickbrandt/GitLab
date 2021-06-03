@@ -1,0 +1,8 @@
+---
+name: async_retry_build_on_failure
+introduced_by_url:
+rollout_issue_url: https://gitlab.com/gitlab-org/gitlab/-/issues/326776
+milestone: '13.11'
+type: development
+group: group::continuous integration
+default_enabled: false

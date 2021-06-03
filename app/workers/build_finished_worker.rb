@@ -39,6 +39,8 @@ class BuildFinishedWorker # rubocop:disable Scalability/IdempotentWorker
     ChatNotificationWorker.perform_async(build.id) if build.pipeline.chat?
 
     if build.failed?
+      # Adding a todo when a build fails depends on state from the retry, therefore execute retry sync
+      ::Ci::RetryBuildOnFailureService.new(build).execute if Feature.enabled?(:async_retry_build_on_failure, build.project, default_enabled: :yaml)
       ::Ci::MergeRequests::AddTodoWhenBuildFailsWorker.perform_async(build.id)
     end
 

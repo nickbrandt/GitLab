@@ -543,7 +543,7 @@ module Ci
           end
         end
 
-        context 'when build has data integrity problem' do
+        context 'when build has data integrity problem', :sidekiq_inline do
           let!(:pending_job) do
             create(:ci_build, :pending, pipeline: pipeline)
           end
