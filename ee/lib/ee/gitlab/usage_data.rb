@@ -393,7 +393,6 @@ module EE
         # rubocop:disable CodeReuse/ActiveRecord
         def count_secure_user_scans(time_period)
           return {} if time_period.blank?
-          return {} unless ::Feature.enabled?(:postgres_hll_batch_counting)
 
           user_scans = {}
           start_id, finish_id = min_max_security_scan_id(time_period)
@@ -435,53 +434,33 @@ module EE
 
           pipelines_with_secure_jobs = {}
 
-          # HLL batch counting always iterate over pkey of
-          # given relation, while ordinary batch count
-          # iterated over counted attribute, one-to-many joins
-          # can break batch size limitation, and lead to
-          # time outing batch queries, to avoid that
-          # different join strategy is used for HLL counter
-          if ::Feature.enabled?(:postgres_hll_batch_counting)
-            start_id, finish_id = min_max_security_scan_id(time_period)
+          start_id, finish_id = min_max_security_scan_id(time_period)
 
-            ::Security::Scan.scan_types.each do |name, scan_type|
-              relation = ::Security::Scan
-                           .latest_successful_by_build
-                           .by_scan_types(scan_type)
-                           .where(security_scans: time_period)
+          ::Security::Scan.scan_types.each do |name, scan_type|
+            relation = ::Security::Scan
+                         .latest_successful_by_build
+                         .by_scan_types(scan_type)
+                         .where(security_scans: time_period)
 
-              metric_name = "#{name}_pipeline"
-              aggregated_metrics_params = {
-                metric_name: metric_name,
-                recorded_at_timestamp: recorded_at,
-                time_period: time_period
-              }
+            metric_name = "#{name}_pipeline"
+            aggregated_metrics_params = {
+              metric_name: metric_name,
+              recorded_at_timestamp: recorded_at,
+              time_period: time_period
+            }
 
-              pipelines_with_secure_jobs[metric_name.to_sym] =
-                if start_id && finish_id
-                  estimate_batch_distinct_count(relation, :commit_id, batch_size: 1000, start: start_id, finish: finish_id) do |result|
-                    ::Gitlab::Usage::Metrics::Aggregates::Sources::PostgresHll
-                      .save_aggregated_metrics(**aggregated_metrics_params.merge({ data: result }))
-                  end
-                else
+            pipelines_with_secure_jobs[metric_name.to_sym] =
+              if start_id && finish_id
+                estimate_batch_distinct_count(relation, :commit_id, batch_size: 1000, start: start_id, finish: finish_id) do |result|
                   ::Gitlab::Usage::Metrics::Aggregates::Sources::PostgresHll
-                    .save_aggregated_metrics(**aggregated_metrics_params.merge({ data: ::Gitlab::Database::PostgresHll::Buckets.new }))
-                  0
+                    .save_aggregated_metrics(**aggregated_metrics_params.merge({ data: result }))
                 end
-            end
-          else
-            start = minimum_id(::Ci::Pipeline)
-            finish = maximum_id(::Ci::Pipeline)
-
-            ::Security::Scan.scan_types.each do |name, scan_type|
-              relation = ::Ci::Build.joins(:security_scans)
-                           .where(status: 'success', retried: [nil, false])
-                           .where(security_scans: { scan_type: scan_type })
-                           .where(time_period)
-              pipelines_with_secure_jobs["#{name}_pipeline".to_sym] = distinct_count(relation, :commit_id, start: start, finish: finish, batch: false)
-            end
+              else
+                ::Gitlab::Usage::Metrics::Aggregates::Sources::PostgresHll
+                  .save_aggregated_metrics(**aggregated_metrics_params.merge({ data: ::Gitlab::Database::PostgresHll::Buckets.new }))
+                0
+              end
           end
-
           pipelines_with_secure_jobs
         end
 
