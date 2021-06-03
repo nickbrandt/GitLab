@@ -2,8 +2,8 @@ import { GlAlert, GlIntersectionObserver, GlLoadingIcon } from '@gitlab/ui';
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import { Portal } from 'portal-vue';
 import VueApollo from 'vue-apollo';
-import ProjectVulnerabilitiesApp from 'ee/security_dashboard/components/project_vulnerabilities.vue';
-import SecurityScannerAlert from 'ee/security_dashboard/components/security_scanner_alert.vue';
+import ProjectVulnerabilities from 'ee/security_dashboard/components/project/project_vulnerabilities.vue';
+import SecurityScannerAlert from 'ee/security_dashboard/components/project/security_scanner_alert.vue';
 import VulnerabilityList from 'ee/security_dashboard/components/vulnerability_list.vue';
 import securityScannersQuery from 'ee/security_dashboard/graphql/queries/project_security_scanners.query.graphql';
 import vulnerabilitiesQuery from 'ee/security_dashboard/graphql/queries/project_vulnerabilities.query.graphql';
@@ -11,7 +11,7 @@ import { useLocalStorageSpy } from 'helpers/local_storage_helper';
 import createMockApollo from 'helpers/mock_apollo_helper';
 import waitForPromises from 'helpers/wait_for_promises';
 import LocalStorageSync from '~/vue_shared/components/local_storage_sync.vue';
-import { generateVulnerabilities } from './mock_data';
+import { generateVulnerabilities } from '../mock_data';
 
 const localVue = createLocalVue();
 localVue.use(VueApollo);
@@ -25,7 +25,7 @@ describe('Vulnerabilities app component', () => {
   };
 
   const createWrapper = ({ props = {}, $apollo = apolloMock } = {}, options = {}) => {
-    wrapper = shallowMount(ProjectVulnerabilitiesApp, {
+    wrapper = shallowMount(ProjectVulnerabilities, {
       provide: {
         projectFullPath: '#',
         hasJiraVulnerabilitiesIntegrationEnabled: false,
@@ -195,7 +195,7 @@ describe('Vulnerabilities app component', () => {
     });
 
     const createWrapperWithApollo = ({ filters }) => {
-      wrapper = shallowMount(ProjectVulnerabilitiesApp, {
+      wrapper = shallowMount(ProjectVulnerabilities, {
         localVue,
         apolloProvider: createMockApollo([
           [vulnerabilitiesQuery, vulnerabilitiesHandler],
@@ -223,7 +223,7 @@ describe('Vulnerabilities app component', () => {
     const vulnerabilityReportAlertsPortal = 'test-alerts-portal';
 
     const createWrapperForScannerAlerts = async ({ securityScanners }) => {
-      wrapper = shallowMount(ProjectVulnerabilitiesApp, {
+      wrapper = shallowMount(ProjectVulnerabilities, {
         localVue,
         apolloProvider: createMockApollo([
           [securityScannersQuery, () => securityScannersHandler(securityScanners)],
@@ -273,7 +273,7 @@ describe('Vulnerabilities app component', () => {
 
       it('should never show the alert once it has been dismissed', async () => {
         window.localStorage.setItem(
-          ProjectVulnerabilitiesApp.SCANNER_ALERT_DISMISSED_LOCAL_STORAGE_KEY,
+          ProjectVulnerabilities.SCANNER_ALERT_DISMISSED_LOCAL_STORAGE_KEY,
           'true',
         );
 
@@ -309,7 +309,7 @@ describe('Vulnerabilities app component', () => {
         await wrapper.vm.$nextTick();
 
         expect(window.localStorage.setItem.mock.calls).toContainEqual([
-          ProjectVulnerabilitiesApp.SCANNER_ALERT_DISMISSED_LOCAL_STORAGE_KEY,
+          ProjectVulnerabilities.SCANNER_ALERT_DISMISSED_LOCAL_STORAGE_KEY,
           'true',
         ]);
       });

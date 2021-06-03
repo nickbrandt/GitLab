@@ -1,14 +1,14 @@
 <script>
 import { GlLoadingIcon } from '@gitlab/ui';
 import { GlLineChart } from '@gitlab/ui/dist/charts';
+import projectsHistoryQuery from 'ee/security_dashboard/graphql/queries/project_vulnerabilities_by_day_and_count.query.graphql';
+import { PROJECT_LOADING_ERROR_MESSAGE } from 'ee/security_dashboard/helpers';
 import createFlash from '~/flash';
 import { formatDate, getDateInPast } from '~/lib/utils/datetime_utility';
 import { getSvgIconPathContent } from '~/lib/utils/icon_utils';
 import { s__, __ } from '~/locale';
-import projectsHistoryQuery from '../graphql/queries/project_vulnerabilities_by_day_and_count.query.graphql';
-import { PROJECT_LOADING_ERROR_MESSAGE } from '../helpers';
-import DashboardNotConfigured from './empty_states/reports_not_configured.vue';
-import SecurityChartsLayout from './security_charts_layout.vue';
+import DashboardNotConfigured from '../empty_states/reports_not_configured.vue';
+import SecurityDashboardLayout from '../shared/security_dashboard_layout.vue';
 
 const CHART_DEFAULT_DAYS = 30;
 const MAX_DAYS = 100;
@@ -25,7 +25,7 @@ const SEVERITIES = [
 export default {
   components: {
     DashboardNotConfigured,
-    SecurityChartsLayout,
+    SecurityDashboardLayout,
     GlLoadingIcon,
     GlLineChart,
   },
@@ -174,7 +174,7 @@ export default {
 </script>
 
 <template>
-  <security-charts-layout ref="layout">
+  <security-dashboard-layout ref="layout">
     <template v-if="shouldShowEmptyState" #empty-state>
       <dashboard-not-configured />
     </template>
@@ -190,5 +190,5 @@ export default {
     <template v-else #loading>
       <gl-loading-icon size="lg" class="gl-mt-6" />
     </template>
-  </security-charts-layout>
+  </security-dashboard-layout>
 </template>

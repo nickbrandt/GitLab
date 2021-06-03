@@ -3,15 +3,15 @@ import { GlLineChart } from '@gitlab/ui/dist/charts';
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import VueApollo from 'vue-apollo';
 import DashboardNotConfigured from 'ee/security_dashboard/components/empty_states/reports_not_configured.vue';
-import ProjectSecurityCharts from 'ee/security_dashboard/components/project_security_charts.vue';
-import SecurityChartsLayout from 'ee/security_dashboard/components/security_charts_layout.vue';
+import ProjectSecurityDashboard from 'ee/security_dashboard/components/project/project_security_dashboard.vue';
+import SecurityDashboardLayout from 'ee/security_dashboard/components/shared/security_dashboard_layout.vue';
 import projectsHistoryQuery from 'ee/security_dashboard/graphql/queries/project_vulnerabilities_by_day_and_count.query.graphql';
 import { useFakeDate } from 'helpers/fake_date';
 import createMockApollo from 'helpers/mock_apollo_helper';
 import {
   mockProjectSecurityChartsWithData,
   mockProjectSecurityChartsWithoutData,
-} from '../mock_data';
+} from '../../mock_data';
 
 const localVue = createLocalVue();
 localVue.use(VueApollo);
@@ -20,7 +20,7 @@ jest.mock('~/lib/utils/icon_utils', () => ({
   getSvgIconPathContent: jest.fn().mockResolvedValue('mockSvgPathContent'),
 }));
 
-describe('Project Security Charts component', () => {
+describe('Project Security Dashboard component', () => {
   let wrapper;
 
   const projectFullPath = 'project/path';
@@ -35,7 +35,7 @@ describe('Project Security Charts component', () => {
   };
 
   const createComponent = ({ query, propsData, chartWidth = 1024 }) => {
-    const component = shallowMount(ProjectSecurityCharts, {
+    const component = shallowMount(ProjectSecurityDashboard, {
       localVue,
       apolloProvider: createApolloProvider([
         projectsHistoryQuery,
@@ -47,7 +47,7 @@ describe('Project Security Charts component', () => {
         ...propsData,
       },
       stubs: {
-        SecurityChartsLayout,
+        SecurityDashboardLayout,
       },
     });
 

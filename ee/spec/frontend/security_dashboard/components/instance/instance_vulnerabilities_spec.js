@@ -1,22 +1,17 @@
 import { GlAlert, GlIntersectionObserver, GlLoadingIcon } from '@gitlab/ui';
-import { shallowMount, createLocalVue } from '@vue/test-utils';
+import { createLocalVue, shallowMount } from '@vue/test-utils';
 import VueApollo from 'vue-apollo';
-import FirstClassGroupVulnerabilities from 'ee/security_dashboard/components/first_class_group_security_dashboard_vulnerabilities.vue';
+import InstanceVulnerabilities from 'ee/security_dashboard/components/instance/instance_vulnerabilities.vue';
 import VulnerabilityList from 'ee/security_dashboard/components/vulnerability_list.vue';
-import vulnerabilitiesQuery from 'ee/security_dashboard/graphql/queries/group_vulnerabilities.query.graphql';
+import vulnerabilitiesQuery from 'ee/security_dashboard/graphql/queries/instance_vulnerabilities.query.graphql';
 import createMockApollo from 'helpers/mock_apollo_helper';
-import { generateVulnerabilities } from './mock_data';
+import { generateVulnerabilities } from '../mock_data';
 
 const localVue = createLocalVue();
 localVue.use(VueApollo);
 
-describe('First Class Group Dashboard Vulnerabilities Component', () => {
+describe('Instance Security Dashboard Vulnerabilities Component', () => {
   let wrapper;
-  const apolloMock = {
-    queries: { vulnerabilities: { loading: true } },
-  };
-
-  const groupFullPath = 'group-full-path';
 
   const findIntersectionObserver = () => wrapper.find(GlIntersectionObserver);
   const findVulnerabilities = () => wrapper.find(VulnerabilityList);
@@ -28,17 +23,19 @@ describe('First Class Group Dashboard Vulnerabilities Component', () => {
     expect(findLoadingIcon().exists()).toBe(nextPage);
   };
 
-  const createWrapper = ({ $apollo = apolloMock } = {}) => {
-    return shallowMount(FirstClassGroupVulnerabilities, {
+  const createWrapper = ({ loading = false, data } = {}) => {
+    return shallowMount(InstanceVulnerabilities, {
       mocks: {
-        $apollo,
+        $apollo: {
+          queries: { vulnerabilities: { loading } },
+        },
         fetchNextPage: () => {},
       },
+      data,
       propsData: {
         filters: {},
       },
       provide: {
-        groupFullPath,
         hasVulnerabilities: true,
         hasJiraVulnerabilitiesIntegrationEnabled: false,
       },
@@ -51,11 +48,7 @@ describe('First Class Group Dashboard Vulnerabilities Component', () => {
 
   describe('when the query is loading', () => {
     beforeEach(() => {
-      wrapper = createWrapper({
-        $apollo: {
-          queries: { vulnerabilities: { loading: true } },
-        },
-      });
+      wrapper = createWrapper({ loading: true });
     });
 
     it('shows the initial loading state', () => {
@@ -66,13 +59,7 @@ describe('First Class Group Dashboard Vulnerabilities Component', () => {
   describe('when the query returned an error status', () => {
     beforeEach(() => {
       wrapper = createWrapper({
-        $apollo: {
-          queries: { vulnerabilities: { loading: false } },
-        },
-      });
-
-      wrapper.setData({
-        errorLoadingVulnerabilities: true,
+        data: () => ({ errorLoadingVulnerabilities: true }),
       });
     });
 
@@ -100,13 +87,7 @@ describe('First Class Group Dashboard Vulnerabilities Component', () => {
 
     beforeEach(() => {
       wrapper = createWrapper({
-        $apollo: {
-          queries: { vulnerabilities: { loading: false } },
-        },
-      });
-
-      wrapper.setData({
-        vulnerabilities,
+        data: () => ({ vulnerabilities }),
       });
     });
 
@@ -147,52 +128,57 @@ describe('First Class Group Dashboard Vulnerabilities Component', () => {
 
     beforeEach(() => {
       wrapper = createWrapper({
-        $apollo: {
-          queries: { vulnerabilities: { loading: false } },
-        },
-      });
-
-      wrapper.setData({
-        vulnerabilities,
-        pageInfo: {
-          hasNextPage: true,
-        },
+        data: () => ({
+          vulnerabilities,
+          pageInfo: {
+            hasNextPage: true,
+          },
+        }),
       });
     });
 
     it('should render the observer component', () => {
       expect(findIntersectionObserver().exists()).toBe(true);
     });
+
+    describe('when the filter is changed', () => {
+      it('it should not render the observer component', async () => {
+        await wrapper.setProps({ filters: {} });
+
+        expect(findIntersectionObserver().exists()).toBe(false);
+      });
+    });
   });
 
-  describe('when the query is loading the next page', () => {
+  describe('when the query is loading and there is another page', () => {
     beforeEach(() => {
       wrapper = createWrapper({
-        $apollo: {
-          queries: { vulnerabilities: { loading: true } },
-        },
-      });
-
-      wrapper.setData({
-        vulnerabilities: generateVulnerabilities(),
-        pageInfo: {
-          hasNextPage: true,
-        },
+        loading: true,
+        data: () => ({
+          vulnerabilities: generateVulnerabilities(),
+          pageInfo: {
+            hasNextPage: true,
+          },
+        }),
       });
     });
 
-    it('should render the loading spinner', () => {
+    it('should render the observer component', () => {
+      expect(findIntersectionObserver().exists()).toBe(true);
+    });
+
+    it('should render the next page loading spinner', () => {
       expectLoadingState({ nextPage: true });
     });
   });
 
   describe('when filter or sort is changed', () => {
     beforeEach(() => {
-      wrapper = createWrapper();
+      wrapper = createWrapper({ loading: true });
     });
 
-    it('should show the initial loading state when the filter is changed', () => {
-      wrapper.setProps({ filter: {} });
+    it('should show the initial loading state when the filter is changed', async () => {
+      await wrapper.setProps({ filter: {} });
 
       expectLoadingState({ initial: true });
     });
@@ -210,21 +196,18 @@ describe('First Class Group Dashboard Vulnerabilities Component', () => {
   describe('filters prop', () => {
     const mockQuery = jest.fn().mockResolvedValue({
       data: {
-        group: {
-          vulnerabilities: {
-            nodes: [],
-            pageInfo: { startCursor: '', endCursor: '' },
-          },
+        vulnerabilities: {
+          nodes: [],
+          pageInfo: { startCursor: '', endCursor: '' },
         },
       },
     });
 
     const createWrapperWithApollo = ({ query, filters }) => {
-      wrapper = shallowMount(FirstClassGroupVulnerabilities, {
+      wrapper = shallowMount(InstanceVulnerabilities, {
         localVue,
         apolloProvider: createMockApollo([[vulnerabilitiesQuery, query]]),
         propsData: { filters },
-        provide: { groupFullPath: 'path' },
       });
     };
 

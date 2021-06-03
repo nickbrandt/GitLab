@@ -1,6 +1,6 @@
 import { GlBanner, GlButton } from '@gitlab/ui';
 import { shallowMount } from '@vue/test-utils';
-import SurveyRequestBanner from 'ee/security_dashboard/components/survey_request_banner.vue';
+import SurveyRequestBanner from 'ee/security_dashboard/components/shared/survey_request_banner.vue';
 import {
   SURVEY_BANNER_LOCAL_STORAGE_KEY,
   SURVEY_BANNER_CURRENT_ID,

@@ -1,10 +1,10 @@
 import { GlLoadingIcon, GlTable } from '@gitlab/ui';
 import { shallowMount } from '@vue/test-utils';
-import VulnerabilityChart from 'ee/security_dashboard/components/first_class_vulnerability_chart';
+import VulnerabilitiesOverTimeChart from 'ee/security_dashboard/components/shared/vulnerabilities_over_time_chart.vue';
 import ChartButtons from 'ee/security_dashboard/components/vulnerability_chart_buttons.vue';
 import { extendedWrapper } from 'helpers/vue_test_utils_helper';
 
-describe('First class vulnerability chart component', () => {
+describe('Vulnerabilities Over Time Chart Component', () => {
   let wrapper;
 
   const responseData = {
@@ -32,7 +32,7 @@ describe('First class vulnerability chart component', () => {
 
   const createComponent = ({ $apollo, propsData, stubs, data, provide } = {}) => {
     return extendedWrapper(
-      shallowMount(VulnerabilityChart, {
+      shallowMount(VulnerabilitiesOverTimeChart, {
         propsData: { query: {}, ...propsData },
         provide: { groupFullPath: undefined, ...provide },
         mocks: { $apollo: mockApollo($apollo) },

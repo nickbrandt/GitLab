@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Security Charts default states sets up group-level 1`] = `
+exports[`Security Dashboard default states sets up group-level 1`] = `
 <div>
   <div>
     <div
@@ -15,7 +15,7 @@ exports[`Security Charts default states sets up group-level 1`] = `
 </div>
 `;
 
-exports[`Security Charts default states sets up instance-level 1`] = `
+exports[`Security Dashboard default states sets up instance-level 1`] = `
 <div>
   <div>
     <div
@@ -30,7 +30,7 @@ exports[`Security Charts default states sets up instance-level 1`] = `
 </div>
 `;
 
-exports[`Security Charts error states has unavailable pages 1`] = `
+exports[`Security Dashboard error states has unavailable pages 1`] = `
 <div>
   <section
     class="row empty-state text-center"
