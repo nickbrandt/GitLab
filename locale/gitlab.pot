@@ -19,9 +19,6 @@ msgstr ""
 msgid " %{name},  confirm your email address now! "
 msgstr ""
 
-msgid " %{project_name}#%{issuable_iid} &middot; created %{issuable_created} by %{author} &middot; updated %{issuable_updated}"
-msgstr ""
-
 msgid " %{start} to %{end}"
 msgstr ""
 
@@ -38522,6 +38519,9 @@ msgid "could not read private key, is the passphrase correct?"
 msgstr ""
 
 msgid "created"
+msgstr ""
+
+msgid "created %{issuable_created} by %{author}"
 msgstr ""
 
 msgid "created %{timeAgoString} by %{email} via %{user}"
