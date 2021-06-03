@@ -201,7 +201,6 @@ module EE
                 issues_with_health_status: count(::Issue.with_health_status, start: minimum_id(::Issue), finish: maximum_id(::Issue)),
                 ldap_keys: count(::LDAPKey),
                 ldap_users: count(::User.ldap, 'users.id'),
-                pod_logs_usages_total: ::Gitlab::UsageData::DEPRECATED_VALUE,
                 merged_merge_requests_using_approval_rules: count(::MergeRequest.merged.joins(:approval_rules), # rubocop: disable CodeReuse/ActiveRecord
                                                                   start: minimum_id(::MergeRequest),
                                                                   finish: maximum_id(::MergeRequest)),
@@ -233,8 +232,7 @@ module EE
         def usage_activity_by_stage_configure(time_period)
           super.merge({
             projects_slack_notifications_active: distinct_count(::Project.with_slack_service.where(time_period), :creator_id),
-            projects_slack_slash_active: distinct_count(::Project.with_slack_slash_commands_service.where(time_period), :creator_id),
-            projects_with_prometheus_alerts: ::Gitlab::UsageData::DEPRECATED_VALUE
+            projects_slack_slash_active: distinct_count(::Project.with_slack_slash_commands_service.where(time_period), :creator_id)
           })
         end
 
