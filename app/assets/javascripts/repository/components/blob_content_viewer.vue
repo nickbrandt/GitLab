@@ -8,11 +8,13 @@ import createFlash from '~/flash';
 import { __ } from '~/locale';
 import blobInfoQuery from '../queries/blob_info.query.graphql';
 import BlobHeaderEdit from './blob_header_edit.vue';
+import BlobReplace from './blob_replace.vue';
 
 export default {
   components: {
     BlobHeader,
     BlobHeaderEdit,
+    BlobReplace,
     BlobContent,
     GlLoadingIcon,
   },
@@ -87,6 +89,9 @@ export default {
     };
   },
   computed: {
+    isLoggedIn() {
+      return Boolean(gon.current_user_id);
+    },
     isLoading() {
       return this.$apollo.queries.project.loading;
     },
@@ -130,6 +135,7 @@ export default {
             :edit-path="blobInfo.editBlobPath"
             :web-ide-path="blobInfo.ideEditPath"
           />
+          <blob-replace v-if="isLoggedIn" :name="blobInfo.name" :path="path" />
         </template>
       </blob-header>
       <blob-content

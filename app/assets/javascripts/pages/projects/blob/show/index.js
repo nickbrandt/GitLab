@@ -5,6 +5,7 @@ import PipelineTourSuccessModal from '~/blob/pipeline_tour_success_modal.vue';
 import BlobViewer from '~/blob/viewer/index';
 import GpgBadges from '~/gpg_badges';
 import createDefaultClient from '~/lib/graphql';
+import { parseBoolean } from '~/lib/utils/common_utils';
 import initBlob from '~/pages/projects/init_blob';
 import initWebIdeLink from '~/pages/projects/shared/web_ide_link';
 import commitPipelineStatus from '~/projects/tree/components/commit_pipeline_status_component.vue';
@@ -20,12 +21,25 @@ const apolloProvider = new VueApollo({
 const viewBlobEl = document.querySelector('#js-view-blob-app');
 
 if (viewBlobEl) {
-  const { blobPath, projectPath } = viewBlobEl.dataset;
+  const {
+    blobPath,
+    projectPath,
+    targetBranch,
+    originalBranch,
+    canPushCode,
+    replacePath,
+  } = viewBlobEl.dataset;
 
   // eslint-disable-next-line no-new
   new Vue({
     el: viewBlobEl,
     apolloProvider,
+    provide: {
+      targetBranch,
+      originalBranch,
+      canPushCode: parseBoolean(canPushCode),
+      replacePath,
+    },
     render(createElement) {
       return createElement(BlobContentViewer, {
         props: {
