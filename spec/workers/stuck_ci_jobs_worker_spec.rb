@@ -82,6 +82,12 @@ RSpec.describe StuckCiJobsWorker do
 
           it_behaves_like 'job is dropped'
         end
+
+        context 'when created_at is outside lookback window' do
+          let(:created_at) { described_class::BUILD_LOOKBACK - 1.day }
+
+          it_behaves_like 'job is unchanged'
+        end
       end
 
       context 'when job was updated less than 1 day ago' do
@@ -98,6 +104,12 @@ RSpec.describe StuckCiJobsWorker do
 
           it_behaves_like 'job is unchanged'
         end
+
+        context 'when created_at is outside lookback window' do
+          let(:created_at) { described_class::BUILD_LOOKBACK - 1.day }
+
+          it_behaves_like 'job is unchanged'
+        end
       end
 
       context 'when job was updated more than 1 hour ago' do
@@ -111,6 +123,12 @@ RSpec.describe StuckCiJobsWorker do
 
         context 'when created_at is before updated_at' do
           let(:created_at) { 3.days.ago }
+
+          it_behaves_like 'job is unchanged'
+        end
+
+        context 'when created_at is outside lookback window' do
+          let(:created_at) { described_class::BUILD_LOOKBACK - 1.day }
 
           it_behaves_like 'job is unchanged'
         end
@@ -136,6 +154,12 @@ RSpec.describe StuckCiJobsWorker do
 
           it_behaves_like 'job is dropped'
         end
+
+        context 'when created_at is outside lookback window' do
+          let(:created_at) { described_class::BUILD_LOOKBACK - 1.day }
+
+          it_behaves_like 'job is unchanged'
+        end
       end
 
       context 'when job was updated in less than 1 hour ago' do
@@ -152,6 +176,12 @@ RSpec.describe StuckCiJobsWorker do
 
           it_behaves_like 'job is unchanged'
         end
+
+        context 'when created_at is outside lookback window' do
+          let(:created_at) { described_class::BUILD_LOOKBACK - 1.day }
+
+          it_behaves_like 'job is unchanged'
+        end
       end
     end
   end
@@ -162,17 +192,7 @@ RSpec.describe StuckCiJobsWorker do
     context 'when job was updated_at more than an hour ago' do
       let(:updated_at) { 2.hours.ago }
 
-      context 'when created_at is the same as updated_at' do
-        let(:created_at) { 2.hours.ago }
-
-        it_behaves_like 'job is dropped'
-      end
-
-      context 'when created_at is before updated_at' do
-        let(:created_at) { 3.days.ago }
-
-        it_behaves_like 'job is dropped'
-      end
+      it_behaves_like 'job is dropped'
     end
 
     context 'when job was updated in less than 1 hour ago' do
@@ -195,6 +215,12 @@ RSpec.describe StuckCiJobsWorker do
 
       context 'when created_at is before updated_at' do
         let(:created_at) { 3.days.ago }
+
+        it_behaves_like 'job is unchanged'
+      end
+
+      context 'when created_at is outside lookback window' do
+        let(:created_at) { described_class::BUILD_LOOKBACK - 1.day }
 
         it_behaves_like 'job is unchanged'
       end

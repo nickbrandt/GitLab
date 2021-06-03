@@ -15,43 +15,24 @@ class StuckCiJobsWorker # rubocop:disable Scalability/IdempotentWorker
   BUILD_PENDING_OUTDATED_TIMEOUT = 1.day
   BUILD_SCHEDULED_OUTDATED_TIMEOUT = 1.hour
   BUILD_PENDING_STUCK_TIMEOUT = 1.hour
+  BUILD_LOOKBACK = 5.days
 
   def perform
     return unless try_obtain_lease
 
     Gitlab::AppLogger.info "#{self.class}: Cleaning stuck builds"
 
+    drop(running_timed_out_builds, failure_reason: :stuck_or_timeout_failure)
+
     drop(
-      Ci::Build.running.where( # rubocop: disable CodeReuse/ActiveRecord
-        'ci_builds.updated_at < ?',
-        BUILD_RUNNING_OUTDATED_TIMEOUT.ago
-      ),
+      Ci::Build.pending.updated_before(lookback: BUILD_LOOKBACK.ago, timeout: BUILD_PENDING_OUTDATED_TIMEOUT.ago),
       failure_reason: :stuck_or_timeout_failure
     )
 
-    drop(
-      Ci::Build.pending.where( # rubocop: disable CodeReuse/ActiveRecord
-        'ci_builds.created_at < ? AND ci_builds.updated_at < ?',
-        BUILD_PENDING_OUTDATED_TIMEOUT.ago,
-        BUILD_PENDING_OUTDATED_TIMEOUT.ago
-      ),
-      failure_reason: :stuck_or_timeout_failure
-    )
-
-    drop(
-      Ci::Build.where(status: :scheduled).where( # rubocop: disable CodeReuse/ActiveRecord
-        'ci_builds.scheduled_at IS NOT NULL AND ci_builds.scheduled_at < ?',
-        BUILD_SCHEDULED_OUTDATED_TIMEOUT.ago
-      ),
-      failure_reason: :stale_schedule
-    )
+    drop(scheduled_timed_out_builds, failure_reason: :stale_schedule)
 
     drop_stuck(
-      Ci::Build.pending.where( # rubocop: disable CodeReuse/ActiveRecord
-        'ci_builds.created_at < ? AND ci_builds.updated_at < ?',
-        BUILD_PENDING_STUCK_TIMEOUT.ago,
-        BUILD_PENDING_STUCK_TIMEOUT.ago
-      ),
+      Ci::Build.pending.updated_before(lookback: BUILD_LOOKBACK.ago, timeout: BUILD_PENDING_STUCK_TIMEOUT.ago),
       failure_reason: :stuck_or_timeout_failure
     )
 
@@ -59,6 +40,20 @@ class StuckCiJobsWorker # rubocop:disable Scalability/IdempotentWorker
   end
 
   private
+
+  def scheduled_timed_out_builds
+    Ci::Build.where(status: :scheduled).where( # rubocop: disable CodeReuse/ActiveRecord
+      'ci_builds.scheduled_at IS NOT NULL AND ci_builds.scheduled_at < ?',
+      BUILD_SCHEDULED_OUTDATED_TIMEOUT.ago
+    )
+  end
+
+  def running_timed_out_builds
+    Ci::Build.running.where( # rubocop: disable CodeReuse/ActiveRecord
+      'ci_builds.updated_at < ?',
+      BUILD_RUNNING_OUTDATED_TIMEOUT.ago
+    )
+  end
 
   def try_obtain_lease
     @uuid = Gitlab::ExclusiveLease.new(EXCLUSIVE_LEASE_KEY, timeout: 30.minutes).try_obtain
