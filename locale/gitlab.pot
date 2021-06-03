@@ -11294,7 +11294,7 @@ msgstr ""
 msgid "DevopsAdoption|DevOps adoption tracks the use of key features across your favorite groups. Add a group to the table to begin."
 msgstr ""
 
-msgid "DevopsAdoption|Feature adoption is based on usage in the current calendar month. Last updated: %{timestamp}."
+msgid "DevopsAdoption|Feature adoption is based on usage in the previous calendar month. Last updated: %{timestamp}."
 msgstr ""
 
 msgid "DevopsAdoption|Filter by name"
