@@ -142,7 +142,7 @@ describe('JiraIssuesListRoot', () => {
         ${['API error']} | ${'API error'}
         ${undefined}     | ${'An error occurred while loading issues'}
       `(
-        'calls `createFlash` with "$expectedRenderedErrorMessage" when API responds with "$APIErrorMessage"',
+        'calls `createFlash` with "$expectedRenderedErrorMessage" when API responds with "$APIErrors"',
         async ({ APIErrors, expectedRenderedErrorMessage }) => {
           jest.spyOn(axios, 'get');
           mock

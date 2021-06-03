@@ -18,9 +18,11 @@ query jiraIssues(
     page: $page
   ) @client {
     errors
-    totalIssues
-    currentPage
-    issues {
+    pageInfo {
+      total
+      page
+    }
+    nodes {
       id
       projectId
       createdAt

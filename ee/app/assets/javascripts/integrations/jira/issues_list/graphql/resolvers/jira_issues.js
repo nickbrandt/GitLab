@@ -31,9 +31,12 @@ export const transformJiraIssuesREST = (response) => {
   return {
     __typename: 'JiraIssues',
     errors: [],
-    currentPage: parseInt(headers['x-page'], 10),
-    totalIssues: parseInt(headers['x-total'], 10),
-    issues: jiraIssues.map((rawIssue, index) => {
+    pageInfo: {
+      __typename: 'JiraIssuesPageInfo',
+      page: parseInt(headers['x-page'], 10),
+      total: parseInt(headers['x-total'], 10),
+    },
+    nodes: jiraIssues.map((rawIssue, index) => {
       const jiraIssue = convertObjectPropsToCamelCase(rawIssue, { deep: true });
       return {
         __typename: 'JiraIssue',
@@ -72,9 +75,11 @@ export default function jiraIssuesResolver(
       return {
         __typename: 'JiraIssues',
         errors: error?.response?.data?.errors || [__('An error occurred while loading issues')],
-        totalIssues: 0,
-        currentPage: 1,
-        issues: [],
+        pageInfo: {
+          total: 0,
+          page: 1,
+        },
+        nodes: [],
       };
     });
 }

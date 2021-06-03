@@ -105,12 +105,12 @@ export default {
           },
         });
 
-        const { currentPage, totalIssues, issues, errors } = data?.jiraIssues ?? {};
+        const { pageInfo, nodes, errors } = data?.jiraIssues ?? {};
         if (errors?.length > 0) throw new Error(errors[0]);
 
-        this.currentPage = currentPage;
-        this.totalIssues = totalIssues;
-        this.issues = issues;
+        this.currentPage = pageInfo.page;
+        this.totalIssues = pageInfo.total;
+        this.issues = nodes;
         this.issuesCount[this.currentState] = this.issues.length;
       } catch (error) {
         this.issuesListLoadFailed = true;
