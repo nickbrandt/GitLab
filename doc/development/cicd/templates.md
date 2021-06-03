@@ -307,6 +307,22 @@ include:
   - remote: https://gitlab.com/gitlab-org/gitlab/-/raw/v13.0.1-ee/lib/gitlab/ci/templates/Jobs/Deploy.gitlab-ci.yml
 ```
 
+### Use a feature flag to rollout the latest template
+
+At a GitLab major version update, we should renew [stable templates](#stable-version) by the corresponding [latest templates](#latest-version),
+but in some cases, you'd want to gauge the impact at first, so that we can be
+more confident that the change wouldn't require revert/rollback on production.
+
+To do so, you can use the feature flag, named `redirect_to_latest_template_<name>`.
+For example, you can redirect to the latest template in 25% of projects on `gitlab.com`, by the following chatops command:
+
+```shell
+/chatops run feature set redirect_to_latest_template_jobs_deploy 25 --actors
+```
+
+Once you're confident on the latest template, you should renew the stable template by the latest content,
+remove the latest template and remove the corresponding feature flag.
+
 ### Further reading
 
 There is an [open issue](https://gitlab.com/gitlab-org/gitlab/-/issues/17716) about
