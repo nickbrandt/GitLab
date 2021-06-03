@@ -28339,6 +28339,9 @@ msgstr ""
 msgid "Runners|Architecture"
 msgstr ""
 
+msgid "Runners|Are you sure you want to delete this runner?"
+msgstr ""
+
 msgid "Runners|Can run untagged jobs"
 msgstr ""
 
