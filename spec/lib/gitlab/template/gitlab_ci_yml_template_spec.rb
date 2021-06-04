@@ -23,6 +23,7 @@ RSpec.describe Gitlab::Template::GitlabCiYmlTemplate do
 
   describe '.find' do
     let_it_be(:project) { create(:project) }
+    let_it_be(:other_project) { create(:project) }
 
     described_class::TEMPLATES_WITH_LATEST_VERSION.keys.each do |key|
       it "finds the latest template for #{key}" do
@@ -57,7 +58,7 @@ RSpec.describe Gitlab::Template::GitlabCiYmlTemplate do
 
       context 'when `redirect_to_latest_template` feature flag is enabled on the other project' do
         before do
-          stub_feature_flags("redirect_to_latest_template_#{key.underscore.tr('/', '_')}".to_sym => create(:project))
+          stub_feature_flags("redirect_to_latest_template_#{key.underscore.tr('/', '_')}".to_sym => other_project)
         end
 
         it "finds the stable template for #{key}" do

@@ -18,6 +18,7 @@ module Gitlab
       end
 
       class << self
+        extend ::Gitlab::Utils::Override
         include Gitlab::Utils::StrongMemoize
 
         def extension
@@ -63,6 +64,7 @@ module Gitlab
           )
         end
 
+        override :find
         def find(key, project = nil)
           if try_redirect_to_latest?(key, project)
             key += '.latest'
