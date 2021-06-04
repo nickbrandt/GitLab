@@ -28790,6 +28790,9 @@ msgstr ""
 msgid "SecurityConfiguration|By default, all analyzers are applied in order to cover all languages across your project, and only run if the language is detected in the Merge Request."
 msgstr ""
 
+msgid "SecurityConfiguration|Check your application %{strongStart}before%{strongEnd} deployment for security vulnerabilities including unauthorized access, data leaks, denial of service attacks."
+msgstr ""
+
 msgid "SecurityConfiguration|Code snippet for the %{scanType} configuration"
 msgstr ""
 
@@ -28838,7 +28841,13 @@ msgstr ""
 msgid "SecurityConfiguration|Feature documentation for %{featureName}"
 msgstr ""
 
+msgid "SecurityConfiguration|Implement controls to prevent known vulnerabilities being added to your application."
+msgstr ""
+
 msgid "SecurityConfiguration|Manage"
+msgstr ""
+
+msgid "SecurityConfiguration|Manage and report on vulnerabilities detected."
 msgstr ""
 
 msgid "SecurityConfiguration|Manage scans"
@@ -28856,6 +28865,9 @@ msgstr ""
 msgid "SecurityConfiguration|SAST Configuration"
 msgstr ""
 
+msgid "SecurityConfiguration|Secure your project with Ultimate"
+msgstr ""
+
 msgid "SecurityConfiguration|Security Control"
 msgstr ""
 
@@ -28869,6 +28881,9 @@ msgid "SecurityConfiguration|Testing & Compliance"
 msgstr ""
 
 msgid "SecurityConfiguration|The status of the tools only applies to the default branch and is based on the %{linkStart}latest pipeline%{linkEnd}. Once you've enabled a scan for the default branch, any subsequent feature branch you create will include the scan."
+msgstr ""
+
+msgid "SecurityConfiguration|Upgrade or start a free trial"
 msgstr ""
 
 msgid "SecurityConfiguration|Using custom settings. You won't receive automatic updates on this variable. %{anchorStart}Restore to default%{anchorEnd}"
