@@ -82,7 +82,7 @@ describe('redesigned App component', () => {
     });
 
     it('renders right amount of tabs with correct title ', () => {
-      expect(findTabs().length).toEqual(2);
+      expect(findTabs()).toHaveLength(2);
     });
 
     it('renders security-testing tab', () => {
@@ -95,7 +95,7 @@ describe('redesigned App component', () => {
 
     it('renders right amount of feature cards for given props with correct props', () => {
       const cards = findFeatureCards();
-      expect(cards.length).toEqual(2);
+      expect(cards).toHaveLength(2);
       expect(cards.at(0).props()).toEqual({ feature: securityFeaturesMock[0] });
       expect(cards.at(1).props()).toEqual({ feature: complianceFeaturesMock[0] });
     });
@@ -115,23 +115,23 @@ describe('redesigned App component', () => {
     });
 
     it('should show latest pipeline info on the security tab  with correct link when latestPipelinePath is defined', () => {
-      expect(findByTestId('latest-pipeline-info-security').exists()).toBe(true);
-      expect(findByTestId('latest-pipeline-info-security').text()).toMatchInterpolatedText(
+      const latestPipelineInfoSecurity = findByTestId('latest-pipeline-info-security');
+
+      expect(latestPipelineInfoSecurity.exists()).toBe(true);
+      expect(latestPipelineInfoSecurity.text()).toMatchInterpolatedText(
         i18n.securityTestingDescription,
       );
-      expect(findByTestId('latest-pipeline-info-security').find('a').attributes('href')).toBe(
-        'test/path',
-      );
+      expect(latestPipelineInfoSecurity.find('a').attributes('href')).toBe('test/path');
     });
 
     it('should show latest pipeline info on the compliance tab  with correct link when latestPipelinePath is defined', () => {
-      expect(findByTestId('latest-pipeline-info-compliance').exists()).toBe(true);
-      expect(findByTestId('latest-pipeline-info-compliance').text()).toMatchInterpolatedText(
+      const latestPipelineInfoCompliance = findByTestId('latest-pipeline-info-compliance');
+
+      expect(latestPipelineInfoCompliance.exists()).toBe(true);
+      expect(latestPipelineInfoCompliance.text()).toMatchInterpolatedText(
         i18n.securityTestingDescription,
       );
-      expect(findByTestId('latest-pipeline-info-compliance').find('a').attributes('href')).toBe(
-        'test/path',
-      );
+      expect(latestPipelineInfoCompliance.find('a').attributes('href')).toBe('test/path');
     });
   });
 });
