@@ -14,7 +14,9 @@ export default {
   render(h, { props }) {
     const { lineNumber, path } = props;
 
-    const parsedLineNumber = lineNumber + 1;
+    const parsedLineNumber = gon.features?.infinitelyCollapsibleSections
+      ? lineNumber
+      : lineNumber + 1;
     const lineId = `L${parsedLineNumber}`;
     const lineHref = `${path}#${lineId}`;
 

@@ -9,6 +9,7 @@ describe('Job Log', () => {
   let actions;
   let state;
   let store;
+  let origGon;
 
   const localVue = createLocalVue();
   localVue.use(Vuex);
@@ -25,6 +26,10 @@ describe('Job Log', () => {
       toggleCollapsibleLine: () => {},
     };
 
+    origGon = window.gon;
+
+    window.gon = { features: { infinitelyCollapsibleSections: false } }; // NOTE: This also passes with the feature flag set to ON
+
     state = {
       trace: logLinesParser(jobLog),
       traceEndpoint: 'jobs/id',
@@ -40,6 +45,8 @@ describe('Job Log', () => {
 
   afterEach(() => {
     wrapper.destroy();
+
+    window.gon = origGon;
   });
 
   const findCollapsibleLine = () => wrapper.find('.collapsible-line');

@@ -1,5 +1,6 @@
 import {
   logLinesParser,
+  logLinesParserNew,
   updateIncrementalTrace,
   parseHeaderLine,
   parseLine,
@@ -17,6 +18,7 @@ import {
   headerTraceIncremental,
   collapsibleTrace,
   collapsibleTraceIncremental,
+  multipleCollapsibleSectionsMockData,
 } from '../components/log/mock_data';
 
 describe('Jobs Store Utils', () => {
@@ -212,6 +214,87 @@ describe('Jobs Store Utils', () => {
 
       it('does not add section duration as a line', () => {
         expect(result[1].lines.includes(utilsMockData[4])).toEqual(false);
+      });
+    });
+  });
+
+  describe('logLinesParserNew', () => {
+    let result;
+
+    beforeEach(() => {
+      result = logLinesParserNew(utilsMockData);
+    });
+
+    describe('regular line', () => {
+      it('adds a lineNumber property with correct index', () => {
+        expect(result.parsedLines[0].lineNumber).toEqual(1);
+        expect(result.parsedLines[1].line.lineNumber).toEqual(2);
+      });
+    });
+
+    describe('collapsible section', () => {
+      it('adds a `isClosed` property', () => {
+        expect(result.parsedLines[1].isClosed).toEqual(false);
+      });
+
+      it('adds a `isHeader` property', () => {
+        expect(result.parsedLines[1].isHeader).toEqual(true);
+      });
+
+      it('creates a lines array property with the content of the collapsible section', () => {
+        expect(result.parsedLines[1].lines.length).toEqual(2);
+        expect(result.parsedLines[1].lines[0].content).toEqual(utilsMockData[2].content);
+        expect(result.parsedLines[1].lines[1].content).toEqual(utilsMockData[3].content);
+      });
+    });
+
+    describe('section duration', () => {
+      it('adds the section information to the header section', () => {
+        expect(result.parsedLines[1].line.section_duration).toEqual(
+          utilsMockData[4].section_duration,
+        );
+      });
+
+      it('does not add section duration as a line', () => {
+        expect(result.parsedLines[1].lines.includes(utilsMockData[4])).toEqual(false);
+      });
+    });
+
+    describe('multiple collapsible sections', () => {
+      beforeEach(() => {
+        result = logLinesParserNew(multipleCollapsibleSectionsMockData);
+      });
+
+      it('should contain a section inside another section', () => {
+        const innerSection = [
+          {
+            isClosed: false,
+            isHeader: true,
+            line: {
+              content: [{ text: '1st collapsible section' }],
+              lineNumber: 6,
+              offset: 1006,
+              section: 'collapsible-1',
+              section_duration: '01:00',
+              section_header: true,
+            },
+            lines: [
+              {
+                content: [
+                  {
+                    text:
+                      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam lorem dolor, congue ac condimentum vitae',
+                  },
+                ],
+                lineNumber: 7,
+                offset: 1007,
+                section: 'collapsible-1',
+              },
+            ],
+          },
+        ];
+
+        expect(result.parsedLines[1].lines).toEqual(expect.arrayContaining(innerSection));
       });
     });
   });
