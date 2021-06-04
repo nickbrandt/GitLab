@@ -53,6 +53,7 @@ module EE
     override :search_service
     def search_service
       return super if group.blank? || projects.blank?
+      raise "[search_service]"
       return super unless ::Feature.enabled?(:advanced_search_multi_project_select, group)
       return super unless ::Gitlab::CurrentSettings.search_using_elasticsearch?(scope: group) || ::Gitlab::CurrentSettings.search_using_elasticsearch?(scope: projects)
 
