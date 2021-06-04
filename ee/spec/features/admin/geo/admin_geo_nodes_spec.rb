@@ -38,7 +38,7 @@ RSpec.describe 'admin Geo Nodes', :js, :geo do
       wait_for_requests
     end
 
-    it 'shows all public Geo Nodes and create new node link' do
+    it 'shows all public Geo Nodes and Add site link' do
       expect(page).to have_link('Add site', href: new_admin_geo_node_path)
       page.within(find('.geo-node-core-details-grid-columns', match: :first)) do
         expect(page).to have_content(geo_node.url)

@@ -8,11 +8,11 @@ module QA
           module Nodes
             class Show < QA::Page::Base
               view 'ee/app/assets/javascripts/geo_nodes_beta/components/app.vue' do
-                element :new_node_link
+                element :add_site_button
               end
 
               def new_node!
-                click_element :new_node_link
+                click_element(:add_site_button)
               end
             end
           end
