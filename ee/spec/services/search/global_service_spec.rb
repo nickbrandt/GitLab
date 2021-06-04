@@ -18,12 +18,6 @@ RSpec.describe Search::GlobalService do
     let(:service) { described_class.new(user, params) }
   end
 
-  context 'notes search' do
-    let(:results) { described_class.new(nil, search: '*').execute.objects('notes') }
-
-    it_behaves_like 'search query applies joins based on migrations shared examples', :add_permissions_data_to_notes_documents
-  end
-
   context 'merge_requests search' do
     let(:results) { described_class.new(nil, search: '*').execute.objects('merge_requests') }
 
@@ -122,17 +116,7 @@ RSpec.describe Search::GlobalService do
         end
 
         with_them do
-          context 'when add_permissions_data_to_notes_documents migration is finished' do
-            it_behaves_like 'search respects visibility'
-          end
-
-          context 'when add_permissions_data_to_notes_documents migration is not finished' do
-            before do
-              set_elasticsearch_migration_to :add_permissions_data_to_notes_documents, including: false
-            end
-
-            it_behaves_like 'search respects visibility'
-          end
+          it_behaves_like 'search respects visibility'
         end
       end
 
@@ -144,17 +128,7 @@ RSpec.describe Search::GlobalService do
         end
 
         with_them do
-          context 'when add_permissions_data_to_notes_documents migration is finished' do
-            it_behaves_like 'search respects visibility'
-          end
-
-          context 'when add_permissions_data_to_notes_documents migration is not finished' do
-            before do
-              set_elasticsearch_migration_to :add_permissions_data_to_notes_documents, including: false
-            end
-
-            it_behaves_like 'search respects visibility'
-          end
+          it_behaves_like 'search respects visibility'
         end
       end
 
@@ -171,17 +145,7 @@ RSpec.describe Search::GlobalService do
             project.repository.index_commits_and_blobs
           end
 
-          context 'when add_permissions_data_to_notes_documents migration is finished' do
-            it_behaves_like 'search respects visibility'
-          end
-
-          context 'when add_permissions_data_to_notes_documents migration is not finished' do
-            before do
-              set_elasticsearch_migration_to :add_permissions_data_to_notes_documents, including: false
-            end
-
-            it_behaves_like 'search respects visibility'
-          end
+          it_behaves_like 'search respects visibility'
         end
       end
 
@@ -193,17 +157,7 @@ RSpec.describe Search::GlobalService do
         end
 
         with_them do
-          context 'when add_permissions_data_to_notes_documents migration is finished' do
-            it_behaves_like 'search respects visibility'
-          end
-
-          context 'when add_permissions_data_to_notes_documents migration is not finished' do
-            before do
-              set_elasticsearch_migration_to :add_permissions_data_to_notes_documents, including: false
-            end
-
-            it_behaves_like 'search respects visibility'
-          end
+          it_behaves_like 'search respects visibility'
         end
       end
     end
@@ -427,61 +381,19 @@ RSpec.describe Search::GlobalService do
     context 'with notes on issues' do
       let(:noteable) { create :issue, project: project }
 
-      context 'when add_permissions_data_to_notes_documents migration has not finished' do
-        before do
-          set_elasticsearch_migration_to :add_permissions_data_to_notes_documents, including: false
-        end
-
-        it_behaves_like 'search notes shared examples', :note_on_issue
-      end
-
-      context 'when add_permissions_data_to_notes_documents migration has finished' do
-        before do
-          set_elasticsearch_migration_to :add_permissions_data_to_notes_documents, including: true
-        end
-
-        it_behaves_like 'search notes shared examples', :note_on_issue
-      end
+      it_behaves_like 'search notes shared examples', :note_on_issue
     end
 
     context 'with notes on merge requests' do
       let(:noteable) { create :merge_request, target_project: project, source_project: project }
 
-      context 'when add_permissions_data_to_notes_documents migration has not finished' do
-        before do
-          set_elasticsearch_migration_to :add_permissions_data_to_notes_documents, including: false
-        end
-
-        it_behaves_like 'search notes shared examples', :note_on_merge_request
-      end
-
-      context 'when add_permissions_data_to_notes_documents migration has finished' do
-        before do
-          set_elasticsearch_migration_to :add_permissions_data_to_notes_documents, including: true
-        end
-
-        it_behaves_like 'search notes shared examples', :note_on_merge_request
-      end
+      it_behaves_like 'search notes shared examples', :note_on_merge_request
     end
 
     context 'with notes on commits' do
       let(:noteable) { create(:commit, project: project) }
 
-      context 'when add_permissions_data_to_notes_documents migration has not finished' do
-        before do
-          set_elasticsearch_migration_to :add_permissions_data_to_notes_documents, including: false
-        end
-
-        it_behaves_like 'search notes shared examples', :note_on_commit
-      end
-
-      context 'when add_permissions_data_to_notes_documents migration has finished' do
-        before do
-          set_elasticsearch_migration_to :add_permissions_data_to_notes_documents, including: true
-        end
-
-        it_behaves_like 'search notes shared examples', :note_on_commit
-      end
+      it_behaves_like 'search notes shared examples', :note_on_commit
     end
   end
 end
