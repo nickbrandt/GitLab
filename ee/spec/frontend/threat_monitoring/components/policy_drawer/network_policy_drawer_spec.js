@@ -1,5 +1,5 @@
+import ContainerRuntimePolicy from 'ee/threat_monitoring/components/policy_drawer/container_runtime_policy.vue';
 import NetworkPolicyDrawer from 'ee/threat_monitoring/components/policy_drawer/network_policy_drawer.vue';
-import ContainerRuntimePolicy from 'ee/threat_monitoring/components/policy_editor/container_runtime_policy.vue';
 import { mountExtended } from 'helpers/vue_test_utils_helper';
 import { mockPoliciesResponse, mockCiliumPolicy } from '../../mocks/mock_data';
 

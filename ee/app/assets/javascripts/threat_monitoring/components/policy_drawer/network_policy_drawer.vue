@@ -2,7 +2,7 @@
 import { GlButton, GlDrawer } from '@gitlab/ui';
 import { getContentWrapperHeight } from '../../utils';
 import { CiliumNetworkPolicyKind } from '../policy_editor/constants';
-import ContainerRuntimePolicy from '../policy_editor/container_runtime_policy.vue';
+import ContainerRuntimePolicy from './container_runtime_policy.vue';
 
 export default {
   components: {

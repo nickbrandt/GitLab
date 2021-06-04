@@ -1,4 +1,4 @@
-import ContainerRuntimePolicy from 'ee/threat_monitoring/components/policy_editor/container_runtime_policy.vue';
+import ContainerRuntimePolicy from 'ee/threat_monitoring/components/policy_drawer/container_runtime_policy.vue';
 import toYaml from 'ee/threat_monitoring/components/policy_editor/lib/to_yaml';
 import PolicyPreview from 'ee/threat_monitoring/components/policy_editor/policy_preview.vue';
 import { shallowMountExtended } from 'helpers/vue_test_utils_helper';
