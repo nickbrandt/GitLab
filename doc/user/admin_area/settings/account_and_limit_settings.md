@@ -38,6 +38,7 @@ When [adding files to a repository](../../project/repository/web_editor.md#creat
 via the web UI, the maximum **attachment** size is the limiting factor.
 This is due to a [web server](../../../development/architecture.md#components)
 needing to receive the file before GitLab generates the commit.
+Prefer [Git LFS](../../../topics/git/lfs/index.md) for adding large files to a repository. 
 
 ## Max import size
 
