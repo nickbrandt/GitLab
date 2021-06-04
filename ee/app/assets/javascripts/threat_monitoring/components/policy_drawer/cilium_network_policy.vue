@@ -41,7 +41,7 @@ export default {
 <template>
   <div>
     <h5 class="gl-mt-3">{{ __('Type') }}</h5>
-    <p>{{ s__('NetworkPolicies|Container runtime') }}</p>
+    <p>{{ s__('NetworkPolicies|Network policy') }}</p>
 
     <div v-if="policy">
       <template v-if="policy.description">

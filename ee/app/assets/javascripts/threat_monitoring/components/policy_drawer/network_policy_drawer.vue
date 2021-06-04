@@ -2,7 +2,7 @@
 import { GlButton, GlDrawer } from '@gitlab/ui';
 import { getContentWrapperHeight } from '../../utils';
 import { CiliumNetworkPolicyKind } from '../policy_editor/constants';
-import ContainerRuntimePolicy from './container_runtime_policy.vue';
+import CiliumNetworkPolicy from './cilium_network_policy.vue';
 
 export default {
   components: {
@@ -10,7 +10,7 @@ export default {
     GlDrawer,
     NetworkPolicyEditor: () =>
       import(/* webpackChunkName: 'network_policy_editor' */ '../network_policy_editor.vue'),
-    ContainerRuntimePolicy,
+    CiliumNetworkPolicy,
   },
   props: {
     policy: {
@@ -25,7 +25,7 @@ export default {
     },
   },
   computed: {
-    isContainerRuntimePolicy() {
+    isCiliumNetworkPolicy() {
       return this.policy ? this.policy.manifest.includes(CiliumNetworkPolicyKind) : false;
     },
   },
@@ -59,7 +59,7 @@ export default {
       </div>
     </template>
     <div v-if="policy">
-      <container-runtime-policy v-if="isContainerRuntimePolicy" :value="policy.manifest" />
+      <cilium-network-policy v-if="isCiliumNetworkPolicy" :value="policy.manifest" />
 
       <div v-else>
         <h5>{{ s__('NetworkPolicies|Policy definition') }}</h5>

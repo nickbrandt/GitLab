@@ -1,4 +1,4 @@
-import ContainerRuntimePolicy from 'ee/threat_monitoring/components/policy_drawer/container_runtime_policy.vue';
+import CiliumNetworkPolicy from 'ee/threat_monitoring/components/policy_drawer/cilium_network_policy.vue';
 import NetworkPolicyDrawer from 'ee/threat_monitoring/components/policy_drawer/network_policy_drawer.vue';
 import { mountExtended } from 'helpers/vue_test_utils_helper';
 import { mockPoliciesResponse, mockCiliumPolicy } from '../../mocks/mock_data';
@@ -22,7 +22,7 @@ describe('NetworkPolicyDrawer component', () => {
   // Finders
   const findEditButton = () => wrapper.findByTestId('edit-button');
   const findPolicyEditor = () => wrapper.findByTestId('policyEditor');
-  const findCiliumPolicy = () => wrapper.findComponent(ContainerRuntimePolicy);
+  const findCiliumNetworkPolicy = () => wrapper.findComponent(CiliumNetworkPolicy);
 
   // Shared assertions
   const itRendersEditButton = () => {
@@ -75,8 +75,8 @@ describe('NetworkPolicyDrawer component', () => {
       });
     });
 
-    it('renders the container runtime component', () => {
-      expect(findCiliumPolicy().exists()).toBe(true);
+    it('renders the network policy component', () => {
+      expect(findCiliumNetworkPolicy().exists()).toBe(true);
     });
 
     itRendersEditButton();

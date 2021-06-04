@@ -1,9 +1,9 @@
-import ContainerRuntimePolicy from 'ee/threat_monitoring/components/policy_drawer/container_runtime_policy.vue';
+import CiliumNetworkPolicy from 'ee/threat_monitoring/components/policy_drawer/cilium_network_policy.vue';
 import toYaml from 'ee/threat_monitoring/components/policy_editor/lib/to_yaml';
 import PolicyPreview from 'ee/threat_monitoring/components/policy_editor/policy_preview.vue';
 import { shallowMountExtended } from 'helpers/vue_test_utils_helper';
 
-describe('ContainerRuntimePolicy component', () => {
+describe('CiliumNetworkPolicy component', () => {
   let wrapper;
   const policy = {
     name: 'test-policy',
@@ -17,7 +17,7 @@ describe('ContainerRuntimePolicy component', () => {
   const findDescription = () => wrapper.findByTestId('description');
 
   const factory = ({ propsData } = {}) => {
-    wrapper = shallowMountExtended(ContainerRuntimePolicy, {
+    wrapper = shallowMountExtended(CiliumNetworkPolicy, {
       propsData: {
         ...propsData,
       },
