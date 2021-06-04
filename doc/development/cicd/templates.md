@@ -307,9 +307,9 @@ include:
   - remote: https://gitlab.com/gitlab-org/gitlab/-/raw/v13.0.1-ee/lib/gitlab/ci/templates/Jobs/Deploy.gitlab-ci.yml
 ```
 
-### Use a feature flag to rollout the latest template
+### Use a feature flag to roll out a `latest` template
 
-At a major version, like 13.0 or 14.0, [stable templates](#stable-version) must be
+With a major version release like 13.0 or 14.0, [stable templates](#stable-version) must be
 updated with their corresponding [latest template versions](#latest-version).
 It may be hard to gauge the impact of this change, so use the `redirect_to_latest_template_<name>`
 feature flag to test the impact on a subset of users. Using a feature flag can help
