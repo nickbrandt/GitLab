@@ -106,6 +106,17 @@ RSpec.describe Nav::TopNavHelper do
         ]
         expect(subject[:secondary]).to eq(expected_secondary)
       end
+
+      context 'with current nav as project' do
+        before do
+          helper.nav('project')
+        end
+
+        it 'has expected :active' do
+          pp subject
+          expect(subject[:primary].detect { |entry| entry[:id] == 'project' }[:active]).to eq(true)
+        end
+      end
     end
 
     context 'when current_user is non-admin' do
@@ -188,6 +199,16 @@ RSpec.describe Nav::TopNavHelper do
               )
             ]
             expect(projects_view[:linksSecondary]).to eq(expected_links_secondary)
+          end
+
+          context 'with current nav as project' do
+            before do
+              helper.nav('project')
+            end
+
+            it 'has expected :active' do
+              expect(subject[:primary].detect { |entry| entry[:id] == 'project' }[:active]).to eq(true)
+            end
           end
 
           context 'with persisted project' do
@@ -279,6 +300,16 @@ RSpec.describe Nav::TopNavHelper do
               )
             ]
             expect(groups_view[:linksSecondary]).to eq(expected_links_secondary)
+          end
+
+          context 'with current nav as group' do
+            before do
+              helper.nav('group')
+            end
+
+            it 'has expected :active' do
+              expect(subject[:primary].detect { |entry| entry[:id] == 'groups' }[:active]).to eq(true)
+            end
           end
 
           context 'with persisted group' do
