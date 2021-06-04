@@ -1,7 +1,7 @@
 import { GlDropdown, GlDropdownItem } from '@gitlab/ui';
 import { shallowMount } from '@vue/test-utils';
-import { EntityTypes } from 'ee/threat_monitoring/components/policy_editor/constants';
-import PolicyRuleEntity from 'ee/threat_monitoring/components/policy_editor/policy_rule_entity.vue';
+import { EntityTypes } from 'ee/threat_monitoring/components/policy_editor/network_policy/lib';
+import PolicyRuleEntity from 'ee/threat_monitoring/components/policy_editor/network_policy/policy_rule_entity.vue';
 
 describe('PolicyRuleEntity component', () => {
   let wrapper;

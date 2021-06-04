@@ -1,14 +1,14 @@
 import { shallowMount } from '@vue/test-utils';
-import NetworkPolicyEditor from 'ee/threat_monitoring/components/network_policy_editor.vue';
+import PolicyYamlEditor from 'ee/threat_monitoring/components/policy_yaml_editor.vue';
 import EditorLite from '~/vue_shared/components/editor_lite.vue';
 
-describe('NetworkPolicyEditor component', () => {
+describe('PolicyYamlEditor component', () => {
   let wrapper;
 
   const findEditor = () => wrapper.findComponent(EditorLite);
 
   const factory = ({ propsData } = {}) => {
-    wrapper = shallowMount(NetworkPolicyEditor, {
+    wrapper = shallowMount(PolicyYamlEditor, {
       propsData: {
         value: 'foo',
         ...propsData,

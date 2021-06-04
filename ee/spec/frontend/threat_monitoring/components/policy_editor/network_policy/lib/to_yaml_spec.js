@@ -1,6 +1,8 @@
-import { EndpointMatchModeLabel } from 'ee/threat_monitoring/components/policy_editor/constants';
-import { buildRule } from 'ee/threat_monitoring/components/policy_editor/lib/rules';
-import toYaml from 'ee/threat_monitoring/components/policy_editor/lib/to_yaml';
+import {
+  EndpointMatchModeLabel,
+  buildRule,
+  toYaml,
+} from 'ee/threat_monitoring/components/policy_editor/network_policy/lib';
 
 describe('toYaml', () => {
   let policy;

@@ -8,8 +8,9 @@ import {
   PortMatchModeAny,
   PortMatchModePortProtocol,
   EntityTypes,
-} from 'ee/threat_monitoring/components/policy_editor/constants';
-import { buildRule, ruleSpec } from 'ee/threat_monitoring/components/policy_editor/lib/rules';
+  buildRule,
+} from 'ee/threat_monitoring/components/policy_editor/network_policy/lib';
+import { ruleSpec } from 'ee/threat_monitoring/components/policy_editor/network_policy/lib/rules';
 
 describe('buildRule', () => {
   const oldRule = {

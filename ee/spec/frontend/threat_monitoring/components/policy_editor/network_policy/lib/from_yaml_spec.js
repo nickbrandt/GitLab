@@ -10,12 +10,11 @@ import {
   RuleTypeCIDR,
   RuleTypeFQDN,
   EntityTypes,
-} from 'ee/threat_monitoring/components/policy_editor/constants';
-import fromYaml, {
+  fromYaml,
   removeUnnecessaryDashes,
-} from 'ee/threat_monitoring/components/policy_editor/lib/from_yaml';
-import { buildRule } from 'ee/threat_monitoring/components/policy_editor/lib/rules';
-import toYaml from 'ee/threat_monitoring/components/policy_editor/lib/to_yaml';
+  buildRule,
+  toYaml,
+} from 'ee/threat_monitoring/components/policy_editor/network_policy/lib';
 
 describe('fromYaml', () => {
   let policy;
