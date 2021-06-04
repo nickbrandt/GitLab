@@ -19,7 +19,7 @@ module Resolvers
 
       argument :search, GraphQL::STRING_TYPE,
                required: false,
-               description: 'Filter by text present in token or description fields.'
+               description: 'Filter by token or text present in description field.'
 
       argument :sort, ::Types::Ci::RunnerSortEnum,
                required: false,

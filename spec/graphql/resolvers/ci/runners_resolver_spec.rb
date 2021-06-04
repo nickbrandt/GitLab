@@ -154,11 +154,11 @@ RSpec.describe Resolvers::Ci::RunnersResolver do
         end
       end
 
-      context 'to "def"' do
-        let(:search_term) { 'def' }
+      context 'to "defghi"' do
+        let(:search_term) { 'defghi' }
 
         it 'returns runners containing term in token' do
-          is_expected.to contain_exactly(inactive_project_runner, offline_project_runner)
+          is_expected.to contain_exactly(offline_project_runner)
         end
       end
     end
