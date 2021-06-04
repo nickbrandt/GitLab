@@ -216,15 +216,6 @@ ul.related-merge-requests > li {
 }
 
 @include media-breakpoint-up(sm) {
-  .emoji-block .row {
-    display: flex;
-
-    .new-branch-col {
-      padding-top: 0;
-      align-self: center;
-    }
-  }
-
   .create-mr-dropdown-wrap {
     .btn-group:not(.hidden) {
       display: inline-flex;
