@@ -43,4 +43,23 @@ RSpec.describe ImportExportUpload do
       end
     end
   end
+
+  context 'ActiveRecord callbacks' do
+    let(:after_save_callbacks) { described_class._save_callbacks.select { |cb| cb.kind == :after } }
+    let(:after_commit_callbacks) { described_class._commit_callbacks.select { |cb| cb.kind == :after } }
+
+    def find_callback(callbacks, key)
+      callbacks.find { |cb| cb.instance_variable_get(:@key) == key }
+    end
+
+    it 'export file is stored in after_commit callback' do
+      expect(find_callback(after_commit_callbacks, :store_export_file!)).to be_present
+      expect(find_callback(after_save_callbacks, :store_export_file!)).to be_nil
+    end
+
+    it 'import file is stored in after_save callback' do
+      expect(find_callback(after_save_callbacks, :store_import_file!)).to be_present
+      expect(find_callback(after_commit_callbacks, :store_import_file!)).to be_nil
+    end
+  end
 end
