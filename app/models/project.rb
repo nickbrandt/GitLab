@@ -406,9 +406,8 @@ class Project < ApplicationRecord
     :wiki_access_level, :snippets_access_level, :builds_access_level,
     :repository_access_level, :pages_access_level, :metrics_dashboard_access_level, :analytics_access_level,
     :operations_enabled?, :operations_access_level, :security_and_compliance_access_level,
-    :container_registry_access_level, :container_registry_enabled?,
+    :container_registry_access_level,
     to: :project_feature, allow_nil: true
-  alias_method :container_registry_enabled, :container_registry_enabled?
   delegate :show_default_award_emojis, :show_default_award_emojis=,
     :show_default_award_emojis?,
     to: :project_setting, allow_nil: true
@@ -547,6 +546,7 @@ class Project < ApplicationRecord
   scope :include_project_feature, -> { includes(:project_feature) }
   scope :with_service, ->(service) { joins(service).eager_load(service) }
   scope :with_shared_runners, -> { where(shared_runners_enabled: true) }
+  scope :with_container_registry, -> { where(container_registry_enabled: true) }
   scope :inside_path, ->(path) do
     # We need routes alias rs for JOIN so it does not conflict with
     # includes(:route) which we use in ProjectsFinder.
@@ -2611,6 +2611,15 @@ class Project < ApplicationRecord
   def merge_requests_author_approval
     !!read_attribute(:merge_requests_author_approval)
   end
+
+  def container_registry_enabled
+    if Feature.enabled?(:read_container_registry_access_level, self.namespace, default_enabled: :yaml)
+      project_feature.container_registry_enabled?
+    else
+      read_attribute(:container_registry_enabled)
+    end
+  end
+  alias_method :container_registry_enabled?, :container_registry_enabled
 
   private
 
