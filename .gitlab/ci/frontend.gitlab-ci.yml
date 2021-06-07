@@ -353,8 +353,6 @@ compile-storybook:
     - cd storybook/
     - run_timed_command "retry yarn install --frozen-lockfile"
     - yarn build
-    - mkdir public
-    - mv storybook-static/* public
   artifacts:
     name: storybook
     expire_in: 31d

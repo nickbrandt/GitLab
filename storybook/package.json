@@ -2,8 +2,8 @@
   "private": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "start-storybook -p 6006 -c config",
-    "build": "build-storybook -c config"
+    "start": "start-storybook -p 9002 -c config",
+    "build": "build-storybook -c config -o public"
   },
   "dependencies": {},
   "devDependencies": {
