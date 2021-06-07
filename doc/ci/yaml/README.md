@@ -3524,12 +3524,13 @@ as artifacts.
 
 The collected Metrics report uploads to GitLab as an artifact and displays in merge requests.
 
-##### `artifacts:reports:performance` **(PREMIUM)**
+##### `artifacts:reports:browser_performance` **(PREMIUM)**
 
 > - Introduced in GitLab 11.5.
 > - Requires GitLab Runner 11.5 and above.
+> - [Name changed](https://gitlab.com/gitlab-org/gitlab/-/issues/225914) from `artifacts:reports:performance` in GitLab 14.0.
 
-The `performance` report collects [Browser Performance Testing metrics](../../user/project/merge_requests/browser_performance_testing.md)
+The `browser_performance` report collects [Browser Performance Testing metrics](../../user/project/merge_requests/browser_performance_testing.md)
 as artifacts.
 
 The collected Browser Performance report uploads to GitLab as an artifact and displays in merge requests.
