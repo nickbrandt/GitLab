@@ -34,12 +34,15 @@ export default {
       return getContentWrapperHeight('.js-threat-monitoring-container-wrapper');
     },
   },
+  // We set the drawer's z-index to 252 to clear flash messages that might be displayed in the page
+  // and that have a z-index of 251.
+  DRAWER_Z_INDEX: 252,
 };
 </script>
 
 <template>
   <gl-drawer
-    :z-index="252"
+    :z-index="$options.DRAWER_Z_INDEX"
     :header-height="getDrawerHeaderHeight()"
     v-bind="$attrs"
     v-on="$listeners"
