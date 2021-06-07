@@ -35845,6 +35845,9 @@ msgstr ""
 msgid "View full log"
 msgstr ""
 
+msgid "View group in admin area"
+msgstr ""
+
 msgid "View group labels"
 msgstr ""
 
@@ -35894,6 +35897,9 @@ msgid "View performance dashboard."
 msgstr ""
 
 msgid "View project"
+msgstr ""
+
+msgid "View project in admin area"
 msgstr ""
 
 msgid "View project labels"
