@@ -79,6 +79,10 @@ export const disableButtonIfEmptyField = (fieldSelector, buttonSelector, eventNa
 // automatically adjust scroll position for hash urls taking the height of the navbar into account
 // https://github.com/twitter/bootstrap/issues/1768
 export const handleLocationHash = () => {
+  if (window.gon?.features?.diffsVirtualScrolling && document.querySelector('#diffs.active')) {
+    return;
+  }
+
   let hash = getLocationHash();
   if (!hash) return;
 

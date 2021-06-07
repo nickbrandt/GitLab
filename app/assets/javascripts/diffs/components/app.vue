@@ -42,6 +42,7 @@ import {
   TRACKING_MULTIPLE_FILES_MODE,
 } from '../constants';
 
+import diffsEventHub from '../event_hub';
 import { reviewStatuses } from '../utils/file_reviews';
 import { diffsApp } from '../utils/performance';
 import { fileByFile } from '../utils/preferences';
@@ -323,6 +324,10 @@ export default {
       this.setHighlightedRow(id.split('diff-content').pop().slice(1));
     }
 
+    if (window.gon?.features?.diffsVirtualScrolling) {
+      diffsEventHub.$on('scrollToFileHash', this.scrollVirtualScrollerToFileHash);
+    }
+
     if (window.gon?.features?.diffSettingsUsageData) {
       if (this.renderTreeList) {
         api.trackRedisHllUserEvent(TRACKING_FILE_BROWSER_TREE);
@@ -377,6 +382,10 @@ export default {
     diffsApp.deinstrument();
     this.unsubscribeFromEvents();
     this.removeEventListeners();
+
+    if (window.gon?.features?.diffsVirtualScrolling) {
+      diffsEventHub.$off('scrollToFileHash', this.scrollVirtualScrollerToFileHash);
+    }
   },
   methods: {
     ...mapActions(['startTaskList']),
@@ -494,6 +503,7 @@ export default {
       const targetIndex = this.currentDiffIndex + step;
       if (targetIndex >= 0 && targetIndex < this.diffFiles.length) {
         this.scrollToFile(this.diffFiles[targetIndex].file_path);
+        this.scrollVirtualScrollerToFileHash(this.diffFiles[targetIndex].file_hash);
       }
     },
     setTreeDisplay() {
@@ -507,6 +517,14 @@ export default {
       }
 
       return this.setShowTreeList({ showTreeList, saving: false });
+    },
+    scrollVirtualScrollerToFileHash(hash) {
+      const index = this.diffFiles.findIndex((f) => f.file_hash === hash);
+
+      if (index !== -1) {
+        this.$refs.virtualScroller.scrollToItem(index);
+        window.scrollBy(0, -154);
+      }
     },
   },
   minTreeWidth: MIN_TREE_WIDTH,
@@ -572,6 +590,7 @@ export default {
           <template v-else-if="renderDiffFiles">
             <dynamic-scroller
               v-if="isVirtualScrollingEnabled"
+              ref="virtualScroller"
               :items="diffs"
               :min-item-size="70"
               :buffer="1000"

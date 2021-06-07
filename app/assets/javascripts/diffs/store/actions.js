@@ -189,7 +189,13 @@ export const fetchDiffFilesBatch = ({ commit, state, dispatch }) => {
       .catch(() => commit(types.SET_RETRIEVING_BATCHES, false));
 
   return getBatch()
-    .then(handleLocationHash)
+    .then(() => handleLocationHash())
+    .then(() => {
+      eventHub.$emit(
+        'scrollToFileHash',
+        window.location.hash.replace('#', '').split('diff-content-').pop(),
+      );
+    })
     .catch(() => null);
 };
 
@@ -529,6 +535,10 @@ export const scrollToFile = ({ state, commit }, path) => {
   document.location.hash = fileHash;
 
   commit(types.VIEW_DIFF_FILE, fileHash);
+
+  if (window.gon?.features?.diffsVirtualScrolling) {
+    eventHub.$emit('scrollToFileHash', fileHash);
+  }
 };
 
 export const setShowTreeList = ({ commit }, { showTreeList, saving = true }) => {
