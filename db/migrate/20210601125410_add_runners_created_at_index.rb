@@ -8,13 +8,13 @@ class AddRunnersCreatedAtIndex < ActiveRecord::Migration[6.0]
 
   disable_ddl_transaction!
 
-  INDEX_NAME = 'index_ci_runners_on_created_at_and_id'
-
   def up
-    add_concurrent_index :ci_runners, [:created_at, :id], name: INDEX_NAME
+    add_concurrent_index :ci_runners, [:created_at, :id], order: { id: :desc }, name: 'index_ci_runners_on_created_at_and_id_desc'
+    add_concurrent_index :ci_runners, [:created_at, :id], order: { created_at: :desc, id: :desc }, name: 'index_ci_runners_on_created_at_desc_and_id_desc'
   end
 
   def down
-    remove_concurrent_index :ci_runners, [:created_at, :id], name: INDEX_NAME
+    remove_concurrent_index :ci_runners, [:created_at, :id], order: { id: :desc }, name: 'index_ci_runners_on_created_at_and_id_desc'
+    remove_concurrent_index :ci_runners, [:created_at, :id], order: { created_at: :desc, id: :desc }, name: 'index_ci_runners_on_created_at_desc_and_id_desc'
   end
 end

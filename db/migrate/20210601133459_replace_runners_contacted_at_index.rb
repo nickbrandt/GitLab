@@ -9,16 +9,17 @@ class ReplaceRunnersContactedAtIndex < ActiveRecord::Migration[6.0]
   disable_ddl_transaction!
 
   OLD_INDEX_NAME = 'index_ci_runners_on_contacted_at'
-  NEW_INDEX_NAME = 'index_ci_runners_on_contacted_at_and_id'
 
   def up
-    add_concurrent_index :ci_runners, [:contacted_at, :id], name: NEW_INDEX_NAME, using: 'btree'
+    add_concurrent_index :ci_runners, [:contacted_at, :id], order: { id: :desc }, name: 'index_ci_runners_on_contacted_at_and_id_desc', using: 'btree'
+    add_concurrent_index :ci_runners, [:contacted_at, :id], order: { contacted_at: :desc, id: :desc }, name: 'index_ci_runners_on_contacted_at_desc_and_id_desc', using: 'btree'
 
     remove_concurrent_index_by_name :ci_runners, OLD_INDEX_NAME
   end
 
   def down
-    remove_concurrent_index_by_name :ci_runners, NEW_INDEX_NAME
+    remove_concurrent_index_by_name :ci_runners, 'index_ci_runners_on_contacted_at_and_id_desc'
+    remove_concurrent_index_by_name :ci_runners, 'index_ci_runners_on_contacted_at_desc_and_id_desc'
 
     add_concurrent_index :ci_runners, :contacted_at, name: OLD_INDEX_NAME, using: 'btree'
   end
