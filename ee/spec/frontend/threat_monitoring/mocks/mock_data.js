@@ -43,7 +43,7 @@ spec:
 
 export const mockCiliumPolicy = {
   name: 'policy',
-  creationTimestamp: new Date(),
+  creationTimestamp: new Date('2021-06-07T00:00:00.000Z'),
   manifest: `apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
