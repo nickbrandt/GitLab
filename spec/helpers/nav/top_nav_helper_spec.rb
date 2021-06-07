@@ -113,7 +113,6 @@ RSpec.describe Nav::TopNavHelper do
         end
 
         it 'has expected :active' do
-          pp subject
           expect(subject[:primary].detect { |entry| entry[:id] == 'project' }[:active]).to eq(true)
         end
       end
