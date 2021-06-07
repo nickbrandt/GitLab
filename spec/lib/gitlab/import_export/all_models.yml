@@ -54,6 +54,8 @@ issues:
 - namespace
 - note_authors
 - issue_email_participants
+- incident_management_issuable_escalations
+- incident_management_issuable_escalation_statuses
 events:
 - author
 - project
