@@ -62,8 +62,8 @@ describe('~/subscriptions/buy_minutes/graphql/resolvers', () => {
 
           expect(createFlash).not.toHaveBeenCalled();
           expect(result).toStrictEqual([
-            { name: 'United States of America', alpha2: 'US', __typename: 'Country' },
-            { name: 'Uruguay', alpha2: 'UY', __typename: 'Country' },
+            { name: 'United States of America', id: 'US', __typename: 'Country' },
+            { name: 'Uruguay', id: 'UY', __typename: 'Country' },
           ]);
         });
       });

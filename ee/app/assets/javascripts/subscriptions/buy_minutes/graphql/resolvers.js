@@ -15,7 +15,7 @@ export const resolvers = {
         .then(({ data }) =>
           data.map(([name, alpha2]) =>
             // eslint-disable-next-line @gitlab/require-i18n-strings
-            ({ name, alpha2, __typename: 'Country' }),
+            ({ name, id: alpha2, __typename: 'Country' }),
           ),
         )
         .catch(() => createFlash({ message: ERROR_FETCHING_COUNTRIES }));
