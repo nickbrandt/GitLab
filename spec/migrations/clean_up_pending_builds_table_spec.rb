@@ -10,6 +10,8 @@ RSpec.describe CleanUpPendingBuildsTable do
   let(:builds) { table(:ci_builds) }
 
   before do
+    allow(Gitlab).to receive(:com?).and_return(true)
+
     namespaces.create!(id: 123, name: 'sample', path: 'sample')
     projects.create!(id: 123, name: 'sample', path: 'sample', namespace_id: 123)
 
@@ -31,5 +33,17 @@ RSpec.describe CleanUpPendingBuildsTable do
     expect(queue.all.count).to eq 1
     expect(queue.first.id).to eq 1
     expect(builds.all.count).to eq 6
+  end
+
+  context 'when there are multiple batches' do
+    before do
+      stub_const("#{described_class}::BATCH_SIZE", 1)
+    end
+
+    it 'iterates the data correctly' do
+      migrate!
+
+      expect(queue.all.count).to eq 1
+    end
   end
 end
