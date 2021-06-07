@@ -6,11 +6,11 @@ import UPDATE_STATE from 'ee/subscriptions/graphql/mutations/update_state.mutati
 import STATE_QUERY from 'ee/subscriptions/graphql/queries/state.query.graphql';
 import { NEW_GROUP } from 'ee/subscriptions/new/constants';
 import Step from 'ee/vue_shared/purchase_flow/components/step.vue';
-import { sprintf, s__, __ } from '~/locale';
-import autofocusonshow from '~/vue_shared/directives/autofocusonshow';
-import { getParameterValues } from '~/lib/utils/url_utility';
 import { GENERAL_ERROR_MESSAGE } from 'ee/vue_shared/purchase_flow/constants';
 import createFlash from '~/flash';
+import { getParameterValues } from '~/lib/utils/url_utility';
+import { sprintf, s__, __ } from '~/locale';
+import autofocusonshow from '~/vue_shared/directives/autofocusonshow';
 
 export default {
     components: {
@@ -57,9 +57,6 @@ export default {
         this.selectedPlanId = data.selectedPlanId;
       },
     },
-  },
-  mounted() {
-    this.preselectPlan();
   },
   computed: {
     selectedPlanModel: {
@@ -157,6 +154,9 @@ export default {
         : this.$options.i18n.selectedGroupDescription;
     },
   },
+  mounted() {
+    this.preselectPlan();
+  },
   methods: {
     updateState(payload = {}) {
       this.$apollo.mutate({
@@ -176,15 +176,15 @@ export default {
         return;
       }
 
-      let plan = this.plans[0];
+      let preselectedPlan = this.plans[0];
 
       const planIdFromSearchParams = getParameterValues('planId');
 
       if (planIdFromSearchParams.length > 0) {
-        plan = this.plans.find((plan) => plan.id === planIdFromSearchParams[0].id) || plan;
+        preselectedPlan = this.plans.find((plan) => plan.id === planIdFromSearchParams[0].id) || preselectedPlan;
       }
 
-      this.updateState({ selectedPlanId: plan.id });
+      this.updateState({ selectedPlanId: preselectedPlan.id });
     },
   },
     i18n: {

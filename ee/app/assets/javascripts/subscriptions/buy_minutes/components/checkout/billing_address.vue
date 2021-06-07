@@ -3,14 +3,14 @@ import { GlFormGroup, GlFormInput, GlFormSelect } from '@gitlab/ui';
 import { isEmpty } from 'lodash';
 import { STEPS } from 'ee/subscriptions/constants';
 import UPDATE_STATE from 'ee/subscriptions/graphql/mutations/update_state.mutation.graphql';
-import STATE_QUERY from 'ee/subscriptions/graphql/queries/state.query.graphql';
 import COUNTRIES_QUERY from 'ee/subscriptions/graphql/queries/countries.query.graphql';
+import STATE_QUERY from 'ee/subscriptions/graphql/queries/state.query.graphql';
 import STATES_QUERY from 'ee/subscriptions/graphql/queries/states.query.graphql';
 import Step from 'ee/vue_shared/purchase_flow/components/step.vue';
-import { s__ } from '~/locale';
-import autofocusonshow from '~/vue_shared/directives/autofocusonshow';
 import { GENERAL_ERROR_MESSAGE } from 'ee/vue_shared/purchase_flow/constants';
 import createFlash from '~/flash';
+import { s__ } from '~/locale';
+import autofocusonshow from '~/vue_shared/directives/autofocusonshow';
 
 export default {
   components: {
@@ -42,7 +42,7 @@ export default {
           return;
         }
 
-        const customer = data.customer;
+        const {customer} = data;
         this.country = customer.country;
         this.address1 = customer.address1;
         this.address2 = customer.address2;
