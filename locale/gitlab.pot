@@ -26681,6 +26681,9 @@ msgstr ""
 msgid "ProtectedBranch|%{wildcards_link_start}Wildcards%{wildcards_link_end} such as %{code_tag_start}*-stable%{code_tag_end} or %{code_tag_start}production/*%{code_tag_end} are supported."
 msgstr ""
 
+msgid "ProtectedBranch|Allow all users with push access to %{tag_start}force push%{tag_end}."
+msgstr ""
+
 msgid "ProtectedBranch|Allow all users with push access to force push."
 msgstr ""
 
