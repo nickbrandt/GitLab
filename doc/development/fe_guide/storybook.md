@@ -10,13 +10,13 @@ To build and launch Storybook locally, in the root directory of the `gitlab` pro
 
 1. Install Storybook dependencies:
 
-    ```bash
+    ```shell
     yarn storybook:install
     ```
 
 1. Build the Storybook site:
 
-    ```bash
+    ```shell
     yarn storybook:start
     ```
 
