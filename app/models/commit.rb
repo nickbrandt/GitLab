@@ -530,6 +530,20 @@ class Commit
     expire_note_etag_cache_for_related_mrs
   end
 
+  # attr_mentionable uses safe_message, which is a combination of full_title and
+  # description. Those fields are implemented by cache_markdown_field, but we
+  # can't easily use them (and their cache) with attr_mentionable, since this is
+  # not an ActiveRecord model. Work around it for now by combining the HTML
+  # generated for those two fields whenever attr_mentionable asks for the HTML
+  # for safe_message.
+  #
+  # https://gitlab.com/gitlab-org/gitlab/-/issues/TODO
+  def updated_cached_html_for(field)
+    return super unless field == :safe_message
+
+    [super(:full_title), super(:description)].join("\n")
+  end
+
   private
 
   def expire_note_etag_cache_for_related_mrs

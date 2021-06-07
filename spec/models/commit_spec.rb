@@ -471,16 +471,22 @@ eos
   end
 
   it_behaves_like 'a mentionable' do
-    subject { create(:project, :repository).commit }
+    subject(:commit) { create(:project, :repository).commit }
 
     let(:author) { create(:user, email: subject.author_email) }
     let(:backref_text) { "commit #{subject.id}" }
     let(:set_mentionable_text) do
-      ->(txt) { allow(subject).to receive(:safe_message).and_return(txt) }
+      ->(txt) { allow(commit).to receive(:safe_message).and_return(txt) }
     end
 
     # Include the subject in the repository stub.
     let(:extra_commits) { [subject] }
+
+    it 'does not use the mentionable cache', :use_clean_rails_redis_caching do
+      commit.all_references(project.owner).all
+
+      expect(Rails.cache.read("banzai/commit:#{commit.id}/safe_message/single_line")).to be_nil
+    end
   end
 
   describe '#hook_attrs' do
@@ -798,6 +804,16 @@ eos
 
     it 'returns false if the commit has not been reverted' do
       expect(commit.has_been_reverted?(user, issue.notes_with_associations)).to eq(false)
+    end
+  end
+
+  describe '#updated_cached_html_for' do
+    it 'derives safe_message from full_title and description' do
+      allow(commit).to receive(:updated_cached_html_for).and_call_original
+      expect(commit).to receive(:updated_cached_html_for).with(:full_title).and_return('title')
+      expect(commit).to receive(:updated_cached_html_for).with(:description).and_return('description')
+
+      expect(commit.updated_cached_html_for(:safe_message)).to eq("title\ndescription")
     end
   end
 end
