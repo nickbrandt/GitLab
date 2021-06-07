@@ -1,6 +1,12 @@
+---
+stage: none
+group: unassigned
+info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#assignments
+---
+
 # Storybook
 
-The Storybook for the `gitlab-org/gitlab` project is available on our GitLab Pages site at https://gitlab-org.gitlab.io/gitlab/storybook.
+The Storybook for the `gitlab-org/gitlab` project is available on our [GitLab Pages site](https://gitlab-org.gitlab.io/gitlab/storybook).
 
 ## Storybook in local development
 
@@ -36,7 +42,7 @@ To add a story:
     │  ├─ todo_button.stories.js
     ```
 
-1. Write the story as per the official Storybook instructions: https://storybook.js.org/docs/vue/writing-stories/introduction
+1. Write the story as per the [official Storybook instructions](https://storybook.js.org/docs/vue/writing-stories/introduction)
    
    Notes:
    - Specify the `title` field of the story as the component's file path from the `javascripts/` directory,
