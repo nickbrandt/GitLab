@@ -10,8 +10,6 @@ RSpec.describe CleanUpPendingBuildsTable do
   let(:builds) { table(:ci_builds) }
 
   before do
-    allow(Gitlab).to receive(:com?).and_return(true)
-
     namespaces.create!(id: 123, name: 'sample', path: 'sample')
     projects.create!(id: 123, name: 'sample', path: 'sample', namespace_id: 123)
 

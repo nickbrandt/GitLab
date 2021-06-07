@@ -6,7 +6,7 @@ class CleanUpPendingBuildsTable < ActiveRecord::Migration[6.0]
   disable_ddl_transaction!
 
   def up
-    return unless Gitlab.com?
+    return unless Gitlab.dev_or_test_env? || Gitlab.com?
 
     each_batch('ci_pending_builds', of: BATCH_SIZE) do |min, max|
       execute <<~SQL
