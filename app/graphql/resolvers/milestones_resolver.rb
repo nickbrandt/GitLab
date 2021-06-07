@@ -28,8 +28,6 @@ module Resolvers
     type Types::MilestoneType.connection_type, null: true
 
     def resolve(**args)
-      validate_timeframe_params!(args)
-
       authorize!
 
       MilestonesFinder.new(milestones_finder_params(args)).execute
@@ -44,15 +42,7 @@ module Resolvers
         title: args[:title],
         search_title: args[:search_title],
         containing_date: args[:containing_date]
-      }.merge!(timeframe_parameters(args)).merge!(parent_id_parameters(args))
-    end
-
-    def timeframe_parameters(args)
-      if args[:timeframe]
-        args[:timeframe].transform_keys { |k| :"#{k}_date" }
-      else
-        args.slice(:start_date, :end_date)
-      end
+      }.merge!(transform_timeframe_parameters(args)).merge!(parent_id_parameters(args))
     end
 
     def parent

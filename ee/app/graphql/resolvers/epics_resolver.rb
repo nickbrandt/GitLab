@@ -61,7 +61,6 @@ module Resolvers
     type Types::EpicType, null: true
 
     def ready?(**args)
-      validate_timeframe_params!(args)
       validate_starts_with_iid!(args)
 
       super(**args)
@@ -105,7 +104,7 @@ module Resolvers
       transformed[:parent_id]   = parent.id if parent
       transformed[:iids]      ||= [args[:iid]].compact
 
-      transformed
+      transformed.merge(transform_timeframe_parameters(args))
     end
 
     # `resolver_object` refers to the object we're currently querying on, and is usually a `Group`
