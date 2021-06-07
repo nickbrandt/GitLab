@@ -47,6 +47,8 @@ export default {
   methods: {
     updateLink() {
       this.tiptapEditor.chain().focus().unsetLink().setLink({ href: this.linkHref }).run();
+
+      this.$emit('execute', { contentType: linkContentType });
     },
     selectLink() {
       const { tiptapEditor } = this;
@@ -58,6 +60,8 @@ export default {
     },
     removeLink() {
       this.tiptapEditor.chain().focus().unsetLink().run();
+
+      this.$emit('execute', { contentType: linkContentType });
     },
   },
 };
@@ -73,7 +77,7 @@ export default {
     <gl-dropdown-form class="gl-px-3!">
       <gl-form-input-group v-model="linkHref" :placeholder="__('Link URL')">
         <template #append>
-          <gl-button variant="confirm" @click="updateLink">{{ __('Apply') }}</gl-button>
+          <gl-button variant="confirm" @click="updateLink()">{{ __('Apply') }}</gl-button>
         </template>
       </gl-form-input-group>
     </gl-dropdown-form>

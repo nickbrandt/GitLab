@@ -1,5 +1,5 @@
-import { GlDropdown, GlDropdownDivider, GlDropdownItem, GlFormInputGroup } from '@gitlab/ui';
-import { shallowMountExtended } from 'helpers/vue_test_utils_helper';
+import { GlDropdown, GlDropdownDivider, GlFormInputGroup, GlButton } from '@gitlab/ui';
+import { mountExtended } from 'helpers/vue_test_utils_helper';
 import ToolbarLinkButton from '~/content_editor/components/toolbar_link_button.vue';
 import { tiptapExtension as Link } from '~/content_editor/extensions/link';
 import { hasSelection } from '~/content_editor/services/utils';
@@ -12,7 +12,7 @@ describe('content_editor/components/toolbar_link_button', () => {
   let editor;
 
   const buildWrapper = () => {
-    wrapper = shallowMountExtended(ToolbarLinkButton, {
+    wrapper = mountExtended(ToolbarLinkButton, {
       propsData: {
         tiptapEditor: editor,
       },
@@ -23,7 +23,9 @@ describe('content_editor/components/toolbar_link_button', () => {
   };
   const findDropdown = () => wrapper.findComponent(GlDropdown);
   const findDropdownDivider = () => wrapper.findComponent(GlDropdownDivider);
-  const findDropdownItem = () => wrapper.findComponent(GlDropdownItem);
+  const findLinkURLInput = () => wrapper.findComponent(GlFormInputGroup).find('input[type="text"]');
+  const findApplyLinkButton = () => wrapper.findComponent(GlButton);
+  const findRemoveLinkButton = () => wrapper.findByText('Remove link');
 
   beforeEach(() => {
     editor = createTestEditor({
@@ -58,13 +60,25 @@ describe('content_editor/components/toolbar_link_button', () => {
       expect(wrapper.findByText('Remove link').exists()).toBe(true);
     });
 
-    it('executes removeLink command when the remove link option is clicked', () => {
+    it('executes removeLink command when the remove link option is clicked', async () => {
       const commands = mockChainedCommands(editor, ['focus', 'unsetLink', 'run']);
 
-      findDropdownItem().vm.$emit('click');
+      await findRemoveLinkButton().trigger('click');
 
       expect(commands.unsetLink).toHaveBeenCalled();
       expect(commands.focus).toHaveBeenCalled();
+      expect(commands.run).toHaveBeenCalled();
+    });
+
+    it('updates the link with a new link when "Apply" button is clicked', async () => {
+      const commands = mockChainedCommands(editor, ['focus', 'unsetLink', 'setLink', 'run']);
+
+      await findLinkURLInput().setValue('https://example');
+      await findApplyLinkButton().trigger('click');
+
+      expect(commands.focus).toHaveBeenCalled();
+      expect(commands.unsetLink).toHaveBeenCalled();
+      expect(commands.setLink).toHaveBeenCalledWith({ href: 'https://example' });
       expect(commands.run).toHaveBeenCalled();
     });
   });
@@ -84,6 +98,17 @@ describe('content_editor/components/toolbar_link_button', () => {
       expect(findDropdownDivider().exists()).toBe(false);
       expect(wrapper.findByText('Remove link').exists()).toBe(false);
     });
+
+    it('sets the link to the value in the URL input when "Apply" button is clicked', async () => {
+      const commands = mockChainedCommands(editor, ['focus', 'unsetLink', 'setLink', 'run']);
+
+      await findLinkURLInput().setValue('https://example');
+      await findApplyLinkButton().trigger('click');
+
+      expect(commands.focus).toHaveBeenCalled();
+      expect(commands.setLink).toHaveBeenCalledWith({ href: 'https://example' });
+      expect(commands.run).toHaveBeenCalled();
+    });
   });
 
   describe('when the user displays the dropdown', () => {
@@ -92,6 +117,7 @@ describe('content_editor/components/toolbar_link_button', () => {
     beforeEach(() => {
       commands = mockChainedCommands(editor, ['focus', 'extendMarkRange', 'run']);
     });
+
     describe('given the user has not selected text', () => {
       beforeEach(() => {
         hasSelection.mockReturnValueOnce(false);
