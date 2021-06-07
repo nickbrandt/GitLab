@@ -1,5 +1,5 @@
 <script>
-import { reportTypeToSecurityReportTypeEnum } from 'ee/vue_shared/security_reports/constants';
+import { reportTypeToSecurityReportTypeEnum } from 'ee_else_ce/vue_shared/security_reports/constants';
 import createFlash from '~/flash';
 import { s__ } from '~/locale';
 import SecurityReportDownloadDropdown from '~/vue_shared/security_reports/components/security_report_download_dropdown.vue';
