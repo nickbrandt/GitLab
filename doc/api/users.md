@@ -738,7 +738,7 @@ Parameters:
 | Attribute                    | Required | Description                                                 |
 | :--------------------------- | :------- | :---------------------------------------------------------- |
 | `view_diffs_file_by_file`    | Yes      | Flag indicating the user sees only one file diff per page.  |
-| `show_whitespace_in_diffs`   | Yes      | Flag indicating the user sees whitespace changes in diffs   |
+| `show_whitespace_in_diffs`   | Yes      | Flag indicating the user sees whitespace changes in diffs.  |
 
 ## Set user status
 
