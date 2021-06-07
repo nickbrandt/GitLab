@@ -8,9 +8,12 @@ import { NEW_GROUP } from 'ee/subscriptions/new/constants';
 import Step from 'ee/vue_shared/purchase_flow/components/step.vue';
 import { sprintf, s__, __ } from '~/locale';
 import autofocusonshow from '~/vue_shared/directives/autofocusonshow';
+import { getParameterValues } from '~/lib/utils/url_utility';
+import { GENERAL_ERROR_MESSAGE } from 'ee/vue_shared/purchase_flow/constants';
+import createFlash from '~/flash';
 
 export default {
-  components: {
+    components: {
     GlFormGroup,
     GlFormSelect,
     GlFormInput,
@@ -34,45 +37,37 @@ export default {
       customer: {},
       isSetupForCompany: null,
       isNewUser: null,
+      selectedPlanId: null,
     };
   },
   apollo: {
     state: {
       query: STATE_QUERY,
-      update(data) {
-        const {
-          subscription = {},
-          namespaces = [],
-          customer = {},
-          isSetupForCompany = null,
-          isNewUser = null,
-        } = data;
-        return {
-          subscription,
-          namespaces,
-          customer,
-          isSetupForCompany,
-          isNewUser,
-        };
-      },
-      result({ data }) {
-        const { subscription, namespaces, customer, isSetupForCompany, isNewUser } = data || {};
+      manual: true,
+      result({ data, loading }) {
+        if (loading) {
+          return;
+        }
 
-        this.subscription = subscription;
-        this.namespaces = namespaces;
-        this.customer = customer;
-        this.isSetupForCompany = isSetupForCompany;
-        this.isNewUser = isNewUser;
+        this.subscription = data.subscription;
+        this.namespaces = data.namespaces;
+        this.customer = data.customer;
+        this.isSetupForCompany = data.isSetupForCompany;
+        this.isNewUser = data.isNewUser;
+        this.selectedPlanId = data.selectedPlanId;
       },
     },
+  },
+  mounted() {
+    this.preselectPlan();
   },
   computed: {
     selectedPlanModel: {
       get() {
-        return this.subscription.planId || this.plans[0].code;
+        return this.selectedPlanId || this.plans[0].id;
       },
       set(planId) {
-        this.updateSubscription({ subscription: { planId } });
+        this.updateState({ subscription: { planId } });
       },
     },
     selectedGroupModel: {
@@ -83,7 +78,7 @@ export default {
         const quantity =
           this.namespaces.find((namespace) => namespace.id === namespaceId)?.users || 1;
 
-        this.updateSubscription({ subscription: { namespaceId, quantity } });
+        this.updateState({ subscription: { namespaceId, quantity } });
       },
     },
     numberOfUsersModel: {
@@ -91,7 +86,7 @@ export default {
         return this.selectedGroupUsers || 1;
       },
       set(number) {
-        this.updateSubscription({ subscription: { quantity: number } });
+        this.updateState({ subscription: { quantity: number } });
       },
     },
     companyModel: {
@@ -99,11 +94,11 @@ export default {
         return this.customer.company;
       },
       set(company) {
-        this.updateSubscription({ customer: { company } });
+        this.updateState({ customer: { company } });
       },
     },
     selectedPlan() {
-      const selectedPlan = this.plans.find((plan) => plan.code === this.subscription.planId);
+      const selectedPlan = this.plans.find((plan) => plan.id === this.selectedPlanId);
       if (!selectedPlan) {
         return this.plans[0];
       }
@@ -111,13 +106,13 @@ export default {
       return selectedPlan;
     },
     selectedPlanTextLine() {
-      return sprintf(this.$options.i18n.selectedPlan, { selectedPlanText: this.selectedPlan.code });
+      return sprintf(this.$options.i18n.selectedPlan, { selectedPlanText: this.selectedPlan.id });
+    },
+    selectedGroup() {
+      return this.namespaces.find((namespace) => namespace.id === this.subscription.namespaceId);
     },
     selectedGroupUsers() {
-      return (
-        this.namespaces.find((namespace) => namespace.id === this.subscription.namespaceId)
-          ?.users || 1
-      );
+      return this.selectedGroup?.users || 1;
     },
     isGroupSelected() {
       return this.subscription.namespaceId !== null;
@@ -129,14 +124,10 @@ export default {
     },
     isValid() {
       if (this.isSetupForCompany) {
-        return (
-          !isEmpty(this.subscription.planId) &&
-          (!isEmpty(this.customer.company) || this.isNewGroupSelected) &&
-          this.isNumberOfUsersValid
-        );
+        return this.isNumberOfUsersValid && !isEmpty(this.selectedPlanId) && (!isEmpty(this.customer.company) || this.isGroupSelected);
       }
 
-      return !isEmpty(this.subscription.planId) && this.subscription.quantity === 1;
+      return (this.subscription.quantity === 1) && !isEmpty(this.selectedPlanId);
     },
     isShowingGroupSelector() {
       return !this.isNewUser && this.namespaces.length;
@@ -167,37 +158,54 @@ export default {
     },
   },
   methods: {
-    updateSubscription(payload = {}) {
+    updateState(payload = {}) {
       this.$apollo.mutate({
         mutation: UPDATE_STATE,
         variables: {
           input: payload,
         },
+      }).catch((error) => {
+        createFlash({ message: GENERAL_ERROR_MESSAGE, error, captureError: true });
       });
     },
     toggleIsSetupForCompany() {
       this.updateSubscription({ isSetupForCompany: !this.isSetupForCompany });
     },
+    preselectPlan() {
+      if (this.selectedPlanId) {
+        return;
+      }
+
+      let plan = this.plans[0];
+
+      const planIdFromSearchParams = getParameterValues('planId');
+
+      if (planIdFromSearchParams.length > 0) {
+        plan = this.plans.find((plan) => plan.id === planIdFromSearchParams[0].id) || plan;
+      }
+
+      this.updateState({ selectedPlanId: plan.id });
+    },
   },
-  i18n: {
-    stepTitle: s__('Checkout|Subscription details'),
-    nextStepButtonText: s__('Checkout|Continue to billing'),
-    selectedPlanLabel: s__('Checkout|GitLab plan'),
-    selectedGroupLabel: s__('Checkout|GitLab group'),
-    groupSelectPrompt: __('Select'),
-    groupSelectCreateNewOption: s__('Checkout|Create a new group'),
-    selectedGroupDescription: s__('Checkout|Your subscription will be applied to this group'),
-    createNewGroupDescription: s__("Checkout|You'll create your new group after checkout"),
-    organizationNameLabel: s__('Checkout|Name of company or organization using GitLab'),
-    numberOfUsersLabel: s__('Checkout|Number of users'),
-    needMoreUsersLink: s__('Checkout|Need more users? Purchase GitLab for your %{company}.'),
-    companyOrTeam: s__('Checkout|company or team'),
-    selectedPlan: s__('Checkout|%{selectedPlanText} plan'),
-    group: __('Group'),
-    users: __('Users'),
-  },
-  stepId: STEPS[0].id,
-};
+    i18n: {
+      stepTitle: s__('Checkout|Subscription details'),
+      nextStepButtonText: s__('Checkout|Continue to billing'),
+      selectedPlanLabel: s__('Checkout|GitLab plan'),
+      selectedGroupLabel: s__('Checkout|GitLab group'),
+      groupSelectPrompt: __('Select'),
+      groupSelectCreateNewOption: s__('Checkout|Create a new group'),
+      selectedGroupDescription: s__('Checkout|Your subscription will be applied to this group'),
+      createNewGroupDescription: s__("Checkout|You'll create your new group after checkout"),
+      organizationNameLabel: s__('Checkout|Name of company or organization using GitLab'),
+      numberOfUsersLabel: s__('Checkout|Number of users'),
+      needMoreUsersLink: s__('Checkout|Need more users? Purchase GitLab for your %{company}.'),
+      companyOrTeam: s__('Checkout|company or team'),
+      selectedPlan: s__('Checkout|%{selectedPlanText} plan'),
+      group: __('Group'),
+      users: __('Users'),
+    },
+    stepId: STEPS[0].id,
+  };
 </script>
 <template>
   <step
@@ -213,7 +221,7 @@ export default {
           v-model="selectedPlanModel"
           v-autofocusonshow
           :options="plans"
-          value-field="code"
+          value-field="id"
           text-field="name"
           data-qa-selector="plan_name"
         />
@@ -271,7 +279,7 @@ export default {
         {{ selectedPlanTextLine }}
       </strong>
       <div v-if="isSetupForCompany" ref="summary-line-2">
-        {{ $options.i18n.group }}: {{ customer.company || selectedGroupName }}
+        {{ $options.i18n.group }}: {{ customer.company || selectedGroup.name }}
       </div>
       <div ref="summary-line-3">{{ $options.i18n.users }}: {{ subscription.quantity }}</div>
     </template>
