@@ -1,3 +1,4 @@
+import { GlIcon } from '@gitlab/ui';
 import { mount } from '@vue/test-utils';
 import { trimText } from 'helpers/text_helper';
 import IntervalPatternInput from '~/pages/projects/pipeline_schedules/shared/components/interval_pattern_input.vue';
@@ -27,6 +28,8 @@ describe('Interval Pattern Input Component', () => {
   const findAllLabels = () => wrapper.findAll('label');
   const findSelectedRadio = () =>
     wrapper.findAll('input[type="radio"]').wrappers.find((x) => x.element.checked);
+  const findIcon = () => wrapper.findComponent(GlIcon);
+  const findAllIcons = () => wrapper.findAllComponents(GlIcon);
   const findSelectedRadioKey = () => findSelectedRadio()?.attributes('data-testid');
   const selectEveryDayRadio = () => findEveryDayRadio().trigger('click');
   const selectEveryWeekRadio = () => findEveryWeekRadio().trigger('click');
@@ -200,6 +203,15 @@ describe('Interval Pattern Input Component', () => {
 
     it('loads with the custom option being selected', () => {
       expect(findSelectedRadioKey()).toBe(customKey);
+    });
+  });
+
+  describe('Custom cron syntax quota info', () => {
+    it('the help text icon is only shown for the custom radio option', () => {
+      createWrapper();
+
+      expect(findIcon().exists()).toBe(true);
+      expect(findAllIcons().length).toBe(1);
     });
   });
 });
