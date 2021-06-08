@@ -110,7 +110,7 @@ To do so, follow these steps:
       the feature can be officially announced in a release blog post.
     - [ ] `/chatops run auto_deploy status <merge-commit>`
 - [ ] Close [the feature issue](ISSUE LINK) to indicate the feature will be released in the current milestone.
-- [ ] (Optional) Close this issue and create a separate issue for scheduling the steps below to "Release the feature".
+- [ ] (Optional) If you plan to clean up the feature flag in a future milestone, you can close this issue and create a separate issue for scheduling the steps below to "Release the feature".
 
 **WARNING:** This approach has the downside that it makes it difficult for us to
 [clean up](https://docs.gitlab.com/ee/development/feature_flags/controls.html#cleaning-up) the flag.
