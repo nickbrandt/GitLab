@@ -1,8 +1,8 @@
 <script>
 import { __ } from '~/locale';
-import fromYaml, { removeUnnecessaryDashes } from './lib/from_yaml';
-import humanizeNetworkPolicy from './lib/humanize';
-import PolicyPreview from './policy_preview.vue';
+import fromYaml, { removeUnnecessaryDashes } from '../policy_editor/lib/from_yaml';
+import humanizeNetworkPolicy from '../policy_editor/lib/humanize';
+import PolicyPreview from '../policy_editor/policy_preview.vue';
 
 export default {
   components: {
@@ -41,7 +41,7 @@ export default {
 <template>
   <div>
     <h5 class="gl-mt-3">{{ __('Type') }}</h5>
-    <p>{{ s__('NetworkPolicies|Container runtime') }}</p>
+    <p>{{ s__('NetworkPolicies|Network policy') }}</p>
 
     <div v-if="policy">
       <template v-if="policy.description">
