@@ -27,6 +27,14 @@ RSpec.describe Resolvers::Ci::RunnersResolver do
       {}
     end
 
+    context 'when the user cannot see runners' do
+      let(:user) { create(:user) }
+
+      it 'returns no runners' do
+        is_expected.to be_empty
+      end
+    end
+
     context 'without sort' do
       it 'returns all the runners' do
         is_expected.to contain_exactly(inactive_project_runner, offline_project_runner, group_runner, instance_runner)
