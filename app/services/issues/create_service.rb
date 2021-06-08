@@ -6,9 +6,9 @@ module Issues
 
     def execute(skip_system_notes: false)
       @request = params.delete(:request)
-      @spam_params = Spam::SpamActionService.filter_spam_params!(params)
+      @spam_params = Spam::SpamActionService.filter_spam_params!(params, @request)
 
-      @issue = BuildService.new(project, current_user, params).execute
+      @issue = BuildService.new(project: project, current_user: current_user, params: params).execute
 
       filter_resolve_discussion_params
 
@@ -32,15 +32,26 @@ module Issues
       end
     end
 
+    # Add new items to Issues::AfterCreateService if they can be performed in Sidekiq
     def after_create(issue)
-      add_incident_label(issue)
-      todo_service.new_issue(issue, current_user)
       user_agent_detail_service.create
       resolve_discussions_with_issue(issue)
-      delete_milestone_total_issue_counter_cache(issue.milestone)
-      track_incident_action(current_user, issue, :incident_created)
 
       super
+    end
+
+    def handle_changes(issue, options)
+      super
+      old_associations = options.fetch(:old_associations, {})
+      old_assignees = old_associations.fetch(:assignees, [])
+
+      handle_assignee_changes(issue, old_assignees)
+    end
+
+    def handle_assignee_changes(issue, old_assignees)
+      return if issue.assignees == old_assignees
+
+      create_assignee_note(issue, old_assignees)
     end
 
     def resolve_discussions_with_issue(issue)
@@ -58,23 +69,7 @@ module Issues
     def user_agent_detail_service
       UserAgentDetailService.new(@issue, request)
     end
-
-    # Applies label "incident" (creates it if missing) to incident issues.
-    # For use in "after" hooks only to ensure we are not appyling
-    # labels prematurely.
-    def add_incident_label(issue)
-      return unless issue.incident?
-
-      label = ::IncidentManagement::CreateIncidentLabelService
-        .new(project, current_user)
-        .execute
-        .payload[:label]
-
-      return if issue.label_ids.include?(label.id)
-
-      issue.labels << label
-    end
   end
 end
 
-Issues::CreateService.prepend_if_ee('EE::Issues::CreateService')
+Issues::CreateService.prepend_mod

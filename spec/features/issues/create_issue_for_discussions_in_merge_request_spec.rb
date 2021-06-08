@@ -18,10 +18,6 @@ RSpec.describe 'Resolving all open threads in a merge request from an issue', :j
     end
   end
 
-  before do
-    stub_feature_flags(remove_resolve_note: false)
-  end
-
   describe 'as a user with access to the project' do
     before do
       project.add_maintainer(user)
@@ -37,7 +33,7 @@ RSpec.describe 'Resolving all open threads in a merge request from an issue', :j
 
     context 'resolving the thread' do
       before do
-        click_button 'Resolve thread'
+        find('button[data-qa-selector="resolve_discussion_button"]').click
       end
 
       it 'hides the link for creating a new issue' do
@@ -76,7 +72,7 @@ RSpec.describe 'Resolving all open threads in a merge request from an issue', :j
         end
 
         it 'shows a warning that the merge request contains unresolved threads' do
-          expect(page).to have_content 'Before this can be merged,'
+          expect(page).to have_content 'all threads must be resolved'
         end
 
         it 'has a link to resolve all threads by creating an issue' do

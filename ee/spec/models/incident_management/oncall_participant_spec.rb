@@ -53,13 +53,11 @@ RSpec.describe IncidentManagement::OncallParticipant do
 
       it { is_expected.to contain_exactly(removed_participant) }
     end
-  end
 
-  describe '#mark_as_removed' do
-    subject { participant.mark_as_removed }
+    describe '.for_user' do
+      subject { described_class.for_user(participant.user) }
 
-    it 'updates is_removed to true' do
-      expect { subject }.to change { participant.reload.is_removed }.to(true)
+      it { is_expected.to contain_exactly(participant) }
     end
   end
 

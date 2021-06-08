@@ -1,6 +1,6 @@
 ---
-stage: none
-group: unassigned
+stage: Verify
+group: Pipeline Authoring
 info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#assignments
 ---
 
@@ -31,14 +31,16 @@ curl --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/a
         "variable_type": "env_var",
         "value": "TEST_1",
         "protected": false,
-        "masked": false
+        "masked": false,
+        "environment_scope": "*"
     },
     {
         "key": "TEST_VARIABLE_2",
         "variable_type": "env_var",
         "value": "TEST_2",
         "protected": false,
-        "masked": false
+        "masked": false,
+        "environment_scope": "*"
     }
 ]
 ```
@@ -66,7 +68,8 @@ curl --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/a
     "variable_type": "env_var",
     "value": "TEST_1",
     "protected": false,
-    "masked": false
+    "masked": false,
+    "environment_scope": "*"
 }
 ```
 
@@ -86,9 +89,11 @@ POST /groups/:id/variables
 | `variable_type` | string  | no       | The type of a variable. Available types are: `env_var` (default) and `file` |
 | `protected`     | boolean | no       | Whether the variable is protected |
 | `masked`        | boolean | no       | Whether the variable is masked |
+| `environment_scope` **(PREMIUM)** | string | no | The [environment scope](../ci/variables/README.md#limit-the-environment-scope-of-a-cicd-variable) of a variable |
 
 ```shell
-curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/groups/1/variables" --form "key=NEW_VARIABLE" --form "value=new value"
+curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" \
+     "https://gitlab.example.com/api/v4/groups/1/variables" --form "key=NEW_VARIABLE" --form "value=new value"
 ```
 
 ```json
@@ -97,7 +102,8 @@ curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" "https://gitla
     "value": "new value",
     "variable_type": "env_var",
     "protected": false,
-    "masked": false
+    "masked": false,
+    "environment_scope": "*"
 }
 ```
 
@@ -117,9 +123,11 @@ PUT /groups/:id/variables/:key
 | `variable_type` | string  | no       | The type of a variable. Available types are: `env_var` (default) and `file` |
 | `protected`     | boolean | no       | Whether the variable is protected |
 | `masked`        | boolean | no       | Whether the variable is masked |
+| `environment_scope` **(PREMIUM)** | string | no | The [environment scope](../ci/variables/README.md#limit-the-environment-scope-of-a-cicd-variable) of a variable |
 
 ```shell
-curl --request PUT --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/groups/1/variables/NEW_VARIABLE" --form "value=updated value"
+curl --request PUT --header "PRIVATE-TOKEN: <your_access_token>" \
+     "https://gitlab.example.com/api/v4/groups/1/variables/NEW_VARIABLE" --form "value=updated value"
 ```
 
 ```json
@@ -128,7 +136,8 @@ curl --request PUT --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab
     "value": "updated value",
     "variable_type": "env_var",
     "protected": true,
-    "masked": true
+    "masked": true,
+    "environment_scope": "*"
 }
 ```
 
@@ -146,5 +155,6 @@ DELETE /groups/:id/variables/:key
 | `key`     | string  | yes      | The `key` of a variable |
 
 ```shell
-curl --request DELETE --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/groups/1/variables/VARIABLE_1"
+curl --request DELETE --header "PRIVATE-TOKEN: <your_access_token>" \
+     "https://gitlab.example.com/api/v4/groups/1/variables/VARIABLE_1"
 ```

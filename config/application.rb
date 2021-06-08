@@ -29,13 +29,12 @@ module Gitlab
     require_dependency Rails.root.join('lib/gitlab/middleware/same_site_cookies')
     require_dependency Rails.root.join('lib/gitlab/middleware/handle_ip_spoof_attack_error')
     require_dependency Rails.root.join('lib/gitlab/middleware/handle_malformed_strings')
+    require_dependency Rails.root.join('lib/gitlab/middleware/rack_multipart_tempfile_factory')
     require_dependency Rails.root.join('lib/gitlab/runtime')
 
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded.
-
-    config.active_record.sqlite3.represent_boolean_as_integer = true
 
     # Sidekiq uses eager loading, but directories not in the standard Rails
     # directories must be added to the eager load paths:
@@ -48,6 +47,7 @@ module Gitlab
     config.eager_load_paths.push(*%W[#{config.root}/lib
                                      #{config.root}/app/models/badges
                                      #{config.root}/app/models/hooks
+                                     #{config.root}/app/models/integrations
                                      #{config.root}/app/models/members
                                      #{config.root}/app/models/project_services
                                      #{config.root}/app/graphql/resolvers/concerns
@@ -56,26 +56,36 @@ module Gitlab
 
     config.generators.templates.push("#{config.root}/generator_templates")
 
-    if Gitlab.ee?
-      ee_paths = config.eager_load_paths.each_with_object([]) do |path, memo|
-        ee_path = config.root.join('ee', Pathname.new(path).relative_path_from(config.root))
-        memo << ee_path.to_s
+    foss_eager_load_paths = config.eager_load_paths.dup.freeze
+    load_paths = lambda do |dir:|
+      ext_paths = foss_eager_load_paths.each_with_object([]) do |path, memo|
+        ext_path = config.root.join(dir, Pathname.new(path).relative_path_from(config.root))
+        memo << ext_path.to_s
       end
 
-      ee_paths << "#{config.root}/ee/app/replicators"
+      ext_paths << "#{config.root}/#{dir}/app/replicators"
 
       # Eager load should load CE first
-      config.eager_load_paths.push(*ee_paths)
-      config.helpers_paths.push "#{config.root}/ee/app/helpers"
+      config.eager_load_paths.push(*ext_paths)
+      config.helpers_paths.push "#{config.root}/#{dir}/app/helpers"
 
-      # Other than Ruby modules we load EE first
-      config.paths['lib/tasks'].unshift "#{config.root}/ee/lib/tasks"
-      config.paths['app/views'].unshift "#{config.root}/ee/app/views"
+      # Other than Ruby modules we load extensions first
+      config.paths['lib/tasks'].unshift "#{config.root}/#{dir}/lib/tasks"
+      config.paths['app/views'].unshift "#{config.root}/#{dir}/app/views"
+    end
+
+    Gitlab.ee do
+      load_paths.call(dir: 'ee')
+    end
+
+    Gitlab.jh do
+      load_paths.call(dir: 'jh')
     end
 
     # Rake tasks ignore the eager loading settings, so we need to set the
     # autoload paths explicitly
     config.autoload_paths = config.eager_load_paths.dup
+    config.autoload_paths.push("#{config.root}/lib/generators")
 
     # Only load the plugins named here, in the order given (default is alphabetical).
     # :all can be used as a placeholder for all plugins not explicitly named.
@@ -137,6 +147,7 @@ module Gitlab
       encrypted_key
       import_url
       elasticsearch_url
+      elasticsearch_password
       search
       jwt
       otp_attempt
@@ -189,6 +200,7 @@ module Gitlab
     config.assets.precompile << "page_bundles/epics.css"
     config.assets.precompile << "page_bundles/error_tracking_details.css"
     config.assets.precompile << "page_bundles/error_tracking_index.css"
+    config.assets.precompile << "page_bundles/group.css"
     config.assets.precompile << "page_bundles/ide.css"
     config.assets.precompile << "page_bundles/import.css"
     config.assets.precompile << "page_bundles/incident_management_list.css"
@@ -196,15 +208,19 @@ module Gitlab
     config.assets.precompile << "page_bundles/jira_connect.css"
     config.assets.precompile << "page_bundles/jira_connect_users.css"
     config.assets.precompile << "page_bundles/learn_gitlab.css"
+    config.assets.precompile << "page_bundles/members.css"
     config.assets.precompile << "page_bundles/merge_conflicts.css"
     config.assets.precompile << "page_bundles/merge_requests.css"
     config.assets.precompile << "page_bundles/milestone.css"
+    config.assets.precompile << "page_bundles/new_namespace.css"
     config.assets.precompile << "page_bundles/oncall_schedules.css"
+    config.assets.precompile << "page_bundles/escalation_policies.css"
     config.assets.precompile << "page_bundles/pipeline.css"
     config.assets.precompile << "page_bundles/pipeline_schedules.css"
     config.assets.precompile << "page_bundles/pipelines.css"
     config.assets.precompile << "page_bundles/productivity_analytics.css"
     config.assets.precompile << "page_bundles/profile_two_factor_auth.css"
+    config.assets.precompile << "page_bundles/project.css"
     config.assets.precompile << "page_bundles/reports.css"
     config.assets.precompile << "page_bundles/roadmap.css"
     config.assets.precompile << "page_bundles/security_dashboard.css"
@@ -269,6 +285,8 @@ module Gitlab
     config.middleware.insert_before ActionDispatch::RemoteIp, ::Gitlab::Middleware::HandleIpSpoofAttackError
 
     config.middleware.insert_after ActionDispatch::ActionableExceptions, ::Gitlab::Middleware::HandleMalformedStrings
+
+    config.middleware.insert_after Rack::Sendfile, ::Gitlab::Middleware::RackMultipartTempfileFactory
 
     # Allow access to GitLab API from other domains
     config.middleware.insert_before Warden::Manager, Rack::Cors do

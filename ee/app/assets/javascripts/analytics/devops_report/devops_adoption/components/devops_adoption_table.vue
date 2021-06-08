@@ -1,5 +1,12 @@
 <script>
-import { GlTable, GlButton, GlModalDirective, GlTooltipDirective, GlIcon } from '@gitlab/ui';
+import {
+  GlTable,
+  GlButton,
+  GlModalDirective,
+  GlTooltipDirective,
+  GlIcon,
+  GlBadge,
+} from '@gitlab/ui';
 import LocalStorageSync from '~/vue_shared/components/local_storage_sync.vue';
 import {
   DEVOPS_ADOPTION_TABLE_TEST_IDS,
@@ -8,6 +15,8 @@ import {
   DEVOPS_ADOPTION_SEGMENT_DELETE_MODAL_ID,
   DEVOPS_ADOPTION_SEGMENTS_TABLE_SORT_BY_STORAGE_KEY,
   DEVOPS_ADOPTION_SEGMENTS_TABLE_SORT_DESC_STORAGE_KEY,
+  DEVOPS_ADOPTION_TABLE_REMOVE_BUTTON_DISABLED,
+  DEVOPS_ADOPTION_GROUP_COL_LABEL,
 } from '../constants';
 import DevopsAdoptionDeleteModal from './devops_adoption_delete_modal.vue';
 import DevopsAdoptionTableCellFlag from './devops_adoption_table_cell_flag.vue';
@@ -38,17 +47,6 @@ const fieldOptions = {
 
 const { table: i18n } = DEVOPS_ADOPTION_STRINGS;
 
-const headers = [
-  NAME_HEADER,
-  'issueOpened',
-  'mergeRequestOpened',
-  'mergeRequestApproved',
-  'runnerConfigured',
-  'pipelineSucceeded',
-  'deploySucceeded',
-  'securityScanSucceeded',
-].map((key) => ({ key, ...i18n.headers[key], ...fieldOptions }));
-
 export default {
   name: 'DevopsAdoptionTable',
   components: {
@@ -58,23 +56,23 @@ export default {
     LocalStorageSync,
     DevopsAdoptionDeleteModal,
     GlIcon,
+    GlBadge,
   },
-  i18n,
-  devopsSegmentModalId: DEVOPS_ADOPTION_SEGMENT_MODAL_ID,
-  devopsSegmentDeleteModalId: DEVOPS_ADOPTION_SEGMENT_DELETE_MODAL_ID,
   directives: {
     GlTooltip: GlTooltipDirective,
     GlModal: GlModalDirective,
   },
-  tableHeaderFields: [
-    ...headers,
-    {
-      key: 'actions',
-      tdClass: 'actions-cell',
-      ...fieldOptions,
-      sortable: false,
+  inject: {
+    groupGid: {
+      default: null,
     },
-  ],
+  },
+  i18n: {
+    ...i18n,
+    removeButtonDisabled: DEVOPS_ADOPTION_TABLE_REMOVE_BUTTON_DISABLED,
+  },
+  devopsSegmentModalId: DEVOPS_ADOPTION_SEGMENT_MODAL_ID,
+  devopsSegmentDeleteModalId: DEVOPS_ADOPTION_SEGMENT_DELETE_MODAL_ID,
   testids: DEVOPS_ADOPTION_TABLE_TEST_IDS,
   sortByStorageKey: DEVOPS_ADOPTION_SEGMENTS_TABLE_SORT_BY_STORAGE_KEY,
   sortDescStorageKey: DEVOPS_ADOPTION_SEGMENTS_TABLE_SORT_DESC_STORAGE_KEY,
@@ -83,24 +81,56 @@ export default {
       type: Array,
       required: true,
     },
-    selectedSegment: {
-      type: Object,
-      required: false,
-      default: null,
+    cols: {
+      type: Array,
+      required: true,
     },
   },
   data() {
     return {
       sortBy: NAME_HEADER,
       sortDesc: false,
+      selectedSegment: null,
     };
+  },
+  computed: {
+    tableHeaderFields() {
+      return [
+        {
+          key: 'name',
+          label: DEVOPS_ADOPTION_GROUP_COL_LABEL,
+          ...fieldOptions,
+        },
+        ...this.cols.map((item) => ({
+          ...item,
+          ...fieldOptions,
+        })),
+        {
+          key: 'actions',
+          tdClass: 'actions-cell',
+          ...fieldOptions,
+          sortable: false,
+        },
+      ];
+    },
   },
   methods: {
     setSelectedSegment(segment) {
-      this.$emit('set-selected-segment', segment);
+      this.selectedSegment = segment;
     },
-    slotName(key) {
+    headerSlotName(key) {
       return `head(${key})`;
+    },
+    cellSlotName(key) {
+      return `cell(${key})`;
+    },
+    isCurrentGroup(item) {
+      return item.namespace?.id === this.groupGid;
+    },
+    getDeleteButtonTooltipText(item) {
+      return this.isCurrentGroup(item)
+        ? this.$options.i18n.removeButtonDisabled
+        : this.$options.i18n.removeButton;
     },
   },
 };
@@ -120,14 +150,14 @@ export default {
       as-json
     />
     <gl-table
-      :fields="$options.tableHeaderFields"
+      :fields="tableHeaderFields"
       :items="segments"
       :sort-by.sync="sortBy"
       :sort-desc.sync="sortDesc"
       thead-class="gl-border-t-0 gl-border-b-solid gl-border-b-1 gl-border-b-gray-100"
       stacked="sm"
     >
-      <template v-for="header in $options.tableHeaderFields" #[slotName(header.key)]>
+      <template v-for="header in tableHeaderFields" #[headerSlotName(header.key)]>
         <div :key="header.key" class="gl-display-flex gl-align-items-center">
           <span>{{ header.label }}</span>
           <gl-icon
@@ -140,94 +170,48 @@ export default {
         </div>
       </template>
 
-      <template
-        #cell(name)="{
-          item: {
-            namespace: { fullName },
-            latestSnapshot,
-          },
-        }"
-      >
+      <template #cell(name)="{ item }">
         <div :data-testid="$options.testids.SEGMENT">
-          <strong v-if="latestSnapshot">{{ fullName }}</strong>
+          <strong v-if="item.latestSnapshot">{{ item.namespace.fullName }}</strong>
           <template v-else>
-            <span class="gl-text-gray-400">{{ fullName }}</span>
+            <span class="gl-text-gray-400">{{ item.namespace.fullName }}</span>
             <gl-icon name="hourglass" class="gl-text-gray-400" />
           </template>
+          <gl-badge v-if="isCurrentGroup(item)" class="gl-ml-1" variant="info">{{
+            __('This group')
+          }}</gl-badge>
         </div>
       </template>
 
-      <template #cell(issueOpened)="{ item }">
+      <template v-for="col in cols" #[cellSlotName(col.key)]="{ item }">
         <devops-adoption-table-cell-flag
           v-if="item.latestSnapshot"
-          :data-testid="$options.testids.ISSUES"
-          :enabled="item.latestSnapshot.issueOpened"
-        />
-      </template>
-
-      <template #cell(mergeRequestOpened)="{ item }">
-        <devops-adoption-table-cell-flag
-          v-if="item.latestSnapshot"
-          :data-testid="$options.testids.MRS"
-          :enabled="item.latestSnapshot.mergeRequestOpened"
-        />
-      </template>
-
-      <template #cell(mergeRequestApproved)="{ item }">
-        <devops-adoption-table-cell-flag
-          v-if="item.latestSnapshot"
-          :data-testid="$options.testids.APPROVALS"
-          :enabled="item.latestSnapshot.mergeRequestApproved"
-        />
-      </template>
-
-      <template #cell(runnerConfigured)="{ item }">
-        <devops-adoption-table-cell-flag
-          v-if="item.latestSnapshot"
-          :data-testid="$options.testids.RUNNERS"
-          :enabled="item.latestSnapshot.runnerConfigured"
-        />
-      </template>
-
-      <template #cell(pipelineSucceeded)="{ item }">
-        <devops-adoption-table-cell-flag
-          v-if="item.latestSnapshot"
-          :data-testid="$options.testids.PIPELINES"
-          :enabled="item.latestSnapshot.pipelineSucceeded"
-        />
-      </template>
-
-      <template #cell(deploySucceeded)="{ item }">
-        <devops-adoption-table-cell-flag
-          v-if="item.latestSnapshot"
-          :data-testid="$options.testids.DEPLOYS"
-          :enabled="item.latestSnapshot.deploySucceeded"
-        />
-      </template>
-
-      <template #cell(securityScanSucceeded)="{ item }">
-        <devops-adoption-table-cell-flag
-          v-if="item.latestSnapshot"
-          :data-testid="$options.testids.SCANNING"
-          :enabled="item.latestSnapshot.securityScanSucceeded"
+          :key="col.key"
+          :data-testid="col.testId"
+          :enabled="Boolean(item.latestSnapshot[col.key])"
         />
       </template>
 
       <template #cell(actions)="{ item }">
-        <div :data-testid="$options.testids.ACTIONS">
+        <span
+          v-gl-tooltip.hover="getDeleteButtonTooltipText(item)"
+          :data-testid="$options.testids.ACTIONS"
+        >
           <gl-button
             v-gl-modal="$options.devopsSegmentDeleteModalId"
-            v-gl-tooltip.hover="$options.i18n.removeButton"
+            :disabled="isCurrentGroup(item)"
             category="tertiary"
             icon="remove"
+            :aria-label="$options.i18n.removeButton"
             @click="setSelectedSegment(item)"
           />
-        </div>
+        </span>
       </template>
     </gl-table>
     <devops-adoption-delete-modal
       v-if="selectedSegment"
       :segment="selectedSegment"
+      @segmentsRemoved="$emit('segmentsRemoved', $event)"
       @trackModalOpenState="$emit('trackModalOpenState', $event)"
     />
   </div>

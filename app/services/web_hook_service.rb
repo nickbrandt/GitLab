@@ -6,6 +6,18 @@ class WebHookService
 
     attr_reader :body, :headers, :code
 
+    def success?
+      false
+    end
+
+    def redirection?
+      false
+    end
+
+    def internal_server_error?
+      true
+    end
+
     def initialize
       @headers = Gitlab::HTTP::Response::Headers.new({})
       @body = ''
@@ -33,6 +45,8 @@ class WebHookService
   end
 
   def execute
+    return { status: :error, message: 'Hook disabled' } unless hook.executable?
+
     start_time = Gitlab::Metrics::System.monotonic_time
 
     response = if parsed_url.userinfo.blank?
@@ -54,8 +68,7 @@ class WebHookService
       http_status: response.code,
       message: response.to_s
     }
-  rescue SocketError, OpenSSL::SSL::SSLError, Errno::ECONNRESET, Errno::ECONNREFUSED, Errno::EHOSTUNREACH,
-         Net::OpenTimeout, Net::ReadTimeout, Gitlab::HTTP::BlockedUrlError, Gitlab::HTTP::RedirectionTooDeep,
+  rescue *Gitlab::HTTP::HTTP_ERRORS,
          Gitlab::Json::LimitedEncoder::LimitExceeded, URI::InvalidURIError => e
     execution_duration = Gitlab::Metrics::System.monotonic_time - start_time
     log_execution(
@@ -76,7 +89,13 @@ class WebHookService
   end
 
   def async_execute
-    WebHookWorker.perform_async(hook.id, data, hook_name)
+    if rate_limited?(hook)
+      log_rate_limit(hook)
+    else
+      Gitlab::ApplicationContext.with_context(hook.application_context) do
+        WebHookWorker.perform_async(hook.id, data, hook_name)
+      end
+    end
   end
 
   private
@@ -104,6 +123,8 @@ class WebHookService
   end
 
   def log_execution(trigger:, url:, request_data:, response:, execution_duration:, error_message: nil)
+    handle_failure(response, hook)
+
     WebHookLog.create(
       web_hook: hook,
       trigger: trigger,
@@ -116,6 +137,16 @@ class WebHookService
       response_status: response.code,
       internal_error_message: error_message
     )
+  end
+
+  def handle_failure(response, hook)
+    if response.success? || response.redirection?
+      hook.enable!
+    elsif response.internal_server_error?
+      hook.backoff!
+    else
+      hook.failed!
+    end
   end
 
   def build_headers(hook_name)
@@ -141,5 +172,35 @@ class WebHookService
     return '' unless response.body
 
     response.body.encode('UTF-8', invalid: :replace, undef: :replace, replace: '')
+  end
+
+  def rate_limited?(hook)
+    return false unless Feature.enabled?(:web_hooks_rate_limit, default_enabled: :yaml)
+    return false if rate_limit.nil?
+
+    Gitlab::ApplicationRateLimiter.throttled?(
+      :web_hook_calls,
+      scope: [hook],
+      threshold: rate_limit
+    )
+  end
+
+  def rate_limit
+    @rate_limit ||= hook.rate_limit
+  end
+
+  def log_rate_limit(hook)
+    payload = {
+      message: 'Webhook rate limit exceeded',
+      hook_id: hook.id,
+      hook_type: hook.type,
+      hook_name: hook_name
+    }
+
+    Gitlab::AuthLogger.error(payload)
+
+    # Also log into application log for now, so we can use this information
+    # to determine suitable limits for gitlab.com
+    Gitlab::AppLogger.error(payload)
   end
 end

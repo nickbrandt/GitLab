@@ -6,15 +6,17 @@ module EE
     extend ::Gitlab::Utils::Override
 
     prepended do
-      FREE = 'free'.freeze
-      BRONZE = 'bronze'.freeze
-      SILVER = 'silver'.freeze
-      PREMIUM = 'premium'.freeze
-      GOLD = 'gold'.freeze
-      ULTIMATE = 'ultimate'.freeze
+      FREE = 'free'
+      BRONZE = 'bronze'
+      SILVER = 'silver'
+      PREMIUM = 'premium'
+      GOLD = 'gold'
+      ULTIMATE = 'ultimate'
+      ULTIMATE_TRIAL = 'ultimate_trial'
+      PREMIUM_TRIAL = 'premium_trial'
 
       EE_DEFAULT_PLANS = (const_get(:DEFAULT_PLANS, false) + [FREE]).freeze
-      PAID_HOSTED_PLANS = [BRONZE, SILVER, PREMIUM, GOLD, ULTIMATE].freeze
+      PAID_HOSTED_PLANS = [BRONZE, SILVER, PREMIUM, GOLD, ULTIMATE, ULTIMATE_TRIAL, PREMIUM_TRIAL].freeze
       EE_ALL_PLANS = (EE_DEFAULT_PLANS + PAID_HOSTED_PLANS).freeze
       PLANS_ELIGIBLE_FOR_TRIAL = EE_DEFAULT_PLANS
 

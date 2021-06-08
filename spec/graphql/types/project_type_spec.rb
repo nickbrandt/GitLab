@@ -14,7 +14,7 @@ RSpec.describe GitlabSchema.types['Project'] do
   it 'has the expected fields' do
     expected_fields = %w[
       user_permissions id full_path path name_with_namespace
-      name description description_html tag_list ssh_url_to_repo
+      name description description_html tag_list topics ssh_url_to_repo
       http_url_to_repo web_url star_count forks_count
       created_at last_activity_at archived visibility
       container_registry_enabled shared_runners_enabled
@@ -32,6 +32,7 @@ RSpec.describe GitlabSchema.types['Project'] do
       issue_status_counts terraform_states alert_management_integrations
       container_repositories container_repositories_count
       pipeline_analytics squash_read_only sast_ci_configuration
+      ci_template
     ]
 
     expect(described_class).to include_graphql_fields(*expected_fields)
@@ -106,7 +107,8 @@ RSpec.describe GitlabSchema.types['Project'] do
       expect(secure_analyzers_prefix['type']).to eq('string')
       expect(secure_analyzers_prefix['field']).to eq('SECURE_ANALYZERS_PREFIX')
       expect(secure_analyzers_prefix['label']).to eq('Image prefix')
-      expect(secure_analyzers_prefix['defaultValue']).to eq('registry.gitlab.com/gitlab-org/security-products/analyzers')
+      expect(secure_analyzers_prefix['defaultValue'])
+        .to eq('registry.gitlab.com/gitlab-org/security-products/analyzers')
       expect(secure_analyzers_prefix['value']).to eq('registry.gitlab.com/gitlab-org/security-products/analyzers')
       expect(secure_analyzers_prefix['size']).to eq('LARGE')
       expect(secure_analyzers_prefix['options']).to be_nil
@@ -124,8 +126,8 @@ RSpec.describe GitlabSchema.types['Project'] do
 
     it "returns the project's sast configuration for analyzer variables" do
       analyzer = subject.dig('data', 'project', 'sastCiConfiguration', 'analyzers', 'nodes').first
-      expect(analyzer['name']).to eq('brakeman')
-      expect(analyzer['label']).to eq('Brakeman')
+      expect(analyzer['name']).to eq('bandit')
+      expect(analyzer['label']).to eq('Bandit')
       expect(analyzer['enabled']).to eq(true)
     end
 
@@ -184,9 +186,11 @@ RSpec.describe GitlabSchema.types['Project'] do
 
         context 'when repository is accessible only by team members' do
           it "returns no configuration" do
-            project.project_feature.update!(merge_requests_access_level: ProjectFeature::DISABLED,
-                                                   builds_access_level: ProjectFeature::DISABLED,
-                                                   repository_access_level: ProjectFeature::PRIVATE)
+            project.project_feature.update!(
+              merge_requests_access_level: ProjectFeature::DISABLED,
+              builds_access_level: ProjectFeature::DISABLED,
+              repository_access_level: ProjectFeature::PRIVATE
+            )
 
             secure_analyzers_prefix = subject.dig('data', 'project', 'sastCiConfiguration')
             expect(secure_analyzers_prefix).to be_nil
@@ -240,6 +244,7 @@ RSpec.describe GitlabSchema.types['Project'] do
                                             :assignee_username,
                                             :reviewer_username,
                                             :milestone_title,
+                                            :not,
                                             :sort
                                            )
     end
@@ -342,8 +347,13 @@ RSpec.describe GitlabSchema.types['Project'] do
     let_it_be(:project) { create(:project, :public) }
 
     context 'when project has Jira imports' do
-      let_it_be(:jira_import1) { create(:jira_import_state, :finished, project: project, jira_project_key: 'AA', created_at: 2.days.ago) }
-      let_it_be(:jira_import2) { create(:jira_import_state, :finished, project: project, jira_project_key: 'BB', created_at: 5.days.ago) }
+      let_it_be(:jira_import1) do
+        create(:jira_import_state, :finished, project: project, jira_project_key: 'AA', created_at: 2.days.ago)
+      end
+
+      let_it_be(:jira_import2) do
+        create(:jira_import_state, :finished, project: project, jira_project_key: 'BB', created_at: 5.days.ago)
+      end
 
       it 'retrieves the imports' do
         expect(subject).to contain_exactly(jira_import1, jira_import2)
@@ -362,5 +372,19 @@ RSpec.describe GitlabSchema.types['Project'] do
 
     it { is_expected.to have_graphql_type(Types::Ci::AnalyticsType) }
     it { is_expected.to have_graphql_resolver(Resolvers::ProjectPipelineStatisticsResolver) }
+  end
+
+  describe 'jobs field' do
+    subject { described_class.fields['jobs'] }
+
+    it { is_expected.to have_graphql_type(Types::Ci::JobType.connection_type) }
+    it { is_expected.to have_graphql_arguments(:statuses) }
+  end
+
+  describe 'ci_template field' do
+    subject { described_class.fields['ciTemplate'] }
+
+    it { is_expected.to have_graphql_type(Types::Ci::TemplateType) }
+    it { is_expected.to have_graphql_arguments(:name) }
   end
 end

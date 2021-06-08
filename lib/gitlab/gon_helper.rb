@@ -45,8 +45,9 @@ module Gitlab
       # Initialize gon.features with any flags that should be
       # made globally available to the frontend
       push_frontend_feature_flag(:snippets_binary_blob, default_enabled: false)
-      push_frontend_feature_flag(:usage_data_api, default_enabled: true)
+      push_frontend_feature_flag(:usage_data_api, type: :ops, default_enabled: :yaml)
       push_frontend_feature_flag(:security_auto_fix, default_enabled: false)
+      push_frontend_feature_flag(:improved_emoji_picker, default_enabled: :yaml)
     end
 
     # Exposes the state of a feature flag to the frontend code.
@@ -80,4 +81,4 @@ module Gitlab
   end
 end
 
-Gitlab::GonHelper.prepend_if_ee('EE::Gitlab::GonHelper')
+Gitlab::GonHelper.prepend_mod_with('Gitlab::GonHelper')

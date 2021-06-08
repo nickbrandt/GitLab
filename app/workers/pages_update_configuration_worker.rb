@@ -3,11 +3,14 @@
 class PagesUpdateConfigurationWorker
   include ApplicationWorker
 
+  sidekiq_options retry: 3
+
   idempotent!
   feature_category :pages
+  tags :exclude_from_kubernetes
 
   def self.perform_async(*args)
-    return unless Feature.enabled?(:pages_update_legacy_storage, default_enabled: true)
+    return unless ::Settings.pages.local_store.enabled
 
     super(*args)
   end

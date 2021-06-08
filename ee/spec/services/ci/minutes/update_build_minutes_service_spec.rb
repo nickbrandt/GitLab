@@ -5,7 +5,7 @@ require 'spec_helper'
 RSpec.describe Ci::Minutes::UpdateBuildMinutesService do
   describe '#perform' do
     let(:namespace) { create(:namespace, shared_runners_minutes_limit: 100) }
-    let(:project) { create(:project, :public, namespace: namespace) }
+    let(:project) { create(:project, :private, namespace: namespace) }
     let(:pipeline) { create(:ci_pipeline, project: project) }
 
     let(:build) do
@@ -33,7 +33,7 @@ RSpec.describe Ci::Minutes::UpdateBuildMinutesService do
 
     context 'with shared runner' do
       let(:cost_factor) { 2.0 }
-      let(:runner) { create(:ci_runner, :instance, public_projects_minutes_cost_factor: cost_factor) }
+      let(:runner) { create(:ci_runner, :instance, private_projects_minutes_cost_factor: cost_factor) }
 
       it 'creates a statistics and sets duration with applied cost factor' do
         subject
@@ -137,6 +137,44 @@ RSpec.describe Ci::Minutes::UpdateBuildMinutesService do
 
           expect(project_amount_used)
             .to eq((project.statistics.reload.shared_runners_seconds.to_f / 60).round(2))
+        end
+      end
+
+      context 'when live tracking exists for the build', :redis do
+        before do
+          allow(Gitlab).to receive(:com?).and_return(true)
+
+          build.update!(status: :running)
+
+          freeze_time do
+            ::Ci::Minutes::TrackLiveConsumptionService.new(build).tap do |service|
+              service.time_last_tracked_consumption!((build.duration.to_i - 5.minutes).ago)
+              service.execute
+            end
+          end
+
+          build.update!(status: :success)
+        end
+
+        it 'observes the difference between actual vs live consumption' do
+          histogram = double(:histogram)
+          expect(::Gitlab::Ci::Pipeline::Metrics)
+            .to receive(:gitlab_ci_difference_live_vs_actual_minutes)
+            .and_return(histogram)
+
+          expect(histogram).to receive(:observe).with({ plan: 'free' }, 5 * cost_factor)
+
+          subject
+        end
+
+        it_behaves_like 'new tracking matches legacy tracking'
+      end
+
+      context 'when live tracking does not exist for the build' do
+        it 'does not observe the difference' do
+          expect(::Gitlab::Ci::Pipeline::Metrics).not_to receive(:gitlab_ci_difference_live_vs_actual_minutes)
+
+          subject
         end
       end
     end

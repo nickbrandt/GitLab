@@ -38,7 +38,8 @@ class IssuePolicy < IssuablePolicy
 
   rule { ~anonymous & can?(:read_issue) }.policy do
     enable :create_todo
+    enable :update_subscription
   end
 end
 
-IssuePolicy.prepend_if_ee('EE::IssuePolicy')
+IssuePolicy.prepend_mod_with('IssuePolicy')

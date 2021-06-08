@@ -390,11 +390,11 @@ RSpec.describe QuickActions::InterpretService do
               allow(current_user).to receive(:can?).with(:admin_issue, project).and_return(false)
             end
 
-            it 'returns empty message' do
+            it 'returns an error message' do
               _, updates, message = service.execute(content, issue)
 
               expect(updates).to be_empty
-              expect(message).to be_empty
+              expect(message).to eq('Could not apply iteration command.')
             end
           end
         end
@@ -458,11 +458,11 @@ RSpec.describe QuickActions::InterpretService do
             allow(current_user).to receive(:can?).with(:admin_issue, project).and_return(false)
           end
 
-          it 'returns empty message' do
+          it 'returns an error message' do
             _, updates, message = service.execute(content, issue)
 
             expect(updates).to be_empty
-            expect(message).to be_empty
+            expect(message).to eq('Could not apply remove_iteration command.')
           end
         end
       end
@@ -1106,12 +1106,12 @@ RSpec.describe QuickActions::InterpretService do
 
     context 'confidential command' do
       context 'for test cases' do
-        it 'does not mark to update confidential attribute' do
+        it 'does mark to update confidential attribute' do
           issuable = create(:quality_test_case, project: project)
 
           _, updates, _ = service.execute('/confidential', issuable)
 
-          expect(updates[:confidential]).to eq(nil)
+          expect(updates[:confidential]).to eq(true)
         end
       end
     end

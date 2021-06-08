@@ -200,10 +200,6 @@
     @include btn-red;
   }
 
-  &.btn-cancel {
-    float: right;
-  }
-
   &.btn-grouped {
     @include btn-with-margin;
   }
@@ -337,7 +333,7 @@
 
 .btn-loading {
   &:not(.disabled) {
-    .spinner {
+    .gl-spinner {
       display: none;
     }
   }
@@ -433,32 +429,27 @@
 }
 
 // All disabled buttons, regardless of color, type, etc
-%disabled {
-  background-color: $gray-light;
-  border-color: $gray-100;
-  color: $gl-text-color-disabled;
-  opacity: 1;
-  text-decoration: none;
-  cursor: default;
-
-  &.cursor-not-allowed {
-    cursor: not-allowed;
-  }
-
-  i {
-    color: $gl-text-color-disabled;
-  }
-}
-
 .btn.disabled,
 .btn[disabled],
 fieldset[disabled] .btn,
 .dropdown-toggle[disabled],
 [disabled].dropdown-menu-toggle {
-  @extend %disabled;
-
+  &,
   &:hover {
-    @extend %disabled;
+    background-color: $gray-light;
+    border-color: $gray-100;
+    color: $gl-text-color-disabled;
+    opacity: 1;
+    text-decoration: none;
+    cursor: default;
+
+    &.cursor-not-allowed {
+      cursor: not-allowed;
+    }
+
+    i {
+      color: $gl-text-color-disabled;
+    }
   }
 
   &.btn-link {

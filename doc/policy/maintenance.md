@@ -36,7 +36,7 @@ The following table describes the version types and their release cadence:
 
 | Version type | Description | Cadence |
 |:-------------|:------------|:--------|
-| Major        | For significant changes, or when any backward-incompatible changes are introduced to the public API. | Yearly. The next major release is GitLab 14.0 on May 22, 2021. Subsequent major releases will be scheduled for May 22 each year, by default. |
+| Major        | For significant changes, or when any backward-incompatible changes are introduced to the public API. | Yearly. The next major release is GitLab 14.0 on June 22, 2021 (one month later than typical, details in [this issue](https://gitlab.com/gitlab-com/Product/-/issues/2337)). Subsequent major releases will be scheduled for May 22 each year, by default. |
 | Minor        | For when new backward-compatible functionality is introduced to the public API, a minor feature is introduced, or when a set of smaller features is rolled out. | Monthly on the 22nd. |
 | Patch        | For backward-compatible bug fixes that fix incorrect behavior. See [Patch releases](#patch-releases). | As needed. |
 
@@ -103,12 +103,12 @@ have to adhere to various internal requirements (for example, org. compliance, v
 1. Requirements consisting of extensive testing for not only stable GitLab release, but every patch version.
 
 In cases where a strategic user has a requirement to test a feature before it is
-officially released, we can offer to create a Release Candidate (RC) version that will
-include the specific feature. This should be needed only in extreme cases and can be requested for
+officially released, we can offer to create a Release Candidate (RC) version that
+includes the specific feature. This should be needed only in extreme cases and can be requested for
 consideration by raising an issue in the [release/tasks](https://gitlab.com/gitlab-org/release/tasks/-/issues/new?issuable_template=Backporting-request) issue tracker.
-It is important to note that the Release Candidate will also contain other features and changes as
+It is important to note that the Release Candidate contains other features and changes as
 it is not possible to easily isolate a specific feature (similar reasons as noted above). The
-Release Candidate will be no different than any code that is deployed to GitLab.com or is publicly
+Release Candidate is no different than any code that is deployed to GitLab.com or is publicly
 accessible.
 
 ### Backporting to older releases
@@ -149,6 +149,8 @@ This decision is made on a case-by-case basis.
 
 ## More information
 
-More information about the release procedures can be found in our
-[release documentation](https://gitlab.com/gitlab-org/release/docs). You may also want to read our
-[Responsible Disclosure Policy](https://about.gitlab.com/security/disclosure/).
+You may also want to read our:
+
+- [Release documentation](https://gitlab.com/gitlab-org/release/docs) describing release procedures
+- [Deprecation guidelines](../development/deprecation_guidelines/index.md)
+- [Responsible Disclosure Policy](https://about.gitlab.com/security/disclosure/)

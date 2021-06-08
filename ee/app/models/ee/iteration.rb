@@ -46,11 +46,14 @@ module EE
       validate :validate_group
 
       before_validation :set_iterations_cadence, unless: -> { project_id.present? }
-      before_create :set_past_iteration_state
+      before_save :set_iteration_state
+      before_destroy :check_if_can_be_destroyed
 
       scope :upcoming, -> { with_state(:upcoming) }
       scope :started, -> { with_state(:started) }
       scope :closed, -> { with_state(:closed) }
+      scope :by_iteration_cadence_ids, ->(cadence_ids) { where(iterations_cadence_id: cadence_ids) }
+      scope :with_start_date_after, ->(date) { where('start_date > :date', date: date) }
 
       scope :within_timeframe, -> (start_date, end_date) do
         where('start_date <= ?', end_date).where('due_date >= ?', start_date)
@@ -139,6 +142,19 @@ module EE
 
     private
 
+    def last_iteration_in_cadence?
+      !::Iteration.by_iteration_cadence_ids(iterations_cadence_id).with_start_date_after(due_date).exists?
+    end
+
+    def check_if_can_be_destroyed
+      return if closed?
+
+      unless last_iteration_in_cadence?
+        errors.add(:base, "upcoming/current iterations can't be deleted unless they are the last one in the cadence")
+        throw :abort # rubocop: disable Cop/BanCatchThrow
+      end
+    end
+
     def timebox_format_reference(format = :id)
       raise ::ArgumentError, _('Unknown format') unless [:id, :name].include?(format)
 
@@ -181,10 +197,20 @@ module EE
       errors.add(:project_id, s_("is not allowed. We do not currently support project-level iterations"))
     end
 
-    def set_past_iteration_state
-      # if we create an iteration in the past, we set the state to closed right away,
-      # no need to wait for IterationsUpdateStatusWorker to do so.
-      self.state = :closed if due_date < Date.current
+    def set_iteration_state
+      self.state = compute_state
+    end
+
+    def compute_state
+      today = Date.today
+
+      if start_date > today
+        :upcoming
+      elsif due_date < today
+        :closed
+      else
+        :started
+      end
     end
 
     # TODO: this method should be removed as part of https://gitlab.com/gitlab-org/gitlab/-/issues/296099
@@ -203,11 +229,19 @@ module EE
       self.iterations_cadence = default_cadence
     end
 
+    # TODO: this method should be removed as part of https://gitlab.com/gitlab-org/gitlab/-/issues/296099
     def find_or_create_default_cadence
       cadence_title = "#{group.name} Iterations"
       start_date = self.start_date || Date.today
 
-      ::Iterations::Cadence.create_with(title: cadence_title, start_date: start_date).safe_find_or_create_by!(group: group)
+      ::Iterations::Cadence.create_with(
+        title: cadence_title,
+        start_date: start_date,
+        automatic: false,
+        # set to 0, i.e. unspecified when creating default iterations as we do validate for presence.
+        iterations_in_advance: 0,
+        duration_in_weeks: 0
+      ).safe_find_or_create_by!(group: group)
     end
 
     # TODO: remove this as part of https://gitlab.com/gitlab-org/gitlab/-/issues/296100

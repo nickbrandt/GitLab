@@ -44,7 +44,8 @@ module Resolvers
       {
         alert_management_alert: [:alert_management_alert],
         labels: [:labels],
-        assignees: [:assignees]
+        assignees: [:assignees],
+        timelogs: [:timelogs]
       }
     end
 
@@ -54,4 +55,4 @@ module Resolvers
   end
 end
 
-Resolvers::IssuesResolver.prepend_if_ee('::EE::Resolvers::IssuesResolver')
+Resolvers::IssuesResolver.prepend_mod_with('Resolvers::IssuesResolver')

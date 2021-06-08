@@ -1,5 +1,10 @@
 # frozen_string_literal: true
 
+# EpicsFinder
+#
+# Used to find and filter epics in a single group or a single group hierarchy.
+# It can not be used for finding epics in multiple top-level groups.
+#
 # Params:
 #   iids: integer[]
 #   state: 'open' or 'closed' or 'all'
@@ -95,8 +100,15 @@ class EpicsFinder < IssuableFinder
 
       # if user is member of top-level related group, he can automatically read
       # all epics in all subgroups
-      next groups if can_read_all_epics_in_related_groups?(groups)
+      next groups if can_read_all_epics_in_related_groups?(groups, include_confidential: false)
 
+      next groups.public_to_user unless current_user
+      next groups.public_to_user(current_user) unless groups.user_is_member(current_user).exists?
+
+      # when traversal ids are enabled, we could avoid N+1 issue
+      # by taking all public groups plus groups where user is member
+      # and its descendants, but for now we have to check groups
+      # one by one
       groups_user_can_read_epics(groups)
     end
   end
@@ -124,10 +136,10 @@ class EpicsFinder < IssuableFinder
   end
 
   def filter_negated_items(items)
-    return items unless not_filters_enabled?
-
     # API endpoints send in `nil` values so we test if there are any non-nil
     return items unless not_params&.values&.any?
+
+    items = by_negated_my_reaction_emoji(items)
 
     by_negated_label(items)
   end
@@ -204,7 +216,14 @@ class EpicsFinder < IssuableFinder
     GroupMember.by_group_ids(group_ids).by_user_id(current_user).non_guests.select(:source_id)
   end
 
-  def can_read_all_epics_in_related_groups?(groups)
+  # @param include_confidential [Boolean] if this method should factor in
+  # confidential issues. Setting this to `false` will mean that it only checks
+  # the user can view all non-confidential epics within all of these groups. It
+  # does not check that they can view confidential epics and as such may return
+  # `true` even if `groups` contains a group where the user cannot view
+  # confidential epics. As such you should only call this with `false` if you
+  # are planning on filtering out confidential epics separately.
+  def can_read_all_epics_in_related_groups?(groups, include_confidential: true)
     return true if @skip_visibility_check
     return false unless current_user
 
@@ -214,12 +233,23 @@ class EpicsFinder < IssuableFinder
     # `read_confidential_epic` policy. If that's the case we don't need to
     # check membership on subgroups.
     #
-    # `groups` is a list of groups in the same group hierarchy, by default
-    # these should be ordered by nested level in the group hierarchy in
-    # descending order (so top-level first), except if we fetch ancestors
-    # - in that case top-level group is group's root parent
-    parent = params.fetch(:include_ancestor_groups, false) ? groups.first.root_ancestor : group
-    Ability.allowed?(current_user, :read_confidential_epic, parent)
+    # `groups` is a list of groups in the same group hierarchy, group is
+    # highest in the group hierarchy except if we fetch ancestors - in that
+    # case top-level group is group's root parent
+    parent = params.fetch(:include_ancestor_groups, false) ? group.root_ancestor : group
+
+    # If they can view confidential epics in this parent group they can
+    # definitely view confidential epics in subgroups.
+    return true if Ability.allowed?(current_user, :read_confidential_epic, parent)
+
+    # If we don't account for confidential (assume it will be filtered later by
+    # with_confidentiality_access_check) then as long as the user can see all
+    # epics in this group they can see in all subgroups. This is only true for
+    # private top level groups because it's possible that a top level public
+    # group has private subgroups and therefore they would not necessarily be
+    # able to read epics in the private subgroup even though they can in the
+    # parent group.
+    !include_confidential && parent.private? && Ability.allowed?(current_user, :read_epic, parent)
   end
 
   def by_confidential(items)

@@ -51,6 +51,9 @@ module Clusters
 
     has_one :platform_kubernetes, class_name: 'Clusters::Platforms::Kubernetes', inverse_of: :cluster, autosave: true
 
+    has_one :integration_prometheus, class_name: 'Clusters::Integrations::Prometheus', inverse_of: :cluster
+    has_one :integration_elastic_stack, class_name: 'Clusters::Integrations::ElasticStack', inverse_of: :cluster
+
     def self.has_one_cluster_application(name) # rubocop:disable Naming/PredicateName
       application = APPLICATIONS[name.to_s]
       has_one application.association_name, class_name: application.to_s, inverse_of: :cluster # rubocop:disable Rails/ReflectionClassName
@@ -100,9 +103,9 @@ module Clusters
     delegate :rbac?, to: :platform_kubernetes, prefix: true, allow_nil: true
     delegate :available?, to: :application_helm, prefix: true, allow_nil: true
     delegate :available?, to: :application_ingress, prefix: true, allow_nil: true
-    delegate :available?, to: :application_prometheus, prefix: true, allow_nil: true
     delegate :available?, to: :application_knative, prefix: true, allow_nil: true
-    delegate :available?, to: :application_elastic_stack, prefix: true, allow_nil: true
+    delegate :available?, to: :integration_elastic_stack, prefix: true, allow_nil: true
+    delegate :available?, to: :integration_prometheus, prefix: true, allow_nil: true
     delegate :external_ip, to: :application_ingress, prefix: true, allow_nil: true
     delegate :external_hostname, to: :application_ingress, prefix: true, allow_nil: true
 
@@ -139,7 +142,7 @@ module Clusters
     scope :with_available_elasticstack, -> { joins(:application_elastic_stack).merge(::Clusters::Applications::ElasticStack.available) }
     scope :with_available_cilium, -> { joins(:application_cilium).merge(::Clusters::Applications::Cilium.available) }
     scope :distinct_with_deployed_environments, -> { joins(:environments).merge(::Deployment.success).distinct }
-    scope :preload_elasticstack, -> { preload(:application_elastic_stack) }
+    scope :preload_elasticstack, -> { preload(:integration_elastic_stack) }
     scope :preload_environments, -> { preload(:environments) }
 
     scope :managed, -> { where(managed: true) }
@@ -148,6 +151,9 @@ module Clusters
     scope :with_management_project, -> { where.not(management_project: nil) }
 
     scope :for_project_namespace, -> (namespace_id) { joins(:projects).where(projects: { namespace_id: namespace_id }) }
+
+    # with_application_prometheus scope is deprecated, and scheduled for removal
+    # in %14.0. See https://gitlab.com/groups/gitlab-org/-/epics/4280
     scope :with_application_prometheus, -> { includes(:application_prometheus).joins(:application_prometheus) }
     scope :with_project_http_integrations, -> (project_ids) do
       conditions = { projects: :alert_management_http_integrations }
@@ -276,6 +282,14 @@ module Clusters
       public_send(association_name) || public_send("build_#{association_name}") # rubocop:disable GitlabSecurity/PublicSend
     end
 
+    def find_or_build_integration_prometheus
+      integration_prometheus || build_integration_prometheus
+    end
+
+    def find_or_build_integration_elastic_stack
+      integration_elastic_stack || build_integration_elastic_stack
+    end
+
     def provider
       if gcp?
         provider_gcp
@@ -308,6 +322,18 @@ module Clusters
 
     def kubeclient
       platform_kubernetes.kubeclient if kubernetes?
+    end
+
+    def elastic_stack_adapter
+      integration_elastic_stack
+    end
+
+    def elasticsearch_client
+      elastic_stack_adapter&.elasticsearch_client
+    end
+
+    def elastic_stack_available?
+      !!integration_elastic_stack_available?
     end
 
     def kubernetes_namespace_for(environment, deployable: environment.last_deployable)
@@ -362,7 +388,7 @@ module Clusters
     end
 
     def prometheus_adapter
-      application_prometheus
+      integration_prometheus
     end
 
     private
@@ -458,4 +484,4 @@ module Clusters
   end
 end
 
-Clusters::Cluster.prepend_if_ee('EE::Clusters::Cluster')
+Clusters::Cluster.prepend_mod_with('Clusters::Cluster')

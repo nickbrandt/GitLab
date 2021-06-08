@@ -2,26 +2,42 @@
 
 module AuditEvents
   class BuildService
+    # Handle missing attributes
+    MissingAttributeError = Class.new(StandardError)
+
+    # @raise [MissingAttributeError] when required attributes are blank
+    #
+    # @return [BuildService]
     def initialize(author:, scope:, target:, ip_address:, message:)
-      @author = author
+      raise MissingAttributeError if missing_attribute?(author, scope, target, ip_address, message)
+
+      @author = build_author(author)
       @scope = scope
       @target = target
       @ip_address = ip_address
-      @message = message
+      @message = build_message(message)
     end
 
+    # Create an instance of AuditEvent
+    #
+    # @return [AuditEvent]
     def execute
       AuditEvent.new(payload)
     end
 
     private
 
+    def missing_attribute?(author, scope, target, ip_address, message)
+      author.blank? || scope.blank? || target.blank? || message.blank?
+    end
+
     def payload
       if License.feature_available?(:admin_audit_log)
         base_payload.merge(
           details: base_details_payload.merge(
-            ip_address: @ip_address,
-            entity_path: @scope.full_path
+            ip_address: ip_address,
+            entity_path: @scope.full_path,
+            custom_message: @message
           ),
           ip_address: ip_address
         )
@@ -48,6 +64,18 @@ module AuditEvents
         target_details: @target.name,
         custom_message: @message
       }
+    end
+
+    def build_author(author)
+      author.impersonated? ? ::Gitlab::Audit::ImpersonatedAuthor.new(author) : author
+    end
+
+    def build_message(message)
+      if License.feature_available?(:admin_audit_log) && @author.impersonated?
+        "#{message} (by #{@author.impersonated_by})"
+      else
+        message
+      end
     end
 
     def ip_address

@@ -1,18 +1,9 @@
 import Vue from 'vue';
 import createFlash from '~/flash';
+import { parseRailsFormFields } from '~/lib/utils/forms';
 import { __ } from '~/locale';
 
 import ExpiresAtField from './components/expires_at_field.vue';
-
-const getInputAttrs = (el) => {
-  const input = el.querySelector('input');
-
-  return {
-    id: input.id,
-    name: input.name,
-    placeholder: input.placeholder,
-  };
-};
 
 export const initExpiresAtField = () => {
   const el = document.querySelector('.js-access-tokens-expires-at');
@@ -21,7 +12,7 @@ export const initExpiresAtField = () => {
     return null;
   }
 
-  const inputAttrs = getInputAttrs(el);
+  const { expiresAt: inputAttrs } = parseRailsFormFields(el);
 
   return new Vue({
     el,
@@ -42,7 +33,7 @@ export const initProjectsField = () => {
     return null;
   }
 
-  const inputAttrs = getInputAttrs(el);
+  const { projects: inputAttrs } = parseRailsFormFields(el);
 
   if (window.gon.features.personalAccessTokensScopedToProjects) {
     return new Promise((resolve) => {

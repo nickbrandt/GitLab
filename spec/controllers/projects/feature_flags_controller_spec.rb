@@ -9,6 +9,7 @@ RSpec.describe Projects::FeatureFlagsController do
   let_it_be(:project) { create(:project) }
   let_it_be(:developer) { create(:user) }
   let_it_be(:reporter) { create(:user) }
+
   let(:user) { developer }
 
   before_all do
@@ -366,6 +367,58 @@ RSpec.describe Projects::FeatureFlagsController do
         subject
 
         expect(json_response['strategies'].map { |s| s['id'] }).to eq([first_strategy.id, second_strategy.id])
+      end
+    end
+  end
+
+  describe 'GET edit' do
+    subject { get(:edit, params: params) }
+
+    context 'with legacy flags' do
+      let!(:feature_flag) { create(:operations_feature_flag, project: project) }
+
+      let(:params) do
+        {
+          namespace_id: project.namespace,
+          project_id: project,
+          iid: feature_flag.iid
+        }
+      end
+
+      context 'removed' do
+        before do
+          stub_feature_flags(remove_legacy_flags: true, remove_legacy_flags_override: false)
+        end
+
+        it 'returns not found' do
+          is_expected.to have_gitlab_http_status(:not_found)
+        end
+      end
+
+      context 'removed' do
+        before do
+          stub_feature_flags(remove_legacy_flags: false)
+        end
+
+        it 'returns ok' do
+          is_expected.to have_gitlab_http_status(:ok)
+        end
+      end
+    end
+
+    context 'with new version flags' do
+      let!(:feature_flag) { create(:operations_feature_flag, :new_version_flag, project: project) }
+
+      let(:params) do
+        {
+          namespace_id: project.namespace,
+          project_id: project,
+          iid: feature_flag.iid
+        }
+      end
+
+      it 'returns successfully' do
+        is_expected.to have_gitlab_http_status(:ok)
       end
     end
   end

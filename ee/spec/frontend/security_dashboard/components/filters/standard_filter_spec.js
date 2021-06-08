@@ -23,15 +23,15 @@ const optionIdsAt = (indexes) => optionsAt(indexes).map((x) => x.id);
 describe('Standard Filter component', () => {
   let wrapper;
 
-  const createWrapper = (filterOptions, showSearchBox) => {
+  const createWrapper = (filterOptions, props) => {
     wrapper = shallowMount(StandardFilter, {
       localVue,
       router,
-      propsData: { filter: { ...filter, ...filterOptions }, showSearchBox },
+      propsData: { filter: { ...filter, ...filterOptions }, ...props },
     });
   };
 
-  const dropdownItems = () => wrapper.findAll('[data-testid="filterOption"]');
+  const dropdownItems = () => wrapper.findAll(`[data-testid^=${filter.id}]`);
   const dropdownItemAt = (index) => dropdownItems().at(index);
   const allOptionItem = () => wrapper.find('[data-testid="allOption"]');
   const isChecked = (item) => item.props('isChecked');
@@ -66,11 +66,11 @@ describe('Standard Filter component', () => {
   };
 
   afterEach(() => {
-    // Clear out the querystring if one exists. It persists between tests.
-    if (filterQuery()) {
+    wrapper.destroy();
+    // Clear out the querystring if one exists, it persists between tests.
+    if (router.currentRoute.query[filter.id]) {
       wrapper.vm.$router.push('/');
     }
-    wrapper.destroy();
   });
 
   describe('filter options', () => {
@@ -96,13 +96,14 @@ describe('Standard Filter component', () => {
 
   describe('search box', () => {
     it.each`
-      phrase             | showSearchBox
-      ${'shows'}         | ${true}
-      ${'does not show'} | ${false}
-    `('$phrase search box if showSearchBox is $showSearchBox', ({ showSearchBox }) => {
-      createWrapper({}, showSearchBox);
+      phrase     | count | searchBoxShowThreshold
+      ${'shows'} | ${5}  | ${5}
+      ${'hides'} | ${7}  | ${8}
+    `('$phrase search box if there are $count options', ({ count, searchBoxShowThreshold }) => {
+      createWrapper({ options: generateOptions(count) }, { searchBoxShowThreshold });
+      const shouldShow = count >= searchBoxShowThreshold;
 
-      expect(filterBody().props('showSearchBox')).toBe(showSearchBox);
+      expect(filterBody().props('showSearchBox')).toBe(shouldShow);
     });
 
     it('filters options when something is typed in the search box', async () => {
@@ -113,6 +114,14 @@ describe('Standard Filter component', () => {
 
       expect(dropdownItems()).toHaveLength(3);
       expect(dropdownItems().wrappers.map((x) => x.props('text'))).toEqual(expectedItems);
+    });
+  });
+
+  describe('loading prop', () => {
+    it.each([true, false])(`sets the filter body loading prop to %s`, (loading) => {
+      createWrapper({}, { loading });
+
+      expect(filterBody().props('loading')).toBe(loading);
     });
   });
 
@@ -177,7 +186,7 @@ describe('Standard Filter component', () => {
   });
 
   describe('filter querystring', () => {
-    const updateRouteQuery = async (ids) => {
+    const updateQuerystring = async (ids) => {
       // window.history.back() won't change the location nor fire the popstate event, so we need
       // to fake it by doing it manually.
       router.replace({ query: { [filter.id]: ids } });
@@ -212,7 +221,7 @@ describe('Standard Filter component', () => {
 
     describe('querystring on page load', () => {
       it('selects correct items', () => {
-        updateRouteQuery(optionIdsAt([1, 3, 5, 7]));
+        updateQuerystring(optionIdsAt([1, 3, 5, 7]));
         createWrapper();
 
         expectSelectedItems([1, 3, 5, 7]);
@@ -220,21 +229,21 @@ describe('Standard Filter component', () => {
 
       it('selects only valid items when querystring has valid and invalid IDs', async () => {
         const ids = optionIdsAt([2, 4, 6]).concat(['some', 'invalid', 'ids']);
-        updateRouteQuery(ids);
+        updateQuerystring(ids);
         createWrapper();
 
         expectSelectedItems([2, 4, 6]);
       });
 
       it('selects default options if querystring only has invalid items', async () => {
-        updateRouteQuery(['some', 'invalid', 'ids']);
+        updateQuerystring(['some', 'invalid', 'ids']);
         createWrapper({ defaultOptions: optionsAt([4, 5, 8]) });
 
         expectSelectedItems([4, 5, 8]);
       });
 
       it('selects All option if querystring only has invalid IDs and there are no default options', async () => {
-        updateRouteQuery(['some', 'invalid', 'ids']);
+        updateQuerystring(['some', 'invalid', 'ids']);
         createWrapper();
 
         expectAllOptionSelected();
@@ -245,7 +254,7 @@ describe('Standard Filter component', () => {
       it('selects the correct options', async () => {
         createWrapper();
         const indexes = [3, 5, 7];
-        await updateRouteQuery(optionIdsAt(indexes));
+        await updateQuerystring(optionIdsAt(indexes));
 
         expectSelectedItems(indexes);
       });
@@ -256,7 +265,7 @@ describe('Standard Filter component', () => {
         await clickItemAt(3);
         expectSelectedItems([2, 3, 5, 8]);
 
-        await updateRouteQuery([]);
+        await updateQuerystring([]);
         expectSelectedItems([2, 5, 8]);
       });
 
@@ -266,7 +275,7 @@ describe('Standard Filter component', () => {
         await clickItemAt(3);
         expectSelectedItems([3]);
 
-        await updateRouteQuery([]);
+        await updateQuerystring([]);
         expectAllOptionSelected();
       });
 
@@ -274,13 +283,13 @@ describe('Standard Filter component', () => {
         createWrapper({ defaultOptions: optionsAt([2, 4, 8]) });
         expectSelectedItems([2, 4, 8]);
 
-        await updateRouteQuery([filter.allOption.id]);
+        await updateQuerystring([filter.allOption.id]);
         expectAllOptionSelected();
       });
 
       it('selects All option if querystring has all option ID as well as other IDs', async () => {
         createWrapper({ defaultOptions: optionsAt([5, 6, 9]) });
-        await updateRouteQuery([filter.allOption.id, ...optionIdsAt([1, 2])]);
+        await updateQuerystring([filter.allOption.id, ...optionIdsAt([1, 2])]);
 
         expectAllOptionSelected();
       });
@@ -288,7 +297,7 @@ describe('Standard Filter component', () => {
       it('selects only valid items when querystring has valid and invalid IDs', async () => {
         createWrapper();
         const ids = optionIdsAt([3, 7, 9]).concat(['some', 'invalid', 'ids']);
-        await updateRouteQuery(ids);
+        await updateQuerystring(ids);
 
         expectSelectedItems([3, 7, 9]);
       });
@@ -299,7 +308,7 @@ describe('Standard Filter component', () => {
         await clickItemAt(8);
         expectSelectedItems([1, 3, 4, 8]);
 
-        await updateRouteQuery(['some', 'invalid', 'ids']);
+        await updateQuerystring(['some', 'invalid', 'ids']);
         expectSelectedItems([1, 3, 4]);
       });
 
@@ -309,7 +318,7 @@ describe('Standard Filter component', () => {
         await clickItemAt(8);
         expectSelectedItems([8]);
 
-        await updateRouteQuery(['some', 'invalid', 'ids']);
+        await updateQuerystring(['some', 'invalid', 'ids']);
         expectAllOptionSelected();
       });
 
@@ -318,7 +327,7 @@ describe('Standard Filter component', () => {
         const ids = optionIdsAt([1, 2, 3]);
         const other = ['6', '7', '8'];
         const query = { [filter.id]: ids, other };
-        router.replace({ query });
+        router.push({ query });
         window.dispatchEvent(new Event('popstate'));
         await wrapper.vm.$nextTick();
 

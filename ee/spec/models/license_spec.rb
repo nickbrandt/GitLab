@@ -68,14 +68,13 @@ RSpec.describe License do
 
       context 'threshold for users overage' do
         let(:current_active_users_count) { 0 }
-        let(:new_license) do
-          gl_license = build(
+        let(:new_license) { build(:license, data: gitlab_license.export) }
+        let(:gitlab_license) do
+          build(
             :gitlab_license,
             starts_at: Date.current,
             restrictions: { active_user_count: 10, previous_user_count: previous_user_count }
           )
-
-          build(:license, data: gl_license.export)
         end
 
         context 'when current active users count is above the limit set by the license' do
@@ -100,6 +99,21 @@ RSpec.describe License do
 
               it 'does not accept the license' do
                 expect(new_license).not_to be_valid
+              end
+
+              context 'when license is a cloud license' do
+                let(:gitlab_license) do
+                  build(
+                    :gitlab_license,
+                    cloud_licensing_enabled: true,
+                    starts_at: Date.current,
+                    restrictions: { active_user_count: 10, previous_user_count: previous_user_count }
+                  )
+                end
+
+                it 'accepts the license' do
+                  expect(new_license).to be_valid
+                end
               end
             end
           end
@@ -151,7 +165,7 @@ RSpec.describe License do
             license.valid?
 
             error_msg = "This GitLab installation currently has 2 active users, exceeding this license's limit of 1 by 1 user. " \
-                        "Please upload a license for at least 2 users or contact sales at renewals@gitlab.com"
+                        "Please upload a license for at least 2 users or contact sales at https://about.gitlab.com/sales/"
 
             expect(license.errors[:base].first).to eq(error_msg)
           end
@@ -741,6 +755,24 @@ RSpec.describe License do
     end
   end
 
+  describe "#data_filename" do
+    subject { license.data_filename }
+
+    context 'when licensee includes company information' do
+      let(:gl_license) do
+        build(:gitlab_license, licensee: { 'Company' => ' Example & Partner Inc. 2 ', 'Name' => 'User Example' })
+      end
+
+      it { is_expected.to eq('ExamplePartnerInc2.gitlab-license') }
+    end
+
+    context 'when licensee does not include company information' do
+      let(:gl_license) { build(:gitlab_license, licensee: { 'Name' => 'User Example' }) }
+
+      it { is_expected.to eq('UserExample.gitlab-license') }
+    end
+  end
+
   describe "#md5" do
     it "returns the same MD5 for licenses with carriage returns and those without" do
       other_license = build(:license, data: license.data.gsub("\n", "\r\n"))
@@ -872,26 +904,6 @@ RSpec.describe License do
           it "returns false for #{feature}" do
             expect(license.feature_available?(feature)).to eq(false)
           end
-        end
-      end
-
-      context 'when feature is disabled by a feature flag' do
-        it 'returns false' do
-          feature = license.features.first
-          stub_feature_flags(feature => false)
-
-          expect(license.features).not_to receive(:include?)
-
-          expect(license.feature_available?(feature)).to eq(false)
-        end
-      end
-
-      context 'when feature is enabled by a feature flag' do
-        it 'returns true' do
-          feature = license.features.first
-          stub_feature_flags(feature => true)
-
-          expect(license.feature_available?(feature)).to eq(true)
         end
       end
     end
@@ -1395,6 +1407,68 @@ RSpec.describe License do
     end
   end
 
+  describe '#cloud_license?' do
+    subject { license.cloud_license? }
+
+    context 'when no license provided' do
+      before do
+        license.data = nil
+      end
+
+      it { is_expected.to be false }
+    end
+
+    context 'when the license has cloud licensing disabled' do
+      let(:gl_license) { build(:gitlab_license, cloud_licensing_enabled: false) }
+
+      it { is_expected.to be false }
+    end
+
+    context 'when the license has cloud licensing enabled' do
+      let(:gl_license) { build(:gitlab_license, cloud_licensing_enabled: true) }
+
+      it { is_expected.to be true }
+    end
+  end
+
+  describe '#usage_ping?' do
+    subject { license.usage_ping? }
+
+    context 'when no license provided' do
+      before do
+        license.data = nil
+      end
+
+      it { is_expected.to be false }
+    end
+
+    context 'when the license has usage ping required metrics disabled' do
+      let(:gl_license) { build(:gitlab_license, usage_ping_required_metrics_enabled: false) }
+
+      it { is_expected.to be false }
+    end
+
+    context 'when the license has usage ping required metrics enabled' do
+      let(:gl_license) { build(:gitlab_license, usage_ping_required_metrics_enabled: true) }
+
+      it { is_expected.to be true }
+    end
+  end
+
+  describe '#license_type' do
+    subject { license.license_type }
+
+    context 'when the license is not a cloud license' do
+      it { is_expected.to eq(described_class::LEGACY_LICENSE_TYPE) }
+    end
+
+    context 'when the license is a cloud license' do
+      let(:gl_license) { build(:gitlab_license, cloud_licensing_enabled: true) }
+
+      it { is_expected.to eq(described_class::CLOUD_LICENSE_TYPE) }
+    end
+  end
+
   describe '#auto_renew' do
     it 'is false' do
       expect(license.auto_renew).to be false
@@ -1467,6 +1541,51 @@ RSpec.describe License do
       end
 
       it { is_expected.to eq(result) }
+    end
+  end
+
+  describe '#licensee_name' do
+    subject { license.licensee_name }
+
+    let(:gl_license) { build(:gitlab_license, licensee: { 'Name' => 'User Example' }) }
+
+    it { is_expected.to eq('User Example') }
+  end
+
+  describe '#licensee_email' do
+    subject { license.licensee_email }
+
+    let(:gl_license) { build(:gitlab_license, licensee: { 'Email' => 'user@example.com' }) }
+
+    it { is_expected.to eq('user@example.com') }
+  end
+
+  describe '#licensee_company' do
+    subject { license.licensee_company }
+
+    let(:gl_license) { build(:gitlab_license, licensee: { 'Company' => 'Example Inc.' }) }
+
+    it { is_expected.to eq('Example Inc.') }
+  end
+
+  describe '#activated_at' do
+    subject { license.activated_at }
+
+    let(:license) do
+      gl_license = build(:gitlab_license, activated_at: activated_at)
+      build(:license, data: gl_license.export, created_at: 5.days.ago)
+    end
+
+    context 'when activated_at is set within the license data' do
+      let(:activated_at) { Date.yesterday.to_datetime }
+
+      it { is_expected.to eq(activated_at) }
+    end
+
+    context 'when activated_at is not set within the license data' do
+      let(:activated_at) { nil }
+
+      it { is_expected.to eq(license.created_at) }
     end
   end
 end

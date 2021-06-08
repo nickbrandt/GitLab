@@ -37,7 +37,7 @@ module API
           begin
             @blob = Gitlab::Git::Blob.raw(@repo, params[:sha])
             @blob.load_all_data!(@repo)
-          rescue
+          rescue StandardError
             not_found! 'Blob'
           end
 
@@ -106,7 +106,7 @@ module API
         not_acceptable! if Gitlab::HotlinkingDetector.intercept_hotlinking?(request)
 
         send_git_archive user_project.repository, ref: params[:sha], format: params[:format], append_sha: true
-      rescue
+      rescue StandardError
         not_found!('File')
       end
 
@@ -116,10 +116,23 @@ module API
       params do
         requires :from, type: String, desc: 'The commit, branch name, or tag name to start comparison'
         requires :to, type: String, desc: 'The commit, branch name, or tag name to stop comparison'
+        optional :from_project_id, type: String, desc: 'The project to compare from'
         optional :straight, type: Boolean, desc: 'Comparison method, `true` for direct comparison between `from` and `to` (`from`..`to`), `false` to compare using merge base (`from`...`to`)', default: false
       end
       get ':id/repository/compare' do
-        compare = CompareService.new(user_project, params[:to]).execute(user_project, params[:from], straight: params[:straight])
+        if params[:from_project_id].present?
+          target_project = MergeRequestTargetProjectFinder
+            .new(current_user: current_user, source_project: user_project, project_feature: :repository)
+            .execute(include_routes: true).find_by_id(params[:from_project_id])
+
+          if target_project.blank?
+            render_api_error!("Target project id:#{params[:from_project_id]} is not a fork of project id:#{params[:id]}", 400)
+          end
+        else
+          target_project = user_project
+        end
+
+        compare = CompareService.new(user_project, params[:to]).execute(target_project, params[:from], straight: params[:straight])
 
         if compare
           present compare, with: Entities::Compare
@@ -139,7 +152,7 @@ module API
       get ':id/repository/contributors' do
         contributors = ::Kaminari.paginate_array(user_project.repository.contributors(order_by: params[:order_by], sort: params[:sort]))
         present paginate(contributors), with: Entities::Contributor
-      rescue
+      rescue StandardError
         not_found!
       end
 
@@ -211,7 +224,7 @@ module API
           desc: 'The commit message to use when committing the changelog'
       end
       post ':id/repository/changelog' do
-        branch = params[:branch] || user_project.default_branch_or_master
+        branch = params[:branch] || user_project.default_branch_or_main
         access = Gitlab::UserAccess.new(current_user, container: user_project)
 
         unless access.can_push_to_branch?(branch)

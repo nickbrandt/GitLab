@@ -30,7 +30,7 @@ RSpec.describe BulkCreateIntegrationService do
         described_class.new(integration, batch, association).execute
 
         expect(created_integration.reload.data_fields.attributes.except(*excluded_attributes))
-          .to eq(integration.data_fields.attributes.except(*excluded_attributes))
+          .to eq(integration.reload.data_fields.attributes.except(*excluded_attributes))
       end
     end
   end
@@ -59,7 +59,7 @@ RSpec.describe BulkCreateIntegrationService do
 
     context 'with a group association' do
       let!(:group) { create(:group) }
-      let(:created_integration) { Service.find_by(group: group) }
+      let(:created_integration) { Integration.find_by(group: group) }
       let(:batch) { Group.where(id: group.id) }
       let(:association) { 'group' }
 
@@ -86,7 +86,7 @@ RSpec.describe BulkCreateIntegrationService do
     context 'with a group association' do
       let!(:subgroup) { create(:group, parent: group) }
       let(:integration) { create(:jira_service, group: group, project: nil, inherit_from_id: instance_integration.id) }
-      let(:created_integration) { Service.find_by(group: subgroup) }
+      let(:created_integration) { Integration.find_by(group: subgroup) }
       let(:batch) { Group.where(id: subgroup.id) }
       let(:association) { 'group' }
       let(:inherit_from_id) { instance_integration.id }

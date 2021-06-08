@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe 'Query.project(fullPath).pipeline(iid).securityReportFinding' do
+RSpec.describe 'Query.project(fullPath).pipeline(iid).securityReportFindings' do
   let_it_be(:project) { create(:project, :repository) }
   let_it_be(:pipeline) { create(:ci_pipeline, :success, project: project) }
   let_it_be(:user) { create(:user) }
@@ -58,13 +58,13 @@ RSpec.describe 'Query.project(fullPath).pipeline(iid).securityReportFinding' do
       stub_licensed_features(sast: true, dast: true)
     end
 
-    context 'when user is memeber of the project' do
+    context 'when user is member of the project' do
       before do
         project.add_developer(user)
       end
 
       it 'returns all the vulnerability findings' do
-        expect(security_report_findings.length).to eq(53)
+        expect(security_report_findings.length).to eq(25)
       end
 
       it 'returns all the queried fields', :aggregate_failures do
@@ -84,7 +84,7 @@ RSpec.describe 'Query.project(fullPath).pipeline(iid).securityReportFinding' do
       end
     end
 
-    context 'when user is not memeber of the project' do
+    context 'when user is not a member of the project' do
       it 'returns no vulnerability findings' do
         expect(security_report_findings).to be_nil
       end

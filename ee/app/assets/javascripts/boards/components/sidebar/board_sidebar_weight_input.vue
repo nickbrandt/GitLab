@@ -2,7 +2,6 @@
 import { GlButton, GlForm, GlFormInput } from '@gitlab/ui';
 import { mapGetters, mapActions } from 'vuex';
 import BoardEditableItem from '~/boards/components/sidebar/board_editable_item.vue';
-import createFlash from '~/flash';
 import { __ } from '~/locale';
 import autofocusonshow from '~/vue_shared/directives/autofocusonshow';
 
@@ -23,13 +22,13 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(['activeIssue', 'projectPathForActiveIssue']),
+    ...mapGetters(['activeBoardItem', 'projectPathForActiveIssue']),
     hasWeight() {
-      return this.activeIssue.weight > 0;
+      return this.activeBoardItem.weight > 0;
     },
   },
   watch: {
-    activeIssue: {
+    activeBoardItem: {
       handler(updatedIssue) {
         this.weight = updatedIssue.weight;
       },
@@ -37,7 +36,7 @@ export default {
     },
   },
   methods: {
-    ...mapActions(['setActiveIssueWeight']),
+    ...mapActions(['setActiveIssueWeight', 'setError']),
     handleFormSubmit() {
       this.$refs.sidebarItem.collapse({ emitEvent: false });
       this.setWeight();
@@ -45,7 +44,7 @@ export default {
     async setWeight(provided) {
       const weight = provided ?? this.weight;
 
-      if (this.loading || weight === this.activeIssue.weight) {
+      if (this.loading || weight === this.activeBoardItem.weight) {
         return;
       }
 
@@ -55,8 +54,8 @@ export default {
         await this.setActiveIssueWeight({ weight, projectPath: this.projectPathForActiveIssue });
         this.weight = weight;
       } catch (e) {
-        this.weight = this.activeIssue.weight;
-        createFlash({ message: __('An error occurred when updating the issue weight') });
+        this.weight = this.activeBoardItem.weight;
+        this.setError({ message: __('An error occurred when updating the issue weight') });
       } finally {
         this.loading = false;
       }
@@ -70,11 +69,16 @@ export default {
     ref="sidebarItem"
     :title="__('Weight')"
     :loading="loading"
+    data-testid="sidebar-weight"
     @close="setWeight()"
   >
     <template v-if="hasWeight" #collapsed>
       <div class="gl-display-flex gl-align-items-center">
-        <strong class="gl-text-gray-900">{{ activeIssue.weight }}</strong>
+        <strong
+          class="gl-text-gray-900 js-weight-weight-label-value"
+          data-qa-selector="weight_label_value"
+          >{{ activeBoardItem.weight }}</strong
+        >
         <span class="gl-mx-2">-</span>
         <gl-button
           variant="link"

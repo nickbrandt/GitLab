@@ -10,6 +10,7 @@ export const mockPipelineHeader = {
   id: 123,
   userPermissions: {
     destroyPipeline: true,
+    updatePipeline: true,
   },
   createdAt: threeWeeksAgo.toISOString(),
   user: {
@@ -34,8 +35,58 @@ export const mockFailedPipelineHeader = {
   },
 };
 
+export const mockFailedPipelineNoPermissions = {
+  id: 123,
+  userPermissions: {
+    destroyPipeline: false,
+    updatePipeline: false,
+  },
+  createdAt: threeWeeksAgo.toISOString(),
+  user: {
+    name: 'Foo',
+    username: 'foobar',
+    email: 'foo@bar.com',
+    avatarUrl: 'link',
+  },
+  status: PIPELINE_RUNNING,
+  retryable: true,
+  cancelable: false,
+  detailedStatus: {
+    group: 'running',
+    icon: 'status_running',
+    label: 'running',
+    text: 'running',
+    detailsPath: 'path',
+  },
+};
+
 export const mockRunningPipelineHeader = {
   ...mockPipelineHeader,
+  status: PIPELINE_RUNNING,
+  retryable: false,
+  cancelable: true,
+  detailedStatus: {
+    group: 'running',
+    icon: 'status_running',
+    label: 'running',
+    text: 'running',
+    detailsPath: 'path',
+  },
+};
+
+export const mockRunningPipelineNoPermissions = {
+  id: 123,
+  userPermissions: {
+    destroyPipeline: false,
+    updatePipeline: false,
+  },
+  createdAt: threeWeeksAgo.toISOString(),
+  user: {
+    name: 'Foo',
+    username: 'foobar',
+    email: 'foo@bar.com',
+    avatarUrl: 'link',
+  },
   status: PIPELINE_RUNNING,
   retryable: false,
   cancelable: true,
@@ -387,7 +438,7 @@ export const tags = [
     protected: false,
   },
   {
-    name: 'master-tag',
+    name: 'main-tag',
     message: '',
     target: '66673b07efef254dab7d537f0433a40e61cf84fe',
     commit: {
@@ -413,10 +464,10 @@ export const tags = [
 
 export const mockSearch = [
   { type: 'username', value: { data: 'root', operator: '=' } },
-  { type: 'ref', value: { data: 'master', operator: '=' } },
+  { type: 'ref', value: { data: 'main', operator: '=' } },
   { type: 'status', value: { data: 'pending', operator: '=' } },
 ];
 
 export const mockBranchesAfterMap = ['branch-1', 'branch-10', 'branch-11'];
 
-export const mockTagsAfterMap = ['tag-3', 'tag-2', 'tag-1', 'master-tag'];
+export const mockTagsAfterMap = ['tag-3', 'tag-2', 'tag-1', 'main-tag'];

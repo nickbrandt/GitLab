@@ -24,7 +24,7 @@ RSpec.describe Email do
     let(:user) { create(:user) }
 
     it 'synchronizes the gpg keys when the email is updated' do
-      email = user.emails.create(email: 'new@email.com')
+      email = user.emails.create!(email: 'new@email.com')
 
       expect(user).to receive(:update_invalid_gpg_signatures)
 
@@ -44,12 +44,11 @@ RSpec.describe Email do
     end
   end
 
-  describe 'delegation' do
-    let(:user) { create(:user) }
-
-    it 'delegates to :user' do
-      expect(build(:email, user: user).username).to eq user.username
-    end
+  describe 'delegations' do
+    it { is_expected.to delegate_method(:can?).to(:user) }
+    it { is_expected.to delegate_method(:username).to(:user) }
+    it { is_expected.to delegate_method(:pending_invitations).to(:user) }
+    it { is_expected.to delegate_method(:accept_pending_invitations!).to(:user) }
   end
 
   describe 'Devise emails' do

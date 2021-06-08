@@ -158,7 +158,7 @@ RSpec.describe Milestone do
 
     it 'returns false if milestone active and not all nested issues closed' do
       issue.milestone = milestone
-      issue.save
+      issue.save!
 
       expect(milestone.can_be_closed?).to be_falsey
     end
@@ -293,21 +293,7 @@ RSpec.describe Milestone do
     end
   end
 
-  context 'when `optimized_timebox_queries` feature flag is enabled' do
-    before do
-      stub_feature_flags(optimized_timebox_queries: true)
-    end
-
-    it_behaves_like '#for_projects_and_groups'
-  end
-
-  context 'when `optimized_timebox_queries` feature flag is disabled' do
-    before do
-      stub_feature_flags(optimized_timebox_queries: false)
-    end
-
-    it_behaves_like '#for_projects_and_groups'
-  end
+  it_behaves_like '#for_projects_and_groups'
 
   describe '.upcoming_ids' do
     let(:group_1) { create(:group) }

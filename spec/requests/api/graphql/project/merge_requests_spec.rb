@@ -47,10 +47,10 @@ RSpec.describe 'getting merge request listings nested in a project' do
     end
 
     before do
-      # We cannot call the whitelist here, since the transaction does not
+      # We cannot disable SQL query limiting here, since the transaction does not
       # begin until we enter the controller.
       headers = {
-        'X-GITLAB-QUERY-WHITELIST-ISSUE' => 'https://gitlab.com/gitlab-org/gitlab/-/issues/322979'
+        'X-GITLAB-DISABLE-SQL-QUERY-LIMIT' => 'https://gitlab.com/gitlab-org/gitlab/-/issues/322979'
       }
 
       post_graphql(query, current_user: current_user, headers: headers)
@@ -299,6 +299,7 @@ RSpec.describe 'getting merge request listings nested in a project' do
       reviewers { nodes { username } }
       participants { nodes { username } }
       headPipeline { status }
+      timelogs { nodes { timeSpent } }
       SELECT
     end
 
@@ -307,7 +308,7 @@ RSpec.describe 'getting merge request listings nested in a project' do
         query($first: Int) {
           project(fullPath: "#{project.full_path}") {
             mergeRequests(first: $first) {
-              nodes { #{mr_fields} }
+              nodes { iid #{mr_fields} }
             }
           }
         }
@@ -324,6 +325,7 @@ RSpec.describe 'getting merge request listings nested in a project' do
         mr.assignees << current_user
         mr.reviewers << create(:user)
         mr.reviewers << current_user
+        mr.timelogs << create(:merge_request_timelog, merge_request: mr)
       end
     end
 
@@ -345,7 +347,7 @@ RSpec.describe 'getting merge request listings nested in a project' do
     end
 
     def user_collection
-      { 'nodes' => all(match(a_hash_including('username' => be_present))) }
+      { 'nodes' => be_present.and(all(match(a_hash_including('username' => be_present)))) }
     end
 
     it 'returns appropriate results' do
@@ -358,7 +360,8 @@ RSpec.describe 'getting merge request listings nested in a project' do
             'assignees' => user_collection,
             'reviewers' => user_collection,
             'participants' => user_collection,
-            'headPipeline' => { 'status' => be_present }
+            'headPipeline' => { 'status' => be_present },
+            'timelogs' => { 'nodes' => be_one }
           )))
     end
 
@@ -381,29 +384,41 @@ RSpec.describe 'getting merge request listings nested in a project' do
     end
 
     context 'when sorting by merged_at DESC' do
+      let(:sort_param) { :MERGED_AT_DESC }
+      let(:expected_results) do
+        [
+          merge_request_b,
+          merge_request_d,
+          merge_request_c,
+          merge_request_e,
+          merge_request_a
+        ].map { |mr| global_id_of(mr) }
+      end
+
+      before do
+        five_days_ago = 5.days.ago
+
+        merge_request_d.metrics.update!(merged_at: five_days_ago)
+
+        # same merged_at, the second order column will decide (merge_request.id)
+        merge_request_c.metrics.update!(merged_at: five_days_ago)
+
+        merge_request_b.metrics.update!(merged_at: 1.day.ago)
+      end
+
       it_behaves_like 'sorted paginated query' do
-        let(:sort_param) { :MERGED_AT_DESC }
         let(:first_param) { 2 }
+      end
 
-        let(:expected_results) do
-          [
-            merge_request_b,
-            merge_request_d,
-            merge_request_c,
-            merge_request_e,
-            merge_request_a
-          ].map { |mr| global_id_of(mr) }
-        end
+      context 'when last parameter is given' do
+        let(:params) { graphql_args(sort: sort_param, last: 2) }
+        let(:page_info) { nil }
 
-        before do
-          five_days_ago = 5.days.ago
+        it 'takes the last 2 records' do
+          query = pagination_query(params)
+          post_graphql(query, current_user: current_user)
 
-          merge_request_d.metrics.update!(merged_at: five_days_ago)
-
-          # same merged_at, the second order column will decide (merge_request.id)
-          merge_request_c.metrics.update!(merged_at: five_days_ago)
-
-          merge_request_b.metrics.update!(merged_at: 1.day.ago)
+          expect(results.map { |item| item["id"] }).to eq(expected_results.last(2))
         end
       end
     end

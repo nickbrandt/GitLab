@@ -14,6 +14,9 @@ import { sprintf, __ } from '~/locale';
 import ModalCopyButton from '~/vue_shared/components/modal_copy_button.vue';
 
 export default {
+  i18n: {
+    sendEmail: __('Send email'),
+  },
   name: 'IssuableByEmail',
   components: {
     GlButton,
@@ -88,7 +91,7 @@ export default {
 
 <template>
   <div>
-    <gl-button v-gl-modal="$options.modalId" variant="link" data-testid="issuable-email-modal-btn"
+    <gl-button v-gl-modal="$options.modalId" variant="link"
       ><gl-sprintf :message="__('Email a new %{name} to this project')"
         ><template #name>{{ issuableName }}</template></gl-sprintf
       ></gl-button
@@ -116,9 +119,9 @@ export default {
           <gl-button
             v-gl-tooltip.hover
             :href="mailToLink"
-            :title="__('Send email')"
+            :title="$options.i18n.sendEmail"
+            :aria-label="$options.i18n.sendEmail"
             icon="mail"
-            data-testid="mail-to-btn"
           />
         </template>
       </gl-form-input-group>
@@ -152,12 +155,7 @@ export default {
             /></gl-link>
           </template>
           <template #resetLink="{ content }">
-            <gl-button
-              variant="link"
-              data-testid="incoming-email-token-reset"
-              @click="resetIncomingEmailToken"
-              >{{ content }}</gl-button
-            >
+            <gl-button variant="link" @click="resetIncomingEmailToken">{{ content }}</gl-button>
           </template>
         </gl-sprintf>
       </p>

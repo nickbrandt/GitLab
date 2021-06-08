@@ -13,9 +13,12 @@ import {
   endDate,
   allowedStages,
   selectedProjects,
-  transformedStagePathData,
   issueStage,
   stageMedians,
+  stageCounts,
+  basePaginationResult,
+  initialPaginationState,
+  transformedStagePathData,
 } from '../mock_data';
 
 let state = null;
@@ -213,9 +216,42 @@ describe('Value Stream Analytics getters', () => {
         stages: allowedStages,
         medians: stageMedians,
         selectedStage: issueStage,
+        stageCounts,
       };
 
       expect(getters.pathNavigationData(state)).toEqual(transformedStagePathData);
+    });
+  });
+
+  describe('paginationParams', () => {
+    beforeEach(() => {
+      state = { pagination: initialPaginationState };
+    });
+
+    it('returns the `pagination` type', () => {
+      expect(getters.paginationParams(state)).toEqual(basePaginationResult);
+    });
+
+    it('returns the `sort` type', () => {
+      expect(getters.paginationParams(state)).toEqual(basePaginationResult);
+    });
+
+    it('with page=10, sets the `page` property', () => {
+      const page = 10;
+      state = { pagination: { ...initialPaginationState, page } };
+      expect(getters.paginationParams(state)).toEqual({ ...basePaginationResult, page });
+    });
+  });
+
+  describe('selectedStageCount', () => {
+    it('returns the count when a value exist for the given stage', () => {
+      state = { selectedStage: { id: 1 }, stageCounts: { 1: 10, 2: 20 } };
+      expect(getters.selectedStageCount(state)).toEqual(10);
+    });
+
+    it('returns null if there is no value for the given stage', () => {
+      state = { selectedStage: { id: 3 }, stageCounts: { 1: 10, 2: 20 } };
+      expect(getters.selectedStageCount(state)).toEqual(null);
     });
   });
 });

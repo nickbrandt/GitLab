@@ -7,6 +7,8 @@ RSpec.describe Ci::CreatePipelineService do
 
   let_it_be(:project, reload: true) { create(:project, :repository) }
   let_it_be(:user, reload: true) { project.owner }
+  let_it_be(:runner) { create(:ci_runner, :online, tag_list: %w[postgres mysql ruby]) }
+
   let(:ref_name) { 'refs/heads/master' }
 
   before do
@@ -63,7 +65,7 @@ RSpec.describe Ci::CreatePipelineService do
         expect(pipeline).to be_push
         expect(pipeline).to eq(project.ci_pipelines.last)
         expect(pipeline).to have_attributes(user: user)
-        expect(pipeline).to have_attributes(status: 'pending')
+        expect(pipeline).to have_attributes(status: 'created')
         expect(pipeline.iid).not_to be_nil
         expect(pipeline.repository_source?).to be true
         expect(pipeline.builds.first).to be_kind_of(Ci::Build)
@@ -71,19 +73,21 @@ RSpec.describe Ci::CreatePipelineService do
       end
 
       it 'increments the prometheus counter' do
-        expect(Gitlab::Metrics).to receive(:counter)
-          .with(:pipelines_created_total, "Counter of pipelines created")
-          .and_call_original
-        allow(Gitlab::Metrics).to receive(:counter).and_call_original # allow other counters
+        counter = spy('pipeline created counter')
+
+        allow(Gitlab::Ci::Pipeline::Metrics)
+          .to receive(:pipelines_created_counter).and_return(counter)
 
         pipeline
+
+        expect(counter).to have_received(:increment)
       end
 
       it 'records pipeline size in a prometheus histogram' do
         histogram = spy('pipeline size histogram')
 
         allow(Gitlab::Ci::Pipeline::Metrics)
-          .to receive(:new).and_return(histogram)
+          .to receive(:pipeline_size_histogram).and_return(histogram)
 
         execute_service
 
@@ -97,14 +101,6 @@ RSpec.describe Ci::CreatePipelineService do
         end
 
         execute_service
-      end
-
-      describe 'recording a conversion event' do
-        it 'schedules a record conversion event worker' do
-          expect(Experiments::RecordConversionEventWorker).to receive(:perform_async).with(:ci_syntax_templates_b, user.id)
-
-          pipeline
-        end
       end
 
       context 'when merge requests already exist for this source branch' do
@@ -253,7 +249,7 @@ RSpec.describe Ci::CreatePipelineService do
           pipeline
           pipeline_on_previous_commit
 
-          expect(pipeline.reload).to have_attributes(status: 'pending', auto_canceled_by_id: nil)
+          expect(pipeline.reload).to have_attributes(status: 'created', auto_canceled_by_id: nil)
         end
 
         it 'auto cancel pending non-HEAD pipelines', :sidekiq_might_not_need_inline do
@@ -263,8 +259,8 @@ RSpec.describe Ci::CreatePipelineService do
           expect(pipeline_on_previous_commit.reload).to have_attributes(status: 'canceled', auto_canceled_by_id: pipeline.id)
         end
 
-        it 'cancels running outdated pipelines', :sidekiq_might_not_need_inline do
-          pipeline_on_previous_commit.run
+        it 'cancels running outdated pipelines', :sidekiq_inline do
+          pipeline_on_previous_commit.reload.run
           head_pipeline = execute_service
 
           expect(pipeline_on_previous_commit.reload).to have_attributes(status: 'canceled', auto_canceled_by_id: head_pipeline.id)
@@ -278,13 +274,13 @@ RSpec.describe Ci::CreatePipelineService do
         end
 
         it 'does not cancel pipelines from the other branches' do
-          pending_pipeline = execute_service(
+          new_pipeline = execute_service(
             ref: 'refs/heads/feature',
             after: previous_commit_sha_from_ref('feature')
           )
           pipeline
 
-          expect(pending_pipeline.reload).to have_attributes(status: 'pending', auto_canceled_by_id: nil)
+          expect(new_pipeline.reload).to have_attributes(status: 'created', auto_canceled_by_id: nil)
         end
 
         context 'when the interruptible attribute is' do
@@ -465,12 +461,12 @@ RSpec.describe Ci::CreatePipelineService do
           project.update!(auto_cancel_pending_pipelines: 'disabled')
         end
 
-        it 'does not auto cancel pending non-HEAD pipelines' do
+        it 'does not auto cancel created non-HEAD pipelines' do
           pipeline_on_previous_commit
           pipeline
 
           expect(pipeline_on_previous_commit.reload)
-            .to have_attributes(status: 'pending', auto_canceled_by_id: nil)
+            .to have_attributes(status: 'created', auto_canceled_by_id: nil)
         end
       end
 
@@ -579,6 +575,13 @@ RSpec.describe Ci::CreatePipelineService do
       let(:message) { 'Message' }
 
       it_behaves_like 'a failed pipeline'
+
+      it 'increments the error metric' do
+        stub_ci_pipeline_yaml_file(ci_yaml)
+
+        counter = Gitlab::Metrics.counter(:gitlab_ci_pipeline_failure_reasons, 'desc')
+        expect { execute_service }.to change { counter.get(reason: 'config_error') }.by(1)
+      end
 
       context 'when receive git commit' do
         before do
@@ -770,7 +773,7 @@ RSpec.describe Ci::CreatePipelineService do
         stub_ci_pipeline_yaml_file(config)
       end
 
-      it 'does not create a new pipeline' do
+      it 'does not create a new pipeline', :sidekiq_inline do
         result = execute_service
 
         expect(result).to be_persisted

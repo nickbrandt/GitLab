@@ -1,6 +1,6 @@
 ---
 stage: Verify
-group: Continuous Integration
+group: Pipeline Execution
 info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#assignments
 type: reference
 ---
@@ -86,7 +86,7 @@ Second command line.
 When you omit the `>` or `|` block scalar indicators, GitLab concatenates non-empty
 lines to form the command. Make sure the lines can run when concatenated.
 
-[Shell here documents](https://en.wikipedia.org/wiki/Here_document) work with the
+[These documents](https://en.wikipedia.org/wiki/Here_document) work with the
 `|` and `>` operators as well. The example below transliterates lower case letters
 to upper case:
 

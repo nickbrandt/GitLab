@@ -38,7 +38,10 @@ module GraphqlHelpers
     # All resolution goes through fields, so we need to create one here that
     # uses our resolver. Thankfully, apart from the field name, resolvers
     # contain all the configuration needed to define one.
-    field_options = resolver_class.field_options.merge(name: 'field_value')
+    field_options = resolver_class.field_options.merge(
+      owner: resolver_parent,
+      name: 'field_value'
+    )
     field = ::Types::BaseField.new(**field_options)
 
     # All mutations accept a single `:input` argument. Wrap arguments here.
@@ -139,9 +142,9 @@ module GraphqlHelpers
     Class.new(::Types::BaseObject) { graphql_name name }
   end
 
-  def resolver_instance(resolver_class, obj: nil, ctx: {}, field: nil, schema: GitlabSchema)
+  def resolver_instance(resolver_class, obj: nil, ctx: {}, field: nil, schema: GitlabSchema, subscription_update: false)
     if ctx.is_a?(Hash)
-      q = double('Query', schema: schema)
+      q = double('Query', schema: schema, subscription_update?: subscription_update)
       ctx = GraphQL::Query::Context.new(query: q, object: obj, values: ctx)
     end
 
@@ -219,9 +222,12 @@ module GraphqlHelpers
     lazy_vals.is_a?(Array) ? lazy_vals.map { |val| sync(val) } : sync(lazy_vals)
   end
 
-  def graphql_query_for(name, args = {}, selection = nil)
+  def graphql_query_for(name, args = {}, selection = nil, operation_name = nil)
     type = GitlabSchema.types['Query'].fields[GraphqlHelpers.fieldnamerize(name)]&.type
-    wrap_query(query_graphql_field(name, args, selection, type))
+    query = wrap_query(query_graphql_field(name, args, selection, type))
+    query = "query #{operation_name}#{query}" if operation_name
+
+    query
   end
 
   def wrap_query(query)
@@ -271,11 +277,11 @@ module GraphqlHelpers
   # prepare_input_for_mutation({ 'my_key' => 1 })
   #   => { 'myKey' => 1}
   def prepare_input_for_mutation(input)
-    input.map do |name, value|
+    input.to_h do |name, value|
       value = prepare_input_for_mutation(value) if value.is_a?(Hash)
 
       [GraphqlHelpers.fieldnamerize(name), value]
-    end.to_h
+    end
   end
 
   def input_variable_name_for_mutation(mutation_name)
@@ -301,7 +307,10 @@ module GraphqlHelpers
 
   def query_graphql_field(name, attributes = {}, fields = nil, type = nil)
     type ||= name.to_s.classify
-    attributes, fields = [nil, attributes] if fields.nil? && !attributes.is_a?(Hash)
+    if fields.nil? && !attributes.is_a?(Hash)
+      fields = attributes
+      attributes = nil
+    end
 
     field = field_with_params(name, attributes)
 
@@ -387,17 +396,21 @@ module GraphqlHelpers
     post api('/', current_user, version: 'graphql'), params: { _json: queries }, headers: headers
   end
 
-  def post_graphql(query, current_user: nil, variables: nil, headers: {})
+  def post_graphql(query, current_user: nil, variables: nil, headers: {}, token: {})
     params = { query: query, variables: serialize_variables(variables) }
-    post api('/', current_user, version: 'graphql'), params: params, headers: headers
+    post api('/', current_user, version: 'graphql', **token), params: params, headers: headers
 
-    if graphql_errors # Errors are acceptable, but not this one:
-      expect(graphql_errors).not_to include(a_hash_including('message' => 'Internal server error'))
-    end
+    return unless graphql_errors
+
+    # Errors are acceptable, but not this one:
+    expect(graphql_errors).not_to include(a_hash_including('message' => 'Internal server error'))
   end
 
-  def post_graphql_mutation(mutation, current_user: nil)
-    post_graphql(mutation.query, current_user: current_user, variables: mutation.variables)
+  def post_graphql_mutation(mutation, current_user: nil, token: {})
+    post_graphql(mutation.query,
+                 current_user: current_user,
+                 variables: mutation.variables,
+                 token: token)
   end
 
   def post_graphql_mutation_with_uploads(mutation, current_user: nil)

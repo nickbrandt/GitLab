@@ -27,10 +27,12 @@ As well as defining the experiment rollout and cleanup, this issue incorporates 
 ### What might happen if this goes wrong?
 
 ### What can we monitor to detect problems with this?
-<!-- Which dashboards from https://dashboards.gitlab.net are most relevant? Sentry errors reports can alse be useful to review -->
+<!-- Which dashboards from https://dashboards.gitlab.net are most relevant? Sentry errors reports can also be useful to review -->
 
 ### Tracked data
 <!-- brief description or link to issue or Sisense dashboard -->
+ 
+ Note: you can utilize [CXL calculator](https://cxl.com/ab-test-calculator/) to determine if your experiment has reached signifigance, it also includes an estimate for how much longer an experiment will need to run for before reaching signifigance.
 
 ### Staging Test
 <!-- For experiments using `experimentation.rb`: To force this experiment on staging use `?force_experiment=<experiment-key>` -->
@@ -79,6 +81,7 @@ If applicable, any groups/projects that are happy to have this feature turned on
 - [ ] Announce on the issue that the flag has been enabled
 - [ ] Remove experiment code and feature flag and add changelog entry - a separate [cleanup issue](https://gitlab.com/gitlab-org/gitlab/-/issues/new?issuable_template=Experiment%20Successful%20Cleanup) might be required
 - [ ] After the flag removal is deployed, [clean up the feature flag](https://docs.gitlab.com/ee/development/feature_flags/controls.html#cleaning-up) by running chatops command in `#production` channel
+- [ ] Assign to the product manager to update the [knowledge base](https://about.gitlab.com/direction/growth/#growth-insights-knowledge-base) (if applicable)
 
 ## Rollback Steps
 

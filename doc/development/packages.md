@@ -122,7 +122,7 @@ There are usually 2 phases for the MVC:
 
 When implementing a new package manager, it is tempting to create one large merge request containing all of the
 necessary endpoints and services necessary to support basic usage. Instead, put the
-API endpoints behind a [feature flag](feature_flags/development.md) and
+API endpoints behind a [feature flag](feature_flags/index.md) and
 submit each endpoint or behavior (download, upload, etc) in a different merge request to shorten the review
 process.
 
@@ -133,7 +133,7 @@ During this phase, the idea is to collect as much information as possible about 
 - **Authentication**: What authentication mechanisms are available (OAuth, Basic
   Authorization, other). Keep in mind that GitLab users often want to use their
   [Personal Access Tokens](../user/profile/personal_access_tokens.md).
-  Although not needed for the MVC first iteration, the [CI job tokens](../user/project/new_ci_build_permissions_model.md#job-token)
+  Although not needed for the MVC first iteration, the [CI/CD job tokens](../api/README.md#gitlab-cicd-job-token)
   have to be supported at some point in the future.
 - **Requests**: Which requests are needed to have a working MVC. Ideally, produce
   a list of all the requests needed for the MVC (including required actions). Further
@@ -219,12 +219,12 @@ demonstrates adding an instance-level endpoint for Conan to workhorse. You can a
 implemented in the same file.
 
 Once the route has been added, you must add an additional `/authorize` version of the upload endpoint to your API file.
-[Here is an example](https://gitlab.com/gitlab-org/gitlab/blob/398fef1ca26ae2b2c3dc89750f6b20455a1e5507/ee/lib/api/maven_packages.rb#L164)
-of the additional endpoint added for Maven. The `/authorize` endpoint verifies and authorizes the request from workhorse,
+[This example](https://gitlab.com/gitlab-org/gitlab/blob/398fef1ca26ae2b2c3dc89750f6b20455a1e5507/ee/lib/api/maven_packages.rb#L164)
+shows the additional endpoint added for Maven. The `/authorize` endpoint verifies and authorizes the request from workhorse,
 then the normal upload endpoint is implemented below, consuming the metadata that workhorse provides in order to
 create the package record. Workhorse provides a variety of file metadata such as type, size, and different checksum formats.
 
-For testing purposes, you may want to [enable object storage](https://gitlab.com/gitlab-org/gitlab-development-kit/blob/master/doc/howto/object_storage.md)
+For testing purposes, you may want to [enable object storage](https://gitlab.com/gitlab-org/gitlab-development-kit/blob/main/doc/howto/object_storage.md)
 in your local development environment.
 
 #### File size limits
@@ -255,6 +255,30 @@ These route prefixes guarantee a higher rate limit:
 /api/v4/projects/:project_id/packages/
 /api/v4/groups/:group_id/-/packages/
 ```
+
+### MVC Checklist
+
+When adding support to GitLab for a new package manager, the first iteration must contain the
+following features. You can add the features through many merge requests as needed, but all the
+features must be implemented when the feature flag is removed.
+
+- Project-level API
+- Push event tracking
+- Pull event tracking
+- Authentication with Personal Access Tokens
+- Authentication with Job Tokens
+- Authentication with Deploy Tokens (group and project)
+- File size [limit](#file-size-limits)
+- File format guards (only accept valid file formats for the package type)
+- Name regex with validation
+- Version regex with validation
+- Workhorse route for [accelerated](uploads.md#how-to-add-a-new-upload-route) uploads
+- Background workers for extracting package metadata (if applicable)
+- Documentation (how to use the feature)
+- API Documentation (individual endpoints with curl examples)
+- Seeding in [`db/fixtures/development/26_packages.rb`](https://gitlab.com/gitlab-org/gitlab/blob/master/db/fixtures/development/26_packages.rb)
+- Update the [runbook](https://gitlab.com/gitlab-com/runbooks/-/blob/31fb4959e89db25fddf865bc81734c222daf32dd/dashboards/stage-groups/package.dashboard.jsonnet#L74) for the Grafana charts
+- End-to-end feature tests for (at the minimum) publishing and installing a package
 
 ### Future Work
 

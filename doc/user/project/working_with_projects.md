@@ -41,7 +41,8 @@ For a list of words that can't be used as project names see
 
 To create a new blank project on the **New project** page:
 
-1. On the **Blank project** tab, provide the following information:
+1. Click **Create blank project**
+1. Provide the following information:
    - The name of your project in the **Project name** field. You can't use
      special characters, but you can use spaces, hyphens, underscores, or even
      emoji. When adding the name, the **Project slug** auto populates.
@@ -83,10 +84,12 @@ Built-in templates are project templates that are:
 - Developed and maintained in the [`project-templates`](https://gitlab.com/gitlab-org/project-templates)
   and [`pages`](https://gitlab.com/pages) groups.
 - Released with GitLab.
+- Anyone can contribute a built-in template by following [these steps](https://about.gitlab.com/community/contribute/project-templates).
 
 To use a built-in template on the **New project** page:
 
-1. On the **Create from template** tab, select the **Built-in** tab.
+1. Click **Create from template**
+1. Select the **Built-in** tab.
 1. From the list of available built-in templates, click the:
    - **Preview** button to look at the template source itself.
    - **Use template** button to start creating the project.
@@ -99,7 +102,8 @@ GitLab is developing Enterprise templates to help you streamline audit managemen
 
 To create a new project with an Enterprise template, on the **New project** page:
 
-1. On the **Create from template** tab, select the **Built-in** tab.
+1. Click **Create from template**
+1. Select the **Built-in** tab.
 1. From the list of available built-in Enterprise templates, click the:
    - **Preview** button to look at the template source itself.
    - **Use template** button to start creating the project.
@@ -123,11 +127,12 @@ quickly starting projects.
 
 Custom projects are available at the [instance-level](../../user/admin_area/custom_project_templates.md)
 from the **Instance** tab, or at the [group-level](../../user/group/custom_project_templates.md)
-from the **Group** tab, under the **Create from template** tab.
+from the **Group** tab, on the **Create from template** page.
 
 To use a custom project template on the **New project** page:
 
-1. On the **Create from template** tab, select the **Instance** tab or the **Group** tab.
+1. Click **Create from template**
+1. Select the **Instance** tab or the **Group** tab.
 1. From the list of available custom templates, click the:
    - **Preview** button to look at the template source itself.
    - **Use template** button to start creating the project.
@@ -329,7 +334,7 @@ For public projects, and to members of internal and private projects
 with [permissions to view the project's code](../permissions.md#project-members-permissions):
 
 - The content of a
-  [`README` or an index file](repository/#repository-readme-and-index-files)
+  [`README` or an index file](repository/index.md#readme-and-index-files)
   is displayed (if any), followed by the list of directories in the
   project's repository.
 - If the project doesn't contain either of these files, the

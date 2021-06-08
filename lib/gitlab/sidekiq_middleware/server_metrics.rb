@@ -13,6 +13,10 @@ module Gitlab
         @metrics = init_metrics
 
         @metrics[:sidekiq_concurrency].set({}, Sidekiq.options[:concurrency].to_i)
+
+        if ::Gitlab::Database::LoadBalancing.enable?
+          @metrics[:sidekiq_load_balancing_count] = ::Gitlab::Metrics.counter(:sidekiq_load_balancing_count, 'Sidekiq jobs with load balancing')
+        end
       end
 
       def call(worker, job, queue)
@@ -21,6 +25,16 @@ module Gitlab
         Thread.current.name ||= Gitlab::Metrics::Samplers::ThreadsSampler::SIDEKIQ_WORKER_THREAD_NAME
 
         labels = create_labels(worker.class, queue, job)
+        instrument(job, labels) do
+          yield
+        end
+      end
+
+      protected
+
+      attr_reader :metrics
+
+      def instrument(job, labels)
         queue_duration = ::Gitlab::InstrumentationHelper.queue_duration_for_job(job)
 
         @metrics[:sidekiq_jobs_queue_duration_seconds].observe(labels, queue_duration) if queue_duration
@@ -34,7 +48,8 @@ module Gitlab
         monotonic_time_start = Gitlab::Metrics::System.monotonic_time
         job_thread_cputime_start = get_thread_cputime
         begin
-          yield
+          transaction = Gitlab::Metrics::BackgroundTransaction.new
+          transaction.run { yield }
           job_succeeded = true
         ensure
           monotonic_time_end = Gitlab::Metrics::System.monotonic_time
@@ -49,18 +64,26 @@ module Gitlab
 
           # job_status: done, fail match the job_status attribute in structured logging
           labels[:job_status] = job_succeeded ? "done" : "fail"
+          instrumentation = job[:instrumentation] || {}
           @metrics[:sidekiq_jobs_cpu_seconds].observe(labels, job_thread_cputime)
           @metrics[:sidekiq_jobs_completion_seconds].observe(labels, monotonic_time)
           @metrics[:sidekiq_jobs_db_seconds].observe(labels, ActiveRecord::LogSubscriber.runtime / 1000)
-          @metrics[:sidekiq_jobs_gitaly_seconds].observe(labels, get_gitaly_time(job))
-          @metrics[:sidekiq_redis_requests_total].increment(labels, get_redis_calls(job))
-          @metrics[:sidekiq_redis_requests_duration_seconds].observe(labels, get_redis_time(job))
-          @metrics[:sidekiq_elasticsearch_requests_total].increment(labels, get_elasticsearch_calls(job))
-          @metrics[:sidekiq_elasticsearch_requests_duration_seconds].observe(labels, get_elasticsearch_time(job))
+          @metrics[:sidekiq_jobs_gitaly_seconds].observe(labels, get_gitaly_time(instrumentation))
+          @metrics[:sidekiq_redis_requests_total].increment(labels, get_redis_calls(instrumentation))
+          @metrics[:sidekiq_redis_requests_duration_seconds].observe(labels, get_redis_time(instrumentation))
+          @metrics[:sidekiq_elasticsearch_requests_total].increment(labels, get_elasticsearch_calls(instrumentation))
+          @metrics[:sidekiq_elasticsearch_requests_duration_seconds].observe(labels, get_elasticsearch_time(instrumentation))
+
+          if ::Gitlab::Database::LoadBalancing.enable? && job[:database_chosen]
+            load_balancing_labels = {
+              database_chosen: job[:database_chosen],
+              data_consistency: job[:data_consistency]
+            }
+
+            @metrics[:sidekiq_load_balancing_count].increment(labels.merge(load_balancing_labels), 1)
+          end
         end
       end
-
-      private
 
       def init_metrics
         {
@@ -80,29 +103,33 @@ module Gitlab
         }
       end
 
+      private
+
       def get_thread_cputime
         defined?(Process::CLOCK_THREAD_CPUTIME_ID) ? Process.clock_gettime(Process::CLOCK_THREAD_CPUTIME_ID) : 0
       end
 
-      def get_redis_time(job)
-        job.fetch(:redis_duration_s, 0)
+      def get_redis_time(payload)
+        payload.fetch(:redis_duration_s, 0)
       end
 
-      def get_redis_calls(job)
-        job.fetch(:redis_calls, 0)
+      def get_redis_calls(payload)
+        payload.fetch(:redis_calls, 0)
       end
 
-      def get_elasticsearch_time(job)
-        job.fetch(:elasticsearch_duration_s, 0)
+      def get_elasticsearch_time(payload)
+        payload.fetch(:elasticsearch_duration_s, 0)
       end
 
-      def get_elasticsearch_calls(job)
-        job.fetch(:elasticsearch_calls, 0)
+      def get_elasticsearch_calls(payload)
+        payload.fetch(:elasticsearch_calls, 0)
       end
 
-      def get_gitaly_time(job)
-        job.fetch(:gitaly_duration_s, 0)
+      def get_gitaly_time(payload)
+        payload.fetch(:gitaly_duration_s, 0)
       end
     end
   end
 end
+
+Gitlab::SidekiqMiddleware::ServerMetrics.prepend_mod_with('Gitlab::SidekiqMiddleware::ServerMetrics')

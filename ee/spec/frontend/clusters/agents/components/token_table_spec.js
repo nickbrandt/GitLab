@@ -2,6 +2,7 @@ import { GlEmptyState, GlLink, GlTooltip, GlTruncate } from '@gitlab/ui';
 import { mount } from '@vue/test-utils';
 import TokenTable from 'ee/clusters/agents/components/token_table.vue';
 import { useFakeDate } from 'helpers/fake_date';
+import { extendedWrapper } from 'helpers/vue_test_utils_helper';
 
 describe('ClusterAgentTokenTable', () => {
   let wrapper;
@@ -15,18 +16,21 @@ describe('ClusterAgentTokenTable', () => {
       createdByUser: {
         name: 'user-1',
       },
+      lastUsedAt: '2021-02-13T00:00:00Z',
+      name: 'token-1',
     },
     {
       id: '2',
       createdAt: '2021-02-10T00:00:00Z',
       description: null,
       createdByUser: null,
+      lastUsedAt: null,
+      name: 'token-2',
     },
   ];
 
   const createComponent = (tokens) => {
-    wrapper = mount(TokenTable, { propsData: { tokens } });
-    return wrapper.vm.$nextTick();
+    wrapper = extendedWrapper(mount(TokenTable, { propsData: { tokens } }));
   };
 
   const findEmptyState = () => wrapper.find(GlEmptyState);
@@ -46,6 +50,31 @@ describe('ClusterAgentTokenTable', () => {
     expect(learnMoreLink.exists()).toBe(true);
     expect(learnMoreLink.text()).toBe(TokenTable.i18n.learnMore);
   });
+
+  it.each`
+    name         | lineNumber
+    ${'token-1'} | ${0}
+    ${'token-2'} | ${1}
+  `('displays token name "$name" for line "$lineNumber"', ({ name, lineNumber }) => {
+    const tokens = wrapper.findAll('[data-testid="agent-token-name"]');
+    const token = tokens.at(lineNumber);
+
+    expect(token.text()).toBe(name);
+  });
+
+  it.each`
+    lastUsedText    | lineNumber
+    ${'2 days ago'} | ${0}
+    ${'Never'}      | ${1}
+  `(
+    'displays last used information "$lastUsedText" for line "$lineNumber"',
+    ({ lastUsedText, lineNumber }) => {
+      const tokens = wrapper.findAllByTestId('agent-token-used');
+      const token = tokens.at(lineNumber);
+
+      expect(token.text()).toBe(lastUsedText);
+    },
+  );
 
   it.each`
     createdText     | lineNumber

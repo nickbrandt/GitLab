@@ -26,8 +26,8 @@ GET /search
 | `search`      | string   | yes        | The search query  |
 | `state`       | string   | no        | Filter by state. Issues and merge requests are supported; it is ignored for other scopes. |
 | `confidential` | boolean   | no         | Filter by confidentiality. Issues scope is supported; it is ignored for other scopes. |
-| `order_by`    | string   | no         | Allowed values are `created_at` only. If this is not set, the results will either be sorted by `created_at` in descending order for basic search, or by the most relevant documents when using advanced search.|
-| `sort`    | string   | no         | Allowed values are `asc` or `desc` only. If this is not set, the results will either be sorted by `created_at` in descending order for basic search, or by the most relevant documents when using advanced search.|
+| `order_by`    | string   | no         | Allowed values are `created_at` only. If this is not set, the results are either sorted by `created_at` in descending order for basic search, or by the most relevant documents when using advanced search.|
+| `sort`    | string   | no         | Allowed values are `asc` or `desc` only. If this is not set, the results are either sorted by `created_at` in descending order for basic search, or by the most relevant documents when using advanced search.|
 
 Search the expression within the specified scope. Currently these scopes are supported: projects, issues, merge_requests, milestones, snippet_titles, users.
 
@@ -54,7 +54,8 @@ Example response:
     "path_with_namespace": "twitter/flight",
     "created_at": "2017-09-05T07:58:01.621Z",
     "default_branch": "master",
-    "tag_list":[],
+    "tag_list":[], //deprecated, use `topics` instead
+    "topics":[],
     "ssh_url_to_repo": "ssh://jarka@localhost:2222/twitter/flight.git",
     "http_url_to_repo": "http://localhost:3000/twitter/flight.git",
     "web_url": "http://localhost:3000/twitter/flight",
@@ -295,7 +296,7 @@ Example response:
 ```
 
 NOTE:
-`filename` is deprecated in favor of `path`. Both return the full path of the file inside the repository, but in the future `filename` will be only the filename and not the full path. For details, see [issue 34521](https://gitlab.com/gitlab-org/gitlab/-/issues/34521).
+`filename` is deprecated in favor of `path`. Both return the full path of the file inside the repository, but in the future `filename` is intended to be only the filename and not the full path. For details, see [issue 34521](https://gitlab.com/gitlab-org/gitlab/-/issues/34521).
 
 ### Scope: commits **(PREMIUM)**
 
@@ -371,7 +372,7 @@ Example response:
 ```
 
 NOTE:
-`filename` is deprecated in favor of `path`. Both return the full path of the file inside the repository, but in the future `filename` will be only the file name and not the full path. For details, see [issue 34521](https://gitlab.com/gitlab-org/gitlab/-/issues/34521).
+`filename` is deprecated in favor of `path`. Both return the full path of the file inside the repository, but in the future `filename` is intended to be only the filename and not the full path. For details, see [issue 34521](https://gitlab.com/gitlab-org/gitlab/-/issues/34521).
 
 ### Scope: notes **(PREMIUM)**
 
@@ -434,7 +435,7 @@ Example response:
 
 Search within the specified group.
 
-If a user is not a member of a group and the group is private, a `GET` request on that group will result to a `404` status code.
+If a user is not a member of a group and the group is private, a `GET` request on that group results in a `404` status code.
 
 ```plaintext
 GET /groups/:id/search
@@ -447,8 +448,8 @@ GET /groups/:id/search
 | `search`      | string   | yes        | The search query  |
 | `state`       | string   | no        | Filter by state. Issues and merge requests are supported; it is ignored for other scopes. |
 | `confidential` | boolean   | no         | Filter by confidentiality. Issues scope is supported; it is ignored for other scopes. |
-| `order_by`    | string   | no         | Allowed values are `created_at` only. If this is not set, the results will either be sorted by `created_at` in descending order for basic search, or by the most relevant documents when using advanced search.|
-| `sort`    | string   | no         | Allowed values are `asc` or `desc` only. If this is not set, the results will either be sorted by `created_at` in descending order for basic search, or by the most relevant documents when using advanced search.|
+| `order_by`    | string   | no         | Allowed values are `created_at` only. If this is not set, the results are either sorted by `created_at` in descending order for basic search, or by the most relevant documents when using advanced search.|
+| `sort`    | string   | no         | Allowed values are `asc` or `desc` only. If this is not set, the results are either sorted by `created_at` in descending order for basic search, or by the most relevant documents when using advanced search.|
 
 Search the expression within the specified scope. Currently these scopes are supported: projects, issues, merge_requests, milestones, users.
 
@@ -475,7 +476,8 @@ Example response:
     "path_with_namespace": "twitter/flight",
     "created_at": "2017-09-05T07:58:01.621Z",
     "default_branch": "master",
-    "tag_list":[],
+    "tag_list":[], //deprecated, use `topics` instead
+    "topics":[],
     "ssh_url_to_repo": "ssh://jarka@localhost:2222/twitter/flight.git",
     "http_url_to_repo": "http://localhost:3000/twitter/flight.git",
     "web_url": "http://localhost:3000/twitter/flight",
@@ -685,7 +687,7 @@ Example response:
 ```
 
 NOTE:
-`filename` is deprecated in favor of `path`. Both return the full path of the file inside the repository, but in the future `filename` will be only the filename and not the full path. For details, see [issue 34521](https://gitlab.com/gitlab-org/gitlab/-/issues/34521).
+`filename` is deprecated in favor of `path`. Both return the full path of the file inside the repository, but in the future `filename` is intended to be only the filename and not the full path. For details, see [issue 34521](https://gitlab.com/gitlab-org/gitlab/-/issues/34521).
 
 ### Scope: commits **(PREMIUM)**
 
@@ -761,7 +763,7 @@ Example response:
 ```
 
 NOTE:
-`filename` is deprecated in favor of `path`. Both return the full path of the file inside the repository, but in the future `filename` will be only the file name and not the full path. For details, see [issue 34521](https://gitlab.com/gitlab-org/gitlab/-/issues/34521).
+`filename` is deprecated in favor of `path`. Both return the full path of the file inside the repository, but in the future `filename` is intended to be only the filename and not the full path. For details, see [issue 34521](https://gitlab.com/gitlab-org/gitlab/-/issues/34521).
 
 ### Scope: notes **(PREMIUM)**
 
@@ -824,7 +826,7 @@ Example response:
 
 Search within the specified project.
 
-If a user is not a member of a project and the project is private, a `GET` request on that project will result to a `404` status code.
+If a user is not a member of a project and the project is private, a `GET` request on that project results in a `404` status code.
 
 ```plaintext
 GET /projects/:id/search
@@ -838,8 +840,8 @@ GET /projects/:id/search
 | `ref`         | string   | no         | The name of a repository branch or tag to search on. The project's default branch is used by default. This is only applicable for scopes: commits, blobs, and wiki_blobs.  |
 | `state`       | string   | no        | Filter by state. Issues and merge requests are supported; it is ignored for other scopes. |
 | `confidential` | boolean   | no         | Filter by confidentiality. Issues scope is supported; it is ignored for other scopes. |
-| `order_by`    | string   | no         | Allowed values are `created_at` only. If this is not set, the results will either be sorted by `created_at` in descending order for basic search, or by the most relevant documents when using advanced search.|
-| `sort`    | string   | no         | Allowed values are `asc` or `desc` only. If this is not set, the results will either be sorted by `created_at` in descending order for basic search, or by the most relevant documents when using advanced search.|
+| `order_by`    | string   | no         | Allowed values are `created_at` only. If this is not set, the results are either sorted by `created_at` in descending order for basic search, or by the most relevant documents when using advanced search.|
+| `sort`    | string   | no         | Allowed values are `asc` or `desc` only. If this is not set, the results are either sorted by `created_at` in descending order for basic search, or by the most relevant documents when using advanced search.|
 
 Search the expression within the specified scope. Currently these scopes are supported: issues, merge_requests, milestones, notes, wiki_blobs, commits, blobs, users.
 
@@ -1096,7 +1098,7 @@ Example response:
 ```
 
 NOTE:
-`filename` is deprecated in favor of `path`. Both return the full path of the file inside the repository, but in the future `filename` will be only the filename and not the full path. For details, see [issue 34521](https://gitlab.com/gitlab-org/gitlab/-/issues/34521).
+`filename` is deprecated in favor of `path`. Both return the full path of the file inside the repository, but in the future `filename` are intended to be only the filename and not the full path. For details, see [issue 34521](https://gitlab.com/gitlab-org/gitlab/-/issues/34521).
 
 ### Scope: commits **(PREMIUM)**
 
@@ -1178,7 +1180,7 @@ Example response:
 ```
 
 NOTE:
-`filename` is deprecated in favor of `path`. Both return the full path of the file inside the repository, but in the future `filename` will be only the filename and not the full path. For details, see [issue 34521](https://gitlab.com/gitlab-org/gitlab/-/issues/34521).
+`filename` is deprecated in favor of `path`. Both return the full path of the file inside the repository, but in the future `filename` is intended to be only the filename and not the full path. For details, see [issue 34521](https://gitlab.com/gitlab-org/gitlab/-/issues/34521).
 
 ### Scope: users
 

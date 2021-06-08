@@ -1,6 +1,6 @@
 ---
 stage: Verify
-group: Continuous Integration
+group: Pipeline Execution
 info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#assignments
 type: tutorial
 ---
@@ -26,7 +26,7 @@ depending on which trigger method is used.
 | `pipeline`                  | Using the `trigger:` keyword in the CI/CD configuration file, or using the trigger API with `$CI_JOB_TOKEN`. |
 | `trigger`                   | Using the trigger API using a generated trigger token |
 
-This also applies when using the `pipelines` or `triggers` keywords with the legacy [`only/except` basic syntax](../yaml/README.md#onlyexcept-basic).
+This also applies when using the `pipelines` or `triggers` keywords with the legacy [`only/except` basic syntax](../yaml/README.md#only--except).
 
 ### Trigger token
 
@@ -56,7 +56,7 @@ and it creates a dependent pipeline relation visible on the
 trigger_pipeline:
   stage: deploy
   script:
-    - curl --request POST --form "token=$CI_JOB_TOKEN" --form ref=master "https://gitlab.example.com/api/v4/projects/9/trigger/pipeline"
+    - curl --request POST --form "token=$CI_JOB_TOKEN" --form ref=main "https://gitlab.example.com/api/v4/projects/9/trigger/pipeline"
   only:
     - tags
 ```
@@ -81,7 +81,7 @@ build_submodule:
   stage: test
   script:
     - apt update && apt install -y unzip
-    - curl --location --output artifacts.zip "https://gitlab.example.com/api/v4/projects/1/jobs/artifacts/master/download?job=test&job_token=$CI_JOB_TOKEN"
+    - curl --location --output artifacts.zip "https://gitlab.example.com/api/v4/projects/1/jobs/artifacts/main/download?job=test&job_token=$CI_JOB_TOKEN"
     - unzip artifacts.zip
   only:
     - tags
@@ -140,21 +140,21 @@ By using cURL you can trigger a pipeline rerun with minimal effort, for example:
 ```shell
 curl --request POST \
      --form token=TOKEN \
-     --form ref=master \
+     --form ref=main \
      "https://gitlab.example.com/api/v4/projects/9/trigger/pipeline"
 ```
 
-In this case, the pipeline for the project with ID `9` runs on the `master` branch.
+In this case, the pipeline for the project with ID `9` runs on the `main` branch.
 
 Alternatively, you can pass the `token` and `ref` arguments in the query string:
 
 ```shell
 curl --request POST \
-    "https://gitlab.example.com/api/v4/projects/9/trigger/pipeline?token=TOKEN&ref=master"
+    "https://gitlab.example.com/api/v4/projects/9/trigger/pipeline?token=TOKEN&ref=main"
 ```
 
 You can also benefit by using triggers in your `.gitlab-ci.yml`. Let's say that
-you have two projects, A and B, and you want to trigger a pipeline on the `master`
+you have two projects, A and B, and you want to trigger a pipeline on the `main`
 branch of project B whenever a tag on project A is created. This is the job you
 need to add in project A's `.gitlab-ci.yml`:
 
@@ -162,7 +162,7 @@ need to add in project A's `.gitlab-ci.yml`:
 trigger_pipeline:
   stage: deploy
   script:
-    - 'curl --request POST --form token=TOKEN --form ref=master "https://gitlab.example.com/api/v4/projects/9/trigger/pipeline"'
+    - 'curl --request POST --form token=TOKEN --form ref=main "https://gitlab.example.com/api/v4/projects/9/trigger/pipeline"'
   only:
     - tags
 ```
@@ -178,7 +178,7 @@ To trigger a job from a webhook of another project you need to add the following
 webhook URL for Push and Tag events (change the project ID, ref and token):
 
 ```plaintext
-https://gitlab.example.com/api/v4/projects/9/ref/master/trigger/pipeline?token=TOKEN
+https://gitlab.example.com/api/v4/projects/9/ref/main/trigger/pipeline?token=TOKEN
 ```
 
 You should pass `ref` as part of the URL, to take precedence over `ref` from
@@ -188,37 +188,12 @@ source repository. Be sure to URL-encode `ref` if it contains slashes.
 ### Using webhook payload in the triggered pipeline
 
 > - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/31197) in GitLab 13.9.
-> - It's [deployed behind a feature flag](../../user/feature_flags.md), enabled by default.
-> - It's enabled on GitLab.com.
-> - It's recommended for production use.
-> - For GitLab self-managed instances, GitLab administrators can opt to [disable it](#enable-or-disable-the-trigger_payload-variable). **(FREE SELF)**
-
-WARNING:
-This feature might not be available to you. Check the **version history** note above for details.
+> - [Feature flag removed](https://gitlab.com/gitlab-org/gitlab/-/issues/321027) in GitLab 13.11.
 
 If you trigger a pipeline by using a webhook, you can access the webhook payload with
 the `TRIGGER_PAYLOAD` [predefined CI/CD variable](../variables/predefined_variables.md).
-The payload is exposed as a [file-type variable](../variables/README.md#custom-cicd-variables-of-type-file),
+The payload is exposed as a [file-type variable](../variables/README.md#cicd-variable-types),
 so you can access the data with `cat $TRIGGER_PAYLOAD` or a similar command.
-
-#### Enable or disable the `TRIGGER_PAYLOAD` variable
-
-The `TRIGGER_PAYLOAD` CI/CD variable is under development but ready for production use.
-It is deployed behind a feature flag that is **enabled by default**.
-[GitLab administrators with access to the GitLab Rails console](../../administration/feature_flags.md)
-can opt to disable it.
-
-To disable it:
-
-```ruby
-Feature.disable(:ci_trigger_payload_into_pipeline)
-```
-
-To enable it:
-
-```ruby
-Feature.enable(:ci_trigger_payload_into_pipeline)
-```
 
 ## Making use of trigger variables
 
@@ -275,22 +250,22 @@ and the script of the `upload_package` job is run:
 ```shell
 curl --request POST \
   --form token=TOKEN \
-  --form ref=master \
+  --form ref=main \
   --form "variables[UPLOAD_TO_S3]=true" \
   "https://gitlab.example.com/api/v4/projects/9/trigger/pipeline"
 ```
 
-Trigger variables have the [highest priority](../variables/README.md#priority-of-cicd-variables)
+Trigger variables have the [highest priority](../variables/README.md#cicd-variable-precedence)
 of all types of variables.
 
 ## Using cron to trigger nightly pipelines
 
 Whether you craft a script or just run cURL directly, you can trigger jobs
-in conjunction with cron. The example below triggers a job on the `master`
+in conjunction with cron. The example below triggers a job on the `main` branch
 branch of project with ID `9` every night at `00:30`:
 
 ```shell
-30 0 * * * curl --request POST --form token=TOKEN --form ref=master "https://gitlab.example.com/api/v4/projects/9/trigger/pipeline"
+30 0 * * * curl --request POST --form token=TOKEN --form ref=main "https://gitlab.example.com/api/v4/projects/9/trigger/pipeline"
 ```
 
 This behavior can also be achieved through the GitLab UI with

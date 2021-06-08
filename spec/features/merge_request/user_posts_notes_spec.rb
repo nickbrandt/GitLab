@@ -6,6 +6,7 @@ RSpec.describe 'Merge request > User posts notes', :js do
   include NoteInteractionHelpers
 
   let_it_be(:project) { create(:project, :repository) }
+
   let(:user) { project.creator }
   let(:merge_request) do
     create(:merge_request, source_project: project, target_project: project)
@@ -173,7 +174,7 @@ RSpec.describe 'Merge request > User posts notes', :js do
       it 'allows using markdown buttons after saving a note and then trying to edit it again' do
         page.within('.current-note-edit-form') do
           fill_in 'note[note]', with: 'This is the new content'
-          find('.btn-success').click
+          find('.btn-confirm').click
         end
 
         find('.note').hover
@@ -182,16 +183,16 @@ RSpec.describe 'Merge request > User posts notes', :js do
         find('.js-note-edit').click
 
         page.within('.current-note-edit-form') do
-          expect(find('#note_note').value).to include('This is the new content')
+          expect(find_field('note[note]').value).to include('This is the new content')
           first('.js-md').click
-          expect(find('#note_note').value).to include('This is the new content****')
+          expect(find_field('note[note]').value).to include('This is the new content****')
         end
       end
 
       it 'appends the edited at time to the note' do
         page.within('.current-note-edit-form') do
           fill_in 'note[note]', with: 'Some new content'
-          find('.btn-success').click
+          find('.btn-confirm').click
         end
 
         page.within("#note_#{note.id}") do

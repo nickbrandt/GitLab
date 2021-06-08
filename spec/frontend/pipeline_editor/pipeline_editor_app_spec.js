@@ -9,7 +9,8 @@ import TextEditor from '~/pipeline_editor/components/editor/text_editor.vue';
 
 import PipelineEditorTabs from '~/pipeline_editor/components/pipeline_editor_tabs.vue';
 import PipelineEditorEmptyState from '~/pipeline_editor/components/ui/pipeline_editor_empty_state.vue';
-import { COMMIT_SUCCESS, COMMIT_FAILURE, LOAD_FAILURE_UNKNOWN } from '~/pipeline_editor/constants';
+import PipelineEditorMessages from '~/pipeline_editor/components/ui/pipeline_editor_messages.vue';
+import { COMMIT_SUCCESS, COMMIT_FAILURE } from '~/pipeline_editor/constants';
 import getCiConfigData from '~/pipeline_editor/graphql/queries/ci_config.graphql';
 import PipelineEditorApp from '~/pipeline_editor/pipeline_editor_app.vue';
 import PipelineEditorHome from '~/pipeline_editor/pipeline_editor_home.vue';
@@ -53,6 +54,7 @@ describe('Pipeline editor app component', () => {
         CommitForm,
         PipelineEditorHome,
         PipelineEditorTabs,
+        PipelineEditorMessages,
         EditorLite: MockEditorLite,
         PipelineEditorEmptyState,
       },
@@ -72,7 +74,7 @@ describe('Pipeline editor app component', () => {
     });
   };
 
-  const createComponentWithApollo = ({ props = {}, provide = {} } = {}) => {
+  const createComponentWithApollo = async ({ props = {}, provide = {} } = {}) => {
     const handlers = [[getCiConfigData, mockCiConfigData]];
     const resolvers = {
       Query: {
@@ -89,11 +91,18 @@ describe('Pipeline editor app component', () => {
 
     const options = {
       localVue,
+      data() {
+        return {
+          currentBranch: mockDefaultBranch,
+        };
+      },
       mocks: {},
       apolloProvider: mockApollo,
     };
 
     createComponent({ props, provide, options });
+
+    return waitForPromises();
   };
 
   const findLoadingIcon = () => wrapper.findComponent(GlLoadingIcon);
@@ -110,17 +119,16 @@ describe('Pipeline editor app component', () => {
   });
 
   afterEach(() => {
-    mockBlobContentData.mockReset();
-    mockCiConfigData.mockReset();
-
     wrapper.destroy();
   });
 
-  it('displays a loading icon if the blob query is loading', () => {
-    createComponent({ blobLoading: true });
+  describe('loading state', () => {
+    it('displays a loading icon if the blob query is loading', () => {
+      createComponent({ blobLoading: true });
 
-    expect(findLoadingIcon().exists()).toBe(true);
-    expect(findTextEditor().exists()).toBe(false);
+      expect(findLoadingIcon().exists()).toBe(true);
+      expect(findTextEditor().exists()).toBe(false);
+    });
   });
 
   describe('when queries are called', () => {
@@ -131,9 +139,7 @@ describe('Pipeline editor app component', () => {
 
     describe('when file exists', () => {
       beforeEach(async () => {
-        createComponentWithApollo();
-
-        await waitForPromises();
+        await createComponentWithApollo();
       });
 
       it('shows pipeline editor home component', () => {
@@ -145,10 +151,6 @@ describe('Pipeline editor app component', () => {
       });
 
       it('ci config query is called with correct variables', async () => {
-        createComponentWithApollo();
-
-        await waitForPromises();
-
         expect(mockCiConfigData).toHaveBeenCalledWith({
           content: mockCiYml,
           projectPath: mockProjectFullPath,
@@ -164,9 +166,7 @@ describe('Pipeline editor app component', () => {
               status: httpStatusCodes.BAD_REQUEST,
             },
           });
-          createComponentWithApollo();
-
-          await waitForPromises();
+          await createComponentWithApollo();
 
           expect(findEmptyState().exists()).toBe(true);
           expect(findAlert().exists()).toBe(false);
@@ -181,9 +181,7 @@ describe('Pipeline editor app component', () => {
               status: httpStatusCodes.NOT_FOUND,
             },
           });
-          createComponentWithApollo();
-
-          await waitForPromises();
+          await createComponentWithApollo();
 
           expect(findEmptyState().exists()).toBe(true);
           expect(findAlert().exists()).toBe(false);
@@ -193,12 +191,14 @@ describe('Pipeline editor app component', () => {
 
       describe('because of a fetching error', () => {
         it('shows a unkown error message', async () => {
+          const loadUnknownFailureText = 'The CI configuration was not loaded, please try again.';
+
           mockBlobContentData.mockRejectedValueOnce(new Error('My error!'));
-          createComponentWithApollo();
-          await waitForPromises();
+          await createComponentWithApollo();
 
           expect(findEmptyState().exists()).toBe(false);
-          expect(findAlert().text()).toBe(wrapper.vm.$options.errorTexts[LOAD_FAILURE_UNKNOWN]);
+
+          expect(findAlert().text()).toBe(loadUnknownFailureText);
           expect(findEditorHome().exists()).toBe(true);
         });
       });
@@ -212,15 +212,13 @@ describe('Pipeline editor app component', () => {
           },
         });
 
-        createComponentWithApollo({
+        await createComponentWithApollo({
           provide: {
             glFeatures: {
               pipelineEditorEmptyStateAction: true,
             },
           },
         });
-
-        await waitForPromises();
 
         expect(findEmptyState().exists()).toBe(true);
         expect(findTextEditor().exists()).toBe(false);
@@ -234,6 +232,7 @@ describe('Pipeline editor app component', () => {
 
     describe('when the user commits', () => {
       const updateFailureMessage = 'The GitLab CI configuration could not be updated.';
+      const updateSuccessMessage = 'Your changes have been successfully committed.';
 
       describe('and the commit mutation succeeds', () => {
         beforeEach(() => {
@@ -244,7 +243,7 @@ describe('Pipeline editor app component', () => {
         });
 
         it('shows a confirmation message', () => {
-          expect(findAlert().text()).toBe(wrapper.vm.$options.successTexts[COMMIT_SUCCESS]);
+          expect(findAlert().text()).toBe(updateSuccessMessage);
         });
 
         it('scrolls to the top of the page to bring attention to the confirmation message', () => {
@@ -254,9 +253,9 @@ describe('Pipeline editor app component', () => {
       describe('and the commit mutation fails', () => {
         const commitFailedReasons = ['Commit failed'];
 
-        beforeEach(() => {
+        beforeEach(async () => {
           window.scrollTo = jest.fn();
-          createComponent();
+          await createComponentWithApollo();
 
           findEditorHome().vm.$emit('showError', {
             type: COMMIT_FAILURE,
@@ -278,9 +277,9 @@ describe('Pipeline editor app component', () => {
       describe('when an unknown error occurs', () => {
         const unknownReasons = ['Commit failed'];
 
-        beforeEach(() => {
+        beforeEach(async () => {
           window.scrollTo = jest.fn();
-          createComponent();
+          await createComponentWithApollo();
 
           findEditorHome().vm.$emit('showError', {
             type: COMMIT_FAILURE,
@@ -298,6 +297,39 @@ describe('Pipeline editor app component', () => {
           expect(window.scrollTo).toHaveBeenCalledWith({ top: 0, behavior: 'smooth' });
         });
       });
+    });
+  });
+
+  describe('when refetching content', () => {
+    it('refetches blob content', async () => {
+      await createComponentWithApollo();
+      jest
+        .spyOn(wrapper.vm.$apollo.queries.initialCiFileContent, 'refetch')
+        .mockImplementation(jest.fn());
+
+      expect(wrapper.vm.$apollo.queries.initialCiFileContent.refetch).toHaveBeenCalledTimes(0);
+
+      await wrapper.vm.refetchContent();
+
+      expect(wrapper.vm.$apollo.queries.initialCiFileContent.refetch).toHaveBeenCalledTimes(1);
+    });
+
+    it('hides start screen when refetch fetches CI file', async () => {
+      mockBlobContentData.mockRejectedValue({
+        response: {
+          status: httpStatusCodes.NOT_FOUND,
+        },
+      });
+      await createComponentWithApollo();
+
+      expect(findEmptyState().exists()).toBe(true);
+      expect(findEditorHome().exists()).toBe(false);
+
+      mockBlobContentData.mockResolvedValue(mockCiYml);
+      await wrapper.vm.$apollo.queries.initialCiFileContent.refetch();
+
+      expect(findEmptyState().exists()).toBe(false);
+      expect(findEditorHome().exists()).toBe(true);
     });
   });
 });

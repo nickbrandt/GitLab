@@ -21,6 +21,7 @@ RSpec.describe Clusters::Cluster, :use_clean_rails_memory_store_caching do
   it { is_expected.to have_one(:provider_gcp) }
   it { is_expected.to have_one(:provider_aws) }
   it { is_expected.to have_one(:platform_kubernetes) }
+  it { is_expected.to have_one(:integration_prometheus) }
   it { is_expected.to have_one(:application_helm) }
   it { is_expected.to have_one(:application_ingress) }
   it { is_expected.to have_one(:application_prometheus) }
@@ -40,9 +41,9 @@ RSpec.describe Clusters::Cluster, :use_clean_rails_memory_store_caching do
   it { is_expected.to delegate_method(:rbac?).to(:platform_kubernetes).with_prefix }
   it { is_expected.to delegate_method(:available?).to(:application_helm).with_prefix }
   it { is_expected.to delegate_method(:available?).to(:application_ingress).with_prefix }
-  it { is_expected.to delegate_method(:available?).to(:application_prometheus).with_prefix }
   it { is_expected.to delegate_method(:available?).to(:application_knative).with_prefix }
-  it { is_expected.to delegate_method(:available?).to(:application_elastic_stack).with_prefix }
+  it { is_expected.to delegate_method(:available?).to(:integration_elastic_stack).with_prefix }
+  it { is_expected.to delegate_method(:available?).to(:integration_prometheus).with_prefix }
   it { is_expected.to delegate_method(:external_ip).to(:application_ingress).with_prefix }
   it { is_expected.to delegate_method(:external_hostname).to(:application_ingress).with_prefix }
 
@@ -1344,6 +1345,58 @@ RSpec.describe Clusters::Cluster, :use_clean_rails_memory_store_caching do
             .once
 
           subject
+        end
+      end
+    end
+  end
+
+  describe '#integration_prometheus_available?' do
+    let_it_be_with_reload(:cluster) { create(:cluster, :project) }
+
+    subject { cluster.integration_prometheus_available? }
+
+    it { is_expected.to be_falsey }
+
+    context 'when integration is enabled' do
+      let!(:integration) { create(:clusters_integrations_prometheus, cluster: cluster) }
+
+      it { is_expected.to be_truthy }
+    end
+
+    context 'when integration is disabled' do
+      let!(:integration) { create(:clusters_integrations_prometheus, enabled: false, cluster: cluster) }
+
+      it { is_expected.to be_falsey }
+    end
+  end
+
+  describe '#prometheus_adapter' do
+    let_it_be_with_reload(:cluster) { create(:cluster, :project) }
+
+    it 'returns nothing' do
+      expect(cluster.prometheus_adapter).to be_nil
+    end
+
+    context 'has integration_prometheus' do
+      let_it_be(:integration) { create(:clusters_integrations_prometheus, cluster: cluster) }
+
+      it 'returns the integration' do
+        expect(cluster.prometheus_adapter).to eq(integration)
+      end
+    end
+
+    context 'has application_prometheus' do
+      let_it_be(:application) { create(:clusters_applications_prometheus, :no_helm_installed, cluster: cluster) }
+
+      it 'returns nil' do
+        expect(cluster.prometheus_adapter).to be_nil
+      end
+
+      context 'also has a integration_prometheus' do
+        let_it_be(:integration) { create(:clusters_integrations_prometheus, cluster: cluster) }
+
+        it 'returns the integration' do
+          expect(cluster.prometheus_adapter).to eq(integration)
         end
       end
     end

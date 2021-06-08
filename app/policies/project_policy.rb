@@ -108,7 +108,8 @@ class ProjectPolicy < BasePolicy
   condition(:service_desk_enabled) { @subject.service_desk_enabled? }
 
   with_scope :subject
-  condition(:resource_access_token_available) { resource_access_token_available? }
+  condition(:resource_access_token_feature_available) { resource_access_token_feature_available? }
+  condition(:resource_access_token_creation_allowed) { resource_access_token_creation_allowed? }
 
   # We aren't checking `:read_issue` or `:read_merge_request` in this case
   # because it could be possible for a user to see an issuable-iid
@@ -170,6 +171,7 @@ class ProjectPolicy < BasePolicy
   rule { guest | admin }.enable :read_project_for_iids
 
   rule { admin }.enable :update_max_artifacts_size
+  rule { admin }.enable :read_storage_disk_path
   rule { can?(:read_all_resources) }.enable :read_confidential_issues
 
   rule { guest }.enable :guest_access
@@ -225,6 +227,8 @@ class ProjectPolicy < BasePolicy
     enable :read_insights
   end
 
+  rule { can?(:guest_access) & can?(:create_issue) }.enable :create_incident
+
   # These abilities are not allowed to admins that are not members of the project,
   # that's why they are defined separately.
   rule { guest & can?(:download_code) }.enable :build_download_code
@@ -234,6 +238,7 @@ class ProjectPolicy < BasePolicy
     enable :admin_issue_board
     enable :download_code
     enable :read_statistics
+    enable :daily_statistics
     enable :download_wiki_code
     enable :create_snippet
     enable :update_issue
@@ -342,7 +347,6 @@ class ProjectPolicy < BasePolicy
     enable :update_deployment
     enable :create_release
     enable :update_release
-    enable :daily_statistics
     enable :create_metrics_dashboard_annotation
     enable :delete_metrics_dashboard_annotation
     enable :update_metrics_dashboard_annotation
@@ -631,11 +635,18 @@ class ProjectPolicy < BasePolicy
 
   rule { project_bot }.enable :project_bot_access
 
-  rule { resource_access_token_available & can?(:admin_project) }.policy do
-    enable :admin_resource_access_tokens
+  rule { can?(:admin_project) & resource_access_token_feature_available }.policy do
+    enable :read_resource_access_tokens
+    enable :destroy_resource_access_tokens
   end
 
-  rule { can?(:project_bot_access) }.prevent :admin_resource_access_tokens
+  rule { can?(:read_resource_access_tokens) & resource_access_token_creation_allowed }.policy do
+    enable :create_resource_access_tokens
+  end
+
+  rule { can?(:project_bot_access) }.policy do
+    prevent :create_resource_access_tokens
+  end
 
   rule { user_defined_variables_allowed | can?(:maintainer_access) }.policy do
     enable :set_pipeline_variables
@@ -719,8 +730,16 @@ class ProjectPolicy < BasePolicy
     end
   end
 
-  def resource_access_token_available?
+  def resource_access_token_feature_available?
     true
+  end
+
+  def resource_access_token_creation_allowed?
+    group = project.group
+
+    return true unless group # always enable for projects in personal namespaces
+
+    resource_access_token_feature_available? && group.root_ancestor.namespace_settings.resource_access_token_creation_allowed?
   end
 
   def project
@@ -728,4 +747,4 @@ class ProjectPolicy < BasePolicy
   end
 end
 
-ProjectPolicy.prepend_if_ee('EE::ProjectPolicy')
+ProjectPolicy.prepend_mod_with('ProjectPolicy')

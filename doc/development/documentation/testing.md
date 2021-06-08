@@ -20,7 +20,7 @@ For the specifics of each test run in our CI/CD pipelines, see the configuration
 in the relevant projects:
 
 - <https://gitlab.com/gitlab-org/gitlab/-/blob/master/.gitlab/ci/docs.gitlab-ci.yml>
-- <https://gitlab.com/gitlab-org/gitlab-runner/-/blob/master/.gitlab/ci/docs.gitlab-ci.yml>
+- <https://gitlab.com/gitlab-org/gitlab-runner/-/blob/main/.gitlab/ci/docs.gitlab-ci.yml>
 - <https://gitlab.com/gitlab-org/omnibus-gitlab/-/blob/master/gitlab-ci-config/gitlab-com.yml>
 - <https://gitlab.com/gitlab-org/charts/gitlab/-/blob/master/.gitlab-ci.yml>
 
@@ -150,11 +150,11 @@ from those guidelines.
 
 markdownlint configuration is found in the following projects:
 
-- [`gitlab`](https://gitlab.com/gitlab-org/gitlab/blob/master/.markdownlint.json)
-- [`gitlab-runner`](https://gitlab.com/gitlab-org/gitlab-runner/blob/master/.markdownlint.json)
-- [`omnibus-gitlab`](https://gitlab.com/gitlab-org/omnibus-gitlab/blob/master/.markdownlint.json)
-- [`charts`](https://gitlab.com/gitlab-org/charts/gitlab/-/blob/master/.markdownlint.json)
-- [`gitlab-development-kit`](https://gitlab.com/gitlab-org/gitlab-development-kit/-/blob/master/.markdownlint.json)
+- [`gitlab`](https://gitlab.com/gitlab-org/gitlab)
+- [`gitlab-runner`](https://gitlab.com/gitlab-org/gitlab-runner)
+- [`omnibus-gitlab`](https://gitlab.com/gitlab-org/omnibus-gitlab)
+- [`charts`](https://gitlab.com/gitlab-org/charts/gitlab)
+- [`gitlab-development-kit`](https://gitlab.com/gitlab-org/gitlab-development-kit)
 
 This configuration is also used in build pipelines.
 
@@ -166,7 +166,7 @@ You can use markdownlint:
 
 ### Vale
 
-[Vale](https://errata-ai.gitbook.io/vale/) is a grammar, style, and word usage linter for the
+[Vale](https://docs.errata.ai/vale/about/) is a grammar, style, and word usage linter for the
 English language. Vale's configuration is stored in the
 [`.vale.ini`](https://gitlab.com/gitlab-org/gitlab/blob/master/.vale.ini) file located in the root
 directory of projects.
@@ -178,7 +178,7 @@ documentation directory of projects.
 You can find Vale configuration in the following projects:
 
 - [`gitlab`](https://gitlab.com/gitlab-org/gitlab/-/tree/master/doc/.vale/gitlab)
-- [`gitlab-runner`](https://gitlab.com/gitlab-org/gitlab-runner/-/tree/master/docs/.vale/gitlab)
+- [`gitlab-runner`](https://gitlab.com/gitlab-org/gitlab-runner/-/tree/main/docs/.vale/gitlab)
 - [`omnibus-gitlab`](https://gitlab.com/gitlab-org/omnibus-gitlab/-/tree/master/doc/.vale/gitlab)
 - [`charts`](https://gitlab.com/gitlab-org/charts/gitlab/-/tree/master/doc/.vale/gitlab)
 - [`gitlab-development-kit`](https://gitlab.com/gitlab-org/gitlab-development-kit/-/tree/master/doc/.vale/gitlab)
@@ -188,7 +188,7 @@ This configuration is also used in build pipelines, where
 
 You can use Vale:
 
-- [On the command line](https://errata-ai.gitbook.io/vale/getting-started/usage).
+- [On the command line](https://docs.errata.ai/vale/cli).
 - [In a code editor](#configure-editors).
 - [In a Git hook](#configure-pre-push-hooks). Vale only reports errors in the Git hook (the same
   configuration as the CI/CD pipelines), and does not report suggestions or warnings.
@@ -222,7 +222,7 @@ build pipelines:
    ```
 
    We recommend installing the version of `markdownlint-cli`
-   [used](https://gitlab.com/gitlab-org/gitlab-docs/-/blob/master/.gitlab-ci.yml#L447) when building
+   [used (see `variables:` section)](https://gitlab.com/gitlab-org/gitlab-docs/-/blob/main/.gitlab-ci.yml) when building
    the `image:docs-lint-markdown`.
 
 1. Install [`vale`](https://github.com/errata-ai/vale/releases). For example, to install using
@@ -240,7 +240,7 @@ It's important to use linter versions that are the same or newer than those run 
 CI/CD. This provides access to new features and possible bug fixes.
 
 To match the versions of `markdownlint-cli` and `vale` used in the GitLab projects, refer to the
-[versions used](https://gitlab.com/gitlab-org/gitlab-docs/-/blob/master/.gitlab-ci.yml#L447)
+[versions used (see `variables:` section)](https://gitlab.com/gitlab-org/gitlab-docs/-/blob/main/.gitlab-ci.yml)
 when building the `image:docs-lint-markdown` Docker image containing these tools for CI/CD.
 
 | Tool               | Version   | Command                                   | Additional information |
@@ -333,4 +333,4 @@ document:
 Whenever possible, exclude only the problematic rule and line(s).
 
 For more information, see
-[Vale's documentation](https://errata-ai.gitbook.io/vale/getting-started/markup#markup-based-configuration).
+[Vale's documentation](https://docs.errata.ai/vale/scoping#markup-based-configuration).

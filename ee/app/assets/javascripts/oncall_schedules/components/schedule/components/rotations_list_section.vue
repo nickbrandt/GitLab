@@ -6,12 +6,10 @@ import {
   GlTooltipDirective,
   GlModalDirective,
 } from '@gitlab/ui';
-import DeleteRotationModal from 'ee/oncall_schedules/components/rotations/components/delete_rotation_modal.vue';
 import ScheduleShiftWrapper from 'ee/oncall_schedules/components/schedule/components/shifts/components/schedule_shift_wrapper.vue';
 import {
   editRotationModalId,
   deleteRotationModalId,
-  PRESET_TYPES,
   TIMELINE_CELL_WIDTH,
 } from 'ee/oncall_schedules/constants';
 import { s__ } from '~/locale';
@@ -32,7 +30,6 @@ export default {
     GlButtonGroup,
     GlLoadingIcon,
     CurrentDayIndicator,
-    DeleteRotationModal,
     ScheduleShiftWrapper,
   },
   directives: {
@@ -40,6 +37,11 @@ export default {
     GlTooltip: GlTooltipDirective,
   },
   props: {
+    loading: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
     presetType: {
       type: String,
       required: true,
@@ -48,18 +50,13 @@ export default {
       type: Array,
       required: true,
     },
-    timeframe: {
-      type: Array,
-      required: true,
-    },
     scheduleIid: {
       type: String,
       required: true,
     },
-    loading: {
-      type: Boolean,
-      required: false,
-      default: false,
+    timeframe: {
+      type: Array,
+      required: true,
     },
   },
   data() {
@@ -68,33 +65,22 @@ export default {
     };
   },
   computed: {
-    presetIsDay() {
-      return this.presetType === PRESET_TYPES.DAYS;
+    editRotationModalId() {
+      return `${this.$options.editRotationModalId}-${this.scheduleIid}`;
     },
-    timeframeToDraw() {
-      if (this.presetIsDay) {
-        return [this.timeframe[0]];
-      }
-
-      return this.timeframe;
+    deleteRotationModalId() {
+      return `${this.$options.deleteRotationModalId}-${this.scheduleIid}`;
     },
     timelineStyles() {
-      const length = this.presetIsDay ? 1 : 2;
-
       return {
-        width: `calc((${100}% - ${TIMELINE_CELL_WIDTH}px) / ${length})`,
+        width: `calc(${100}% - ${TIMELINE_CELL_WIDTH}px)`,
       };
     },
   },
   methods: {
     setRotationToUpdate(rotation) {
       this.rotationToUpdate = rotation;
-    },
-    cellShouldHideOverflow(index) {
-      return index + 1 === this.timeframe.length || this.presetIsDay;
-    },
-    timeframeItemUniqueKey(timeframeItem) {
-      return timeframeItem.valueOf();
+      this.$emit('set-rotation-to-update', rotation);
     },
   },
 };
@@ -107,16 +93,18 @@ export default {
       <span
         class="details-cell gl-display-flex gl-justify-content-space-between gl-align-items-center gl-pl-3"
       >
-        <span class="gl-text-truncated">{{ $options.i18n.addRotationLabel }}</span>
+        <span class="gl-text-truncate">{{ $options.i18n.addRotationLabel }}</span>
       </span>
       <span
-        v-for="(timeframeItem, index) in timeframeToDraw"
-        :key="index"
-        class="timeline-cell gl-border-b-solid gl-border-b-gray-100 gl-border-b-1"
+        class="timeline-cell gl-border-b-solid gl-border-b-gray-100 gl-border-b-1 gl-overflow-hidden"
         :style="timelineStyles"
         data-testid="empty-timeline-cell"
       >
-        <current-day-indicator :preset-type="presetType" :timeframe-item="timeframeItem" />
+        <current-day-indicator
+          :preset-type="presetType"
+          :timeframe-item="timeframe[0]"
+          :timeline-width="2"
+        />
       </span>
     </div>
     <div v-else>
@@ -124,13 +112,17 @@ export default {
         <span
           class="details-cell gl-display-flex gl-justify-content-space-between gl-align-items-center gl-pl-3"
         >
-          <span class="gl-text-truncated">{{ rotation.name }}</span>
+          <span
+            v-gl-tooltip="{ boundary: 'viewport', title: rotation.name }"
+            class="gl-text-truncate"
+            :aria-label="rotation.name"
+            :data-testid="`rotation-name-${rotation.id}`"
+            >{{ rotation.name }}</span
+          >
           <gl-button-group class="gl-px-2">
-            <!-- TODO: Un-hide this button when: https://gitlab.com/gitlab-org/gitlab/-/issues/262862 is completed -->
             <gl-button
-              v-gl-modal="$options.editRotationModalId"
+              v-gl-modal="editRotationModalId"
               v-gl-tooltip
-              class="gl-display-none"
               category="tertiary"
               :title="$options.i18n.editRotationLabel"
               icon="pencil"
@@ -138,7 +130,7 @@ export default {
               @click="setRotationToUpdate(rotation)"
             />
             <gl-button
-              v-gl-modal="$options.deleteRotationModalId"
+              v-gl-modal="deleteRotationModalId"
               v-gl-tooltip
               category="tertiary"
               :title="$options.i18n.deleteRotationLabel"
@@ -149,29 +141,23 @@ export default {
           </gl-button-group>
         </span>
         <span
-          v-for="(timeframeItem, index) in timeframeToDraw"
-          :key="timeframeItemUniqueKey(timeframeItem)"
-          class="timeline-cell gl-border-b-solid gl-border-b-gray-100 gl-border-b-1"
-          :class="{ 'gl-overflow-hidden': cellShouldHideOverflow(index) }"
+          class="timeline-cell gl-border-b-solid gl-border-b-gray-100 gl-border-b-1 gl-overflow-hidden"
           :style="timelineStyles"
           data-testid="timeline-cell"
         >
-          <current-day-indicator :preset-type="presetType" :timeframe-item="timeframeItem" />
+          <current-day-indicator
+            :preset-type="presetType"
+            :timeframe-item="timeframe[0]"
+            :timeline-width="2"
+          />
           <schedule-shift-wrapper
             v-if="rotation.shifts"
             :preset-type="presetType"
-            :timeframe-item="timeframeItem"
             :timeframe="timeframe"
             :rotation="rotation"
           />
         </span>
       </div>
     </div>
-    <delete-rotation-modal
-      :rotation="rotationToUpdate"
-      :schedule-iid="scheduleIid"
-      :modal-id="$options.deleteRotationModalId"
-      @set-rotation-to-update="setRotationToUpdate"
-    />
   </div>
 </template>

@@ -1,11 +1,11 @@
 ---
 stage: Verify
-group: Continuous Integration
+group: Pipeline Execution
 info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#assignments
 type: reference
 ---
 
-# Pipeline Efficiency
+# Pipeline efficiency **(FREE)**
 
 [CI/CD Pipelines](index.md) are the fundamental building blocks for [GitLab CI/CD](../README.md).
 Making pipelines more efficient helps you save developer time, which:
@@ -109,6 +109,8 @@ for Prometheus fetches metrics from the API and pipeline events. It can check br
 and get the pipeline status and duration. In combination with a Grafana dashboard,
 this helps build an actionable view for your operations team. Metric graphs can also
 be embedded into incidents making problem resolving easier. Additionally, it can also export metrics about jobs and environments.
+
+If you use the GitLab CI Pipelines Exporter, you should start with the [example configuration](https://github.com/mvisonneau/gitlab-ci-pipelines-exporter/blob/main/docs/configuration_syntax.md).
 
 ![Grafana Dashboard for GitLab CI Pipelines Prometheus Exporter](img/ci_efficiency_pipeline_health_grafana_dashboard.png)
 

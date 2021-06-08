@@ -9,7 +9,9 @@ module Search
     attr_accessor :project, :current_user, :params
 
     def initialize(project, user, params)
-      @project, @current_user, @params = project, user, params.dup
+      @project = project
+      @current_user = user
+      @params = params.dup
     end
 
     def execute
@@ -35,4 +37,4 @@ module Search
   end
 end
 
-Search::ProjectService.prepend_if_ee('EE::Search::ProjectService')
+Search::ProjectService.prepend_mod_with('Search::ProjectService')

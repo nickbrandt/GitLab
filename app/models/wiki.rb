@@ -88,7 +88,7 @@ class Wiki
     repository.create_if_not_exists
 
     raise CouldNotCreateWikiError unless repository_exists?
-  rescue => err
+  rescue StandardError => err
     Gitlab::ErrorTracking.track_exception(err, wiki: {
       container_type: container.class.name,
       container_id: container.id,
@@ -159,8 +159,13 @@ class Wiki
     find_page(SIDEBAR, version)
   end
 
-  def find_file(name, version = nil)
-    wiki.file(name, version)
+  def find_file(name, version = 'HEAD', load_content: true)
+    data_limit = load_content ? -1 : 0
+    blobs = repository.blobs_at([[version, name]], blob_size_limit: data_limit)
+
+    return if blobs.empty?
+
+    Gitlab::Git::WikiFile.new(blobs.first)
   end
 
   def create_page(title, content, format = :markdown, message = nil)
@@ -187,10 +192,13 @@ class Wiki
   def delete_page(page, message = nil)
     return unless page
 
-    wiki.delete_page(page.path, commit_details(:deleted, message, page.title))
-    after_wiki_activity
+    capture_git_error(:deleted) do
+      repository.delete_file(user, page.path, **multi_commit_options(:deleted, message, page.title))
 
-    true
+      after_wiki_activity
+
+      true
+    end
   end
 
   def page_title_and_dir(title)
@@ -267,8 +275,20 @@ class Wiki
 
   private
 
+  def multi_commit_options(action, message = nil, title = nil)
+    commit_message = build_commit_message(action, message, title)
+    git_user = Gitlab::Git::User.from_gitlab(user)
+
+    {
+      branch_name: repository.root_ref,
+      message: commit_message,
+      author_email: git_user.email,
+      author_name: git_user.name
+    }
+  end
+
   def commit_details(action, message = nil, title = nil)
-    commit_message = message.presence || default_message(action, title)
+    commit_message = build_commit_message(action, message, title)
     git_user = Gitlab::Git::User.from_gitlab(user)
 
     Gitlab::Git::Wiki::CommitDetails.new(user.id,
@@ -278,9 +298,26 @@ class Wiki
                                          commit_message)
   end
 
+  def build_commit_message(action, message, title)
+    message.presence || default_message(action, title)
+  end
+
   def default_message(action, title)
     "#{user.username} #{action} page: #{title}"
   end
+
+  def capture_git_error(action, &block)
+    yield block
+  rescue Gitlab::Git::Index::IndexError,
+         Gitlab::Git::CommitError,
+         Gitlab::Git::PreReceiveError,
+         Gitlab::Git::CommandError,
+         ArgumentError => error
+
+    Gitlab::ErrorTracking.log_exception(error, action: action, wiki_id: id)
+
+    false
+  end
 end
 
-Wiki.prepend_if_ee('EE::Wiki')
+Wiki.prepend_mod_with('Wiki')

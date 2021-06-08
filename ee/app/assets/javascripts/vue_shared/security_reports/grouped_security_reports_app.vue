@@ -3,7 +3,6 @@ import { GlButton, GlSprintf, GlLink, GlModalDirective } from '@gitlab/ui';
 import { once } from 'lodash';
 import { mapActions, mapState, mapGetters } from 'vuex';
 import { componentNames } from 'ee/reports/components/issue_body';
-import FuzzingArtifactsDownload from 'ee/security_dashboard/components/fuzzing_artifacts_download.vue';
 import { fetchPolicies } from '~/lib/graphql';
 import { mrStates } from '~/mr_popover/constants';
 import GroupedIssuesList from '~/reports/components/grouped_issues_list.vue';
@@ -12,7 +11,7 @@ import SummaryRow from '~/reports/components/summary_row.vue';
 import { LOADING } from '~/reports/constants';
 import Tracking from '~/tracking';
 import SecuritySummary from '~/vue_shared/security_reports/components/security_summary.vue';
-import ArtifactDownload from './components/artifact_download.vue';
+import MrArtifactDownload from './components/artifact_downloads/merge_request_artifact_download.vue';
 import DastModal from './components/dast_modal.vue';
 import IssueModal from './components/modal.vue';
 import { securityReportTypeEnumToReportType } from './constants';
@@ -34,7 +33,7 @@ import {
 export default {
   store: createStore(),
   components: {
-    ArtifactDownload,
+    MrArtifactDownload,
     GroupedIssuesList,
     ReportSection,
     SummaryRow,
@@ -44,7 +43,6 @@ export default {
     GlLink,
     DastModal,
     GlButton,
-    FuzzingArtifactsDownload,
   },
   directives: {
     'gl-modal': GlModalDirective,
@@ -277,7 +275,6 @@ export default {
       'secretDetectionStatusIcon',
     ]),
     ...mapGetters(MODULE_API_FUZZING, ['groupedApiFuzzingText', 'apiFuzzingStatusIcon']),
-    ...mapGetters('pipelineJobs', ['hasFuzzingArtifacts', 'fuzzingJobsWithArtifact']),
     securityTab() {
       return `${this.pipelinePath}/security`;
     },
@@ -447,7 +444,10 @@ export default {
     },
   },
   summarySlots: ['success', 'error', 'loading'],
-  reportTypes: securityReportTypeEnumToReportType,
+  reportTypes: {
+    API_FUZZING: [securityReportTypeEnumToReportType.API_FUZZING],
+    COVERAGE_FUZZING: [securityReportTypeEnumToReportType.COVERAGE_FUZZING],
+  },
 };
 </script>
 <template>
@@ -457,6 +457,7 @@ export default {
     :should-emit-toggle-event="true"
     class="mr-widget-border-top grouped-security-reports mr-report"
     data-qa-selector="vulnerability_report_grouped"
+    track-action="users_expanding_security_report"
     @toggleEvent="handleToggleEvent"
   >
     <template v-for="slot in $options.summarySlots" #[slot]>
@@ -513,6 +514,7 @@ export default {
       <div class="mr-widget-grouped-section report-block">
         <template v-if="hasSastReports">
           <summary-row
+            :nested-summary="true"
             :status-icon="sastStatusIcon"
             :popover-options="sastPopover"
             class="js-sast-widget"
@@ -525,6 +527,7 @@ export default {
 
           <grouped-issues-list
             v-if="hasSastIssues"
+            :nested-level="2"
             :unresolved-issues="sast.newIssues"
             :resolved-issues="sast.resolvedIssues"
             :component="$options.componentNames.SecurityIssueBody"
@@ -534,6 +537,7 @@ export default {
 
         <template v-if="hasDependencyScanningReports">
           <summary-row
+            :nested-summary="true"
             :status-icon="dependencyScanningStatusIcon"
             :popover-options="dependencyScanningPopover"
             class="js-dependency-scanning-widget"
@@ -546,6 +550,7 @@ export default {
 
           <grouped-issues-list
             v-if="hasDependencyScanningIssues"
+            :nested-level="2"
             :unresolved-issues="dependencyScanning.newIssues"
             :resolved-issues="dependencyScanning.resolvedIssues"
             :component="$options.componentNames.SecurityIssueBody"
@@ -555,6 +560,7 @@ export default {
 
         <template v-if="hasContainerScanningReports">
           <summary-row
+            :nested-summary="true"
             :status-icon="containerScanningStatusIcon"
             :popover-options="containerScanningPopover"
             class="js-container-scanning"
@@ -567,6 +573,7 @@ export default {
 
           <grouped-issues-list
             v-if="hasContainerScanningIssues"
+            :nested-level="2"
             :unresolved-issues="containerScanning.newIssues"
             :resolved-issues="containerScanning.resolvedIssues"
             :component="$options.componentNames.SecurityIssueBody"
@@ -576,6 +583,7 @@ export default {
 
         <template v-if="hasDastReports">
           <summary-row
+            :nested-summary="true"
             :status-icon="dastStatusIcon"
             :popover-options="dastPopover"
             class="js-dast-widget"
@@ -589,7 +597,7 @@ export default {
               <div class="text-nowrap">
                 {{ n__('%d URL scanned', '%d URLs scanned', dastSummary.scannedResourcesCount) }}
               </div>
-              <gl-link v-gl-modal.dastUrl class="ml-2" data-qa-selector="dast-ci-job-link">
+              <gl-link v-gl-modal.dastUrl class="ml-2" data-testid="dast-ci-job-link">
                 {{ __('View details') }}
               </gl-link>
               <dast-modal
@@ -598,9 +606,20 @@ export default {
                 :download-link="dastDownloadLink"
               />
             </template>
+            <template v-else-if="dastDownloadLink">
+              <gl-link
+                download
+                :href="dastDownloadLink"
+                class="gl-ml-1"
+                data-testid="download-link"
+              >
+                ({{ s__('SecurityReports|Download scanned resources') }})
+              </gl-link>
+            </template>
           </summary-row>
           <grouped-issues-list
             v-if="hasDastIssues"
+            :nested-level="2"
             :unresolved-issues="dast.newIssues"
             :resolved-issues="dast.resolvedIssues"
             :component="$options.componentNames.SecurityIssueBody"
@@ -610,10 +629,11 @@ export default {
 
         <template v-if="hasSecretDetectionReports">
           <summary-row
+            :nested-summary="true"
             :status-icon="secretDetectionStatusIcon"
             :popover-options="secretScanningPopover"
             class="js-secret-scanning"
-            data-qa-selector="secret_scan_report"
+            data-testid="secret-scan-report"
           >
             <template #summary>
               <security-summary :message="groupedSecretDetectionText" />
@@ -622,6 +642,7 @@ export default {
 
           <grouped-issues-list
             v-if="hasSecretDetectionIssues"
+            :nested-level="2"
             :unresolved-issues="secretDetection.newIssues"
             :resolved-issues="secretDetection.resolvedIssues"
             :component="$options.componentNames.SecurityIssueBody"
@@ -631,6 +652,7 @@ export default {
 
         <template v-if="hasCoverageFuzzingReports">
           <summary-row
+            :nested-summary="true"
             :status-icon="coverageFuzzingStatusIcon"
             :popover-options="coverageFuzzingPopover"
             class="js-coverage-fuzzing-widget"
@@ -639,15 +661,17 @@ export default {
             <template #summary>
               <security-summary :message="groupedCoverageFuzzingText" />
             </template>
-            <fuzzing-artifacts-download
-              v-if="hasFuzzingArtifacts"
-              :jobs="fuzzingJobsWithArtifact"
-              :project-id="projectId"
+            <mr-artifact-download
+              v-if="shouldShowDownloadGuidance"
+              :report-types="$options.reportTypes.COVERAGE_FUZZING"
+              :target-project-full-path="targetProjectFullPath"
+              :mr-iid="mrIid"
             />
           </summary-row>
 
           <grouped-issues-list
             v-if="hasCoverageFuzzingIssues"
+            :nested-level="2"
             :unresolved-issues="coverageFuzzing.newIssues"
             :resolved-issues="coverageFuzzing.resolvedIssues"
             :component="$options.componentNames.SecurityIssueBody"
@@ -657,6 +681,7 @@ export default {
 
         <template v-if="hasApiFuzzingReports">
           <summary-row
+            :nested-summary="true"
             :status-icon="apiFuzzingStatusIcon"
             :popover-options="apiFuzzingPopover"
             class="js-api-fuzzing-widget"
@@ -666,9 +691,9 @@ export default {
               <security-summary :message="groupedApiFuzzingText" />
             </template>
 
-            <artifact-download
+            <mr-artifact-download
               v-if="shouldShowDownloadGuidance"
-              :report-types="[$options.reportTypes.API_FUZZING]"
+              :report-types="$options.reportTypes.API_FUZZING"
               :target-project-full-path="targetProjectFullPath"
               :mr-iid="mrIid"
             />
@@ -676,6 +701,7 @@ export default {
 
           <grouped-issues-list
             v-if="hasApiFuzzingIssues"
+            :nested-level="2"
             :unresolved-issues="apiFuzzing.newIssues"
             :resolved-issues="apiFuzzing.resolvedIssues"
             :component="$options.componentNames.SecurityIssueBody"

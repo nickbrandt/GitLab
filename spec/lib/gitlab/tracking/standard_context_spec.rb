@@ -57,11 +57,33 @@ RSpec.describe Gitlab::Tracking::StandardContext do
       expect(snowplow_context.to_json.dig(:data, :source)).to eq(described_class::GITLAB_RAILS_SOURCE)
     end
 
-    context 'with extra data' do
-      subject { described_class.new(foo: 'bar') }
+    context 'plan' do
+      context 'when namespace is not available' do
+        it 'is nil' do
+          expect(snowplow_context.to_json.dig(:data, :plan)).to be_nil
+        end
+      end
 
-      it 'creates a Snowplow context with the given data' do
-        expect(snowplow_context.to_json.dig(:data, :foo)).to eq('bar')
+      context 'when namespace is available' do
+        subject { described_class.new(namespace: create(:namespace)) }
+
+        it 'contains plan name' do
+          expect(snowplow_context.to_json.dig(:data, :plan)).to eq(Plan::DEFAULT)
+        end
+      end
+    end
+
+    context 'with extra data' do
+      subject { described_class.new(extra_key_1: 'extra value 1', extra_key_2: 'extra value 2') }
+
+      it 'includes extra data in `extra` hash' do
+        expect(snowplow_context.to_json.dig(:data, :extra)).to eq(extra_key_1: 'extra value 1', extra_key_2: 'extra value 2')
+      end
+    end
+
+    context 'without extra data' do
+      it 'contains an empty `extra` hash' do
+        expect(snowplow_context.to_json.dig(:data, :extra)).to be_empty
       end
     end
 

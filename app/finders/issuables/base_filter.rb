@@ -2,13 +2,14 @@
 
 module Issuables
   class BaseFilter
-    attr_reader :issuables, :params
+    attr_reader :params
 
-    def initialize(issuables, params:, or_filters_enabled: false, not_filters_enabled: false)
-      @issuables = issuables
+    FILTER_NONE = 'none'
+    FILTER_ANY = 'any'
+
+    def initialize(params:, or_filters_enabled: false)
       @params = params
       @or_filters_enabled = or_filters_enabled
-      @not_filters_enabled = not_filters_enabled
     end
 
     def filter
@@ -27,10 +28,6 @@ module Issuables
 
     def or_filters_enabled?
       @or_filters_enabled
-    end
-
-    def not_filters_enabled?
-      @not_filters_enabled
     end
   end
 end

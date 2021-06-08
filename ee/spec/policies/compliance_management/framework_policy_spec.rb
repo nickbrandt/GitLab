@@ -4,6 +4,7 @@ require 'spec_helper'
 
 RSpec.describe ComplianceManagement::FrameworkPolicy do
   let_it_be_with_refind(:framework) { create(:compliance_framework) }
+
   let(:user) { framework.namespace.owner }
 
   subject { described_class.new(user, framework) }
@@ -49,15 +50,6 @@ RSpec.describe ComplianceManagement::FrameworkPolicy do
   context 'feature is unlicensed' do
     before do
       stub_licensed_features(custom_compliance_frameworks: false, evaluate_group_level_compliance_pipeline: false)
-    end
-
-    it { is_expected.to be_disallowed(:manage_compliance_framework) }
-    it { is_expected.to be_disallowed(:manage_group_level_compliance_pipeline_config) }
-  end
-
-  context 'feature is disabled' do
-    before do
-      stub_feature_flags(ff_custom_compliance_framework: false)
     end
 
     it { is_expected.to be_disallowed(:manage_compliance_framework) }

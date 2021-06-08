@@ -16,6 +16,7 @@ RSpec.describe API::NugetProjectPackages do
   describe 'GET /api/v4/projects/:id/packages/nuget' do
     it_behaves_like 'handling nuget service requests' do
       let(:url) { "/projects/#{target.id}/packages/nuget/index.json" }
+      let(:snowplow_gitlab_standard_context) { { project: project, namespace: project.namespace } }
     end
   end
 
@@ -34,6 +35,7 @@ RSpec.describe API::NugetProjectPackages do
   describe 'GET /api/v4/projects/:id/packages/nuget/query' do
     it_behaves_like 'handling nuget search requests' do
       let(:url) { "/projects/#{target.id}/packages/nuget/query?#{query_parameters.to_query}" }
+      let(:snowplow_gitlab_standard_context) { { project: project, namespace: project.namespace } }
     end
   end
 
@@ -121,6 +123,7 @@ RSpec.describe API::NugetProjectPackages do
       with_them do
         let(:token) { user_token ? personal_access_token.token : 'wrong' }
         let(:headers) { user_role == :anonymous ? {} : basic_auth_header(user.username, token) }
+        let(:snowplow_gitlab_standard_context) { { project: project, namespace: project.namespace } }
 
         subject { get api(url), headers: headers }
 
@@ -188,6 +191,10 @@ RSpec.describe API::NugetProjectPackages do
 
     it_behaves_like 'deploy token for package uploads'
 
+    it_behaves_like 'job token for package uploads', authorize_endpoint: true do
+      let_it_be(:job) { create(:ci_build, :running, user: user) }
+    end
+
     it_behaves_like 'rejects nuget access with unknown target id'
 
     it_behaves_like 'rejects nuget access with invalid target id'
@@ -240,6 +247,7 @@ RSpec.describe API::NugetProjectPackages do
         let(:token) { user_token ? personal_access_token.token : 'wrong' }
         let(:user_headers) { user_role == :anonymous ? {} : basic_auth_header(user.username, token) }
         let(:headers) { user_headers.merge(workhorse_headers) }
+        let(:snowplow_gitlab_standard_context) { { project: project, user: user, namespace: project.namespace } }
 
         before do
           update_visibility_to(Gitlab::VisibilityLevel.const_get(visibility_level, false))
@@ -250,6 +258,10 @@ RSpec.describe API::NugetProjectPackages do
     end
 
     it_behaves_like 'deploy token for package uploads'
+
+    it_behaves_like 'job token for package uploads' do
+      let_it_be(:job) { create(:ci_build, :running, user: user) }
+    end
 
     it_behaves_like 'rejects nuget access with unknown target id'
 

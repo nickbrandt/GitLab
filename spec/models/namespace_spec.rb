@@ -5,6 +5,7 @@ require 'spec_helper'
 RSpec.describe Namespace do
   include ProjectForksHelper
   include GitHelpers
+  include ReloadHelpers
 
   let!(:namespace) { create(:namespace, :with_namespace_settings) }
   let(:gitlab_shell) { Gitlab::Shell.new }
@@ -21,6 +22,7 @@ RSpec.describe Namespace do
     it { is_expected.to have_many :custom_emoji }
     it { is_expected.to have_one :package_setting_relation }
     it { is_expected.to have_one :onboarding_progress }
+    it { is_expected.to have_one :admin_note }
   end
 
   describe 'validations' do
@@ -140,7 +142,7 @@ RSpec.describe Namespace do
       end
 
       it 'allows updating other attributes for existing record' do
-        namespace = build(:namespace, path: 'j')
+        namespace = build(:namespace, path: 'j', owner: create(:user))
         namespace.save(validate: false)
         namespace.reload
 
@@ -150,6 +152,33 @@ RSpec.describe Namespace do
 
         expect(namespace).to be_valid
         expect(namespace.name).to eq('something new')
+      end
+    end
+  end
+
+  describe 'scopes' do
+    let_it_be(:namespace1) { create(:group, name: 'Namespace 1', path: 'namespace-1') }
+    let_it_be(:namespace2) { create(:group, name: 'Namespace 2', path: 'namespace-2') }
+    let_it_be(:namespace1sub) { create(:group, name: 'Sub Namespace', path: 'sub-namespace', parent: namespace1) }
+    let_it_be(:namespace2sub) { create(:group, name: 'Sub Namespace', path: 'sub-namespace', parent: namespace2) }
+
+    describe '.by_parent' do
+      it 'includes correct namespaces' do
+        expect(described_class.by_parent(namespace1.id)).to eq([namespace1sub])
+        expect(described_class.by_parent(namespace2.id)).to eq([namespace2sub])
+        expect(described_class.by_parent(nil)).to match_array([namespace, namespace1, namespace2])
+      end
+    end
+
+    describe '.filter_by_path' do
+      it 'includes correct namespaces' do
+        expect(described_class.filter_by_path(namespace1.path)).to eq([namespace1])
+        expect(described_class.filter_by_path(namespace2.path)).to eq([namespace2])
+        expect(described_class.filter_by_path('sub-namespace')).to match_array([namespace1sub, namespace2sub])
+      end
+
+      it 'filters case-insensitive' do
+        expect(described_class.filter_by_path(namespace1.path.upcase)).to eq([namespace1])
       end
     end
   end
@@ -168,27 +197,69 @@ RSpec.describe Namespace do
   describe 'inclusions' do
     it { is_expected.to include_module(Gitlab::VisibilityLevel) }
     it { is_expected.to include_module(Namespaces::Traversal::Recursive) }
+    it { is_expected.to include_module(Namespaces::Traversal::Linear) }
   end
 
-  describe 'callbacks' do
-    describe 'before_save :ensure_delayed_project_removal_assigned_to_namespace_settings' do
-      it 'sets the matching value in namespace_settings' do
-        expect { namespace.update!(delayed_project_removal: true) }.to change {
-          namespace.namespace_settings.delayed_project_removal
-        }.from(false).to(true)
+  it_behaves_like 'linear namespace traversal'
+
+  context 'traversal_ids on create' do
+    context 'default traversal_ids' do
+      let(:namespace) { build(:namespace) }
+
+      before do
+        namespace.save!
+        namespace.reload
       end
 
-      context 'when the feature flag is disabled' do
-        before do
-          stub_feature_flags(migrate_delayed_project_removal: false)
-        end
+      it { expect(namespace.traversal_ids).to eq [namespace.id] }
+    end
+  end
 
-        it 'does not set the matching value in namespace_settings' do
-          expect { namespace.update!(delayed_project_removal: true) }.not_to change {
-            namespace.namespace_settings.delayed_project_removal
-          }
+  describe "after_commit :expire_child_caches" do
+    let(:namespace) { create(:group) }
+
+    it "expires the child caches when updated" do
+      child_1 = create(:group, parent: namespace, updated_at: 1.week.ago)
+      child_2 = create(:group, parent: namespace, updated_at: 1.day.ago)
+      grandchild = create(:group, parent: child_1, updated_at: 1.week.ago)
+      project_1 = create(:project, namespace: namespace, updated_at: 2.days.ago)
+      project_2 = create(:project, namespace: child_1, updated_at: 3.days.ago)
+      project_3 = create(:project, namespace: grandchild, updated_at: 4.years.ago)
+
+      freeze_time do
+        namespace.update!(path: "foo")
+
+        [namespace, child_1, child_2, grandchild, project_1, project_2, project_3].each do |record|
+          expect(record.reload.updated_at).to eq(Time.zone.now)
         end
       end
+    end
+
+    it "expires on name changes" do
+      expect(namespace).to receive(:expire_child_caches).once
+
+      namespace.update!(name: "Foo")
+    end
+
+    it "expires on path changes" do
+      expect(namespace).to receive(:expire_child_caches).once
+
+      namespace.update!(path: "bar")
+    end
+
+    it "expires on parent changes" do
+      expect(namespace).to receive(:expire_child_caches).once
+
+      namespace.update!(parent: create(:group))
+    end
+
+    it "doesn't expire on other field changes" do
+      expect(namespace).not_to receive(:expire_child_caches)
+
+      namespace.update!(
+        description: "Foo bar",
+        max_artifacts_size: 10
+      )
     end
   end
 
@@ -202,6 +273,41 @@ RSpec.describe Namespace do
 
   describe '#human_name' do
     it { expect(namespace.human_name).to eq(namespace.owner_name) }
+  end
+
+  describe '#any_project_has_container_registry_tags?' do
+    subject { namespace.any_project_has_container_registry_tags? }
+
+    let!(:project_without_registry) { create(:project, namespace: namespace) }
+
+    context 'without tags' do
+      it { is_expected.to be_falsey }
+    end
+
+    context 'with tags' do
+      before do
+        repositories = create_list(:container_repository, 3)
+        create(:project, namespace: namespace, container_repositories: repositories)
+
+        stub_container_registry_config(enabled: true)
+      end
+
+      it 'finds tags' do
+        stub_container_registry_tags(repository: :any, tags: ['tag'])
+
+        is_expected.to be_truthy
+      end
+
+      it 'does not cause N+1 query in fetching registries' do
+        stub_container_registry_tags(repository: :any, tags: [])
+        control_count = ActiveRecord::QueryRecorder.new { namespace.any_project_has_container_registry_tags? }.count
+
+        other_repositories = create_list(:container_repository, 2)
+        create(:project, namespace: namespace, container_repositories: other_repositories)
+
+        expect { namespace.any_project_has_container_registry_tags? }.not_to exceed_query_limit(control_count + 1)
+      end
+    end
   end
 
   describe '#first_project_with_container_registry_tags' do
@@ -701,9 +807,9 @@ RSpec.describe Namespace do
       end
 
       it 'updates the project storage location' do
-        repository_project_in_parent_group = create(:project_repository, project: project_in_parent_group)
-        repository_hashed_project_in_subgroup = create(:project_repository, project: hashed_project_in_subgroup)
-        repository_legacy_project_in_subgroup = create(:project_repository, project: legacy_project_in_subgroup)
+        repository_project_in_parent_group = project_in_parent_group.project_repository
+        repository_hashed_project_in_subgroup = hashed_project_in_subgroup.project_repository
+        repository_legacy_project_in_subgroup = legacy_project_in_subgroup.project_repository
 
         parent.update(path: 'mygroup_moved')
 
@@ -859,7 +965,27 @@ RSpec.describe Namespace do
     end
   end
 
-  it_behaves_like 'recursive namespace traversal'
+  describe '#use_traversal_ids?' do
+    let_it_be(:namespace, reload: true) { create(:namespace) }
+
+    subject { namespace.use_traversal_ids? }
+
+    context 'when use_traversal_ids feature flag is true' do
+      before do
+        stub_feature_flags(use_traversal_ids: true)
+      end
+
+      it { is_expected.to eq true }
+    end
+
+    context 'when use_traversal_ids feature flag is false' do
+      before do
+        stub_feature_flags(use_traversal_ids: false)
+      end
+
+      it { is_expected.to eq false }
+    end
+  end
 
   describe '#users_with_descendants' do
     let(:user_a) { create(:user) }
@@ -887,47 +1013,52 @@ RSpec.describe Namespace do
     end
   end
 
-  describe '#all_projects' do
+  shared_examples '#all_projects' do
     context 'when namespace is a group' do
-      let(:namespace) { create(:group) }
-      let(:child) { create(:group, parent: namespace) }
-      let!(:project1) { create(:project_empty_repo, namespace: namespace) }
-      let!(:project2) { create(:project_empty_repo, namespace: child) }
+      let_it_be(:namespace) { create(:group) }
+      let_it_be(:child) { create(:group, parent: namespace) }
+      let_it_be(:project1) { create(:project_empty_repo, namespace: namespace) }
+      let_it_be(:project2) { create(:project_empty_repo, namespace: child) }
+      let_it_be(:other_project) { create(:project_empty_repo) }
+
+      before do
+        reload_models(namespace, child)
+      end
 
       it { expect(namespace.all_projects.to_a).to match_array([project2, project1]) }
       it { expect(child.all_projects.to_a).to match_array([project2]) }
-
-      it 'queries for the namespace and its descendants' do
-        expect(Project).to receive(:where).with(namespace: [namespace, child])
-
-        namespace.all_projects
-      end
     end
 
     context 'when namespace is a user namespace' do
       let_it_be(:user) { create(:user) }
       let_it_be(:user_namespace) { create(:namespace, owner: user) }
       let_it_be(:project) { create(:project, namespace: user_namespace) }
+      let_it_be(:other_project) { create(:project_empty_repo) }
+
+      before do
+        reload_models(user_namespace)
+      end
 
       it { expect(user_namespace.all_projects.to_a).to match_array([project]) }
-
-      it 'only queries for the namespace itself' do
-        expect(Project).to receive(:where).with(namespace: user_namespace)
-
-        user_namespace.all_projects
-      end
     end
   end
 
-  describe '#all_pipelines' do
-    let(:group) { create(:group) }
-    let(:child) { create(:group, parent: group) }
-    let!(:project1) { create(:project_empty_repo, namespace: group) }
-    let!(:project2) { create(:project_empty_repo, namespace: child) }
-    let!(:pipeline1) { create(:ci_empty_pipeline, project: project1) }
-    let!(:pipeline2) { create(:ci_empty_pipeline, project: project2) }
+  describe '#all_projects' do
+    context 'with use_traversal_ids feature flag enabled' do
+      before do
+        stub_feature_flags(use_traversal_ids: true)
+      end
 
-    it { expect(group.all_pipelines.to_a).to match_array([pipeline1, pipeline2]) }
+      include_examples '#all_projects'
+    end
+
+    context 'with use_traversal_ids feature flag disabled' do
+      before do
+        stub_feature_flags(use_traversal_ids: false)
+      end
+
+      include_examples '#all_projects'
+    end
   end
 
   describe '#share_with_group_lock with subgroups' do
@@ -1071,21 +1202,42 @@ RSpec.describe Namespace do
   end
 
   describe '#root_ancestor' do
-    let!(:root_group) { create(:group) }
+    context 'with persisted root group' do
+      let!(:root_group) { create(:group) }
 
-    it 'returns root_ancestor for root group without a query' do
-      expect { root_group.root_ancestor }.not_to exceed_query_limit(0)
+      it 'returns root_ancestor for root group without a query' do
+        expect { root_group.root_ancestor }.not_to exceed_query_limit(0)
+      end
+
+      it 'returns the top most ancestor' do
+        nested_group = create(:group, parent: root_group)
+        deep_nested_group = create(:group, parent: nested_group)
+        very_deep_nested_group = create(:group, parent: deep_nested_group)
+
+        expect(root_group.root_ancestor).to eq(root_group)
+        expect(nested_group.root_ancestor).to eq(root_group)
+        expect(deep_nested_group.root_ancestor).to eq(root_group)
+        expect(very_deep_nested_group.root_ancestor).to eq(root_group)
+      end
     end
 
-    it 'returns the top most ancestor' do
-      nested_group = create(:group, parent: root_group)
-      deep_nested_group = create(:group, parent: nested_group)
-      very_deep_nested_group = create(:group, parent: deep_nested_group)
+    context 'with not persisted root group' do
+      let!(:root_group) { build(:group) }
 
-      expect(root_group.root_ancestor).to eq(root_group)
-      expect(nested_group.root_ancestor).to eq(root_group)
-      expect(deep_nested_group.root_ancestor).to eq(root_group)
-      expect(very_deep_nested_group.root_ancestor).to eq(root_group)
+      it 'returns root_ancestor for root group without a query' do
+        expect { root_group.root_ancestor }.not_to exceed_query_limit(0)
+      end
+
+      it 'returns the top most ancestor' do
+        nested_group = build(:group, parent: root_group)
+        deep_nested_group = build(:group, parent: nested_group)
+        very_deep_nested_group = build(:group, parent: deep_nested_group)
+
+        expect(root_group.root_ancestor).to eq(root_group)
+        expect(nested_group.root_ancestor).to eq(root_group)
+        expect(deep_nested_group.root_ancestor).to eq(root_group)
+        expect(very_deep_nested_group.root_ancestor).to eq(root_group)
+      end
     end
   end
 
@@ -1235,36 +1387,14 @@ RSpec.describe Namespace do
   describe '#pages_virtual_domain' do
     let(:project) { create(:project, namespace: namespace) }
 
-    context 'when there are pages deployed for the project' do
-      context 'but pages metadata is not migrated' do
-        before do
-          generic_commit_status = create(:generic_commit_status, :success, stage: 'deploy', name: 'pages:deploy')
-          generic_commit_status.update!(project: project)
-          project.pages_metadatum.destroy!
-        end
+    it 'returns the virual domain' do
+      project.mark_pages_as_deployed
+      project.update_pages_deployment!(create(:pages_deployment, project: project))
 
-        it 'migrates pages metadata and returns the virual domain' do
-          virtual_domain = namespace.pages_virtual_domain
+      virtual_domain = namespace.pages_virtual_domain
 
-          expect(project.reload.pages_metadatum.deployed).to eq(true)
-
-          expect(virtual_domain).to be_an_instance_of(Pages::VirtualDomain)
-          expect(virtual_domain.lookup_paths).not_to be_empty
-        end
-      end
-
-      context 'and pages metadata is migrated' do
-        before do
-          project.mark_pages_as_deployed
-        end
-
-        it 'returns the virual domain' do
-          virtual_domain = namespace.pages_virtual_domain
-
-          expect(virtual_domain).to be_an_instance_of(Pages::VirtualDomain)
-          expect(virtual_domain.lookup_paths).not_to be_empty
-        end
-      end
+      expect(virtual_domain).to be_an_instance_of(Pages::VirtualDomain)
+      expect(virtual_domain.lookup_paths).not_to be_empty
     end
   end
 
@@ -1355,6 +1485,12 @@ RSpec.describe Namespace do
 
         it_behaves_like 'fetching closest setting'
       end
+    end
+  end
+
+  describe '#paid?' do
+    it 'returns false for a root namespace with a free plan' do
+      expect(namespace.paid?).to eq(false)
     end
   end
 

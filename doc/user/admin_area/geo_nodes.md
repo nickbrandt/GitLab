@@ -70,13 +70,19 @@ breaking communication between **primary** and **secondary** nodes when using
 HTTPS, customize your Internal URL to point to a load balancer with TLS
 terminated at the load balancer.
 
+WARNING:
+Starting with GitLab 13.3 and [until 13.11](https://gitlab.com/gitlab-org/gitlab/-/issues/325522),
+using an internal URL that is not accessible to the users will result in the
+OAuth authorization flow not working properly, as the users will get redirected
+to the internal URL instead of the external one.
+
 ## Multiple secondary nodes behind a load balancer
 
 In GitLab 11.11, **secondary** nodes can use identical external URLs as long as
 a unique `name` is set for each Geo node. The `gitlab.rb` setting
 `gitlab_rails['geo_node_name']` must:
 
-- Be set for each GitLab instance that runs `unicorn`, `sidekiq`, or `geo_logcursor`.
+- Be set for each GitLab instance that runs `puma`, `sidekiq`, or `geo_logcursor`.
 - Match a Geo node name.
 
 The load balancer must use sticky sessions in order to avoid authentication

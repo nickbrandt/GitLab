@@ -18,6 +18,7 @@ RSpec.describe Ci::RetryBuildService do
   end
 
   let_it_be_with_refind(:build) { create(:ci_build, pipeline: pipeline, stage_id: stage.id) }
+
   let(:user) { developer }
 
   let(:service) do
@@ -58,13 +59,14 @@ RSpec.describe Ci::RetryBuildService do
        metadata runner_session trace_chunks upstream_pipeline_id
        artifacts_file artifacts_metadata artifacts_size commands
        resource resource_group_id processed security_scans author
-       pipeline_id report_results pending_state pages_deployments].freeze
+       pipeline_id report_results pending_state pages_deployments
+       queuing_entry].freeze
 
   shared_examples 'build duplication' do
     let_it_be(:another_pipeline) { create(:ci_empty_pipeline, project: project) }
 
     let_it_be(:build) do
-      create(:ci_build, :failed, :expired, :erased, :queued, :coverage, :tags,
+      create(:ci_build, :failed, :picked, :expired, :erased, :queued, :coverage, :tags,
              :allowed_to_fail, :on_tag, :triggered, :teardown_environment, :resource_group,
              description: 'my-job', stage: 'test', stage_id: stage.id,
              pipeline: pipeline, auto_canceled_by: another_pipeline,
@@ -181,7 +183,7 @@ RSpec.describe Ci::RetryBuildService do
       end
 
       it 'resolves todos for old build that failed' do
-        expect(MergeRequests::AddTodoWhenBuildFailsService)
+        expect(::MergeRequests::AddTodoWhenBuildFailsService)
           .to receive_message_chain(:new, :close)
 
         service.execute(build)

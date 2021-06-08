@@ -1,12 +1,12 @@
 ---
 stage: Verify
-group: Continuous Integration
+group: Pipeline Execution
 info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#assignments
 comments: false
 type: index, howto
 ---
 
-# Migrating from Jenkins
+# Migrating from Jenkins **(FREE)**
 
 A lot of GitLab users have successfully migrated to GitLab CI/CD from Jenkins. To make this
 easier if you're just getting started, we've collected several resources here that you might find useful
@@ -305,7 +305,7 @@ my_job:
 
 In GitLab, we use the [`variables` keyword](../yaml/README.md#variables) to define different variables at runtime.
 These can also be set up through the GitLab UI, under CI/CD settings. See also our [general documentation on variables](../variables/README.md),
-including the section on [protected variables](../variables/README.md#protect-a-custom-variable) which can be used
+including the section on [protected variables](../variables/README.md#protect-a-cicd-variable) which can be used
 to limit access to certain variables to certain environments or runners:
 
 ```yaml
@@ -349,8 +349,8 @@ variable entry.
 
 GitLab does support a [`when` keyword](../yaml/README.md#when) which is used to indicate when a job should be
 run in case of (or despite) failure, but most of the logic for controlling pipelines can be found in
-our very powerful [`only/except` rules system](../yaml/README.md#onlyexcept-basic)
-(see also our [advanced syntax](../yaml/README.md#onlyexcept-basic)):
+our very powerful [`only/except` rules system](../yaml/README.md#only--except)
+(see also our [advanced syntax](../yaml/README.md#only--except)):
 
 ```yaml
 my_job:

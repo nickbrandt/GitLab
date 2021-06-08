@@ -25,7 +25,7 @@ Developers making significant changes to Elasticsearch queries should test their
 
 ## Setting up development environment
 
-See the [Elasticsearch GDK setup instructions](https://gitlab.com/gitlab-org/gitlab-development-kit/blob/master/doc/howto/elasticsearch.md)
+See the [Elasticsearch GDK setup instructions](https://gitlab.com/gitlab-org/gitlab-development-kit/blob/main/doc/howto/elasticsearch.md)
 
 ## Helpful Rake tasks
 
@@ -198,7 +198,10 @@ filename format, which is similar to Rails database migrations:
 # frozen_string_literal: true
 
 class MigrationName < Elastic::Migration
-  # Important: Any update to the Elastic index mappings should be replicated in Elastic::Latest::Config
+  # Important: Any updates to the Elastic index mappings must be replicated in the respective
+  # configuration files:
+  #   - `Elastic::Latest::Config`, for the main index.
+  #   - `Elastic::Latest::<Type>Config`, for standalone indices.
 
   def migrate
   end
@@ -214,7 +217,10 @@ Applied migrations are stored in `gitlab-#{RAILS_ENV}-migrations` index. All mig
 are applied by the [`Elastic::MigrationWorker`](https://gitlab.com/gitlab-org/gitlab/blob/master/ee/app/workers/elastic/migration_worker.rb)
 cron worker sequentially.
 
-Any update to the Elastic index mappings should be replicated in [`Elastic::Latest::Config`](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/lib/elastic/latest/config.rb).
+To update Elastic index mappings, apply the configuration to the respective files:
+
+- For the main index: [`Elastic::Latest::Config`](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/lib/elastic/latest/config.rb).
+- For standalone indices: `Elastic::Latest::<Type>Config`.
 
 Migrations can be built with a retry limit and have the ability to be [failed and marked as halted](https://gitlab.com/gitlab-org/gitlab/-/blob/66e899b6637372a4faf61cfd2f254cbdd2fb9f6d/ee/lib/elastic/migration.rb#L40).
 Any data or index cleanup needed to support migration retries should be handled within the migration.
@@ -235,6 +241,10 @@ cron worker runs. Default value is 5 minutes.
 - `pause_indexing!` - Pause indexing while the migration runs. This setting will record the indexing setting before
 the migration runs and set it back to that value when the migration is completed.
 
+- `space_requirements!` - Verify that enough free space is available in the cluster when the migration runs. This setting
+  will halt the migration if the storage required is not available when the migration runs. The migration must provide
+  the space required in bytes by defining a `space_required_bytes` method.
+
 ```ruby
 # frozen_string_literal: true
 
@@ -242,19 +252,21 @@ class BatchedMigrationName < Elastic::Migration
   # Declares a migration should be run in batches
   batched!
   throttle_delay 10.minutes
-
+  pause_indexing!
+  space_requirements!
+  
   # ...
 end
 ```
 
 ### Multi-version compatibility
 
-These Elasticsearch migrations, like any other GitLab changes, need to support the case where
+These Advanced Search migrations, like any other GitLab changes, need to support the case where
 [multiple versions of the application are running at the same time](multi_version_compatibility.md).
 
 Depending on the order of deployment, it's possible that the migration
 has started or finished and there's still a server running the application code from before the
-migration. We need to take this into consideration until we can [ensure all Elasticsearch migrations
+migration. We need to take this into consideration until we can [ensure all Advanced Search migrations
 start after the deployment has finished](https://gitlab.com/gitlab-org/gitlab/-/issues/321619).
 
 ### Reverting a migration
@@ -268,12 +280,12 @@ some data is moved) to a later merge request after the migrations have
 completed successfully. To be safe, for self-managed customers we should also
 defer it to another release if there is risk of important data loss.
 
-### Best practices for Elasticsearch migrations
+### Best practices for Advanced Search migrations
 
 Follow these best practices for best results:
 
 - When working in batches, keep the batch size under 9,000 documents
-  and `throttle_delay` over 3 minutes. The bulk indexer is set to run
+  and `throttle_delay` for at least 3 minutes. The bulk indexer is set to run
   every 1 minute and process a batch of 10,000 documents. These limits
   allow the bulk indexer time to process records before another migration
   batch is attempted.
@@ -285,6 +297,58 @@ Follow these best practices for best results:
 - Pause indexing if you're using any Elasticsearch Reindex API operations.
 - Consider adding a retry limit if there is potential for the migration to fail.
   This ensures that migrations can be halted if an issue occurs.
+
+## Deleting Advanced Search migrations in a major version upgrade
+
+Since our Advanced Search migrations usually require us to support multiple
+code paths for a long period of time, it's important to clean those up when we
+safely can.
+
+We choose to use GitLab major version upgrades as a safe time to remove
+backwards compatibility for indices that have not been fully migrated. We
+[document this in our upgrade
+documentation](../update/index.md#upgrading-to-a-new-major-version). We also
+choose to replace the migration code with the halted migration
+and remove tests so that:
+
+- We don't need to maintain any code that is called from our Advanced Search
+  migrations.
+- We don't waste CI time running tests for migrations that we don't support
+  anymore.
+- Operators who have not run this migration and who upgrade directly to the
+  target version will see a message prompting them to reindex from scratch.
+
+To be extra safe, we will not delete migrations that were created in the last
+minor version before the major upgrade. So, if we are upgrading to `%14.0`,
+we should not delete migrations that were only added in `%13.12`. This is an
+extra safety net as we expect there are migrations that get merged that may
+take multiple weeks to finish on GitLab.com. It would be bad if we upgraded
+GitLab.com to `%14.0` before the migrations in `%13.12` were finished. Since
+our deployments to GitLab.com are automated and we currently don't have
+automated checks to prevent this, the extra precaution is warranted.
+Additionally, even if we did have automated checks to prevent it, we wouldn't
+actually want to hold up GitLab.com deployments on Advanced Search migrations,
+as they may still have another week to go, and that's too long to block
+deployments.
+
+### Process for removing migrations
+
+For every migration that was created 2 minor versions before the major version
+being upgraded to, we do the following:
+
+1. Confirm the migration has actually completed successfully for GitLab.com.
+1. Replace the content of the migration with:
+
+   ```ruby
+   include Elastic::MigrationObsolete
+   ```
+
+1. Delete any spec files to support this migration.
+1. Remove any logic handling backwards compatibility for this migration. You
+   can find this by looking for
+   `Elastic::DataMigrationService.migration_has_finished?(:migration_name_in_lowercase)`.
+1. Create a merge request with these changes. Noting that we should not
+   accidentally merge this before the major release is started.
 
 ## Performance Monitoring
 

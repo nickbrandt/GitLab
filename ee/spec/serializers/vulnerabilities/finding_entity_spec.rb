@@ -60,6 +60,7 @@ RSpec.describe Vulnerabilities::FindingEntity do
       expect(subject).to include(:scan)
       expect(subject).to include(:assets, :evidence_source, :supporting_messages)
       expect(subject).to include(:uuid)
+      expect(subject).to include(:details)
     end
 
     context 'when not allowed to admin vulnerability feedback' do
@@ -101,7 +102,7 @@ RSpec.describe Vulnerabilities::FindingEntity do
 
         before do
           stub_licensed_features(jira_vulnerabilities_integration: true)
-          allow_next_found_instance_of(JiraService) do |jira|
+          allow_next_found_instance_of(Integrations::Jira) do |jira|
             allow(jira).to receive(:jira_project_id).and_return('11223')
           end
         end

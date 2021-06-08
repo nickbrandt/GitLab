@@ -8,6 +8,8 @@ RSpec.describe 'User edit profile' do
   let(:user) { create(:user) }
 
   before do
+    stub_feature_flags(improved_emoji_picker: false)
+
     sign_in(user)
     visit(profile_path)
   end
@@ -212,8 +214,10 @@ RSpec.describe 'User edit profile' do
         end
 
         it 'shows author as busy in the assignee dropdown' do
-          find('.block.assignee .edit-link').click
-          wait_for_requests
+          page.within('.assignee') do
+            click_button('Edit')
+            wait_for_requests
+          end
 
           page.within '.dropdown-menu-user' do
             expect(page).to have_content("#{user.name} (Busy)")
@@ -227,18 +231,7 @@ RSpec.describe 'User edit profile' do
           visit project_issue_path(project, issue)
           wait_for_requests
 
-          expect(page.find('[data-testid="expanded-assignee"]')).to have_text("#{user.name} (Busy)")
-        end
-      end
-
-      context 'with set_user_availability_status feature flag disabled' do
-        before do
-          stub_feature_flags(set_user_availability_status: false)
-          visit root_path(user)
-        end
-
-        it 'does not display the availability checkbox' do
-          expect(page).not_to have_css('[data-testid="user-availability-checkbox"]')
+          expect(page.find('.issuable-assignees')).to have_content("#{user.name} (Busy)")
         end
       end
     end
@@ -483,19 +476,6 @@ RSpec.describe 'User edit profile' do
           first_note = page.find_all(".main-notes-list .timeline-entry").first
 
           expect(first_note).not_to have_css('.user-status-emoji')
-        end
-      end
-
-      context 'with set_user_availability_status feature flag disabled' do
-        before do
-          stub_feature_flags(set_user_availability_status: false)
-          visit root_path(user)
-        end
-
-        it 'does not display the availability checkbox' do
-          open_user_status_modal
-
-          expect(page).not_to have_css('[data-testid="user-availability-checkbox"]')
         end
       end
     end

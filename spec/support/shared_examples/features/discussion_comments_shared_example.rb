@@ -11,6 +11,8 @@ RSpec.shared_examples 'thread comments for commit and snippet' do |resource_name
   let(:comment) { 'My comment' }
 
   it 'clicking "Comment" will post a comment' do
+    wait_for_all_requests
+
     expect(page).to have_selector toggle_selector
 
     find("#{form_selector} .note-textarea").send_keys(comment)
@@ -29,6 +31,8 @@ RSpec.shared_examples 'thread comments for commit and snippet' do |resource_name
       find("#{form_selector} .note-textarea").send_keys(comment)
 
       find(toggle_selector).click
+
+      wait_for_all_requests
     end
 
     it 'has a "Comment" item (selected by default) and "Start thread" item' do
@@ -304,7 +308,7 @@ RSpec.shared_examples 'thread comments for issue, epic and merge request' do |re
           let(:reply_id) { find("#{comments_selector} .note:last-of-type", match: :first)['data-note-id'] }
 
           it 'can be replied to after resolving' do
-            click_button "Resolve thread"
+            find('button[data-qa-selector="resolve_discussion_button"]').click
             wait_for_requests
 
             refresh
@@ -316,7 +320,7 @@ RSpec.shared_examples 'thread comments for issue, epic and merge request' do |re
           it 'shows resolved thread when toggled' do
             submit_reply('a')
 
-            click_button "Resolve thread"
+            find('button[data-qa-selector="resolve_discussion_button"]').click
             wait_for_requests
 
             expect(page).to have_selector(".note-row-#{note_id}", visible: true)

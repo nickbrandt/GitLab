@@ -27,9 +27,10 @@ RSpec.describe API::Lint do
       end
     end
 
-    context 'when signup settings are enabled' do
+    context 'when signup is enabled and not limited' do
       before do
         Gitlab::CurrentSettings.signup_enabled = true
+        stub_application_setting(domain_allowlist: [], email_restrictions_enabled: false, require_admin_approval_after_user_signup: false)
       end
 
       context 'when unauthenticated' do
@@ -42,6 +43,31 @@ RSpec.describe API::Lint do
 
       context 'when authenticated' do
         let_it_be(:api_user) { create(:user) }
+        it 'returns authentication success' do
+          post api('/ci/lint', api_user), params: { content: 'content' }
+
+          expect(response).to have_gitlab_http_status(:ok)
+        end
+      end
+    end
+
+    context 'when limited signup is enabled' do
+      before do
+        stub_application_setting(domain_allowlist: ['www.gitlab.com'])
+        Gitlab::CurrentSettings.signup_enabled = true
+      end
+
+      context 'when unauthenticated' do
+        it 'returns unauthorized' do
+          post api('/ci/lint'), params: { content: 'content' }
+
+          expect(response).to have_gitlab_http_status(:unauthorized)
+        end
+      end
+
+      context 'when authenticated' do
+        let_it_be(:api_user) { create(:user) }
+
         it 'returns authentication success' do
           post api('/ci/lint', api_user), params: { content: 'content' }
 
@@ -166,7 +192,7 @@ RSpec.describe API::Lint do
 
         included_config = YAML.safe_load(included_content, [Symbol])
         root_config = YAML.safe_load(yaml_content, [Symbol])
-        expected_yaml = included_config.merge(root_config).except(:include).to_yaml
+        expected_yaml = included_config.merge(root_config).except(:include).deep_stringify_keys.to_yaml
 
         expect(response).to have_gitlab_http_status(:ok)
         expect(json_response).to be_an Hash
@@ -246,7 +272,7 @@ RSpec.describe API::Lint do
           let(:dry_run) { false }
 
           let(:included_content) do
-            { another_test: { stage: 'test', script: 'echo 1' } }.to_yaml
+            { another_test: { stage: 'test', script: 'echo 1' } }.deep_stringify_keys.to_yaml
           end
 
           before do
@@ -299,7 +325,7 @@ RSpec.describe API::Lint do
         end
 
         let(:included_content) do
-          { another_test: { stage: 'test', script: 'echo 1' } }.to_yaml
+          { another_test: { stage: 'test', script: 'echo 1' } }.deep_stringify_keys.to_yaml
         end
 
         before do
@@ -341,7 +367,7 @@ RSpec.describe API::Lint do
 
       context 'with invalid .gitlab-ci.yml content' do
         let(:yaml_content) do
-          { image: 'ruby:2.7', services: ['postgres'] }.to_yaml
+          { image: 'ruby:2.7', services: ['postgres'] }.deep_stringify_keys.to_yaml
         end
 
         before do
@@ -385,7 +411,7 @@ RSpec.describe API::Lint do
 
         included_config = YAML.safe_load(included_content, [Symbol])
         root_config = YAML.safe_load(yaml_content, [Symbol])
-        expected_yaml = included_config.merge(root_config).except(:include).to_yaml
+        expected_yaml = included_config.merge(root_config).except(:include).deep_stringify_keys.to_yaml
 
         expect(response).to have_gitlab_http_status(:ok)
         expect(json_response).to be_an Hash
@@ -403,6 +429,24 @@ RSpec.describe API::Lint do
         expect(json_response['merged_yaml']).to eq(yaml_content)
         expect(json_response['valid']).to eq(false)
         expect(json_response['errors']).to eq(['jobs config should contain at least one visible job'])
+      end
+    end
+
+    context 'with an empty repository' do
+      let_it_be(:empty_project) { create(:project_empty_repo) }
+      let_it_be(:yaml_content) do
+        File.read(Rails.root.join('spec/support/gitlab_stubs/gitlab_ci.yml'))
+      end
+
+      before do
+        empty_project.add_developer(api_user)
+      end
+
+      it 'passes validation without errors' do
+        post api("/projects/#{empty_project.id}/ci/lint", api_user), params: { content: yaml_content }
+        expect(response).to have_gitlab_http_status(:ok)
+        expect(json_response['valid']).to eq(true)
+        expect(json_response['errors']).to eq([])
       end
     end
 
@@ -521,7 +565,7 @@ RSpec.describe API::Lint do
 
       context 'with invalid .gitlab-ci.yml content' do
         let(:yaml_content) do
-          { image: 'ruby:2.7', services: ['postgres'] }.to_yaml
+          { image: 'ruby:2.7', services: ['postgres'] }.deep_stringify_keys.to_yaml
         end
 
         context 'when running as dry run' do

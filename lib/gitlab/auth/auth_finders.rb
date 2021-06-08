@@ -24,9 +24,9 @@ module Gitlab
 
       PRIVATE_TOKEN_HEADER = 'HTTP_PRIVATE_TOKEN'
       PRIVATE_TOKEN_PARAM = :private_token
-      JOB_TOKEN_HEADER = 'HTTP_JOB_TOKEN'.freeze
+      JOB_TOKEN_HEADER = 'HTTP_JOB_TOKEN'
       JOB_TOKEN_PARAM = :job_token
-      DEPLOY_TOKEN_HEADER = 'HTTP_DEPLOY_TOKEN'.freeze
+      DEPLOY_TOKEN_HEADER = 'HTTP_DEPLOY_TOKEN'
       RUNNER_TOKEN_PARAM = :token
       RUNNER_JOB_TOKEN_PARAM = :token
 
@@ -160,7 +160,7 @@ module Gitlab
 
         case AccessTokenValidationService.new(access_token, request: request).validate(scopes: scopes)
         when AccessTokenValidationService::INSUFFICIENT_SCOPE
-          raise InsufficientScopeError.new(scopes)
+          raise InsufficientScopeError, scopes
         when AccessTokenValidationService::EXPIRED
           raise ExpiredError
         when AccessTokenValidationService::REVOKED
@@ -321,4 +321,4 @@ module Gitlab
   end
 end
 
-Gitlab::Auth::AuthFinders.prepend_if_ee('::EE::Gitlab::Auth::AuthFinders')
+Gitlab::Auth::AuthFinders.prepend_mod_with('Gitlab::Auth::AuthFinders')

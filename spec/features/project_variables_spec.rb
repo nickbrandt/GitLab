@@ -18,7 +18,7 @@ RSpec.describe 'Project variables', :js do
   it_behaves_like 'variable list'
 
   it 'adds a new variable with an environment scope' do
-    click_button('Add Variable')
+    click_button('Add variable')
 
     page.within('#add-ci-variable') do
       find('[data-qa-selector="ci_variable_key_field"] input').set('akey')
@@ -32,7 +32,7 @@ RSpec.describe 'Project variables', :js do
 
     wait_for_requests
 
-    page.within('.ci-variable-table') do
+    page.within('[data-testid="ci-variable-table"]') do
       expect(find('.js-ci-variable-row:first-child [data-label="Environments"]').text).to eq('review/*')
     end
   end

@@ -3,11 +3,11 @@
 require 'spec_helper'
 
 RSpec.describe 'Project active tab' do
-  let(:user) { create :user }
-  let(:project) { create(:project, :repository) }
+  let_it_be(:project) { create(:project, :repository) }
+
+  let(:user) { project.owner }
 
   before do
-    project.add_maintainer(user)
     sign_in(user)
   end
 
@@ -18,16 +18,40 @@ RSpec.describe 'Project active tab' do
   end
 
   context 'on project Home' do
-    before do
+    it 'activates Project scope menu' do
       visit project_path(project)
+
+      expect(page).to have_selector('.sidebar-top-level-items > li.active', count: 1)
+      expect(find('.sidebar-top-level-items > li.active')).to have_content(project.name)
     end
 
-    it_behaves_like 'page has active tab', 'Project'
-    it_behaves_like 'page has active sub tab', 'Details'
-
-    context 'on project Home/Activity' do
+    context 'when feature flag :sidebar_refactor is disabled' do
       before do
-        click_tab('Activity')
+        stub_feature_flags(sidebar_refactor: false)
+
+        visit project_path(project)
+      end
+
+      it_behaves_like 'page has active tab', 'Project'
+      it_behaves_like 'page has active sub tab', 'Details'
+    end
+  end
+
+  context 'on Project information' do
+    context 'default link' do
+      before do
+        visit project_path(project)
+
+        click_link('Project information', match: :first)
+      end
+
+      it_behaves_like 'page has active tab', 'Project'
+      it_behaves_like 'page has active sub tab', 'Activity'
+    end
+
+    context 'on Project information/Activity' do
+      before do
+        visit activity_project_path(project)
       end
 
       it_behaves_like 'page has active tab', 'Project'
@@ -56,20 +80,37 @@ RSpec.describe 'Project active tab' do
   end
 
   context 'on project Issues' do
+    let(:feature_flag_value) { true }
+
     before do
+      stub_feature_flags(sidebar_refactor: feature_flag_value)
+
       visit project_issues_path(project)
     end
 
     it_behaves_like 'page has active tab', 'Issues'
 
-    %w(Milestones Labels).each do |sub_menu|
-      context "on project Issues/#{sub_menu}" do
-        before do
-          click_tab(sub_menu)
-        end
+    context "on project Issues/Milestones" do
+      before do
+        click_tab('Milestones')
+      end
 
-        it_behaves_like 'page has active tab', 'Issues'
-        it_behaves_like 'page has active sub tab', sub_menu
+      it_behaves_like 'page has active tab', 'Issues'
+      it_behaves_like 'page has active sub tab', 'Milestones'
+    end
+
+    context 'when feature flag is disabled' do
+      let(:feature_flag_value) { false }
+
+      %w(Milestones Labels).each do |sub_menu|
+        context "on project Issues/#{sub_menu}" do
+          before do
+            click_tab(sub_menu)
+          end
+
+          it_behaves_like 'page has active tab', 'Issues'
+          it_behaves_like 'page has active sub tab', sub_menu
+        end
       end
     end
   end
@@ -79,7 +120,7 @@ RSpec.describe 'Project active tab' do
       visit project_merge_requests_path(project)
     end
 
-    it_behaves_like 'page has active tab', 'Merge Requests'
+    it_behaves_like 'page has active tab', 'Merge requests'
   end
 
   context 'on project Wiki' do
@@ -132,13 +173,13 @@ RSpec.describe 'Project active tab' do
       it_behaves_like 'page has active sub tab', _('Value Stream')
     end
 
-    context 'on project Analytics/"CI / CD"' do
+    context 'on project Analytics/"CI/CD"' do
       before do
-        click_tab(_('CI / CD'))
+        click_tab(_('CI/CD'))
       end
 
       it_behaves_like 'page has active tab', _('Analytics')
-      it_behaves_like 'page has active sub tab', _('CI / CD')
+      it_behaves_like 'page has active sub tab', _('CI/CD')
     end
   end
 end

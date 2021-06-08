@@ -82,6 +82,34 @@ RSpec.describe Projects::CreateService, '#execute' do
     end
   end
 
+  describe 'topics' do
+    subject(:project) { create_project(user, opts) }
+
+    context "with 'topics' parameter" do
+      let(:opts) { { topics: 'topics' } }
+
+      it 'keeps them as specified' do
+        expect(project.topic_list).to eq(%w[topics])
+      end
+    end
+
+    context "with 'topic_list' parameter" do
+      let(:opts) { { topic_list: 'topic_list' } }
+
+      it 'keeps them as specified' do
+        expect(project.topic_list).to eq(%w[topic_list])
+      end
+    end
+
+    context "with 'tag_list' parameter (deprecated)" do
+      let(:opts) { { tag_list: 'tag_list' } }
+
+      it 'keeps them as specified' do
+        expect(project.topic_list).to eq(%w[tag_list])
+      end
+    end
+  end
+
   context 'user namespace' do
     it do
       project = create_project(user, opts)
@@ -272,16 +300,6 @@ RSpec.describe Projects::CreateService, '#execute' do
     it 'handles invalid options' do
       opts[:default_branch] = 'master'
       expect(create_project(user, opts)).to eq(nil)
-    end
-
-    it 'sets invalid service as inactive' do
-      create(:service, type: 'JiraService', project: nil, template: true, active: true)
-
-      project = create_project(user, opts)
-      service = project.services.first
-
-      expect(project).to be_persisted
-      expect(service.active).to be false
     end
   end
 
@@ -574,18 +592,18 @@ RSpec.describe Projects::CreateService, '#execute' do
       let!(:template_integration) { create(:prometheus_service, :template, api_url: 'https://prometheus.template.com/') }
 
       it 'creates a service from the template' do
-        expect(project.services.count).to eq(1)
-        expect(project.services.first.api_url).to eq(template_integration.api_url)
-        expect(project.services.first.inherit_from_id).to be_nil
+        expect(project.integrations.count).to eq(1)
+        expect(project.integrations.first.api_url).to eq(template_integration.api_url)
+        expect(project.integrations.first.inherit_from_id).to be_nil
       end
 
       context 'with an active instance-level integration' do
         let!(:instance_integration) { create(:prometheus_service, :instance, api_url: 'https://prometheus.instance.com/') }
 
         it 'creates a service from the instance-level integration' do
-          expect(project.services.count).to eq(1)
-          expect(project.services.first.api_url).to eq(instance_integration.api_url)
-          expect(project.services.first.inherit_from_id).to eq(instance_integration.id)
+          expect(project.integrations.count).to eq(1)
+          expect(project.integrations.first.api_url).to eq(instance_integration.api_url)
+          expect(project.integrations.first.inherit_from_id).to eq(instance_integration.id)
         end
 
         context 'with an active group-level integration' do
@@ -604,9 +622,9 @@ RSpec.describe Projects::CreateService, '#execute' do
           end
 
           it 'creates a service from the group-level integration' do
-            expect(project.services.count).to eq(1)
-            expect(project.services.first.api_url).to eq(group_integration.api_url)
-            expect(project.services.first.inherit_from_id).to eq(group_integration.id)
+            expect(project.integrations.count).to eq(1)
+            expect(project.integrations.first.api_url).to eq(group_integration.api_url)
+            expect(project.integrations.first.inherit_from_id).to eq(group_integration.id)
           end
 
           context 'with an active subgroup' do
@@ -625,23 +643,12 @@ RSpec.describe Projects::CreateService, '#execute' do
             end
 
             it 'creates a service from the subgroup-level integration' do
-              expect(project.services.count).to eq(1)
-              expect(project.services.first.api_url).to eq(subgroup_integration.api_url)
-              expect(project.services.first.inherit_from_id).to eq(subgroup_integration.id)
+              expect(project.integrations.count).to eq(1)
+              expect(project.integrations.first.api_url).to eq(subgroup_integration.api_url)
+              expect(project.integrations.first.inherit_from_id).to eq(subgroup_integration.id)
             end
           end
         end
-      end
-    end
-
-    context 'when there is an invalid integration' do
-      before do
-        create(:service, :template, type: 'DroneCiService', active: true)
-      end
-
-      it 'creates an inactive service' do
-        expect(project).to be_persisted
-        expect(project.services.first.active).to be false
       end
     end
   end
@@ -673,8 +680,18 @@ RSpec.describe Projects::CreateService, '#execute' do
     expect(rugged.config['gitlab.fullpath']).to eq project.full_path
   end
 
+  it 'triggers PostCreationWorker' do
+    expect(Projects::PostCreationWorker).to receive(:perform_async).with(a_kind_of(Integer))
+
+    create_project(user, opts)
+  end
+
   context 'when project has access to shared service' do
-    context 'Prometheus application is shared via group cluster' do
+    before do
+      stub_feature_flags(projects_post_creation_worker: false)
+    end
+
+    context 'Prometheus integration is shared via group cluster' do
       let(:cluster) { create(:cluster, :group, groups: [group]) }
       let(:group) do
         create(:group).tap do |group|
@@ -683,7 +700,7 @@ RSpec.describe Projects::CreateService, '#execute' do
       end
 
       before do
-        create(:clusters_applications_prometheus, :installed, cluster: cluster)
+        create(:clusters_integrations_prometheus, cluster: cluster)
       end
 
       it 'creates PrometheusService record', :aggregate_failures do
@@ -696,11 +713,11 @@ RSpec.describe Projects::CreateService, '#execute' do
       end
     end
 
-    context 'Prometheus application is shared via instance cluster' do
+    context 'Prometheus integration is shared via instance cluster' do
       let(:cluster) { create(:cluster, :instance) }
 
       before do
-        create(:clusters_applications_prometheus, :installed, cluster: cluster)
+        create(:clusters_integrations_prometheus, cluster: cluster)
       end
 
       it 'creates PrometheusService record', :aggregate_failures do
@@ -714,9 +731,7 @@ RSpec.describe Projects::CreateService, '#execute' do
 
       it 'cleans invalid record and logs warning', :aggregate_failures do
         invalid_service_record = build(:prometheus_service, properties: { api_url: nil, manual_configuration: true }.to_json)
-        allow_next_instance_of(Project) do |instance|
-          allow(instance).to receive(:build_prometheus_service).and_return(invalid_service_record)
-        end
+        allow(PrometheusService).to receive(:new).and_return(invalid_service_record)
 
         expect(Gitlab::ErrorTracking).to receive(:track_exception).with(an_instance_of(ActiveRecord::RecordInvalid), include(extra: { project_id: a_kind_of(Integer) }))
         project = create_project(user, opts)
@@ -725,7 +740,7 @@ RSpec.describe Projects::CreateService, '#execute' do
       end
     end
 
-    context 'shared Prometheus application is not available' do
+    context 'shared Prometheus integration is not available' do
       it 'does not persist PrometheusService record', :aggregate_failures do
         project = create_project(user, opts)
 

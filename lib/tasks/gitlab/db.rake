@@ -80,22 +80,6 @@ namespace :gitlab do
       end
     end
 
-    desc 'GitLab | DB | Checks if migrations require downtime or not'
-    task :downtime_check, [:ref] => :environment do |_, args|
-      abort 'You must specify a Git reference to compare with' unless args[:ref]
-
-      require 'shellwords'
-
-      ref = Shellwords.escape(args[:ref])
-
-      migrations = `git diff #{ref}.. --diff-filter=A --name-only -- db/migrate`.lines
-        .map { |file| Rails.root.join(file.strip).to_s }
-        .select { |file| File.file?(file) }
-        .select { |file| /\A[0-9]+.*\.rb\z/ =~ File.basename(file) }
-
-      Gitlab::DowntimeCheck.new.check_and_print(migrations)
-    end
-
     desc 'GitLab | DB | Sets up EE specific database functionality'
 
     if Gitlab.ee?
@@ -145,13 +129,28 @@ namespace :gitlab do
     end
 
     # Inform Rake that custom tasks should be run every time rake db:structure:dump is run
+    #
+    # Rails 6.1 deprecates db:structure:dump in favor of db:schema:dump
     Rake::Task['db:structure:dump'].enhance do
       Rake::Task['gitlab:db:clean_structure_sql'].invoke
       Rake::Task['gitlab:db:dump_custom_structure'].invoke
     end
 
+    # Inform Rake that custom tasks should be run every time rake db:schema:dump is run
+    Rake::Task['db:schema:dump'].enhance do
+      Rake::Task['gitlab:db:clean_structure_sql'].invoke
+      Rake::Task['gitlab:db:dump_custom_structure'].invoke
+    end
+
     # Inform Rake that custom tasks should be run every time rake db:structure:load is run
+    #
+    # Rails 6.1 deprecates db:structure:load in favor of db:schema:load
     Rake::Task['db:structure:load'].enhance do
+      Rake::Task['gitlab:db:load_custom_structure'].invoke
+    end
+
+    # Inform Rake that custom tasks should be run every time rake db:schema:load is run
+    Rake::Task['db:schema:load'].enhance do
       Rake::Task['gitlab:db:load_custom_structure'].invoke
     end
 
@@ -175,7 +174,13 @@ namespace :gitlab do
     #
     # Other than that it's helpful to create partitions early when bootstrapping
     # a new installation.
+    #
+    # Rails 6.1 deprecates db:structure:load in favor of db:schema:load
     Rake::Task['db:structure:load'].enhance do
+      Rake::Task['gitlab:db:create_dynamic_partitions'].invoke
+    end
+
+    Rake::Task['db:schema:load'].enhance do
       Rake::Task['gitlab:db:create_dynamic_partitions'].invoke
     end
 
@@ -204,10 +209,10 @@ namespace :gitlab do
         raise "Index not found or not supported: #{args[:index_name]}" if indexes.empty?
       end
 
-      ActiveRecord::Base.logger = Logger.new(STDOUT) if Gitlab::Utils.to_boolean(ENV['LOG_QUERIES_TO_CONSOLE'], default: false)
+      ActiveRecord::Base.logger = Logger.new($stdout) if Gitlab::Utils.to_boolean(ENV['LOG_QUERIES_TO_CONSOLE'], default: false)
 
       Gitlab::Database::Reindexing.perform(indexes)
-    rescue => e
+    rescue StandardError => e
       Gitlab::AppLogger.error(e)
       raise
     end
@@ -233,11 +238,12 @@ namespace :gitlab do
     end
 
     desc 'Run migrations with instrumentation'
-    task :migration_testing, [:result_file] => :environment do |_, args|
-      result_file = args[:result_file] || raise("Please specify result_file argument")
-      raise "File exists already, won't overwrite: #{result_file}" if File.exist?(result_file)
+    task migration_testing: :environment do
+      result_dir = Gitlab::Database::Migrations::Instrumentation::RESULT_DIR
+      FileUtils.mkdir_p(result_dir)
 
-      verbose_was, ActiveRecord::Migration.verbose = ActiveRecord::Migration.verbose, true
+      verbose_was = ActiveRecord::Migration.verbose
+      ActiveRecord::Migration.verbose = true
 
       ctx = ActiveRecord::Base.connection.migration_context
       existing_versions = ctx.get_all_versions.to_set
@@ -255,13 +261,27 @@ namespace :gitlab do
       end
     ensure
       if instrumentation
-        File.open(result_file, 'wb+') do |io|
+        File.open(File.join(result_dir, Gitlab::Database::Migrations::Instrumentation::STATS_FILENAME), 'wb+') do |io|
           io << instrumentation.observations.to_json
         end
       end
 
       ActiveRecord::Base.clear_cache!
       ActiveRecord::Migration.verbose = verbose_was
+    end
+
+    desc 'Run all pending batched migrations'
+    task execute_batched_migrations: :environment do
+      Gitlab::Database::BackgroundMigration::BatchedMigration.active.queue_order.each do |migration|
+        Gitlab::AppLogger.info("Executing batched migration #{migration.id} inline")
+        Gitlab::Database::BackgroundMigration::BatchedMigrationRunner.new.run_entire_migration(migration)
+      end
+    end
+
+    # Only for development environments,
+    # we execute pending data migrations inline for convenience.
+    Rake::Task['db:migrate'].enhance do
+      Rake::Task['gitlab:db:execute_batched_migrations'].invoke if Rails.env.development?
     end
   end
 end

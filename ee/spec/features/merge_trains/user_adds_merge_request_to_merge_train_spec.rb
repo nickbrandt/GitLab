@@ -17,6 +17,7 @@ RSpec.describe 'User adds a merge request to a merge train', :js do
   end
 
   before do
+    stub_const('Gitlab::QueryLimiting::Transaction::THRESHOLD', 200)
     stub_feature_flags(disable_merge_trains: false)
     stub_licensed_features(merge_pipelines: true, merge_trains: true)
     project.add_maintainer(user)
@@ -63,6 +64,8 @@ RSpec.describe 'User adds a merge request to a merge train', :js do
     end
 
     context 'when pipeline for merge train succeeds', :sidekiq_might_not_need_inline do
+      let_it_be(:runner) { create(:ci_runner, :online) }
+
       before do
         visit project_merge_request_path(project, merge_request)
         merge_request.merge_train.pipeline.builds.map(&:success!)

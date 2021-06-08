@@ -7,7 +7,7 @@ info: To determine the technical writer assigned to the Stage/Group associated w
 # Getting started with Continuous Deployment to AWS Elastic Container Service **(FREE)**
 
 This step-by-step guide helps you use [Continuous Deployment to ECS](../index.md#deploy-your-application-to-the-aws-elastic-container-service-ecs)
-that deploys a project hosted on GitLab.com to [Elastic Container Service](https://aws.amazon.com/ecs)
+that deploys a project hosted on GitLab.com to [Elastic Container Service](https://aws.amazon.com/ecs/)
 (ECS) on AWS.
 
 In this guide, you begin by creating an ECS cluster manually using the AWS console. You create and
@@ -59,13 +59,13 @@ container registry.
 
 ### Push a containerized application image to GitLab Container Registry
 
-[ECS](https://aws.amazon.com/ecs) is a container orchestration service, meaning that you must
+[ECS](https://aws.amazon.com/ecs/) is a container orchestration service, meaning that you must
 provide a containerized application image during the infrastructure build. To do so, you can use
 GitLab [Auto Build](../../../topics/autodevops/stages.md#auto-build)
 and [Container Registry](../../../user/packages/container_registry/index.md).
 
 1. Go to **ecs-demo** project on GitLab.
-1. Click **Setup up CI/CD**. It brings you to a [`.gitlab-ci.yml`](../../README.md#getting-started)
+1. Click **Setup up CI/CD**. It brings you to a `.gitlab-ci.yml`
    creation form.
 1. Copy and paste the following content into the empty `.gitlab-ci.yml`. This defines
    [a pipeline for continuous deployment to ECS](../index.md#deploy-your-application-to-the-aws-elastic-container-service-ecs).
@@ -77,9 +77,9 @@ and [Container Registry](../../../user/packages/container_registry/index.md).
 
 1. Click **Commit Changes**. It automatically triggers a new pipeline. In this pipeline, the `build`
    job containerizes the application and pushes the image to [GitLab Container Registry](../../../user/packages/container_registry/index.md).
-  
+
    ![Create project](img/initial-pipeline.png)
-  
+
 1. Visit **Packages & Registries > Container Registry**. Make sure the application image has been
    pushed.
 
@@ -145,7 +145,7 @@ Note the following:
 - Optionally, you can set a SSH key pair in the creation form. This allows you to SSH to the EC2
   instance for debugging.
 - If you don't choose an existing VPC, it creates a new VPC by default. This could cause an error if
-  it reaches the maximum allowed number of internet gateways on your account. 
+  it reaches the maximum allowed number of internet gateways on your account.
 - The cluster requires an EC2 instance, meaning it costs you [according to the instance-type](https://aws.amazon.com/ec2/pricing/on-demand/).
 
 ### Create an ECS Service
@@ -211,7 +211,7 @@ Do not share the secret access key in a public place. You must save it in a secu
 
 ### Setup credentials in GitLab to let pipeline jobs access to ECS
 
-You can register the access information in [GitLab Environment Variables](../../variables/README.md#create-a-custom-variable-in-the-ui).
+You can register the access information in [GitLab Environment Variables](../../variables/README.md#custom-cicd-variables).
 These variables are injected into the pipeline jobs and can access the ECS API.
 
 1. Go to **ecs-demo** project on GitLab.
@@ -232,7 +232,7 @@ These variables are injected into the pipeline jobs and can access the ECS API.
 Change a file in the project and see if it's reflected in the demo application on ECS:
 
 1. Go to **ecs-demo** project on GitLab.
-1. Open the file at **app > views > welcome > index.html.erb**.
+1. Open the file at **app > views > welcome > `index.html.erb`**.
 1. Click **Edit**.
 1. Change the text to `You're on ECS!`.
 1. Click **Commit Changes**. This automatically triggers a new pipeline. Wait until it finishes.

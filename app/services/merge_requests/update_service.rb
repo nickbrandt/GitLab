@@ -4,28 +4,18 @@ module MergeRequests
   class UpdateService < MergeRequests::BaseService
     extend ::Gitlab::Utils::Override
 
-    def initialize(project, user = nil, params = {})
+    def initialize(project:, current_user: nil, params: {})
       super
 
       @target_branch_was_deleted = @params.delete(:target_branch_was_deleted)
     end
 
     def execute(merge_request)
-      # We don't allow change of source/target projects and source branch
-      # after merge request was created
-      params.delete(:source_project_id)
-      params.delete(:target_project_id)
-      params.delete(:source_branch)
-
-      if merge_request.closed_or_merged_without_fork?
-        params.delete(:target_branch)
-        params.delete(:force_remove_source_branch)
-      end
-
-      update_task_event(merge_request) || update(merge_request)
+      update_merge_request_with_specialized_service(merge_request) || general_fallback(merge_request)
     end
 
     def handle_changes(merge_request, options)
+      super
       old_associations = options.fetch(:old_associations, {})
       old_labels = old_associations.fetch(:labels, [])
       old_mentioned_users = old_associations.fetch(:mentioned_users, [])
@@ -42,14 +32,13 @@ module MergeRequests
       end
 
       handle_target_branch_change(merge_request)
-      handle_assignees_change(merge_request, old_assignees) if merge_request.assignees != old_assignees
-      handle_reviewers_change(merge_request, old_reviewers) if merge_request.reviewers != old_reviewers
       handle_milestone_change(merge_request)
       handle_draft_status_change(merge_request, changed_fields)
 
       track_title_and_desc_edits(changed_fields)
       track_discussion_lock_toggle(merge_request, changed_fields)
       track_time_estimate_and_spend_edits(merge_request, old_timelogs, changed_fields)
+      track_labels_change(merge_request, old_labels)
 
       notify_if_labels_added(merge_request, old_labels)
       notify_if_mentions_added(merge_request, old_mentioned_users)
@@ -60,7 +49,7 @@ module MergeRequests
       #
       if merge_request.previous_changes.include?('target_branch') ||
           merge_request.previous_changes.include?('source_branch')
-        merge_request.mark_as_unchecked
+        merge_request.mark_as_unchecked unless merge_request.unchecked?
       end
     end
 
@@ -84,6 +73,21 @@ module MergeRequests
     private
 
     attr_reader :target_branch_was_deleted
+
+    def general_fallback(merge_request)
+      # We don't allow change of source/target projects and source branch
+      # after merge request was created
+      params.delete(:source_project_id)
+      params.delete(:target_project_id)
+      params.delete(:source_branch)
+
+      if merge_request.closed_or_merged_without_fork?
+        params.delete(:target_branch)
+        params.delete(:force_remove_source_branch)
+      end
+
+      update_task_event(merge_request) || update(merge_request)
+    end
 
     def track_title_and_desc_edits(changed_fields)
       tracked_fields = %w(title description)
@@ -113,6 +117,12 @@ module MergeRequests
       merge_request_activity_counter.track_time_spent_changed_action(user: current_user) if old_timelogs != merge_request.timelogs
     end
 
+    def track_labels_change(merge_request, old_labels)
+      return if Set.new(merge_request.labels) == Set.new(old_labels)
+
+      merge_request_activity_counter.track_labels_changed_action(user: current_user)
+    end
+
     def notify_if_labels_added(merge_request, old_labels)
       added_labels = merge_request.labels - old_labels
 
@@ -140,7 +150,11 @@ module MergeRequests
     def resolve_todos(merge_request, old_labels, old_assignees, old_reviewers)
       return unless has_changes?(merge_request, old_labels: old_labels, old_assignees: old_assignees, old_reviewers: old_reviewers)
 
-      todo_service.resolve_todos_for_target(merge_request, current_user)
+      service_user = current_user
+
+      merge_request.run_after_commit_or_now do
+        ::MergeRequests::ResolveTodosService.new(merge_request, service_user).async_execute
+      end
     end
 
     def handle_target_branch_change(merge_request)
@@ -191,33 +205,18 @@ module MergeRequests
 
       return unless merge_request.previous_changes.include?('milestone_id')
 
+      merge_request_activity_counter.track_milestone_changed_action(user: current_user)
+
+      previous_milestone = Milestone.find_by_id(merge_request.previous_changes['milestone_id'].first)
+      delete_milestone_total_merge_requests_counter_cache(previous_milestone)
+
       if merge_request.milestone.nil?
         notification_service.async.removed_milestone_merge_request(merge_request, current_user)
       else
         notification_service.async.changed_milestone_merge_request(merge_request, merge_request.milestone, current_user)
+
+        delete_milestone_total_merge_requests_counter_cache(merge_request.milestone)
       end
-    end
-
-    def handle_assignees_change(merge_request, old_assignees)
-      create_assignee_note(merge_request, old_assignees)
-      notification_service.async.reassigned_merge_request(merge_request, current_user, old_assignees)
-      todo_service.reassigned_assignable(merge_request, current_user, old_assignees)
-
-      new_assignees = merge_request.assignees - old_assignees
-      merge_request_activity_counter.track_users_assigned_to_mr(users: new_assignees)
-      merge_request_activity_counter.track_assignees_changed_action(user: current_user)
-    end
-
-    def handle_reviewers_change(merge_request, old_reviewers)
-      affected_reviewers = (old_reviewers + merge_request.reviewers) - (old_reviewers & merge_request.reviewers)
-      create_reviewer_note(merge_request, old_reviewers)
-      notification_service.async.changed_reviewer_of_merge_request(merge_request, current_user, old_reviewers)
-      todo_service.reassigned_reviewable(merge_request, current_user, old_reviewers)
-      invalidate_cache_counts(merge_request, users: affected_reviewers.compact)
-
-      new_reviewers = merge_request.reviewers - old_reviewers
-      merge_request_activity_counter.track_users_review_requested(users: new_reviewers)
-      merge_request_activity_counter.track_reviewers_changed_action(user: current_user)
     end
 
     def create_branch_change_note(issuable, branch_type, event_type, old_branch, new_branch)
@@ -258,7 +257,41 @@ module MergeRequests
     def quick_action_options
       { merge_request_diff_head_sha: params.delete(:merge_request_diff_head_sha) }
     end
+
+    def update_merge_request_with_specialized_service(merge_request)
+      return unless params.delete(:use_specialized_service)
+
+      # If we're attempting to modify only a single attribute, look up whether
+      #   we have a specialized, targeted service we should use instead. We may
+      #   in the future extend this to include specialized services that operate
+      #   on multiple attributes, but for now limit to only single attribute
+      #   updates.
+      #
+      return unless params.one?
+
+      attempt_specialized_update_services(merge_request, params.each_key.first.to_sym)
+    end
+
+    def attempt_specialized_update_services(merge_request, attribute)
+      case attribute
+      when :assignee_ids, :assignee_id
+        assignees_service.execute(merge_request)
+      when :spend_time
+        add_time_spent_service.execute(merge_request)
+      else
+        nil
+      end
+    end
+
+    def assignees_service
+      @assignees_service ||= ::MergeRequests::UpdateAssigneesService
+        .new(project: project, current_user: current_user, params: params)
+    end
+
+    def add_time_spent_service
+      @add_time_spent_service ||= ::MergeRequests::AddSpentTimeService.new(project: project, current_user: current_user, params: params)
+    end
   end
 end
 
-MergeRequests::UpdateService.prepend_if_ee('EE::MergeRequests::UpdateService')
+MergeRequests::UpdateService.prepend_mod_with('MergeRequests::UpdateService')

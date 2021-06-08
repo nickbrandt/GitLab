@@ -28,7 +28,7 @@ The source of the documentation exists within the codebase of each GitLab applic
 | Project | Path |
 | --- | --- |
 | [GitLab](https://gitlab.com/gitlab-org/gitlab/) | [`/doc`](https://gitlab.com/gitlab-org/gitlab/tree/master/doc) |
-| [GitLab Runner](https://gitlab.com/gitlab-org/gitlab-runner/) | [`/docs`](https://gitlab.com/gitlab-org/gitlab-runner/tree/master/docs) |
+| [GitLab Runner](https://gitlab.com/gitlab-org/gitlab-runner/) | [`/docs`](https://gitlab.com/gitlab-org/gitlab-runner/-/tree/main/docs) |
 | [Omnibus GitLab](https://gitlab.com/gitlab-org/omnibus-gitlab/) | [`/doc`](https://gitlab.com/gitlab-org/omnibus-gitlab/tree/master/doc) |
 | [Charts](https://gitlab.com/gitlab-org/charts/gitlab) | [`/doc`](https://gitlab.com/gitlab-org/charts/gitlab/tree/master/doc) |
 
@@ -156,7 +156,7 @@ Nanoc layout), which is displayed at the top of the page if defined:
 
 - `reading_time`: If you want to add an indication of the approximate reading
   time of a page, you can set `reading_time` to `true`. This uses a simple
-  [algorithm](https://gitlab.com/gitlab-org/gitlab-docs/-/blob/master/lib/helpers/reading_time.rb)
+  [algorithm](https://gitlab.com/gitlab-org/gitlab-docs/-/blob/main/lib/helpers/reading_time.rb)
   to calculate the reading time based on the number of words.
 
 ## Move or rename a page
@@ -177,26 +177,59 @@ There are two types of redirects:
 - [GitLab Pages redirects](../../user/project/pages/redirects.md),
   for users who view the docs on [`docs.gitlab.com`](https://docs.gitlab.com).
 
-The Technical Writing team manages the [process](https://gitlab.com/gitlab-org/technical-writing/-/blob/master/.gitlab/issue_templates/tw-monthly-tasks.md)
-to regularly update the [`redirects.yaml`](https://gitlab.com/gitlab-org/gitlab-docs/-/blob/master/content/_data/redirects.yaml)
+The Technical Writing team manages the [process](https://gitlab.com/gitlab-org/technical-writing/-/blob/main/.gitlab/issue_templates/tw-monthly-tasks.md)
+to regularly update the [`redirects.yaml`](https://gitlab.com/gitlab-org/gitlab-docs/-/blob/main/content/_data/redirects.yaml)
 file.
 
 To add a redirect:
 
-1. Create a merge request in one of the internal docs projects (`gitlab`,
-   `gitlab-runner`, `omnibus-gitlab`, or `charts`), depending on the location of
-   the file that's being moved, renamed, or removed.
-1. To move or rename the documentation file, create a new file with the new
-   name or location, but don't delete the existing documentation file.
-1. In the original documentation file, add the redirect code for
-   `/help`. Use the following template exactly, and change only the links and
-   date. Use relative paths and `.md` for a redirect to another documentation
-   page. Use the full URL (with `https://`) to redirect to a different project or
-   site:
+1. In the repository (`gitlab`, `gitlab-runner`, `omnibus-gitlab`, or `charts`),
+   create a new documentation file. Don't delete the old one. The easiest
+   way is to copy it. For example:
+
+   ```shell
+   cp doc/user/search/old_file.md doc/api/new_file.md
+   ```
+
+1. Add the redirect code to the old documentation file by running the
+   following Rake task. The first argument is the path of the old file,
+   and the second argument is the path of the new file:
+
+   - To redirect to a page in the same project, use relative paths and
+     the `.md` extension. Both old and new paths start from the same location.
+     In the following example, both paths are relative to `doc/`:
+
+     ```shell
+     bundle exec rake "gitlab:docs:redirect[doc/user/search/old_file.md, doc/api/new_file.md]"
+     ```
+
+   - To redirect to a page in a different project or site, use the full URL (with `https://`) :
+
+     ```shell
+     bundle exec rake "gitlab:docs:redirect[doc/user/search/old_file.md, https://example.com]"
+     ```
+
+   Alternatively, you can omit the arguments, and you'll be asked to enter
+   their values:
+
+   ```shell
+   bundle exec rake gitlab:docs:redirect
+   ```
+
+   If you don't want to use the Rake task, you can use the following template.
+   However, the file paths must be relative to the `doc` or `docs` directory.
+
+   Replace the value of `redirect_to` with the new file path and `YYYY-MM-DD`
+   with the date the file should be removed.
+
+   Redirect files that link to docs in internal documentation projects
+   are removed after three months. Redirect files that link to external sites are
+   removed after one year:
 
    ```markdown
    ---
-   redirect_to: '../path/to/file/index.md'
+   redirect_to: '../newpath/to/file/index.md'
+   remove_date: 'YYYY-MM-DD'
    ---
 
    This document was moved to [another location](../path/to/file/index.md).
@@ -205,27 +238,24 @@ To add a redirect:
    <!-- Before deletion, see: https://docs.gitlab.com/ee/development/documentation/#move-or-rename-a-page -->
    ```
 
-   Redirect files linking to docs in any of the internal documentations projects
-   are removed after three months. Redirect files linking to external sites are
-   removed after one year.
-
 1. If the documentation page being moved has any Disqus comments, follow the steps
    described in [Redirections for pages with Disqus comments](#redirections-for-pages-with-disqus-comments).
-1. If a documentation page you're removing includes images that aren't used
+1. Open a merge request with your changes. If a documentation page
+   you're removing includes images that aren't used
    with any other documentation pages, be sure to use your merge request to delete
    those images from the repository.
 1. Assign the merge request to a technical writer for review and merge.
-1. Search for links to the original documentation file. You must find and update all
-   links that point to the original documentation file:
+1. Search for links to the old documentation file. You must find and update all
+   links that point to the old documentation file:
 
    - In <https://gitlab.com/gitlab-com/www-gitlab-com>, search for full URLs:
      `grep -r "docs.gitlab.com/ee/path/to/file.html" .`
    - In <https://gitlab.com/gitlab-org/gitlab-docs/-/tree/master/content/_data>,
      search the navigation bar configuration files for the path with `.html`:
      `grep -r "path/to/file.html" .`
-   - In any of the four internal projects. This includes searching for links in the docs
+   - In any of the four internal projects, search for links in the docs
      and codebase. Search for all variations, including full URL and just the path.
-     In macOS for example, go to the root directory of the `gitlab` project and run:
+     For example, go to the root directory of the `gitlab` project and run:
 
      ```shell
      grep -r "docs.gitlab.com/ee/path/to/file.html" .
@@ -382,16 +412,16 @@ on how the left-side navigation menu is built and updated.
 
 NOTE:
 To preview your changes to documentation locally, follow this
-[development guide](https://gitlab.com/gitlab-org/gitlab-docs/blob/master/README.md#development-when-contributing-to-gitlab-documentation) or [these instructions for GDK](https://gitlab.com/gitlab-org/gitlab-development-kit/blob/master/doc/howto/gitlab_docs.md).
+[development guide](https://gitlab.com/gitlab-org/gitlab-docs/blob/main/README.md#development-when-contributing-to-gitlab-documentation) or [these instructions for GDK](https://gitlab.com/gitlab-org/gitlab-development-kit/blob/main/doc/howto/gitlab_docs.md).
 
 The live preview is currently enabled for the following projects:
 
 - [`gitlab`](https://gitlab.com/gitlab-org/gitlab)
+- [`omnibus-gitlab`](https://gitlab.com/gitlab-org/omnibus-gitlab)
 - [`gitlab-runner`](https://gitlab.com/gitlab-org/gitlab-runner)
 
 If your merge request has docs changes, you can use the manual `review-docs-deploy` job
 to deploy the docs review app for your merge request.
-You need at least Maintainer permissions to be able to run it.
 
 ![Manual trigger a docs build](img/manual_build_docs.png)
 
@@ -399,11 +429,6 @@ You must push a branch to those repositories, as it doesn't work for forks.
 
 The `review-docs-deploy*` job:
 
-1. Creates a new branch in the [`gitlab-docs`](https://gitlab.com/gitlab-org/gitlab-docs)
-   project named after the scheme: `docs-preview-$DOCS_GITLAB_REPO_SUFFIX-$CI_MERGE_REQUEST_IID`,
-   where `DOCS_GITLAB_REPO_SUFFIX` is the suffix for each product, e.g, `ee` for
-   EE, `omnibus` for Omnibus GitLab, etc, and `CI_MERGE_REQUEST_IID` is the ID
-   of the respective merge request.
 1. Triggers a cross project pipeline and build the docs site with your changes.
 
 In case the review app URL returns 404, this means that either the site is not
@@ -411,11 +436,6 @@ yet deployed, or something went wrong with the remote pipeline. Give it a few
 minutes and it should appear online, otherwise you can check the status of the
 remote pipeline from the link in the merge request's job output.
 If the pipeline failed or got stuck, drop a line in the `#docs` chat channel.
-
-Make sure that you always delete the branch of the merge request you were
-working on. If you don't, the remote docs branch isn't removed either,
-and the server where the Review Apps are hosted can eventually run out of
-disk space.
 
 NOTE:
 Someone with no merge rights to the GitLab projects (think of forks from
@@ -440,19 +460,11 @@ If you want to know the in-depth details, here's what's really happening:
 
 1. You manually run the `review-docs-deploy` job in a merge request.
 1. The job runs the [`scripts/trigger-build`](https://gitlab.com/gitlab-org/gitlab/blob/master/scripts/trigger-build)
-   script with the `docs deploy` flag, which in turn:
-   1. Takes your branch name and applies the following:
-      - The `docs-preview-` prefix is added.
-      - The product slug is used to know the project the review app originated
-        from.
-      - The number of the merge request is added so that you can know by the
-        `gitlab-docs` branch name the merge request it originated from.
-   1. The remote branch is then created if it doesn't exist (meaning you can
-      re-run the manual job as many times as you want and this step is skipped).
-   1. A new cross-project pipeline is triggered in the docs project.
-   1. The preview URL is shown both at the job output and in the merge request
-      widget. You also get the link to the remote pipeline.
-1. In the docs project, the pipeline is created and it
+   script with the `docs deploy` flag, which triggers the "Triggered from `gitlab-org/gitlab` 'review-docs-deploy' job"
+   pipeline trigger in the `gitlab-org/gitlab-docs` project for the `$DOCS_BRANCH` (defaults to `master`).
+1. The preview URL is shown both at the job output and in the merge request
+   widget. You also get the link to the remote pipeline.
+1. In the `gitlab-org/gitlab-docs` project, the pipeline is created and it
    [skips the test jobs](https://gitlab.com/gitlab-org/gitlab-docs/blob/8d5d5c750c602a835614b02f9db42ead1c4b2f5e/.gitlab-ci.yml#L50-55)
    to lower the build time.
 1. Once the docs site is built, the HTML files are uploaded as artifacts.
@@ -471,7 +483,8 @@ The following GitLab features are used among others:
 
 ## Testing
 
-For more information on documentation testing, see [Documentation testing](testing.md)
+For more information about documentation testing, see the [Documentation testing](testing.md)
+guide.
 
 ## Danger Bot
 
@@ -490,7 +503,7 @@ help of a configuration file known as **screenshot generator**.
 
 To run the tool on an existing screenshot generator, take the following steps:
 
-1. Set up the [GitLab Development Kit (GDK)](https://gitlab.com/gitlab-org/gitlab-development-kit/blob/master/doc/howto/gitlab_docs.md).
+1. Set up the [GitLab Development Kit (GDK)](https://gitlab.com/gitlab-org/gitlab-development-kit/blob/main/doc/howto/gitlab_docs.md).
 1. Navigate to the subdirectory with your cloned GitLab repository, typically `gdk/gitlab`.
 1. Make sure that your GDK database is fully migrated: `bin/rake db:migrate RAILS_ENV=development`.
 1. Install `pngquant`, see the tool website for more information: [`pngquant`](https://pngquant.org/)

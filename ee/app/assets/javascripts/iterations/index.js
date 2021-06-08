@@ -2,9 +2,11 @@ import Vue from 'vue';
 import VueApollo from 'vue-apollo';
 import createDefaultClient from '~/lib/graphql';
 import { parseBoolean } from '~/lib/utils/common_utils';
+import App from './components/app.vue';
 import IterationForm from './components/iteration_form.vue';
 import IterationReport from './components/iteration_report.vue';
 import Iterations from './components/iterations.vue';
+import createRouter from './router';
 
 Vue.use(VueApollo);
 
@@ -71,10 +73,12 @@ export function initIterationReport({ namespaceType, initiallyEditing } = {}) {
   return new Vue({
     el,
     apolloProvider,
+    provide: {
+      fullPath,
+    },
     render(createElement) {
       return createElement(IterationReport, {
         props: {
-          fullPath,
           hasScopedLabelsFeature: parseBoolean(hasScopedLabelsFeature),
           iterationId,
           labelsFetchPath,
@@ -86,6 +90,38 @@ export function initIterationReport({ namespaceType, initiallyEditing } = {}) {
           initiallyEditing,
         },
       });
+    },
+  });
+}
+
+export function initCadenceApp() {
+  const el = document.querySelector('.js-iteration-cadence-app');
+
+  if (!el) {
+    return null;
+  }
+
+  const {
+    groupFullPath: groupPath,
+    cadencesListPath,
+    canCreateCadence,
+    canEditCadence,
+  } = el.dataset;
+  const router = createRouter(cadencesListPath);
+
+  return new Vue({
+    el,
+    router,
+    apolloProvider,
+    provide: {
+      fullPath: groupPath,
+      groupPath,
+      cadencesListPath,
+      canCreateCadence: parseBoolean(canCreateCadence),
+      canEditCadence: parseBoolean(canEditCadence),
+    },
+    render(createElement) {
+      return createElement(App);
     },
   });
 }

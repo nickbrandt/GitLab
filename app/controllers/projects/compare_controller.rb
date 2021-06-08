@@ -26,6 +26,10 @@ class Projects::CompareController < Projects::ApplicationController
 
   feature_category :source_code_management
 
+  # Diffs may be pretty chunky, the less is better in this endpoint.
+  # Pagination design guides: https://design.gitlab.com/components/pagination/#behavior
+  COMMIT_DIFFS_PER_PAGE = 20
+
   def index
   end
 
@@ -75,11 +79,11 @@ class Projects::CompareController < Projects::ApplicationController
   private
 
   def validate_refs!
-    valid = [head_ref, start_ref].map { |ref| valid_ref?(ref) }
+    invalid = [head_ref, start_ref].filter { |ref| !valid_ref?(ref) }
 
-    return if valid.all?
+    return if invalid.empty?
 
-    flash[:alert] = "Invalid branch name"
+    flash[:alert] = "Invalid branch name(s): #{invalid.join(', ')}"
     redirect_to project_compare_index_path(source_project)
   end
 
@@ -132,7 +136,7 @@ class Projects::CompareController < Projects::ApplicationController
     if compare
       environment_params = source_project.repository.branch_exists?(head_ref) ? { ref: head_ref } : { commit: compare.commit }
       environment_params[:find_latest] = true
-      @environment = EnvironmentsFinder.new(source_project, current_user, environment_params).execute.last
+      @environment = ::Environments::EnvironmentsByDeploymentsFinder.new(source_project, current_user, environment_params).execute.last
     end
   end
 

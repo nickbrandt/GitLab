@@ -3,6 +3,7 @@
 module Projects
   module Settings
     class RepositoryController < Projects::ApplicationController
+      layout 'project_settings'
       before_action :authorize_admin_project!
       before_action :define_variables, only: [:create_deploy_token]
       before_action do
@@ -133,4 +134,4 @@ module Projects
   end
 end
 
-Projects::Settings::RepositoryController.prepend_if_ee('EE::Projects::Settings::RepositoryController')
+Projects::Settings::RepositoryController.prepend_mod_with('Projects::Settings::RepositoryController')

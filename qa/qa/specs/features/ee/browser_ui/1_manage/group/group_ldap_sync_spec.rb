@@ -34,7 +34,7 @@ module QA
         Runtime::Browser.visit(:gitlab, Page::Main::Login)
         Page::Main::Login.perform(&:sign_in_using_admin_credentials)
 
-        Runtime::Env.personal_access_token = Resource::PersonalAccessToken.fabricate!.access_token
+        Runtime::Env.personal_access_token = Resource::PersonalAccessToken.fabricate!.token
         Page::Main::Menu.perform(&:sign_out)
       end
 
@@ -89,7 +89,7 @@ module QA
           Page::Group::Menu.perform(&:go_to_ldap_sync_settings)
 
           EE::Page::Group::Settings::LDAPSync.perform do |settings|
-            settings.set_sync_method('LDAP Group cn')
+            settings.set_ldap_group_sync_method
             settings.set_group_cn('Engineering')
             settings.click_add_sync_button
           end

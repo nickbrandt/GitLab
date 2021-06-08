@@ -19,6 +19,10 @@ module Gitlab
     Settings
   end
 
+  def self.host_with_port
+    "#{self.config.gitlab.host}:#{self.config.gitlab.port}"
+  end
+
   def self.revision
     @_revision ||= begin
       if File.exist?(root.join("REVISION"))
@@ -88,6 +92,16 @@ module Gitlab
     Rails.env.development? || Rails.env.test?
   end
 
+  def self.extensions
+    if jh?
+      %w[ee jh]
+    elsif ee?
+      %w[ee]
+    else
+      %w[]
+    end
+  end
+
   def self.ee?
     @is_ee ||=
       # We use this method when the Rails environment is not loaded. This
@@ -104,8 +118,19 @@ module Gitlab
         !%w[true 1].include?(ENV['FOSS_ONLY'].to_s)
   end
 
+  def self.jh?
+    @is_jh ||=
+      ee? &&
+        root.join('jh').exist? &&
+        !%w[true 1].include?(ENV['EE_ONLY'].to_s)
+  end
+
   def self.ee
     yield if ee?
+  end
+
+  def self.jh
+    yield if jh?
   end
 
   def self.http_proxy_env?

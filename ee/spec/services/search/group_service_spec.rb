@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe Search::GroupService, :elastic do
+RSpec.describe Search::GroupService do
   include SearchResultHelpers
   include ProjectHelpers
   using RSpec::Parameterized::TableSyntax
@@ -50,7 +50,7 @@ RSpec.describe Search::GroupService, :elastic do
       ensure_elasticsearch_index!
     end
 
-    context 'finding projects by name', :sidekiq_might_not_need_inline do
+    context 'finding projects by name', :elastic, :clean_gitlab_redis_shared_state, :sidekiq_might_not_need_inline do
       subject { results.objects('projects') }
 
       context 'in parent group' do
@@ -67,19 +67,7 @@ RSpec.describe Search::GroupService, :elastic do
     end
   end
 
-  context 'notes search' do
-    let_it_be(:group) { create(:group) }
-    let_it_be(:project) { create(:project, namespace: group) }
-    let(:results) { described_class.new(nil, group, search: 'test').execute.objects('notes') }
-
-    before do
-      allow(Elastic::DataMigrationService).to receive(:migration_has_finished?).and_call_original
-    end
-
-    it_behaves_like 'search query applies joins based on migrations shared examples', :add_permissions_data_to_notes_documents
-  end
-
-  context 'visibility', :sidekiq_inline do
+  context 'visibility', :elastic_delete_by_query, :clean_gitlab_redis_shared_state, :sidekiq_inline do
     include_context 'ProjectPolicyTable context'
 
     shared_examples 'search respects visibility' do
@@ -97,6 +85,7 @@ RSpec.describe Search::GroupService, :elastic do
     end
 
     let_it_be(:group) { create(:group) }
+
     let!(:project) { create(:project, project_level, namespace: group) }
     let!(:project2) { create(:project, project_level) }
     let(:user) { create_user_from_membership(project, membership) }
@@ -156,21 +145,7 @@ RSpec.describe Search::GroupService, :elastic do
         end
 
         with_them do
-          before do
-            allow(Elastic::DataMigrationService).to receive(:migration_has_finished?).and_call_original
-          end
-
-          context 'when add_permissions_data_to_notes_documents migration is finished' do
-            it_behaves_like 'search respects visibility'
-          end
-
-          context 'when add_permissions_data_to_notes_documents migration is not finished' do
-            before do
-              allow(Elastic::DataMigrationService).to receive(:migration_has_finished?).with(:add_permissions_data_to_notes_documents).and_return(false)
-            end
-
-            it_behaves_like 'search respects visibility'
-          end
+          it_behaves_like 'search respects visibility'
         end
       end
 
@@ -183,21 +158,7 @@ RSpec.describe Search::GroupService, :elastic do
         end
 
         with_them do
-          before do
-            allow(Elastic::DataMigrationService).to receive(:migration_has_finished?).and_call_original
-          end
-
-          context 'when add_permissions_data_to_notes_documents migration is finished' do
-            it_behaves_like 'search respects visibility'
-          end
-
-          context 'when add_permissions_data_to_notes_documents migration is not finished' do
-            before do
-              allow(Elastic::DataMigrationService).to receive(:migration_has_finished?).with(:add_permissions_data_to_notes_documents).and_return(false)
-            end
-
-            it_behaves_like 'search respects visibility'
-          end
+          it_behaves_like 'search respects visibility'
         end
       end
 
@@ -213,23 +174,11 @@ RSpec.describe Search::GroupService, :elastic do
 
         with_them do
           before do
-            allow(Elastic::DataMigrationService).to receive(:migration_has_finished?).and_call_original
-
             project.repository.index_commits_and_blobs
             project2.repository.index_commits_and_blobs
           end
 
-          context 'when add_permissions_data_to_notes_documents migration is finished' do
-            it_behaves_like 'search respects visibility'
-          end
-
-          context 'when add_permissions_data_to_notes_documents migration is not finished' do
-            before do
-              allow(Elastic::DataMigrationService).to receive(:migration_has_finished?).with(:add_permissions_data_to_notes_documents).and_return(false)
-            end
-
-            it_behaves_like 'search respects visibility'
-          end
+          it_behaves_like 'search respects visibility'
         end
       end
 
@@ -242,21 +191,7 @@ RSpec.describe Search::GroupService, :elastic do
         end
 
         with_them do
-          before do
-            allow(Elastic::DataMigrationService).to receive(:migration_has_finished?).and_call_original
-          end
-
-          context 'when add_permissions_data_to_notes_documents migration is finished' do
-            it_behaves_like 'search respects visibility'
-          end
-
-          context 'when add_permissions_data_to_notes_documents migration is not finished' do
-            before do
-              allow(Elastic::DataMigrationService).to receive(:migration_has_finished?).with(:add_permissions_data_to_notes_documents).and_return(false)
-            end
-
-            it_behaves_like 'search respects visibility'
-          end
+          it_behaves_like 'search respects visibility'
         end
       end
     end
@@ -347,7 +282,7 @@ RSpec.describe Search::GroupService, :elastic do
     end
   end
 
-  context 'sorting' do
+  context 'sorting', :elastic, :clean_gitlab_redis_shared_state do
     context 'issues' do
       let(:scope) { 'issues' }
       let_it_be(:group) { create(:group) }

@@ -46,7 +46,7 @@ module Geo
 
         # Secondaries don't need to run this since they will receive an event for each
         # rechecksummed resource: https://gitlab.com/gitlab-org/gitlab/-/issues/13842
-        ::Geo::ReverificationBatchWorker.perform_async(replicable_name) if ::Gitlab::Geo.primary?
+        ::Geo::ReverificationBatchWorker.perform_with_capacity(replicable_name) if ::Gitlab::Geo.primary?
       end
 
       # Called by VerificationBatchWorker.
@@ -189,7 +189,7 @@ module Geo
 
     # Schedules a verification job after a model record is created/updated
     def after_verifiable_update
-      verify_async if should_primary_verify?
+      verify_async if should_primary_verify_after_save?
     end
 
     def verify_async
@@ -223,7 +223,9 @@ module Geo
     #
     # @abstract
     def primary_checksum
-      model_record.verification_checksum
+      # If verification is not yet setup, then model_record will not have the verification_checksum
+      # attribute yet. Returning nil is fine here
+      model_record.verification_checksum if model_record.respond_to?(:verification_checksum)
     end
 
     def secondary_checksum
@@ -242,10 +244,22 @@ module Geo
 
     private
 
-    def should_primary_verify?
-      self.class.verification_enabled? &&
-       primary_checksum.nil? && # Some models may populate this as part of creating the record
-       checksummable?
+    def should_primary_verify_after_save?
+      return false unless self.class.verification_enabled?
+
+      # Optimization: If the data is immutable, then there is no need to
+      # recalculate checksum when a record is created (some models calculate
+      # checksum as part of creation) or updated. Note that reverification
+      # should still run as usual.
+      return false if immutable? && primary_checksum.present?
+
+      checksummable?
+    end
+
+    # @abstract
+    # @return [Boolean] whether the replicable is supposed to be immutable
+    def immutable?
+      raise NotImplementedError, "#{self.class} does not implement #{__method__}"
     end
 
     # @abstract

@@ -11,11 +11,7 @@ class Admin::ApplicationSettingsController < Admin::ApplicationController
   # https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/30233
   before_action :set_application_setting, except: :integrations
 
-  before_action :whitelist_query_limiting, only: [:usage_data]
-
-  before_action only: [:ci_cd] do
-    push_frontend_feature_flag(:ci_instance_variables_ui, default_enabled: true)
-  end
+  before_action :disable_query_limiting, only: [:usage_data]
 
   feature_category :not_owned, [
                      :general, :reporting, :metrics_and_profiling, :network,
@@ -53,7 +49,7 @@ class Admin::ApplicationSettingsController < Admin::ApplicationController
   def integrations
     return not_found unless instance_level_integrations?
 
-    @integrations = Service.find_or_initialize_all_non_project_specific(Service.for_instance).sort_by(&:title)
+    @integrations = Integration.find_or_initialize_all_non_project_specific(Integration.for_instance).sort_by(&:title)
   end
 
   def update
@@ -194,8 +190,8 @@ class Admin::ApplicationSettingsController < Admin::ApplicationController
     @plans = Plan.all
   end
 
-  def whitelist_query_limiting
-    Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab-foss/issues/63107')
+  def disable_query_limiting
+    Gitlab::QueryLimiting.disable!('https://gitlab.com/gitlab-org/gitlab/-/issues/29418')
   end
 
   def application_setting_params
@@ -237,7 +233,6 @@ class Admin::ApplicationSettingsController < Admin::ApplicationController
     [
       *::ApplicationSettingsHelper.visible_attributes,
       *::ApplicationSettingsHelper.external_authorization_service_attributes,
-      *ApplicationSetting.repository_storages_weighted_attributes,
       *ApplicationSetting.kroki_formats_attributes.keys.map { |key| "kroki_formats_#{key}".to_sym },
       :lets_encrypt_notification_email,
       :lets_encrypt_terms_of_service_accepted,
@@ -248,8 +243,8 @@ class Admin::ApplicationSettingsController < Admin::ApplicationController
       :default_branch_name,
       disabled_oauth_sign_in_sources: [],
       import_sources: [],
-      repository_storages: [],
-      restricted_visibility_levels: []
+      restricted_visibility_levels: [],
+      repository_storages_weighted: {}
     ]
   end
 
@@ -297,4 +292,4 @@ class Admin::ApplicationSettingsController < Admin::ApplicationController
   end
 end
 
-Admin::ApplicationSettingsController.prepend_if_ee('EE::Admin::ApplicationSettingsController')
+Admin::ApplicationSettingsController.prepend_mod_with('Admin::ApplicationSettingsController')

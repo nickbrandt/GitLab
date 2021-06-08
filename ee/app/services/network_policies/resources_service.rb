@@ -18,7 +18,7 @@ module NetworkPolicies
 
       @kubeclient_info.each do |platform, namespace|
         policies_per_environment, error_per_environment = execute_per_environment(platform, namespace)
-        policies += policies_per_environment
+        policies += policies_per_environment if policies_per_environment
         errors << error_per_environment if error_per_environment
       end
       errors.empty? ? ServiceResponse.success(payload: policies) : kubernetes_error_response(errors.join, policies)
@@ -35,7 +35,7 @@ module NetworkPolicies
         .map { |resource| Gitlab::Kubernetes::CiliumNetworkPolicy.from_resource(resource) }
       [policies, nil]
     rescue Kubeclient::HttpError => e
-      [[], e]
+      [policies, e]
     end
 
     def has_deployment_platform?(kubeclient_info)
@@ -48,7 +48,7 @@ module NetworkPolicies
         if environment_id
           Clusters::KubernetesNamespace.where(environment: project.environments.id_in(environment_id))
         else
-          Clusters::KubernetesNamespace.where(environment: project.environments.available.at_most(LIMIT))
+          Clusters::KubernetesNamespace.where(environment: project.environments.available.limit(LIMIT))
         end
 
       kubernetes_namespaces

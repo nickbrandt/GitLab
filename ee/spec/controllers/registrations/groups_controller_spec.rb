@@ -3,12 +3,14 @@
 require 'spec_helper'
 
 RSpec.describe Registrations::GroupsController do
+  using RSpec::Parameterized::TableSyntax
+
   let_it_be(:user) { create(:user) }
 
   shared_examples 'hides email confirmation warning' do
     RSpec::Matchers.define :set_confirm_warning_for do |email|
       match do |response|
-        expect(response).to set_flash.now[:warning].to include("Please check your email (#{email}) to verify that you own this address and unlock the power of CI/CD.")
+        expect(controller).to set_flash.now[:warning].to include("Please check your email (#{email}) to verify that you own this address and unlock the power of CI/CD.")
       end
     end
 
@@ -25,8 +27,14 @@ RSpec.describe Registrations::GroupsController do
     end
   end
 
-  describe 'GET #new' do
+  describe 'GET #new', :aggregate_failures do
     let(:signup_onboarding_enabled) { true }
+    let(:learn_gitlab_context) do
+      {
+        in_experiment_group_a: false,
+        in_experiment_group_b: false
+      }
+    end
 
     subject { get :new }
 
@@ -51,10 +59,26 @@ RSpec.describe Registrations::GroupsController do
         expect(assigns(:group).visibility_level).to eq(Gitlab::CurrentSettings.default_group_visibility)
       end
 
-      it 'calls the record user method for trial_during_signup experiment' do
-        expect(controller).to receive(:record_experiment_user).with(:trial_during_signup)
+      context 'with different experiment rollouts' do
+        before do
+          stub_experiment_for_subject(learn_gitlab_a: experiment_a, learn_gitlab_b: experiment_b)
+        end
 
-        subject
+        where(:experiment_a, :experiment_b, :context) do
+          false       | false         | { in_experiment_group_a: false, in_experiment_group_b: false }
+          false       | true          | { in_experiment_group_a: false, in_experiment_group_b: true }
+          true        | false         | { in_experiment_group_a: true, in_experiment_group_b: false }
+          true        | true          | { in_experiment_group_a: true, in_experiment_group_b: false }
+        end
+
+        with_them do
+          it 'sets the correct context', :aggregate_failures do
+            expect(controller).to receive(:record_experiment_user).with(:learn_gitlab_a, context)
+            expect(controller).to receive(:record_experiment_user).with(:learn_gitlab_b, context)
+
+            subject
+          end
+        end
       end
 
       context 'user without the ability to create a group' do
@@ -73,11 +97,12 @@ RSpec.describe Registrations::GroupsController do
     end
   end
 
-  describe 'POST #create' do
+  describe 'POST #create', :aggregate_failure do
     let_it_be(:glm_params) { {} }
     let_it_be(:trial_form_params) { { trial: 'false' } }
     let_it_be(:trial_onboarding_issues_enabled) { false }
     let_it_be(:trial_onboarding_flow_params) { {} }
+
     let(:signup_onboarding_enabled) { true }
     let(:group_params) { { name: 'Group name', path: 'group-path', visibility_level: Gitlab::VisibilityLevel::PRIVATE, emails: ['', ''] } }
     let(:params) do
@@ -111,6 +136,17 @@ RSpec.describe Registrations::GroupsController do
           expect { subject }.to change { Group.count }.by(1)
         end
 
+        it 'tracks an event for the jobs_to_be_done experiment', :experiment do
+          stub_experiments(jobs_to_be_done: :candidate)
+
+          expect(experiment(:jobs_to_be_done)).to track(:create_group, namespace: an_instance_of(Group))
+            .on_next_instance
+            .for(:candidate)
+            .with_context(user: user)
+
+          subject
+        end
+
         context 'when the trial onboarding is active - apply_trial_for_trial_onboarding_flow' do
           let_it_be(:group) { create(:group) }
           let_it_be(:trial_onboarding_flow_params) { { trial_onboarding_flow: true, glm_source: 'about.gitlab.com', glm_content: 'content' } }
@@ -142,10 +178,8 @@ RSpec.describe Registrations::GroupsController do
                 expect(service).to receive(:execute).with(apply_trial_params).and_return({ success: true })
               end
               expect(controller).to receive(:record_experiment_user).with(:remove_known_trial_form_fields, namespace_id: group.id)
-              expect(controller).to receive(:record_experiment_user).with(:trial_registration_with_social_signin, namespace_id: group.id)
               expect(controller).to receive(:record_experiment_user).with(:trial_onboarding_issues, namespace_id: group.id)
               expect(controller).to receive(:record_experiment_conversion_event).with(:remove_known_trial_form_fields)
-              expect(controller).to receive(:record_experiment_conversion_event).with(:trial_registration_with_social_signin)
               expect(controller).to receive(:record_experiment_conversion_event).with(:trial_onboarding_issues)
             end
 
@@ -180,16 +214,17 @@ RSpec.describe Registrations::GroupsController do
         context 'when not in the trial onboarding - registration_onboarding_flow' do
           let_it_be(:group) { create(:group) }
 
-          it 'calls the record user trial_during_signup experiment' do
+          it 'calls the record user for learn gitlab experiment' do
             expect_next_instance_of(Groups::CreateService) do |service|
               expect(service).to receive(:execute).and_return(group)
             end
-            expect(controller).to receive(:record_experiment_user).with(:trial_during_signup, trial_chosen: false, namespace_id: group.id)
+            expect(controller).to receive(:record_experiment_conversion_event).with(:learn_gitlab_a, namespace_id: group.id)
+            expect(controller).to receive(:record_experiment_conversion_event).with(:learn_gitlab_b, namespace_id: group.id)
 
             subject
           end
 
-          context 'when in experiment group for trial_during_signup - trial_during_signup_flow' do
+          context 'when trial_during_signup - trial_during_signup_flow' do
             let_it_be(:glm_params) { { glm_source: 'gitlab.com', glm_content: 'content' } }
             let_it_be(:trial_form_params) do
               {
@@ -236,10 +271,6 @@ RSpec.describe Registrations::GroupsController do
               }
             end
 
-            before do
-              allow(controller).to receive(:experiment_enabled?).with(:trial_during_signup).and_return(true)
-            end
-
             context 'when a user chooses a trial - create_lead_and_apply_trial_flow' do
               context 'when successfully creating a lead and applying trial' do
                 before do
@@ -258,8 +289,8 @@ RSpec.describe Registrations::GroupsController do
                   it 'tracks experiment as expected', :experiment do
                     expect(experiment(:registrations_group_invite))
                       .to track(:created, { property: group.id.to_s })
-                            .on_any_instance
-                            .with_context(actor: :user)
+                            .on_next_instance
+                            .with_context(actor: user)
 
                     subject
                   end
@@ -299,17 +330,15 @@ RSpec.describe Registrations::GroupsController do
             context 'when user chooses no trial' do
               let_it_be(:trial_form_params) { { trial: 'false' } }
 
-              it 'calls the record user trial_during_signup experiment' do
+              it 'redirects user to the new user signup page' do
                 expect_next_instance_of(Groups::CreateService) do |service|
                   expect(service).to receive(:execute).and_return(group)
                 end
 
-                expect(controller).to receive(:record_experiment_user).with(:trial_during_signup, trial_chosen: false, namespace_id: group.id)
-
                 expect(subject).to redirect_to(new_users_sign_up_project_path(namespace_id: group.id, trial: false))
               end
 
-              it 'does not call trial_during_signup experiment methods' do
+              it 'does not call trial creation methods' do
                 expect(controller).not_to receive(:create_lead)
                 expect(controller).not_to receive(:apply_trial)
 
@@ -324,8 +353,8 @@ RSpec.describe Registrations::GroupsController do
 
                   expect(experiment(:registrations_group_invite))
                     .to track(:created, { property: group.id.to_s })
-                          .on_any_instance
-                          .with_context(actor: :user)
+                          .on_next_instance
+                          .with_context(actor: user)
 
                   subject
                 end
@@ -346,42 +375,6 @@ RSpec.describe Registrations::GroupsController do
                   it { is_expected.to redirect_to(new_users_sign_up_project_path(namespace_id: user.groups.last.id, trial: false)) }
                 end
               end
-            end
-          end
-
-          context 'when not in experiment group for trial_during_signup' do
-            before do
-              allow(controller).to receive(:experiment_enabled?).with(:trial_during_signup).and_return(false)
-            end
-
-            it 'tracks experiment as expected', :experiment do
-              expect_next_instance_of(Groups::CreateService) do |service|
-                expect(service).to receive(:execute).and_return(group)
-              end
-              expect(experiment(:registrations_group_invite))
-                .to track(:created, { property: group.id.to_s })
-                      .on_any_instance
-                      .with_context(actor: :user)
-
-              subject
-            end
-
-            context 'when registrations_group_invite invite_page path is taken' do
-              before do
-                stub_experiments(registrations_group_invite: :invite_page)
-              end
-
-              it { is_expected.to redirect_to(new_users_sign_up_group_invite_path(group_id: user.groups.last.id, trial: false)) }
-            end
-
-            context 'when registrations_group_invite experiment control path is taken' do
-              before do
-                stub_experiments(registrations_group_invite: :control)
-              end
-
-              it { is_expected.to redirect_to(new_users_sign_up_project_path(namespace_id: user.groups.last.id, trial: false)) }
-
-              it_behaves_like GroupInviteMembers
             end
           end
         end

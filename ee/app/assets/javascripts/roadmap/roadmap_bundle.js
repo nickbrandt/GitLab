@@ -43,6 +43,7 @@ export default () => {
 
   return new Vue({
     el,
+    apolloProvider: {},
     store: createStore(),
     components: {
       roadmapApp,
@@ -75,6 +76,10 @@ export default () => {
         // when it is defined.
         ...(rawFilterParams.confidential && {
           confidential: parseBoolean(rawFilterParams.confidential),
+        }),
+
+        ...(rawFilterParams.epicIid && {
+          epicIid: rawFilterParams.epicIid,
         }),
       };
       const timeframe = getTimeframeForPreset(

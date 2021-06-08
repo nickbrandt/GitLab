@@ -10,7 +10,11 @@ module Ci
 
     Result = Struct.new(:build, :build_json, :valid?)
 
-    MAX_QUEUE_DEPTH = 50
+    ##
+    # The queue depth limit number has been determined by observing 95
+    # percentile of effective queue depth on gitlab.com. This is only likely to
+    # affect 5% of the worst case scenarios.
+    MAX_QUEUE_DEPTH = 45
 
     def initialize(runner)
       @runner = runner
@@ -18,10 +22,26 @@ module Ci
     end
 
     def execute(params = {})
+      db_all_caught_up = ::Gitlab::Database::LoadBalancing::Sticking.all_caught_up?(:runner, runner.id)
+
       @metrics.increment_queue_operation(:queue_attempt)
 
-      @metrics.observe_queue_time do
+      result = @metrics.observe_queue_time(:process, @runner.runner_type) do
         process_queue(params)
+      end
+
+      # Since we execute this query against replica it might lead to false-positive
+      # We might receive the positive response: "hi, we don't have any more builds for you".
+      # This might not be true. If our DB replica is not up-to date with when runner event was generated
+      # we might still have some CI builds to be picked. Instead we should say to runner:
+      # "Hi, we don't have any more builds now,  but not everything is right anyway, so try again".
+      # Runner will retry, but again, against replica, and again will check if replication lag did catch-up.
+      if !db_all_caught_up && !result.build
+        metrics.increment_queue_operation(:queue_replication_lag)
+
+        ::Ci::RegisterJobService::Result.new(nil, false) # rubocop:disable Cop/AvoidReturnFromBlocks
+      else
+        result
       end
     end
 
@@ -105,21 +125,35 @@ module Ci
         builds = builds.queued_before(params[:job_age].seconds.ago)
       end
 
-      if Feature.enabled?(:ci_register_job_service_one_by_one, runner)
-        build_ids = builds.pluck(:id)
+      if Feature.enabled?(:ci_register_job_service_one_by_one, runner, default_enabled: true)
+        build_ids = retrieve_queue(-> { builds.pluck(:id) })
 
-        @metrics.observe_queue_size(-> { build_ids.size })
+        @metrics.observe_queue_size(-> { build_ids.size }, @runner.runner_type)
 
         build_ids.each do |build_id|
           yield Ci::Build.find(build_id)
         end
       else
-        @metrics.observe_queue_size(-> { builds.to_a.size })
+        builds_array = retrieve_queue(-> { builds.to_a })
 
-        builds.each(&blk)
+        @metrics.observe_queue_size(-> { builds_array.size }, @runner.runner_type)
+
+        builds_array.each(&blk)
       end
     end
     # rubocop: enable CodeReuse/ActiveRecord
+
+    def retrieve_queue(queue_query_proc)
+      ##
+      # We want to reset a load balancing session to discard the side
+      # effects of writes that could have happened prior to this moment.
+      #
+      ::Gitlab::Database::LoadBalancing::Session.clear_session
+
+      @metrics.observe_queue_time(:retrieve, @runner.runner_type) do
+        queue_query_proc.call
+      end
+    end
 
     def process_build(build, params)
       unless build.pending?
@@ -157,7 +191,7 @@ module Ci
       @metrics.increment_queue_operation(:build_conflict_transition)
 
       Result.new(nil, nil, false)
-    rescue => ex
+    rescue StandardError => ex
       @metrics.increment_queue_operation(:build_conflict_exception)
 
       # If an error (e.g. GRPC::DeadlineExceeded) occurred constructing
@@ -170,13 +204,7 @@ module Ci
     end
 
     def max_queue_depth
-      @max_queue_depth ||= begin
-        if Feature.enabled?(:gitlab_ci_builds_queue_limit, runner, default_enabled: false)
-          MAX_QUEUE_DEPTH
-        else
-          ::Gitlab::Database::MAX_INT_VALUE
-        end
-      end
+      MAX_QUEUE_DEPTH
     end
 
     # Force variables evaluation to occur now
@@ -221,7 +249,7 @@ module Ci
       Gitlab::OptimisticLocking.retry_lock(build, 3, name: 'register_job_scheduler_failure') do |subject|
         subject.drop!(:scheduler_failure)
       end
-    rescue => ex
+    rescue StandardError => ex
       build.doom!
 
       # This requires extra exception, otherwise we would loose information
@@ -241,49 +269,57 @@ module Ci
 
     # rubocop: disable CodeReuse/ActiveRecord
     def builds_for_shared_runner
-      new_builds.
+      relation = new_builds.
         # don't run projects which have not enabled shared runners and builds
         joins(:project).where(projects: { shared_runners_enabled: true, pending_delete: false })
         .joins('LEFT JOIN project_features ON ci_builds.project_id = project_features.project_id')
-        .where('project_features.builds_access_level IS NULL or project_features.builds_access_level > 0').
+        .where('project_features.builds_access_level IS NULL or project_features.builds_access_level > 0')
 
-      # Implement fair scheduling
-      # this returns builds that are ordered by number of running builds
-      # we prefer projects that don't use shared runners at all
-      joins("LEFT JOIN (#{running_builds_for_shared_runners.to_sql}) AS project_builds ON ci_builds.project_id=project_builds.project_id")
-        .order(Arel.sql('COALESCE(project_builds.running_builds, 0) ASC'), 'ci_builds.id ASC')
+      if Feature.enabled?(:ci_queueing_disaster_recovery, runner, type: :ops, default_enabled: :yaml)
+        # if disaster recovery is enabled, we fallback to FIFO scheduling
+        relation.order('ci_builds.id ASC')
+      else
+        # Implement fair scheduling
+        # this returns builds that are ordered by number of running builds
+        # we prefer projects that don't use shared runners at all
+        relation
+          .joins("LEFT JOIN (#{running_builds_for_shared_runners.to_sql}) AS project_builds ON ci_builds.project_id=project_builds.project_id")
+          .order(Arel.sql('COALESCE(project_builds.running_builds, 0) ASC'), 'ci_builds.id ASC')
+      end
     end
-    # rubocop: enable CodeReuse/ActiveRecord
 
-    # rubocop: disable CodeReuse/ActiveRecord
     def builds_for_project_runner
       new_builds.where(project: runner.projects.without_deleted.with_builds_enabled).order('id ASC')
     end
-    # rubocop: enable CodeReuse/ActiveRecord
 
-    # rubocop: disable CodeReuse/ActiveRecord
     def builds_for_group_runner
       # Workaround for weird Rails bug, that makes `runner.groups.to_sql` to return `runner_id = NULL`
       groups = ::Group.joins(:runner_namespaces).merge(runner.runner_namespaces)
 
-      hierarchy_groups = Gitlab::ObjectHierarchy.new(groups).base_and_descendants
+      hierarchy_groups = Gitlab::ObjectHierarchy.new(groups, options: { use_distinct: Feature.enabled?(:use_distinct_in_register_job_object_hierarchy) }).base_and_descendants
       projects = Project.where(namespace_id: hierarchy_groups)
         .with_group_runners_enabled
         .with_builds_enabled
         .without_deleted
       new_builds.where(project: projects).order('id ASC')
     end
-    # rubocop: enable CodeReuse/ActiveRecord
 
-    # rubocop: disable CodeReuse/ActiveRecord
     def running_builds_for_shared_runners
       Ci::Build.running.where(runner: Ci::Runner.instance_type)
         .group(:project_id).select(:project_id, 'count(*) AS running_builds')
     end
+
+    def all_builds
+      if Feature.enabled?(:ci_pending_builds_queue_join, runner, default_enabled: :yaml)
+        Ci::Build.joins(:queuing_entry)
+      else
+        Ci::Build.all
+      end
+    end
     # rubocop: enable CodeReuse/ActiveRecord
 
     def new_builds
-      builds = Ci::Build.pending.unstarted
+      builds = all_builds.pending.unstarted
       builds = builds.ref_protected if runner.ref_protected?
       builds
     end
@@ -298,4 +334,4 @@ module Ci
   end
 end
 
-Ci::RegisterJobService.prepend_if_ee('EE::Ci::RegisterJobService')
+Ci::RegisterJobService.prepend_mod_with('Ci::RegisterJobService')

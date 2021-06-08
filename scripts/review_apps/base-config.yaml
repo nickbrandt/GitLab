@@ -5,9 +5,9 @@ global:
   ingress:
     annotations:
       external-dns.alpha.kubernetes.io/ttl: 10
+      cert-manager.io/cluster-issuer: review-apps-route53-dns01-wildcard-cluster-issuer
+      kubernetes.io/tls-acme: true
     configureCertmanager: false
-    tls:
-      secretName: review-apps-tls
   initialRootPassword:
     secret: shared-gitlab-initial-root-password
 certmanager:
@@ -70,10 +70,10 @@ gitlab:
     resources:
       requests:
         cpu: 746m
-        memory: 1873M
+        memory: 2809M
       limits:
         cpu: 1119m
-        memory: 2809M
+        memory: 4214M
     deployment:
       readinessProbe:
         initialDelaySeconds: 5  # Default is 0
@@ -83,10 +83,10 @@ gitlab:
       resources:
         requests:
           cpu: 400m
-          memory: 50M
+          memory: 75M
         limits:
           cpu: 600m
-          memory: 75M
+          memory: 113M
       readinessProbe:
         initialDelaySeconds: 5  # Default is 0
         periodSeconds: 15  # Default is 10
@@ -113,10 +113,10 @@ nginx-ingress:
       ssl-ciphers: ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA256:ECDHE-RSA-AES256-SHA:ECDHE-RSA-AES128-SHA:AES256-GCM-SHA384:AES128-GCM-SHA256:AES256-SHA256:AES128-SHA256:AES256-SHA:AES128-SHA:!aNULL:!eNULL:!EXPORT:!DES:!MD5:!PSK:!RC4
     resources:
       requests:
-        cpu: 100m
+        cpu: 300m
         memory: 450M
       limits:
-        cpu: 200m
+        cpu: 600m
         memory: 675M
     service:
       enableHttp: false
@@ -137,10 +137,10 @@ postgresql:
     enabled: false
   resources:
     requests:
-      cpu: 550m
+      cpu: 600m
       memory: 1000M
     limits:
-      cpu: 825m
+      cpu: 1300m
       memory: 1500M
 prometheus:
   install: false

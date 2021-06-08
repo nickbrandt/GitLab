@@ -665,6 +665,38 @@ describe('GfmAutoComplete', () => {
           expect(GfmAutoComplete.Members.nameOrUsernameIncludes(member, query)).toBe(result);
         });
       });
+
+      describe('sorter', () => {
+        const query = 'c';
+
+        const items = [
+          { search: 'DougHackett elayne.krieger' },
+          { search: 'BerylHuel cherie.block' },
+          { search: 'ErlindaMayert nicolle' },
+          { search: 'Administrator root' },
+          { search: 'PhoebeSchaden salina' },
+          { search: 'CatherinTerry tommy.will' },
+          { search: 'AntoineLedner ammie' },
+          { search: 'KinaCummings robena' },
+          { search: 'CharlsieHarber xzbdulia' },
+        ];
+
+        const expected = [
+          // Members whose name/username starts with `c` are grouped first
+          { search: 'BerylHuel cherie.block' },
+          { search: 'CatherinTerry tommy.will' },
+          { search: 'CharlsieHarber xzbdulia' },
+          // Members whose name/username contains `c` are grouped second
+          { search: 'DougHackett elayne.krieger' },
+          { search: 'ErlindaMayert nicolle' },
+          { search: 'PhoebeSchaden salina' },
+          { search: 'KinaCummings robena' },
+        ];
+
+        it('filters out non-matches, then puts matches with start of name/username first', () => {
+          expect(GfmAutoComplete.Members.sort(query, items)).toMatchObject(expected);
+        });
+      });
     });
   });
 

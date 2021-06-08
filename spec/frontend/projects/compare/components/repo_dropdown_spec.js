@@ -1,36 +1,16 @@
-import { GlDropdown } from '@gitlab/ui';
+import { GlDropdown, GlDropdownItem } from '@gitlab/ui';
 import { shallowMount } from '@vue/test-utils';
 import RepoDropdown from '~/projects/compare/components/repo_dropdown.vue';
-
-const defaultProps = {
-  paramsName: 'to',
-};
-
-const projectToId = '1';
-const projectToName = 'some-to-name';
-const projectFromId = '2';
-const projectFromName = 'some-from-name';
-
-const defaultProvide = {
-  projectTo: { id: projectToId, name: projectToName },
-  projectsFrom: [
-    { id: projectFromId, name: projectFromName },
-    { id: 3, name: 'some-from-another-name' },
-  ],
-};
+import { revisionCardDefaultProps as defaultProps } from './mock_data';
 
 describe('RepoDropdown component', () => {
   let wrapper;
 
-  const createComponent = (props = {}, provide = {}) => {
+  const createComponent = (props = {}) => {
     wrapper = shallowMount(RepoDropdown, {
       propsData: {
         ...defaultProps,
         ...props,
-      },
-      provide: {
-        ...defaultProvide,
-        ...provide,
       },
     });
   };
@@ -49,11 +29,11 @@ describe('RepoDropdown component', () => {
     });
 
     it('set hidden input', () => {
-      expect(findHiddenInput().attributes('value')).toBe(projectToId);
+      expect(findHiddenInput().attributes('value')).toBe(defaultProps.selectedProject.id);
     });
 
     it('displays the project name in the disabled dropdown', () => {
-      expect(findGlDropdown().props('text')).toBe(projectToName);
+      expect(findGlDropdown().props('text')).toBe(defaultProps.selectedProject.name);
       expect(findGlDropdown().props('disabled')).toBe(true);
     });
 
@@ -66,33 +46,39 @@ describe('RepoDropdown component', () => {
 
   describe('Target Revision', () => {
     beforeEach(() => {
-      createComponent({ paramsName: 'from' });
+      const projects = [
+        {
+          name: 'some-to-name',
+          id: '1',
+        },
+      ];
+
+      createComponent({ paramsName: 'from', projects });
     });
 
-    it('set hidden input of the first project', () => {
-      expect(findHiddenInput().attributes('value')).toBe(projectFromId);
+    it('set hidden input of the selected project', () => {
+      expect(findHiddenInput().attributes('value')).toBe(defaultProps.selectedProject.id);
     });
 
-    it('displays the first project name initially in the dropdown', () => {
-      expect(findGlDropdown().props('text')).toBe(projectFromName);
+    it('displays matching project name of the source revision initially in the dropdown', () => {
+      expect(findGlDropdown().props('text')).toBe(defaultProps.selectedProject.name);
     });
 
-    it('updates the hiddin input value when onClick method is triggered', async () => {
-      const repoId = '100';
+    it('updates the hidden input value when onClick method is triggered', async () => {
+      const repoId = '1';
       wrapper.vm.onClick({ id: repoId });
       await wrapper.vm.$nextTick();
       expect(findHiddenInput().attributes('value')).toBe(repoId);
     });
 
-    it('emits initial `changeTargetProject` event with target project', () => {
-      expect(wrapper.emitted('changeTargetProject')).toEqual([[projectFromName]]);
-    });
-
-    it('emits `changeTargetProject` event when another target project is selected', async () => {
-      const newTargetProject = 'new-from-name';
-      wrapper.vm.$emit('changeTargetProject', newTargetProject);
+    it('emits `selectProject` event when another target project is selected', async () => {
+      findGlDropdown().findAll(GlDropdownItem).at(0).vm.$emit('click');
       await wrapper.vm.$nextTick();
-      expect(wrapper.emitted('changeTargetProject')[1]).toEqual([newTargetProject]);
+
+      expect(wrapper.emitted('selectProject')[0][0]).toEqual({
+        direction: 'from',
+        project: { id: '1', name: 'some-to-name' },
+      });
     });
   });
 });

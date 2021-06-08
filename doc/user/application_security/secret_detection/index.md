@@ -5,7 +5,7 @@ group: Static Analysis
 info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#assignments
 ---
 
-# Secret Detection
+# Secret Detection **(FREE)**
 
 > - [Introduced](https://about.gitlab.com/releases/2019/03/22/gitlab-11-9-released/#detect-secrets-and-credentials-in-the-repository) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 11.9.
 > - Made [available in all tiers](https://gitlab.com/gitlab-org/gitlab/-/issues/222788) in 13.3.
@@ -61,6 +61,9 @@ The [default ruleset provided by Gitleaks](https://gitlab.com/gitlab-org/securit
   - Generic API key strings starting with `api-`
 - Password in URL
 - U.S. Social Security Number
+
+WARNING:
+Gitleaks does not support scanning binary files.
 
 ## Requirements
 
@@ -118,7 +121,7 @@ To enable Secret Detection for GitLab 13.1 and later, you must include the
 `Secret-Detection.gitlab-ci.yml` template that's provided as a part of your GitLab installation. For
 GitLab versions earlier than 11.9, you can copy and use the job as defined in that template.
 
-Add the following to your `.gitlab-ci.yml` file:
+Ensure your `.gitlab-ci.yml` file has a `stage` called `test`, and add the following to your `.gitlab-ci.yml` file:
 
 ```yaml
 include:
@@ -129,25 +132,38 @@ The included template creates Secret Detection jobs in your CI/CD pipeline and s
 your project's source code for secrets.
 
 The results are saved as a
-[Secret Detection report artifact](../../../ci/pipelines/job_artifacts.md#artifactsreportssecret_detection)
+[Secret Detection report artifact](../../../ci/yaml/README.md#artifactsreportssecret_detection)
 that you can later download and analyze. Due to implementation limitations, we
 always take the latest Secret Detection artifact available.
 
-### Post-processing
+### Enable Secret Detection via an automatic merge request **(ULTIMATE SELF)**
 
-> [Introduced](https://gitlab.com/groups/gitlab-org/-/epics/4639) in GitLab 13.6.
+> - [Introduced](https://gitlab.com/groups/gitlab-org/-/epics/4496) in GitLab 13.11.
+> - [Deployed behind a feature flag](../../../user/feature_flags.md), enabled by default.
+> - Enabled on GitLab.com.
+> - Recommended for production use.
+> - For GitLab self-managed instances, GitLab administrators can opt to [disable it](#enable-or-disable-configure-secret-detection-via-a-merge-request). **(ULTIMATE SELF)**
 
-Upon detection of a secret, GitLab supports post processing hooks. These can be used to take actions like notifying the cloud service who issued the secret. The cloud provider can confirm the credentials and take remediation actions like revoking or reissuing a new secret and notifying the creator of the secret. Post-processing workflows vary by supported cloud providers.
+WARNING:
+This feature might not be available to you. Check the **version history** note above for details.
 
-GitLab currently supports post-processing for following service providers:
+There can be
+[risks when disabling released features](../../../user/feature_flags.md#risks-when-disabling-released-features).
+Refer to this feature's version history for more details.
 
-- Amazon Web Services (AWS)
+To enable Secret Detection in a project, you can create a merge request
+from the Security Configuration page.
 
-Third party cloud and SaaS providers can [express integration interest by filling out this form](https://forms.gle/wWpvrtLRK21Q2WJL9). Learn more about the [technical details of post-processing secrets](https://gitlab.com/groups/gitlab-org/-/epics/4639).
+1. In the project where you want to enable Secret Detection, go to
+   **Security & Compliance > Configuration**.
+1. In the **Secret Detection** row, select **Configure via Merge Request**.
+
+This automatically creates a merge request with the changes necessary to enable Secret Detection
+that you can review and merge to complete the configuration.
 
 ### Customizing settings
 
-The Secret Detection scan settings can be changed through [CI/CD variables](#available-variables)
+The Secret Detection scan settings can be changed through [CI/CD variables](#available-cicd-variables)
 by using the
 [`variables`](../../../ci/yaml/README.md#variables) parameter in `.gitlab-ci.yml`.
 
@@ -156,7 +172,7 @@ declare a job with the same name as the SAST job to override. Place this new job
 inclusion and specify any additional keys under it.
 
 WARNING:
-Beginning in GitLab 13.0, the use of [`only` and `except`](../../../ci/yaml/README.md#onlyexcept-basic)
+Beginning in GitLab 13.0, the use of [`only` and `except`](../../../ci/yaml/README.md#only--except)
 is no longer supported. When overriding the template, you must use [`rules`](../../../ci/yaml/README.md#rules) instead.
 
 #### GIT_DEPTH
@@ -183,7 +199,7 @@ secret_detection:
 Because the template is [evaluated before](../../../ci/yaml/README.md#include)
 the pipeline configuration, the last mention of the variable takes precedence.
 
-#### Available variables
+#### Available CI/CD variables
 
 Secret Detection can be customized by defining available CI/CD variables:
 
@@ -249,6 +265,34 @@ From highest to lowest severity, the logging levels are:
 - `info` (default)
 - `debug`
 
+## Post-processing and revocation
+
+> [Introduced](https://gitlab.com/groups/gitlab-org/-/epics/4639) in GitLab 13.6.
+
+Upon detection of a secret, GitLab supports post-processing hooks. These can be used to take actions like notifying the cloud service who issued the secret. The cloud provider can confirm the credentials and take remediation actions like revoking or reissuing a new secret and notifying the creator of the secret. Post-processing workflows vary by supported cloud providers.
+
+GitLab currently supports post-processing for following service providers:
+
+- Amazon Web Services (AWS)
+
+Third party cloud and SaaS providers can [express integration interest by filling out this form](https://forms.gle/wWpvrtLRK21Q2WJL9). Learn more about the [technical details of post-processing secrets](https://gitlab.com/groups/gitlab-org/-/epics/4639).
+
+NOTE:
+Post-processing is currently limited to a project's default branch, see the above epic for future efforts to support additional branches.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    Rails->>+Sidekiq: gl-secret-detection-report.json
+    Sidekiq-->+Sidekiq: BuildFinishedWorker
+    Sidekiq-->+RevocationAPI: GET revocable keys types
+    RevocationAPI-->>-Sidekiq: OK
+    Sidekiq->>+RevocationAPI: POST revoke revocable keys
+    RevocationAPI-->>-Sidekiq: ACCEPTED
+    RevocationAPI-->>+Cloud Vendor: revoke revocable keys
+    Cloud Vendor-->>+RevocationAPI: ACCEPTED
+```
+
 ## Full History Secret Scan
 
 GitLab 12.11 introduced support for scanning the full history of a repository. This new functionality
@@ -257,7 +301,7 @@ want to perform a full secret scan. Running a secret scan on the full history ca
 especially for larger repositories with lengthy Git histories. We recommend not setting this CI/CD variable
 as part of your normal job definition.
 
-A new configuration variable ([`SECRET_DETECTION_HISTORIC_SCAN`](../sast/#vulnerability-filters))
+A new configuration variable ([`SECRET_DETECTION_HISTORIC_SCAN`](#available-cicd-variables))
 can be set to change the behavior of the GitLab Secret Detection scan to run on the entire Git history of a repository.
 
 We have created a [short video walkthrough](https://youtu.be/wDtc_K00Y0A) showcasing how you can perform a full history secret scan.
@@ -300,8 +344,8 @@ registry.gitlab.com/gitlab-org/security-products/analyzers/secrets:3
 
 The process for importing Docker images into a local offline Docker registry depends on
 **your network security policy**. Please consult your IT staff to find an accepted and approved
-process by which external resources can be imported or temporarily accessed. Note that these scanners are [updated periodically](../index.md#maintenance-and-update-of-the-vulnerabilities-database)
-with new definitions, so consider if you're able to make periodic updates yourself.
+process by which external resources can be imported or temporarily accessed. These scanners are [periodically updated](../vulnerabilities/index.md#vulnerability-scanner-maintenance)
+with new definitions, and you may be able to make occasional updates on your own.
 
 For details on saving and transporting Docker images as a file, see Docker's documentation on
 [`docker save`](https://docs.docker.com/engine/reference/commandline/save/), [`docker load`](https://docs.docker.com/engine/reference/commandline/load/),
@@ -363,4 +407,23 @@ your `.gitlab-ci.yml` file:
 secret_detection:
   variables:
     GIT_DEPTH: 100
+```
+
+### Enable or disable Configure Secret Detection via a Merge Request
+
+Configure Secret Detection via a Merge Request is under development but ready for production use.
+It is deployed behind a feature flag that is **enabled by default**.
+[GitLab administrators with access to the GitLab Rails console](../../../administration/feature_flags.md)
+can opt to disable it.
+
+To enable it:
+
+```ruby
+Feature.enable(:sec_secret_detection_ui_enable)
+```
+
+To disable it:
+
+```ruby
+Feature.disable(:sec_secret_detection_ui_enable)
 ```

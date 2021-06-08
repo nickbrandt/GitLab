@@ -6,6 +6,7 @@ RSpec.describe Gitlab::GithubImport::Importer::PullRequestReviewImporter, :clean
   using RSpec::Parameterized::TableSyntax
 
   let_it_be(:merge_request) { create(:merge_request) }
+
   let(:project) { merge_request.project }
   let(:client_double) { double(user: double(id: 999, login: 'author', email: 'author@email.com')) }
   let(:submitted_at) { Time.new(2017, 1, 1, 12, 00).utc }
@@ -129,7 +130,7 @@ RSpec.describe Gitlab::GithubImport::Importer::PullRequestReviewImporter, :clean
             .to change(Note, :count).by(1)
 
           last_note = merge_request.notes.last
-          expect(last_note.note).to eq("*Created by author*\n\n**Review:** Approved")
+          expect(last_note.note).to eq("*Created by: author*\n\n**Review:** Approved")
           expect(last_note.author).to eq(project.creator)
           expect(last_note.created_at).to eq(submitted_at)
         end
@@ -152,6 +153,20 @@ RSpec.describe Gitlab::GithubImport::Importer::PullRequestReviewImporter, :clean
       end
     end
 
+    context 'when original author was deleted in github' do
+      let(:review) { create_review(type: 'APPROVED', note: '', author: nil) }
+
+      it 'creates a note for the review without the author information' do
+        expect { subject.execute }
+          .to change(Note, :count).by(1)
+
+        last_note = merge_request.notes.last
+        expect(last_note.note).to eq('**Review:** Approved')
+        expect(last_note.author).to eq(project.creator)
+        expect(last_note.created_at).to eq(submitted_at)
+      end
+    end
+
     context 'when the review has a note text' do
       context 'when the review is "APPROVED"' do
         let(:review) { create_review(type: 'APPROVED') }
@@ -162,7 +177,7 @@ RSpec.describe Gitlab::GithubImport::Importer::PullRequestReviewImporter, :clean
 
           last_note = merge_request.notes.last
 
-          expect(last_note.note).to eq("*Created by author*\n\n**Review:** Approved\n\nnote")
+          expect(last_note.note).to eq("*Created by: author*\n\n**Review:** Approved\n\nnote")
           expect(last_note.author).to eq(project.creator)
           expect(last_note.created_at).to eq(submitted_at)
         end
@@ -177,7 +192,7 @@ RSpec.describe Gitlab::GithubImport::Importer::PullRequestReviewImporter, :clean
 
           last_note = merge_request.notes.last
 
-          expect(last_note.note).to eq("*Created by author*\n\n**Review:** Commented\n\nnote")
+          expect(last_note.note).to eq("*Created by: author*\n\n**Review:** Commented\n\nnote")
           expect(last_note.author).to eq(project.creator)
           expect(last_note.created_at).to eq(submitted_at)
         end
@@ -192,7 +207,7 @@ RSpec.describe Gitlab::GithubImport::Importer::PullRequestReviewImporter, :clean
 
           last_note = merge_request.notes.last
 
-          expect(last_note.note).to eq("*Created by author*\n\n**Review:** Changes requested\n\nnote")
+          expect(last_note.note).to eq("*Created by: author*\n\n**Review:** Changes requested\n\nnote")
           expect(last_note.author).to eq(project.creator)
           expect(last_note.created_at).to eq(submitted_at)
         end
@@ -200,13 +215,13 @@ RSpec.describe Gitlab::GithubImport::Importer::PullRequestReviewImporter, :clean
     end
   end
 
-  def create_review(type:, note: 'note')
+  def create_review(type:, note: 'note', author: { id: 999, login: 'author' })
     Gitlab::GithubImport::Representation::PullRequestReview.from_json_hash(
       merge_request_id: merge_request.id,
       review_type: type,
       note: note,
       submitted_at: submitted_at.to_s,
-      author: { id: 999, login: 'author' }
+      author: author
     )
   end
 end

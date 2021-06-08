@@ -5,7 +5,7 @@ module API
     module Runner
       include Gitlab::Utils::StrongMemoize
 
-      prepend_if_ee('EE::API::Helpers::Runner') # rubocop: disable Cop/InjectEnterpriseEditionModule
+      prepend_mod_with('API::Helpers::Runner') # rubocop: disable Cop/InjectEnterpriseEditionModule
 
       JOB_TOKEN_HEADER = 'HTTP_JOB_TOKEN'
       JOB_TOKEN_PARAM = :token
@@ -25,6 +25,7 @@ module API
         return get_runner_ip unless params['info'].present?
 
         attributes_for_keys(%w(name version revision platform architecture), params['info'])
+          .merge(get_runner_config_from_request)
           .merge(get_runner_ip)
       end
 
@@ -33,15 +34,29 @@ module API
       end
 
       def current_runner
+        token = params[:token]
+
+        if token
+          ::Gitlab::Database::LoadBalancing::RackMiddleware
+            .stick_or_unstick(env, :runner, token)
+        end
+
         strong_memoize(:current_runner) do
-          ::Ci::Runner.find_by_token(params[:token].to_s)
+          ::Ci::Runner.find_by_token(token.to_s)
         end
       end
 
+      # HTTP status codes to terminate the job on GitLab Runner:
+      # - 403
       def authenticate_job!(require_running: true)
         job = current_job
 
-        not_found! unless job
+        # 404 is not returned here because we want to terminate the job if it's
+        # running. A 404 can be returned from anywhere in the networking stack which is why
+        # we are explicit about a 403, we should improve this in
+        # https://gitlab.com/gitlab-org/gitlab/-/issues/327703
+        forbidden! unless job
+
         forbidden! unless job_token_valid?(job)
 
         forbidden!('Project has been deleted!') if job.project.nil? || job.project.pending_delete?
@@ -57,8 +72,15 @@ module API
       end
 
       def current_job
+        id = params[:id]
+
+        if id
+          ::Gitlab::Database::LoadBalancing::RackMiddleware
+            .stick_or_unstick(env, :build, id)
+        end
+
         strong_memoize(:current_job) do
-          ::Ci::Build.find_by_id(params[:id])
+          ::Ci::Build.find_by_id(id)
         end
       end
 
@@ -73,23 +95,22 @@ module API
       end
 
       def set_application_context
-        if current_job
-          Gitlab::ApplicationContext.push(
-            user: -> { current_job.user },
-            project: -> { current_job.project }
-          )
-        elsif current_runner&.project_type?
-          Gitlab::ApplicationContext.push(
-            project: -> do
-              projects = current_runner.projects.limit(2) # rubocop: disable CodeReuse/ActiveRecord
-              projects.first if projects.length == 1
-            end
-          )
-        elsif current_runner&.group_type?
-          Gitlab::ApplicationContext.push(
-            namespace: -> { current_runner.groups.first }
-          )
-        end
+        return unless current_job
+
+        Gitlab::ApplicationContext.push(
+          user: -> { current_job.user },
+          project: -> { current_job.project }
+        )
+      end
+
+      def track_ci_minutes_usage!(_build, _runner)
+        # noop: overridden in EE
+      end
+
+      private
+
+      def get_runner_config_from_request
+        { config: attributes_for_keys(%w(gpus), params.dig('info', 'config')) }
       end
     end
   end

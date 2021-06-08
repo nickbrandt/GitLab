@@ -1,7 +1,7 @@
 <script>
 import { GlButton, GlForm, GlFormInput } from '@gitlab/ui';
-import DueDateSelectors from '~/due_date_select';
-import { deprecatedCreateFlash as createFlash } from '~/flash';
+import initDatePicker from '~/behaviors/date_picker';
+import createFlash from '~/flash';
 import { visitUrl } from '~/lib/utils/url_utility';
 import { __ } from '~/locale';
 import MarkdownField from '~/vue_shared/components/markdown/field.vue';
@@ -65,8 +65,8 @@ export default {
     },
   },
   mounted() {
-    // eslint-disable-next-line no-new
-    new DueDateSelectors();
+    // TODO: utilize GlDatepicker instead of relying on this jQuery behavior
+    initDatePicker();
   },
   methods: {
     save() {
@@ -90,7 +90,9 @@ export default {
           const { errors, iteration } = data.createIteration;
           if (errors.length > 0) {
             this.loading = false;
-            createFlash(errors[0]);
+            createFlash({
+              message: errors[0],
+            });
             return;
           }
 
@@ -98,7 +100,9 @@ export default {
         })
         .catch(() => {
           this.loading = false;
-          createFlash(__('Unable to save iteration. Please try again'));
+          createFlash({
+            message: __('Unable to save iteration. Please try again'),
+          });
         });
     },
     updateIteration() {
@@ -115,14 +119,18 @@ export default {
         .then(({ data }) => {
           const { errors } = data.updateIteration;
           if (errors.length > 0) {
-            createFlash(errors[0]);
+            createFlash({
+              message: errors[0],
+            });
             return;
           }
 
           this.$emit('updated');
         })
         .catch(() => {
-          createFlash(__('Unable to save iteration. Please try again'));
+          createFlash({
+            message: __('Unable to save iteration. Please try again'),
+          });
         })
         .finally(() => {
           this.loading = false;

@@ -3,9 +3,11 @@ import { GlEmptyState } from '@gitlab/ui';
 import { mapActions } from 'vuex';
 import { fetchPolicies } from '~/lib/graphql';
 import { s__ } from '~/locale';
+import glFeatureFlagMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import pipelineSecurityReportSummaryQuery from '../graphql/queries/pipeline_security_report_summary.query.graphql';
 import SecurityDashboard from './security_dashboard_vuex.vue';
 import SecurityReportsSummary from './security_reports_summary.vue';
+import VulnerabilityReport from './vulnerability_report.vue';
 
 export default {
   name: 'PipelineSecurityDashboard',
@@ -13,7 +15,9 @@ export default {
     GlEmptyState,
     SecurityReportsSummary,
     SecurityDashboard,
+    VulnerabilityReport,
   },
+  mixins: [glFeatureFlagMixin()],
   apollo: {
     securityReportSummary: {
       query: pipelineSecurityReportSummaryQuery,
@@ -21,7 +25,7 @@ export default {
       variables() {
         return {
           fullPath: this.projectFullPath,
-          pipelineIid: this.pipelineIid,
+          pipelineIid: this.pipeline.iid,
         };
       },
       update(data) {
@@ -30,29 +34,10 @@ export default {
       },
     },
   },
+  inject: ['projectFullPath', 'pipeline', 'dashboardDocumentation', 'emptyStateSvgPath'],
   props: {
-    dashboardDocumentation: {
-      type: String,
-      required: true,
-    },
-    emptyStateSvgPath: {
-      type: String,
-      required: true,
-    },
-    pipelineId: {
-      type: Number,
-      required: true,
-    },
-    pipelineIid: {
-      type: Number,
-      required: true,
-    },
     projectId: {
       type: Number,
-      required: true,
-    },
-    sourceBranch: {
-      type: String,
       required: true,
     },
     vulnerabilitiesEndpoint: {
@@ -63,18 +48,11 @@ export default {
       type: Object,
       required: true,
     },
-    projectFullPath: {
-      type: String,
-      required: false,
-      default: '',
-    },
-    pipelineJobsPath: {
-      type: String,
-      required: false,
-      default: '',
-    },
   },
   computed: {
+    shouldShowGraphqlVulnerabilityReport() {
+      return this.glFeatures.pipelineSecurityDashboardGraphql;
+    },
     emptyStateProps() {
       return {
         svgPath: this.emptyStateSvgPath,
@@ -88,8 +66,8 @@ export default {
     },
   },
   created() {
-    this.setSourceBranch(this.sourceBranch);
-    this.setPipelineJobsPath(this.pipelineJobsPath);
+    this.setSourceBranch(this.pipeline.sourceBranch);
+    this.setPipelineJobsPath(this.pipeline.jobsPath);
     this.setProjectId(this.projectId);
   },
   methods: {
@@ -107,9 +85,12 @@ export default {
       class="gl-my-5"
     />
     <security-dashboard
+      v-if="!shouldShowGraphqlVulnerabilityReport"
       :vulnerabilities-endpoint="vulnerabilitiesEndpoint"
       :lock-to-project="{ id: projectId }"
-      :pipeline-id="pipelineId"
+      :pipeline-id="pipeline.id"
+      :pipeline-iid="pipeline.iid"
+      :project-full-path="projectFullPath"
       :loading-error-illustrations="loadingErrorIllustrations"
       :security-report-summary="securityReportSummary"
     >
@@ -117,5 +98,6 @@ export default {
         <gl-empty-state v-bind="emptyStateProps" />
       </template>
     </security-dashboard>
+    <vulnerability-report v-else />
   </div>
 </template>

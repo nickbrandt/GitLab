@@ -54,6 +54,7 @@ RSpec.describe Registrations::ProjectsController do
     subject { post :create, params: { project: params }.merge(trial_onboarding_flow_params) }
 
     let_it_be(:trial_onboarding_flow_params) { {} }
+
     let(:params) { { namespace_id: namespace.id, name: 'New project', path: 'project-path', visibility_level: Gitlab::VisibilityLevel::PRIVATE } }
     let(:signup_onboarding_enabled) { true }
 
@@ -64,6 +65,10 @@ RSpec.describe Registrations::ProjectsController do
 
     context 'with an authenticated user', :sidekiq_inline do
       let_it_be(:trial_onboarding_issues_enabled) { true }
+      let_it_be(:first_project) { create(:project) }
+      let_it_be(:onboarding_context) do
+        { learn_gitlab_project_id: project.id, namespace_id: project.namespace_id, project_id: first_project.id }
+      end
 
       before do
         namespace.add_owner(user)
@@ -77,6 +82,39 @@ RSpec.describe Registrations::ProjectsController do
         expect(subject).to have_gitlab_http_status(:redirect)
         expect(subject).to redirect_to(users_sign_up_experience_level_path(namespace_path: namespace.to_param))
         expect(namespace.projects.find_by_name(s_('Learn GitLab'))).to be_import_finished
+      end
+
+      it 'tracks an event for the jobs_to_be_done experiment', :experiment do
+        stub_experiments(jobs_to_be_done: :candidate)
+
+        expect(experiment(:jobs_to_be_done)).to track(:create_project, project: an_instance_of(Project))
+          .on_next_instance
+          .for(:candidate)
+          .with_context(user: user)
+
+        subject
+      end
+
+      it 'tracks learn gitlab experiments' do
+        allow_next_instance_of(::Projects::CreateService) do |service|
+          allow(service).to receive(:execute).and_return(first_project)
+        end
+        allow_next_instance_of(::Projects::GitlabProjectsImportService) do |service|
+          allow(service).to receive(:execute).and_return(project)
+        end
+        expect(controller).to receive(:record_experiment_user).with(:learn_gitlab_a, onboarding_context)
+        expect(controller).to receive(:record_experiment_user).with(:learn_gitlab_b, onboarding_context)
+
+        subject
+      end
+
+      it 'tracks the registrations_group_invite experiment as expected', :experiment do
+        expect(experiment(:registrations_group_invite))
+          .to track(:signup_successful, { property: namespace.id.to_s })
+                .on_next_instance
+                .with_context(actor: user)
+
+        subject
       end
 
       context 'learn gitlab project' do
@@ -113,10 +151,6 @@ RSpec.describe Registrations::ProjectsController do
       context 'when the trial onboarding is active' do
         let_it_be(:trial_onboarding_flow_params) { { trial_onboarding_flow: true } }
         let_it_be(:trial_onboarding_issues_enabled) { true }
-        let_it_be(:first_project) { create(:project) }
-        let_it_be(:trial_onboarding_context) do
-          { learn_gitlab_project_id: project.id, namespace_id: project.namespace_id, project_id: first_project.id }
-        end
 
         it 'creates a new project, a "Learn GitLab - Ultimate trial" project, does not set a cookie' do
           expect { subject }.to change { namespace.projects.pluck(:name) }.from([]).to(['New project', s_('Learn GitLab - Ultimate trial')])
@@ -131,7 +165,7 @@ RSpec.describe Registrations::ProjectsController do
           expect_next_instance_of(::Projects::GitlabProjectsImportService) do |service|
             expect(service).to receive(:execute).and_return(project)
           end
-          expect(controller).to receive(:record_experiment_user).with(:trial_onboarding_issues, trial_onboarding_context)
+          expect(controller).to receive(:record_experiment_user).with(:trial_onboarding_issues, onboarding_context)
           expect(controller).to receive(:record_experiment_conversion_event).with(:trial_onboarding_issues)
           expect(subject).to redirect_to(trial_getting_started_users_sign_up_welcome_path(learn_gitlab_project_id: project.id))
         end

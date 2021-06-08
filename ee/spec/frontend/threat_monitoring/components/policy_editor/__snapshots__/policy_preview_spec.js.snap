@@ -1,22 +1,11 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`PolicyPreview component renders policy preview tabs 1`] = `
+exports[`PolicyPreview component with policy description renders policy preview tabs 1`] = `
 <gl-tabs-stub
   contentclass="gl-pt-0"
   theme="indigo"
   value="0"
 >
-  <gl-tab-stub
-    title=".yaml"
-    titlelinkclass=""
-  >
-    <pre
-      class="gl-bg-white gl-rounded-top-left-none gl-rounded-top-right-none"
-    >
-      foo
-    </pre>
-  </gl-tab-stub>
-   
   <gl-tab-stub
     title="Rule"
     titlelinkclass=""
@@ -30,6 +19,17 @@ exports[`PolicyPreview component renders policy preview tabs 1`] = `
       <br />
       test
     </div>
+  </gl-tab-stub>
+   
+  <gl-tab-stub
+    title=".yaml"
+    titlelinkclass=""
+  >
+    <pre
+      class="gl-bg-white gl-rounded-top-left-none gl-rounded-top-right-none"
+    >
+      foo
+    </pre>
   </gl-tab-stub>
 </gl-tabs-stub>
 `;

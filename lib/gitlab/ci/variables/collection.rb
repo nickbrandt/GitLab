@@ -24,6 +24,10 @@ module Gitlab
           self
         end
 
+        def compact
+          Collection.new(select { |variable| !variable.value.nil? })
+        end
+
         def concat(resources)
           return self if resources.nil?
 
@@ -63,10 +67,53 @@ module Gitlab
           Collection.new(@variables.reject(&block))
         end
 
-        # Returns a sorted Collection object, and sets errors property in case of an error
-        def sorted_collection(project)
-          Sort.new(self, project).collection
+        def expand_value(value, keep_undefined: false)
+          value.gsub(Item::VARIABLES_REGEXP) do
+            match = Regexp.last_match
+            if match[:key]
+              # we matched variable
+              if variable = @variables_by_key[match[:key]]
+                variable.value
+              elsif keep_undefined
+                match[0]
+              end
+            else
+              # we escape sequence
+              match[0]
+            end
+          end
         end
+
+        def sort_and_expand_all(project, keep_undefined: false)
+          return self if Feature.disabled?(:variable_inside_variable, project)
+
+          sorted = Sort.new(self)
+          return self.class.new(self, sorted.errors) unless sorted.valid?
+
+          new_collection = self.class.new
+
+          sorted.tsort.each do |item|
+            unless item.depends_on
+              new_collection.append(item)
+              next
+            end
+
+            # expand variables as they are added
+            variable = item.to_runner_variable
+            variable[:value] = new_collection.expand_value(variable[:value], keep_undefined: keep_undefined)
+            new_collection.append(variable)
+          end
+
+          new_collection
+        end
+
+        def to_s
+          "#{@variables_by_key.keys}, @errors='#{@errors}'"
+        end
+
+        protected
+
+        attr_reader :variables
       end
     end
   end

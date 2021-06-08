@@ -147,6 +147,17 @@ recorded:
 
 Instance events can also be accessed via the [Instance Audit Events API](../api/audit_events.md#instance-audit-events).
 
+### Sign-in events **(FREE)**
+
+Successful sign-in events are the only Audit Events available at all tiers. To see
+successful sign-in events:
+
+1. Select your avatar.
+1. Select **Edit profile > Authentication log**.
+
+After upgrading from GitLab Free to a paid tier, successful sign-in events are the only Audit
+Events visible in Audit Events views until more events are logged.
+
 ### Missing events
 
 Some events are not tracked in Audit Events. See the following
@@ -156,6 +167,11 @@ on adding these events into GitLab:
 - [Project settings and activity](https://gitlab.com/groups/gitlab-org/-/epics/474)
 - [Group settings and activity](https://gitlab.com/groups/gitlab-org/-/epics/475)
 - [Instance-level settings and activity](https://gitlab.com/groups/gitlab-org/-/epics/476)
+
+Don't see the event you want in any of the epics linked above? You can use the **Audit Event
+Proposal** issue template to
+[create an issue](https://gitlab.com/gitlab-org/gitlab/-/issues/new?issuable_template=Audit%20Event%20Proposal)
+to request it.
 
 ### Disabled events
 
@@ -170,7 +186,7 @@ In an upcoming release, Audit Events for Git push events will be enabled
 by default. Follow our [Partitioning strategy for Audit Events epic](https://gitlab.com/groups/gitlab-org/-/epics/3206) for updates.
 
 If you still wish to enable **Repository push** events in your instance, follow
-the steps bellow.
+the steps below.
 
 **In Omnibus installations:**
 

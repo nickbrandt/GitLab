@@ -32,9 +32,9 @@
   - 1
 - - analytics_devops_adoption_create_snapshot
   - 1
-- - analytics_instance_statistics_counter_job
-  - 1
 - - analytics_usage_trends_counter_job
+  - 1
+- - approval_rules_external_approval_rule_payload
   - 1
 - - approve_blocked_pending_approval_users
   - 1
@@ -53,6 +53,12 @@
 - - bulk_import
   - 1
 - - bulk_imports_entity
+  - 1
+- - bulk_imports_export_request
+  - 1
+- - bulk_imports_pipeline
+  - 1
+- - bulk_imports_relation_export
   - 1
 - - chaos
   - 2
@@ -110,8 +116,6 @@
   - 1
 - - elastic_full_index
   - 1
-- - elastic_indexer
-  - 1
 - - elastic_indexing_control
   - 1
 - - elastic_namespace_indexer
@@ -143,8 +147,6 @@
 - - gcp_cluster
   - 1
 - - geo
-  - 1
-- - git_garbage_collect
   - 1
 - - github_import_advance_stage
   - 1
@@ -186,6 +188,10 @@
   - 1
 - - issuable_export_csv
   - 1
+- - issuable_label_links_destroy
+  - 1
+- - issuables_clear_groups_issue_counter
+  - 1
 - - issue_placement
   - 2
 - - issue_rebalancing
@@ -209,6 +215,12 @@
 - - merge_request_reset_approvals
   - 1
 - - merge_requests_delete_source_branch
+  - 1
+- - merge_requests_handle_assignees_change
+  - 1
+- - merge_requests_resolve_todos
+  - 1
+- - merge_requests_sync_code_owner_approval_rules
   - 1
 - - metrics_dashboard_prune_old_annotations
   - 1
@@ -239,6 +251,8 @@
 - - object_storage
   - 1
 - - package_repositories
+  - 1
+- - packages_composer_cache_update
   - 1
 - - pages
   - 1
@@ -282,15 +296,13 @@
   - 1
 - - project_import_schedule
   - 1
-- - project_schedule_bulk_repository_shard_moves
-  - 1
 - - project_service
   - 1
 - - project_template_export
   - 1
-- - project_update_repository_storage
-  - 1
 - - projects_git_garbage_collect
+  - 1
+- - projects_post_creation
   - 1
 - - projects_schedule_bulk_repository_shard_moves
   - 1
@@ -351,10 +363,6 @@
 - - service_desk_email_receiver
   - 1
 - - set_user_status_based_on_user_cap_setting
-  - 1
-- - snippet_schedule_bulk_repository_shard_moves
-  - 1
-- - snippet_update_repository_storage
   - 1
 - - snippets_schedule_bulk_repository_shard_moves
   - 1

@@ -4,10 +4,10 @@ group: Configure
 info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#designated-technical-writers
 ---
 
-# Kubernetes Agent configuration repository **(PREMIUM SELF)**
+# Kubernetes Agent configuration repository **(PREMIUM)**
 
 > - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/259669) in [GitLab Premium](https://about.gitlab.com/pricing/) 13.7.
-> - It's disabled on GitLab.com. Rolling this feature out to GitLab.com is [planned](https://gitlab.com/groups/gitlab-org/-/epics/3834).
+> - [Introduced](https://gitlab.com/groups/gitlab-org/-/epics/3834) in GitLab 13.11, the Kubernetes Agent became available on GitLab.com.
 
 WARNING:
 This feature might not be available to you. Check the **version history** note above for details.
@@ -93,4 +93,42 @@ gitops:
     - glob: '/team2/apps/**/*.yaml'
       # If 'paths' is not specified or is an empty list, the configuration below is used
     - glob: '/**/*.{yaml,yml,json}'
+```
+
+## Surface network security alerts from cluster to GitLab
+
+The GitLab Agent provides an [integration with Cilium](index.md#kubernetes-network-security-alerts).
+To integrate, add a top-level `cilium` section to your `config.yml` file. Currently, the
+only configuration option is the Hubble relay address:
+
+```yaml
+cilium:
+  hubble_relay_address: "<hubble-relay-host>:<hubble-relay-port>"
+```
+
+If your Cilium integration was performed through GitLab Managed Apps, you can use `hubble-relay.gitlab-managed-apps.svc.cluster.local:80` as the address:
+
+```yaml
+cilium:
+  hubble_relay_address: "hubble-relay.gitlab-managed-apps.svc.cluster.local:80"
+```
+
+## Debugging
+
+To debug the cluster-side component (`agentk`) of the GitLab Kubernetes Agent, set the log
+level according to the available options:
+
+- `off`
+- `warning`
+- `error`
+- `info`
+- `debug`
+
+The log level defaults to `info`. You can change it by using a top-level `observability`
+section in the configuration file, for example:
+
+```yaml
+observability:
+  logging:
+    level: debug
 ```

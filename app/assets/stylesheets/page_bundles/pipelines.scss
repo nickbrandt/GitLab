@@ -116,7 +116,7 @@
         position: absolute;
         right: -7px;
         top: 11px;
-        border-bottom: 2px solid $border-color;
+        border-bottom: 2px solid var(--border-color, $border-color);
       }
     }
 
@@ -180,11 +180,6 @@ button.gl-button.btn-link.mini-pipeline-graph-dropdown-toggle {
   &::before {
     border-width: 0 5px 5px;
     border-bottom-color: $border-color;
-  }
-
-  &::after {
-    margin-top: 1px;
-    border-bottom-color: $white;
   }
 
   /**

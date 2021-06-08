@@ -125,6 +125,7 @@ export default {
             }
             this.$refs.addUpdateScheduleModal.hide();
             this.$emit('scheduleCreated');
+            this.clearScheduleForm();
           },
         )
         .catch((error) => {
@@ -135,7 +136,10 @@ export default {
         });
     },
     editSchedule() {
-      const { projectPath } = this;
+      const {
+        projectPath,
+        form: { timezone },
+      } = this;
       this.loading = true;
 
       this.$apollo
@@ -167,6 +171,9 @@ export default {
         })
         .finally(() => {
           this.loading = false;
+          if (timezone !== this.schedule.timezone) {
+            window.location.reload();
+          }
         });
     },
     hideErrorAlert() {
@@ -182,6 +189,11 @@ export default {
       } else if (key === 'timezone') {
         this.validationState.timezone = !isEmpty(this.form.timezone);
       }
+    },
+    clearScheduleForm() {
+      this.form.name = '';
+      this.form.description = '';
+      this.form.timezone = {};
     },
   },
 };
@@ -203,7 +215,6 @@ export default {
     <add-edit-schedule-form
       :validation-state="validationState"
       :form="form"
-      :schedule="schedule"
       @update-schedule-form="updateScheduleForm"
     />
   </gl-modal>

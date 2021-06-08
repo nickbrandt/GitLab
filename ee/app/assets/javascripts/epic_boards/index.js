@@ -2,16 +2,19 @@
 // relies on app/views/shared/boards/_show.html.haml for its
 // template.
 /* eslint-disable @gitlab/no-runtime-template-compiler */
+import { IntrospectionFragmentMatcher } from 'apollo-cache-inmemory';
 import Vue from 'vue';
 import VueApollo from 'vue-apollo';
-import { mapActions } from 'vuex';
+import { mapActions, mapState } from 'vuex';
 
+import initFilteredSearch from 'ee/boards/epic_filtered_search';
+import { fullEpicBoardId, transformBoardConfig } from 'ee_component/boards/boards_util';
 import BoardSidebar from 'ee_component/boards/components/board_sidebar';
 import toggleLabels from 'ee_component/boards/toggle_labels';
 
 import BoardAddNewColumnTrigger from '~/boards/components/board_add_new_column_trigger.vue';
 import BoardContent from '~/boards/components/board_content.vue';
-import BoardAddIssuesModal from '~/boards/components/modal/index.vue';
+import boardConfigToggle from '~/boards/config_toggle';
 import { issuableTypes } from '~/boards/constants';
 import mountMultipleBoardsSwitcher from '~/boards/mount_multiple_boards_switcher';
 import store from '~/boards/stores';
@@ -19,11 +22,25 @@ import createDefaultClient from '~/lib/graphql';
 
 import '~/boards/filters/due_date_filters';
 import { NavigationType, parseBoolean } from '~/lib/utils/common_utils';
+import { updateHistory } from '~/lib/utils/url_utility';
+import introspectionQueryResultData from '~/sidebar/fragmentTypes.json';
 
 Vue.use(VueApollo);
 
+const fragmentMatcher = new IntrospectionFragmentMatcher({
+  introspectionQueryResultData,
+});
+
 const apolloProvider = new VueApollo({
-  defaultClient: createDefaultClient(),
+  defaultClient: createDefaultClient(
+    {},
+    {
+      cacheConfig: {
+        fragmentMatcher,
+      },
+      assumeImmutableResults: true,
+    },
+  ),
 });
 
 export default () => {
@@ -39,13 +56,14 @@ export default () => {
     }
   });
 
+  initFilteredSearch(apolloProvider);
+
   // eslint-disable-next-line no-new
   new Vue({
     el: $boardApp,
     components: {
       BoardContent,
       BoardSidebar,
-      BoardAddIssuesModal,
       BoardSettingsSidebar: () => import('~/boards/components/board_settings_sidebar.vue'),
     },
     provide: {
@@ -53,7 +71,8 @@ export default () => {
       groupId: parseInt($boardApp.dataset.groupId, 10),
       rootPath: $boardApp.dataset.rootPath,
       currentUserId: gon.current_user_id || null,
-      canUpdate: $boardApp.dataset.canUpdate,
+      canUpdate: parseBoolean($boardApp.dataset.canUpdate),
+      canAdminList: parseBoolean($boardApp.dataset.canAdminList),
       labelsFetchPath: $boardApp.dataset.labelsFetchPath,
       labelsManagePath: $boardApp.dataset.labelsManagePath,
       labelsFilterBasePath: $boardApp.dataset.labelsFilterBasePath,
@@ -63,6 +82,10 @@ export default () => {
         ? parseInt($boardApp.dataset.boardWeight, 10)
         : null,
       scopedLabelsAvailable: parseBoolean($boardApp.dataset.scopedLabels),
+      milestoneListsAvailable: false,
+      assigneeListsAvailable: false,
+      iterationListsAvailable: false,
+      emailsDisabled: parseBoolean($boardApp.dataset.emailsDisabled),
     },
     store,
     apolloProvider,
@@ -79,9 +102,13 @@ export default () => {
         detailIssueVisible: false,
       };
     },
+    computed: {
+      ...mapState(['boardConfig']),
+    },
     created() {
       this.setInitialBoardData({
         boardId: $boardApp.dataset.boardId,
+        fullBoardId: fullEpicBoardId($boardApp.dataset.boardId),
         fullPath: $boardApp.dataset.fullPath,
         boardType: this.parent,
         disabled: this.disabled,
@@ -102,6 +129,13 @@ export default () => {
       });
     },
     mounted() {
+      const boardConfigPath = transformBoardConfig(this.boardConfig);
+      if (boardConfigPath !== '') {
+        const filterPath = window.location.search ? `${window.location.search}&` : '?';
+        updateHistory({
+          url: `${filterPath}${transformBoardConfig(this.boardConfig)}`,
+        });
+      }
       this.performSearch();
     },
     methods: {
@@ -128,6 +162,7 @@ export default () => {
   }
 
   toggleLabels();
+  boardConfigToggle();
 
   mountMultipleBoardsSwitcher({
     fullPath: $boardApp.dataset.fullPath,

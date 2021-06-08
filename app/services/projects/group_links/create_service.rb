@@ -23,7 +23,7 @@ module Projects
       private
 
       def setup_authorizations(group, group_access = nil)
-        if Feature.enabled?(:specialized_project_authorization_project_share_worker)
+        if Feature.enabled?(:specialized_project_authorization_project_share_worker, default_enabled: :yaml)
           AuthorizedProjectUpdate::ProjectGroupLinkCreateWorker.perform_async(
             project.id, group.id, group_access)
 
@@ -44,4 +44,4 @@ module Projects
   end
 end
 
-Projects::GroupLinks::CreateService.prepend_if_ee('EE::Projects::GroupLinks::CreateService')
+Projects::GroupLinks::CreateService.prepend_mod_with('Projects::GroupLinks::CreateService')

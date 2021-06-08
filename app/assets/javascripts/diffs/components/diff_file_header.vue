@@ -41,6 +41,7 @@ export default {
     GlDropdownDivider,
     GlFormCheckbox,
     GlLoadingIcon,
+    CodeQualityBadge: () => import('ee_component/diffs/components/code_quality_badge.vue'),
   },
   directives: {
     GlTooltip: GlTooltipDirective,
@@ -49,6 +50,7 @@ export default {
   mixins: [glFeatureFlagsMixin()],
   i18n: {
     ...DIFF_FILE_HEADER,
+    compareButtonLabel: s__('Compare submodule commit revisions'),
   },
   props: {
     discussionPath: {
@@ -93,6 +95,11 @@ export default {
       type: Boolean,
       required: false,
       default: false,
+    },
+    codequalityDiff: {
+      type: Array,
+      required: false,
+      default: () => [],
     },
   },
   data() {
@@ -191,6 +198,12 @@ export default {
     },
     isReviewable() {
       return reviewable(this.diffFile);
+    },
+    externalUrlLabel() {
+      return sprintf(__('View on %{url}'), { url: this.diffFile.formatted_external_url });
+    },
+    showCodequalityBadge() {
+      return this.codequalityDiff?.length > 0 && !this.glFeatures.codequalityMrDiffAnnotations;
     },
   },
   methods: {
@@ -323,6 +336,13 @@ export default {
         data-track-property="diff_copy_file"
       />
 
+      <code-quality-badge
+        v-if="showCodequalityBadge"
+        :file-name="filePath"
+        :codequality-diff="codequalityDiff"
+        class="gl-mr-2"
+      />
+
       <small v-if="isModeChanged" ref="fileMode" class="mr-1">
         {{ diffFile.a_mode }} → {{ diffFile.b_mode }}
       </small>
@@ -352,7 +372,8 @@ export default {
           ref="externalLink"
           v-gl-tooltip.hover
           :href="diffFile.external_url"
-          :title="`View on ${diffFile.formatted_external_url}`"
+          :title="externalUrlLabel"
+          :aria-label="externalUrlLabel"
           target="_blank"
           data-track-event="click_toggle_external_button"
           data-track-label="diff_toggle_external_button"
@@ -444,7 +465,8 @@ export default {
         v-gl-tooltip.hover
         v-safe-html="submoduleDiffCompareLinkText"
         class="submodule-compare"
-        :title="s__('Compare submodule commit revisions')"
+        :title="$options.i18n.compareButtonLabel"
+        :aria-label="$options.i18n.compareButtonLabel"
         :href="diffFile.submodule_compare.url"
       />
     </div>

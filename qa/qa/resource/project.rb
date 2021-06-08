@@ -83,7 +83,7 @@ module QA
           end
         end
 
-        Page::Project::NewExperiment.perform(&:click_blank_project_link) if Page::Project::NewExperiment.perform(&:shown?)
+        Page::Project::New.perform(&:click_blank_project_link)
 
         Page::Project::New.perform do |new_page|
           new_page.choose_test_namespace
@@ -155,6 +155,10 @@ module QA
         "#{api_get_path}/registry/repositories"
       end
 
+      def api_packages_path
+        "#{api_get_path}/packages"
+      end
+
       def api_commits_path
         "#{api_get_path}/repository/commits"
       end
@@ -173,6 +177,10 @@ module QA
 
       def api_pipelines_path
         "#{api_get_path}/pipelines"
+      end
+
+      def api_pipeline_schedules_path
+        "#{api_get_path}/pipeline_schedules"
       end
 
       def api_put_path
@@ -252,9 +260,9 @@ module QA
 
       def runners(tag_list: nil)
         response = if tag_list
-                     get Runtime::API::Request.new(api_client, "#{api_runners_path}?tag_list=#{tag_list.compact.join(',')}").url
+                     get Runtime::API::Request.new(api_client, "#{api_runners_path}?tag_list=#{tag_list.compact.join(',')}", per_page: '100').url
                    else
-                     get Runtime::API::Request.new(api_client, "#{api_runners_path}").url
+                     get Runtime::API::Request.new(api_client, "#{api_runners_path}", per_page: '100').url
                    end
 
         parse_body(response)
@@ -262,7 +270,11 @@ module QA
 
       def registry_repositories
         response = get Runtime::API::Request.new(api_client, "#{api_registry_repositories_path}").url
+        parse_body(response)
+      end
 
+      def packages
+        response = get Runtime::API::Request.new(api_client, "#{api_packages_path}").url
         parse_body(response)
       end
 
@@ -280,6 +292,10 @@ module QA
 
       def pipelines
         parse_body(get(Runtime::API::Request.new(api_client, api_pipelines_path).url))
+      end
+
+      def pipeline_schedules
+        parse_body(get(Runtime::API::Request.new(api_client, api_pipeline_schedules_path).url))
       end
 
       private

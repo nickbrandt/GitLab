@@ -17,6 +17,10 @@ RSpec.describe "Admin Runners" do
   describe "Runners page" do
     let(:pipeline) { create(:ci_pipeline) }
 
+    before do
+      stub_feature_flags(runner_list_view_vue_ui: false)
+    end
+
     context "when there are runners" do
       it 'has all necessary texts' do
         runner = create(:ci_runner, contacted_at: Time.now)
@@ -201,21 +205,21 @@ RSpec.describe "Admin Runners" do
 
         visit admin_runners_path
 
-        within '.runners-content .gl-responsive-table-row:nth-child(2)' do
+        within '[data-testid="runners-table"] .gl-responsive-table-row:nth-child(2)' do
           expect(page).to have_content 'runner-2'
         end
 
-        within '.runners-content .gl-responsive-table-row:nth-child(3)' do
+        within '[data-testid="runners-table"] .gl-responsive-table-row:nth-child(3)' do
           expect(page).to have_content 'runner-1'
         end
 
         sorting_by 'Last Contact'
 
-        within '.runners-content .gl-responsive-table-row:nth-child(2)' do
+        within '[data-testid="runners-table"] .gl-responsive-table-row:nth-child(2)' do
           expect(page).to have_content 'runner-1'
         end
 
-        within '.runners-content .gl-responsive-table-row:nth-child(3)' do
+        within '[data-testid="runners-table"] .gl-responsive-table-row:nth-child(3)' do
           expect(page).to have_content 'runner-2'
         end
       end
@@ -240,7 +244,7 @@ RSpec.describe "Admin Runners" do
       it 'shows the label and does not show the project count' do
         visit admin_runners_path
 
-        within "#runner_#{runner.id}" do
+        within "[data-testid='runner-row-#{runner.id}']" do
           expect(page).to have_selector '.badge', text: 'group'
           expect(page).to have_text 'n/a'
         end
@@ -253,7 +257,7 @@ RSpec.describe "Admin Runners" do
 
         visit admin_runners_path
 
-        within "#runner_#{runner.id}" do
+        within "[data-testid='runner-row-#{runner.id}']" do
           expect(page).to have_selector '.badge', text: 'shared'
           expect(page).to have_text 'n/a'
         end
@@ -267,9 +271,33 @@ RSpec.describe "Admin Runners" do
 
         visit admin_runners_path
 
-        within "#runner_#{runner.id}" do
+        within "[data-testid='runner-row-#{runner.id}']" do
           expect(page).to have_selector '.badge', text: 'specific'
           expect(page).to have_text '1'
+        end
+      end
+    end
+
+    describe 'runners registration token' do
+      let!(:token) { Gitlab::CurrentSettings.runners_registration_token }
+
+      before do
+        visit admin_runners_path
+      end
+
+      it 'has a registration token' do
+        expect(page.find('[data-testid="registration_token"]')).to have_content(token)
+      end
+
+      describe 'reset registration token' do
+        let(:page_token) { find('[data-testid="registration_token"]').text }
+
+        before do
+          click_button 'Reset registration token'
+        end
+
+        it 'changes registration token' do
+          expect(page_token).not_to eq token
         end
       end
     end
@@ -285,8 +313,16 @@ RSpec.describe "Admin Runners" do
     end
 
     describe 'runner page breadcrumbs' do
-      it 'contains the current runner’s short sha' do
-        expect(page.find('h2')).to have_content(runner.short_sha)
+      it 'contains the current runner token' do
+        page.within '[data-testid="breadcrumb-links"]' do
+          expect(page.find('h2')).to have_content(runner.short_sha)
+        end
+      end
+    end
+
+    describe 'runner page title', :js do
+      it 'contains the runner id' do
+        expect(find('.page-title')).to have_content("Runner ##{runner.id}")
       end
     end
 
@@ -313,11 +349,11 @@ RSpec.describe "Admin Runners" do
     describe 'enable/create' do
       shared_examples 'assignable runner' do
         it 'enables a runner for a project' do
-          within '.unassigned-projects' do
+          within '[data-testid="unassigned-projects"]' do
             click_on 'Enable'
           end
 
-          assigned_project = page.find('.assigned-projects')
+          assigned_project = page.find('[data-testid="assigned-projects"]')
 
           expect(assigned_project).to have_content(@project2.path)
         end
@@ -347,7 +383,7 @@ RSpec.describe "Admin Runners" do
         let(:runner) { create(:ci_runner, :instance) }
 
         before do
-          @project1.destroy
+          @project1.destroy!
           visit admin_runner_path(runner)
         end
 
@@ -363,37 +399,13 @@ RSpec.describe "Admin Runners" do
       end
 
       it 'enables specific runner for project' do
-        within '.assigned-projects' do
+        within '[data-testid="assigned-projects"]' do
           click_on 'Disable'
         end
 
-        new_runner_project = page.find('.unassigned-projects')
+        new_runner_project = page.find('[data-testid="unassigned-projects"]')
 
         expect(new_runner_project).to have_content(@project1.path)
-      end
-    end
-  end
-
-  describe 'runners registration token' do
-    let!(:token) { Gitlab::CurrentSettings.runners_registration_token }
-
-    before do
-      visit admin_runners_path
-    end
-
-    it 'has a registration token' do
-      expect(page.find('#registration_token')).to have_content(token)
-    end
-
-    describe 'reload registration token' do
-      let(:page_token) { find('#registration_token').text }
-
-      before do
-        click_button 'Reset registration token'
-      end
-
-      it 'changes registration token' do
-        expect(page_token).not_to eq token
       end
     end
   end

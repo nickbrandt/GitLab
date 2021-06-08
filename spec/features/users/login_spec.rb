@@ -138,7 +138,7 @@ RSpec.describe 'Login' do
 
       gitlab_sign_in(User.ghost)
 
-      expect(page).to have_content('Invalid Login or password.')
+      expect(page).to have_content('Invalid login or password.')
     end
 
     it 'does not update Devise trackable attributes', :clean_gitlab_redis_shared_state do
@@ -239,7 +239,7 @@ RSpec.describe 'Login' do
           expect(codes.size).to eq 10
 
           # Ensure the generated codes get saved
-          user.save(touch: false)
+          user.save!(touch: false)
         end
 
         context 'with valid code' do
@@ -394,6 +394,25 @@ RSpec.describe 'Login' do
 
         gitlab_sign_in(user)
       end
+
+      context 'when the users password is expired' do
+        before do
+          user.update!(password_expires_at: Time.parse('2018-05-08 11:29:46 UTC'))
+        end
+
+        it 'asks for a new password' do
+          expect(authentication_metrics)
+            .to increment(:user_authenticated_counter)
+
+          visit new_user_session_path
+
+          fill_in 'user_login', with: user.email
+          fill_in 'user_password', with: '12345678'
+          click_button 'Sign in'
+
+          expect(current_path).to eq(new_profile_password_path)
+        end
+      end
     end
 
     context 'with invalid username and password' do
@@ -406,7 +425,7 @@ RSpec.describe 'Login' do
 
         gitlab_sign_in(user)
 
-        expect(page).to have_content('Invalid Login or password.')
+        expect(page).to have_content('Invalid login or password.')
       end
     end
   end

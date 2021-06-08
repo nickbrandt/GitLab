@@ -57,7 +57,7 @@ include:
 creates an `a11y` job in your CI/CD pipeline, runs
 Pa11y against the web pages defined in `a11y_urls`, and builds an HTML report for each.
 
-The report for each URL is saved as an artifact that can be [viewed directly in your browser](../../../ci/pipelines/job_artifacts.md#browsing-artifacts).
+The report for each URL is saved as an artifact that can be [viewed directly in your browser](../../../ci/pipelines/job_artifacts.md#download-job-artifacts).
 
 A single `gl-accessibility.json` artifact is created and saved along with the individual HTML reports.
 It includes report data for all URLs scanned.
@@ -67,7 +67,7 @@ For GitLab 12.10 and earlier, the [artifact generated is named `accessibility.js
 
 NOTE:
 For GitLab versions earlier than 12.9, you can use `include:remote` and use a
-link to the [current template in `master`](https://gitlab.com/gitlab-org/gitlab/-/raw/master/lib/gitlab/ci/templates/Verify/Accessibility.gitlab-ci.yml)
+link to the [current template in the default branch](https://gitlab.com/gitlab-org/gitlab/-/raw/master/lib/gitlab/ci/templates/Verify/Accessibility.gitlab-ci.yml)
 
 NOTE:
 The job definition provided by the template does not support Kubernetes yet.

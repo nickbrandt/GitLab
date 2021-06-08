@@ -31,11 +31,16 @@ class Projects::BlobController < Projects::ApplicationController
   before_action :editor_variables, except: [:show, :preview, :diff]
   before_action :validate_diff_params, only: :diff
   before_action :set_last_commit_sha, only: [:edit, :update]
-  before_action :record_experiment, only: :new
+  before_action :track_experiment, only: :create
 
   track_redis_hll_event :create, :update, name: 'g_edit_by_sfe'
 
   feature_category :source_code_management
+
+  before_action do
+    push_frontend_feature_flag(:refactor_blob_viewer, @project, default_enabled: :yaml)
+    push_frontend_feature_flag(:consolidated_edit_button, @project, default_enabled: :yaml)
+  end
 
   def new
     commit unless @repository.empty?
@@ -43,7 +48,7 @@ class Projects::BlobController < Projects::ApplicationController
 
   def create
     create_commit(Files::CreateService, success_notice: _("The file has been successfully created."),
-                                        success_path: -> { project_blob_path(@project, File.join(@branch_name, @file_path)) },
+                                        success_path: -> { create_success_path },
                                         failure_view: :new,
                                         failure_path: project_new_blob_path(@project, @ref))
   end
@@ -88,7 +93,7 @@ class Projects::BlobController < Projects::ApplicationController
     @blob.load_all_data!
     diffy = Diffy::Diff.new(@blob.data, @content, diff: '-U 3', include_diff_info: true)
     diff_lines = diffy.diff.scan(/.*\n/)[2..-1]
-    diff_lines = Gitlab::Diff::Parser.new.parse(diff_lines)
+    diff_lines = Gitlab::Diff::Parser.new.parse(diff_lines).to_a
     @diff_lines = Gitlab::Diff::Highlight.new(diff_lines, repository: @repository).highlight
 
     render layout: false
@@ -214,7 +219,7 @@ class Projects::BlobController < Projects::ApplicationController
   def show_html
     environment_params = @repository.branch_exists?(@ref) ? { ref: @ref } : { commit: @commit }
     environment_params[:find_latest] = true
-    @environment = EnvironmentsFinder.new(@project, current_user, environment_params).execute.last
+    @environment = ::Environments::EnvironmentsByDeploymentsFinder.new(@project, current_user, environment_params).execute.last
     @last_commit = @repository.last_commit_for_path(@commit.id, @blob.path, literal_pathspec: true)
     @code_navigation_path = Gitlab::CodeNavigationPath.new(@project, @blob.commit_id).full_json_path_for(@blob.path)
 
@@ -262,9 +267,17 @@ class Projects::BlobController < Projects::ApplicationController
     current_user&.id
   end
 
-  def record_experiment
-    return unless params[:file_name] == @project.ci_config_path_or_default && @project.namespace.recent?
+  def create_success_path
+    if params[:code_quality_walkthrough]
+      project_pipelines_path(@project, code_quality_walkthrough: true)
+    else
+      project_blob_path(@project, File.join(@branch_name, @file_path))
+    end
+  end
 
-    record_experiment_user(:ci_syntax_templates_b, namespace_id: @project.namespace_id)
+  def track_experiment
+    return unless params[:code_quality_walkthrough]
+
+    experiment(:code_quality_walkthrough, namespace: @project.root_ancestor).track(:commit_created)
   end
 end

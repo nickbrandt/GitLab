@@ -47,9 +47,8 @@ const deleteScheduleFromStore = (store, query, { oncallScheduleDestroy }, variab
   });
 
   const data = produce(sourceData, (draftData) => {
-    // eslint-disable-next-line no-param-reassign
     draftData.project.incidentManagementOncallSchedules.nodes = draftData.project.incidentManagementOncallSchedules.nodes.filter(
-      ({ id }) => id !== schedule.id,
+      ({ iid }) => iid !== schedule.iid,
     );
   });
 
@@ -72,7 +71,6 @@ const updateScheduleFromStore = (store, query, { oncallScheduleUpdate }, variabl
   });
 
   const data = produce(sourceData, (draftData) => {
-    // eslint-disable-next-line no-param-reassign
     draftData.project.incidentManagementOncallSchedules.nodes = draftData.project.incidentManagementOncallSchedules.nodes.map(
       (scheduleToUpdate) => {
         return scheduleToUpdate.iid === schedule.iid ? schedule : scheduleToUpdate;

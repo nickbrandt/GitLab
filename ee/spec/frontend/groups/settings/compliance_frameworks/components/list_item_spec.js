@@ -19,6 +19,7 @@ describe('ListItem', () => {
     color: '#112233',
     editPath: 'group/framework/1/edit',
   };
+
   const findLabel = () => wrapper.findComponent(GlLabel);
   const findDescription = () => wrapper.findByTestId('compliance-framework-description');
   const findEditButton = () => wrapper.findByTestId('compliance-framework-edit-button');
@@ -50,10 +51,14 @@ describe('ListItem', () => {
     expect(button.attributes('aria-label')).toBe(ariaLabel);
   };
 
-  const disablesTheButton = (button) => {
-    expect(button.props('disabled')).toBe(true);
-    expect(button.props('loading')).toBe(true);
-  };
+  it('does not show modification buttons when framework is missing paths', () => {
+    createComponent({
+      framework: { ...framework, editPath: null },
+    });
+
+    expect(findEditButton().exists()).toBe(false);
+    expect(findDeleteButton().exists()).toBe(false);
+  });
 
   it('displays the description defined by the framework', () => {
     createComponent();
@@ -70,7 +75,9 @@ describe('ListItem', () => {
   });
 
   it('displays the label as scoped', () => {
-    createComponent({ framework: { ...framework, name: 'scoped::framework' } });
+    createComponent({
+      framework: { ...framework, name: 'scoped::framework' },
+    });
 
     expect(findLabel().props('title')).toBe('scoped::framework');
     expect(findLabel().props('target')).toBe(framework.editPath);
@@ -115,11 +122,17 @@ describe('ListItem', () => {
     });
 
     it('disables the delete button and shows loading', () => {
-      disablesTheButton(findDeleteButton());
+      const button = findDeleteButton();
+
+      expect(button.props('disabled')).toBe(true);
+      expect(button.props('loading')).toBe(true);
     });
 
-    it('disables the edit button and shows loading', () => {
-      disablesTheButton(findEditButton());
+    it('disables the edit button and does not show loading', () => {
+      const button = findEditButton();
+
+      expect(button.props('disabled')).toBe(true);
+      expect(button.props('loading')).toBe(false);
     });
   });
 });

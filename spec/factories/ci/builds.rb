@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-include ActionDispatch::TestProcess
-
 FactoryBot.define do
   factory :ci_build, class: 'Ci::Build', parent: :ci_processable do
     name { 'test' }
@@ -28,6 +26,21 @@ FactoryBot.define do
     trait :degenerated do
       options { nil }
       yaml_variables { nil }
+    end
+
+    trait :unique_name do
+      name { generate(:job_name) }
+    end
+
+    trait :dependent do
+      transient do
+        sequence(:needed_name) { |n| "dependency #{n}" }
+        needed { association(:ci_build, name: needed_name, pipeline: pipeline) }
+      end
+
+      after(:create) do |build, evaluator|
+        build.needs << create(:ci_build_need, build: build, name: evaluator.needed.name)
+      end
     end
 
     trait :started do
@@ -66,6 +79,7 @@ FactoryBot.define do
 
     trait :pending do
       queued_at { 'Di 29. Okt 09:50:59 CET 2013' }
+
       status { 'pending' }
     end
 
@@ -273,6 +287,15 @@ FactoryBot.define do
 
     trait :queued do
       queued_at { Time.now }
+
+      after(:create) do |build|
+        build.create_queuing_entry!
+      end
+    end
+
+    trait :picked do
+      running
+
       runner factory: :ci_runner
     end
 
@@ -356,6 +379,12 @@ FactoryBot.define do
       end
     end
 
+    trait :codequality_reports_without_degradation do
+      after(:build) do |build|
+        build.job_artifacts << create(:ci_job_artifact, :codequality_without_errors, job: build)
+      end
+    end
+
     trait :terraform_reports do
       after(:build) do |build|
         build.job_artifacts << create(:ci_job_artifact, :terraform, job: build)
@@ -412,7 +441,8 @@ FactoryBot.define do
             name: 'Release $CI_COMMIT_SHA',
             description: 'Created using the release-cli $EXTRA_DESCRIPTION',
             tag_name: 'release-$CI_COMMIT_SHA',
-            ref: '$CI_COMMIT_SHA'
+            ref: '$CI_COMMIT_SHA',
+            assets: { links: [{ name: 'asset1', url: 'https://example.com/assets/1' }] }
           }
         }
       end

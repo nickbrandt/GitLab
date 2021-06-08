@@ -5,7 +5,7 @@ info: "To determine the technical writer assigned to the Stage/Group associated 
 type: reference
 ---
 
-# Projects **(FREE)**
+# Organize work with projects **(FREE)**
 
 In GitLab, you can create projects to host
 your codebase. You can also use projects to track issues, plan work,
@@ -45,7 +45,7 @@ Projects include the following [features](https://about.gitlab.com/features/):
   - [Multiple Issue Boards](issue_board.md#multiple-issue-boards): Create team-specific workflows (Issue Boards) for a project.
 - [Merge Requests](merge_requests/index.md): Apply a branching
   strategy and get reviewed by your team.
-  - [Merge Request Approvals](merge_requests/merge_request_approvals.md): Ask for approval before
+  - [Merge Request Approvals](merge_requests/approvals/index.md): Ask for approval before
   implementing a change.
   - [Fix merge conflicts from the UI](merge_requests/resolve_conflicts.md): View Git diffs from the GitLab UI.
   - [Review Apps](../../ci/review_apps/index.md): By branch, preview the results
@@ -154,9 +154,7 @@ There are numerous [APIs](../../api/README.md) to use with your projects:
 - [Aliases](../../api/project_aliases.md)
 - [DORA4 Analytics](../../api/dora4_project_analytics.md)
 
-## DORA4 analytics overview **(ULTIMATE ONLY)**
-
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/279039) in GitLab [Ultimate](https://about.gitlab.com/pricing/) 13.7 as a [Beta feature](https://about.gitlab.com/handbook/product/gitlab-the-product/#beta).
+## DORA4 analytics overview
 
 Project details include the following analytics:
 

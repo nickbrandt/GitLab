@@ -4,7 +4,8 @@ require 'spec_helper'
 
 RSpec.describe 'Pipeline', :js do
   let_it_be(:user) { create(:user) }
-  let_it_be(:project) { create(:project, :repository) }
+  let_it_be(:namespace) { create(:namespace) }
+  let_it_be(:project, reload: true) { create(:project, :repository, namespace: namespace) }
 
   before do
     stub_feature_flags(graphql_pipeline_details_users: false)
@@ -146,6 +147,43 @@ RSpec.describe 'Pipeline', :js do
         end
       end
     end
+
+    context 'when :ci_require_credit_card_on_free_plan flag is on' do
+      before do
+        allow(::Gitlab).to receive(:com?).and_return(true)
+        create(:gitlab_subscription, namespace: namespace, hosted_plan: create(:free_plan))
+
+        stub_feature_flags(ci_require_credit_card_on_free_plan: true)
+      end
+
+      context 'on free plan' do
+        it 'does not show an alert to verify an account with a credit card' do
+          subject
+
+          expect(page).not_to have_selector('[data-testid="creditCardValidationRequiredAlert"]')
+        end
+
+        context 'when failed' do
+          let!(:pipeline) do
+            create(
+              :ci_empty_pipeline,
+              project: project,
+              ref: 'master',
+              status: 'failed',
+              failure_reason: 'user_not_verified',
+              sha: project.commit.id,
+              user: user
+            )
+          end
+
+          it 'shows an alert to verify an account with a credit card' do
+            subject
+
+            expect(page).to have_selector('[data-testid="creditCardValidationRequiredAlert"]')
+          end
+        end
+      end
+    end
   end
 
   describe 'GET /:project/-/pipelines/:id/security' do
@@ -153,6 +191,7 @@ RSpec.describe 'Pipeline', :js do
 
     before do
       stub_licensed_features(sast: true, security_dashboard: true)
+      stub_feature_flags(pipeline_security_dashboard_graphql: false)
     end
 
     context 'with a sast artifact' do

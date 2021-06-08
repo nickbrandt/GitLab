@@ -40,6 +40,7 @@ RSpec.describe Ci::Pipeline, :mailer, factory_default: :keep do
 
   it { is_expected.to respond_to :git_author_name }
   it { is_expected.to respond_to :git_author_email }
+  it { is_expected.to respond_to :git_author_full_text }
   it { is_expected.to respond_to :short_sha }
   it { is_expected.to delegate_method(:full_path).to(:project).with_prefix }
 
@@ -67,14 +68,23 @@ RSpec.describe Ci::Pipeline, :mailer, factory_default: :keep do
     end
 
     describe '#downloadable_artifacts' do
-      let(:build) { create(:ci_build, pipeline: pipeline) }
+      let_it_be(:build) { create(:ci_build, pipeline: pipeline) }
+      let_it_be(:downloadable_artifact) { create(:ci_job_artifact, :codequality, job: build) }
+      let_it_be(:expired_artifact) { create(:ci_job_artifact, :junit, :expired, job: build) }
+      let_it_be(:undownloadable_artifact) { create(:ci_job_artifact, :trace, job: build) }
 
-      it 'returns downloadable artifacts that have not expired' do
-        downloadable_artifact = create(:ci_job_artifact, :codequality, job: build)
-        _expired_artifact = create(:ci_job_artifact, :junit, :expired, job: build)
-        _undownloadable_artifact = create(:ci_job_artifact, :trace, job: build)
+      context 'when artifacts are locked' do
+        it 'returns downloadable artifacts including locked artifacts' do
+          expect(pipeline.downloadable_artifacts).to contain_exactly(downloadable_artifact, expired_artifact)
+        end
+      end
 
-        expect(pipeline.downloadable_artifacts).to contain_exactly(downloadable_artifact)
+      context 'when artifacts are unlocked' do
+        it 'returns only downloadable artifacts not expired' do
+          expired_artifact.job.pipeline.unlocked!
+
+          expect(pipeline.reload.downloadable_artifacts).to contain_exactly(downloadable_artifact)
+        end
       end
     end
   end
@@ -426,6 +436,7 @@ RSpec.describe Ci::Pipeline, :mailer, factory_default: :keep do
     subject { pipeline.legacy_detached_merge_request_pipeline? }
 
     let_it_be(:merge_request) { create(:merge_request) }
+
     let(:ref) { 'feature' }
     let(:target_sha) { nil }
 
@@ -807,6 +818,7 @@ RSpec.describe Ci::Pipeline, :mailer, factory_default: :keep do
       expect(keys).to eq %w[
         CI_PIPELINE_IID
         CI_PIPELINE_SOURCE
+        CI_PIPELINE_CREATED_AT
         CI_COMMIT_SHA
         CI_COMMIT_SHORT_SHA
         CI_COMMIT_BEFORE_SHA
@@ -818,6 +830,7 @@ RSpec.describe Ci::Pipeline, :mailer, factory_default: :keep do
         CI_COMMIT_DESCRIPTION
         CI_COMMIT_REF_PROTECTED
         CI_COMMIT_TIMESTAMP
+        CI_COMMIT_AUTHOR
         CI_BUILD_REF
         CI_BUILD_BEFORE_SHA
         CI_BUILD_REF_NAME
@@ -829,6 +842,7 @@ RSpec.describe Ci::Pipeline, :mailer, factory_default: :keep do
       let_it_be(:assignees) { create_list(:user, 2) }
       let_it_be(:milestone) { create(:milestone, project: project) }
       let_it_be(:labels) { create_list(:label, 2) }
+
       let(:merge_request) do
         create(:merge_request, :simple,
                source_project: project,
@@ -1131,22 +1145,28 @@ RSpec.describe Ci::Pipeline, :mailer, factory_default: :keep do
           end
 
           context 'when commit status is retried' do
-            before do
+            let!(:old_commit_status) do
               create(:commit_status, pipeline: pipeline,
-                                    stage: 'build',
-                                    name: 'mac',
-                                    stage_idx: 0,
-                                    status: 'success')
-
-              Ci::ProcessPipelineService
-                .new(pipeline)
-                .execute
+                                     stage: 'build',
+                                     name: 'mac',
+                                     stage_idx: 0,
+                                     status: 'success')
             end
 
-            it 'ignores the previous state' do
-              expect(statuses).to eq([%w(build success),
-                                      %w(test success),
-                                      %w(deploy running)])
+            context 'when FF ci_remove_update_retried_from_process_pipeline is disabled' do
+              before do
+                stub_feature_flags(ci_remove_update_retried_from_process_pipeline: false)
+
+                Ci::ProcessPipelineService
+                  .new(pipeline)
+                  .execute
+              end
+
+              it 'ignores the previous state' do
+                expect(statuses).to eq([%w(build success),
+                                        %w(test success),
+                                        %w(deploy running)])
+              end
             end
           end
         end
@@ -1267,6 +1287,7 @@ RSpec.describe Ci::Pipeline, :mailer, factory_default: :keep do
 
   describe 'state machine' do
     let_it_be_with_reload(:pipeline) { create(:ci_empty_pipeline, :created) }
+
     let(:current) { Time.current.change(usec: 0) }
     let(:build) { create_build('build1', queued_at: 0) }
     let(:build_b) { create_build('build2', queued_at: 0) }
@@ -1927,6 +1948,30 @@ RSpec.describe Ci::Pipeline, :mailer, factory_default: :keep do
         expect(pipeline.modified_paths).to match(merge_request.modified_paths)
       end
     end
+
+    context 'when source is an external pull request' do
+      let(:pipeline) do
+        create(:ci_pipeline, source: :external_pull_request_event, external_pull_request: external_pull_request)
+      end
+
+      let(:external_pull_request) do
+        create(:external_pull_request, project: project, target_sha: '281d3a7', source_sha: '498214d')
+      end
+
+      it 'returns external pull request modified paths' do
+        expect(pipeline.modified_paths).to match(external_pull_request.modified_paths)
+      end
+
+      context 'when the FF ci_modified_paths_of_external_prs is disabled' do
+        before do
+          stub_feature_flags(ci_modified_paths_of_external_prs: false)
+        end
+
+        it 'returns nil' do
+          expect(pipeline.modified_paths).to be_nil
+        end
+      end
+    end
   end
 
   describe '#all_worktree_paths' do
@@ -2270,6 +2315,35 @@ RSpec.describe Ci::Pipeline, :mailer, factory_default: :keep do
         )
       end
     end
+
+    context 'when method is scoped' do
+      let!(:commit_123_ref_master_parent_pipeline) do
+        create(
+          :ci_pipeline,
+          sha: '123',
+          ref: 'master',
+          project: project
+        )
+      end
+
+      let!(:commit_123_ref_master_child_pipeline) do
+        create(
+          :ci_pipeline,
+          sha: '123',
+          ref: 'master',
+          project: project,
+          child_of: commit_123_ref_master_parent_pipeline
+        )
+      end
+
+      it 'returns the latest pipeline after applying the scope' do
+        result = described_class.ci_sources.latest_pipeline_per_commit(%w[123], 'master')
+
+        expect(result).to match(
+          '123' => commit_123_ref_master_parent_pipeline
+        )
+      end
+    end
   end
 
   describe '.latest_successful_ids_per_project' do
@@ -2318,6 +2392,7 @@ RSpec.describe Ci::Pipeline, :mailer, factory_default: :keep do
     subject { pipeline.reload.status }
 
     let_it_be(:pipeline) { create(:ci_empty_pipeline, :created) }
+
     let(:build) { create(:ci_build, :created, pipeline: pipeline, name: 'test') }
 
     context 'on waiting for resource' do
@@ -2626,6 +2701,37 @@ RSpec.describe Ci::Pipeline, :mailer, factory_default: :keep do
         expect(latest_status).to eq %w(canceled canceled)
       end
     end
+
+    context 'preloading relations' do
+      let(:pipeline1) { create(:ci_empty_pipeline, :created) }
+      let(:pipeline2) { create(:ci_empty_pipeline, :created) }
+
+      before do
+        create(:ci_build, :pending, pipeline: pipeline1)
+        create(:generic_commit_status, :pending, pipeline: pipeline1)
+
+        create(:ci_build, :pending, pipeline: pipeline2)
+        create(:ci_build, :pending, pipeline: pipeline2)
+        create(:generic_commit_status, :pending, pipeline: pipeline2)
+        create(:generic_commit_status, :pending, pipeline: pipeline2)
+        create(:generic_commit_status, :pending, pipeline: pipeline2)
+      end
+
+      it 'preloads relations for each build to avoid N+1 queries' do
+        control1 = ActiveRecord::QueryRecorder.new do
+          pipeline1.cancel_running
+        end
+
+        control2 = ActiveRecord::QueryRecorder.new do
+          pipeline2.cancel_running
+        end
+
+        extra_update_queries = 4 # transition ... => :canceled, queue pop
+        extra_generic_commit_status_validation_queries = 2 # name_uniqueness_across_types
+
+        expect(control2.count).to eq(control1.count + extra_update_queries + extra_generic_commit_status_validation_queries)
+      end
+    end
   end
 
   describe '#retry_failed' do
@@ -2681,6 +2787,7 @@ RSpec.describe Ci::Pipeline, :mailer, factory_default: :keep do
 
   describe '#execute_hooks' do
     let_it_be(:pipeline) { create(:ci_empty_pipeline, :created) }
+
     let!(:build_a) { create_build('a', 0) }
     let!(:build_b) { create_build('b', 0) }
 
@@ -3055,6 +3162,81 @@ RSpec.describe Ci::Pipeline, :mailer, factory_default: :keep do
     end
   end
 
+  describe '#environments_in_self_and_descendants' do
+    subject { pipeline.environments_in_self_and_descendants }
+
+    context 'when pipeline is not child nor parent' do
+      let_it_be(:pipeline) { create(:ci_pipeline, :created) }
+      let_it_be(:build) { create(:ci_build, :with_deployment, :deploy_to_production, pipeline: pipeline) }
+
+      it 'returns just the pipeline environment' do
+        expect(subject).to contain_exactly(build.deployment.environment)
+      end
+    end
+
+    context 'when pipeline is in extended family' do
+      let_it_be(:parent) { create(:ci_pipeline) }
+      let_it_be(:parent_build) { create(:ci_build, :with_deployment, environment: 'staging', pipeline: parent) }
+
+      let_it_be(:pipeline) { create(:ci_pipeline, child_of: parent) }
+      let_it_be(:build) { create(:ci_build, :with_deployment, :deploy_to_production, pipeline: pipeline) }
+
+      let_it_be(:child) { create(:ci_pipeline, child_of: pipeline) }
+      let_it_be(:child_build) { create(:ci_build, :with_deployment, environment: 'canary', pipeline: child) }
+
+      let_it_be(:grandchild) { create(:ci_pipeline, child_of: child) }
+      let_it_be(:grandchild_build) { create(:ci_build, :with_deployment, environment: 'test', pipeline: grandchild) }
+
+      let_it_be(:sibling) { create(:ci_pipeline, child_of: parent) }
+      let_it_be(:sibling_build) { create(:ci_build, :with_deployment, environment: 'review', pipeline: sibling) }
+
+      it 'returns its own environment and from all descendants' do
+        expected_environments = [
+          build.deployment.environment,
+          child_build.deployment.environment,
+          grandchild_build.deployment.environment
+        ]
+        expect(subject).to match_array(expected_environments)
+      end
+
+      it 'does not return parent environment' do
+        expect(subject).not_to include(parent_build.deployment.environment)
+      end
+
+      it 'does not return sibling environment' do
+        expect(subject).not_to include(sibling_build.deployment.environment)
+      end
+    end
+
+    context 'when each pipeline has multiple environments' do
+      let_it_be(:pipeline) { create(:ci_pipeline, :created) }
+      let_it_be(:build1) { create(:ci_build, :with_deployment, :deploy_to_production, pipeline: pipeline) }
+      let_it_be(:build2) { create(:ci_build, :with_deployment, environment: 'staging', pipeline: pipeline) }
+
+      let_it_be(:child) { create(:ci_pipeline, child_of: pipeline) }
+      let_it_be(:child_build1) { create(:ci_build, :with_deployment, environment: 'canary', pipeline: child) }
+      let_it_be(:child_build2) { create(:ci_build, :with_deployment, environment: 'test', pipeline: child) }
+
+      it 'returns all related environments' do
+        expected_environments = [
+          build1.deployment.environment,
+          build2.deployment.environment,
+          child_build1.deployment.environment,
+          child_build2.deployment.environment
+        ]
+        expect(subject).to match_array(expected_environments)
+      end
+    end
+
+    context 'when pipeline has no environment' do
+      let_it_be(:pipeline) { create(:ci_pipeline, :created) }
+
+      it 'returns empty' do
+        expect(subject).to be_empty
+      end
+    end
+  end
+
   describe '#root_ancestor' do
     subject { pipeline.root_ancestor }
 
@@ -3126,18 +3308,6 @@ RSpec.describe Ci::Pipeline, :mailer, factory_default: :keep do
       pipeline.add_error_message('The error message')
 
       expect(pipeline.messages.map(&:content)).to contain_exactly('The error message')
-    end
-
-    context 'when feature flag ci_store_pipeline_messages is disabled' do
-      before do
-        stub_feature_flags(ci_store_pipeline_messages: false)
-      end
-
-      it 'does not add pipeline error message' do
-        pipeline.add_error_message('The error message')
-
-        expect(pipeline.messages).to be_empty
-      end
     end
   end
 
@@ -3346,6 +3516,7 @@ RSpec.describe Ci::Pipeline, :mailer, factory_default: :keep do
 
   describe '#build_with_artifacts_in_self_and_descendants' do
     let_it_be(:pipeline) { create(:ci_pipeline) }
+
     let!(:build) { create(:ci_build, name: 'test', pipeline: pipeline) }
     let(:child_pipeline) { create(:ci_pipeline, child_of: pipeline) }
     let!(:child_build) { create(:ci_build, :artifacts, name: 'test', pipeline: child_pipeline) }
@@ -3773,6 +3944,26 @@ RSpec.describe Ci::Pipeline, :mailer, factory_default: :keep do
     end
   end
 
+  describe '#uses_needs?' do
+    let_it_be(:pipeline) { create(:ci_pipeline) }
+
+    context 'when the scheduling type is `dag`' do
+      it 'returns true' do
+        create(:ci_build, pipeline: pipeline, scheduling_type: :dag)
+
+        expect(pipeline.uses_needs?).to eq(true)
+      end
+    end
+
+    context 'when the scheduling type is nil or stage' do
+      it 'returns false' do
+        create(:ci_build, pipeline: pipeline, scheduling_type: :stage)
+
+        expect(pipeline.uses_needs?).to eq(false)
+      end
+    end
+  end
+
   describe '#total_size' do
     let(:pipeline) { create(:ci_pipeline) }
     let!(:build_job1) { create(:ci_build, pipeline: pipeline, stage_idx: 0) }
@@ -3807,6 +3998,16 @@ RSpec.describe Ci::Pipeline, :mailer, factory_default: :keep do
           pipeline.drop
         end
       end
+
+      context 'with failure_reason' do
+        let(:pipeline) { create(:ci_pipeline, :running) }
+        let(:failure_reason) { 'config_error' }
+        let(:counter) { Gitlab::Metrics.counter(:gitlab_ci_pipeline_failure_reasons, 'desc') }
+
+        it 'increments the counter with the failure_reason' do
+          expect { pipeline.drop!(failure_reason) }.to change { counter.get(reason: failure_reason) }.by(1)
+        end
+      end
     end
   end
 
@@ -3836,6 +4037,7 @@ RSpec.describe Ci::Pipeline, :mailer, factory_default: :keep do
 
   describe '#find_stage_by_name' do
     let_it_be(:pipeline) { create(:ci_pipeline) }
+
     let(:stage_name) { 'test' }
 
     let(:stage) do
@@ -4121,6 +4323,7 @@ RSpec.describe Ci::Pipeline, :mailer, factory_default: :keep do
     subject { pipeline.base_and_ancestors(same_project: same_project) }
 
     let_it_be(:pipeline) { create(:ci_pipeline, :created) }
+
     let(:same_project) { false }
 
     context 'when pipeline is not child nor parent' do
@@ -4157,6 +4360,7 @@ RSpec.describe Ci::Pipeline, :mailer, factory_default: :keep do
 
     context 'when pipeline is a child of a child pipeline' do
       let_it_be(:pipeline) { create(:ci_pipeline, :created) }
+
       let(:ancestor) { create(:ci_pipeline) }
       let(:parent) { create(:ci_pipeline) }
 
@@ -4172,6 +4376,7 @@ RSpec.describe Ci::Pipeline, :mailer, factory_default: :keep do
 
     context 'when pipeline is a triggered pipeline' do
       let_it_be(:pipeline) { create(:ci_pipeline, :created) }
+
       let(:upstream) { create(:ci_pipeline, project: create(:project)) }
 
       before do
@@ -4194,17 +4399,71 @@ RSpec.describe Ci::Pipeline, :mailer, factory_default: :keep do
     end
   end
 
-  describe 'reset_ancestor_bridges!' do
-    let_it_be(:pipeline) { create(:ci_pipeline, :created) }
+  describe '#reset_source_bridge!' do
+    let(:pipeline) { create(:ci_pipeline, :created, project: project) }
+
+    subject(:reset_bridge) { pipeline.reset_source_bridge!(project.owner) }
+
+    # This whole block will be removed by https://gitlab.com/gitlab-org/gitlab/-/issues/329194
+    # It contains some duplicate checks.
+    context 'when the FF ci_reset_bridge_with_subsequent_jobs is disabled' do
+      before do
+        stub_feature_flags(ci_reset_bridge_with_subsequent_jobs: false)
+      end
+
+      context 'when the pipeline is a child pipeline and the bridge is depended' do
+        let!(:parent_pipeline) { create(:ci_pipeline) }
+        let!(:bridge) { create_bridge(parent_pipeline, pipeline, true) }
+
+        it 'marks source bridge as pending' do
+          reset_bridge
+
+          expect(bridge.reload).to be_pending
+        end
+
+        context 'when the parent pipeline has subsequent jobs after the bridge' do
+          let!(:after_bridge_job) { create(:ci_build, :skipped, pipeline: parent_pipeline, stage_idx: bridge.stage_idx + 1) }
+
+          it 'does not touch subsequent jobs of the bridge' do
+            reset_bridge
+
+            expect(after_bridge_job.reload).to be_skipped
+          end
+        end
+
+        context 'when the parent pipeline has a dependent upstream pipeline' do
+          let!(:upstream_bridge) do
+            create_bridge(create(:ci_pipeline, project: create(:project)), parent_pipeline, true)
+          end
+
+          it 'marks all source bridges as pending' do
+            reset_bridge
+
+            expect(bridge.reload).to be_pending
+            expect(upstream_bridge.reload).to be_pending
+          end
+        end
+      end
+    end
 
     context 'when the pipeline is a child pipeline and the bridge is depended' do
       let!(:parent_pipeline) { create(:ci_pipeline) }
       let!(:bridge) { create_bridge(parent_pipeline, pipeline, true) }
 
       it 'marks source bridge as pending' do
-        pipeline.reset_ancestor_bridges!
+        reset_bridge
 
         expect(bridge.reload).to be_pending
+      end
+
+      context 'when the parent pipeline has subsequent jobs after the bridge' do
+        let!(:after_bridge_job) { create(:ci_build, :skipped, pipeline: parent_pipeline, stage_idx: bridge.stage_idx + 1) }
+
+        it 'marks subsequent jobs of the bridge as processable' do
+          reset_bridge
+
+          expect(after_bridge_job.reload).to be_created
+        end
       end
 
       context 'when the parent pipeline has a dependent upstream pipeline' do
@@ -4213,7 +4472,7 @@ RSpec.describe Ci::Pipeline, :mailer, factory_default: :keep do
         end
 
         it 'marks all source bridges as pending' do
-          pipeline.reset_ancestor_bridges!
+          reset_bridge
 
           expect(bridge.reload).to be_pending
           expect(upstream_bridge.reload).to be_pending
@@ -4226,7 +4485,7 @@ RSpec.describe Ci::Pipeline, :mailer, factory_default: :keep do
       let!(:bridge) { create_bridge(parent_pipeline, pipeline, false) }
 
       it 'does not touch source bridge' do
-        pipeline.reset_ancestor_bridges!
+        reset_bridge
 
         expect(bridge.reload).to be_success
       end
@@ -4237,7 +4496,7 @@ RSpec.describe Ci::Pipeline, :mailer, factory_default: :keep do
         end
 
         it 'does not touch any source bridge' do
-          pipeline.reset_ancestor_bridges!
+          reset_bridge
 
           expect(bridge.reload).to be_success
           expect(upstream_bridge.reload).to be_success
@@ -4326,6 +4585,19 @@ RSpec.describe Ci::Pipeline, :mailer, factory_default: :keep do
 
       expect { multi_build_pipeline.builds_with_failed_tests.map(&:project).map(&:full_path) }
         .not_to exceed_query_limit(control_count)
+    end
+  end
+
+  describe '#build_matchers' do
+    let_it_be(:pipeline) { create(:ci_pipeline) }
+    let_it_be(:builds) { create_list(:ci_build, 2, pipeline: pipeline, project: pipeline.project) }
+
+    subject(:matchers) { pipeline.build_matchers }
+
+    it 'returns build matchers' do
+      expect(matchers.size).to eq(1)
+      expect(matchers).to all be_a(Gitlab::Ci::Matching::BuildMatcher)
+      expect(matchers.first.build_ids).to match_array(builds.map(&:id))
     end
   end
 end

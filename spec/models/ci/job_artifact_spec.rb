@@ -195,6 +195,22 @@ RSpec.describe Ci::JobArtifact do
     end
   end
 
+  describe '#archived_trace_exists?' do
+    subject { artifact.archived_trace_exists? }
+
+    context 'when the file exists' do
+      it { is_expected.to be_truthy }
+    end
+
+    context 'when the file does not exist' do
+      before do
+        artifact.file.remove!
+      end
+
+      it { is_expected.to be_falsy }
+    end
+  end
+
   describe '.for_sha' do
     let(:first_pipeline) { create(:ci_pipeline) }
     let(:second_pipeline) { create(:ci_pipeline, project: first_pipeline.project, sha: Digest::SHA1.hexdigest(SecureRandom.hex)) }
@@ -582,6 +598,34 @@ RSpec.describe Ci::JobArtifact do
 
           it_behaves_like 'basing off the project closest setting'
         end
+      end
+    end
+  end
+
+  context 'FastDestroyAll' do
+    let_it_be(:project) { create(:project) }
+    let_it_be(:pipeline) { create(:ci_pipeline, project: project) }
+    let_it_be(:job) { create(:ci_build, pipeline: pipeline, project: project) }
+
+    let!(:job_artifact) { create(:ci_job_artifact, :archive, job: job) }
+    let(:subjects) { pipeline.job_artifacts }
+
+    describe '.use_fast_destroy' do
+      it 'performs cascading delete with fast_destroy_all' do
+        expect(Ci::DeletedObject.count).to eq(0)
+        expect(subjects.count).to be > 0
+
+        expect { pipeline.destroy! }.not_to raise_error
+
+        expect(subjects.count).to eq(0)
+        expect(Ci::DeletedObject.count).to be > 0
+      end
+
+      it 'updates project statistics' do
+        expect(ProjectStatistics).to receive(:increment_statistic).once
+              .with(project, :build_artifacts_size, -job_artifact.file.size)
+
+        pipeline.destroy!
       end
     end
   end

@@ -4,7 +4,7 @@ group: unassigned
 info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#assignments
 ---
 
-# GitLab.com settings
+# GitLab.com settings **(FREE SAAS)**
 
 This page contains information about the settings that are used on
 [GitLab.com](https://about.gitlab.com/pricing/).
@@ -50,7 +50,7 @@ Projects can be backed up in their entirety by exporting them either [through th
 
 With exports, be sure to take note of [what is and is not](../project/settings/import_export.md#exported-contents), included in a project export.
 
-Since GitLab is built on Git, you can back up **just** the repository of a project by [cloning](../../gitlab-basics/start-using-git.md#clone-a-repository) it to another machine. Similarly, if you need to back up just the wiki of a repository it can also be cloned and all files uploaded to that wiki are included [if they were uploaded after 2020-08-22](../project/wiki/index.md#creating-a-new-wiki-page).
+Since GitLab is built on Git, you can back up **just** the repository of a project by [cloning](../../gitlab-basics/start-using-git.md#clone-a-repository) it to another machine. Similarly, if you need to back up just the wiki of a repository it can also be cloned and all files uploaded to that wiki are included [if they were uploaded after 2020-08-22](../project/wiki/index.md#create-a-new-wiki-page).
 
 ## Alternative SSH port
 
@@ -98,11 +98,12 @@ Any settings or feature limits not listed here are using the defaults listed in 
 | Artifacts maximum size (compressed) | 1G                | 100M          |
 | Artifacts [expiry time](../../ci/yaml/README.md#artifactsexpire_in)   | From June 22, 2020, deleted after 30 days unless otherwise specified (artifacts created before that date have no expiry).           | deleted after 30 days unless otherwise specified    |
 | Scheduled Pipeline Cron | `*/5 * * * *` | `3-59/10 * * * *` |
-| [Max jobs in active pipelines](../../administration/instance_limits.md#number-of-jobs-in-active-pipelines) | `500` for Free tier, unlimited otherwise | Unlimited
+| [Max jobs in active pipelines](../../administration/instance_limits.md#number-of-jobs-in-active-pipelines) | `500` for Free tier, unlimited otherwise | Unlimited |
 | [Max CI/CD subscriptions to a project](../../administration/instance_limits.md#number-of-cicd-subscriptions-to-a-project) | `2` | Unlimited |
 | [Max pipeline schedules in projects](../../administration/instance_limits.md#number-of-pipeline-schedules) | `10` for Free tier, `50` for all paid tiers | Unlimited |
 | [Scheduled Job Archival](../../user/admin_area/settings/continuous_integration.md#archive-jobs) | 3 months | Never |
 | Max test cases per [unit test report](../../ci/unit_test_reports.md) | `500_000` | Unlimited |
+| [Max registered runners](../../administration/instance_limits.md#number-of-registered-runners-per-scope) | `50` per-project and per-group for Free tier,<br/>`1_000` per-group for all paid tiers / `1_000` per-project for all paid tiers | `1_000` per-group / `1_000` per-project |
 
 ## Account and limit settings
 
@@ -113,15 +114,16 @@ or over the repository size limit, you can [reduce your repository size with Git
 
 | Setting                       | GitLab.com  | Default       |
 | -----------                   | ----------- | ------------- |
-| [Repository size including LFS](../admin_area/settings/account_and_limit_settings.md) | 10 GB       | Unlimited     |
+| [Repository size including LFS](../admin_area/settings/account_and_limit_settings.md#repository-size-limit) | 10 GB       | Unlimited     |
 | Maximum import size           | 5 GB        | Unlimited ([Modified](https://gitlab.com/gitlab-org/gitlab/-/issues/251106) from 50MB to unlimited in GitLab 13.8.    |
+| Maximum attachment size       | 10 MB      |     10 MB   | 
 
 NOTE:
 `git push` and GitLab project imports are limited to 5 GB per request through Cloudflare. Git LFS and imports other than a file upload are not affected by this limit.
 
 ## IP range
 
-GitLab.com is using the IP range `34.74.90.64/28` for traffic from its Web/API
+GitLab.com uses the IP ranges `34.74.90.64/28` and `34.74.226.0/24` for traffic from its Web/API
 fleet. This whole range is solely allocated to GitLab. You can expect connections from webhooks or repository mirroring to come
 from those IPs and allow them.
 
@@ -205,7 +207,7 @@ can be used for:
 - Downloading assets from a CDN
 - Any other commands that must run before the `git init`
 
-To use this feature, define a [CI/CD variable](../../ci/variables/README.md#create-a-custom-variable-in-the-ui) called
+To use this feature, define a [CI/CD variable](../../ci/variables/README.md#custom-cicd-variables) called
 `CI_PRE_CLONE_SCRIPT` that contains a bash script.
 
 [This example](../../development/pipelines.md#pre-clone-step)
@@ -500,25 +502,11 @@ for `shared_buffers` is quite high and as such we are looking into adjusting it.
 More information on this particular change can be found at
 <https://gitlab.com/gitlab-com/infrastructure/-/issues/1555>. An up to date list
 of proposed changes can be found at
-<https://gitlab.com/gitlab-com/infrastructure/-/issues?scope=all&utf8=%E2%9C%93&state=opened&label_name[]=database&label_name[]=change>.
+<https://gitlab.com/gitlab-com/infrastructure/-/issues?scope=all&state=opened&label_name[]=database&label_name[]=change>.
 
 ## Puma
 
 GitLab.com uses the default of 60 seconds for [Puma request timeouts](https://docs.gitlab.com/omnibus/settings/puma.html#worker-timeout).
-
-## Unicorn
-
-GitLab.com adjusts the memory limits for the [unicorn-worker-killer](https://rubygems.org/gems/unicorn-worker-killer) gem.
-
-Base default:
-
-- `memory_limit_min` = 750MiB
-- `memory_limit_max` = 1024MiB
-
-Web front-ends:
-
-- `memory_limit_min` = 1024MiB
-- `memory_limit_max` = 1280MiB
 
 ## GitLab.com-specific rate limits
 

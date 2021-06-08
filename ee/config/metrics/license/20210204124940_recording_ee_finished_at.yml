@@ -8,8 +8,9 @@ product_category: collection
 value_type: string
 status: data_available
 time_frame: none
-data_source:
+data_source: system
 distribution:
 - ee
-tier: []
-skip_validation: true
+tier:
+- premium
+- ultimate

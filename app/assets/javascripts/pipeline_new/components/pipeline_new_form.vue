@@ -21,7 +21,13 @@ import { backOff } from '~/lib/utils/common_utils';
 import httpStatusCodes from '~/lib/utils/http_status';
 import { redirectTo } from '~/lib/utils/url_utility';
 import { s__, __, n__ } from '~/locale';
-import { VARIABLE_TYPE, FILE_TYPE, CONFIG_VARIABLES_TIMEOUT } from '../constants';
+import {
+  VARIABLE_TYPE,
+  FILE_TYPE,
+  CONFIG_VARIABLES_TIMEOUT,
+  CC_VALIDATION_REQUIRED_ERROR,
+} from '../constants';
+import filterVariables from '../utils/filter_variables';
 import RefsDropdown from './refs_dropdown.vue';
 
 const i18n = {
@@ -33,6 +39,7 @@ const i18n = {
   submitErrorTitle: s__('Pipeline|Pipeline cannot be run.'),
   warningTitle: __('The form contains the following warning:'),
   maxWarningsSummary: __('%{total} warnings found: showing first %{warningsDisplayed}'),
+  removeVariableLabel: s__('CiVariables|Remove variable'),
 };
 
 export default {
@@ -58,6 +65,8 @@ export default {
     GlSprintf,
     GlLoadingIcon,
     RefsDropdown,
+    CcValidationRequiredAlert: () =>
+      import('ee_component/billings/components/cc_validation_required_alert.vue'),
   },
   directives: { SafeHtml },
   props: {
@@ -140,6 +149,9 @@ export default {
     },
     descriptions() {
       return this.form[this.refFullName]?.descriptions ?? {};
+    },
+    ccRequiredError() {
+      return this.error === CC_VALIDATION_REQUIRED_ERROR;
     },
   },
   watch: {
@@ -280,20 +292,13 @@ export default {
     },
     createPipeline() {
       this.submitted = true;
-      const filteredVariables = this.variables
-        .filter(({ key, value }) => key !== '' && value !== '')
-        .map(({ variable_type, key, value }) => ({
-          variable_type,
-          key,
-          secret_value: value,
-        }));
 
       return axios
         .post(this.pipelinesPath, {
           // send shortName as fall back for query params
           // https://gitlab.com/gitlab-org/gitlab/-/issues/287815
           ref: this.refValue.fullName || this.refShortName,
-          variables_attributes: filteredVariables,
+          variables_attributes: filterVariables(this.variables),
         })
         .then(({ data }) => {
           redirectTo(`${this.pipelinesPath}/${data.id}`);
@@ -334,8 +339,9 @@ export default {
 
 <template>
   <gl-form @submit.prevent="createPipeline">
+    <cc-validation-required-alert v-if="ccRequiredError" class="gl-pb-5" />
     <gl-alert
-      v-if="error"
+      v-else-if="error"
       :title="errorTitle"
       :dismissible="false"
       variant="danger"
@@ -392,6 +398,7 @@ export default {
             v-model="variable.variable_type"
             :class="$options.formElementClasses"
             :options="$options.typeOptions"
+            data-testid="pipeline-form-ci-variable-type"
           />
           <gl-form-input
             v-model="variable.key"
@@ -416,15 +423,17 @@ export default {
               data-testid="remove-ci-variable-row"
               variant="danger"
               category="secondary"
+              :aria-label="$options.i18n.removeVariableLabel"
               @click="removeVariable(index)"
             >
               <gl-icon class="gl-mr-0! gl-display-none gl-md-display-block" name="clear" />
-              <span class="gl-md-display-none">{{ s__('CiVariables|Remove variable') }}</span>
+              <span class="gl-md-display-none">{{ $options.i18n.removeVariableLabel }}</span>
             </gl-button>
             <gl-button
               v-else
               class="gl-md-ml-3 gl-mb-3 gl-display-none gl-md-display-block gl-visibility-hidden"
               icon="clear"
+              :aria-label="$options.i18n.removeVariableLabel"
             />
           </template>
         </div>
@@ -441,18 +450,16 @@ export default {
         </gl-sprintf></template
       >
     </gl-form-group>
-    <div
-      class="gl-border-t-solid gl-border-gray-100 gl-border-t-1 gl-p-5 gl-bg-gray-10 gl-display-flex gl-justify-content-space-between"
-    >
+    <div class="gl-pt-5 gl-display-flex">
       <gl-button
         type="submit"
         category="primary"
-        variant="success"
-        class="js-no-auto-disable"
+        variant="confirm"
+        class="js-no-auto-disable gl-mr-3"
         data-qa-selector="run_pipeline_button"
         data-testid="run_pipeline_button"
         :disabled="submitted"
-        >{{ s__('Pipeline|Run Pipeline') }}</gl-button
+        >{{ s__('Pipeline|Run pipeline') }}</gl-button
       >
       <gl-button :href="pipelinesPath">{{ __('Cancel') }}</gl-button>
     </div>

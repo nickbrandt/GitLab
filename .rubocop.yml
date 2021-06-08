@@ -36,8 +36,9 @@ AllCops:
     - 'plugins/**/*'
     - 'file_hooks/**/*'
     - 'workhorse/**/*'
+    - 'spec/support/*.git/**/*'  # e.g. spec/support/gitlab-git-test.git
   CacheRootDirectory: tmp
-  MaxFilesInCache: 18000
+  MaxFilesInCache: 25000
 
 Cop/AvoidKeywordArgumentsInSidekiqWorkers:
   Enabled: true
@@ -307,6 +308,9 @@ Cop/ActiveRecordAssociationReload:
     - 'spec/**/*'
     - 'ee/spec/**/*'
 
+Cop/ActiveModelErrorsDirectManipulation:
+  Enabled: true
+
 Gitlab/AvoidFeatureGet:
   Enabled: true
 
@@ -572,6 +576,9 @@ Rails/SaveBang:
     - 'ee/spec/**/*.rb'
     - 'qa/spec/**/*.rb'
     - 'qa/qa/specs/**/*.rb'
+  Exclude:
+  - spec/models/wiki_page/**/*
+  - spec/models/wiki_page_spec.rb
 
 Cop/PutProjectRoutesUnderScope:
   Include:
@@ -620,3 +627,40 @@ Gitlab/NamespacedClass:
     - 'ee/elastic/**/*.rb'
     - 'scripts/**/*'
     - 'spec/migrations/**/*.rb'
+
+Lint/HashCompareByIdentity:
+  Enabled: true
+
+Lint/RedundantSafeNavigation:
+  Enabled: true
+
+Style/ClassEqualityComparison:
+  Enabled: true
+
+# WIP See https://gitlab.com/gitlab-org/gitlab/-/issues/207950
+Cop/UserAdmin:
+  Enabled: true
+  Exclude:
+    - 'app/controllers/admin/sessions_controller.rb'
+    - 'app/controllers/concerns/enforces_admin_authentication.rb'
+    - 'app/policies/base_policy.rb'
+    - 'lib/gitlab/auth/current_user_mode.rb'
+    - 'spec/**/*.rb'
+    - 'ee/spec/**/*.rb'
+
+Performance/OpenStruct:
+  Exclude:
+    - 'ee/spec/**/*.rb'
+
+# See https://gitlab.com/gitlab-org/gitlab/-/issues/327495
+Style/RegexpLiteral:
+  Enabled: false
+
+Style/RegexpLiteralMixedPreserve:
+  Enabled: true
+  SupportedStyles:
+    - slashes
+    - percent_r
+    - mixed
+    - mixed_preserve
+  EnforcedStyle: mixed_preserve

@@ -10,7 +10,7 @@ module Snippets
       # NOTE: disable_spam_action_service can be removed when the ':snippet_spam' feature flag is removed.
       disable_spam_action_service = params.delete(:disable_spam_action_service) == true
       @request = params.delete(:request)
-      @spam_params = Spam::SpamActionService.filter_spam_params!(params)
+      @spam_params = Spam::SpamActionService.filter_spam_params!(params, @request)
 
       return invalid_params_error(snippet) unless valid_params?
 
@@ -78,7 +78,7 @@ module Snippets
       create_commit(snippet)
 
       true
-    rescue => e
+    rescue StandardError => e
       # Restore old attributes but re-assign changes so they're not lost
       unless snippet.previous_changes.empty?
         snippet.previous_changes.each { |attr, value| snippet[attr] = value[0] }

@@ -3,8 +3,8 @@
 require 'spec_helper'
 
 RSpec.describe Projects::Settings::IntegrationsController do
-  let(:project) { create(:project, :public) }
-  let(:user) { create(:user) }
+  let_it_be(:project) { create(:project, :public) }
+  let_it_be(:user) { create(:user) }
 
   before do
     project.add_maintainer(user)
@@ -27,38 +27,34 @@ RSpec.describe Projects::Settings::IntegrationsController do
     end
   end
 
-  context 'Sets correct services list' do
-    let(:active_services) { assigns(:services).map(&:type) }
-    let(:disabled_services) { %w[GithubService] }
+  context 'sets correct services list' do
+    let(:active_services) { assigns(:integrations).map(&:model_name) }
+    let(:disabled_services) { %w[Integrations::Github] }
 
-    it 'enables SlackSlashCommandsService and disables GitlabSlackApplication' do
+    it 'enables SlackSlashCommands and disables GitlabSlackApplication' do
       get :show, params: { namespace_id: project.namespace, project_id: project }
 
-      expect(active_services).to include('SlackSlashCommandsService')
-      expect(active_services).not_to include('GitlabSlackApplicationService')
+      expect(active_services).to include('Integrations::SlackSlashCommands')
+      expect(active_services).not_to include('Integrations::GitlabSlackApplication')
     end
 
-    it 'enables GitlabSlackApplication and disables SlackSlashCommandsService' do
+    it 'enables GitlabSlackApplication and disables SlackSlashCommands' do
       stub_application_setting(slack_app_enabled: true)
       allow(::Gitlab).to receive(:com?).and_return(true)
 
       get :show, params: { namespace_id: project.namespace, project_id: project }
 
-      expect(active_services).to include('GitlabSlackApplicationService')
-      expect(active_services).not_to include('SlackSlashCommandsService')
+      expect(active_services).to include('Integrations::GitlabSlackApplication')
+      expect(active_services).not_to include('Integrations::SlackSlashCommands')
     end
 
     context 'without a license key' do
-      before do
-        License.destroy_all # rubocop: disable Cop/DestroyAll
-      end
-
       it_behaves_like 'endpoint with some disabled services'
     end
 
     context 'with a license key' do
-      let(:namespace) { create(:group, :private) }
-      let(:project) { create(:project, :private, namespace: namespace) }
+      let_it_be(:namespace) { create(:group, :private) }
+      let_it_be(:project) { create(:project, :private, namespace: namespace) }
 
       before do
         create(:license, plan: ::License::PREMIUM_PLAN)

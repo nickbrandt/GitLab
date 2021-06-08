@@ -16,21 +16,16 @@ import { initRails } from '~/lib/utils/rails_ujs';
 import * as popovers from '~/popovers';
 import * as tooltips from '~/tooltips';
 import initAlertHandler from './alert_handler';
-import { deprecatedCreateFlash as Flash, removeFlashClickListener } from './flash';
+import { removeFlashClickListener } from './flash';
 import initTodoToggle from './header';
 import initLayoutNav from './layout_nav';
-import {
-  handleLocationHash,
-  addSelectOnFocusBehaviour,
-  getCspNonceValue,
-} from './lib/utils/common_utils';
+import { handleLocationHash, addSelectOnFocusBehaviour } from './lib/utils/common_utils';
 import { localTimeAgo } from './lib/utils/datetime_utility';
 import { getLocationHash, visitUrl } from './lib/utils/url_utility';
 
 // everything else
 import initFeatureHighlight from './feature_highlight';
 import LazyLoader from './lazy_loader';
-import { __ } from './locale';
 import initLogoAnimation from './logo';
 import initFrequentItemDropdowns from './frequent_items';
 import initBreadcrumbs from './breadcrumb';
@@ -40,6 +35,7 @@ import initUsagePingConsent from './usage_ping_consent';
 import GlFieldErrors from './gl_field_errors';
 import initUserPopovers from './user_popovers';
 import initBroadcastNotifications from './broadcast_notification';
+import { initTopNav } from './nav';
 
 import 'ee_else_ce/main_ee';
 
@@ -49,29 +45,8 @@ applyGitLabUIConfig();
 window.jQuery = jQuery;
 window.$ = jQuery;
 
-// Add nonce to jQuery script handler
-jQuery.ajaxSetup({
-  converters: {
-    // eslint-disable-next-line @gitlab/require-i18n-strings, func-names
-    'text script': function (text) {
-      jQuery.globalEval(text, { nonce: getCspNonceValue() });
-      return text;
-    },
-  },
-});
-
-function disableJQueryAnimations() {
-  $.fx.off = true;
-}
-
-// Disable jQuery animations
-if (gon?.disable_animations) {
-  disableJQueryAnimations();
-}
-
 // inject test utilities if necessary
 if (process.env.NODE_ENV !== 'production' && gon?.test_env) {
-  disableJQueryAnimations();
   import(/* webpackMode: "eager" */ './test_utils/');
 }
 
@@ -106,6 +81,7 @@ initRails();
 function deferredInitialisation() {
   const $body = $('body');
 
+  initTopNav();
   initBreadcrumbs();
   initTodoToggle();
   initLogoAnimation();
@@ -134,20 +110,6 @@ function deferredInitialisation() {
   }
 
   addSelectOnFocusBehaviour('.js-select-on-focus');
-
-  $('.remove-row').on('ajax:success', function removeRowAjaxSuccessCallback() {
-    tooltips.dispose(this);
-
-    $(this).closest('li').addClass('gl-display-none!');
-  });
-
-  $('.js-remove-tr').on('ajax:before', function removeTRAjaxBeforeCallback() {
-    $(this).hide();
-  });
-
-  $('.js-remove-tr').on('ajax:success', function removeTRAjaxSuccessCallback() {
-    $(this).closest('tr').addClass('gl-display-none!');
-  });
 
   const glTooltipDelay = localStorage.getItem('gl-tooltip-delay');
   const delay = glTooltipDelay ? JSON.parse(glTooltipDelay) : 0;
@@ -239,17 +201,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // eslint-disable-next-line no-jquery/no-ajax-events
-  $(document).ajaxError((e, xhrObj) => {
-    const ref = xhrObj.status;
-
-    if (ref === 401) {
-      Flash(__('You need to be logged in.'));
-    } else if (ref === 404 || ref === 500) {
-      Flash(__('Something went wrong on our end.'));
-    }
-  });
-
   $('.navbar-toggler').on('click', () => {
     $('.header-content').toggleClass('menu-expanded');
   });
@@ -272,7 +223,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     e.preventDefault();
 
-    $this.toggleClass('active');
+    $this.toggleClass('selected');
 
     if ($this.hasClass('active')) {
       notesHolders.show().find('.hide, .content').show();

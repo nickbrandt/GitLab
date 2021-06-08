@@ -56,3 +56,5 @@ module Groups
     end
   end
 end
+
+Groups::VariablesController.prepend_mod_with('Groups::VariablesController')

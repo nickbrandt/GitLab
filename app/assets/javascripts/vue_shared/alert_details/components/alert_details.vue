@@ -21,10 +21,10 @@ import Tracking from '~/tracking';
 import initUserPopovers from '~/user_popovers';
 import AlertDetailsTable from '~/vue_shared/components/alert_details_table.vue';
 import TimeAgoTooltip from '~/vue_shared/components/time_ago_tooltip.vue';
-import { SEVERITY_LEVELS } from '../constants';
+import { PAGE_CONFIG, SEVERITY_LEVELS } from '../constants';
 import createIssueMutation from '../graphql/mutations/alert_issue_create.mutation.graphql';
 import toggleSidebarStatusMutation from '../graphql/mutations/alert_sidebar_status.mutation.graphql';
-import alertQuery from '../graphql/queries/alert_details.query.graphql';
+import alertQuery from '../graphql/queries/alert_sidebar_details.query.graphql';
 import sidebarStatusQuery from '../graphql/queries/alert_sidebar_status.query.graphql';
 import AlertMetrics from './alert_metrics.vue';
 import AlertSidebar from './alert_sidebar.vue';
@@ -91,6 +91,9 @@ export default {
     },
     projectIssuesPath: {
       default: '',
+    },
+    statuses: {
+      default: PAGE_CONFIG.OPERATIONS.STATUSES,
     },
     trackAlertsDetailsViewsOptions: {
       default: null,
@@ -367,7 +370,7 @@ export default {
           >
             {{ alert.runbook }}
           </alert-summary-row>
-          <alert-details-table :alert="alert" :loading="loading" />
+          <alert-details-table :alert="alert" :loading="loading" :statuses="statuses" />
         </gl-tab>
         <gl-tab
           v-if="!isThreatMonitoringPage"

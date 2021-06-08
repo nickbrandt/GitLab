@@ -18,30 +18,13 @@ RSpec.describe Search::GlobalService do
     let(:service) { described_class.new(user, params) }
   end
 
-  context 'issue search' do
-    let(:results) { described_class.new(nil, search: '*').execute.objects('issues') }
+  context 'merge_requests search' do
+    let(:results) { described_class.new(nil, search: '*').execute.objects('merge_requests') }
 
-    before do
-      allow(Elastic::DataMigrationService).to receive(:migration_has_finished?).and_call_original
-      allow(Elastic::DataMigrationService).to receive(:migration_has_finished?)
-                                                .with(:migrate_issues_to_separate_index)
-                                                .and_return(false)
-    end
-
-    it_behaves_like 'search query applies joins based on migrations shared examples', :add_new_data_to_issues_documents
+    it_behaves_like 'search query applies joins based on migrations shared examples', :add_new_data_to_merge_requests_documents
   end
 
-  context 'notes search' do
-    let(:results) { described_class.new(nil, search: '*').execute.objects('notes') }
-
-    before do
-      allow(Elastic::DataMigrationService).to receive(:migration_has_finished?).and_call_original
-    end
-
-    it_behaves_like 'search query applies joins based on migrations shared examples', :add_permissions_data_to_notes_documents
-  end
-
-  context 'visibility', :elastic, :sidekiq_inline do
+  context 'visibility', :elastic_delete_by_query, :sidekiq_inline do
     include_context 'ProjectPolicyTable context'
 
     shared_examples 'search respects visibility' do
@@ -57,6 +40,7 @@ RSpec.describe Search::GlobalService do
     end
 
     let_it_be(:group) { create(:group) }
+
     let(:project) { create(:project, project_level, namespace: group) }
     let(:user) { create_user_from_membership(project, membership) }
 
@@ -71,6 +55,28 @@ RSpec.describe Search::GlobalService do
 
       with_them do
         it_behaves_like 'search respects visibility'
+      end
+
+      # Since newly created indices automatically have all migrations as
+      # finished we need a test to verify the old style searches work for
+      # instances which haven't finished the migration yet
+      context 'when add_new_data_to_merge_requests_documents migration is not finished' do
+        before do
+          set_elasticsearch_migration_to :add_new_data_to_merge_requests_documents, including: false
+        end
+
+        # merge_request cannot be defined prior to the migration mocks because it
+        # will cause the incorrect value to be passed to `use_separate_indices` when creating
+        # the proxy
+        let!(:merge_request) { create(:merge_request, target_project: project, source_project: project) }
+
+        where(:project_level, :feature_access_level, :membership, :admin_mode, :expected_count) do
+          permission_table_for_reporter_feature_access
+        end
+
+        with_them do
+          it_behaves_like 'search respects visibility'
+        end
       end
     end
 
@@ -110,21 +116,7 @@ RSpec.describe Search::GlobalService do
         end
 
         with_them do
-          before do
-            allow(Elastic::DataMigrationService).to receive(:migration_has_finished?).and_call_original
-          end
-
-          context 'when add_permissions_data_to_notes_documents migration is finished' do
-            it_behaves_like 'search respects visibility'
-          end
-
-          context 'when add_permissions_data_to_notes_documents migration is not finished' do
-            before do
-              allow(Elastic::DataMigrationService).to receive(:migration_has_finished?).with(:add_permissions_data_to_notes_documents).and_return(false)
-            end
-
-            it_behaves_like 'search respects visibility'
-          end
+          it_behaves_like 'search respects visibility'
         end
       end
 
@@ -136,21 +128,7 @@ RSpec.describe Search::GlobalService do
         end
 
         with_them do
-          before do
-            allow(Elastic::DataMigrationService).to receive(:migration_has_finished?).and_call_original
-          end
-
-          context 'when add_permissions_data_to_notes_documents migration is finished' do
-            it_behaves_like 'search respects visibility'
-          end
-
-          context 'when add_permissions_data_to_notes_documents migration is not finished' do
-            before do
-              allow(Elastic::DataMigrationService).to receive(:migration_has_finished?).with(:add_permissions_data_to_notes_documents).and_return(false)
-            end
-
-            it_behaves_like 'search respects visibility'
-          end
+          it_behaves_like 'search respects visibility'
         end
       end
 
@@ -164,21 +142,10 @@ RSpec.describe Search::GlobalService do
 
         with_them do
           before do
-            allow(Elastic::DataMigrationService).to receive(:migration_has_finished?).and_call_original
             project.repository.index_commits_and_blobs
           end
 
-          context 'when add_permissions_data_to_notes_documents migration is finished' do
-            it_behaves_like 'search respects visibility'
-          end
-
-          context 'when add_permissions_data_to_notes_documents migration is not finished' do
-            before do
-              allow(Elastic::DataMigrationService).to receive(:migration_has_finished?).with(:add_permissions_data_to_notes_documents).and_return(false)
-            end
-
-            it_behaves_like 'search respects visibility'
-          end
+          it_behaves_like 'search respects visibility'
         end
       end
 
@@ -190,21 +157,7 @@ RSpec.describe Search::GlobalService do
         end
 
         with_them do
-          before do
-            allow(Elastic::DataMigrationService).to receive(:migration_has_finished?).and_call_original
-          end
-
-          context 'when add_permissions_data_to_notes_documents migration is finished' do
-            it_behaves_like 'search respects visibility'
-          end
-
-          context 'when add_permissions_data_to_notes_documents migration is not finished' do
-            before do
-              allow(Elastic::DataMigrationService).to receive(:migration_has_finished?).with(:add_permissions_data_to_notes_documents).and_return(false)
-            end
-
-            it_behaves_like 'search respects visibility'
-          end
+          it_behaves_like 'search respects visibility'
         end
       end
     end
@@ -213,44 +166,14 @@ RSpec.describe Search::GlobalService do
       let(:scope) { 'issues' }
       let(:search) { issue.title }
 
-      context 'when add_new_data_to_issues_documents migration is finished' do
-        let!(:issue) { create :issue, project: project }
+      let!(:issue) { create :issue, project: project }
 
-        where(:project_level, :feature_access_level, :membership, :admin_mode, :expected_count) do
-          permission_table_for_guest_feature_access
-        end
-
-        with_them do
-          it_behaves_like 'search respects visibility'
-        end
+      where(:project_level, :feature_access_level, :membership, :admin_mode, :expected_count) do
+        permission_table_for_guest_feature_access
       end
 
-      # Since newly created indices automatically have all migrations as
-      # finished we need a test to verify the old style searches work for
-      # instances which haven't finished the migration yet
-      context 'when add_new_data_to_issues_documents migration is not finished' do
-        before do
-          allow(Elastic::DataMigrationService).to receive(:migration_has_finished?).and_call_original
-          allow(Elastic::DataMigrationService).to receive(:migration_has_finished?)
-            .with(:add_new_data_to_issues_documents)
-            .and_return(false)
-          allow(Elastic::DataMigrationService).to receive(:migration_has_finished?)
-            .with(:migrate_issues_to_separate_index)
-            .and_return(false)
-        end
-
-        # issue cannot be defined prior to the migration mocks because it
-        # will cause the incorrect value to be passed to `use_separate_indices` when creating
-        # the proxy
-        let!(:issue) { create(:issue, project: project) }
-
-        where(:project_level, :feature_access_level, :membership, :admin_mode, :expected_count) do
-          permission_table_for_guest_feature_access
-        end
-
-        with_them do
-          it_behaves_like 'search respects visibility'
-        end
+      with_them do
+        it_behaves_like 'search respects visibility'
       end
     end
 
@@ -455,80 +378,22 @@ RSpec.describe Search::GlobalService do
   context 'confidential notes' do
     let(:project) { create(:project, :public, :repository) }
 
-    before do
-      allow(Elastic::DataMigrationService).to receive(:migration_has_finished?).and_call_original
-    end
-
     context 'with notes on issues' do
       let(:noteable) { create :issue, project: project }
 
-      context 'when add_permissions_data_to_notes_documents migration has not finished' do
-        before do
-          allow(Elastic::DataMigrationService).to receive(:migration_has_finished?)
-                                                    .with(:add_permissions_data_to_notes_documents)
-                                                    .and_return(false)
-        end
-
-        it_behaves_like 'search notes shared examples', :note_on_issue
-      end
-
-      context 'when add_permissions_data_to_notes_documents migration has finished' do
-        before do
-          allow(Elastic::DataMigrationService).to receive(:migration_has_finished?)
-                                                    .with(:add_permissions_data_to_notes_documents)
-                                                    .and_return(true)
-        end
-
-        it_behaves_like 'search notes shared examples', :note_on_issue
-      end
+      it_behaves_like 'search notes shared examples', :note_on_issue
     end
 
     context 'with notes on merge requests' do
       let(:noteable) { create :merge_request, target_project: project, source_project: project }
 
-      context 'when add_permissions_data_to_notes_documents migration has not finished' do
-        before do
-          allow(Elastic::DataMigrationService).to receive(:migration_has_finished?)
-                                                    .with(:add_permissions_data_to_notes_documents)
-                                                    .and_return(false)
-        end
-
-        it_behaves_like 'search notes shared examples', :note_on_merge_request
-      end
-
-      context 'when add_permissions_data_to_notes_documents migration has finished' do
-        before do
-          allow(Elastic::DataMigrationService).to receive(:migration_has_finished?)
-                                                    .with(:add_permissions_data_to_notes_documents)
-                                                    .and_return(true)
-        end
-
-        it_behaves_like 'search notes shared examples', :note_on_merge_request
-      end
+      it_behaves_like 'search notes shared examples', :note_on_merge_request
     end
 
     context 'with notes on commits' do
       let(:noteable) { create(:commit, project: project) }
 
-      context 'when add_permissions_data_to_notes_documents migration has not finished' do
-        before do
-          allow(Elastic::DataMigrationService).to receive(:migration_has_finished?)
-                                                    .with(:add_permissions_data_to_notes_documents)
-                                                    .and_return(false)
-        end
-
-        it_behaves_like 'search notes shared examples', :note_on_commit
-      end
-
-      context 'when add_permissions_data_to_notes_documents migration has finished' do
-        before do
-          allow(Elastic::DataMigrationService).to receive(:migration_has_finished?)
-                                                    .with(:add_permissions_data_to_notes_documents)
-                                                    .and_return(true)
-        end
-
-        it_behaves_like 'search notes shared examples', :note_on_commit
-      end
+      it_behaves_like 'search notes shared examples', :note_on_commit
     end
   end
 end

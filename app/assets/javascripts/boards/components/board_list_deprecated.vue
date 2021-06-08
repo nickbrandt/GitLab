@@ -1,7 +1,7 @@
 <script>
 import { GlLoadingIcon } from '@gitlab/ui';
 import { Sortable, MultiDrag } from 'sortablejs';
-import { deprecatedCreateFlash as createFlash } from '~/flash';
+import createFlash from '~/flash';
 import { BV_HIDE_TOOLTIP } from '~/lib/utils/constants';
 import { sprintf, __ } from '~/locale';
 import eventHub from '../eventhub';
@@ -134,9 +134,10 @@ export default {
               e.target.closest('.js-board-list') || e.target.querySelector('.js-board-list');
             const toBoardType = containerEl.dataset.boardType;
             const cloneActions = {
-              label: ['milestone', 'assignee'],
-              assignee: ['milestone', 'label'],
-              milestone: ['label', 'assignee'],
+              label: ['milestone', 'assignee', 'iteration'],
+              assignee: ['milestone', 'label', 'iteration'],
+              milestone: ['label', 'assignee', 'iteration'],
+              iteration: ['label', 'assignee', 'milestone'],
             };
 
             if (toBoardType) {
@@ -294,7 +295,9 @@ export default {
         }
 
         if (!toList) {
-          createFlash(__('Something went wrong while performing the action.'));
+          createFlash({
+            message: __('Something went wrong while performing the action.'),
+          });
         }
 
         if (!isSameList) {

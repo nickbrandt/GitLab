@@ -1,6 +1,6 @@
 ---
-stage: none
-group: unassigned
+stage: Create
+group: Ecosystem
 info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#assignments
 ---
 
@@ -29,12 +29,14 @@ Example:
 
 ```shell
 GRAPHQL_TOKEN=<your-token>
-curl "https://gitlab.com/api/graphql" --header "Authorization: Bearer $GRAPHQL_TOKEN" --header "Content-Type: application/json" --request POST --data "{\"query\": \"query {currentUser {name}}\"}"
+curl "https://gitlab.com/api/graphql" --header "Authorization: Bearer $GRAPHQL_TOKEN" \
+     --header "Content-Type: application/json" --request POST \
+     --data "{\"query\": \"query {currentUser {name}}\"}"
 ```
 
 ### GraphiQL
 
-GraphiQL (pronounced “graphical”) allows you to run queries directly against the server endpoint
+GraphiQL (pronounced "graphical") allows you to run queries directly against the server endpoint
 with syntax highlighting and autocomplete. It also allows you to explore the schema and types.
 
 The examples below:

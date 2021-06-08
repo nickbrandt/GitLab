@@ -27,8 +27,6 @@ of top-performing instances based on [usage ping data](../settings/usage_statist
 collected. Your score is compared to the lead score of each feature and then expressed as a percentage at the bottom of said feature.
 Your overall **DevOps Score** is an average of your feature scores. You can use this score to compare your DevOps status to other organizations.
 
-![DevOps Report](img/dev_ops_report_v13_4.png)
-
 The page also provides helpful links to articles and GitLab docs, to help you
 improve your scores.
 
@@ -42,13 +40,14 @@ collected before this feature is available.
 
 The DevOps Adoption tab shows you which groups within your organization are using the most essential features of GitLab:
 
+- Approvals
+- Code owners
+- Deployments
 - Issues
 - Merge Requests
-- Approvals
-- Runners
 - Pipelines
-- Deploys
-- Scanning
+- Runners
+- Scans
 
 Buttons to manage your groups appear in the DevOps Adoption section of the page.
 
@@ -58,22 +57,20 @@ DevOps Adoption allows you to:
 - Identify specific groups that are lagging in their adoption of GitLab so you can help them along in their DevOps journey.
 - Find the groups that have adopted certain features and can provide guidance to other groups on how to use those features.
 
-![DevOps Report](img/dev_ops_adoption_v13_9.png)
-
 ### Disable or enable DevOps Adoption
 
-DevOps Adoption is deployed behind a feature flag that is **disabled by default**.
+DevOps Adoption is deployed behind a feature flag that is **enabled by default**.
 [GitLab administrators with access to the GitLab Rails console](../../../administration/feature_flags.md)
-can opt to enable it.
-
-To enable it:
-
-```ruby
-Feature.enable(:devops_adoption_feature)
-```
+can opt to disable it.
 
 To disable it:
 
 ```ruby
 Feature.disable(:devops_adoption_feature)
+```
+
+To reenable it:
+
+```ruby
+Feature.enable(:devops_adoption_feature)
 ```

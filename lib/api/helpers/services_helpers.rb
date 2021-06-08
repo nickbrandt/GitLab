@@ -394,7 +394,7 @@ module API
               required: true,
               name: :external_wiki_url,
               type: String,
-              desc: 'The URL of the external Wiki'
+              desc: 'The URL of the external wiki'
             }
           ],
           'flowdock' => [
@@ -420,44 +420,6 @@ module API
             },
             chat_notification_events
           ].flatten,
-          'hipchat' => [
-            {
-              required: true,
-              name: :token,
-              type: String,
-              desc: 'The room token'
-            },
-            {
-              required: false,
-              name: :room,
-              type: String,
-              desc: 'The room name or ID'
-            },
-            {
-              required: false,
-              name: :color,
-              type: String,
-              desc: 'The room color'
-            },
-            {
-              required: false,
-              name: :notify,
-              type: Boolean,
-              desc: 'Enable notifications'
-            },
-            {
-              required: false,
-              name: :api_version,
-              type: String,
-              desc: 'Leave blank for default (v2)'
-            },
-            {
-              required: false,
-              name: :server,
-              type: String,
-              desc: 'Leave blank for default. https://hipchat.example.com'
-            }
-          ],
           'irker' => [
             {
               required: true,
@@ -543,9 +505,15 @@ module API
             },
             {
               required: false,
+              name: :jira_issue_transition_automatic,
+              type: Boolean,
+              desc: 'Enable automatic issue transitions'
+            },
+            {
+              required: false,
               name: :jira_issue_transition_id,
               type: String,
-              desc: 'The ID of a transition that moves issues to a closed state. You can find this number under the Jira workflow administration (**Administration > Issues > Workflows**) by selecting **View** under **Operations** of the desired workflow of your project. The ID of each state can be found inside the parenthesis of each transition name under the **Transitions (id)** column ([see screenshot][trans]). By default, this ID is set to `2`'
+              desc: 'The ID of one or more transitions for custom issue transitions'
             },
             {
               required: false,
@@ -797,7 +765,7 @@ module API
               required: true,
               name: :webhook,
               type: String,
-              desc: 'The Webex Teams webhook. e.g. https://api.ciscospark.com/v1/webhooks/incoming/…'
+              desc: 'The Webex Teams webhook. For example, https://api.ciscospark.com/v1/webhooks/incoming/...'
             },
             chat_notification_events
           ].flatten
@@ -806,45 +774,44 @@ module API
 
       def self.service_classes
         [
-          ::AsanaService,
-          ::AssemblaService,
-          ::BambooService,
-          ::BugzillaService,
-          ::BuildkiteService,
-          ::ConfluenceService,
-          ::CampfireService,
-          ::CustomIssueTrackerService,
-          ::DatadogService,
-          ::DiscordService,
-          ::DroneCiService,
-          ::EmailsOnPushService,
-          ::EwmService,
-          ::ExternalWikiService,
-          ::FlowdockService,
-          ::HangoutsChatService,
-          ::HipchatService,
-          ::IrkerService,
-          ::JenkinsService,
-          ::JiraService,
-          ::MattermostSlashCommandsService,
-          ::SlackSlashCommandsService,
-          ::PackagistService,
-          ::PipelinesEmailService,
-          ::PivotaltrackerService,
-          ::PrometheusService,
-          ::PushoverService,
-          ::RedmineService,
-          ::YoutrackService,
-          ::SlackService,
-          ::MattermostService,
-          ::MicrosoftTeamsService,
-          ::TeamcityService
+          ::Integrations::Asana,
+          ::Integrations::Assembla,
+          ::Integrations::Bamboo,
+          ::Integrations::Bugzilla,
+          ::Integrations::Buildkite,
+          ::Integrations::Campfire,
+          ::Integrations::Confluence,
+          ::Integrations::CustomIssueTracker,
+          ::Integrations::Datadog,
+          ::Integrations::Discord,
+          ::Integrations::DroneCi,
+          ::Integrations::EmailsOnPush,
+          ::Integrations::Ewm,
+          ::Integrations::ExternalWiki,
+          ::Integrations::Flowdock,
+          ::Integrations::HangoutsChat,
+          ::Integrations::Irker,
+          ::Integrations::Jenkins,
+          ::Integrations::Jira,
+          ::Integrations::Mattermost,
+          ::Integrations::MattermostSlashCommands,
+          ::Integrations::MicrosoftTeams,
+          ::Integrations::Packagist,
+          ::Integrations::PipelinesEmail,
+          ::Integrations::Pivotaltracker,
+          ::Integrations::Pushover,
+          ::Integrations::Redmine,
+          ::Integrations::Slack,
+          ::Integrations::SlackSlashCommands,
+          ::Integrations::Teamcity,
+          ::Integrations::Youtrack,
+          ::PrometheusService
         ]
       end
 
       def self.development_service_classes
         [
-          ::MockCiService,
+          ::Integrations::MockCi,
           ::MockMonitoringService
         ]
       end
@@ -852,4 +819,4 @@ module API
   end
 end
 
-API::Helpers::ServicesHelpers.prepend_if_ee('EE::API::Helpers::ServicesHelpers')
+API::Helpers::ServicesHelpers.prepend_mod_with('API::Helpers::ServicesHelpers')

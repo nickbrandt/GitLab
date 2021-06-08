@@ -201,7 +201,7 @@ RSpec.describe Admin::ApplicationSettingsController do
       put :update, params: { application_setting: { repository_size_limit: '100' } }
 
       expect(response).to redirect_to(general_admin_application_settings_path)
-      expect(response).to set_flash[:notice].to('Application settings saved successfully')
+      expect(controller).to set_flash[:notice].to('Application settings saved successfully')
     end
 
     it 'does not accept negative repository_size_limit' do
@@ -326,10 +326,10 @@ RSpec.describe Admin::ApplicationSettingsController do
 
       let!(:task) { create(:elastic_reindexing_task) }
 
-      it 'assigns elasticsearch reindexing task' do
+      it 'assigns last elasticsearch reindexing task' do
         get :advanced_search
 
-        expect(assigns(:elasticsearch_reindexing_task)).to eq(task)
+        expect(assigns(:last_elasticsearch_reindexing_task)).to eq(task)
         expect(response.body).to include("Reindexing Status: #{task.state}")
       end
     end

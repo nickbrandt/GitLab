@@ -10,6 +10,7 @@ RSpec.describe Resolvers::EpicsResolver do
 
   context "with a group" do
     let_it_be_with_refind(:group) { create(:group) }
+
     let(:project) { create(:project, :public, group: group) }
     let(:epic1)   { create(:epic, group: group, state: :closed, created_at: 3.days.ago, updated_at: 2.days.ago) }
     let(:epic2)   { create(:epic, group: group, author: user2, title: 'foo', description: 'bar', created_at: 2.days.ago, updated_at: 3.days.ago) }
@@ -134,6 +135,17 @@ RSpec.describe Resolvers::EpicsResolver do
         end
       end
 
+      context 'with my_reaction_emoji' do
+        it 'filters epics by reaction emoji' do
+          create(:award_emoji, name: 'man_in_business_suit_levitating', user: current_user, awardable: epic1)
+          create(:award_emoji, name: 'thumbsdown', user: current_user, awardable: epic2)
+
+          epics = resolve_epics(my_reaction_emoji: 'man_in_business_suit_levitating')
+
+          expect(epics).to contain_exactly(epic1)
+        end
+      end
+
       context 'with milestone_title' do
         let_it_be(:milestone1) { create(:milestone, group: group) }
 
@@ -249,6 +261,36 @@ RSpec.describe Resolvers::EpicsResolver do
 
           expect(epics).to contain_exactly(epic5)
         end
+      end
+    end
+
+    context 'with negated filters' do
+      let_it_be(:group) { create(:group) }
+      let_it_be(:author) { create(:user) }
+      let_it_be(:label) { create(:label) }
+      let_it_be(:epic_1) { create(:labeled_epic, group: group, labels: [label]) }
+      let_it_be(:epic_2) { create(:epic, group: group, author: author) }
+      let_it_be(:epic_3) { create(:epic, group: group) }
+      let_it_be(:awarded_emoji) { create(:award_emoji, name: 'thumbsup', awardable: epic_3, user: current_user) }
+
+      subject(:results) { resolve_epics(args) }
+
+      context 'for label' do
+        let(:args) { { not: { label_name: [label.title] } } }
+
+        it { is_expected.to contain_exactly(epic_2, epic_3) }
+      end
+
+      context 'for author' do
+        let(:args) { { not: { author_username: author.username } } }
+
+        it { is_expected.to contain_exactly(epic_1, epic_3) }
+      end
+
+      context 'for emoji' do
+        let(:args) { { not: { my_reaction_emoji: awarded_emoji.name } } }
+
+        it { is_expected.to contain_exactly(epic_1, epic_2) }
       end
     end
   end

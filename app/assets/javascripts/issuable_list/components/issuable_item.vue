@@ -3,9 +3,9 @@ import { GlLink, GlIcon, GlLabel, GlFormCheckbox, GlTooltipDirective } from '@gi
 
 import { getIdFromGraphQLId } from '~/graphql_shared/utils';
 import { isScopedLabel } from '~/lib/utils/common_utils';
-import { getTimeago } from '~/lib/utils/datetime_utility';
+import { differenceInSeconds, getTimeago, SECONDS_IN_DAY } from '~/lib/utils/datetime_utility';
 import { isExternal, setUrlFragment } from '~/lib/utils/url_utility';
-import { __, sprintf } from '~/locale';
+import { __, n__, sprintf } from '~/locale';
 import IssuableAssignees from '~/vue_shared/components/issue/issue_assignees.vue';
 import timeagoMixin from '~/vue_shared/mixins/timeago';
 
@@ -50,6 +50,10 @@ export default {
     },
   },
   computed: {
+    createdInPastDay() {
+      const createdSecondsAgo = differenceInSeconds(new Date(this.issuable.createdAt), new Date());
+      return createdSecondsAgo < SECONDS_IN_DAY;
+    },
     author() {
       return this.issuable.author;
     },
@@ -64,6 +68,9 @@ export default {
     },
     labels() {
       return this.issuable.labels?.nodes || this.issuable.labels || [];
+    },
+    labelIdsString() {
+      return JSON.stringify(this.labels.map((label) => label.id));
     },
     assignees() {
       return this.issuable.assignees || [];
@@ -86,8 +93,26 @@ export default {
       }
       return {};
     },
+    taskStatus() {
+      const { completedCount, count } = this.issuable.taskCompletionStatus || {};
+      if (!count) {
+        return undefined;
+      }
+
+      return sprintf(
+        n__(
+          '%{completedCount} of %{count} task completed',
+          '%{completedCount} of %{count} tasks completed',
+          count,
+        ),
+        { completedCount, count },
+      );
+    },
+    notesCount() {
+      return this.issuable.userDiscussionsCount ?? this.issuable.userNotesCount;
+    },
     showDiscussions() {
-      return typeof this.issuable.userDiscussionsCount === 'number';
+      return typeof this.notesCount === 'number';
     },
     showIssuableMeta() {
       return Boolean(
@@ -131,14 +156,22 @@ export default {
 </script>
 
 <template>
-  <li class="issue gl-px-5!">
+  <li
+    :id="`issuable_${issuable.id}`"
+    class="issue gl-px-5!"
+    :class="{ closed: issuable.closedAt, today: createdInPastDay }"
+    :data-labels="labelIdsString"
+  >
     <div class="issuable-info-container">
       <div v-if="showCheckbox" class="issue-check">
         <gl-form-checkbox
           class="gl-mr-0"
           :checked="checked"
+          :data-id="issuable.id"
           @input="$emit('checked-input', $event)"
-        />
+        >
+          <span class="gl-sr-only">{{ issuable.title }}</span>
+        </gl-form-checkbox>
       </div>
       <div class="issuable-main-info">
         <div data-testid="issuable-title" class="issue-title title">
@@ -148,11 +181,19 @@ export default {
               v-gl-tooltip
               name="eye-slash"
               :title="__('Confidential')"
+              :aria-label="__('Confidential')"
             />
             <gl-link :href="webUrl" v-bind="issuableTitleProps"
               >{{ issuable.title
               }}<gl-icon v-if="isIssuableUrlExternal" name="external-link" class="gl-ml-2"
             /></gl-link>
+          </span>
+          <span
+            v-if="taskStatus"
+            class="task-status gl-display-none gl-sm-display-inline-block! gl-ml-3"
+            data-testid="task-status"
+          >
+            {{ taskStatus }}
           </span>
         </div>
         <div class="issuable-info">
@@ -160,7 +201,7 @@ export default {
           <span v-else data-testid="issuable-reference" class="issuable-reference"
             >{{ issuableSymbol }}{{ issuable.iid }}</span
           >
-          <span class="issuable-authored d-none d-sm-inline-block">
+          <span class="issuable-authored gl-display-none gl-sm-display-inline-block! gl-mr-3">
             &middot;
             <span
               v-gl-tooltip:tooltipcontainer.bottom
@@ -203,6 +244,16 @@ export default {
           <li v-if="hasSlotContents('status')" class="issuable-status">
             <slot name="status"></slot>
           </li>
+          <li v-if="assignees.length" class="gl-display-flex">
+            <issuable-assignees
+              :assignees="assignees"
+              :icon-size="16"
+              :max-visible="4"
+              img-css-classes="gl-mr-2!"
+              class="gl-align-items-center gl-display-flex gl-ml-3"
+            />
+          </li>
+          <slot name="statistics"></slot>
           <li
             v-if="showDiscussions"
             data-testid="issuable-discussions"
@@ -212,26 +263,17 @@ export default {
               v-gl-tooltip:tooltipcontainer.top
               :title="__('Comments')"
               :href="issuableNotesLink"
-              :class="{ 'no-comments': !issuable.userDiscussionsCount }"
+              :class="{ 'no-comments': !notesCount }"
               class="gl-reset-color!"
             >
               <gl-icon name="comments" />
-              {{ issuable.userDiscussionsCount }}
+              {{ notesCount }}
             </gl-link>
-          </li>
-          <li v-if="assignees.length" class="gl-display-flex">
-            <issuable-assignees
-              :assignees="issuable.assignees"
-              :icon-size="16"
-              :max-visible="4"
-              img-css-classes="gl-mr-2!"
-              class="gl-align-items-center gl-display-flex gl-ml-3"
-            />
           </li>
         </ul>
         <div
           data-testid="issuable-updated-at"
-          class="float-right issuable-updated-at d-none d-sm-inline-block"
+          class="float-right issuable-updated-at gl-display-none gl-sm-display-inline-block"
         >
           <span
             v-gl-tooltip:tooltipcontainer.bottom

@@ -645,9 +645,6 @@ export const convertObjectPropsToCamelCase = (obj = {}, options = {}) =>
 export const convertObjectPropsToSnakeCase = (obj = {}, options = {}) =>
   convertObjectProps(convertToSnakeCase, obj, options);
 
-export const imagePath = (imgUrl) =>
-  `${gon.asset_host || ''}${gon.relative_url_root || ''}/assets/${imgUrl}`;
-
 export const addSelectOnFocusBehaviour = (selector = '.js-select-on-focus') => {
   // Click a .js-select-on-focus field, select the contents
   // Prevent a mouseup event from deselecting the input
@@ -679,6 +676,19 @@ export const roundOffFloat = (number, precision = 0) => {
   const multiplier = Math.pow(10, precision);
   return Math.round(number * multiplier) / multiplier;
 };
+
+/**
+ * Method to round values to the nearest half (0.5)
+ *
+ * Eg; roundToNearestHalf(3.141592) = 3, roundToNearestHalf(3.41592) = 3.5
+ *
+ * Refer to spec/javascripts/lib/utils/common_utils_spec.js for
+ * more supported examples.
+ *
+ * @param {Float} number
+ * @returns {Float|Number}
+ */
+export const roundToNearestHalf = (num) => Math.round(num * 2).toFixed() / 2;
 
 /**
  * Method to round down values with decimal places

@@ -11,7 +11,6 @@ export const initSecurityConfiguration = (el) => {
     autoDevopsHelpPagePath,
     autoDevopsPath,
     features,
-    helpPagePath,
     latestPipelinePath,
     autoFixEnabled,
     autoFixHelpPath,
@@ -19,6 +18,7 @@ export const initSecurityConfiguration = (el) => {
     containerScanningHelpPath,
     dependencyScanningHelpPath,
     toggleAutofixSettingEndpoint,
+    projectPath,
     gitlabCiHistoryPath,
   } = el.dataset;
 
@@ -27,13 +27,15 @@ export const initSecurityConfiguration = (el) => {
     components: {
       SecurityConfigurationApp,
     },
+    provide: {
+      projectPath,
+    },
     render(createElement) {
       return createElement(SecurityConfigurationApp, {
         props: {
           autoDevopsHelpPagePath,
           autoDevopsPath,
           features: JSON.parse(features),
-          helpPagePath,
           latestPipelinePath,
           ...parseBooleanDataAttributes(el, [
             'autoDevopsEnabled',

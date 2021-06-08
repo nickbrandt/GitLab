@@ -55,6 +55,11 @@ export default {
       return this.filteredTags.length;
     },
   },
+  watch: {
+    paramsBranch(newBranch) {
+      this.setSelectedRevision(newBranch);
+    },
+  },
   mounted() {
     this.fetchBranchesAndTags();
   },
@@ -83,10 +88,14 @@ export default {
       return this.paramsBranch || s__('CompareRevisions|Select branch/tag');
     },
     onClick(revision) {
-      this.selectedRevision = revision;
+      this.setSelectedRevision(revision);
     },
     onSearchEnter() {
-      this.selectedRevision = this.searchTerm;
+      this.setSelectedRevision(this.searchTerm);
+    },
+    setSelectedRevision(revision) {
+      this.selectedRevision = revision || s__('CompareRevisions|Select branch/tag');
+      this.$emit('selectRevision', { direction: this.paramsName, revision });
     },
   },
 };
@@ -103,7 +112,7 @@ export default {
       <input type="hidden" :name="paramsName" :value="selectedRevision" />
       <gl-dropdown
         class="gl-flex-grow-1 gl-flex-basis-0 gl-min-w-0 gl-font-monospace"
-        toggle-class="form-control compare-dropdown-toggle js-compare-dropdown gl-min-w-0 gl-rounded-top-left-none! gl-rounded-bottom-left-none!"
+        toggle-class="form-control compare-dropdown-toggle gl-min-w-0 gl-rounded-top-left-none! gl-rounded-bottom-left-none!"
         :text="selectedRevision"
         header-text="Select Git revision"
         :loading="loading"

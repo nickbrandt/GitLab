@@ -15,6 +15,36 @@ All workers should include `ApplicationWorker` instead of `Sidekiq::Worker`,
 which adds some convenience methods and automatically sets the queue based on
 the worker's name.
 
+## Retries
+
+Sidekiq defaults to using [25
+retries](https://github.com/mperham/sidekiq/wiki/Error-Handling#automatic-job-retry),
+with back-off between each retry. 25 retries means that the last retry
+would happen around three weeks after the first attempt (assuming all 24
+prior retries failed).
+
+For most workers - especially [idempotent workers](#idempotent-jobs) -
+the default of 25 retries is more than sufficient. Many of our older
+workers declare 3 retries, which used to be the default within the
+GitLab application. 3 retries happen over the course of a couple of
+minutes, so the jobs are prone to failing completely.
+
+A lower retry count may be applicable if any of the below apply:
+
+1. The worker contacts an external service and we do not provide
+   guarantees on delivery. For example, webhooks.
+1. The worker is not idempotent and running it multiple times could
+   leave the system in an inconsistent state. For example, a worker that
+   posts a system note and then performs an action: if the second step
+   fails and the worker retries, the system note will be posted again.
+1. The worker is a cronjob that runs frequently. For example, if a cron
+   job runs every hour, then we don't need to retry beyond an hour
+   because we don't need two of the same job running at once.
+
+Each retry for a worker is counted as a failure in our metrics. A worker
+which always fails 9 times and succeeds on the 10th would have a 90%
+error rate.
+
 ## Dedicated Queues
 
 All workers should use their own queue, which is automatically set based on the
@@ -123,6 +153,12 @@ A good example of that would be a cache expiration worker.
 
 A job scheduled for an idempotent worker is [deduplicated](#deduplication) when
 an unstarted job with the same arguments is already in the queue.
+
+WARNING:
+For [data consistency jobs](#job-data-consistency), the deduplication is not compatible with the
+`data_consistency` attribute set to `:sticky` or `:delayed`.
+The reason for this is that deduplication always takes into account the latest binary replication pointer into account, not the first one.
+There is an [open issue](https://gitlab.com/gitlab-org/gitlab/-/issues/325291) to improve this.
 
 ### Ensuring a worker is idempotent
 
@@ -426,6 +462,68 @@ If we expect an increase of **less than 5%**, then no further action is needed.
 Otherwise, please ping `@gitlab-org/scalability` on the merge request and ask
 for a review.
 
+## Job data consistency
+
+In order to utilize [Sidekiq read-only database replicas capabilities](../administration/database_load_balancing.md#enable-the-load-balancer-for-sidekiq), 
+set the `data_consistency` attribute of the job to `:always`, `:sticky`, or `:delayed`. 
+
+| **Data Consistency**  | **Description**  |
+|--------------|-----------------------------|
+| `:always`    | The job is required to use the primary database (default). |
+| `:sticky`    | The job uses a replica as long as possible. It switches to primary either on write or long replication lag. It should be used on jobs that require to be executed as fast as possible.  |
+| `:delayed`   | The job always uses replica, but switches to primary on write. The job is delayed if there's a long replication lag. If the replica is not up-to-date with the next retry, it switches to the primary. It should be used on jobs where we are fine to delay the execution of a given job due to their importance such as expire caches, execute hooks, etc. |
+
+To set a data consistency for a job, use the `data_consistency` class method:
+
+```ruby
+class DelayedWorker
+  include ApplicationWorker
+
+  data_consistency :delayed
+
+  # ...
+end
+```
+
+For [idempotent jobs](#idempotent-jobs), the deduplication is not compatible with the
+`data_consistency` attribute set to `:sticky` or `:delayed`.
+The reason for this is that deduplication always takes into account the latest binary replication pointer into account, not the first one.
+There is an [open issue](https://gitlab.com/gitlab-org/gitlab/-/issues/325291) to improve this.
+
+### `feature_flag` property
+
+The `feature_flag` property allows you to toggle a job's `data_consistency`,
+which permits you to safely toggle load balancing capabilities for a specific job.
+When `feature_flag` is disabled, the job defaults to `:always`, which means that the job will always use the primary database.
+
+The `feature_flag` property does not allow the use of
+[feature gates based on actors](../development/feature_flags/index.md).
+This means that the feature flag cannot be toggled only for particular
+projects, groups, or users, but instead, you can safely use [percentage of time rollout](../development/feature_flags/index.md). 
+Note that since we check the feature flag on both Sidekiq client and server, rolling out a 10% of the time, 
+will likely results in 1% (0.1 [from client]*0.1 [from server]) of effective jobs using replicas.
+
+Example:
+
+```ruby
+class DelayedWorker
+  include ApplicationWorker
+
+  data_consistency :delayed, feature_flag: :load_balancing_for_delayed_worker
+
+  # ...
+end
+```
+
+### Delayed job execution
+
+Scheduling workers that utilize [Sidekiq read-only database replicas capabilities](#job-data-consistency),
+(workers with `data_consistency` attribute set to `:sticky` or `:delayed`), 
+by calling `SomeWorker.perform_async` results in a worker performing in the future (1 second in the future).
+
+This way, the replica has a chance to catch up, and the job will likely use the replica.
+For workers with `data_consistency` set to `:delayed`, it can also reduce the number of retried jobs.
+
 ## Jobs with External Dependencies
 
 Most background jobs in the GitLab application communicate with other GitLab
@@ -551,7 +649,7 @@ does not account for weights.
 
 As we are [moving towards using `sidekiq-cluster` in
 Free](https://gitlab.com/gitlab-org/gitlab/-/issues/34396), newly-added
-workers do not need to have weights specified. They can simply use the
+workers do not need to have weights specified. They can use the
 default weight, which is 1.
 
 ## Worker context
@@ -719,6 +817,23 @@ possible situations:
 1. A job is queued by a node running the newer version of the application, but
    executed on a node running an older version of the application.
 
+### Adding new workers
+
+On GitLab.com, we [do not currently have a Sidekiq deployment in the
+canary stage](https://gitlab.com/gitlab-org/gitlab/-/issues/19239). This
+means that a new worker than can be scheduled from an HTTP endpoint may
+be scheduled from canary but not run on Sidekiq until the full
+production deployment is complete. This can be several hours later than
+scheduling the job. For some workers, this will not be a problem. For
+others - particularly [latency-sensitive
+jobs](#latency-sensitive-jobs) - this will result in a poor user
+experience.
+
+This only applies to new worker classes when they are first introduced.
+As we recommend [using feature flags](feature_flags/) as a general
+development process, it's best to control the entire change (including
+scheduling of the new Sidekiq worker) with a feature flag.
+
 ### Changing the arguments for a worker
 
 Jobs need to be backward and forward compatible between consecutive versions
@@ -830,8 +945,6 @@ as shown in this example:
 ```ruby
 class MigrateTheRenamedSidekiqQueue < ActiveRecord::Migration[5.0]
   include Gitlab::Database::MigrationHelpers
-
-  DOWNTIME = false
 
   def up
     sidekiq_queue_migrate 'old_queue_name', to: 'new_queue_name'

@@ -1,14 +1,17 @@
 import { sortBy } from 'lodash';
+import { FiltersInfo as FiltersInfoCE } from '~/boards/boards_util';
 import { getIdFromGraphQLId } from '~/graphql_shared/utils';
 import { urlParamsToObject } from '~/lib/utils/common_utils';
 import { objectToQuery } from '~/lib/utils/url_utility';
 import {
+  EPIC_LANE_BASE_HEIGHT,
   IterationFilterType,
   IterationIDs,
   MilestoneFilterType,
   MilestoneIDs,
   WeightFilterType,
   WeightIDs,
+  EpicFilterType,
 } from './constants';
 
 export function getMilestone({ milestone }) {
@@ -31,13 +34,16 @@ export function fullEpicBoardId(epicBoardId) {
   return `gid://gitlab/Boards::EpicBoard/${epicBoardId}`;
 }
 
+export function calculateSwimlanesBufferSize(listTopCoordinate) {
+  return Math.ceil((window.innerHeight - listTopCoordinate) / EPIC_LANE_BASE_HEIGHT);
+}
+
 export function formatListEpics(listEpics) {
   const boardItems = {};
   let listItemsCount;
 
   const listData = listEpics.nodes.reduce((map, list) => {
-    // TODO update when list.epics.count is available: https://gitlab.com/gitlab-org/gitlab/-/issues/301017
-    listItemsCount = list.epics.edges.length;
+    listItemsCount = list.epicsCount;
     let sortedEpics = list.epics.edges.map((epicNode) => ({
       ...epicNode.node,
     }));
@@ -120,9 +126,8 @@ export function transformBoardConfig(boardConfig) {
   boardConfig.labels.forEach((label) => {
     const labelTitle = encodeURIComponent(label.title);
     const param = `label_name[]=${labelTitle}`;
-    const labelIndex = passedFilterParams.label_name?.indexOf(labelTitle);
 
-    if (labelIndex === -1 || labelIndex === undefined) {
+    if (!passedFilterParams.label_name?.includes(label.title)) {
       filterPath.push(param);
     }
   });
@@ -130,6 +135,40 @@ export function transformBoardConfig(boardConfig) {
   updatedFilterPath = filterPath.join('&');
   return updatedFilterPath;
 }
+
+export const FiltersInfo = {
+  ...FiltersInfoCE,
+  epicId: {
+    negatedSupport: true,
+    transform: (epicId) => fullEpicId(epicId),
+    // epic_id should be renamed to epicWildcardId when ANY or NONE is the value
+    remap: (k, v) => (v === EpicFilterType.any || v === EpicFilterType.none ? 'epicWildcardId' : k),
+  },
+  epicWildcardId: {
+    negatedSupport: false,
+    transform: (val) => val.toUpperCase(),
+  },
+  iterationId: {
+    negatedSupport: true,
+    remap: (k, v) =>
+      // iteration_id should be renamed to iterationWildcardId when CURRENT is the value
+      v === IterationFilterType.any ||
+      v === IterationFilterType.none ||
+      v === IterationFilterType.current
+        ? 'iterationWildcardId'
+        : k,
+  },
+  iterationTitle: {
+    negatedSupport: true,
+  },
+  iterationWildcardId: {
+    negatedSupport: true,
+    transform: (val) => val.toUpperCase(),
+  },
+  weight: {
+    negatedSupport: true,
+  },
+};
 
 export default {
   getMilestone,

@@ -1,14 +1,44 @@
 import Vue from 'vue';
+import VueApollo from 'vue-apollo';
+import TableOfContents from '~/blob/components/table_contents.vue';
 import PipelineTourSuccessModal from '~/blob/pipeline_tour_success_modal.vue';
 import BlobViewer from '~/blob/viewer/index';
 import GpgBadges from '~/gpg_badges';
+import createDefaultClient from '~/lib/graphql';
 import initBlob from '~/pages/projects/init_blob';
 import initWebIdeLink from '~/pages/projects/shared/web_ide_link';
 import commitPipelineStatus from '~/projects/tree/components/commit_pipeline_status_component.vue';
+import BlobContentViewer from '~/repository/components/blob_content_viewer.vue';
 import '~/sourcegraph/load';
 
-new BlobViewer(); // eslint-disable-line no-new
-initBlob();
+Vue.use(VueApollo);
+
+const apolloProvider = new VueApollo({
+  defaultClient: createDefaultClient(),
+});
+
+const viewBlobEl = document.querySelector('#js-view-blob-app');
+
+if (viewBlobEl) {
+  const { blobPath, projectPath } = viewBlobEl.dataset;
+
+  // eslint-disable-next-line no-new
+  new Vue({
+    el: viewBlobEl,
+    apolloProvider,
+    render(createElement) {
+      return createElement(BlobContentViewer, {
+        props: {
+          path: blobPath,
+          projectPath,
+        },
+      });
+    },
+  });
+} else {
+  new BlobViewer(); // eslint-disable-line no-new
+  initBlob();
+}
 
 const CommitPipelineStatusEl = document.querySelector('.js-commit-pipeline-status');
 const statusLink = document.querySelector('.commit-actions .ci-status-link');
@@ -60,6 +90,18 @@ if (successPipelineEl) {
           ...successPipelineEl.dataset,
         },
       });
+    },
+  });
+}
+
+const tableContentsEl = document.querySelector('.js-table-contents');
+
+if (tableContentsEl) {
+  // eslint-disable-next-line no-new
+  new Vue({
+    el: tableContentsEl,
+    render(h) {
+      return h(TableOfContents);
     },
   });
 }

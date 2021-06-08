@@ -71,7 +71,7 @@ RSpec.describe Projects::Integrations::Jira::IssuesController do
           expect(finder).to receive(:execute).and_return(jira_issues)
         end
 
-        expect_next_instance_of(Integrations::Jira::IssueSerializer) do |serializer|
+        expect_next_instance_of(Integrations::JiraSerializers::IssueSerializer) do |serializer|
           expect(serializer).to receive(:represent).with(jira_issues, project: project)
         end
 
@@ -97,7 +97,7 @@ RSpec.describe Projects::Integrations::Jira::IssuesController do
         get :index, params: { namespace_id: project.namespace, project_id: project }, format: :json
 
         expect(response).to have_gitlab_http_status(:bad_request)
-        expect(json_response['errors']).to eq ['An error occurred while requesting data from the Jira service']
+        expect(json_response['errors']).to eq ['An error occurred while requesting data from the Jira service.']
       end
 
       it 'sets pagination headers' do
@@ -184,9 +184,9 @@ RSpec.describe Projects::Integrations::Jira::IssuesController do
   end
 
   describe 'GET #show' do
-    context 'when `jira_issues_show_integration` feature is disabled' do
+    context 'when jira_issues_integration licensed feature is not available' do
       before do
-        stub_feature_flags(jira_issues_show_integration: false)
+        stub_licensed_features(jira_issues_integration: false)
       end
 
       it 'returns 404 status' do
@@ -196,18 +196,18 @@ RSpec.describe Projects::Integrations::Jira::IssuesController do
       end
     end
 
-    context 'when `jira_issues_show_integration` feature is enabled' do
+    context 'when jira_issues_integration licensed feature is available' do
       let(:jira_issue) { { 'from' => 'jira' } }
       let(:issue_json) { { 'from' => 'backend' } }
 
       before do
-        stub_feature_flags(jira_issues_show_integration: true)
+        stub_licensed_features(jira_issues_integration: true)
 
-        expect_next_found_instance_of(JiraService) do |service|
+        expect_next_found_instance_of(Integrations::Jira) do |service|
           expect(service).to receive(:find_issue).with('1', rendered_fields: true).and_return(jira_issue)
         end
 
-        expect_next_instance_of(Integrations::Jira::IssueDetailSerializer) do |serializer|
+        expect_next_instance_of(Integrations::JiraSerializers::IssueDetailSerializer) do |serializer|
           expect(serializer).to receive(:represent).with(jira_issue, project: project).and_return(issue_json)
         end
       end

@@ -130,25 +130,23 @@ RSpec.describe Member do
       @maintainer_user = create(:user).tap { |u| project.add_maintainer(u) }
       @maintainer = project.members.find_by(user_id: @maintainer_user.id)
 
-      @blocked_user = create(:user).tap do |u|
+      @blocked_maintainer_user = create(:user).tap do |u|
         project.add_maintainer(u)
+
+        u.block!
+      end
+      @blocked_developer_user = create(:user).tap do |u|
         project.add_developer(u)
 
         u.block!
       end
-      @blocked_maintainer = project.members.find_by(user_id: @blocked_user.id, access_level: Gitlab::Access::MAINTAINER)
-      @blocked_developer = project.members.find_by(user_id: @blocked_user.id, access_level: Gitlab::Access::DEVELOPER)
+      @blocked_maintainer = project.members.find_by(user_id: @blocked_maintainer_user.id, access_level: Gitlab::Access::MAINTAINER)
+      @blocked_developer = project.members.find_by(user_id: @blocked_developer_user.id, access_level: Gitlab::Access::DEVELOPER)
 
-      @invited_member = create(:project_member, :developer,
-                              project: project,
-                              invite_token: '1234',
-                              invite_email: 'toto1@example.com')
+      @invited_member = create(:project_member, :invited, :developer, project: project)
 
       accepted_invite_user = build(:user, state: :active)
-      @accepted_invite_member = create(:project_member, :developer,
-                                      project: project,
-                                      invite_token: '1234',
-                                      invite_email: 'toto2@example.com')
+      @accepted_invite_member = create(:project_member, :invited, :developer, project: project)
                                       .tap { |u| u.accept_invite!(accepted_invite_user) }
 
       requested_user = create(:user).tap { |u| project.request_access(u) }
@@ -161,7 +159,7 @@ RSpec.describe Member do
 
     describe '.access_for_user_ids' do
       it 'returns the right access levels' do
-        users = [@owner_user.id, @maintainer_user.id, @blocked_user.id]
+        users = [@owner_user.id, @maintainer_user.id, @blocked_maintainer_user.id]
         expected = {
           @owner_user.id => Gitlab::Access::OWNER,
           @maintainer_user.id => Gitlab::Access::MAINTAINER
@@ -321,12 +319,12 @@ RSpec.describe Member do
 
     describe '.search_invite_email' do
       it 'returns only members the matching e-mail' do
-        create(:group_member, :invited)
+        invited_member = create(:group_member, :invited, invite_email: 'invited@example.com')
 
-        invited = described_class.search_invite_email(@invited_member.invite_email)
+        invited = described_class.search_invite_email(invited_member.invite_email)
 
         expect(invited.count).to eq(1)
-        expect(invited.first).to eq(@invited_member)
+        expect(invited.first).to eq(invited_member)
 
         expect(described_class.search_invite_email('bad-email@example.com').count).to eq(0)
       end
@@ -382,6 +380,20 @@ RSpec.describe Member do
       it { is_expected.not_to include @member_with_minimal_access }
     end
 
+    describe '.blocked' do
+      subject { described_class.blocked.to_a }
+
+      it { is_expected.not_to include @owner }
+      it { is_expected.not_to include @maintainer }
+      it { is_expected.not_to include @invited_member }
+      it { is_expected.not_to include @accepted_invite_member }
+      it { is_expected.not_to include @requested_member }
+      it { is_expected.not_to include @accepted_request_member }
+      it { is_expected.to include @blocked_maintainer }
+      it { is_expected.to include @blocked_developer }
+      it { is_expected.not_to include @member_with_minimal_access }
+    end
+
     describe '.active_without_invites_and_requests' do
       subject { described_class.active_without_invites_and_requests.to_a }
 
@@ -395,11 +407,91 @@ RSpec.describe Member do
       it { is_expected.not_to include @blocked_developer }
       it { is_expected.not_to include @member_with_minimal_access }
     end
+
+    describe '.without_invites_and_requests' do
+      subject { described_class.without_invites_and_requests.to_a }
+
+      it { is_expected.to include @owner }
+      it { is_expected.to include @maintainer }
+      it { is_expected.not_to include @invited_member }
+      it { is_expected.to include @accepted_invite_member }
+      it { is_expected.not_to include @requested_member }
+      it { is_expected.to include @accepted_request_member }
+      it { is_expected.to include @blocked_maintainer }
+      it { is_expected.to include @blocked_developer }
+      it { is_expected.not_to include @member_with_minimal_access }
+    end
+
+    describe '.connected_to_user' do
+      subject { described_class.connected_to_user.to_a }
+
+      it { is_expected.to include @owner }
+      it { is_expected.to include @maintainer }
+      it { is_expected.to include @accepted_invite_member }
+      it { is_expected.to include @accepted_request_member }
+      it { is_expected.to include @blocked_maintainer }
+      it { is_expected.to include @blocked_developer }
+      it { is_expected.to include @requested_member }
+      it { is_expected.to include @member_with_minimal_access }
+      it { is_expected.not_to include @invited_member }
+    end
+
+    describe '.authorizable' do
+      subject { described_class.authorizable.to_a }
+
+      it 'includes the member who has an associated user record,'\
+       'but also having an invite_token' do
+        member = create(:project_member,
+                        :developer,
+                        :invited,
+                        user: create(:user))
+
+        expect(subject).to include(member)
+      end
+
+      it { is_expected.to include @owner }
+      it { is_expected.to include @maintainer }
+      it { is_expected.to include @accepted_invite_member }
+      it { is_expected.to include @accepted_request_member }
+      it { is_expected.to include @blocked_maintainer }
+      it { is_expected.to include @blocked_developer }
+      it { is_expected.not_to include @invited_member }
+      it { is_expected.not_to include @requested_member }
+      it { is_expected.not_to include @member_with_minimal_access }
+    end
+
+    describe '.distinct_on_user_with_max_access_level' do
+      let_it_be(:other_group) { create(:group) }
+      let_it_be(:member_with_lower_access_level) { create(:group_member, :developer, group: other_group, user: @owner_user) }
+
+      subject { described_class.default_scoped.distinct_on_user_with_max_access_level.to_a }
+
+      it { is_expected.not_to include member_with_lower_access_level }
+      it { is_expected.to include @owner }
+      it { is_expected.to include @maintainer }
+      it { is_expected.to include @invited_member }
+      it { is_expected.to include @accepted_invite_member }
+      it { is_expected.to include @requested_member }
+      it { is_expected.to include @accepted_request_member }
+      it { is_expected.to include @blocked_maintainer }
+      it { is_expected.to include @blocked_developer }
+      it { is_expected.to include @member_with_minimal_access }
+    end
   end
 
   describe "Delegate methods" do
     it { is_expected.to respond_to(:user_name) }
     it { is_expected.to respond_to(:user_email) }
+  end
+
+  describe '.valid_email?' do
+    it 'is a valid email format' do
+      expect(described_class.valid_email?('foo')).to eq(false)
+    end
+
+    it 'is not a valid email format' do
+      expect(described_class.valid_email?('foo@example.com')).to eq(true)
+    end
   end
 
   describe '.add_user' do
@@ -425,12 +517,10 @@ RSpec.describe Member do
         end
 
         context 'when admin mode is disabled' do
-          # Skipped because `Group#max_member_access_for_user` needs to be migrated to use admin mode
-          # https://gitlab.com/gitlab-org/gitlab/-/issues/207950
-          xit 'rejects setting members.created_by to the given admin current_user' do
+          it 'rejects setting members.created_by to the given admin current_user' do
             member = described_class.add_user(source, user, :maintainer, current_user: admin)
 
-            expect(member.created_by).not_to be_persisted
+            expect(member.created_by).to be_nil
           end
         end
 
@@ -513,6 +603,18 @@ RSpec.describe Member do
               expect(source.users).not_to include(user)
 
               described_class.add_user(source, user.email, :maintainer)
+
+              expect(source.users.reload).to include(user)
+            end
+          end
+
+          context 'when called with a known user secondary email' do
+            let(:secondary_email) { create(:email, email: 'secondary@example.com', user: user) }
+
+            it 'adds the user as a member' do
+              expect(source.users).not_to include(user)
+
+              described_class.add_user(source, secondary_email.email, :maintainer)
 
               expect(source.users.reload).to include(user)
             end
@@ -702,8 +804,25 @@ RSpec.describe Member do
     let(:invited_member) { create(:project_member, invite_email: "user@example.com", user: nil) }
     let(:requester) { create(:project_member, requested_at: Time.current.utc) }
 
-    it { expect(invited_member).to be_invite }
+    it { expect(invited_member).to be_pending }
     it { expect(requester).to be_pending }
+  end
+
+  describe '#hook_prerequisites_met?' do
+    let(:member) { create(:project_member) }
+
+    context 'when the member does not have an associated user' do
+      it 'returns false' do
+        member.update_column(:user_id, nil)
+        expect(member.reload.hook_prerequisites_met?).to eq(false)
+      end
+    end
+
+    context 'when the member has an associated user' do
+      it 'returns true' do
+        expect(member.hook_prerequisites_met?).to eq(true)
+      end
+    end
   end
 
   describe "#accept_invite!" do
@@ -840,7 +959,7 @@ RSpec.describe Member do
       user    = create(:user)
       member  = project.add_reporter(user)
 
-      member.destroy
+      member.destroy!
 
       expect(user.authorized_projects).not_to include(project)
     end
@@ -857,7 +976,7 @@ RSpec.describe Member do
 
     with_them do
       describe 'create member' do
-        let!(:source) { create(source_type) }
+        let!(:source) { create(source_type) } # rubocop:disable Rails/SaveBang
 
         subject { create(member_type, :guest, user: user, source: source) }
 
@@ -869,20 +988,20 @@ RSpec.describe Member do
 
         describe 'update member' do
           context 'when access level was changed' do
-            subject { member.update(access_level: Gitlab::Access::GUEST) }
+            subject { member.update!(access_level: Gitlab::Access::GUEST) }
 
             include_examples 'update highest role with exclusive lease'
           end
 
           context 'when access level was not changed' do
-            subject { member.update(notification_level: NotificationSetting.levels[:disabled]) }
+            subject { member.update!(notification_level: NotificationSetting.levels[:disabled]) }
 
             include_examples 'does not update the highest role'
           end
         end
 
         describe 'destroy member' do
-          subject { member.destroy }
+          subject { member.destroy! }
 
           include_examples 'update highest role with exclusive lease'
         end

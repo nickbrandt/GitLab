@@ -14,6 +14,7 @@ class Member < ApplicationRecord
   include UpdateHighestRole
 
   AVATAR_SIZE = 40
+  ACCESS_REQUEST_APPROVERS_TO_BE_NOTIFIED_LIMIT = 10
 
   attr_accessor :raw_invite_token
 
@@ -75,19 +76,46 @@ class Member < ApplicationRecord
 
     left_join_users
       .where(user_ok)
-      .where(requested_at: nil)
+      .non_request
       .non_minimal_access
       .reorder(nil)
+  end
+
+  scope :blocked, -> do
+    is_external_invite = arel_table[:user_id].eq(nil).and(arel_table[:invite_token].not_eq(nil))
+    user_is_blocked = User.arel_table[:state].eq(:blocked)
+
+    left_join_users
+      .where(user_is_blocked)
+      .where.not(is_external_invite)
+      .non_request
+      .non_minimal_access
+      .reorder(nil)
+  end
+
+  scope :connected_to_user, -> { where.not(user_id: nil) }
+
+  # This scope is exclusively used to get the members
+  # that can possibly have project_authorization records
+  # to projects/groups.
+  scope :authorizable, -> do
+    connected_to_user
+      .non_request
+      .non_minimal_access
   end
 
   # Like active, but without invites. For when a User is required.
   scope :active_without_invites_and_requests, -> do
     left_join_users
       .where(users: { state: 'active' })
-      .non_request
+      .without_invites_and_requests
+      .reorder(nil)
+  end
+
+  scope :without_invites_and_requests, -> do
+    non_request
       .non_invite
       .non_minimal_access
-      .reorder(nil)
   end
 
   scope :invite, -> { where.not(invite_token: nil) }
@@ -124,6 +152,13 @@ class Member < ApplicationRecord
   scope :with_source_id, ->(source_id) { where(source_id: source_id) }
   scope :including_source, -> { includes(:source) }
 
+  scope :distinct_on_user_with_max_access_level, -> do
+    distinct_members = select('DISTINCT ON (user_id, invite_email) *')
+                       .order('user_id, invite_email, access_level DESC, expires_at DESC, created_at ASC')
+
+    from(distinct_members, :members)
+  end
+
   scope :order_name_asc, -> { left_join_users.reorder(Gitlab::Database.nulls_last_order('users.name', 'ASC')) }
   scope :order_name_desc, -> { left_join_users.reorder(Gitlab::Database.nulls_last_order('users.name', 'DESC')) }
   scope :order_recent_sign_in, -> { left_join_users.reorder(Gitlab::Database.nulls_last_order('users.last_sign_in_at', 'DESC')) }
@@ -136,10 +171,10 @@ class Member < ApplicationRecord
   after_create :send_invite, if: :invite?, unless: :importing?
   after_create :send_request, if: :request?, unless: :importing?
   after_create :create_notification_setting, unless: [:pending?, :importing?]
-  after_create :post_create_hook, unless: [:pending?, :importing?]
-  after_update :post_update_hook, unless: [:pending?, :importing?]
+  after_create :post_create_hook, unless: [:pending?, :importing?], if: :hook_prerequisites_met?
+  after_update :post_update_hook, unless: [:pending?, :importing?], if: :hook_prerequisites_met?
   after_destroy :destroy_notification_setting
-  after_destroy :post_destroy_hook, unless: :pending?
+  after_destroy :post_destroy_hook, unless: :pending?, if: :hook_prerequisites_met?
   after_commit :refresh_member_authorized_projects
 
   default_value_for :notification_level, NotificationSetting.levels[:global]
@@ -265,10 +300,16 @@ class Member < ApplicationRecord
       Gitlab::Access.sym_options
     end
 
+    def valid_email?(email)
+      Devise.email_regexp.match?(email)
+    end
+
     private
 
     def parse_users_list(source, list)
-      emails, user_ids, users = [], [], []
+      emails = []
+      user_ids = []
+      users = []
       existing_members = {}
 
       list.each do |item|
@@ -286,6 +327,7 @@ class Member < ApplicationRecord
 
       if user_ids.present?
         users.concat(User.where(id: user_ids))
+        # the below will automatically discard invalid user_ids
         existing_members = source.members_and_requesters.where(user_id: user_ids).index_by(&:user_id)
       end
 
@@ -299,7 +341,7 @@ class Member < ApplicationRecord
 
       return User.find_by(id: user) if user.is_a?(Integer)
 
-      User.find_by(email: user) || user
+      User.find_by_any_email(user) || user
     end
 
     def retrieve_member(source, user, existing_members)
@@ -344,6 +386,12 @@ class Member < ApplicationRecord
 
   def pending?
     invite? || request?
+  end
+
+  def hook_prerequisites_met?
+    # It is essential that an associated user record exists
+    # so that we can successfully fire any member related hooks/notifications.
+    user.present?
   end
 
   def accept_request
@@ -534,4 +582,4 @@ class Member < ApplicationRecord
   end
 end
 
-Member.prepend_if_ee('EE::Member')
+Member.prepend_mod_with('Member')

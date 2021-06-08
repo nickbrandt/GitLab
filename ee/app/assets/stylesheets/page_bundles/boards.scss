@@ -37,6 +37,14 @@
   }
 }
 
+.board-add-new-list .gl-new-dropdown-inner {
+  max-height: 12rem !important;
+
+  .gl-form-radio {
+    min-height: 1em;
+  }
+}
+
 .tab-pane-labels {
   .dropdown-page-one .dropdown-content {
     height: 140px;
@@ -91,6 +99,10 @@
 
 .board-swimlanes {
   overflow-x: auto;
+
+  .board-swimlanes-content {
+    height: fit-content;
+  }
 
   .board-add-new-list {
     height: calc(100% - 1rem);

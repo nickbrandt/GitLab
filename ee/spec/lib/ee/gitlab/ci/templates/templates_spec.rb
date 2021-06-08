@@ -11,16 +11,44 @@ RSpec.describe "CI YML Templates" do
     Gitlab::Template::GitlabCiYmlTemplate.all.map(&:full_name)
   end
 
+  before do
+    stub_feature_flags(
+      redirect_to_latest_template_terraform: false,
+      redirect_to_latest_template_security_dast: false,
+      redirect_to_latest_template_security_api_fuzzing: false,
+      redirect_to_latest_template_jobs_browser_performance_testing: false)
+  end
+
   with_them do
     let(:content) do
-      <<~EOS
-        include:
-          - template: #{template_name}
+      if template_name == 'Security/DAST-API.gitlab-ci.yml'
+        # The DAST-API template purposly excludes a stages
+        # definition.
 
-        concrete_build_implemented_by_a_user:
-          stage: test
-          script: do something
-      EOS
+        <<~EOS
+          include:
+            - template: #{template_name}
+
+          stages:
+            - build
+            - test
+            - deploy
+            - dast
+
+          concrete_build_implemented_by_a_user:
+            stage: test
+            script: do something
+        EOS
+      else
+        <<~EOS
+          include:
+            - template: #{template_name}
+
+          concrete_build_implemented_by_a_user:
+            stage: test
+            script: do something
+        EOS
+      end
     end
 
     it 'is valid' do

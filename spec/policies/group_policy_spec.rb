@@ -193,16 +193,24 @@ RSpec.describe GroupPolicy do
     let(:current_user) { admin }
 
     specify do
-      expect_allowed(*read_group_permissions)
-      expect_allowed(*guest_permissions)
-      expect_allowed(*reporter_permissions)
-      expect_allowed(*developer_permissions)
-      expect_allowed(*maintainer_permissions)
-      expect_allowed(*owner_permissions)
+      expect_disallowed(*read_group_permissions)
+      expect_disallowed(*guest_permissions)
+      expect_disallowed(*reporter_permissions)
+      expect_disallowed(*developer_permissions)
+      expect_disallowed(*maintainer_permissions)
+      expect_disallowed(*owner_permissions)
     end
 
     context 'with admin mode', :enable_admin_mode do
-      specify { expect_allowed(*admin_permissions) }
+      specify do
+        expect_allowed(*read_group_permissions)
+        expect_allowed(*guest_permissions)
+        expect_allowed(*reporter_permissions)
+        expect_allowed(*developer_permissions)
+        expect_allowed(*maintainer_permissions)
+        expect_allowed(*owner_permissions)
+        expect_allowed(*admin_permissions)
+      end
     end
 
     it_behaves_like 'deploy token does not get confused with user' do
@@ -714,6 +722,7 @@ RSpec.describe GroupPolicy do
 
   describe 'design activity' do
     let_it_be(:group) { create(:group, :public) }
+
     let(:current_user) { nil }
 
     subject { described_class.new(current_user, group) }
@@ -773,7 +782,13 @@ RSpec.describe GroupPolicy do
     context 'admin' do
       let(:current_user) { admin }
 
-      it { is_expected.to be_allowed(:create_jira_connect_subscription) }
+      context 'when admin mode is enabled', :enable_admin_mode do
+        it { is_expected.to be_allowed(:create_jira_connect_subscription) }
+      end
+
+      context 'when admin mode is disabled' do
+        it { is_expected.to be_disallowed(:create_jira_connect_subscription) }
+      end
     end
 
     context 'with owner' do
@@ -817,7 +832,13 @@ RSpec.describe GroupPolicy do
     context 'admin' do
       let(:current_user) { admin }
 
-      it { is_expected.to be_allowed(:read_package) }
+      context 'when admin mode is enabled', :enable_admin_mode do
+        it { is_expected.to be_allowed(:read_package) }
+      end
+
+      context 'when admin mode is disabled' do
+        it { is_expected.to be_disallowed(:read_package) }
+      end
     end
 
     context 'with owner' do

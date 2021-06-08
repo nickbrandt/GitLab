@@ -8,7 +8,9 @@ module Releases
     attr_accessor :project, :current_user, :params
 
     def initialize(project, user = nil, params = {})
-      @project, @current_user, @params = project, user, params.dup
+      @project = project
+      @current_user = user
+      @params = params.dup
     end
 
     def tag_name
@@ -84,4 +86,4 @@ module Releases
   end
 end
 
-Releases::BaseService.prepend_if_ee('EE::Releases::BaseService')
+Releases::BaseService.prepend_mod_with('Releases::BaseService')

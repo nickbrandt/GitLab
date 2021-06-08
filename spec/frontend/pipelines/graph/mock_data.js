@@ -8,6 +8,8 @@ export const mockPipelineResponse = {
         __typename: 'Pipeline',
         id: 163,
         iid: '22',
+        complete: true,
+        usesNeeds: true,
         downstream: null,
         upstream: null,
         stages: {
@@ -434,21 +436,7 @@ export const mockPipelineResponse = {
                           },
                           needs: {
                             __typename: 'CiBuildNeedConnection',
-                            nodes: [
-                              {
-                                __typename: 'CiBuildNeed',
-                                name: 'build_c',
-                              },
-                              {
-                                __typename: 'CiBuildNeed',
-                                name: 'build_b',
-                              },
-                              {
-                                __typename: 'CiBuildNeed',
-                                name:
-                                  'build_a_nlfjkdnlvskfnksvjknlfdjvlvnjdkjdf_nvjkenjkrlngjeknjkl',
-                              },
-                            ],
+                            nodes: [],
                           },
                         },
                       ],
@@ -583,6 +571,8 @@ export const wrappedPipelineReturn = {
         __typename: 'Pipeline',
         id: 'gid://gitlab/Ci::Pipeline/175',
         iid: '38',
+        complete: true,
+        usesNeeds: true,
         downstream: {
           __typename: 'PipelineConnection',
           nodes: [],
@@ -681,3 +671,22 @@ export const pipelineWithUpstreamDownstream = (base) => {
 
   return generateResponse(pip, 'root/abcd-dag');
 };
+
+export const mapCallouts = (callouts) =>
+  callouts.map((callout) => {
+    return { featureName: callout, __typename: 'UserCallout' };
+  });
+
+export const mockCalloutsResponse = (mappedCallouts) => ({
+  data: {
+    currentUser: {
+      id: 45,
+      __typename: 'User',
+      callouts: {
+        id: 5,
+        __typename: 'UserCalloutConnection',
+        nodes: mappedCallouts,
+      },
+    },
+  },
+});

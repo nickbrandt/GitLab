@@ -4,7 +4,6 @@ import { escape } from 'lodash';
 import { mapActions, mapState, mapGetters } from 'vuex';
 import { TABLE_TYPE_DEFAULT, TABLE_TYPE_FREE, TABLE_TYPE_TRIAL } from 'ee/billings/constants';
 import { s__ } from '~/locale';
-import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import SubscriptionTableRow from './subscription_table_row.vue';
 
 const createButtonProps = (text, href, testId) => ({ text, href, testId });
@@ -16,7 +15,6 @@ export default {
     GlLoadingIcon,
     SubscriptionTableRow,
   },
-  mixins: [glFeatureFlagsMixin()],
   inject: {
     planUpgradeHref: {
       default: '',
@@ -39,30 +37,33 @@ export default {
     planName: {
       default: '',
     },
+    freePersonalNamespace: {
+      default: false,
+    },
   },
   computed: {
     ...mapState(['isLoadingSubscription', 'hasErrorSubscription', 'plan', 'tables', 'endpoint']),
     ...mapGetters(['isFreePlan']),
+    isSubscription() {
+      return !this.isFreePlan;
+    },
     subscriptionHeader() {
       const planName = this.isFreePlan ? s__('SubscriptionTable|Free') : escape(this.planName);
-      const suffix = !this.isFreePlan && this.plan.trial ? s__('SubscriptionTable|Trial') : '';
+      const suffix = this.isSubscription && this.plan.trial ? s__('SubscriptionTable|Trial') : '';
 
       return `${this.namespaceName}: ${planName} ${suffix}`;
     },
-    canAddSeats() {
-      return this.glFeatures.saasAddSeatsButton && !this.isFreePlan;
-    },
     canRenew() {
-      return !this.isFreePlan;
+      return this.isSubscription && !this.plan.trial;
     },
     canUpgrade() {
-      return this.isFreePlan || this.plan.upgradable;
+      return !this.freePersonalNamespace && (this.isFreePlan || this.plan.upgradable);
     },
     canUpgradeEEPlan() {
-      return !this.isFreePlan && this.planUpgradeHref;
+      return this.isSubscription && this.planUpgradeHref;
     },
     addSeatsButton() {
-      return this.canAddSeats
+      return this.isSubscription
         ? createButtonProps(
             s__('SubscriptionTable|Add seats'),
             this.addSeatsHref,
@@ -88,7 +89,7 @@ export default {
         : null;
     },
     manageButton() {
-      return !this.isFreePlan
+      return this.isSubscription
         ? createButtonProps(
             s__('SubscriptionTable|Manage'),
             this.customerPortalUrl,
@@ -113,7 +114,7 @@ export default {
       return this.tables[tableKey].rows;
     },
   },
-  mounted() {
+  created() {
     this.fetchSubscription();
   },
   methods: {
@@ -129,9 +130,12 @@ export default {
   <div>
     <div
       v-if="!isLoadingSubscription && !hasErrorSubscription"
-      class="card gl-mt-3 subscription-table js-subscription-table"
+      class="gl-card gl-mt-3 subscription-table js-subscription-table"
     >
-      <div class="card-header" data-testid="subscription-header">
+      <div
+        class="gl-card-header gl-display-flex gl-justify-content-space-between gl-align-items-center"
+        data-testid="subscription-header"
+      >
         <strong>{{ subscriptionHeader }}</strong>
         <div class="controls">
           <gl-button
@@ -148,7 +152,7 @@ export default {
         </div>
       </div>
       <div
-        class="card-body gl-display-flex gl-flex-column gl-sm-flex-direction-row flex-lg-column flex-grid"
+        class="gl-card-body gl-display-flex gl-flex-column gl-sm-flex-direction-row flex-lg-column flex-grid gl-p-0"
       >
         <subscription-table-row
           v-for="(row, i) in visibleRows"
@@ -156,6 +160,7 @@ export default {
           :last="isLast(i)"
           :header="row.header"
           :columns="row.columns"
+          :is-free-plan="isFreePlan"
         />
       </div>
     </div>

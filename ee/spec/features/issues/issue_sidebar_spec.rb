@@ -17,6 +17,21 @@ RSpec.describe 'Issue Sidebar' do
     sign_in(user)
   end
 
+  context 'Assignees', :js do
+    let(:user2) { create(:user) }
+    let(:issue2) { create(:issue, project: project, author: user2) }
+
+    it 'shows label text as "Apply" when assignees are changed' do
+      project.add_developer(user)
+      visit_issue(project, issue2)
+
+      open_assignees_dropdown
+      click_on 'Unassigned'
+
+      expect(page).to have_content('Apply')
+    end
+  end
+
   context 'updating weight', :js do
     before do
       project.add_maintainer(user)
@@ -191,7 +206,9 @@ RSpec.describe 'Issue Sidebar' do
   end
 
   def find_and_click_edit_iteration
-    page.find('[data-testid="iteration-edit-link"]').click
+    page.find('[data-testid="iteration-edit"] [data-testid="edit-button"]').click
+
+    wait_for_all_requests
   end
 
   def select_iteration(iteration_name)
@@ -207,5 +224,12 @@ RSpec.describe 'Issue Sidebar' do
   def open_issue_sidebar
     find('aside.right-sidebar.right-sidebar-collapsed .js-sidebar-toggle').click
     find('aside.right-sidebar.right-sidebar-expanded')
+  end
+
+  def open_assignees_dropdown
+    page.within('.assignee') do
+      click_button('Edit')
+      wait_for_requests
+    end
   end
 end

@@ -4,7 +4,11 @@ module Elastic
   class MigrationRecord
     attr_reader :version, :name, :filename
 
-    delegate :migrate, :skip_migration?, :completed?, :batched?, :throttle_delay, :pause_indexing?, to: :migration
+    delegate :migrate, :skip_migration?, :completed?, :batched?, :throttle_delay, :pause_indexing?,
+      :space_requirements?, :space_required_bytes, :obsolete?,
+      to: :migration
+
+    ELASTICSEARCH_SIZE = 25
 
     def initialize(version:, name:, filename:)
       @version = version
@@ -45,6 +49,11 @@ module Elastic
       !!load_state&.dig('halted')
     end
 
+    def halt!(additional_options = {})
+      state = { halted: true, halted_indexing_unpaused: false }.merge(additional_options)
+      save_state!(state)
+    end
+
     def name_for_key
       name.underscore
     end
@@ -52,7 +61,7 @@ module Elastic
     def self.load_versions(completed:)
       helper = Gitlab::Elastic::Helper.default
       helper.client
-            .search(index: helper.migrations_index_name, body: { query: { term: { completed: completed } } })
+            .search(index: helper.migrations_index_name, body: { query: { term: { completed: completed } }, size: ELASTICSEARCH_SIZE })
             .dig('hits', 'hits')
             .map { |v| v['_id'].to_i }
     rescue Elasticsearch::Transport::Transport::Errors::NotFound

@@ -10,8 +10,8 @@ type: reference
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/53016) in GitLab 13.9.
 
 Group repositories can be moved between storages. This can be useful when
-[migrating to Gitaly Cluster](../administration/gitaly/praefect.md#migrate-existing-repositories-to-gitaly-cluster),
-for example, or to migrate a Group Wiki.
+[migrating to Gitaly Cluster](../administration/gitaly/praefect.md#migrate-to-gitaly-cluster), for
+example, or to migrate a Group Wiki.
 
 As group repository storage moves are processed, they transition through different states. Values
 of `state` are:
@@ -202,8 +202,10 @@ Supported attributes:
 Example request:
 
 ```shell
-curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" --header "Content-Type: application/json" \
---data '{"destination_storage_name":"storage2"}' "https://gitlab.example.com/api/v4/groups/1/repository_storage_moves"
+curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" \
+     --header "Content-Type: application/json" \
+     --data '{"destination_storage_name":"storage2"}' \
+     "https://gitlab.example.com/api/v4/groups/1/repository_storage_moves"
 ```
 
 Example response:
@@ -241,8 +243,10 @@ Supported attributes:
 Example request:
 
 ```shell
-curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" --header "Content-Type: application/json" \
---data '{"source_storage_name":"default"}' "https://gitlab.example.com/api/v4/group_repository_storage_moves"
+curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" \
+     --header "Content-Type: application/json" \
+     --data '{"source_storage_name":"default"}' \
+     "https://gitlab.example.com/api/v4/group_repository_storage_moves"
 ```
 
 Example response:

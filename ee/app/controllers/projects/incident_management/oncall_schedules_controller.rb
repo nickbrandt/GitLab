@@ -5,7 +5,7 @@ module Projects
     class OncallSchedulesController < Projects::ApplicationController
       before_action :authorize_read_incident_management_oncall_schedule!
       before_action do
-        push_frontend_feature_flag(:oncall_schedules_mvc_edit_rotations, default_enabled: false)
+        push_frontend_feature_flag(:multiple_oncall_schedules, @project)
       end
 
       feature_category :incident_management

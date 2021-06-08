@@ -14,11 +14,14 @@ import {
   flattenTaskByTypeSeries,
   orderByDate,
   toggleSelectedLabel,
-  transformStagesForPathNavigation,
   prepareTimeMetricsData,
   prepareStageErrors,
+  formatMedianValuesWithOverview,
 } from 'ee/analytics/cycle_analytics/utils';
 import { toYmd } from 'ee/analytics/shared/utils';
+import { rawStageMedians } from 'jest/cycle_analytics/mock_data';
+import { OVERVIEW_STAGE_ID } from '~/cycle_analytics/constants';
+import { medianTimeToParsedSeconds } from '~/cycle_analytics/utils';
 import { getDatesInRange } from '~/lib/utils/datetime_utility';
 import { slugify } from '~/lib/utils/text_utility';
 import {
@@ -34,9 +37,6 @@ import {
   issueStage,
   rawCustomStage,
   rawTasksByTypeData,
-  allowedStages,
-  stageMediansWithNumericIds,
-  pathNavIssueMetric,
   timeMetricsData,
 } from './mock_data';
 
@@ -335,34 +335,6 @@ describe('Value Stream Analytics utils', () => {
     });
   });
 
-  describe('transformStagesForPathNavigation', () => {
-    const stages = allowedStages;
-    const response = transformStagesForPathNavigation({
-      stages,
-      medians: stageMediansWithNumericIds,
-      selectedStage: issueStage,
-    });
-
-    describe('transforms the data as expected', () => {
-      it('returns an array of stages', () => {
-        expect(Array.isArray(response)).toBe(true);
-        expect(response.length).toEqual(stages.length);
-      });
-
-      it('selects the correct stage', () => {
-        const selected = response.filter((stage) => stage.selected === true)[0];
-
-        expect(selected.title).toEqual(issueStage.title);
-      });
-
-      it('includes the correct metric for the associated stage', () => {
-        const issue = response.filter((stage) => stage.name === 'Issue')[0];
-
-        expect(issue.metric).toEqual(pathNavIssueMetric);
-      });
-    });
-  });
-
   describe('prepareTimeMetricsData', () => {
     let prepared;
     const [{ title: firstTitle }, { title: secondTitle }] = timeMetricsData;
@@ -371,7 +343,7 @@ describe('Value Stream Analytics utils', () => {
 
     beforeEach(() => {
       prepared = prepareTimeMetricsData(timeMetricsData, {
-        [firstKey]: 'Is a value that is good',
+        [firstKey]: { description: 'Is a value that is good' },
       });
     });
 
@@ -383,11 +355,25 @@ describe('Value Stream Analytics utils', () => {
       expect(prepared).toMatchObject([{ label: 'Lead Time' }, { label: 'Cycle Time' }]);
     });
 
-    it('will add a tooltip text using the key if it is provided', () => {
+    it('will add a popover description using the key if it is provided', () => {
       expect(prepared).toMatchObject([
-        { tooltipText: 'Is a value that is good' },
-        { tooltipText: '' },
+        { description: 'Is a value that is good' },
+        { description: '' },
       ]);
+    });
+  });
+
+  describe('formatMedianValuesWithOverview', () => {
+    const calculatedMedians = formatMedianValuesWithOverview(rawStageMedians);
+
+    it('returns an object with each stage and their median formatted for display', () => {
+      rawStageMedians.forEach(({ id, value }) => {
+        expect(calculatedMedians).toMatchObject({ [id]: medianTimeToParsedSeconds(value) });
+      });
+    });
+
+    it('calculates a median for the overview stage', () => {
+      expect(calculatedMedians).toMatchObject({ [OVERVIEW_STAGE_ID]: '3w' });
     });
   });
 });

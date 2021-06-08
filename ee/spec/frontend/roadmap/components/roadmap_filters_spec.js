@@ -10,8 +10,11 @@ import { mockSortedBy, mockTimeframeInitialDate } from 'ee_jest/roadmap/mock_dat
 
 import { TEST_HOST } from 'helpers/test_constants';
 import { visitUrl, mergeUrlParams, updateHistory } from '~/lib/utils/url_utility';
+import { OPERATOR_IS_ONLY } from '~/vue_shared/components/filtered_search_bar/constants';
 import FilteredSearchBar from '~/vue_shared/components/filtered_search_bar/filtered_search_bar_root.vue';
 import AuthorToken from '~/vue_shared/components/filtered_search_bar/tokens/author_token.vue';
+import EmojiToken from '~/vue_shared/components/filtered_search_bar/tokens/emoji_token.vue';
+import EpicToken from '~/vue_shared/components/filtered_search_bar/tokens/epic_token.vue';
 import LabelToken from '~/vue_shared/components/filtered_search_bar/tokens/label_token.vue';
 import MilestoneToken from '~/vue_shared/components/filtered_search_bar/tokens/milestone_token.vue';
 
@@ -27,6 +30,7 @@ const createComponent = ({
   epicsState = EPICS_STATES.ALL,
   sortedBy = mockSortedBy,
   groupFullPath = 'gitlab-org',
+  listEpicsPath = '/groups/gitlab-org/-/epics',
   groupMilestonesPath = '/groups/gitlab-org/-/milestones.json',
   timeframe = getTimeframeForMonthsView(mockTimeframeInitialDate),
   filterParams = {},
@@ -50,6 +54,7 @@ const createComponent = ({
     provide: {
       groupFullPath,
       groupMilestonesPath,
+      listEpicsPath,
     },
   });
 };
@@ -159,6 +164,66 @@ describe('RoadmapFilters', () => {
       ];
       let filteredSearchBar;
 
+      const operators = OPERATOR_IS_ONLY;
+
+      const filterTokens = [
+        {
+          type: 'author_username',
+          icon: 'user',
+          title: 'Author',
+          unique: true,
+          symbol: '@',
+          token: AuthorToken,
+          operators,
+          recentTokenValuesStorageKey: 'gitlab-org-epics-recent-tokens-author_username',
+          fetchAuthors: expect.any(Function),
+        },
+        {
+          type: 'label_name',
+          icon: 'labels',
+          title: 'Label',
+          unique: false,
+          symbol: '~',
+          token: LabelToken,
+          operators,
+          recentTokenValuesStorageKey: 'gitlab-org-epics-recent-tokens-label_name',
+          fetchLabels: expect.any(Function),
+        },
+        {
+          type: 'milestone_title',
+          icon: 'clock',
+          title: 'Milestone',
+          unique: true,
+          symbol: '%',
+          token: MilestoneToken,
+          operators,
+          fetchMilestones: expect.any(Function),
+        },
+        {
+          type: 'confidential',
+          icon: 'eye-slash',
+          title: 'Confidential',
+          unique: true,
+          token: GlFilteredSearchToken,
+          operators,
+          options: [
+            { icon: 'eye-slash', value: true, title: 'Yes' },
+            { icon: 'eye', value: false, title: 'No' },
+          ],
+        },
+        {
+          type: 'epic_iid',
+          icon: 'epic',
+          title: 'Epic',
+          unique: true,
+          symbol: '&',
+          token: EpicToken,
+          operators,
+          defaultEpics: [],
+          fetchEpics: expect.any(Function),
+        },
+      ];
+
       beforeEach(() => {
         filteredSearchBar = wrapper.find(FilteredSearchBar);
       });
@@ -169,51 +234,8 @@ describe('RoadmapFilters', () => {
         expect(filteredSearchBar.props('recentSearchesStorageKey')).toBe('epics');
       });
 
-      it('includes `Author` and `Label` tokens', () => {
-        expect(filteredSearchBar.props('tokens')).toEqual([
-          {
-            type: 'author_username',
-            icon: 'user',
-            title: 'Author',
-            unique: true,
-            symbol: '@',
-            token: AuthorToken,
-            operators: [{ value: '=', description: 'is', default: 'true' }],
-            fetchAuthors: expect.any(Function),
-          },
-          {
-            type: 'label_name',
-            icon: 'labels',
-            title: 'Label',
-            unique: false,
-            symbol: '~',
-            token: LabelToken,
-            operators: [{ value: '=', description: 'is', default: 'true' }],
-            fetchLabels: expect.any(Function),
-          },
-          {
-            type: 'milestone_title',
-            icon: 'clock',
-            title: 'Milestone',
-            unique: true,
-            symbol: '%',
-            token: MilestoneToken,
-            operators: [{ value: '=', description: 'is', default: 'true' }],
-            fetchMilestones: expect.any(Function),
-          },
-          {
-            type: 'confidential',
-            icon: 'eye-slash',
-            title: 'Confidential',
-            unique: true,
-            token: GlFilteredSearchToken,
-            operators: [{ value: '=', description: 'is', default: 'true' }],
-            options: [
-              { icon: 'eye-slash', value: true, title: 'Yes' },
-              { icon: 'eye', value: false, title: 'No' },
-            ],
-          },
-        ]);
+      it('includes `Author`, `Milestone`, `Confidential`, `Epic` and `Label` tokens when user is not logged in', () => {
+        expect(filteredSearchBar.props('tokens')).toEqual(filterTokens);
       });
 
       it('includes "Start date" and "Due date" sort options', () => {
@@ -281,6 +303,27 @@ describe('RoadmapFilters', () => {
 
         expect(wrapper.vm.setSortedBy).toHaveBeenCalledWith('end_date_asc');
         expect(wrapper.vm.fetchEpics).toHaveBeenCalled();
+      });
+
+      describe('when user is logged in', () => {
+        beforeAll(() => {
+          gon.current_user_id = 1;
+        });
+
+        it('includes `Author`, `Milestone`, `Confidential`, `Label` and `My-Reaction` tokens', () => {
+          expect(filteredSearchBar.props('tokens')).toEqual([
+            ...filterTokens,
+            {
+              type: 'my_reaction_emoji',
+              icon: 'thumb-up',
+              title: 'My-Reaction',
+              unique: true,
+              token: EmojiToken,
+              operators,
+              fetchEmojis: expect.any(Function),
+            },
+          ]);
+        });
       });
     });
   });

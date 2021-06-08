@@ -171,7 +171,7 @@ list of options.
 ## Custom Helm chart per environment
 
 You can specify the use of a custom Helm chart per environment by scoping the CI/CD variable
-to the desired environment. See [Limiting environment scopes of variables](../../ci/variables/README.md#limit-the-environment-scopes-of-cicd-variables).
+to the desired environment. See [Limit environment scope of CI/CD variables](../../ci/variables/README.md#limit-the-environment-scope-of-a-cicd-variable).
 
 ## Customizing `.gitlab-ci.yml`
 
@@ -244,8 +244,8 @@ include:
 See the [Auto DevOps template](https://gitlab.com/gitlab-org/gitlab/blob/master/lib/gitlab/ci/templates/Auto-DevOps.gitlab-ci.yml) for information on available jobs.
 
 WARNING:
-Auto DevOps templates using the [`only`](../../ci/yaml/README.md#onlyexcept-basic) or
-[`except`](../../ci/yaml/README.md#onlyexcept-basic) syntax have switched
+Auto DevOps templates using the [`only`](../../ci/yaml/README.md#only--except) or
+[`except`](../../ci/yaml/README.md#only--except) syntax have switched
 to the [`rules`](../../ci/yaml/README.md#rules) syntax, starting in
 [GitLab 13.0](https://gitlab.com/gitlab-org/gitlab/-/issues/213336).
 If your `.gitlab-ci.yml` extends these Auto DevOps templates and override the `only` or
@@ -254,6 +254,27 @@ If your `.gitlab-ci.yml` extends these Auto DevOps templates and override the `o
 base template is migrated to use the `rules` syntax.
 For users who cannot migrate just yet, you can alternatively pin your templates to
 the [GitLab 12.10 based templates](https://gitlab.com/gitlab-org/auto-devops-v12-10).
+
+## Use images hosted in a local Docker registry
+
+You can configure many Auto DevOps jobs to run in an [offline environment](../../user/application_security/offline_deployments/index.md):
+
+1. Copy the required Auto DevOps Docker images from Docker Hub and `registry.gitlab.com` to their local GitLab container registry.
+1. After the images are hosted and available in a local registry, edit `.gitlab-ci.yml` to point to the locally-hosted images. For example:
+
+   ```yaml
+   include:
+     - template: Auto-DevOps.gitlab-ci.yml
+
+   variables:
+     REGISTRY_URL: "registry.gitlab.example"
+
+   build:
+     image: "$REGISTRY_URL/docker/auto-build-image:v0.6.0"
+     services:
+       - name: "$REGISTRY_URL/greg/docker/docker:20.10.6-dind"
+         command: ['--tls=false', '--host=tcp://0.0.0.0:2375']
+   ```
 
 ## PostgreSQL database support
 
@@ -337,7 +358,6 @@ applications.
 | `AUTO_DEVOPS_CHART_REPOSITORY_PASSWORD` | From GitLab 11.11, used to set a password to connect to the Helm repository. Defaults to no credentials. Also set `AUTO_DEVOPS_CHART_REPOSITORY_USERNAME`. |
 | `AUTO_DEVOPS_DEPLOY_DEBUG`              | From GitLab 13.1, if this variable is present, Helm outputs debug logs. |
 | `AUTO_DEVOPS_ALLOW_TO_FORCE_DEPLOY_V<N>` | From [auto-deploy-image](https://gitlab.com/gitlab-org/cluster-integration/auto-deploy-image) v1.0.0, if this variable is present, a new major version of chart is forcibly deployed. For more information, see [Ignore warnings and continue deploying](upgrading_auto_deploy_dependencies.md#ignore-warnings-and-continue-deploying). |
-| `AUTO_DEVOPS_MODSECURITY_SEC_RULE_ENGINE` | From GitLab 12.5, used in combination with [ModSecurity feature flag](../../user/clusters/applications.md#web-application-firewall-modsecurity) to toggle [ModSecurity's `SecRuleEngine`](https://github.com/SpiderLabs/ModSecurity/wiki/Reference-Manual-(v2.x)#SecRuleEngine) behavior. Defaults to `DetectionOnly`. |
 | `BUILDPACK_URL`                         | Buildpack's full URL. Can point to either [a Git repository URL or a tarball URL](#custom-buildpacks). |
 | `CANARY_ENABLED`                        | From GitLab 11.0, used to define a [deploy policy for canary environments](#deploy-policy-for-canary-environments). |
 | `CANARY_PRODUCTION_REPLICAS`            | Number of canary replicas to deploy for [Canary Deployments](../../user/project/canary_deployments.md) in the production environment. Takes precedence over `CANARY_REPLICAS`. Defaults to 1. |
@@ -387,6 +407,8 @@ The following table lists variables used to disable jobs.
 |----------------------------------------|---------------------------------|-----------------------|-----------------|
 | `.fuzz_base`                           | `COVFUZZ_DISABLED`              | [From GitLab 13.2](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/34984) | [Read more](../../user/application_security/coverage_fuzzing/) about how `.fuzz_base` provide capability for your own jobs. If the variable is present, your jobs aren't created. |
 | `apifuzzer_fuzz`                       | `API_FUZZING_DISABLED`          | [From GitLab 13.3](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/39135) | If the variable is present, the job isn't created. |
+| `build`                                | `BUILD_DISABLED`                |                       | If the variable is present, the job isn't created. |
+| `build_artifact`                       | `BUILD_DISABLED`                |                       | If the variable is present, the job isn't created. |
 | `bandit-sast`                          | `SAST_DISABLED`                 |                       | If the variable is present, the job isn't created. |
 | `brakeman-sast`                        | `SAST_DISABLED`                 |                       | If the variable is present, the job isn't created. |
 | `bundler-audit-dependency_scanning`    | `DEPENDENCY_SCANNING_DISABLED`  |                       | If the variable is present, the job isn't created. |
@@ -409,7 +431,8 @@ The following table lists variables used to disable jobs.
 | `license_scanning`                     | `LICENSE_MANAGEMENT_DISABLED`   | [From GitLab 12.8](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/22773) | If the variable is present, the job isn't created. |
 | `load_performance`                     | `LOAD_PERFORMANCE_DISABLED`     | From GitLab 13.2      | If the variable is present, the job isn't created. |
 | `nodejs-scan-sast`                     | `SAST_DISABLED`                 |                       | If the variable is present, the job isn't created. |
-| `performance`                          | `PERFORMANCE_DISABLED`          | From GitLab 11.0      | Browser performance. If the variable is present, the job isn't created. |
+| `performance`                          | `PERFORMANCE_DISABLED`          | GitLab 11.0 to GitLab 13.12 | Browser performance. If the variable is present, the job isn't created. Replaced by `browser_peformance`. |
+| `browser_performance`                  | `BROWSER_PERFORMANCE_DISABLED`  | From GitLab 14.0      | Browser performance. If the variable is present, the job isn't created. Replaces `performance`. |
 | `phpcs-security-audit-sast`            | `SAST_DISABLED`                 |                       | If the variable is present, the job isn't created. |
 | `pmd-apex-sast`                        | `SAST_DISABLED`                 |                       | If the variable is present, the job isn't created. |
 | `retire-js-dependency_scanning`        | `DEPENDENCY_SCANNING_DISABLED`  |                       | If the variable is present, the job isn't created. |
@@ -651,7 +674,7 @@ permissions on new projects when Auto DevOps is not enabled:
 The banner can be disabled for:
 
 - A user, when they dismiss it themselves.
-- A project, by explicitly [disabling Auto DevOps](index.md#enablingdisabling-auto-devops).
+- A project, by explicitly [disabling Auto DevOps](index.md#enable-or-disable-auto-devops).
 - An entire GitLab instance:
   - By an administrator running the following in a Rails console:
 

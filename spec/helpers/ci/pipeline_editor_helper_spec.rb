@@ -20,4 +20,72 @@ RSpec.describe Ci::PipelineEditorHelper do
       expect(subject).to be false
     end
   end
+
+  describe '#js_pipeline_editor_data' do
+    let(:project) { create(:project, :repository) }
+
+    before do
+      allow(helper)
+        .to receive(:namespace_project_new_merge_request_path)
+        .and_return('/mock/project/-/merge_requests/new')
+
+      allow(helper)
+        .to receive(:image_path)
+        .and_return('foo')
+    end
+
+    subject(:pipeline_editor_data) { helper.js_pipeline_editor_data(project) }
+
+    context 'with a project with commits' do
+      it 'returns pipeline editor data' do
+        expect(pipeline_editor_data).to eq({
+          "ci-config-path": project.ci_config_path_or_default,
+          "ci-examples-help-page-path" => help_page_path('ci/examples/README'),
+          "ci-help-page-path" => help_page_path('ci/README'),
+          "commit-sha" => project.commit.sha,
+          "default-branch" => project.default_branch,
+          "empty-state-illustration-path" => 'foo',
+          "initial-branch-name": nil,
+          "lint-help-page-path" => help_page_path('ci/lint', anchor: 'validate-basic-logic-and-syntax'),
+          "needs-help-page-path" => help_page_path('ci/yaml/README', anchor: 'needs'),
+          "new-merge-request-path" => '/mock/project/-/merge_requests/new',
+          "pipeline_etag" => graphql_etag_pipeline_sha_path(project.commit.sha),
+          "pipeline-page-path" => project_pipelines_path(project),
+          "project-path" => project.path,
+          "project-full-path" => project.full_path,
+          "project-namespace" => project.namespace.full_path,
+          "runner-help-page-path" => help_page_path('ci/runners/README'),
+          "total-branches" => project.repository.branches.length,
+          "yml-help-page-path" => help_page_path('ci/yaml/README')
+        })
+      end
+    end
+
+    context 'with an empty project' do
+      let(:project) { create(:project, :empty_repo) }
+
+      it 'returns pipeline editor data' do
+        expect(pipeline_editor_data).to eq({
+          "ci-config-path": project.ci_config_path_or_default,
+          "ci-examples-help-page-path" => help_page_path('ci/examples/README'),
+          "ci-help-page-path" => help_page_path('ci/README'),
+          "commit-sha" => '',
+          "default-branch" => project.default_branch,
+          "empty-state-illustration-path" => 'foo',
+          "initial-branch-name": nil,
+          "lint-help-page-path" => help_page_path('ci/lint', anchor: 'validate-basic-logic-and-syntax'),
+          "needs-help-page-path" => help_page_path('ci/yaml/README', anchor: 'needs'),
+          "new-merge-request-path" => '/mock/project/-/merge_requests/new',
+          "pipeline_etag" => '',
+          "pipeline-page-path" => project_pipelines_path(project),
+          "project-path" => project.path,
+          "project-full-path" => project.full_path,
+          "project-namespace" => project.namespace.full_path,
+          "runner-help-page-path" => help_page_path('ci/runners/README'),
+          "total-branches" => 0,
+          "yml-help-page-path" => help_page_path('ci/yaml/README')
+        })
+      end
+    end
+  end
 end

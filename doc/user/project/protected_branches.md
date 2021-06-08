@@ -7,46 +7,45 @@ type: reference, howto
 
 # Protected branches **(FREE)**
 
-[Permissions](../permissions.md) in GitLab are fundamentally defined around the
+In GitLab, [permissions](../permissions.md) are fundamentally defined around the
 idea of having read or write permission to the repository and branches. To impose
 further restrictions on certain branches, they can be protected.
 
-## Overview
+The default branch for your repository is protected by default.
 
-By default, a protected branch does these things:
+## Who can access a protected branch
 
-- It prevents its creation, if not already created, from everybody except users
-  with Maintainer permission.
-- It prevents pushes from everybody except users with **Allowed** permission.
-- It prevents **anyone** from force pushing to the branch.
-- It prevents **anyone** from deleting the branch.
+When a branch is protected, the default behavior enforces
+these restrictions on the branch.
 
-**Permissions:**
+| Action                   | Who can do it |
+|--------------------------|---------------|
+| Protect a branch         | Maintainers only. |
+| Push to the branch       | GitLab administrators and anyone with **Allowed** permission. (*) |
+| Force push to the branch | No one. |
+| Delete the branch        | No one. |
 
-- GitLab administrators are allowed to push to the protected branches.
-- Users with [Developer permissions](../permissions.md) are allowed to
-  create a project in a group, but might not be allowed to initially
-  push to the [default branch](repository/branches/index.md#default-branch).
+(*) Users with developer permissions can create a project in a group,
+but might not be allowed to initially push to the [default branch](repository/branches/default.md).
+
+### Set the branch protection default level
 
 The default branch protection level is set in the [Admin Area](../admin_area/settings/visibility_and_access_controls.md#default-branch-protection).
 
-See the [Changelog](#changelog) section for changes over time.
+## Configure a protected branch
 
-## Configuring protected branches
+Prerequisite:
 
-To protect a branch, you need to have at least Maintainer permission level.
-The `master` branch is protected by default.
+- You must have at least the [Maintainer role](../permissions.md).
 
-1. In your project, go to **Settings > Repository**.
-1. Scroll to find the **Protected branches** section.
-1. From the **Branch** dropdown menu, select the branch you want to protect and
-   click **Protect**. In the screenshot below, we chose the `develop` branch.
+To protect a branch:
 
-   ![Protected branches page](img/protected_branches_page_v12_3.png)
+1. Go to your project and select **Settings > Repository**.
+1. Expand **Protected branches**.
+1. From the **Branch** dropdown menu, select the branch you want to protect.
+1. Select **Protect**.
 
-1. Once done, the protected branch displays in the **Protected branches** list.
-
-   ![Protected branches list](img/protected_branches_list_v12_3.png)
+The protected branch displays in the **Protected branches** list.
 
 ## Using the Allowed to merge and Allowed to push settings
 
@@ -141,7 +140,7 @@ all matching branches:
 
 ![Protected branch matches](img/protected_branches_matches.png)
 
-## Creating a protected branch
+## Create a protected branch
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/issues/53361) in GitLab 11.9.
 
@@ -161,10 +160,10 @@ To create a new branch through the user interface:
    base the new branch on. Only existing protected branches and commits
    that are already in protected branches are accepted.
 
-## Deleting a protected branch
+## Delete a protected branch
 
 From time to time, you may need to delete or clean up protected branches.
-User with [Maintainer permissions](../permissions.md) and greater can manually delete protected
+User with the [Maintainer role](../permissions.md) and greater can manually delete protected
 branches by using the GitLab web interface:
 
 1. Go to **Repository > Branches**.
@@ -176,6 +175,37 @@ branches by using the GitLab web interface:
 Deleting a protected branch is allowed only by using the web interface; not from Git.
 This means that you can't accidentally delete a protected branch from your
 command line or a Git client application.
+
+## Allow force push on protected branches
+
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/15611) in GitLab 13.10 behind a disabled feature flag.
+> - [Feature flag removed](https://gitlab.com/gitlab-org/gitlab/-/issues/323431) in GitLab 14.0.
+
+WARNING:
+This feature might not be available to you. Check the **version history** note above for details.
+
+You can allow [force pushes](../../topics/git/git_rebase.md#force-push) to
+protected branches by either setting **Allowed to force push**
+when you protect a new branch, or by configuring an already-protected branch.
+
+To protect a new branch and enable Force push:
+
+1. Navigate to your project's **Settings > Repository**.
+1. Expand **Protected branches**, and scroll to **Protect a branch**.
+1. Select a **Branch** or wildcard you'd like to protect.
+1. Select the user levels **Allowed to merge** and **Allowed to push**.
+1. To allow all users with push access to force push, toggle the **Allowed to force push** slider.
+1. To reject code pushes that change files listed in the `CODEOWNERS` file, toggle
+   **Require approval from code owners**.
+1. Click **Protect**.
+
+To enable force pushes on branches already protected:
+
+1. Navigate to your project's **Settings > Repository**.
+1. Expand **Protected branches** and scroll to **Protected branch**.
+1. Toggle the **Allowed to force push** slider for the chosen branch.
+
+When enabled, members who are allowed to push to this branch can also force push.
 
 ## Protected branches approval by Code Owners **(PREMIUM)**
 
@@ -193,14 +223,10 @@ To protect a new branch and enable Code Owner's approval:
 1. Scroll down to **Protect a branch**, select a **Branch** or wildcard you'd like to protect, select who's **Allowed to merge** and **Allowed to push**, and toggle the **Require approval from code owners** slider.
 1. Click **Protect**.
 
-![Code Owners approval - new protected branch](img/code_owners_approval_new_protected_branch_v12_4.png)
-
 To enable Code Owner's approval to branches already protected:
 
 1. Navigate to your project's **Settings > Repository** and expand **Protected branches**.
 1. Scroll down to **Protected branch** and toggle the **Code owner approval** slider for the chosen branch.
-
-![Code Owners approval - branch already protected](img/code_owners_approval_protected_branch_v12_4.png)
 
 When enabled, all merge requests targeting these branches require approval
 by a Code Owner per matched rule before they can be merged.

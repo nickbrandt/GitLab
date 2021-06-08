@@ -4,8 +4,8 @@ import { isString, mapValues, isNumber, reduce } from 'lodash';
 import * as timeago from 'timeago.js';
 import { languageCode, s__, __, n__ } from '../../locale';
 
-const MILLISECONDS_IN_HOUR = 60 * 60 * 1000;
-const MILLISECONDS_IN_DAY = 24 * MILLISECONDS_IN_HOUR;
+export const SECONDS_IN_DAY = 86400;
+
 const DAYS_IN_WEEK = 7;
 
 window.timeago = timeago;
@@ -106,7 +106,7 @@ export function formatDateAsMonth(datetime, options = {}) {
 
 /**
  * @example
- * dateFormat('2017-12-05','mmm d, yyyy h:MMtt Z' ) -> "Dec 5, 2017 12:00am GMT+0000"
+ * dateFormat('2017-12-05','mmm d, yyyy h:MMtt Z' ) -> "Dec 5, 2017 12:00am UTC"
  * @param {date} datetime
  * @param {String} format
  * @param {Boolean} UTC convert local time to UTC
@@ -254,6 +254,37 @@ export const timeIntervalInWords = (intervalInSeconds) => {
   return minutes >= 1
     ? [n__('%d minute', '%d minutes', minutes), secondsText].join(' ')
     : secondsText;
+};
+
+/**
+ * Similar to `timeIntervalInWords`, but rounds the return value
+ * to 1/10th of the largest time unit. For example:
+ *
+ * 30 => 30 seconds
+ * 90 => 1.5 minutes
+ * 7200 => 2 hours
+ * 86400 => 1 day
+ * ... etc.
+ *
+ * The largest supported unit is "days".
+ *
+ * @param {Number} intervalInSeconds The time interval in seconds
+ * @returns {String} A humanized description of the time interval
+ */
+export const humanizeTimeInterval = (intervalInSeconds) => {
+  if (intervalInSeconds < 60 /* = 1 minute */) {
+    const seconds = Math.round(intervalInSeconds * 10) / 10;
+    return n__('%d second', '%d seconds', seconds);
+  } else if (intervalInSeconds < 3600 /* = 1 hour */) {
+    const minutes = Math.round(intervalInSeconds / 6) / 10;
+    return n__('%d minute', '%d minutes', minutes);
+  } else if (intervalInSeconds < 86400 /* = 1 day */) {
+    const hours = Math.round(intervalInSeconds / 360) / 10;
+    return n__('%d hour', '%d hours', hours);
+  }
+
+  const days = Math.round(intervalInSeconds / 8640) / 10;
+  return n__('%d day', '%d days', days);
 };
 
 export const dateInWords = (date, abbreviated = false, hideYear = false) => {
@@ -769,6 +800,19 @@ export const nMonthsAfter = (date, numberOfMonths, { utc = false } = {}) => {
 };
 
 /**
+ * Returns the date `n` years after the date provided.
+ *
+ * @param {Date} date the initial date
+ * @param {Number} numberOfYears number of years after
+ * @return {Date} A `Date` object `n` years after the provided `Date`
+ */
+export const nYearsAfter = (date, numberOfYears) => {
+  const clone = newDate(date);
+  clone.setFullYear(clone.getFullYear() + numberOfYears);
+  return clone;
+};
+
+/**
  * Returns the date `n` months before the date provided
  *
  * @param {Date} date the initial date
@@ -837,21 +881,6 @@ export const approximateDuration = (seconds = 0) => {
     return n__('about 1 hour', 'about %d hours', seconds < ONE_HOUR_LIMIT ? 1 : hours);
   }
   return n__('1 day', '%d days', seconds < ONE_DAY_LIMIT ? 1 : days);
-};
-
-/**
- * A utility function which helps creating a date object
- * for a specific date. Accepts the year, month and day
- * returning a date object for the given params.
- *
- * @param {Int} year the full year as a number i.e. 2020
- * @param {Int} month the month index i.e. January => 0
- * @param {Int} day the day as a number i.e. 23
- *
- * @return {Date} the date object from the params
- */
-export const dateFromParams = (year, month, day) => {
-  return new Date(year, month, day);
 };
 
 /**
@@ -934,49 +963,6 @@ export const format24HourTimeStringFromInt = (time) => {
 };
 
 /**
- * A utility function which checks if two date ranges overlap.
- *
- * @param {Object} givenPeriodLeft - the first period to compare.
- * @param {Object} givenPeriodRight - the second period to compare.
- * @returns {Object} { daysOverlap: number of days the overlap is present, hoursOverlap: number of hours the overlap is present, overlapStartDate: the start date of the overlap in time format, overlapEndDate: the end date of the overlap in time format }
- * @throws {Error} Uncaught Error: Invalid period
- *
- * @example
- * getOverlapDateInPeriods(
- *   { start: new Date(2021, 0, 11), end: new Date(2021, 0, 13) },
- *   { start: new Date(2021, 0, 11), end: new Date(2021, 0, 14) }
- * ) => { daysOverlap: 2, hoursOverlap: 48, overlapStartDate: 1610323200000, overlapEndDate: 1610496000000 }
- *
- */
-export const getOverlapDateInPeriods = (givenPeriodLeft = {}, givenPeriodRight = {}) => {
-  const leftStartTime = new Date(givenPeriodLeft.start).getTime();
-  const leftEndTime = new Date(givenPeriodLeft.end).getTime();
-  const rightStartTime = new Date(givenPeriodRight.start).getTime();
-  const rightEndTime = new Date(givenPeriodRight.end).getTime();
-
-  if (!(leftStartTime <= leftEndTime && rightStartTime <= rightEndTime)) {
-    throw new Error(__('Invalid period'));
-  }
-
-  const isOverlapping = leftStartTime < rightEndTime && rightStartTime < leftEndTime;
-
-  if (!isOverlapping) {
-    return { daysOverlap: 0 };
-  }
-
-  const overlapStartDate = Math.max(leftStartTime, rightStartTime);
-  const overlapEndDate = rightEndTime > leftEndTime ? leftEndTime : rightEndTime;
-  const differenceInMs = overlapEndDate - overlapStartDate;
-
-  return {
-    hoursOverlap: Math.ceil(differenceInMs / MILLISECONDS_IN_HOUR),
-    daysOverlap: Math.ceil(differenceInMs / MILLISECONDS_IN_DAY),
-    overlapStartDate,
-    overlapEndDate,
-  };
-};
-
-/**
  * A utility function that checks that the date is today
  *
  * @param {Date} date
@@ -990,6 +976,78 @@ export const isToday = (date) => {
     date.getMonth() === today.getMonth() &&
     date.getFullYear() === today.getFullYear()
   );
+};
+
+/**
+ * Checks whether the date is in the past.
+ *
+ * @param {Date} date
+ * @return {Boolean} Returns true if the date falls before today, otherwise false.
+ */
+export const isInPast = (date) => !isToday(date) && differenceInMilliseconds(date, Date.now()) > 0;
+
+/**
+ * Checks whether the date is in the future.
+ * .
+ * @param {Date} date
+ * @return {Boolean} Returns true if the date falls after today, otherwise false.
+ */
+export const isInFuture = (date) =>
+  !isToday(date) && differenceInMilliseconds(Date.now(), date) > 0;
+
+/**
+ * Checks whether dateA falls before dateB.
+ *
+ * @param {Date} dateA
+ * @param {Date} dateB
+ * @return {Boolean} Returns true if dateA falls before dateB, otherwise false
+ */
+export const fallsBefore = (dateA, dateB) => differenceInMilliseconds(dateA, dateB) > 0;
+
+/**
+ * Removes the time component of the date.
+ *
+ * @param {Date} date
+ * @return {Date} Returns a clone of the date with the time set to midnight
+ */
+export const removeTime = (date) => {
+  const clone = newDate(date);
+  clone.setHours(0, 0, 0, 0);
+  return clone;
+};
+
+/**
+ * Calculates the time remaining from today in words in the format
+ * `n days/weeks/months/years remaining`.
+ *
+ * @param {Date} date A date in future
+ * @return {String} The time remaining in the format `n days/weeks/months/years remaining`
+ */
+export const getTimeRemainingInWords = (date) => {
+  const today = removeTime(new Date());
+  const dateInFuture = removeTime(date);
+
+  const oneWeekFromNow = nWeeksAfter(today, 1);
+  const oneMonthFromNow = nMonthsAfter(today, 1);
+  const oneYearFromNow = nYearsAfter(today, 1);
+
+  if (fallsBefore(dateInFuture, oneWeekFromNow)) {
+    const days = getDayDifference(today, dateInFuture);
+    return n__('1 day remaining', '%d days remaining', days);
+  }
+
+  if (fallsBefore(dateInFuture, oneMonthFromNow)) {
+    const weeks = Math.floor(getDayDifference(today, dateInFuture) / 7);
+    return n__('1 week remaining', '%d weeks remaining', weeks);
+  }
+
+  if (fallsBefore(dateInFuture, oneYearFromNow)) {
+    const months = differenceInMonths(today, dateInFuture);
+    return n__('1 month remaining', '%d months remaining', months);
+  }
+
+  const years = dateInFuture.getFullYear() - today.getFullYear();
+  return n__('1 year remaining', '%d years remaining', years);
 };
 
 /**
@@ -1009,4 +1067,26 @@ export const getStartOfDay = (date, { utc = false } = {}) => {
   const cloneValue = utc ? clone.setUTCHours(0, 0, 0, 0) : clone.setHours(0, 0, 0, 0);
 
   return new Date(cloneValue);
+};
+
+/**
+ * Returns the start of the current week against the provide date
+ *
+ * @param {Date} date The current date instance to calculate against
+ * @param {Object} [options={}] Additional options for this calculation
+ * @param {boolean} [options.utc=false] Performs the calculation using UTC time.
+ * If `true`, the time returned will be midnight UTC. If `false` (the default)
+ * the time returned will be midnight in the user's local time.
+ *
+ * @returns {Date} A new `Date` object that represents the start of the current week
+ * of the provided date
+ */
+export const getStartOfWeek = (date, { utc = false } = {}) => {
+  const cloneValue = utc
+    ? new Date(date.setUTCHours(0, 0, 0, 0))
+    : new Date(date.setHours(0, 0, 0, 0));
+
+  const diff = cloneValue.getDate() - cloneValue.getDay() + (cloneValue.getDay() === 0 ? -6 : 1);
+
+  return new Date(date.setDate(diff));
 };

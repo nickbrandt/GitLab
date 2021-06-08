@@ -21,6 +21,8 @@ RSpec.describe Project do
 
     it { is_expected.to delegate_method(:pipeline_configuration_full_path).to(:compliance_management_framework) }
 
+    it { is_expected.to delegate_method(:prevent_merge_without_jira_issue).to(:project_setting) }
+
     it { is_expected.to belong_to(:deleting_user) }
 
     it { is_expected.to have_one(:import_state).class_name('ProjectImportState') }
@@ -58,6 +60,7 @@ RSpec.describe Project do
 
     it { is_expected.to have_many(:incident_management_oncall_schedules).class_name('IncidentManagement::OncallSchedule') }
     it { is_expected.to have_many(:incident_management_oncall_rotations).through(:incident_management_oncall_schedules).source(:rotations) }
+    it { is_expected.to have_many(:incident_management_escalation_policies).class_name('IncidentManagement::EscalationPolicy') }
 
     describe '#jira_vulnerabilities_integration_enabled?' do
       context 'when project lacks a jira_service relation' do
@@ -123,8 +126,49 @@ RSpec.describe Project do
       end
     end
 
+    context 'import_state dependant predicate method' do
+      shared_examples 'returns expected values' do
+        context 'when project lacks a import_state relation' do
+          it 'returns false' do
+            expect(project.send("mirror_#{method}")).to be_falsey
+          end
+        end
+
+        context 'when project has a import_state relation' do
+          before do
+            create(:import_state, project: project)
+          end
+
+          it 'accesses the value from the import_state' do
+            expect(project.import_state).to receive(method)
+
+            project.send("mirror_#{method}")
+          end
+        end
+      end
+
+      describe '#mirror_last_update_succeeded?' do
+        it_behaves_like 'returns expected values' do
+          let(:method) { "last_update_succeeded?" }
+        end
+      end
+
+      describe '#mirror_last_update_failed?' do
+        it_behaves_like 'returns expected values' do
+          let(:method) { "last_update_failed?" }
+        end
+      end
+
+      describe '#mirror_ever_updated_successfully?' do
+        it_behaves_like 'returns expected values' do
+          let(:method) { "ever_updated_successfully?" }
+        end
+      end
+    end
+
     describe 'approval_rules association' do
       let_it_be(:rule, reload: true) { create(:approval_project_rule) }
+
       let(:project) { rule.project }
       let(:branch) { 'stable' }
 
@@ -357,6 +401,7 @@ RSpec.describe Project do
       let_it_be(:project_1) { create(:project_statistics, lfs_objects_size: 10, repository_size: 10).project }
       let_it_be(:project_2) { create(:project_statistics, lfs_objects_size: 5, repository_size: 55).project }
       let_it_be(:project_3) { create(:project, repository_size_limit: 30, statistics: create(:project_statistics, lfs_objects_size: 8, repository_size: 32)) }
+
       let(:limit) { 20 }
 
       subject { described_class.order_by_total_repository_size_excess_desc(limit) }
@@ -675,10 +720,46 @@ RSpec.describe Project do
       end
     end
 
+    shared_examples 'a predicate wrapper method' do
+      where(:wrapped_method_return, :subject_return) do
+        true  | true
+        false | false
+        nil   | false
+      end
+
+      with_them do
+        it 'returns the expected boolean value' do
+          expect(project)
+            .to receive(wrapped_method)
+            .and_return(wrapped_method_return)
+
+          expect(project.send("#{wrapped_method}?")).to be(subject_return)
+        end
+      end
+    end
+
+    describe '#disable_overriding_approvers_per_merge_request?' do
+      it_behaves_like 'a predicate wrapper method' do
+        let(:wrapped_method) { :disable_overriding_approvers_per_merge_request }
+      end
+    end
+
     describe '#merge_requests_disable_committers_approval' do
       it_behaves_like 'setting modified by application setting' do
         let(:setting) { :merge_requests_disable_committers_approval }
         let(:application_setting) { :prevent_merge_requests_committers_approval }
+      end
+    end
+
+    describe '#merge_requests_disable_committers_approval?' do
+      it_behaves_like 'a predicate wrapper method' do
+        let(:wrapped_method) { :merge_requests_disable_committers_approval }
+      end
+    end
+
+    describe '#require_password_to_approve?' do
+      it_behaves_like 'a predicate wrapper method' do
+        let(:wrapped_method) { :require_password_to_approve }
       end
     end
 
@@ -711,6 +792,12 @@ RSpec.describe Project do
           expect(project.send(setting)).to eq(final_setting)
           expect(project.send("#{setting}?")).to eq(final_setting)
         end
+      end
+    end
+
+    describe '#merge_requests_author_approval?' do
+      it_behaves_like 'a predicate wrapper method' do
+        let(:wrapped_method) { :merge_requests_author_approval }
       end
     end
   end
@@ -790,6 +877,16 @@ RSpec.describe Project do
     end
   end
 
+  describe '#execute_external_compliance_hooks' do
+    let_it_be(:rule) { create(:external_approval_rule) }
+
+    it 'enqueues the correct number of workers' do
+      allow(rule).to receive(:async_execute).once
+
+      rule.project.execute_external_compliance_hooks({})
+    end
+  end
+
   describe "#execute_hooks" do
     context "group hooks" do
       let(:group) { create(:group) }
@@ -805,7 +902,7 @@ RSpec.describe Project do
         project.execute_hooks(some: 'info')
       end
 
-      context 'when group_webhooks frature is enabled' do
+      context 'when group_webhooks feature is enabled' do
         before do
           stub_licensed_features(group_webhooks: true)
         end
@@ -882,14 +979,6 @@ RSpec.describe Project do
 
                 it 'returns true' do
                   is_expected.to eq(true)
-                end
-
-                context 'when feature is disabled by a feature flag' do
-                  it 'returns false' do
-                    stub_feature_flags(feature => false)
-
-                    is_expected.to eq(false)
-                  end
                 end
               end
 
@@ -998,37 +1087,21 @@ RSpec.describe Project do
     end
   end
 
-  describe '#any_runners_limit' do
-    let(:project) { create(:project, shared_runners_enabled: shared_runners_enabled) }
-    let(:specific_runner) { create(:ci_runner, :project) }
-    let(:shared_runner) { create(:ci_runner, :instance) }
+  describe '#any_online_runners?' do
+    let!(:shared_runner) { create(:ci_runner, :instance, :online) }
 
-    context 'for shared runners enabled' do
-      let(:shared_runners_enabled) { true }
+    it { expect(project.any_online_runners?).to be_truthy }
 
-      before do
-        shared_runner
+    context 'with used pipeline minutes' do
+      let(:namespace) { create(:namespace, :with_used_build_minutes_limit) }
+      let(:project) do
+        create(:project,
+               namespace: namespace,
+               shared_runners_enabled: true)
       end
 
-      it 'has a shared runner' do
-        expect(project.any_active_runners?).to be_truthy
-      end
-
-      it 'checks the presence of shared runner' do
-        expect(project.any_active_runners? { |runner| runner == shared_runner }).to be_truthy
-      end
-
-      context 'with used pipeline minutes' do
-        let(:namespace) { create(:namespace, :with_used_build_minutes_limit) }
-        let(:project) do
-          create(:project,
-            namespace: namespace,
-            shared_runners_enabled: shared_runners_enabled)
-        end
-
-        it 'does not have a shared runner' do
-          expect(project.any_active_runners?).to be_falsey
-        end
+      it 'does not have any online runners' do
+        expect(project.any_online_runners?).to be_falsey
       end
     end
   end
@@ -1089,6 +1162,7 @@ RSpec.describe Project do
   describe '#shared_runners_limit_namespace' do
     let_it_be(:root_ancestor) { create(:group) }
     let_it_be(:group) { create(:group, parent: root_ancestor) }
+
     let(:project) { create(:project, namespace: group) }
 
     subject { project.shared_runners_limit_namespace }
@@ -1251,6 +1325,7 @@ RSpec.describe Project do
 
   describe '#visible_user_defined_inapplicable_rules' do
     let_it_be(:project) { create(:project) }
+
     let!(:rule) { create(:approval_project_rule, project: project) }
     let!(:another_rule) { create(:approval_project_rule, project: project) }
 
@@ -1612,16 +1687,16 @@ RSpec.describe Project do
   end
 
   describe '#latest_pipeline_with_security_reports' do
-    let(:only_successful) { false }
-
-    let_it_be(:project) { create(:project) }
+    let_it_be(:project, refind: true) { create(:project) }
     let_it_be(:pipeline_1) { create(:ci_pipeline, :success, project: project) }
     let_it_be(:pipeline_2) { create(:ci_pipeline, project: project) }
     let_it_be(:pipeline_3) { create(:ci_pipeline, :success, project: project) }
 
     subject { project.latest_pipeline_with_security_reports(only_successful: only_successful) }
 
-    context 'when all pipelines are used' do
+    shared_examples_for 'on-the-fly latest_pipeline_with_security_reports calculation' do |expected:|
+      let(:expected_pipeline) { public_send(expected) }
+
       context 'when legacy reports are used' do
         before do
           create(:ee_ci_build, :legacy_sast, pipeline: pipeline_1)
@@ -1629,7 +1704,7 @@ RSpec.describe Project do
         end
 
         it 'returns the latest pipeline with security reports' do
-          is_expected.to eq(pipeline_2)
+          is_expected.to eq(expected_pipeline)
         end
       end
 
@@ -1640,7 +1715,7 @@ RSpec.describe Project do
         end
 
         it 'returns the latest pipeline with security reports' do
-          is_expected.to eq(pipeline_2)
+          is_expected.to eq(expected_pipeline)
         end
 
         context 'when legacy used' do
@@ -1649,8 +1724,34 @@ RSpec.describe Project do
           end
 
           it 'prefers the new reports' do
-            is_expected.to eq(pipeline_2)
+            is_expected.to eq(expected_pipeline)
           end
+        end
+      end
+    end
+
+    context 'when all pipelines are used' do
+      let(:only_successful) { false }
+
+      context 'when there is no associated `vulnerability_statistic` record with the project' do
+        it_behaves_like 'on-the-fly latest_pipeline_with_security_reports calculation', expected: :pipeline_2
+      end
+
+      context 'when there is an associated `vulnerability_statistic` record with the project' do
+        context 'when the pipeline of `vulnerability_statistic` has not been set' do
+          it_behaves_like 'on-the-fly latest_pipeline_with_security_reports calculation', expected: :pipeline_2 do
+            before do
+              create(:vulnerability_statistic, project: project, pipeline: nil)
+            end
+          end
+        end
+
+        context 'when the pipeline of `vulnerability_statistic` has been set' do
+          before do
+            create(:vulnerability_statistic, project: project, pipeline: pipeline_1)
+          end
+
+          it { is_expected.to eq(pipeline_1) }
         end
       end
     end
@@ -1658,37 +1759,11 @@ RSpec.describe Project do
     context 'when only successful pipelines are used' do
       let(:only_successful) { true }
 
-      context 'when legacy reports are used' do
-        before do
-          create(:ee_ci_build, :legacy_sast, pipeline: pipeline_1)
-          create(:ee_ci_build, :legacy_sast, pipeline: pipeline_2)
-        end
-
-        it "returns the latest succesful pipeline with security reports" do
-          is_expected.to eq(pipeline_1)
-        end
+      before do
+        create(:vulnerability_statistic, project: project, pipeline: pipeline_2)
       end
 
-      context 'when new reports are used' do
-        before do
-          create(:ee_ci_build, :sast, pipeline: pipeline_1)
-          create(:ee_ci_build, :sast, pipeline: pipeline_2)
-        end
-
-        it 'returns the latest successful pipeline with security reports' do
-          is_expected.to eq(pipeline_1)
-        end
-
-        context 'when legacy used' do
-          before do
-            create(:ee_ci_build, :legacy_sast, pipeline: pipeline_3)
-          end
-
-          it 'prefers the new reports' do
-            is_expected.to eq(pipeline_1)
-          end
-        end
-      end
+      it_behaves_like 'on-the-fly latest_pipeline_with_security_reports calculation', expected: :pipeline_1
     end
   end
 
@@ -1746,100 +1821,12 @@ RSpec.describe Project do
     end
   end
 
-  describe '#protected_environment_by_name' do
-    let_it_be(:project) { create(:project) }
-
-    subject { project.protected_environment_by_name('production') }
-
-    before do
-      allow(project).to receive(:feature_available?)
-        .with(:protected_environments).and_return(feature_available)
-    end
-
-    context 'when Protected Environments feature is not available on the project' do
-      let(:feature_available) { false }
-
-      it { is_expected.to be_nil }
-    end
-
-    context 'when Protected Environments feature is available on the project' do
-      let(:feature_available) { true }
-
-      context 'when the project environment does not exists' do
-        it { is_expected.to be_nil }
-      end
-
-      context 'when the project environment exists' do
-        let_it_be(:environment) { create(:environment, name: 'production') }
-        let_it_be(:protected_environment) { create(:protected_environment, name: environment.name, project: project) }
-
-        it { is_expected.to eq(protected_environment) }
-
-        it 'caches environment name', :request_store do
-          control_count = ActiveRecord::QueryRecorder.new { project.protected_environment_by_name(protected_environment.name) }
-
-          expect do
-            2.times { project.protected_environment_by_name(protected_environment.name) }
-          end.not_to exceed_query_limit(control_count)
-
-          expect(project.protected_environment_by_name('non-existent-env')).to be_nil
-          expect(project.protected_environment_by_name(protected_environment.name)).to eq(protected_environment)
-        end
-      end
-    end
-  end
-
-  describe '#protected_environment_accessible_to?' do
-    let(:project) { create(:project) }
-    let(:user) { create(:user) }
-    let(:environment) { create(:environment, project: project) }
-    let(:protected_environment) { create(:protected_environment, project: project, name: environment.name) }
-
-    subject { project.protected_environment_accessible_to?(environment.name, user) }
-
-    before do
-      allow(project).to receive(:feature_available?)
-        .with(:protected_environments).and_return(feature_available)
-    end
-
-    context 'when Protected Environments feature is not available on the project' do
-      let(:feature_available) { false }
-
-      it { is_expected.to be_truthy }
-    end
-
-    context 'when Protected Environments feature is available on the project' do
-      let(:feature_available) { true }
-
-      context 'when project does not have protected environments' do
-        it { is_expected.to be_truthy }
-      end
-
-      context 'when project has protected environments' do
-        context 'when user has the right access' do
-          before do
-            protected_environment.deploy_access_levels.create(user_id: user.id)
-          end
-
-          it { is_expected.to be_truthy }
-        end
-
-        context 'when user does not have the right access' do
-          before do
-            protected_environment.deploy_access_levels.create
-          end
-
-          it { is_expected.to be_falsy }
-        end
-      end
-    end
-  end
-
   describe '#after_import' do
     let_it_be(:project) { create(:project) }
 
     context 'Geo repository update events' do
       let_it_be(:import_state) { create(:import_state, :started, project: project) }
+
       let(:repository_updated_service) { instance_double('::Geo::RepositoryUpdatedService') }
       let(:wiki_updated_service) { instance_double('::Geo::RepositoryUpdatedService') }
       let(:design_updated_service) { instance_double('::Geo::RepositoryUpdatedService') }
@@ -1901,7 +1888,7 @@ RSpec.describe Project do
         end
 
         it 'schedules a full index of the wiki repository' do
-          expect(ElasticCommitIndexerWorker).to receive(:perform_async).with(project.id, nil, nil, true)
+          expect(ElasticCommitIndexerWorker).to receive(:perform_async).with(project.id, true)
 
           project.after_import
         end
@@ -2053,11 +2040,13 @@ RSpec.describe Project do
 
   describe '#update_root_ref' do
     let(:project) { create(:project, :repository) }
+    let(:url) { 'http://git.example.com/remote-repo.git' }
+    let(:auth) { 'Basic secret' }
 
     it 'updates the default branch when HEAD has changed' do
       stub_find_remote_root_ref(project, ref: 'feature')
 
-      expect { project.update_root_ref('origin') }
+      expect { project.update_root_ref('origin', url, auth) }
         .to change { project.default_branch }
         .from('master')
         .to('feature')
@@ -2068,7 +2057,7 @@ RSpec.describe Project do
 
       expect(project).to receive(:change_head).with('master').and_call_original
 
-      project.update_root_ref('origin')
+      project.update_root_ref('origin', url, auth)
 
       # For good measure, expunge the root ref cache and reload.
       project.repository.expire_all_method_caches
@@ -2078,14 +2067,22 @@ RSpec.describe Project do
     it 'does not update the default branch when HEAD does not exist' do
       stub_find_remote_root_ref(project, ref: 'foo')
 
-      expect { project.update_root_ref('origin') }
+      expect { project.update_root_ref('origin', url, auth) }
         .not_to change { project.default_branch }
+    end
+
+    it 'does not raise error when repository does not exist' do
+      allow(project.repository).to receive(:find_remote_root_ref)
+        .with('origin', url, auth)
+        .and_raise(Gitlab::Git::Repository::NoRepository)
+
+      expect { project.update_root_ref('origin', url, auth) }.not_to raise_error
     end
 
     def stub_find_remote_root_ref(project, ref:)
       allow(project.repository)
         .to receive(:find_remote_root_ref)
-        .with('origin')
+        .with('origin', url, auth)
         .and_return(ref)
     end
   end
@@ -2623,7 +2620,7 @@ RSpec.describe Project do
       before do
         stub_licensed_features(adjourned_deletion_for_projects_and_groups: licensed?)
         stub_application_setting(deletion_adjourned_period: adjourned_period)
-        allow(group).to receive(:delayed_project_removal?).and_return(feature_enabled_on_group?)
+        allow(group.namespace_settings).to receive(:delayed_project_removal?).and_return(feature_enabled_on_group?)
       end
 
       it { is_expected.to be result }
@@ -2720,14 +2717,6 @@ RSpec.describe Project do
     end
   end
 
-  describe '#mark_primary_write_location' do
-    it 'marks the location with project ID' do
-      expect(Gitlab::Database::LoadBalancing::Sticking).to receive(:mark_primary_write_location).with(:project, project.id)
-
-      project.mark_primary_write_location
-    end
-  end
-
   describe '#add_template_export_job' do
     it 'starts project template export job' do
       user = create(:user)
@@ -2739,6 +2728,28 @@ RSpec.describe Project do
     end
   end
 
+  describe '#prevent_merge_without_jira_issue?' do
+    using RSpec::Parameterized::TableSyntax
+
+    subject { project.prevent_merge_without_jira_issue? }
+
+    where(:feature_available, :prevent_merge, :result) do
+      true  | true  | true
+      true  | false | false
+      false | true  | false
+      false | false | false
+    end
+
+    with_them do
+      before do
+        allow(project).to receive(:jira_issue_association_required_to_merge_enabled?).and_return(feature_available)
+        project.create_project_setting(prevent_merge_without_jira_issue: prevent_merge)
+      end
+
+      it { is_expected.to be result }
+    end
+  end
+
   context 'indexing updates in Elasticsearch', :elastic do
     before do
       stub_ee_application_setting(elasticsearch_indexing: true)
@@ -2747,10 +2758,11 @@ RSpec.describe Project do
     context 'on update' do
       let(:project) { create(:project, :public) }
       let!(:issue) { create(:issue, project: project) }
+      let!(:merge_request) { create(:merge_request, source_project: project, target_project: project) }
 
       context 'when updating the visibility_level' do
-        it 'triggers ElasticAssociationIndexerWorker to update issues and notes' do
-          expect(ElasticAssociationIndexerWorker).to receive(:perform_async).with('Project', project.id, %w[issues notes])
+        it 'triggers ElasticAssociationIndexerWorker to update issues, merge_requests and notes' do
+          expect(ElasticAssociationIndexerWorker).to receive(:perform_async).with('Project', project.id, %w[issues merge_requests notes])
 
           project.update!(visibility_level: Gitlab::VisibilityLevel::PRIVATE)
         end
@@ -2766,6 +2778,18 @@ RSpec.describe Project do
           results = Issue.elastic_search('*', options: { public_and_internal_projects: true })
           expect(results.count).to eq(0)
         end
+
+        it 'ensures all visibility_level updates are correctly applied in merge_request searches', :sidekiq_inline do
+          ensure_elasticsearch_index!
+          results = MergeRequest.elastic_search('*', options: { public_and_internal_projects: true })
+          expect(results.count).to eq(1)
+
+          project.update!(visibility_level: Gitlab::VisibilityLevel::INTERNAL)
+          ensure_elasticsearch_index!
+
+          results = MergeRequest.elastic_search('*', options: { public_and_internal_projects: true })
+          expect(results.count).to eq(0)
+        end
       end
 
       context 'when changing the title' do
@@ -2774,6 +2798,94 @@ RSpec.describe Project do
 
           project.update!(title: 'The new title')
         end
+      end
+    end
+  end
+
+  describe '#available_shared_runners' do
+    let_it_be(:runner) { create(:ci_runner, :instance) }
+
+    let(:project) { build_stubbed(:project, shared_runners_enabled: true) }
+
+    subject { project.available_shared_runners }
+
+    before do
+      allow(project).to receive(:ci_minutes_quota)
+        .and_return(double('quota', minutes_used_up?: minutes_used_up))
+    end
+
+    context 'when CI minutes are available for project' do
+      let(:minutes_used_up) { false }
+
+      it 'returns a list of shared runners' do
+        is_expected.to eq([runner])
+      end
+    end
+
+    context 'when out of CI minutes for project' do
+      let(:minutes_used_up) { true }
+
+      it 'returns a empty list' do
+        is_expected.to be_empty
+      end
+    end
+  end
+
+  describe '#all_available_runners' do
+    let_it_be_with_refind(:project) do
+      create(:project, group: create(:group), shared_runners_enabled: true)
+    end
+
+    let_it_be(:instance_runner) { create(:ci_runner, :instance) }
+    let_it_be(:group_runner) { create(:ci_runner, :group, groups: [project.group]) }
+    let_it_be(:project_runner) { create(:ci_runner, :project, projects: [project]) }
+
+    subject { project.all_available_runners }
+
+    before do
+      allow(project).to receive(:ci_minutes_quota)
+        .and_return(double('quota', minutes_used_up?: minutes_used_up))
+    end
+
+    context 'when CI minutes are available for project' do
+      let(:minutes_used_up) { false }
+
+      it 'returns a list with all runners' do
+        is_expected.to match_array([instance_runner, group_runner, project_runner])
+      end
+    end
+
+    context 'when out of CI minutes for project' do
+      let(:minutes_used_up) { true }
+
+      it 'returns a list with specific runners' do
+        is_expected.to match_array([group_runner, project_runner])
+      end
+    end
+  end
+
+  describe '#shared_runners_enabled_but_unavailable?' do
+    using RSpec::Parameterized::TableSyntax
+
+    let(:project) do
+      build_stubbed(:project, shared_runners_enabled: shared_runners_enabled)
+    end
+
+    before do
+      allow(project).to receive(:ci_minutes_quota)
+        .and_return(double('quota', minutes_used_up?: minutes_used_up))
+    end
+
+    where(:shared_runners_enabled, :minutes_used_up, :result) do
+      true  | true  | true
+      true  | false | false
+      false | false | false
+      false | true  | false
+    end
+
+    with_them do
+      it 'returns the correct value' do
+        expect(project.shared_runners_enabled_but_unavailable?).to eq(result)
       end
     end
   end

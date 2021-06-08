@@ -12,7 +12,7 @@ module Gitlab
 
         author_url = build_author_url(build.commit, commit)
 
-        data = {
+        {
           object_kind: 'build',
 
           ref: build.ref,
@@ -26,9 +26,11 @@ module Gitlab
           build_name: build.name,
           build_stage: build.stage,
           build_status: build.status,
+          build_created_at: build.created_at,
           build_started_at: build.started_at,
           build_finished_at: build.finished_at,
           build_duration: build.duration,
+          build_queued_duration: build.queued_duration,
           build_allow_failure: build.allow_failure,
           build_failure_reason: build.failure_reason,
           pipeline_id: commit.id,
@@ -66,8 +68,6 @@ module Gitlab
 
           environment: build_environment(build)
         }
-
-        data
       end
 
       private
@@ -83,6 +83,7 @@ module Gitlab
         {
           id: runner.id,
           description: runner.description,
+          runner_type: runner.runner_type,
           active: runner.active?,
           is_shared: runner.instance_type?,
           tags: runner.tags&.map(&:name)

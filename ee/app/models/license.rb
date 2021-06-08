@@ -4,10 +4,12 @@ class License < ApplicationRecord
   include ActionView::Helpers::NumberHelper
   include Gitlab::Utils::StrongMemoize
 
-  STARTER_PLAN = 'starter'.freeze
-  PREMIUM_PLAN = 'premium'.freeze
-  ULTIMATE_PLAN = 'ultimate'.freeze
-  ALLOWED_PERCENTAGE_OF_USERS_OVERAGE = (10 / 100.0).freeze
+  STARTER_PLAN = 'starter'
+  PREMIUM_PLAN = 'premium'
+  ULTIMATE_PLAN = 'ultimate'
+  CLOUD_LICENSE_TYPE = 'cloud'
+  LEGACY_LICENSE_TYPE = 'legacy'
+  ALLOWED_PERCENTAGE_OF_USERS_OVERAGE = (10 / 100.0)
 
   EE_ALL_PLANS = [STARTER_PLAN, PREMIUM_PLAN, ULTIMATE_PLAN].freeze
 
@@ -24,7 +26,6 @@ class License < ApplicationRecord
     group_activity_analytics
     group_bulk_edit
     group_webhooks
-    instance_level_devops_adoption
     issuable_default_templates
     issue_weights
     iterations
@@ -95,6 +96,7 @@ class License < ApplicationRecord
     group_repository_analytics
     group_saml
     group_saml_group_sync
+    group_scoped_ci_variables
     group_wikis
     incident_sla
     incident_metric_upload
@@ -110,6 +112,7 @@ class License < ApplicationRecord
     multiple_alert_http_integrations
     multiple_approval_rules
     multiple_group_issue_boards
+    multiple_iteration_cadences
     object_storage
     operations_dashboard
     package_forwarding
@@ -122,13 +125,13 @@ class License < ApplicationRecord
     scoped_labels
     smartcard_auth
     swimlanes
-    group_timelogs
     type_of_work_analytics
     minimal_access_role
     unprotection_restrictions
     ci_project_subscriptions
     incident_timeline_view
     oncall_schedules
+    escalation_policies
     export_user_permissions
   ]
   EEP_FEATURES.freeze
@@ -152,8 +155,11 @@ class License < ApplicationRecord
     evaluate_group_level_compliance_pipeline
     group_ci_cd_analytics
     group_level_compliance_dashboard
+    group_level_devops_adoption
     incident_management
+    inline_codequality
     insights
+    instance_level_devops_adoption
     issuable_health_status
     jira_vulnerabilities_integration
     jira_issue_association_enforcement
@@ -175,7 +181,7 @@ class License < ApplicationRecord
     subepics
     threat_monitoring
     vulnerability_auto_fix
-    evaluate_group_level_compliance_pipeline
+    vulnerability_finding_signatures
   ]
   EEU_FEATURES.freeze
 
@@ -233,6 +239,8 @@ class License < ApplicationRecord
     { range: (100..999), percentage: true, value: 8 },
     { range: (1000..nil), percentage: true, value: 5 }
   ].freeze
+
+  LICENSEE_ATTRIBUTES = %w[Name Email Company].freeze
 
   validate :valid_license
   validate :check_users_limit, if: :new_record?, unless: :validate_with_trueup?
@@ -354,7 +362,7 @@ class License < ApplicationRecord
   end
 
   def data_filename
-    company_name = self.licensee["Company"] || self.licensee.each_value.first
+    company_name = self.licensee_company || self.licensee.each_value.first
     clean_company_name = company_name.gsub(/[^A-Za-z0-9]/, "")
     "#{clean_company_name}.gitlab-license"
   end
@@ -425,9 +433,6 @@ class License < ApplicationRecord
 
   def feature_available?(feature)
     return false if trial? && expired?
-
-    # This feature might not be behind a feature flag at all, so default to true
-    return false unless ::Feature.enabled?(feature, type: :licensed, default_enabled: true)
 
     features.include?(feature)
   end
@@ -546,6 +551,18 @@ class License < ApplicationRecord
     starts_at > Date.current
   end
 
+  def cloud_license?
+    !!license&.cloud_licensing?
+  end
+
+  def usage_ping?
+    !!license&.usage_ping_required_metrics?
+  end
+
+  def license_type
+    cloud_license? ? CLOUD_LICENSE_TYPE : LEGACY_LICENSE_TYPE
+  end
+
   def auto_renew
     false
   end
@@ -570,6 +587,16 @@ class License < ApplicationRecord
 
   def remaining_user_count
     restricted_user_count - daily_billable_users_count
+  end
+
+  LICENSEE_ATTRIBUTES.each do |attribute|
+    define_method "licensee_#{attribute.downcase}" do
+      licensee[attribute]
+    end
+  end
+
+  def activated_at
+    super || created_at
   end
 
   private
@@ -616,6 +643,7 @@ class License < ApplicationRecord
   end
 
   def check_users_limit
+    return if cloud_license?
     return unless restricted_user_count
 
     if previous_user_count && (prior_historical_max <= previous_user_count)
@@ -647,7 +675,7 @@ class License < ApplicationRecord
     else
       message = ["You have applied a True-up for #{trueup_qty} #{"user".pluralize(trueup_qty)}"]
       message << "but you need one for #{expected_trueup_qty} #{"user".pluralize(expected_trueup_qty)}."
-      message << "Please contact sales at renewals@gitlab.com"
+      message << "Please contact sales at https://about.gitlab.com/sales/"
 
       self.errors.add(:base, message.join(' '))
     end
@@ -661,7 +689,7 @@ class License < ApplicationRecord
     message << "exceeding this license's limit of #{number_with_delimiter(restricted_user_count)} by"
     message << "#{number_with_delimiter(overage_count)} #{"user".pluralize(overage_count)}."
     message << "Please upload a license for at least"
-    message << "#{number_with_delimiter(user_count)} #{"user".pluralize(user_count)} or contact sales at renewals@gitlab.com"
+    message << "#{number_with_delimiter(user_count)} #{"user".pluralize(user_count)} or contact sales at https://about.gitlab.com/sales/"
 
     self.errors.add(:base, message.join(' '))
   end

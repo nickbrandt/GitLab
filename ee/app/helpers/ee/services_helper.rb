@@ -6,14 +6,14 @@ module EE
 
     override :project_jira_issues_integration?
     def project_jira_issues_integration?
-      @project.jira_issues_integration_available? && @project.jira_service.issues_enabled
+      @project.jira_issues_integration_available? && @project.jira_service&.issues_enabled
     end
 
     override :integration_form_data
     def integration_form_data(integration, group: nil)
       form_data = super
 
-      if integration.is_a?(JiraService)
+      if integration.is_a?(Integrations::Jira)
         form_data.merge!(
           show_jira_issues_integration: @project&.jira_issues_integration_available?.to_s,
           show_jira_vulnerabilities_integration: integration.jira_vulnerabilities_integration_available?.to_s,
@@ -36,7 +36,7 @@ module EE
 
     def add_to_slack_data(projects)
       {
-        projects: projects,
+        projects: projects.as_json(only: [:id, :name]),
         sign_in_path: new_session_path(:user, redirect_to_referer: 'yes'),
         is_signed_in: current_user.present?,
         slack_link_profile_slack_path: slack_link_profile_slack_path,

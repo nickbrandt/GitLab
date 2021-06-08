@@ -56,11 +56,15 @@ module EE
               description: 'Find iterations.',
               resolver: ::Resolvers::IterationsResolver
 
+        field :iteration_cadences, ::Types::Iterations::CadenceType.connection_type, null: true,
+              description: 'Find iteration cadences.',
+              resolver: ::Resolvers::Iterations::CadencesResolver
+
         field :dast_profiles,
               ::Types::Dast::ProfileType.connection_type,
               null: true,
-              description: 'DAST Profiles associated with the project. Always returns no nodes ' \
-                           'if `dast_saved_scans` is disabled.'
+              resolver: ::Resolvers::AppSec::Dast::ProfileResolver,
+              description: 'DAST Profiles associated with the project.'
 
         field :dast_site_profile,
               ::Types::DastSiteProfileType,
@@ -125,30 +129,57 @@ module EE
               ::Types::IncidentManagement::OncallScheduleType.connection_type,
               null: true,
               description: 'Incident Management On-call schedules of the project.',
+              extras: [:lookahead],
               resolver: ::Resolvers::IncidentManagement::OncallScheduleResolver
 
-        field :api_fuzzing_ci_configuration,
-              ::Types::CiConfiguration::ApiFuzzingType,
+        field :incident_management_escalation_policies,
+              ::Types::IncidentManagement::EscalationPolicyType.connection_type,
               null: true,
-              description: 'API fuzzing configuration for the project.',
-              feature_flag: :api_fuzzing_configuration_ui
+              description: 'Incident Management escalation policies of the project.',
+              extras: [:lookahead],
+              resolver: ::Resolvers::IncidentManagement::EscalationPoliciesResolver
+
+        field :incident_management_escalation_policy,
+              ::Types::IncidentManagement::EscalationPolicyType,
+              null: true,
+              description: 'Incident Management escalation policy of the project.',
+              resolver: ::Resolvers::IncidentManagement::EscalationPoliciesResolver.single
+
+        field :api_fuzzing_ci_configuration,
+              ::Types::AppSec::Fuzzing::Api::CiConfigurationType,
+              null: true,
+              description: 'API fuzzing configuration for the project. '
+
+        field :push_rules,
+              ::Types::PushRulesType,
+              null: true,
+              description: "The project's push rules settings.",
+              method: :push_rule
+
+        field :path_locks,
+              ::Types::PathLockType.connection_type,
+              null: true,
+              description: "The project's path locks.",
+              extras: [:lookahead],
+              resolver: ::Resolvers::PathLocksResolver
+
+        field :scan_execution_policies,
+              ::Types::ScanExecutionPolicyType.connection_type,
+              calls_gitaly: true,
+              null: true,
+              description: 'Scan Execution Policies of the project',
+              resolver: ::Resolvers::ScanExecutionPolicyResolver
       end
 
       def api_fuzzing_ci_configuration
-        return unless Ability.allowed?(current_user, :read_vulnerability, object)
+        return unless Ability.allowed?(current_user, :read_security_resource, object)
 
-        configuration = ::Security::ApiFuzzing::CiConfiguration.new(project: object)
+        configuration = ::AppSec::Fuzzing::Api::CiConfiguration.new(project: object)
 
         {
-          scan_modes: ::Security::ApiFuzzing::CiConfiguration::SCAN_MODES,
+          scan_modes: ::AppSec::Fuzzing::Api::CiConfiguration::SCAN_MODES,
           scan_profiles: configuration.scan_profiles
         }
-      end
-
-      def dast_profiles
-        return Dast::Profile.none unless ::Feature.enabled?(:dast_saved_scans, object, default_enabled: :yaml)
-
-        Dast::ProfilesFinder.new(project_id: object.id).execute
       end
 
       def dast_scanner_profiles

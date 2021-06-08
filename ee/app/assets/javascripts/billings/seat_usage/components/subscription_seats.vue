@@ -3,9 +3,12 @@ import {
   GlAvatarLabeled,
   GlAvatarLink,
   GlBadge,
+  GlButton,
   GlDropdown,
   GlDropdownItem,
+  GlModal,
   GlModalDirective,
+  GlIcon,
   GlPagination,
   GlSearchBoxByType,
   GlTable,
@@ -17,11 +20,14 @@ import {
   FIELDS,
   AVATAR_SIZE,
   SEARCH_DEBOUNCE_MS,
-  REMOVE_MEMBER_MODAL_ID,
+  REMOVE_BILLABLE_MEMBER_MODAL_ID,
+  CANNOT_REMOVE_BILLABLE_MEMBER_MODAL_ID,
+  CANNOT_REMOVE_BILLABLE_MEMBER_MODAL_TITLE,
+  CANNOT_REMOVE_BILLABLE_MEMBER_MODAL_CONTENT,
 } from 'ee/billings/seat_usage/constants';
 import { s__ } from '~/locale';
-import TimeAgoTooltip from '~/vue_shared/components/time_ago_tooltip.vue';
-import RemoveMemberModal from './remove_member_modal.vue';
+import RemoveBillableMemberModal from './remove_billable_member_modal.vue';
+import SubscriptionSeatDetails from './subscription_seat_details.vue';
 
 export default {
   directives: {
@@ -32,13 +38,16 @@ export default {
     GlAvatarLabeled,
     GlAvatarLink,
     GlBadge,
+    GlButton,
     GlDropdown,
     GlDropdownItem,
+    GlModal,
+    GlIcon,
     GlPagination,
     GlSearchBoxByType,
     GlTable,
-    RemoveMemberModal,
-    TimeAgoTooltip,
+    RemoveBillableMemberModal,
+    SubscriptionSeatDetails,
   },
   data() {
     return {
@@ -53,7 +62,7 @@ export default {
       'total',
       'namespaceName',
       'namespaceId',
-      'memberToRemove',
+      'billableMemberToRemove',
     ]),
     ...mapGetters(['tableItems']),
     currentPage: {
@@ -95,7 +104,11 @@ export default {
     this.fetchBillableMembersList();
   },
   methods: {
-    ...mapActions(['fetchBillableMembersList', 'resetMembers', 'setMemberToRemove']),
+    ...mapActions([
+      'fetchBillableMembersList',
+      'resetBillableMembers',
+      'setBillableMemberToRemove',
+    ]),
     onSearchEnter() {
       this.debouncedSearch.cancel();
       this.executeQuery();
@@ -107,7 +120,14 @@ export default {
       if (queryLength === 0 || queryLength >= MIN_SEARCH_LENGTH) {
         this.debouncedSearch();
       } else if (queryLength < MIN_SEARCH_LENGTH) {
-        this.resetMembers();
+        this.resetBillableMembers();
+      }
+    },
+    displayRemoveMemberModal(user) {
+      if (user.removable) {
+        this.setBillableMemberToRemove(user);
+      } else {
+        this.$refs.cannotRemoveModal.show();
       }
     },
   },
@@ -118,7 +138,10 @@ export default {
   },
   avatarSize: AVATAR_SIZE,
   fields: FIELDS,
-  removeMemberModalId: REMOVE_MEMBER_MODAL_ID,
+  removeBillableMemberModalId: REMOVE_BILLABLE_MEMBER_MODAL_ID,
+  cannotRemoveModalId: CANNOT_REMOVE_BILLABLE_MEMBER_MODAL_ID,
+  cannotRemoveModalTitle: CANNOT_REMOVE_BILLABLE_MEMBER_MODAL_TITLE,
+  cannotRemoveModalText: CANNOT_REMOVE_BILLABLE_MEMBER_MODAL_CONTENT,
 };
 </script>
 
@@ -154,22 +177,41 @@ export default {
       data-testid="table"
       :empty-text="emptyText"
     >
-      <template #cell(user)="data">
+      <template #cell(user)="{ item, toggleDetails, detailsShowing }">
         <div class="gl-display-flex">
-          <gl-avatar-link target="blank" :href="data.value.web_url" :alt="data.value.name">
-            <gl-avatar-labeled
-              :src="data.value.avatar_url"
-              :size="$options.avatarSize"
-              :label="data.value.name"
-              :sub-label="data.value.username"
+          <gl-button
+            variant="link"
+            class="gl-mr-2"
+            :aria-label="s__('Billing|Toggle seat details')"
+            data-testid="toggle-seat-usage-details"
+            @click="toggleDetails"
+          >
+            <gl-icon
+              :name="detailsShowing ? 'angle-down' : 'angle-right'"
+              class="text-secondary-900"
             />
+          </gl-button>
+
+          <gl-avatar-link target="blank" :href="item.user.web_url" :alt="item.user.name">
+            <gl-avatar-labeled
+              :src="item.user.avatar_url"
+              :size="$options.avatarSize"
+              :label="item.user.name"
+              :sub-label="item.user.username"
+            >
+              <template v-if="item.user.membership_type === 'group_invite'" #meta>
+                <gl-badge size="sm" variant="muted">
+                  {{ s__('Billing|Group invite') }}
+                </gl-badge>
+              </template>
+            </gl-avatar-labeled>
           </gl-avatar-link>
         </div>
       </template>
 
-      <template #cell(email)="data">
+      <template #cell(email)="{ item }">
         <div data-testid="email">
-          <span v-if="data.value" class="gl-text-gray-900">{{ data.value }}</span>
+          <span v-if="item.email" class="gl-text-gray-900">{{ item.email }}</span>
           <span
             v-else
             v-gl-tooltip
@@ -182,25 +224,25 @@ export default {
       </template>
 
       <template #cell(lastActivityTime)="data">
-        <time-ago-tooltip
-          v-if="data.item.user.last_activity_on"
-          :time="data.item.user.last_activity_on"
-          tooltip-placement="bottom"
-        />
-        <span v-else>
-          {{ __('Never') }}
+        <span>
+          {{ data.item.user.last_activity_on ? data.item.user.last_activity_on : __('Never') }}
         </span>
       </template>
 
       <template #cell(actions)="data">
         <gl-dropdown icon="ellipsis_h" right data-testid="user-actions">
           <gl-dropdown-item
-            v-gl-modal="$options.removeMemberModalId"
-            @click="setMemberToRemove(data.item.user)"
+            v-gl-modal="$options.removeBillableMemberModalId"
+            data-testid="remove-user"
+            @click="displayRemoveMemberModal(data.item.user)"
           >
             {{ __('Remove user') }}
           </gl-dropdown-item>
         </gl-dropdown>
+      </template>
+
+      <template #row-details="{ item }">
+        <subscription-seat-details :seat-member-id="item.user.id" />
       </template>
     </gl-table>
 
@@ -213,6 +255,21 @@ export default {
       class="gl-mt-5"
     />
 
-    <remove-member-modal v-if="memberToRemove" :modal-id="$options.removeMemberModalId" />
+    <remove-billable-member-modal
+      v-if="billableMemberToRemove"
+      :modal-id="$options.removeBillableMemberModalId"
+    />
+
+    <gl-modal
+      ref="cannotRemoveModal"
+      :modal-id="$options.cannotRemoveModalId"
+      :title="$options.cannotRemoveModalTitle"
+      :action-primary="{ text: __('Okay') }"
+      static
+    >
+      <p>
+        {{ $options.cannotRemoveModalText }}
+      </p>
+    </gl-modal>
   </section>
 </template>

@@ -79,13 +79,16 @@ Requests time out at 30 seconds.
 ## Breaking changes
 
 The GitLab GraphQL API is [versionless](https://graphql.org/learn/best-practices/#versioning) which means
-developers must familiarize themselves with our [deprecation cycle of breaking changes](#breaking-changes).
+developers must familiarize themselves with our [Deprecation and Removal process](../api/graphql/index.md#deprecation-and-removal-process).
 
 Breaking changes are:
 
 - Removing or renaming a field, argument, enum value or mutation.
 - Changing the type of a field, argument or enum value.
 - Raising the [complexity](#max-complexity) of a field or complexity multipliers in a resolver.
+- Changing a field from being _not_ nullable (`null: false`) to nullable (`null: true`), as
+discussed in [Nullable fields](#nullable-fields).
+- Changing an argument from being optional (`required: false`) to being required (`required: true`).
 - Changing the [max page size](#page-size-limit) of a connection.
 - Lowering the global limits for query complexity and depth.
 - Anything else that can result in queries hitting a limit that previously was allowed.
@@ -389,6 +392,28 @@ field :blob, type: Types::Snippets::BlobType,
 
 This will increment the [`complexity` score](#field-complexity) of the field by `1`.
 
+If a resolver calls Gitaly, it can be annotated with
+`BaseResolver.calls_gitaly!`. This passes `calls_gitaly: true` to any
+field that uses this resolver.
+
+For example:
+
+```ruby
+class BranchResolver < BaseResolver
+  type ::Types::BranchType, null: true
+  calls_gitaly!
+
+  argument name: ::GraphQL::STRING_TYPE, required: true
+
+  def resolve(name:)
+    object.branch(name)
+  end
+end
+```
+
+Then when we use it, any field that uses `BranchResolver` has the correct
+value for `calls_gitaly:`.
+
 ### Exposing permissions for a type
 
 To expose permissions the current user has on a resource, you can call
@@ -467,7 +492,7 @@ fails. Consider this when toggling the visibility of the feature on or off on
 production.
 
 The `feature_flag` property does not allow the use of
-[feature gates based on actors](../development/feature_flags/development.md).
+[feature gates based on actors](../development/feature_flags/index.md).
 This means that the feature flag cannot be toggled only for particular
 projects, groups, or users, but instead can only be toggled globally for
 everyone.
@@ -745,115 +770,32 @@ argument :title, GraphQL::STRING_TYPE,
           description: copy_field_description(Types::MergeRequestType, :title)
 ```
 
+### Documentation references
+
+Sometimes we want to refer to external URLs in our descriptions. To make this
+easier, and provide proper markup in the generated reference documentation, we
+provide a `see` property on fields. For example:
+
+```ruby
+field :genus,
+      type: GraphQL::STRING_TYPE,
+      null: true,
+      description: 'A taxonomic genus.'
+      see: { 'Wikipedia page on genera' => 'https://wikipedia.org/wiki/Genus' }
+```
+
+This will render in our documentation as:
+
+```markdown
+A taxonomic genus. See: [Wikipedia page on genera](https://wikipedia.org/wiki/Genus)
+```
+
+Multiple documentation references can be provided. The syntax for this property
+is a `HashMap` where the keys are textual descriptions, and the values are URLs.
+
 ## Authorization
 
-Authorizations can be applied to both types and fields using the same
-abilities as in the Rails app.
-
-If the:
-
-- Currently authenticated user fails the authorization, the authorized
-  resource is returned as `null`.
-- Resource is part of a collection, the collection is filtered to
-  exclude the objects that the user's authorization checks failed against.
-
-Also see [authorizing resources in a mutation](#authorizing-resources).
-
-NOTE:
-Try to load only what the currently authenticated user is allowed to
-view with our existing finders first, without relying on authorization
-to filter the records. This minimizes database queries and unnecessary
-authorization checks of the loaded records.
-
-### Type authorization
-
-Authorize a type by passing an ability to the `authorize` method. All
-fields with the same type is authorized by checking that the
-currently authenticated user has the required ability.
-
-For example, the following authorization ensures that the currently
-authenticated user can only see projects that they have the
-`read_project` ability for (so long as the project is returned in a
-field that uses `Types::ProjectType`):
-
-```ruby
-module Types
-  class ProjectType < BaseObject
-    authorize :read_project
-  end
-end
-```
-
-You can also authorize against multiple abilities, in which case all of
-the ability checks must pass.
-
-For example, the following authorization ensures that the currently
-authenticated user must have `read_project` and `another_ability`
-abilities to see a project:
-
-```ruby
-module Types
-  class ProjectType < BaseObject
-    authorize [:read_project, :another_ability]
-  end
-end
-```
-
-### Field authorization
-
-Fields can be authorized with the `authorize` option.
-
-For example, the following authorization ensures that the currently
-authenticated user must have the `owner_access` ability to see the
-project:
-
-```ruby
-module Types
-  class MyType < BaseObject
-    field :project, Types::ProjectType, null: true, resolver: Resolvers::ProjectResolver, authorize: :owner_access
-  end
-end
-```
-
-Fields can also be authorized against multiple abilities, in which case
-all of ability checks must pass. This requires explicitly
-passing a block to `field`:
-
-```ruby
-module Types
-  class MyType < BaseObject
-    field :project, Types::ProjectType, null: true, resolver: Resolvers::ProjectResolver do
-      authorize [:owner_access, :another_ability]
-    end
-  end
-end
-```
-
-If the field's type already [has a particular
-authorization](#type-authorization) then there is no need to add that
-same authorization to the field.
-
-### Type and Field authorizations together
-
-Authorizations are cumulative, so where authorizations are defined on
-a field, and also on the field's type, then the currently authenticated
-user would need to pass all ability checks.
-
-In the following simplified example the currently authenticated user
-would need both `first_permission` and `second_permission` abilities in
-order to see the author of the issue.
-
-```ruby
-class UserType
-  authorize :first_permission
-end
-```
-
-```ruby
-class IssueType
-  field :author, UserType, authorize: :second_permission
-end
-```
+See: [GraphQL Authorization](graphql_guide/authorization.md)
 
 ## Resolvers
 
@@ -948,7 +890,7 @@ The main use case for this is one resolver to find all items, and another to
 find one specific one. For this, we supply convenience methods:
 
 - `BaseResolver.single`, which constructs a new resolver that selects the first item.
-- `BaseResolver.last`, with constructs a resolver that selects the last item.
+- `BaseResolver.last`, which constructs a resolver that selects the last item.
 
 The correct singular type is inferred from the collection type, so we don't have
 to define the `type` here.
@@ -1054,7 +996,7 @@ end
 For this reason, whenever you call a resolver (mainly in tests - as framework
 abstractions Resolvers should not be considered re-usable, finders are to be
 preferred), remember to call the `ready?` method and check the boolean flag
-before calling `resolve`! An example can be seen in our [`GraphQLHelpers`](https://gitlab.com/gitlab-org/gitlab/-/blob/2d395f32d2efbb713f7bc861f96147a2a67e92f2/spec/support/helpers/graphql_helpers.rb#L20-27).
+before calling `resolve`! An example can be seen in our [`GraphqlHelpers`](https://gitlab.com/gitlab-org/gitlab/-/blob/2d395f32d2efbb713f7bc861f96147a2a67e92f2/spec/support/helpers/graphql_helpers.rb#L20-27).
 
 ### Look-Ahead
 
@@ -1091,6 +1033,26 @@ class MyThingResolver < BaseResolver
         field_one: [:other_attribute],
         field_two: [{ nested: [:included_attribute] }]
     }
+  end
+end
+```
+
+By default, fields defined in `#preloads` will be preloaded if that field
+is selected in the query. Occasionally, finer control may be
+needed to avoid preloading too much or incorrect content.
+
+Extending the above example, we might want to preload a different
+association if certain fields are requested together. This can
+be done by overriding `#filtered_preloads`:
+
+```ruby
+class MyThingResolver < BaseResolver
+  # ...
+
+  def filtered_preloads
+    return [:alternate_attribute] if lookahead.selects?(:field_one) && lookahead.selects?(:field_two)
+
+    super
   end
 end
 ```
@@ -1134,9 +1096,10 @@ When using resolvers, they can and should serve as the SSoT for field metadata.
 All field options (apart from the field name) can be declared on the resolver.
 These include:
 
-- `type` (this is particularly important, and is planned to be mandatory)
+- `type` (required - all resolvers must include a type annotation)
 - `extras`
 - `description`
+- Gitaly annotations (with `calls_gitaly!`)
 
 Example:
 
@@ -1146,6 +1109,7 @@ module Resolvers
     type Types::MyType, null: true
     extras [:lookahead]
     description 'Retrieve a single MyType'
+    calls_gitaly!
   end
 end
 ```
@@ -1220,8 +1184,8 @@ are returned as the result of the mutation.
 
 The service-oriented architecture in GitLab means that most mutations call a Create, Delete, or Update
 service, for example `UpdateMergeRequestService`.
-For Update mutations, a you might want to only update one aspect of an object, and thus only need a
-_fine-grained_ mutation, for example `MergeRequest::SetWip`.
+For Update mutations, you might want to only update one aspect of an object, and thus only need a
+_fine-grained_ mutation, for example `MergeRequest::SetDraft`.
 
 It's acceptable to have both fine-grained mutations and coarse-grained mutations, but be aware
 that too many fine-grained mutations can lead to organizational challenges in maintainability, code
@@ -1317,7 +1281,7 @@ end
 [input type](https://graphql.org/learn/schema/#input-types).
 
 For example, the
-[`mergeRequestSetWip` mutation](https://gitlab.com/gitlab-org/gitlab/-/blob/master/app/graphql/mutations/merge_requests/set_wip.rb)
+[`mergeRequestSetDraft` mutation](https://gitlab.com/gitlab-org/gitlab/-/blob/master/app/graphql/mutations/merge_requests/set_draft.rb)
 defines these arguments (some
 [through inheritance](https://gitlab.com/gitlab-org/gitlab/-/blob/master/app/graphql/mutations/merge_requests/base.rb)):
 
@@ -1330,17 +1294,16 @@ argument :iid, GraphQL::STRING_TYPE,
          required: true,
          description: "The IID of the merge request to mutate."
 
-argument :wip,
+argument :draft,
          GraphQL::BOOLEAN_TYPE,
          required: false,
          description: <<~DESC
-                      Whether or not to set the merge request as a WIP.
-                      If not passed, the value will be toggled.
-                      DESC
+           Whether or not to set the merge request as a draft.
+         DESC
 ```
 
 These arguments automatically generate an input type called
-`MergeRequestSetWipInput` with the 3 arguments we specified and the
+`MergeRequestSetDraftInput` with the 3 arguments we specified and the
 `clientMutationId`.
 
 ### Object identifier arguments
@@ -1377,7 +1340,7 @@ From here, we can call the service that modifies the resource.
 
 The `resolve` method should then return a hash with the same field
 names as defined on the mutation including an `errors` array. For example,
-the `Mutations::MergeRequests::SetWip` defines a `merge_request`
+the `Mutations::MergeRequests::SetDraft` defines a `merge_request`
 field:
 
 ```ruby
@@ -1415,13 +1378,13 @@ module Types
 
     graphql_name "Mutation"
 
-    mount_mutation Mutations::MergeRequests::SetWip
+    mount_mutation Mutations::MergeRequests::SetDraft
   end
 end
 ```
 
-Generates a field called `mergeRequestSetWip` that
-`Mutations::MergeRequests::SetWip` to be resolved.
+Generates a field called `mergeRequestSetDraft` that
+`Mutations::MergeRequests::SetDraft` to be resolved.
 
 ### Authorizing resources
 
@@ -1431,8 +1394,8 @@ To authorize resources inside a mutation, we first provide the required
 ```ruby
 module Mutations
   module MergeRequests
-    class SetWip < Base
-      graphql_name 'MergeRequestSetWip'
+    class SetDraft < Base
+      graphql_name 'MergeRequestSetDraft'
 
       authorize :update_merge_request
     end
@@ -1611,6 +1574,41 @@ deprecated aliased mutations.
 
 EE mutations should follow the same process. For an example of the merge request
 process, read [merge request !42588](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/42588).
+
+## Subscriptions
+
+We use subscriptions to push updates to clients. We use the [Action Cable implementation](https://graphql-ruby.org/subscriptions/action_cable_implementation)
+to deliver the messages over websockets.
+
+When a client subscribes to a subscription, we store their query in-memory within Puma workers. Then when the subscription is triggered,
+the Puma workers execute the stored GraphQL queries and push the results to the clients.
+
+NOTE:
+We cannot test subscriptions using GraphiQL, because they require an Action Cable client, which GraphiQL does not support at the moment.
+
+### Building subscriptions
+
+All fields under `Types::SubscriptionType` are subscriptions that clients can subscribe to. These fields require a subscription class,
+which is a descendant of `Subscriptions::BaseSubscription` and is stored under `app/graphql/subscriptions`.
+
+The arguments required to subscribe and the fields that are returned are defined within the subscription class. Multiple fields can share
+the same subscription class if they have the same arguments and return the same fields.
+
+This class runs during the initial subscription request and subsequent updates. You can read more about this in the
+[GraphQL Ruby guides](https://graphql-ruby.org/subscriptions/subscription_classes).
+
+### Authorization
+
+You should implement the `#authorized?` method of the subscription class so that the initial subscription and subsequent updates are authorized.
+
+When a user is not authorized, you should call the `unauthorized!` helper so that execution is halted and the user is unsubscribed. Returning `false`
+results in redaction of the response but we leak information that some updates are happening. This is due to a
+[bug in the GraphQL gem](https://github.com/rmosolgo/graphql-ruby/issues/3390).
+
+### Triggering subscriptions
+
+Define a method under the `GraphqlTriggers` module to trigger a subscription. Do not call `GitlabSchema.subscriptions.trigger` directly in application
+code so that we have a single source of truth and we do not trigger a subscription with different arguments and objects.
 
 ## Pagination implementation
 

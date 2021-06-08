@@ -14,13 +14,11 @@ fragment IssueNode on Issue {
   weight
   confidential
   webUrl
-  subscribed
   blocked
   blockedByCount
   relativePosition
   epic {
     id
-    iid
   }
   milestone {
     id

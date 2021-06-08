@@ -26,6 +26,10 @@ module Resolvers
              required: false,
              description: 'Filter vulnerabilities by VulnerabilityScanner.externalId.'
 
+    argument :scanner_id, [::Types::GlobalIDType[::Vulnerabilities::Scanner]],
+             required: false,
+             description: 'Filter vulnerabilities by scanner ID.'
+
     argument :sort, Types::VulnerabilitySortEnum,
              required: false,
              default_value: 'severity_desc',
@@ -42,12 +46,20 @@ module Resolvers
     def resolve(**args)
       return Vulnerability.none unless vulnerable
 
+      args[:scanner_id] = resolve_gids(args[:scanner_id], ::Vulnerabilities::Scanner) if args[:scanner_id]
+
       vulnerabilities(args)
         .with_findings_scanner_and_identifiers
         .with_created_issue_links_and_issues
     end
 
     private
+
+    def resolve_gids(gids, gid_class)
+      gids.map do |gid|
+        Types::GlobalIDType[gid_class].coerce_isolated_input(gid).model_id
+      end
+    end
 
     def vulnerabilities(params)
       Security::VulnerabilitiesFinder.new(vulnerable, params).execute

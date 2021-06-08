@@ -42,24 +42,8 @@ RSpec.describe Security::SecurityOrchestrationPolicies::OnDemandScanPipelineConf
     end
 
     it 'delegates params creation to DastOnDemandScans::ParamsCreateService' do
-      expect(DastOnDemandScans::ParamsCreateService).to receive(:new).with(container: project, params: { dast_site_profile: site_profile, dast_scanner_profile: scanner_profile }).and_call_original
-      expect(DastOnDemandScans::ParamsCreateService).to receive(:new).with(container: project, params: { dast_site_profile: nil, dast_scanner_profile: nil }).and_call_original
-
-      pipeline_configuration
-    end
-
-    it 'delegates variables preparation to ::Ci::DastScanCiConfigurationService' do
-      expected_params = {
-        branch: project.default_branch_or_master,
-        full_scan_enabled: false,
-        show_debug_messages: false,
-        spider_timeout: nil,
-        target_timeout: nil,
-        target_url: site_profile.dast_site.url,
-        use_ajax_spider: false
-      }
-
-      expect(::Ci::DastScanCiConfigurationService).to receive(:execute).with(expected_params).and_call_original
+      expect(AppSec::Dast::ScanConfigs::BuildService).to receive(:new).with(container: project, params: { dast_site_profile: site_profile, dast_scanner_profile: scanner_profile }).and_call_original
+      expect(AppSec::Dast::ScanConfigs::BuildService).to receive(:new).with(container: project, params: { dast_site_profile: nil, dast_scanner_profile: nil }).and_call_original
 
       pipeline_configuration
     end
@@ -76,19 +60,24 @@ RSpec.describe Security::SecurityOrchestrationPolicies::OnDemandScanPipelineConf
           stage: 'test',
           image: { name: '$SECURE_ANALYZERS_PREFIX/dast:$DAST_VERSION' },
           variables: {
-            DAST_VERSION: 1,
-            SECURE_ANALYZERS_PREFIX: 'registry.gitlab.com/gitlab-org/security-products/analyzers',
-            DAST_WEBSITE: site_profile.dast_site.url,
+            DAST_AUTH_URL: site_profile.auth_url,
+            DAST_DEBUG: 'false',
+            DAST_EXCLUDE_URLS: site_profile.excluded_urls.join(','),
             DAST_FULL_SCAN_ENABLED: 'false',
+            DAST_PASSWORD_FIELD: site_profile.auth_password_field,
+            DAST_USERNAME: site_profile.auth_username,
+            DAST_USERNAME_FIELD: site_profile.auth_username_field,
             DAST_USE_AJAX_SPIDER: 'false',
-            DAST_DEBUG: 'false'
+            DAST_VERSION: 1,
+            DAST_WEBSITE: site_profile.dast_site.url,
+            SECURE_ANALYZERS_PREFIX: 'registry.gitlab.com/gitlab-org/security-products/analyzers'
           },
           allow_failure: true,
           script: ['/analyze'],
           artifacts: { reports: { dast: 'gl-dast-report.json' } }
         },
         'dast-on-demand-1': {
-          script: 'echo "Error during On-Demand Scan execution: Site Profile was not provided" && false',
+          script: 'echo "Error during On-Demand Scan execution: Dast site profile was not provided" && false',
           allow_failure: true
         }
       }

@@ -4,18 +4,6 @@ module EE
   module ProjectsHelper
     extend ::Gitlab::Utils::Override
 
-    override :sidebar_settings_paths
-    def sidebar_settings_paths
-      super + %w[
-        operations#show
-      ]
-    end
-
-    override :sidebar_repository_paths
-    def sidebar_repository_paths
-      super + %w(path_locks)
-    end
-
     override :sidebar_operations_paths
     def sidebar_operations_paths
       super + %w[
@@ -24,54 +12,31 @@ module EE
       ]
     end
 
-    override :get_project_nav_tabs
-    def get_project_nav_tabs(project, current_user)
-      nav_tabs = super
-
-      if can?(current_user, :read_code_review_analytics, project)
-        nav_tabs << :code_review
-      end
-
-      if can?(current_user, :read_project_merge_request_analytics, project)
-        nav_tabs << :merge_request_analytics
-      end
-
-      if project.feature_available?(:issues_analytics) && can?(current_user, :read_project, project)
-        nav_tabs << :issues_analytics
-      end
-
-      if project.insights_available?
-        nav_tabs << :project_insights
-      end
-
-      if can?(current_user, :read_requirement, project)
-        nav_tabs << :requirements
-      end
-
-      if can?(current_user, :read_incident_management_oncall_schedule, project)
-        nav_tabs << :oncall_schedule
-      end
-
-      nav_tabs
-    end
-
     override :project_permissions_settings
     def project_permissions_settings(project)
-      super.merge(
+      settings = super.merge(
         requirementsAccessLevel: project.requirements_access_level
       )
+
+      if ::Feature.enabled?(:cve_id_request_button, project)
+        settings[:cveIdRequestEnabled] = project.public? && project.project_setting.cve_id_request_enabled?
+      end
+
+      settings
     end
 
     override :project_permissions_panel_data
     def project_permissions_panel_data(project)
-      super.merge(
+      panel_data = super.merge(
         requirementsAvailable: project.feature_available?(:requirements)
       )
-    end
 
-    override :show_security_and_compliance_toggle?
-    def show_security_and_compliance_toggle?
-      super || show_audit_events?(@project)
+      if ::Feature.enabled?(:cve_id_request_button, project)
+        panel_data[:requestCveAvailable] = ::Gitlab.com?
+        panel_data[:cveIdRequestHelpPath] = help_page_path('user/application_security/cve_id_request')
+      end
+
+      panel_data
     end
 
     override :default_url_to_repo
@@ -103,7 +68,7 @@ module EE
     end
 
     def approvals_app_data(project = @project)
-      { data: { 'project_id': project.id,
+      data = { 'project_id': project.id,
       'can_edit': can_modify_approvers.to_s,
       'project_path': expose_path(api_v4_projects_path(id: project.id)),
       'settings_path': expose_path(api_v4_projects_approval_settings_path(id: project.id)),
@@ -113,7 +78,22 @@ module EE
       'security_approvals_help_page_path': help_page_path('user/application_security/index.md', anchor: 'security-approvals-in-merge-requests'),
       'security_configuration_path': project_security_configuration_path(project),
       'vulnerability_check_help_page_path': help_page_path('user/application_security/index', anchor: 'enabling-security-approvals-within-a-project'),
-      'license_check_help_page_path': help_page_path('user/application_security/index', anchor: 'enabling-license-approvals-within-a-project') } }
+      'license_check_help_page_path': help_page_path('user/application_security/index', anchor: 'enabling-license-approvals-within-a-project') }
+
+      if ::Feature.enabled?(:ff_compliance_approval_gates, project, default_enabled: :yaml)
+        data[:external_approval_rules_path] = expose_path(api_v4_projects_external_approval_rules_path(id: project.id))
+      end
+
+      { data: data }
+    end
+
+    def status_checks_app_data(project)
+      {
+        data: {
+          project_id: project.id,
+          status_checks_path: expose_path(api_v4_projects_external_approval_rules_path(id: project.id))
+        }
+      }
     end
 
     def can_modify_approvers(project = @project)
@@ -162,63 +142,10 @@ module EE
       @project.feature_available?(:merge_trains)
     end
 
-    override :sidebar_security_paths
-    def sidebar_security_paths
-      super + %w[
-        projects/security/sast_configuration#show
-        projects/security/api_fuzzing_configuration#show
-        projects/security/vulnerabilities#show
-        projects/security/vulnerability_report#index
-        projects/security/dashboard#index
-        projects/on_demand_scans#index
-        projects/on_demand_scans#new
-        projects/on_demand_scans#edit
-        projects/security/dast_profiles#show
-        projects/security/dast_site_profiles#new
-        projects/security/dast_site_profiles#edit
-        projects/security/dast_scanner_profiles#new
-        projects/security/dast_scanner_profiles#edit
-        projects/dependencies#index
-        projects/licenses#index
-        projects/threat_monitoring#show
-        projects/threat_monitoring#new
-        projects/threat_monitoring#edit
-        projects/threat_monitoring#alert_details
-        projects/audit_events#index
-      ]
-    end
-
-    def sidebar_external_tracker_paths
-      %w[
-        projects/integrations/jira/issues#index
-      ]
-    end
-
-    def sidebar_on_demand_scans_paths
-      %w[
-        projects/on_demand_scans#index
-        projects/on_demand_scans#new
-        projects/on_demand_scans#edit
-      ]
-    end
-
-    override :sidebar_security_configuration_paths
-    def sidebar_security_configuration_paths
-      super + %w[
-        projects/security/sast_configuration#show
-        projects/security/api_fuzzing_configuration#show
-        projects/security/dast_profiles#show
-        projects/security/dast_site_profiles#new
-        projects/security/dast_site_profiles#edit
-        projects/security/dast_scanner_profiles#new
-        projects/security/dast_scanner_profiles#edit
-      ]
-    end
-
     def size_limit_message(project)
-      show_lfs = project.lfs_enabled? ? 'including files in LFS' : ''
+      show_lfs = project.lfs_enabled? ? 'including LFS files' : ''
 
-      "The total size of this project's repository #{show_lfs} will be limited to this size. 0 for unlimited. Leave empty to inherit the group/global value."
+      "Max size of this project's repository, #{show_lfs}. For no limit, enter 0. To inherit the group/global value, leave blank."
     end
 
     override :membership_locked?
@@ -242,9 +169,11 @@ module EE
           has_vulnerabilities: 'false',
           has_jira_vulnerabilities_integration_enabled: project.configured_to_create_issues_from_vulnerabilities?.to_s,
           empty_state_svg_path: image_path('illustrations/security-dashboard_empty.svg'),
+          survey_request_svg_path: image_path('illustrations/security-dashboard_empty.svg'),
           security_dashboard_help_path: help_page_path('user/application_security/security_dashboard/index'),
           no_vulnerabilities_svg_path: image_path('illustrations/issues.svg'),
-          project_full_path: project.full_path
+          project_full_path: project.full_path,
+          security_configuration_path: project_security_configuration_path(@project)
         }.merge!(security_dashboard_pipeline_data(project))
       else
         {
@@ -254,6 +183,7 @@ module EE
           project_full_path: project.full_path,
           vulnerabilities_export_endpoint: api_v4_security_projects_vulnerability_exports_path(id: project.id),
           empty_state_svg_path: image_path('illustrations/security-dashboard-empty-state.svg'),
+          survey_request_svg_path: image_path('illustrations/security-dashboard_empty.svg'),
           no_vulnerabilities_svg_path: image_path('illustrations/issues.svg'),
           dashboard_documentation: help_page_path('user/application_security/security_dashboard/index'),
           not_enabled_scanners_help_path: help_page_path('user/application_security/index', anchor: 'quick-start'),
@@ -261,7 +191,8 @@ module EE
           security_dashboard_help_path: help_page_path('user/application_security/security_dashboard/index'),
           auto_fix_documentation: help_page_path('user/application_security/index', anchor: 'auto-fix-merge-requests'),
           auto_fix_mrs_path: project_merge_requests_path(@project, label_name: 'GitLab-auto-fix'),
-          scanners: VulnerabilityScanners::ListService.new(project).execute.to_json
+          scanners: VulnerabilityScanners::ListService.new(project).execute.to_json,
+          can_admin_vulnerability: can?(current_user, :admin_vulnerability, project).to_s
         }.merge!(security_dashboard_pipeline_data(project))
       end
     end
@@ -289,24 +220,6 @@ module EE
       end
     end
 
-    def any_project_nav_tab?(tabs)
-      tabs.any? { |tab| project_nav_tab?(tab) }
-    end
-
-    def top_level_link(project)
-      return project_security_dashboard_index_path(project) if project_nav_tab?(:security)
-      return project_audit_events_path(project) if project_nav_tab?(:audit_events)
-
-      project_dependencies_path(project)
-    end
-
-    def top_level_qa_selector(project)
-      return 'security_dashboard_link' if project_nav_tab?(:security)
-      return 'audit_events_settings_link' if project_nav_tab?(:audit_events)
-
-      'dependency_list_link'
-    end
-
     def show_discover_project_security?(project)
       !!current_user &&
         ::Gitlab.com? &&
@@ -328,50 +241,6 @@ module EE
     end
 
     private
-
-    override :can_read_security_configuration?
-    def can_read_security_configuration?(project, current_user)
-      super || (project.feature_available?(:security_dashboard) &&
-        can?(current_user, :read_project_security_dashboard, project))
-    end
-
-    override :get_project_security_nav_tabs
-    def get_project_security_nav_tabs(project, current_user)
-      return [] unless can?(current_user, :access_security_and_compliance, project)
-
-      nav_tabs = super.union([:security_and_compliance])
-
-      if can?(current_user, :read_project_security_dashboard, project)
-        nav_tabs << :security
-      end
-
-      if can?(current_user, :read_on_demand_scans, @project)
-        nav_tabs << :on_demand_scans
-      end
-
-      if can?(current_user, :read_dependencies, project)
-        nav_tabs << :dependencies
-      end
-
-      if can?(current_user, :read_licenses, project)
-        nav_tabs << :licenses
-      end
-
-      if can?(current_user, :read_threat_monitoring, project)
-        nav_tabs << :threat_monitoring
-      end
-
-      if show_audit_events?(project)
-        nav_tabs << :audit_events
-      end
-
-      nav_tabs
-    end
-
-    def show_audit_events?(project)
-      can?(current_user, :read_project_audit_events, project) &&
-        (project.feature_available?(:audit_events) || show_promotions?(current_user))
-    end
 
     def remove_message_data(project)
       {
@@ -400,13 +269,6 @@ module EE
           }
         }
       }
-    end
-
-    override :view_operations_tab_ability
-    def view_operations_tab_ability
-      super + [
-        :read_incident_management_oncall_schedule
-      ]
     end
   end
 end

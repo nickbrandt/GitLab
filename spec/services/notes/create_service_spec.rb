@@ -176,7 +176,7 @@ RSpec.describe Notes::CreateService do
             end
 
             it 'note is associated with a note diff file' do
-              MergeRequests::MergeToRefService.new(merge_request.project, merge_request.author).execute(merge_request)
+              MergeRequests::MergeToRefService.new(project: merge_request.project, current_user: merge_request.author).execute(merge_request)
 
               note = described_class.new(project_with_repo, user, new_opts).execute
 
@@ -307,7 +307,7 @@ RSpec.describe Notes::CreateService do
               ),
               # Set WIP status
               QuickAction.new(
-                action_text: "/wip",
+                action_text: "/draft",
                 before_action: -> {
                   issuable.reload.update!(title: "title")
                 },
@@ -317,7 +317,7 @@ RSpec.describe Notes::CreateService do
               ),
               # Remove WIP status
               QuickAction.new(
-                action_text: "/wip",
+                action_text: "/draft",
                 before_action: -> {
                   issuable.reload.update!(title: "WIP: title")
                 },
@@ -344,6 +344,24 @@ RSpec.describe Notes::CreateService do
           note = described_class.new(project, user, opts.merge(note: note_text)).execute
 
           expect(note.errors[:commands_only]).to be_present
+        end
+
+        it 'adds commands failed message to note errors' do
+          note_text = %(/reopen)
+          note = described_class.new(project, user, opts.merge(note: note_text)).execute
+
+          expect(note.errors[:commands_only]).to contain_exactly('Could not apply reopen command.')
+        end
+
+        it 'generates success and failed error messages' do
+          note_text = %(/close\n/reopen)
+          service = double(:service)
+          allow(Issues::UpdateService).to receive(:new).and_return(service)
+          expect(service).to receive(:execute)
+
+          note = described_class.new(project, user, opts.merge(note: note_text)).execute
+
+          expect(note.errors[:commands_only]).to contain_exactly('Closed this issue. Could not apply reopen command.')
         end
       end
     end

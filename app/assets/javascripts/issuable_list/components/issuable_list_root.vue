@@ -10,7 +10,14 @@ import IssuableBulkEditSidebar from './issuable_bulk_edit_sidebar.vue';
 import IssuableItem from './issuable_item.vue';
 import IssuableTabs from './issuable_tabs.vue';
 
+const VueDraggable = () => import('vuedraggable');
+
 export default {
+  vueDraggableAttributes: {
+    animation: 200,
+    ghostClass: 'gl-visibility-hidden',
+    tag: 'ul',
+  },
   components: {
     GlSkeletonLoading,
     IssuableTabs,
@@ -18,6 +25,7 @@ export default {
     IssuableItem,
     IssuableBulkEditSidebar,
     GlPagination,
+    VueDraggable,
   },
   props: {
     namespace: {
@@ -127,6 +135,11 @@ export default {
       required: false,
       default: null,
     },
+    isManualOrdering: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   data() {
     return {
@@ -158,6 +171,9 @@ export default {
         }
         return acc;
       }, []);
+    },
+    issuablesWrapper() {
+      return this.isManualOrdering ? VueDraggable : 'ul';
     },
   },
   watch: {
@@ -202,11 +218,16 @@ export default {
     },
     handleIssuableCheckedInput(issuable, value) {
       this.checkedIssuables[this.issuableId(issuable)].checked = value;
+      this.$emit('update-legacy-bulk-edit');
     },
     handleAllIssuablesCheckedInput(value) {
       Object.keys(this.checkedIssuables).forEach((issuableId) => {
         this.checkedIssuables[issuableId].checked = value;
       });
+      this.$emit('update-legacy-bulk-edit');
+    },
+    handleVueDraggableUpdate({ newIndex, oldIndex }) {
+      this.$emit('reorder', { newIndex, oldIndex });
     },
   },
 };
@@ -253,36 +274,47 @@ export default {
           <gl-skeleton-loading />
         </li>
       </ul>
-      <ul
-        v-if="!issuablesLoading && issuables.length"
-        class="content-list issuable-list issues-list"
-      >
-        <issuable-item
-          v-for="issuable in issuables"
-          :key="issuableId(issuable)"
-          :issuable-symbol="issuableSymbol"
-          :issuable="issuable"
-          :enable-label-permalinks="enableLabelPermalinks"
-          :label-filter-param="labelFilterParam"
-          :show-checkbox="showBulkEditSidebar"
-          :checked="issuableChecked(issuable)"
-          @checked-input="handleIssuableCheckedInput(issuable, $event)"
+      <template v-else>
+        <component
+          :is="issuablesWrapper"
+          v-if="issuables.length > 0"
+          class="content-list issuable-list issues-list"
+          :class="{ 'manual-ordering': isManualOrdering }"
+          v-bind="$options.vueDraggableAttributes"
+          @update="handleVueDraggableUpdate"
         >
-          <template #reference>
-            <slot name="reference" :issuable="issuable"></slot>
-          </template>
-          <template #author>
-            <slot name="author" :author="issuable.author"></slot>
-          </template>
-          <template #timeframe>
-            <slot name="timeframe" :issuable="issuable"></slot>
-          </template>
-          <template #status>
-            <slot name="status" :issuable="issuable"></slot>
-          </template>
-        </issuable-item>
-      </ul>
-      <slot v-if="!issuablesLoading && !issuables.length" name="empty-state"></slot>
+          <issuable-item
+            v-for="issuable in issuables"
+            :key="issuableId(issuable)"
+            :class="{ 'gl-cursor-grab': isManualOrdering }"
+            :issuable-symbol="issuableSymbol"
+            :issuable="issuable"
+            :enable-label-permalinks="enableLabelPermalinks"
+            :label-filter-param="labelFilterParam"
+            :show-checkbox="showBulkEditSidebar"
+            :checked="issuableChecked(issuable)"
+            @checked-input="handleIssuableCheckedInput(issuable, $event)"
+          >
+            <template #reference>
+              <slot name="reference" :issuable="issuable"></slot>
+            </template>
+            <template #author>
+              <slot name="author" :author="issuable.author"></slot>
+            </template>
+            <template #timeframe>
+              <slot name="timeframe" :issuable="issuable"></slot>
+            </template>
+            <template #status>
+              <slot name="status" :issuable="issuable"></slot>
+            </template>
+            <template #statistics>
+              <slot name="statistics" :issuable="issuable"></slot>
+            </template>
+          </issuable-item>
+        </component>
+        <slot v-else name="empty-state"></slot>
+      </template>
+
       <gl-pagination
         v-if="showPaginationControls"
         :per-page="defaultPageSize"

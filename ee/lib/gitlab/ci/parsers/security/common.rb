@@ -7,16 +7,20 @@ module Gitlab
         class Common
           SecurityReportParserError = Class.new(Gitlab::Ci::Parsers::ParserError)
 
-          def self.parse!(json_data, report)
-            new(json_data, report).parse!
+          def self.parse!(json_data, report, vulnerability_finding_signatures_enabled = false, validate: false)
+            new(json_data, report, vulnerability_finding_signatures_enabled, validate: validate).parse!
           end
 
-          def initialize(json_data, report)
+          def initialize(json_data, report, vulnerability_finding_signatures_enabled = false, validate: false)
             @json_data = json_data
             @report = report
+            @validate = validate
+            @vulnerability_finding_signatures_enabled = vulnerability_finding_signatures_enabled
           end
 
           def parse!
+            return report_data unless valid?
+
             raise SecurityReportParserError, "Invalid report format" unless report_data.is_a?(Hash)
 
             create_scanner
@@ -26,14 +30,26 @@ module Gitlab
             report_data
           rescue JSON::ParserError
             raise SecurityReportParserError, 'JSON parsing failed'
-          rescue => e
+          rescue StandardError => e
             Gitlab::ErrorTracking.track_and_raise_for_dev_exception(e)
             raise SecurityReportParserError, "#{report.type} security report parsing failed"
           end
 
           private
 
-          attr_reader :json_data, :report
+          attr_reader :json_data, :report, :validate
+
+          def valid?
+            return true if !validate || schema_validator.valid?
+
+            schema_validator.errors.each { |error| report.add_error('Schema', error) }
+
+            false
+          end
+
+          def schema_validator
+            @schema_validator ||= ::Gitlab::Ci::Parsers::Security::Validators::SchemaValidator.new(report.type, report_data)
+          end
 
           def report_data
             @report_data ||= Gitlab::Json.parse!(json_data)
@@ -80,11 +96,20 @@ module Gitlab
             links = create_links(data['links'])
             location = create_location(data['location'] || {})
             remediations = create_remediations(data['remediations'])
-            fingerprints = create_fingerprints(tracking_data(data))
+            signatures = create_signatures(tracking_data(data))
+
+            if @vulnerability_finding_signatures_enabled && !signatures.empty?
+              # NOT the signature_sha - the compare key is hashed
+              # to create the project_fingerprint
+              highest_priority_signature = signatures.max_by(&:priority)
+              uuid = calculate_uuid_v5(identifiers.first, highest_priority_signature.signature_hex)
+            else
+              uuid = calculate_uuid_v5(identifiers.first, location&.fingerprint)
+            end
 
             report.add_finding(
               ::Gitlab::Ci::Reports::Security::Finding.new(
-                uuid: calculate_uuid_v5(identifiers.first, location),
+                uuid: uuid,
                 report_type: report.type,
                 name: finding_name(data, identifiers, location),
                 compare_key: data['cve'] || '',
@@ -99,32 +124,37 @@ module Gitlab
                 raw_metadata: data.to_json,
                 metadata_version: report_version,
                 details: data['details'] || {},
-                fingerprints: fingerprints))
+                signatures: signatures,
+                project_id: report.project_id,
+                vulnerability_finding_signatures_enabled: @vulnerability_finding_signatures_enabled))
           end
 
-          def create_fingerprints(tracking)
-            return [] if tracking.nil? || tracking['items'].nil?
+          def create_signatures(tracking)
+            tracking ||= { 'items' => [] }
 
-            fingerprint_algorithms = Hash.new { |hash, key| hash[key] = [] }
+            signature_algorithms = Hash.new { |hash, key| hash[key] = [] }
+
             tracking['items'].each do |item|
-              next unless item.key?('fingerprints')
+              next unless item.key?('signatures')
 
-              item['fingerprints'].each do |fingerprint|
-                alg = fingerprint['algorithm']
-                fingerprint_algorithms[alg] << fingerprint['value']
+              item['signatures'].each do |signature|
+                alg = signature['algorithm']
+                signature_algorithms[alg] << signature['value']
               end
             end
 
-            fingerprint_algorithms.map do |algorithm, values|
+            signature_algorithms.map do |algorithm, values|
               value = values.join('|')
-              begin
-                fingerprint = ::Gitlab::Ci::Reports::Security::FindingFingerprint.new(
-                  algorithm_type: algorithm,
-                  fingerprint_value: value
-                )
-                fingerprint.valid? ? fingerprint : nil
-              rescue ArgumentError => e
-                Gitlab::ErrorTracking.track_and_raise_for_dev_exception(e)
+              signature = ::Gitlab::Ci::Reports::Security::FindingSignature.new(
+                algorithm_type: algorithm,
+                signature_value: value
+              )
+
+              if signature.valid?
+                signature
+              else
+                e = SecurityReportParserError.new("Vulnerability tracking signature is not valid: #{signature}")
+                Gitlab::ErrorTracking.track_exception(e)
                 nil
               end
             end.compact
@@ -201,11 +231,11 @@ module Gitlab
             "#{identifier.name} in #{location&.fingerprint_path}"
           end
 
-          def calculate_uuid_v5(primary_identifier, location)
+          def calculate_uuid_v5(primary_identifier, location_fingerprint)
             uuid_v5_name_components = {
               report_type: report.type,
               primary_identifier_fingerprint: primary_identifier&.fingerprint,
-              location_fingerprint: location&.fingerprint,
+              location_fingerprint: location_fingerprint,
               project_id: report.project_id
             }
 

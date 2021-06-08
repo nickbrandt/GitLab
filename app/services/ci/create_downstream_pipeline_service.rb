@@ -19,13 +19,14 @@ module Ci
           DuplicateDownstreamPipelineError.new,
           bridge_id: @bridge.id, project_id: @bridge.project_id
         )
-        return
+
+        return error('Already has a downstream pipeline')
       end
 
       pipeline_params = @bridge.downstream_pipeline_params
       target_ref = pipeline_params.dig(:target_revision, :ref)
 
-      return unless ensure_preconditions!(target_ref)
+      return error('Pre-conditions not met') unless ensure_preconditions!(target_ref)
 
       service = ::Ci::CreatePipelineService.new(
         pipeline_params.fetch(:project),
@@ -85,6 +86,12 @@ module Ci
         return false
       end
 
+      if has_cyclic_dependency?
+        @bridge.drop!(:pipeline_loop_detected)
+
+        return false
+      end
+
       true
     end
 
@@ -109,11 +116,27 @@ module Ci
       end
     end
 
+    def has_cyclic_dependency?
+      return false if @bridge.triggers_child_pipeline?
+
+      if Feature.enabled?(:ci_drop_cyclical_triggered_pipelines, @bridge.project, default_enabled: :yaml)
+        pipeline_checksums = @bridge.pipeline.base_and_ancestors.filter_map do |pipeline|
+          config_checksum(pipeline) unless pipeline.child?
+        end
+
+        pipeline_checksums.uniq.length != pipeline_checksums.length
+      end
+    end
+
     def has_max_descendants_depth?
       return false unless @bridge.triggers_child_pipeline?
 
       ancestors_of_new_child = @bridge.pipeline.base_and_ancestors(same_project: true)
       ancestors_of_new_child.count > MAX_DESCENDANTS_DEPTH
+    end
+
+    def config_checksum(pipeline)
+      [pipeline.project_id, pipeline.ref].hash
     end
   end
 end

@@ -16,16 +16,12 @@ migrations are written carefully, can be applied online, and adhere to the style
 guide below.
 
 Migrations are **not** allowed to require GitLab installations to be taken
-offline unless _absolutely necessary_.
-
-When downtime is necessary the migration has to be approved by:
-
-1. The VP of Engineering
-1. A Backend Maintainer
-1. A Database Maintainer
-
-An up-to-date list of people holding these titles can be found at
-<https://about.gitlab.com/company/team/>.
+offline ever. Migrations always must be written in such a way to avoid
+downtime. In the past we had a process for defining migrations that allowed for
+downtime by setting a `DOWNTIME` constant. You may see this when looking at
+older migrations. This process was in place for 4 years without every being
+used and as such we've learnt we can always figure out how to write a migration
+differently to avoid downtime.
 
 When writing your migrations, also consider that databases might have stale data
 or inconsistencies and guard for that. Try to make as few assumptions as
@@ -37,7 +33,7 @@ compatible.
 
 For GitLab.com, please take into consideration that regular migrations (under `db/migrate`)
 are run before [Canary is deployed](https://gitlab.com/gitlab-com/gl-infra/readiness/-/tree/master/library/canary/#configuration-and-deployment),
-and post-deployment migrations (`db/post_migrate`) are run after the deployment to production has finished.
+and [post-deployment migrations](post_deployment_migrations.md) (`db/post_migrate`) are run after the deployment to production has finished.
 
 ## Schema Changes
 
@@ -65,47 +61,16 @@ scripts/regenerate-schema
 TARGET=12-9-stable-ee scripts/regenerate-schema
 ```
 
-## What Requires Downtime?
+## Avoiding downtime
 
-The document ["What Requires Downtime?"](what_requires_downtime.md) specifies
-various database operations, such as
+The document ["Avoiding downtime in migrations"](avoiding_downtime_in_migrations.md) specifies
+various database operations, such as:
 
-- [dropping and renaming columns](what_requires_downtime.md#dropping-columns)
-- [changing column constraints and types](what_requires_downtime.md#changing-column-constraints)
-- [adding and dropping indexes, tables, and foreign keys](what_requires_downtime.md#adding-indexes)
+- [dropping and renaming columns](avoiding_downtime_in_migrations.md#dropping-columns)
+- [changing column constraints and types](avoiding_downtime_in_migrations.md#changing-column-constraints)
+- [adding and dropping indexes, tables, and foreign keys](avoiding_downtime_in_migrations.md#adding-indexes)
 
-and whether they require downtime and how to work around that whenever possible.
-
-## Downtime Tagging
-
-Every migration must specify if it requires downtime or not, and if it should
-require downtime it must also specify a reason for this. This is required even
-if 99% of the migrations don't require downtime as this makes it easier to find
-the migrations that _do_ require downtime.
-
-To tag a migration, add the following two constants to the migration class'
-body:
-
-- `DOWNTIME`: a boolean that when set to `true` indicates the migration requires
-  downtime.
-- `DOWNTIME_REASON`: a String containing the reason for the migration requiring
-  downtime. This constant **must** be set when `DOWNTIME` is set to `true`.
-
-For example:
-
-```ruby
-class MyMigration < ActiveRecord::Migration[6.0]
-  DOWNTIME = true
-  DOWNTIME_REASON = 'This migration requires downtime because ...'
-
-  def change
-    ...
-  end
-end
-```
-
-It is an error (that is, CI fails) if the `DOWNTIME` constant is missing
-from a migration class.
+and explains how to perform them without requiring downtime.
 
 ## Reversibility
 
@@ -149,11 +114,35 @@ rails schema statement: [`add_index`](https://api.rubyonrails.org/v5.2/classes/A
 This is a blocking operation, but it doesn't cause problems because the table is not yet used,
 and therefore it does not have any records yet.
 
+## Naming conventions
+
+We keep column names consistent with [ActiveRecord's schema conventions](https://guides.rubyonrails.org/active_record_basics.html#schema-conventions).
+
+Custom index names should follow the pattern `index_#{table_name}_on_#{column_1}_and_#{column_2}_#{condition}`.
+
+Examples:
+
+- `index_services_on_type_and_id_and_template_when_active`
+- `index_projects_on_id_service_desk_enabled`
+- `index_clusters_on_enabled_cluster_type_id_and_created_at`
+
+### Truncate long index names
+
+PostgreSQL [limits the length of identifiers](https://www.postgresql.org/docs/current/limits.html),
+like column or index names. Column names are not usually a problem, but index names tend
+to be longer. Some methods for shortening a name that's too long:
+
+- Prefix it with `i_` instead of `index_`.
+- Skip redundant prefixes. For example,
+  `index_vulnerability_findings_remediations_on_vulnerability_remediation_id` becomes
+  `index_vulnerability_findings_remediations_on_remediation_id`.
+- Instead of columns, specify the purpose of the index, such as `index_users_for_unconfirmation_notification`.
+
 ## Heavy operations in a single transaction
 
 When using a single-transaction migration, a transaction holds a database connection
 for the duration of the migration, so you must make sure the actions in the migration
-do not take too much time: GitLab.com’s production database has a `15s` timeout, so
+do not take too much time: GitLab.com's production database has a `15s` timeout, so
 in general, the cumulative execution time in a migration should aim to fit comfortably
 in that limit. Singular query timings should fit within the [standard limit](query_performance.md#timing-guidelines-for-queries)
 
@@ -254,7 +243,7 @@ end
 
 **Creating a new table with a foreign key:**
 
-We can simply wrap the `create_table` method with `with_lock_retries`:
+We can wrap the `create_table` method with `with_lock_retries`:
 
 ```ruby
 def up
@@ -289,10 +278,10 @@ def up
     t.bigint :project_id, null: false
     t.bigint :user_id, null: false
     t.string :jid, limit: 255
-  end
 
-  add_index :imports, :project_id
-  add_index :imports, :user_id
+    t.index :project_id
+    t.index :user_id
+  end
 end
 
 def down
@@ -302,7 +291,7 @@ end
 
 Adding foreign key to `projects`:
 
-We can use the `add_concurrenct_foreign_key` method in this case, as this helper method
+We can use the `add_concurrent_foreign_key` method in this case, as this helper method
 has the lock retries built into it.
 
 ```ruby
@@ -374,7 +363,7 @@ standard Rails migration helper methods. Calling more than one migration
 helper is not a problem if they're executed on the same table.
 
 Using the `with_lock_retries` helper method is advised when a database
-migration involves one of the [high-traffic tables](https://gitlab.com/gitlab-org/gitlab/-/blob/master/rubocop/rubocop-migrations.yml#L3).
+migration involves one of the [high-traffic tables](#high-traffic-tables).
 
 Example changes:
 
@@ -512,8 +501,6 @@ class like so:
 class MyMigration < ActiveRecord::Migration[6.0]
   include Gitlab::Database::MigrationHelpers
 
-  DOWNTIME = false
-
   disable_ddl_transaction!
 
   INDEX_NAME = 'index_name'
@@ -606,7 +593,7 @@ we have to employ `add_concurrent_foreign_key` and `add_concurrent_index`
 instead of `add_reference`.
 
 If you have a new or empty table that doesn't reference a
-[high-traffic table](https://gitlab.com/gitlab-org/gitlab/-/blob/master/rubocop/rubocop-migrations.yml#L3),
+[high-traffic table](#high-traffic-tables),
 we recommend that you use `add_reference` in a single-transaction migration. You can
 combine it with other operations that don't require `disable_ddl_transaction!`.
 
@@ -640,8 +627,6 @@ Take the following migration as an example:
 
 ```ruby
 class DefaultRequestAccessGroups < ActiveRecord::Migration[5.2]
-  DOWNTIME = false
-
   def change
     change_column_default(:namespaces, :request_access_enabled, from: false, to: true)
   end
@@ -709,16 +694,13 @@ Dropping a database table is uncommon, and the `drop_table` method
 provided by Rails is generally considered safe. Before dropping the table,
 please consider the following:
 
-If your table has foreign keys on a high-traffic table (like `projects`), then
-the `DROP TABLE` statement might fail with **statement timeout** error. Determining
-what tables are high traffic can be difficult. Self-managed instances might
-use different features of GitLab with different usage patterns, thus making
-assumptions based on GitLab.com is not enough.
+If your table has foreign keys on a [high-traffic table](#high-traffic-tables) (like `projects`), then
+the `DROP TABLE` statement is likely to stall concurrent traffic until it fails with **statement timeout** error.
 
 Table **has no records** (feature was never in use) and **no foreign
 keys**:
 
-- Simply use the `drop_table` method in your migration.
+- Use the `drop_table` method in your migration.
 
 ```ruby
 def change
@@ -852,8 +834,6 @@ Example migration adding this column:
 
 ```ruby
 class AddOptionsToBuildMetadata < ActiveRecord::Migration[5.0]
-  DOWNTIME = false
-
   def change
     add_column :ci_builds_metadata, :config_options, :jsonb
   end
@@ -873,6 +853,37 @@ When using a `JSONB` column, use the [JsonSchemaValidator](https://gitlab.com/gi
 ```ruby
 class BuildMetadata
   validates :config_options, json_schema: { filename: 'build_metadata_config_option' }
+end
+```
+
+## Encrypted attributes
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/227779) in GitLab 14.0.
+
+Do not store `attr_encrypted` attributes as `:text` in the database; use
+`:binary` instead. This uses the `bytea` type in PostgreSQL and makes storage more
+efficient:
+
+```ruby
+class AddSecretToSomething < ActiveRecord::Migration[5.0]
+  def change
+    add_column :something, :encrypted_secret, :binary
+    add_column :something, :encrypted_secret_iv, :binary
+  end
+end
+```
+
+When storing encrypted attributes in a binary column, we need to provide the
+`encode: false` and `encode_iv: false` options to `attr_encrypted`:
+
+```ruby
+class Something < ApplicationRecord
+  attr_encrypted :secret,
+    mode: :per_attribute_iv,
+    key: Settings.attr_encrypted_db_key_base_32,
+    algorithm: 'aes-256-gcm',
+    encode: false,
+    encode_iv: false
 end
 ```
 
@@ -965,6 +976,9 @@ If using a model in the migrations, you should first
 [clear the column cache](https://api.rubyonrails.org/classes/ActiveRecord/ModelSchema/ClassMethods.html#method-i-reset_column_information)
 using `reset_column_information`.
 
+If using a model that leverages single table inheritance (STI), there are [special
+considerations](single_table_inheritance.md#in-migrations).
+
 This avoids problems where a column that you are using was altered and cached
 in a previous migration.
 
@@ -1028,3 +1042,20 @@ D, [2020-07-06T00:37:12.653459 #130101] DEBUG -- :   AddAndSeedMyColumn::User Up
 D, [2020-07-06T00:37:12.653648 #130101] DEBUG -- :   ↳ config/initializers/config_initializers_active_record_locking.rb:13:in `_update_row'
 == 20200705232821 AddAndSeedMyColumn: migrated (0.1706s) =====================
 ```
+
+## High traffic tables
+
+Here's a list of current [high-traffic tables](https://gitlab.com/gitlab-org/gitlab/-/blob/master/rubocop/rubocop-migrations.yml).
+
+Determining what tables are high-traffic can be difficult. Self-managed instances might use
+different features of GitLab with different usage patterns, thus making assumptions based
+on GitLab.com not enough.
+
+To identify a high-traffic table for GitLab.com the following measures are considered.
+Note that the metrics linked here are GitLab-internal only:
+
+- [Read operations](https://thanos.gitlab.net/graph?g0.range_input=2h&g0.max_source_resolution=0s&g0.expr=topk(500%2C%20sum%20by%20(relname)%20(rate(pg_stat_user_tables_seq_tup_read%7Benvironment%3D%22gprd%22%7D%5B12h%5D)%20%2B%20rate(pg_stat_user_tables_idx_scan%7Benvironment%3D%22gprd%22%7D%5B12h%5D)%20%2B%20rate(pg_stat_user_tables_idx_tup_fetch%7Benvironment%3D%22gprd%22%7D%5B12h%5D)))&g0.tab=1)
+- [Number of records](https://thanos.gitlab.net/graph?g0.range_input=2h&g0.max_source_resolution=0s&g0.expr=topk(500%2C%20max%20by%20(relname)%20(pg_stat_user_tables_n_live_tup%7Benvironment%3D%22gprd%22%7D))&g0.tab=1)
+- [Size](https://thanos.gitlab.net/graph?g0.range_input=2h&g0.max_source_resolution=0s&g0.expr=topk(500%2C%20max%20by%20(relname)%20(pg_total_relation_size_bytes%7Benvironment%3D%22gprd%22%7D))&g0.tab=1) is greater than 10 GB
+
+Any table which has some high read operation compared to current [high-traffic tables](https://gitlab.com/gitlab-org/gitlab/-/blob/master/rubocop/rubocop-migrations.yml#L4) might be a good candidate.

@@ -15,7 +15,9 @@ module Banzai
       def call
         return doc if context[:system_note]
 
-        linkable_attributes.each do |attr|
+        # We exclude processed upload links from the linkable attributes to
+        # prevent further modifications by RepositoryLinkFilter
+        linkable_attributes.reject! do |attr|
           process_link_to_upload_attr(attr)
         end
 

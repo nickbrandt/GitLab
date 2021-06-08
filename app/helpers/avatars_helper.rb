@@ -24,11 +24,7 @@ module AvatarsHelper
   def avatar_icon_for_email(email = nil, size = nil, scale = 2, only_path: true)
     return gravatar_icon(email, size, scale) if email.nil?
 
-    if Feature.enabled?(:avatar_cache_for_email, @current_user, type: :development)
-      Gitlab::AvatarCache.by_email(email, size, scale, only_path) do
-        avatar_icon_by_user_email_or_gravatar(email, size, scale, only_path: only_path)
-      end
-    else
+    Gitlab::AvatarCache.by_email(email, size, scale, only_path) do
       avatar_icon_by_user_email_or_gravatar(email, size, scale, only_path: only_path)
     end
   end
@@ -102,6 +98,14 @@ module AvatarsHelper
     end
   end
 
+  def avatar_without_link(resource, options = {})
+    if resource.is_a?(User)
+      user_avatar_without_link(options.merge(user: resource))
+    elsif resource.is_a?(Group)
+      group_icon(resource, options.merge(class: 'avatar'))
+    end
+  end
+
   private
 
   def avatar_icon_by_user_email_or_gravatar(email, size, scale, only_path:)
@@ -140,11 +144,12 @@ module AvatarsHelper
 
   def source_identicon(source, options = {})
     bg_key = (source.id % 7) + 1
+    size_class = "s#{options[:size]}" if options[:size]
 
     options[:class] =
-      [*options[:class], "identicon bg#{bg_key}"].join(' ')
+      [*options[:class], "identicon bg#{bg_key}", size_class].compact.join(' ')
 
-    content_tag(:div, class: options[:class].strip) do
+    content_tag(:span, class: options[:class].strip) do
       source.name[0, 1].upcase
     end
   end

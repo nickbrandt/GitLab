@@ -1,7 +1,6 @@
 <script>
-import { GlModal } from '@gitlab/ui';
-import { mapGetters } from 'vuex';
-import { deprecatedCreateFlash as Flash } from '~/flash';
+import { GlModal, GlAlert } from '@gitlab/ui';
+import { mapGetters, mapActions, mapState } from 'vuex';
 import { convertToGraphQLId } from '~/graphql_shared/utils';
 import { getParameterByName } from '~/lib/utils/common_utils';
 import { visitUrl } from '~/lib/utils/url_utility';
@@ -44,6 +43,7 @@ export default {
     BoardScope: () => import('ee_component/boards/components/board_scope.vue'),
     GlModal,
     BoardConfigurationOptions,
+    GlAlert,
   },
   inject: {
     fullPath: {
@@ -107,7 +107,8 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(['isEpicBoard']),
+    ...mapState(['error']),
+    ...mapGetters(['isIssueBoard', 'isGroupBoard', 'isProjectBoard']),
     isNewForm() {
       return this.currentPage === formType.new;
     },
@@ -127,7 +128,7 @@ export default {
       if (this.isDeleteForm) {
         return 'danger';
       }
-      return 'info';
+      return 'confirm';
     },
     title() {
       if (this.readonly) {
@@ -163,6 +164,9 @@ export default {
     currentMutation() {
       return this.board.id ? updateBoardMutation : createBoardMutation;
     },
+    deleteMutation() {
+      return destroyBoardMutation;
+    },
     baseMutationVariables() {
       const { board } = this;
       const variables = {
@@ -178,11 +182,11 @@ export default {
           }
         : {
             ...variables,
-            projectPath: this.projectId ? this.fullPath : undefined,
-            groupPath: this.groupId ? this.fullPath : undefined,
+            projectPath: this.isProjectBoard ? this.fullPath : undefined,
+            groupPath: this.isGroupBoard ? this.fullPath : undefined,
           };
     },
-    boardScopeMutationVariables() {
+    issueBoardScopeMutationVariables() {
       /* eslint-disable @gitlab/require-i18n-strings */
       return {
         weight: this.board.weight,
@@ -193,12 +197,17 @@ export default {
           this.board.milestone?.id || this.board.milestone?.id === 0
             ? convertToGraphQLId('Milestone', this.board.milestone.id)
             : null,
-        labelIds: this.board.labels.map(fullLabelId),
         iterationId: this.board.iteration_id
           ? convertToGraphQLId('Iteration', this.board.iteration_id)
           : null,
       };
       /* eslint-enable @gitlab/require-i18n-strings */
+    },
+    boardScopeMutationVariables() {
+      return {
+        labelIds: this.board.labels.map(fullLabelId),
+        ...(this.isIssueBoard && this.issueBoardScopeMutationVariables),
+      };
     },
     mutationVariables() {
       return {
@@ -214,6 +223,7 @@ export default {
     }
   },
   methods: {
+    ...mapActions(['setError', 'unsetError']),
     setIteration(iterationId) {
       this.board.iteration_id = iterationId;
     },
@@ -239,20 +249,23 @@ export default {
 
       return this.boardUpdateResponse(response.data);
     },
+    async deleteBoard() {
+      await this.$apollo.mutate({
+        mutation: this.deleteMutation,
+        variables: {
+          id: fullBoardId(this.board.id),
+        },
+      });
+    },
     async submit() {
       if (this.board.name.length === 0) return;
       this.isLoading = true;
       if (this.isDeleteForm) {
         try {
-          await this.$apollo.mutate({
-            mutation: destroyBoardMutation,
-            variables: {
-              id: fullBoardId(this.board.id),
-            },
-          });
+          await this.deleteBoard();
           visitUrl(this.rootPath);
         } catch {
-          Flash(this.$options.i18n.deleteErrorMessage);
+          this.setError({ message: this.$options.i18n.deleteErrorMessage });
         } finally {
           this.isLoading = false;
         }
@@ -261,7 +274,7 @@ export default {
           const url = await this.createOrUpdateBoard();
           visitUrl(url);
         } catch {
-          Flash(this.$options.i18n.saveErrorMessage);
+          this.setError({ message: this.$options.i18n.saveErrorMessage });
         } finally {
           this.isLoading = false;
         }
@@ -297,6 +310,15 @@ export default {
     @close="cancel"
     @hide.prevent
   >
+    <gl-alert
+      v-if="error"
+      class="gl-mb-3"
+      variant="danger"
+      :dismissible="true"
+      @dismiss="unsetError"
+    >
+      {{ error }}
+    </gl-alert>
     <p v-if="isDeleteForm" data-testid="delete-confirmation-message">
       {{ $options.i18n.deleteConfirmationMessage }}
     </p>
@@ -324,7 +346,7 @@ export default {
       />
 
       <board-scope
-        v-if="scopedIssueBoardFeatureEnabled && !isEpicBoard"
+        v-if="scopedIssueBoardFeatureEnabled"
         :collapse-scope="isNewForm"
         :board="board"
         :can-admin-board="canAdminBoard"

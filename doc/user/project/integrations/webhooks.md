@@ -1161,6 +1161,7 @@ X-Gitlab-Event: Pipeline Hook
             "id": 380987,
             "description": "shared-runners-manager-6.gitlab.com",
             "active": true,
+            "runner_type": "instance_type",
             "is_shared": true,
             "tags": [
               "linux",
@@ -1196,7 +1197,8 @@ X-Gitlab-Event: Pipeline Hook
             "id":380987,
             "description":"shared-runners-manager-6.gitlab.com",
             "active":true,
-            "is_shared":true,
+            "runner_type": "instance_type",
+            "is_shared": true,
             "tags": [
               "linux",
               "docker"
@@ -1230,6 +1232,7 @@ X-Gitlab-Event: Pipeline Hook
             "id": 380987,
             "description": "shared-runners-manager-6.gitlab.com",
             "active": true,
+            "runner_type": "instance_type",
             "is_shared": true,
             "tags": [
               "linux",
@@ -1297,6 +1300,7 @@ X-Gitlab-Event: Job Hook
   "build_name": "test",
   "build_stage": "test",
   "build_status": "created",
+  "build_created_at": "2021-02-23T02:41:37.886Z",
   "build_started_at": null,
   "build_finished_at": null,
   "build_duration": null,
@@ -1310,7 +1314,6 @@ X-Gitlab-Event: Job Hook
     "name": "User",
     "email": "user@gitlab.com",
     "avatar_url": "http://www.gravatar.com/avatar/e32bd13e2add097461cb96824b7a829c?s=80\u0026d=identicon",
-    "email": "admin@example.com"
   },
   "commit": {
     "id": 2366,
@@ -1333,6 +1336,7 @@ X-Gitlab-Event: Job Hook
   },
   "runner": {
     "active": true,
+    "runner_type": "project_type", 
     "is_shared": false,
     "id": 380987,
     "description": "shared-runners-manager-6.gitlab.com",
@@ -1368,6 +1372,7 @@ X-Gitlab-Event: Deployment Hook
 {
   "object_kind": "deployment",
   "status": "success",
+  "status_changed_at":"2021-04-28 21:50:00 +0200",
   "deployable_id": 796,
   "deployable_url": "http://10.126.0.2:3000/root/test-deployment-webhooks/-/jobs/796",
   "environment": "staging",

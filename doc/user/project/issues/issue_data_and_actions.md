@@ -39,7 +39,7 @@ The numbers in the image correspond to the following features:
 - **15.** [Edit](#edit)
 - **16.** [Description](#description)
 - **17.** [Mentions](#mentions)
-- **18.** [Related Issues](#related-issues)
+- **18.** [Linked Issues](#linked-issues)
 - **19.** [Related Merge Requests](#related-merge-requests)
 - **20.** [Award emoji](#award-emoji)
 - **21.** [Show all activity](#show-all-activity)
@@ -67,7 +67,7 @@ To access additional actions, select the vertical ellipsis
 
 - To create a new issue in the same project, select **New issue** in the dropdown menu.
 
-- If you are not the issue author, you can [submit an abuse report](../../abuse_reports.md).
+- If you are not the issue author, you can [submit an abuse report](../../report_abuse.md).
   Select **Report abuse** in the dropdown menu.
 
 ### To Do
@@ -101,7 +101,7 @@ assigned to them if they created the issue themselves.
 Often, multiple people work on the same issue together. This can be difficult
 to track in large teams where there is shared ownership of an issue.
 
-In [GitLab Starter](https://about.gitlab.com/pricing/), you can
+To help with this, you can use GitLab to
 [assign multiple people](multiple_assignees_for_issues.md) to an issue.
 
 ### Epic **(PREMIUM)**
@@ -205,10 +205,10 @@ in a different color, which allows you to quickly see which comments involve you
 Avoid mentioning `@all` in issues and merge requests, as it sends an email notification
 to all the members of that project's group. This might be interpreted as spam.
 
-### Related Issues
+### Linked Issues
 
-Issues that were mentioned as [related issues](related_issues.md) are listed here.
-You can also click the `+` to add more related issues.
+Issues that were mentioned as [linked issues](related_issues.md) are listed here.
+You can also click the `+` to add more linked issues.
 
 ### Related Merge Requests
 
@@ -221,7 +221,7 @@ merge request is also listed here.
 
 You can award emojis to issues. You can select the "thumbs up" and "thumbs down",
 or the gray "smiley-face" to choose from the list of available
-[GitLab Flavored Markdown Emoji](../../markdown.md#emoji).
+[GitLab Flavored Markdown Emoji](../../markdown.md#emojis).
 
 NOTE:
 Posting "+1" as a comment in a thread spams all subscribed participants of that issue,

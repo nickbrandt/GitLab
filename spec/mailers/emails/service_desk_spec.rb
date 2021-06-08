@@ -13,7 +13,13 @@ RSpec.describe Emails::ServiceDesk do
   let_it_be(:user) { create(:user) }
   let_it_be(:project) { create(:project) }
   let_it_be(:issue) { create(:issue, project: project) }
+  let_it_be(:email) { 'someone@gitlab.com' }
+
   let(:template) { double(content: template_content) }
+
+  before_all do
+    issue.issue_email_participants.create!(email: email)
+  end
 
   before do
     stub_const('ServiceEmailClass', Class.new(ApplicationMailer))
@@ -72,6 +78,10 @@ RSpec.describe Emails::ServiceDesk do
     let(:template_content) { 'custom text' }
     let(:issue) { create(:issue, project: project)}
 
+    before do
+      issue.issue_email_participants.create!(email: email)
+    end
+
     context 'when a template is in the repository' do
       let(:project) { create(:project, :custom_repo, files: { ".gitlab/service_desk_templates/#{template_key}.md" => template_content }) }
 
@@ -105,6 +115,16 @@ RSpec.describe Emails::ServiceDesk do
     end
   end
 
+  shared_examples 'notification with metric event' do |event_type|
+    it 'adds metric event' do
+      metric_transaction = double('Gitlab::Metrics::WebTransaction', increment: true, observe: true)
+      allow(::Gitlab::Metrics::BackgroundTransaction).to receive(:current).and_return(metric_transaction)
+      expect(metric_transaction).to receive(:add_event).with(event_type)
+
+      subject.content_type
+    end
+  end
+
   describe '.service_desk_thank_you_email' do
     let_it_be(:reply_in_subject) { true }
     let_it_be(:default_text) do
@@ -114,6 +134,7 @@ RSpec.describe Emails::ServiceDesk do
     subject { ServiceEmailClass.service_desk_thank_you_email(issue.id) }
 
     it_behaves_like 'read template from repository', 'thank_you'
+    it_behaves_like 'notification with metric event', :service_desk_thank_you_email
 
     context 'handling template markdown' do
       context 'with a simple text' do
@@ -151,9 +172,10 @@ RSpec.describe Emails::ServiceDesk do
     let_it_be(:note) { create(:note_on_issue, noteable: issue, project: project) }
     let_it_be(:default_text) { note.note }
 
-    subject { ServiceEmailClass.service_desk_new_note_email(issue.id, note.id) }
+    subject { ServiceEmailClass.service_desk_new_note_email(issue.id, note.id, email) }
 
     it_behaves_like 'read template from repository', 'new_note'
+    it_behaves_like 'notification with metric event', :service_desk_new_note_email
 
     context 'handling template markdown' do
       context 'with a simple text' do

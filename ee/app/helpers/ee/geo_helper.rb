@@ -175,14 +175,6 @@ module EE
         {
           data_type: 'blob',
           data_type_title: _('File'),
-          title: _('LFS object'),
-          title_plural: _('LFS objects'),
-          name: 'lfs_object',
-          name_plural: 'lfs_objects'
-        },
-        {
-          data_type: 'blob',
-          data_type_title: _('File'),
           title: _('Upload'),
           title_plural: _('Uploads'),
           name: 'attachment',
@@ -220,8 +212,8 @@ module EE
       enabled_replicator_classes.each do |replicator_class|
         replicable_types.push(
           {
-            data_type: 'blob',
-            data_type_title: _('File'),
+            data_type: replicator_class.data_type,
+            data_type_title: replicator_class.data_type_title,
             title: replicator_class.replicable_title,
             title_plural: replicator_class.replicable_title_plural,
             name: replicator_class.replicable_name,

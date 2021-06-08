@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 # rubocop:disable Style/SignalException
 
-SEE_DOC = "See the [feature flag documentation](https://docs.gitlab.com/ee/development/feature_flags/development.html#feature-flag-definition-and-validation)."
+SEE_DOC = "See the [feature flag documentation](https://docs.gitlab.com/ee/development/feature_flags#feature-flag-definition-and-validation)."
+FEATURE_FLAG_LABEL = "feature flag"
 
 SUGGEST_MR_COMMENT = <<~SUGGEST_COMMENT
 ```suggestion
@@ -12,7 +13,7 @@ group: "%<group>s"
 SUGGEST_COMMENT
 
 def check_feature_flag_yaml(feature_flag)
-  mr_group_label = helper.group_label(gitlab.mr_labels)
+  mr_group_label = helper.group_label
 
   if feature_flag.group.nil?
     message_for_feature_flag_missing_group!(feature_flag: feature_flag, mr_group_label: mr_group_label)
@@ -65,14 +66,21 @@ if feature_flag_file_added_or_removed?
   new_mr_title << ' [RUN ALL RSPEC]' unless helper.run_all_rspec_mr?
   new_mr_title << ' [RUN AS-IF-FOSS]' unless helper.run_as_if_foss_mr?
 
+  changes = {}
+  changes[:add_labels] = FEATURE_FLAG_LABEL unless helper.mr_has_labels?(FEATURE_FLAG_LABEL)
+
   if new_mr_title != helper.mr_title
+    changes[:title] = new_mr_title
+  else
+    message "You're adding or removing a feature flag, your MR title needs to include `[RUN ALL RSPEC] [RUN AS-IF-FOSS]` (we may have updated it automatically for you and started a new MR pipeline) to ensure everything is covered."
+  end
+
+  if changes.any?
     gitlab.api.update_merge_request(
       gitlab.mr_json['project_id'],
       gitlab.mr_json['iid'],
-      title: new_mr_title
+      **changes
     )
     gitlab.api.post("/projects/#{gitlab.mr_json['project_id']}/merge_requests/#{gitlab.mr_json['iid']}/pipelines")
-  else
-    message "You're adding or removing a feature flag, your MR title needs to include `[RUN ALL RSPEC] [RUN AS-IF-FOSS]` (we may have updated it automatically for you and started a new MR pipeline) to ensure everything is covered."
   end
 end

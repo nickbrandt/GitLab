@@ -2,6 +2,7 @@
 
 module Registrations
   class ProjectsController < ApplicationController
+    include LearnGitlabHelper
     layout 'checkout'
 
     LEARN_GITLAB_TEMPLATE = 'learn_gitlab.tar.gz'
@@ -13,7 +14,7 @@ module Registrations
       authorize_create_project!
     end
 
-    feature_category :navigation
+    feature_category :onboarding
 
     def new
       @project = Project.new(namespace: @namespace)
@@ -24,23 +25,31 @@ module Registrations
 
       if @project.saved?
         learn_gitlab_project = create_learn_gitlab_project
+        onboarding_context = {
+          namespace_id: learn_gitlab_project.namespace_id,
+          project_id: @project.id,
+          learn_gitlab_project_id: learn_gitlab_project.id
+        }
+
+        experiment(:registrations_group_invite, actor: current_user)
+          .track(:signup_successful, property: @project.namespace_id.to_s)
+        experiment(:jobs_to_be_done, user: current_user)
+          .track(:create_project, project: @project)
 
         if helpers.in_trial_onboarding_flow?
-          trial_onboarding_context = {
-            namespace_id: learn_gitlab_project.namespace_id,
-            project_id: @project.id,
-            learn_gitlab_project_id: learn_gitlab_project.id
-          }
-
-          record_experiment_user(:trial_onboarding_issues, trial_onboarding_context)
+          record_experiment_user(:trial_onboarding_issues, onboarding_context)
           record_experiment_conversion_event(:trial_onboarding_issues)
-
-          experiment(:registrations_group_invite, actor: @project.group)
-            .track(:signup_successful, property: @project.namespace_id)
 
           redirect_to trial_getting_started_users_sign_up_welcome_path(learn_gitlab_project_id: learn_gitlab_project.id)
         else
-          redirect_to users_sign_up_experience_level_path(namespace_path: @project.namespace)
+          record_experiment_user(:learn_gitlab_a, onboarding_context)
+          record_experiment_user(:learn_gitlab_b, onboarding_context)
+
+          if continous_onboarding_experiment_enabled_for_user?
+            redirect_to continuous_onboarding_getting_started_users_sign_up_welcome_path(project_id: @project.id)
+          else
+            redirect_to users_sign_up_experience_level_path(namespace_path: @project.namespace)
+          end
         end
       else
         render :new
@@ -54,7 +63,7 @@ module Registrations
     end
 
     def create_learn_gitlab_project
-      learn_gitlab_project = File.open(learn_gitlab_template_path) do |archive|
+      File.open(learn_gitlab_template_path) do |archive|
         ::Projects::GitlabProjectsImportService.new(
           current_user,
           namespace_id: @project.namespace_id,
@@ -62,8 +71,6 @@ module Registrations
           name: learn_gitlab_project_name
         ).execute
       end
-
-      learn_gitlab_project
     end
 
     def authorize_create_project!

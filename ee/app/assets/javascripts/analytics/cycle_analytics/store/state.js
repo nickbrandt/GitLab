@@ -1,3 +1,5 @@
+import { PAGINATION_SORT_FIELD_END_EVENT, PAGINATION_SORT_DIRECTION_DESC } from '../constants';
+
 export default () => ({
   featureFlags: {},
   defaultStageConfig: [],
@@ -8,11 +10,7 @@ export default () => ({
   isLoading: false,
   isLoadingStage: false,
 
-  isEmptyStage: false,
   errorCode: null,
-
-  isSavingStageOrder: false,
-  errorSavingStageOrder: false,
 
   currentGroup: null,
   selectedProjects: [],
@@ -30,8 +28,17 @@ export default () => ({
   deleteValueStreamError: null,
 
   stages: [],
+  formEvents: [],
   selectedStageError: '',
   summary: [],
   medians: {},
   valueStreams: [],
+
+  pagination: {
+    page: null,
+    hasNextPage: false,
+    sort: PAGINATION_SORT_FIELD_END_EVENT,
+    direction: PAGINATION_SORT_DIRECTION_DESC,
+  },
+  stageCounts: {},
 });

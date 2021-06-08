@@ -9,13 +9,6 @@ fragment AlertListItem on AlertManagementAlert {
     iid
     state
     title
-  }
-  assignees {
-    nodes {
-      name
-      username
-      avatarUrl
-      webUrl
-    }
+    webUrl
   }
 }

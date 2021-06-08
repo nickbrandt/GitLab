@@ -14,6 +14,7 @@ RSpec.describe API::RubygemPackages do
   let_it_be(:deploy_token) { create(:deploy_token, read_package_registry: true, write_package_registry: true) }
   let_it_be(:project_deploy_token) { create(:project_deploy_token, deploy_token: deploy_token, project: project) }
   let_it_be(:headers) { {} }
+  let(:snowplow_gitlab_standard_context) { { project: project, namespace: project.namespace, user: user } }
 
   let(:tokens) do
     {
@@ -44,7 +45,7 @@ RSpec.describe API::RubygemPackages do
   end
 
   shared_examples 'without authentication' do
-    it_behaves_like 'returning response status', :unauthorized
+    it_behaves_like 'returning response status', :not_found
   end
 
   shared_examples 'with authentication' do
@@ -108,11 +109,69 @@ RSpec.describe API::RubygemPackages do
   end
 
   describe 'GET /api/v4/projects/:project_id/packages/rubygems/gems/:file_name' do
-    let(:url) { api("/projects/#{project.id}/packages/rubygems/gems/my_gem-1.0.0.gem") }
+    let_it_be(:package_name) { 'package' }
+    let_it_be(:version) { '0.0.1' }
+    let_it_be(:package) { create(:rubygems_package, project: project, name: package_name, version: version) }
+    let_it_be(:file_name) { "#{package_name}-#{version}.gem" }
+
+    let(:url) { api("/projects/#{project.id}/packages/rubygems/gems/#{file_name}") }
 
     subject { get(url, headers: headers) }
 
-    it_behaves_like 'an unimplemented route'
+    context 'with valid project' do
+      where(:visibility, :user_role, :member, :token_type, :valid_token, :shared_examples_name, :expected_status) do
+        :public  | :developer  | true  | :personal_access_token | true  | 'Rubygems gem download'            | :success
+        :public  | :guest      | true  | :personal_access_token | true  | 'Rubygems gem download'            | :success
+        :public  | :developer  | true  | :personal_access_token | false | 'rejects rubygems packages access' | :unauthorized
+        :public  | :guest      | true  | :personal_access_token | false | 'rejects rubygems packages access' | :unauthorized
+        :public  | :developer  | false | :personal_access_token | true  | 'Rubygems gem download'            | :success
+        :public  | :guest      | false | :personal_access_token | true  | 'Rubygems gem download'            | :success
+        :public  | :developer  | false | :personal_access_token | false | 'rejects rubygems packages access' | :unauthorized
+        :public  | :guest      | false | :personal_access_token | false | 'rejects rubygems packages access' | :unauthorized
+        :public  | :anonymous  | false | :personal_access_token | true  | 'Rubygems gem download'            | :success
+        :private | :developer  | true  | :personal_access_token | true  | 'Rubygems gem download'            | :success
+        :private | :guest      | true  | :personal_access_token | true  | 'rejects rubygems packages access' | :forbidden
+        :private | :developer  | true  | :personal_access_token | false | 'rejects rubygems packages access' | :unauthorized
+        :private | :guest      | true  | :personal_access_token | false | 'rejects rubygems packages access' | :unauthorized
+        :private | :developer  | false | :personal_access_token | true  | 'rejects rubygems packages access' | :not_found
+        :private | :guest      | false | :personal_access_token | true  | 'rejects rubygems packages access' | :not_found
+        :private | :developer  | false | :personal_access_token | false | 'rejects rubygems packages access' | :unauthorized
+        :private | :guest      | false | :personal_access_token | false | 'rejects rubygems packages access' | :unauthorized
+        :private | :anonymous  | false | :personal_access_token | true  | 'rejects rubygems packages access' | :not_found
+        :public  | :developer  | true  | :job_token             | true  | 'Rubygems gem download'            | :success
+        :public  | :guest      | true  | :job_token             | true  | 'Rubygems gem download'            | :success
+        :public  | :developer  | true  | :job_token             | false | 'rejects rubygems packages access' | :unauthorized
+        :public  | :guest      | true  | :job_token             | false | 'rejects rubygems packages access' | :unauthorized
+        :public  | :developer  | false | :job_token             | true  | 'Rubygems gem download'            | :success
+        :public  | :guest      | false | :job_token             | true  | 'Rubygems gem download'            | :success
+        :public  | :developer  | false | :job_token             | false | 'rejects rubygems packages access' | :unauthorized
+        :public  | :guest      | false | :job_token             | false | 'rejects rubygems packages access' | :unauthorized
+        :private | :developer  | true  | :job_token             | true  | 'Rubygems gem download'            | :success
+        :private | :guest      | true  | :job_token             | true  | 'rejects rubygems packages access' | :forbidden
+        :private | :developer  | true  | :job_token             | false | 'rejects rubygems packages access' | :unauthorized
+        :private | :guest      | true  | :job_token             | false | 'rejects rubygems packages access' | :unauthorized
+        :private | :developer  | false | :job_token             | true  | 'rejects rubygems packages access' | :not_found
+        :private | :guest      | false | :job_token             | true  | 'rejects rubygems packages access' | :not_found
+        :private | :developer  | false | :job_token             | false | 'rejects rubygems packages access' | :unauthorized
+        :private | :guest      | false | :job_token             | false | 'rejects rubygems packages access' | :unauthorized
+        :public  | :developer  | true  | :deploy_token          | true  | 'Rubygems gem download'            | :success
+        :public  | :developer  | true  | :deploy_token          | false | 'rejects rubygems packages access' | :unauthorized
+        :private | :developer  | true  | :deploy_token          | true  | 'Rubygems gem download'            | :success
+        :private | :developer  | true  | :deploy_token          | false | 'rejects rubygems packages access' | :unauthorized
+      end
+
+      with_them do
+        let(:token) { valid_token ? tokens[token_type] : 'invalid-token123' }
+        let(:headers) { user_role == :anonymous ? {} : { 'HTTP_AUTHORIZATION' => token } }
+        let(:snowplow_gitlab_standard_context) { { project: project, namespace: project.namespace } }
+
+        before do
+          project.update_column(:visibility_level, Gitlab::VisibilityLevel.level_value(visibility.to_s))
+        end
+
+        it_behaves_like params[:shared_examples_name], params[:user_role], params[:expected_status], params[:member]
+      end
+    end
   end
 
   describe 'POST /api/v4/projects/:project_id/packages/rubygems/api/v1/gems/authorize' do
@@ -171,7 +230,7 @@ RSpec.describe API::RubygemPackages do
         let(:headers) { user_headers.merge(workhorse_headers) }
 
         before do
-          project.update!(visibility: visibility.to_s)
+          project.update_column(:visibility_level, Gitlab::VisibilityLevel.level_value(visibility.to_s))
         end
 
         it_behaves_like params[:shared_examples_name], params[:user_role], params[:expected_status], params[:member]
@@ -247,9 +306,19 @@ RSpec.describe API::RubygemPackages do
         let(:token) { valid_token ? tokens[token_type] : 'invalid-token123' }
         let(:user_headers) { user_role == :anonymous ? {} : { 'HTTP_AUTHORIZATION' => token } }
         let(:headers) { user_headers.merge(workhorse_headers) }
+        let(:snowplow_gitlab_standard_context) { { project: project, namespace: project.namespace, user: snowplow_user } }
+        let(:snowplow_user) do
+          if token_type == :deploy_token
+            deploy_token
+          elsif token_type == :job_token
+            job.user
+          else
+            user
+          end
+        end
 
         before do
-          project.update!(visibility: visibility.to_s)
+          project.update_column(:visibility_level, Gitlab::VisibilityLevel.level_value(visibility.to_s))
         end
 
         it_behaves_like params[:shared_examples_name], params[:user_role], params[:expected_status], params[:member]
@@ -276,10 +345,65 @@ RSpec.describe API::RubygemPackages do
   end
 
   describe 'GET /api/v4/projects/:project_id/packages/rubygems/api/v1/dependencies' do
+    let_it_be(:package) { create(:rubygems_package, project: project) }
+
     let(:url) { api("/projects/#{project.id}/packages/rubygems/api/v1/dependencies") }
 
-    subject { get(url, headers: headers) }
+    subject { get(url, headers: headers, params: params) }
 
-    it_behaves_like 'an unimplemented route'
+    context 'with valid project' do
+      where(:visibility, :user_role, :member, :token_type, :valid_token, :shared_examples_name, :expected_status) do
+        :public  | :developer  | true  | :personal_access_token | true  | 'dependency endpoint success'      | :success
+        :public  | :guest      | true  | :personal_access_token | true  | 'dependency endpoint success'      | :success
+        :public  | :developer  | true  | :personal_access_token | false | 'rejects rubygems packages access' | :unauthorized
+        :public  | :guest      | true  | :personal_access_token | false | 'rejects rubygems packages access' | :unauthorized
+        :public  | :developer  | false | :personal_access_token | true  | 'dependency endpoint success'      | :success
+        :public  | :guest      | false | :personal_access_token | true  | 'dependency endpoint success'      | :success
+        :public  | :developer  | false | :personal_access_token | false | 'rejects rubygems packages access' | :unauthorized
+        :public  | :guest      | false | :personal_access_token | false | 'rejects rubygems packages access' | :unauthorized
+        :public  | :anonymous  | false | :personal_access_token | true  | 'dependency endpoint success'      | :success
+        :private | :developer  | true  | :personal_access_token | true  | 'dependency endpoint success'      | :success
+        :private | :guest      | true  | :personal_access_token | true  | 'rejects rubygems packages access' | :forbidden
+        :private | :developer  | true  | :personal_access_token | false | 'rejects rubygems packages access' | :unauthorized
+        :private | :guest      | true  | :personal_access_token | false | 'rejects rubygems packages access' | :unauthorized
+        :private | :developer  | false | :personal_access_token | true  | 'rejects rubygems packages access' | :not_found
+        :private | :guest      | false | :personal_access_token | true  | 'rejects rubygems packages access' | :not_found
+        :private | :developer  | false | :personal_access_token | false | 'rejects rubygems packages access' | :unauthorized
+        :private | :guest      | false | :personal_access_token | false | 'rejects rubygems packages access' | :unauthorized
+        :private | :anonymous  | false | :personal_access_token | true  | 'rejects rubygems packages access' | :not_found
+        :public  | :developer  | true  | :job_token             | true  | 'dependency endpoint success'      | :success
+        :public  | :guest      | true  | :job_token             | true  | 'dependency endpoint success'      | :success
+        :public  | :developer  | true  | :job_token             | false | 'rejects rubygems packages access' | :unauthorized
+        :public  | :guest      | true  | :job_token             | false | 'rejects rubygems packages access' | :unauthorized
+        :public  | :developer  | false | :job_token             | true  | 'dependency endpoint success'      | :success
+        :public  | :guest      | false | :job_token             | true  | 'dependency endpoint success'      | :success
+        :public  | :developer  | false | :job_token             | false | 'rejects rubygems packages access' | :unauthorized
+        :public  | :guest      | false | :job_token             | false | 'rejects rubygems packages access' | :unauthorized
+        :private | :developer  | true  | :job_token             | true  | 'dependency endpoint success'      | :success
+        :private | :guest      | true  | :job_token             | true  | 'rejects rubygems packages access' | :forbidden
+        :private | :developer  | true  | :job_token             | false | 'rejects rubygems packages access' | :unauthorized
+        :private | :guest      | true  | :job_token             | false | 'rejects rubygems packages access' | :unauthorized
+        :private | :developer  | false | :job_token             | true  | 'rejects rubygems packages access' | :not_found
+        :private | :guest      | false | :job_token             | true  | 'rejects rubygems packages access' | :not_found
+        :private | :developer  | false | :job_token             | false | 'rejects rubygems packages access' | :unauthorized
+        :private | :guest      | false | :job_token             | false | 'rejects rubygems packages access' | :unauthorized
+        :public  | :developer  | true  | :deploy_token          | true  | 'dependency endpoint success'      | :success
+        :public  | :developer  | true  | :deploy_token          | false | 'rejects rubygems packages access' | :unauthorized
+        :private | :developer  | true  | :deploy_token          | true  | 'dependency endpoint success'      | :success
+        :private | :developer  | true  | :deploy_token          | false | 'rejects rubygems packages access' | :unauthorized
+      end
+
+      with_them do
+        let(:token) { valid_token ? tokens[token_type] : 'invalid-token123' }
+        let(:headers) { user_role == :anonymous ? {} : { 'HTTP_AUTHORIZATION' => token } }
+        let(:params) { {} }
+
+        before do
+          project.update!(visibility: visibility.to_s)
+        end
+
+        it_behaves_like params[:shared_examples_name], params[:user_role], params[:expected_status], params[:member]
+      end
+    end
   end
 end

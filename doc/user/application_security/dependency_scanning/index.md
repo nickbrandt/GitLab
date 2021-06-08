@@ -62,25 +62,26 @@ The following languages and dependency managers are supported:
 
 | Package Managers | Languages  | Supported files | Scan tools |
 | ------------------- | --------- | --------------- | ------------ |
-| [Bundler](https://bundler.io/) | Ruby | `Gemfile.lock`, `gems.locked` | [Gemnasium](https://gitlab.com/gitlab-org/security-products/gemnasium), [bundler-audit](https://github.com/rubysec/bundler-audit) |
-| [Composer](https://getcomposer.org/) | PHP | `composer.lock` | [Gemnasium](https://gitlab.com/gitlab-org/security-products/gemnasium) |
-| [Conan](https://conan.io/) | C, C++ | [`conan.lock`](https://docs.conan.io/en/latest/versioning/lockfiles.html) | [Gemnasium](https://gitlab.com/gitlab-org/security-products/gemnasium) |
-| [Golang](https://golang.org/) | Go | `go.sum` | [Gemnasium](https://gitlab.com/gitlab-org/security-products/gemnasium) |
-| [Gradle](https://gradle.org/), [Maven](https://maven.apache.org/) | Java | `build.gradle`, `build.gradle.kts`, `pom.xml` | [Gemnasium](https://gitlab.com/gitlab-org/security-products/gemnasium) |
-| [npm](https://www.npmjs.com/), [yarn](https://classic.yarnpkg.com/en/) 1.x | JavaScript | `package-lock.json`, `npm-shrinkwrap.json`, `yarn.lock` | [Gemnasium](https://gitlab.com/gitlab-org/security-products/gemnasium) |
+| [Bundler](https://bundler.io/) | Ruby | `Gemfile.lock`, `gems.locked` | [Gemnasium](https://gitlab.com/gitlab-org/security-products/analyzers/gemnasium), [bundler-audit](https://github.com/rubysec/bundler-audit) |
+| [Composer](https://getcomposer.org/) | PHP | `composer.lock` | [Gemnasium](https://gitlab.com/gitlab-org/security-products/analyzers/gemnasium) |
+| [Conan](https://conan.io/) | C, C++ | [`conan.lock`](https://docs.conan.io/en/latest/versioning/lockfiles.html) | [Gemnasium](https://gitlab.com/gitlab-org/security-products/analyzers/gemnasium) |
+| [Golang](https://golang.org/) | Go | `go.sum` | [Gemnasium](https://gitlab.com/gitlab-org/security-products/analyzers/gemnasium) |
+| [Gradle](https://gradle.org/), [Maven](https://maven.apache.org/) | Java | `build.gradle`, `build.gradle.kts`, `pom.xml` | [Gemnasium](https://gitlab.com/gitlab-org/security-products/analyzers/gemnasium) |
+| [npm](https://www.npmjs.com/), [yarn](https://classic.yarnpkg.com/en/) 1.x | JavaScript | `package-lock.json`, `npm-shrinkwrap.json`, `yarn.lock` | [Gemnasium](https://gitlab.com/gitlab-org/security-products/analyzers/gemnasium) |
 | [npm](https://www.npmjs.com/) (7 and earlier), [yarn](https://classic.yarnpkg.com/en/) 1.x | JavaScript | `package.json` | [Retire.js](https://retirejs.github.io/retire.js/) |
-| [NuGet](https://www.nuget.org/) 4.9+ | .NET, C# | [`packages.lock.json`](https://docs.microsoft.com/en-us/nuget/consume-packages/package-references-in-project-files#enabling-lock-file) | [Gemnasium](https://gitlab.com/gitlab-org/security-products/gemnasium) |
-| [`setuptools`](https://setuptools.readthedocs.io/en/latest/), [pip](https://pip.pypa.io/en/stable/), [Pipenv](https://pipenv.pypa.io/en/latest/) (*1*) | Python | `setup.py`, `requirements.txt`, `requirements.pip`, `requires.txt`, `Pipfile`, `Pipfile.lock` | [Gemnasium](https://gitlab.com/gitlab-org/security-products/gemnasium) |
-| [sbt](https://www.scala-sbt.org/) (*2*) | Scala | `build.sbt` | [Gemnasium](https://gitlab.com/gitlab-org/security-products/gemnasium) |
+| [NuGet](https://www.nuget.org/) 4.9+ | .NET, C# | [`packages.lock.json`](https://docs.microsoft.com/en-us/nuget/consume-packages/package-references-in-project-files#enabling-lock-file) | [Gemnasium](https://gitlab.com/gitlab-org/security-products/analyzers/gemnasium) |
+| [`setuptools`](https://setuptools.readthedocs.io/en/latest/), [pip](https://pip.pypa.io/en/stable/), [Pipenv](https://pipenv.pypa.io/en/latest/) (*1*) | Python | `setup.py`, `requirements.txt`, `requirements.pip`, `requires.txt`, `Pipfile`, `Pipfile.lock` | [Gemnasium](https://gitlab.com/gitlab-org/security-products/analyzers/gemnasium) |
+| [sbt](https://www.scala-sbt.org/) (*2*) | Scala | `build.sbt` | [Gemnasium](https://gitlab.com/gitlab-org/security-products/analyzers/gemnasium) |
 
 1. [Pipenv](https://pipenv.pypa.io/en/latest/) projects are scanned when a `Pipfile` is present.
 1. Support for [sbt](https://www.scala-sbt.org/) 1.3 and above was added in GitLab 13.9.
 
 Plans are underway for supporting the following languages, dependency managers, and dependency files. For details, see the issue link for each.
+For workarounds, see the [Troubleshooting section](#troubleshooting)
 
 | Package Managers    | Languages | Supported files | Scan tools | Issue |
 | ------------------- | --------- | --------------- | ---------- | ----- |
-| [Poetry](https://python-poetry.org/) | Python | `poetry.lock` | [Gemnasium](https://gitlab.com/gitlab-org/security-products/gemnasium) | [GitLab#7006](https://gitlab.com/gitlab-org/gitlab/-/issues/7006) |
+| [Poetry](https://python-poetry.org/) | Python | `poetry.lock` | [Gemnasium](https://gitlab.com/gitlab-org/security-products/analyzers/gemnasium) | [GitLab#7006](https://gitlab.com/gitlab-org/gitlab/-/issues/7006) |
 
 ## Contribute your scanner
 
@@ -105,13 +106,13 @@ include:
 The included template creates dependency scanning jobs in your CI/CD
 pipeline and scans your project's source code for possible vulnerabilities.
 The results are saved as a
-[dependency scanning report artifact](../../../ci/pipelines/job_artifacts.md#artifactsreportsdependency_scanning)
+[dependency scanning report artifact](../../../ci/yaml/README.md#artifactsreportsdependency_scanning)
 that you can later download and analyze. Due to implementation limitations, we
 always take the latest dependency scanning artifact available.
 
 ### Customizing the dependency scanning settings
 
-The dependency scanning settings can be changed through [CI/CD variables](#available-variables) by using the
+The dependency scanning settings can be changed through [CI/CD variables](#available-cicd-variables) by using the
 [`variables`](../../../ci/yaml/README.md#variables) parameter in `.gitlab-ci.yml`.
 For example:
 
@@ -129,7 +130,7 @@ configuration, the last mention of the variable takes precedence.
 ### Overriding dependency scanning jobs
 
 WARNING:
-Beginning in GitLab 13.0, the use of [`only` and `except`](../../../ci/yaml/README.md#onlyexcept-basic)
+Beginning in GitLab 13.0, the use of [`only` and `except`](../../../ci/yaml/README.md#only--except)
 is no longer supported. When overriding the template, you must use [`rules`](../../../ci/yaml/README.md#rules) instead.
 
 To override a job definition (for example, to change properties like `variables` or `dependencies`),
@@ -156,7 +157,7 @@ gemnasium-dependency_scanning:
   dependencies: ["build"]
 ```
 
-### Available variables
+### Available CI/CD variables
 
 Dependency scanning can be [configured](#customizing-the-dependency-scanning-settings)
 using environment variables.
@@ -168,7 +169,8 @@ The following variables allow configuration of global dependency scanning settin
 | CI/CD variables             | Description |
 | ----------------------------|------------ |
 | `ADDITIONAL_CA_CERT_BUNDLE` | Bundle of CA certs to trust. The bundle of certificates provided here is also used by other tools during the scanning process, such as `git`, `yarn`, or `npm`. See [Using a custom SSL CA certificate authority](#using-a-custom-ssl-ca-certificate-authority) for more details. |
-| `DS_DEFAULT_ANALYZERS`      | Override the names of the official default images. Read more about [customizing analyzers](analyzers.md). |
+| `DS_EXCLUDED_ANALYZERS`      | Specify the analyzers (by name) to exclude from Dependency Scanning. For more information, see [Dependency Scanning Analyzers](analyzers.md). |
+| `DS_DEFAULT_ANALYZERS`      | ([**DEPRECATED - use `DS_EXCLUDED_ANALYZERS` instead**](https://gitlab.com/gitlab-org/gitlab/-/issues/287691)) Override the names of the official default images. For more information, see [Dependency Scanning Analyzers](analyzers.md). |
 | `DS_EXCLUDED_PATHS`         | Exclude vulnerabilities from output based on the paths. A comma-separated list of patterns. Patterns can be globs, or file or folder paths (for example, `doc,spec`). Parent directories also match patterns. Default: `"spec, test, tests, tmp"`. |
 | `SECURE_ANALYZERS_PREFIX`   | Override the name of the Docker registry providing the official default images (proxy). Read more about [customizing analyzers](analyzers.md). |
 | `SECURE_LOG_LEVEL`          | Set the minimum logging level. Messages of this logging level or higher are output. From highest to lowest severity, the logging levels are: `fatal`, `error`, `warn`, `info`, `debug`. [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/10880) in GitLab 13.1. Default: `info`. |
@@ -183,10 +185,11 @@ The following variables are used for configuring specific analyzers (used for a 
 | `BUNDLER_AUDIT_ADVISORY_DB_URL`      | `bundler-audit`    | `https://github.com/rubysec/ruby-advisory-db` | URL of the advisory database used by bundler-audit. |
 | `BUNDLER_AUDIT_ADVISORY_DB_REF_NAME` | `bundler-audit`    | `master`                     | Git ref for the advisory database specified by `BUNDLER_AUDIT_ADVISORY_DB_URL`. |
 | `GEMNASIUM_DB_LOCAL_PATH`            | `gemnasium`        | `/gemnasium-db`              | Path to local Gemnasium database. |
+| `GEMNASIUM_DB_UPDATE_DISABLED`       | `gemnasium`        | `"false"`                    | Disable automatic updates for the `gemnasium-db` advisory database (For usage see: [examples](#hosting-a-copy-of-the-gemnasium_db-advisory-database))|
 | `GEMNASIUM_DB_REMOTE_URL`            | `gemnasium`        | `https://gitlab.com/gitlab-org/security-products/gemnasium-db.git` | Repository URL for fetching the Gemnasium database. |
 | `GEMNASIUM_DB_REF_NAME`              | `gemnasium`        | `master`                     | Branch name for remote repository database. `GEMNASIUM_DB_REMOTE_URL` is required. |
 | `DS_REMEDIATE`                       | `gemnasium`        | `"true"`                     | Enable automatic remediation of vulnerable dependencies. |
-| `DS_JAVA_VERSION`                    | `gemnasium-maven`  | `11`                         | Version of Java. Available versions: `8`, `11`, `13`, `14`. Maven and Gradle use the Java version specified by this value. |
+| `DS_JAVA_VERSION`                    | `gemnasium-maven`  | `11`                         | Version of Java. Available versions: `8`, `11`, `13`, `14`, `15`. Maven and Gradle use the Java version specified by this value. |
 | `MAVEN_CLI_OPTS`                     | `gemnasium-maven`  | `"-DskipTests --batch-mode"` | List of command line arguments that are passed to `maven` by the analyzer. See an example for [using private repositories](../index.md#using-private-maven-repositories). |
 | `GRADLE_CLI_OPTS`                    | `gemnasium-maven`  |                              | List of command line arguments that are passed to `gradle` by the analyzer. |
 | `SBT_CLI_OPTS`                       | `gemnasium-maven`  |                              | List of command-line arguments that the analyzer passes to `sbt`. |
@@ -214,7 +217,7 @@ variables:
       -----END CERTIFICATE-----
 ```
 
-The `ADDITIONAL_CA_CERT_BUNDLE` value can also be configured as a [custom variable in the UI](../../../ci/variables/README.md#create-a-custom-variable-in-the-ui), either as a `file`, which requires the path to the certificate, or as a variable, which requires the text representation of the certificate.
+The `ADDITIONAL_CA_CERT_BUNDLE` value can also be configured as a [custom variable in the UI](../../../ci/variables/README.md#custom-cicd-variables), either as a `file`, which requires the path to the certificate, or as a variable, which requires the text representation of the certificate.
 
 ### Using private Maven repositories
 
@@ -226,13 +229,13 @@ Read more on [how to use private Maven repositories](../index.md#using-private-m
 ## Interacting with the vulnerabilities
 
 Once a vulnerability is found, you can interact with it. Read more on how to
-[interact with the vulnerabilities](../index.md#interacting-with-the-vulnerabilities).
+[address the vulnerabilities](../vulnerabilities/index.md).
 
-## Solutions for vulnerabilities (auto-remediation)
+## Solutions for vulnerabilities
 
 Some vulnerabilities can be fixed by applying the solution that GitLab
 automatically generates. Read more about the
-[solutions for vulnerabilities](../index.md#automatic-remediation-for-vulnerabilities).
+[solutions for vulnerabilities](../vulnerabilities/index.md#resolve-a-vulnerability).
 
 ## Security Dashboard
 
@@ -242,8 +245,8 @@ vulnerabilities in your groups, projects and pipelines. Read more about the
 
 ## Vulnerabilities database update
 
-For more information about the vulnerabilities database update, check the
-[maintenance table](../index.md#maintenance-and-update-of-the-vulnerabilities-database).
+For more information about the vulnerabilities database update, see the
+[maintenance table](../vulnerabilities/index.md#vulnerability-scanner-maintenance).
 
 ## Dependency List
 
@@ -419,8 +422,8 @@ registry.gitlab.com/gitlab-org/security-products/analyzers/bundler-audit:2
 The process for importing Docker images into a local offline Docker registry depends on
 **your network security policy**. Please consult your IT staff to find an accepted and approved
 process by which external resources can be imported or temporarily accessed.
-Note that these scanners are [updated periodically](../index.md#maintenance-and-update-of-the-vulnerabilities-database)
-with new definitions, so consider if you can make periodic updates yourself.
+These scanners are [periodically updated](../vulnerabilities/index.md#vulnerability-scanner-maintenance)
+with new definitions, and you may be able to make occasional updates on your own.
 
 For details on saving and transporting Docker images as a file, see Docker's documentation on
 [`docker save`](https://docs.docker.com/engine/reference/commandline/save/), [`docker load`](https://docs.docker.com/engine/reference/commandline/load/),
@@ -505,12 +508,56 @@ ensure that it can reach your private repository. Here is an example configurati
    setuptools.ssl_support.cert_paths = ['internal.crt']
    ```
 
+## Hosting a copy of the gemnasium_db advisory database
+
+The [`gemnasium_db`](https://gitlab.com/gitlab-org/security-products/gemnasium-db) Git repository is
+used by `gemnasium`, `gemnasium-maven`, and `gemnasium-python` as the source of vulnerability data.
+This repository updates at scan time to fetch the latest advisories. However, due to a restricted
+networking environment, running this update is sometimes not possible. In this case, a user can do
+one of the following:
+
+- [Host a copy of the advisory database](#host-a-copy-of-the-advisory-database)
+- [Use a local clone](#use-a-local-clone)
+
+### Host a copy of the advisory database
+
+If [gemnasium-db](https://gitlab.com/gitlab-org/security-products/gemnasium-db) is not reachable
+from within the environment, the user can host their own Git copy. Then the analyzer can be
+instructed to update the database from the user's copy by using `GEMNASIUM_DB_REMOTE_URL`:
+
+```yaml
+variables:
+  GEMNASIUM_DB_REMOTE_URL: https://users-own-copy.example.com/gemnasium-db/.git
+
+...
+```
+
+### Use a local clone
+
+If a hosted copy is not possible, then the user can clone [gemnasium-db](https://gitlab.com/gitlab-org/security-products/gemnasium-db)
+or create an archive before the scan and point the analyzer to the directory (using:
+`GEMNASIUM_DB_LOCAL_PATH`). Turn off the analyzer's self-update mechanism (using:
+`GEMNASIUM_DB_UPDATE_DISABLED`). In this example, the database directory is created in the
+`before_script`, before the `gemnasium` analyzer's scan job:
+
+```yaml
+...
+
+gemnasium-dependency_scanning:
+  variables:
+    GEMNASIUM_DB_LOCAL_PATH: ./gemnasium-db-local
+    GEMNASIUM_DB_UPDATE_DISABLED: "true"
+  before_script:
+    - mkdir $GEMNASIUM_DB_LOCAL_PATH
+    - tar -xzf gemnasium_db.tar.gz -C $GEMNASIUM_DB_LOCAL_PATH
+```
+
 ## Limitations
 
 ### Referencing local dependencies using a path in JavaScript projects
 
 The [Retire.js](https://gitlab.com/gitlab-org/security-products/analyzers/retire.js) analyzer
-doesn't support dependency references made with [local paths](https://docs.npmjs.com/cli/v6/configuring-npm/package-json#local-paths)
+doesn't support dependency references made with [local paths](https://docs.npmjs.com/cli/v6/configuring-npm/package-json/#local-paths)
 in the `package.json` of JavaScript projects. The dependency scan outputs the following error for
 such references:
 
@@ -518,10 +565,57 @@ such references:
 ERROR: Could not find dependencies: <dependency-name>. You may need to run npm install
 ```
 
-As a workaround, remove the [`retire.js`](analyzers.md#selecting-specific-analyzers) analyzer from
-[DS_DEFAULT_ANALYZERS](#configuring-dependency-scanning).
+As a workaround, add the [`retire.js`](analyzers.md) analyzer to
+[`DS_EXCLUDED_ANALYZERS`](#configuring-dependency-scanning).
 
 ## Troubleshooting
+
+### Working around missing support for certain languages or package managers
+
+As noted in the ["Supported languages" section](#supported-languages-and-package-managers)
+some dependency definition files are not yet supported.
+However, Dependency Scanning can be achieved if
+the language, a package manager, or a third-party tool
+can convert the definition file
+into a supported format.
+
+Generally, the approach is the following:
+
+1. Define a dedicated converter job in your `.gitlab-ci.yml` file.
+   Use a suitable Docker image, script, or both to facilitate the conversion.
+1. Let that job upload the converted, supported file as an artifact.
+1. Add [`dependencies: [<your-converter-job>]`](../../../ci/yaml/README.md#dependencies)
+   to your `dependency_scanning` job to make use of the converted definitions files.
+
+For example, the currently unsupported `poetry.lock` file can be
+[converted](https://python-poetry.org/docs/cli/#export)
+to the supported `requirements.txt` as follows.
+
+```yaml
+include:
+  - template: Dependency-Scanning.gitlab-ci.yml
+
+stages:
+  - .pre
+  - test
+
+variables:
+  PIP_REQUIREMENTS_FILE: "requirements-converted.txt"
+
+convert-poetry:
+  stage: .pre
+  image: python:3-slim
+  script:
+    - pip install poetry  # Or via another method: https://python-poetry.org/docs/#installation
+    - poetry export --output "$PIP_REQUIREMENTS_FILE"
+  artifacts:
+    paths:
+      - "$PIP_REQUIREMENTS_FILE"
+
+dependency_scanning:
+  stage: test
+  dependencies: ["convert-poetry"]
+```
 
 ### `Error response from daemon: error processing tar file: docker-tar: relocation error`
 

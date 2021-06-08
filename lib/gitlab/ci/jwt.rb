@@ -54,6 +54,7 @@ module Gitlab
           user_login: user&.username,
           user_email: user&.email,
           pipeline_id: build.pipeline.id.to_s,
+          pipeline_source: build.pipeline.source.to_s,
           job_id: build.id.to_s,
           ref: source_ref,
           ref_type: ref_type,
@@ -72,16 +73,16 @@ module Gitlab
 
       def key
         @key ||= begin
-                   key_data = if Feature.enabled?(:ci_jwt_signing_key, build.project, default_enabled: true)
-                                Gitlab::CurrentSettings.ci_jwt_signing_key
-                              else
-                                Rails.application.secrets.openid_connect_signing_key
-                              end
+          key_data = if Feature.enabled?(:ci_jwt_signing_key, build.project, default_enabled: true)
+                       Gitlab::CurrentSettings.ci_jwt_signing_key
+                     else
+                       Rails.application.secrets.openid_connect_signing_key
+                     end
 
-                   raise NoSigningKeyError unless key_data
+          raise NoSigningKeyError unless key_data
 
-                   OpenSSL::PKey::RSA.new(key_data)
-                 end
+          OpenSSL::PKey::RSA.new(key_data)
+        end
       end
 
       def public_key
@@ -123,4 +124,4 @@ module Gitlab
   end
 end
 
-Gitlab::Ci::Jwt.prepend_if_ee('::EE::Gitlab::Ci::Jwt')
+Gitlab::Ci::Jwt.prepend_mod_with('Gitlab::Ci::Jwt')

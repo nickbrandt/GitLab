@@ -71,11 +71,11 @@ export default {
       return (this.glFeatures.mergeRequestWidgetGraphql ? this.state : this.mr).targetBranch;
     },
     shouldRemoveSourceBranch() {
-      if (this.glFeatures.mergeRequestWidgetGraphql) {
-        return this.state.shouldRemoveSourceBranch || this.state.forceRemoveSourceBranch;
-      }
+      if (!this.glFeatures.mergeRequestWidgetGraphql) return this.mr.shouldRemoveSourceBranch;
 
-      return this.mr.shouldRemoveSourceBranch;
+      if (!this.state.shouldRemoveSourceBranch) return false;
+
+      return this.state.shouldRemoveSourceBranch || this.state.forceRemoveSourceBranch;
     },
     autoMergeStrategy() {
       return (this.glFeatures.mergeRequestWidgetGraphql ? this.state : this.mr).autoMergeStrategy;
@@ -154,7 +154,7 @@ export default {
       <status-icon status="success" />
       <div class="media-body">
         <h4 class="gl-display-flex">
-          <span class="gl-mr-3" data-qa-selector="merge_request_status_content">
+          <span class="gl-mr-3">
             <span class="js-status-text-before-author" data-testid="beforeStatusText">{{
               statusTextBeforeAuthor
             }}</span>
@@ -169,6 +169,7 @@ export default {
             role="button"
             href="#"
             class="btn btn-sm btn-default js-cancel-auto-merge"
+            data-qa-selector="cancel_auto_merge_button"
             data-testid="cancelAutomaticMergeButton"
             @click.prevent="cancelAutomaticMerge"
           >

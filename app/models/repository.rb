@@ -288,6 +288,10 @@ class Repository
     false
   end
 
+  def search_branch_names(pattern)
+    redis_set_cache.search('branch_names', pattern) { branch_names }
+  end
+
   def languages
     return [] if empty?
 
@@ -829,12 +833,6 @@ class Repository
     end
   end
 
-  def merge_to_ref(user, source_sha, merge_request, target_ref, message, first_parent_ref, allow_conflicts = false)
-    branch = merge_request.target_branch
-
-    raw.merge_to_ref(user, source_sha, branch, target_ref, message, first_parent_ref, allow_conflicts)
-  end
-
   def delete_refs(*ref_names)
     raw.delete_refs(*ref_names)
   end
@@ -940,6 +938,8 @@ class Repository
   end
 
   def fetch_as_mirror(url, forced: false, refmap: :all_refs, remote_name: nil, prune: true)
+    return fetch_remote(remote_name, url: url, refmap: refmap, forced: forced, prune: prune) if Feature.enabled?(:fetch_remote_params, project, default_enabled: :yaml)
+
     unless remote_name
       remote_name = "tmp-#{SecureRandom.hex}"
       tmp_remote_name = true
@@ -993,6 +993,18 @@ class Repository
     return [] if empty?
 
     raw_repository.search_files_by_name(query, ref)
+  end
+
+  def search_files_by_wildcard_path(path, ref = 'HEAD')
+    # We need to use RE2 to match Gitaly's regexp engine
+    regexp_string = RE2::Regexp.escape(path)
+
+    anything = '.*?'
+    anything_but_not_slash = '([^\/])*?'
+    regexp_string.gsub!('\*\*', anything)
+    regexp_string.gsub!('\*', anything_but_not_slash)
+
+    raw_repository.search_files_by_regexp("^#{regexp_string}$", ref)
   end
 
   def copy_gitattributes(ref)
@@ -1161,17 +1173,13 @@ class Repository
   end
 
   def tags_sorted_by_committed_date
-    tags.sort_by do |tag|
-      # Annotated tags can point to any object (e.g. a blob), but generally
-      # tags point to a commit. If we don't have a commit, then just default
-      # to putting the tag at the end of the list.
-      target = tag.dereferenced_target
+    # Annotated tags can point to any object (e.g. a blob), but generally
+    # tags point to a commit. If we don't have a commit, then just default
+    # to putting the tag at the end of the list.
+    default = Time.current
 
-      if target
-        target.committed_date
-      else
-        Time.current
-      end
+    tags.sort_by do |tag|
+      tag.dereferenced_target&.committed_date || default
     end
   end
 
@@ -1187,4 +1195,4 @@ class Repository
   end
 end
 
-Repository.prepend_if_ee('EE::Repository')
+Repository.prepend_mod_with('Repository')

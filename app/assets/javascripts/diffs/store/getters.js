@@ -1,3 +1,4 @@
+import { getParameterValues } from '~/lib/utils/url_utility';
 import { __, n__ } from '~/locale';
 import {
   PARALLEL_DIFF_VIEW_TYPE,
@@ -135,6 +136,11 @@ export const fileLineCoverage = (state) => (file, line) => {
   return {};
 };
 
+// This function is overwritten for the inline codequality feature in EE
+export const fileLineCodequality = () => () => {
+  return null;
+};
+
 /**
  * Returns index of a currently selected diff in diffFiles
  * @returns {number}
@@ -156,17 +162,22 @@ export const diffLines = (state) => (file, unifiedDiffComponents) => {
   );
 };
 
-export function suggestionCommitMessage(state) {
+export function suggestionCommitMessage(state, _, rootState) {
   return (values = {}) =>
     computeSuggestionCommitMessage({
       message: state.defaultSuggestionCommitMessage,
       values: {
-        branch_name: state.branchName,
-        project_path: state.projectPath,
-        project_name: state.projectName,
-        username: state.username,
-        user_full_name: state.userFullName,
+        branch_name: rootState.page.mrMetadata.branch_name,
+        project_path: rootState.page.mrMetadata.project_path,
+        project_name: rootState.page.mrMetadata.project_name,
+        username: rootState.page.mrMetadata.username,
+        user_full_name: rootState.page.mrMetadata.user_full_name,
         ...values,
       },
     });
 }
+
+export const isVirtualScrollingEnabled = (state) =>
+  !state.viewDiffsFileByFile &&
+  (window.gon?.features?.diffsVirtualScrolling ||
+    getParameterValues('virtual_scrolling')[0] === 'true');

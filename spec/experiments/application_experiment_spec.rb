@@ -25,6 +25,12 @@ RSpec.describe ApplicationExperiment, :experiment do
     described_class.new('namespaced/stub')
   end
 
+  it "doesn't raise an exception without a defined control" do
+    # because we have a default behavior defined
+
+    expect { experiment('namespaced/stub') { } }.not_to raise_error
+  end
+
   describe "enabled" do
     before do
       allow(subject).to receive(:enabled?).and_call_original
@@ -58,32 +64,99 @@ RSpec.describe ApplicationExperiment, :experiment do
   end
 
   describe "publishing results" do
+    it "doesn't record, track or push data to the client if we shouldn't track", :snowplow do
+      allow(subject).to receive(:should_track?).and_return(false)
+      subject.record!
+
+      expect(subject).not_to receive(:record_experiment)
+      expect(subject).not_to receive(:track)
+      expect(Gon).not_to receive(:push)
+
+      subject.publish(:action)
+
+      expect_no_snowplow_event
+    end
+
+    describe 'recording the experiment' do
+      it 'does not record the experiment if we do not tell it to' do
+        expect(subject).not_to receive(:record_experiment)
+
+        subject.publish
+      end
+
+      it 'records the experiment if we tell it to' do
+        subject.record!
+
+        expect(subject).to receive(:record_experiment)
+
+        subject.publish
+      end
+    end
+
     it "tracks the assignment" do
       expect(subject).to receive(:track).with(:assignment)
 
-      subject.publish(nil)
+      subject.publish
     end
 
-    it "pushes the experiment knowledge into the client using Gon.global" do
-      expect(Gon.global).to receive(:push).with(
-        {
-          experiment: {
-            'namespaced/stub' => { # string key because it can be namespaced
-              experiment: 'namespaced/stub',
-              key: '86208ac54ca798e11f127e8b23ec396a',
-              variant: 'control'
-            }
-          }
-        },
-        true
-      )
+    it "pushes the experiment knowledge into the client using Gon" do
+      expect(Gon).to receive(:push).with({ experiment: { 'namespaced/stub' => subject.signature } }, true)
 
-      subject.publish(nil)
+      subject.publish
+    end
+
+    it "handles when Gon raises exceptions (like when it can't be pushed into)" do
+      expect(Gon).to receive(:push).and_raise(NoMethodError)
+
+      expect { subject.publish }.not_to raise_error
     end
   end
 
   it "can exclude from within the block" do
     expect(described_class.new('namespaced/stub') { |e| e.exclude! }).to be_excluded
+  end
+
+  describe 'recording the experiment subject' do
+    using RSpec::Parameterized::TableSyntax
+
+    subject { described_class.new('namespaced/stub', nil, **context) }
+
+    before do
+      subject.record!
+    end
+
+    context 'when providing a compatible context' do
+      where(:context_key, :object_type) do
+        :namespace | :namespace
+        :group     | :namespace
+        :project   | :project
+        :user      | :user
+        :actor     | :user
+      end
+
+      with_them do
+        let(:context) { { context_key => build(object_type) }}
+
+        it 'records the experiment and the experiment subject from the context' do
+          expect { subject.publish }.to change(Experiment, :count).by(1)
+
+          expect(Experiment.last.name).to eq('namespaced/stub')
+          expect(ExperimentSubject.last.send(object_type)).to eq(context[context_key])
+        end
+      end
+    end
+
+    context 'when providing an incompatible or no context' do
+      where(context_hash: [{ foo: :bar }, {}])
+
+      with_them do
+        let(:context) { context_hash }
+
+        it 'does not record the experiment' do
+          expect { subject.publish }.not_to change(Experiment, :count)
+        end
+      end
+    end
   end
 
   describe "tracking events", :snowplow do
@@ -110,7 +183,7 @@ RSpec.describe ApplicationExperiment, :experiment do
             data: { data: '_data_' }
           },
           {
-            schema: 'iglu:com.gitlab/gitlab_experiment/jsonschema/0-3-0',
+            schema: 'iglu:com.gitlab/gitlab_experiment/jsonschema/1-0-0',
             data: { experiment: 'namespaced/stub', key: '86208ac54ca798e11f127e8b23ec396a', variant: 'control' }
           }
         ]
@@ -119,77 +192,22 @@ RSpec.describe ApplicationExperiment, :experiment do
   end
 
   describe "variant resolution" do
-    context "when using the default feature flag percentage rollout" do
-      it "uses the default value as specified in the yaml" do
-        expect(Feature).to receive(:enabled?).with('namespaced_stub', subject, type: :experiment, default_enabled: :yaml)
+    it "uses the default value as specified in the yaml" do
+      expect(Feature).to receive(:enabled?).with('namespaced_stub', subject, type: :experiment, default_enabled: :yaml)
 
-        expect(subject.variant.name).to eq('control')
-      end
-
-      it "returns nil when not rolled out" do
-        stub_feature_flags(namespaced_stub: false)
-
-        expect(subject.variant.name).to eq('control')
-      end
-
-      context "when rolled out to 100%" do
-        it "returns the first variant name" do
-          subject.try(:variant1) {}
-          subject.try(:variant2) {}
-
-          expect(subject.variant.name).to eq('variant1')
-        end
-      end
+      expect(subject.variant.name).to eq('control')
     end
 
-    context "when using the round_robin strategy", :clean_gitlab_redis_shared_state do
-      context "when variants aren't supplied" do
-        subject :inheriting_class do
-          Class.new(described_class) do
-            def rollout_strategy
-              :round_robin
-            end
-          end.new('namespaced/stub')
-        end
-
-        it "raises an error" do
-          expect { inheriting_class.variants }.to raise_error(NotImplementedError)
-        end
+    context "when rolled out to 100%" do
+      before do
+        stub_feature_flags(namespaced_stub: true)
       end
 
-      context "when variants are supplied" do
-        let(:inheriting_class) do
-          Class.new(described_class) do
-            def rollout_strategy
-              :round_robin
-            end
+      it "returns the first variant name" do
+        subject.try(:variant1) {}
+        subject.try(:variant2) {}
 
-            def variants
-              %i[variant1 variant2 control]
-            end
-          end
-        end
-
-        it "proves out round robin in variant selection", :aggregate_failures do
-          instance_1 = inheriting_class.new('namespaced/stub')
-          allow(instance_1).to receive(:enabled?).and_return(true)
-          instance_2 = inheriting_class.new('namespaced/stub')
-          allow(instance_2).to receive(:enabled?).and_return(true)
-          instance_3 = inheriting_class.new('namespaced/stub')
-          allow(instance_3).to receive(:enabled?).and_return(true)
-
-          instance_1.try {}
-
-          expect(instance_1.variant.name).to eq('variant2')
-
-          instance_2.try {}
-
-          expect(instance_2.variant.name).to eq('control')
-
-          instance_3.try {}
-
-          expect(instance_3.variant.name).to eq('variant1')
-        end
+        expect(subject.variant.name).to eq('variant1')
       end
     end
   end

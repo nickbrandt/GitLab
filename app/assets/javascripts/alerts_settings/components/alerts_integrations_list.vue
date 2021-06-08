@@ -21,8 +21,9 @@ import {
 import getCurrentIntegrationQuery from '../graphql/queries/get_current_integration.query.graphql';
 
 export const i18n = {
-  title: s__('AlertsIntegrations|Current integrations'),
-  emptyState: s__('AlertsIntegrations|No integrations have been added yet'),
+  deleteIntegration: s__('AlertSettings|Delete integration'),
+  editIntegration: s__('AlertSettings|Edit integration'),
+  emptyState: s__('AlertsIntegrations|No integrations have been added yet.'),
   status: {
     enabled: {
       name: __('Enabled'),
@@ -114,7 +115,7 @@ export default {
   methods: {
     tbodyTrClass(item) {
       return {
-        [bodyTrClass]: this.integrations.length,
+        [bodyTrClass]: this.integrations?.length,
         'gl-bg-blue-50': (item !== null && item.id) === this.currentIntegration?.id,
       };
     },
@@ -139,7 +140,6 @@ export default {
 
 <template>
   <div class="incident-management-list">
-    <h5 class="gl-font-lg">{{ $options.i18n.title }}</h5>
     <gl-table
       class="integration-list"
       :items="integrations"
@@ -153,7 +153,7 @@ export default {
         <span v-if="item.active" data-testid="integration-activated-status">
           <gl-icon
             v-gl-tooltip
-            name="check-circle-filled"
+            name="check"
             :size="16"
             class="gl-text-green-500 gl-hover-cursor-pointer gl-mr-3"
             :title="$options.i18n.status.enabled.tooltip"
@@ -174,11 +174,16 @@ export default {
 
       <template #cell(actions)="{ item }">
         <gl-button-group class="gl-ml-3">
-          <gl-button icon="settings" @click="editIntegration(item)" />
+          <gl-button
+            icon="settings"
+            :aria-label="$options.i18n.editIntegration"
+            @click="editIntegration(item)"
+          />
           <gl-button
             v-gl-modal.deleteIntegration
             :disabled="item.type === $options.typeSet.prometheus"
             icon="remove"
+            :aria-label="$options.i18n.deleteIntegration"
             @click="setIntegrationToDelete(item)"
           />
         </gl-button-group>
@@ -198,15 +203,15 @@ export default {
     </gl-table>
     <gl-modal
       modal-id="deleteIntegration"
-      :title="s__('AlertSettings|Delete integration')"
-      :ok-title="s__('AlertSettings|Delete integration')"
+      :title="$options.i18n.deleteIntegration"
+      :ok-title="$options.i18n.deleteIntegration"
       ok-variant="danger"
       @ok="deleteIntegration"
     >
       <gl-sprintf
         :message="
           s__(
-            'AlertsIntegrations|You have opted to delete the %{integrationName} integration. Do you want to proceed? It means you will no longer receive alerts from this endpoint in your alert list, and this action cannot be undone.',
+            'AlertsIntegrations|If you delete the %{integrationName} integration, alerts are no longer sent from this endpoint. This action cannot be undone.',
           )
         "
       >

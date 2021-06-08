@@ -84,6 +84,8 @@ module Gitlab
         end
 
         def valid_project_slug?(found_project)
+          return false unless found_project
+
           project_slug == found_project.full_path_slug
         end
 
@@ -100,4 +102,4 @@ module Gitlab
   end
 end
 
-Gitlab::Email::Handler::ReplyProcessing.prepend_if_ee('::EE::Gitlab::Email::Handler::ReplyProcessing')
+Gitlab::Email::Handler::ReplyProcessing.prepend_mod_with('Gitlab::Email::Handler::ReplyProcessing')

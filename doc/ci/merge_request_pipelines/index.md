@@ -1,6 +1,6 @@
 ---
 stage: Verify
-group: Continuous Integration
+group: Pipeline Execution
 info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#assignments
 type: reference, index
 last_update: 2019-07-03
@@ -18,6 +18,12 @@ you can use *pipelines for merge requests*.
 
 In the UI, these pipelines are labeled as `detached`. Otherwise, these pipelines appear the same
 as other pipelines.
+
+Pipelines for merge requests can run when you:
+
+- Create a new merge request.
+- Commit changes to the source branch for the merge request.
+- Select the **Run pipeline** button from the **Pipelines** tab in the merge request.
 
 Any user who has developer [permissions](../../user/permissions.md)
 can run a pipeline for merge requests.
@@ -64,7 +70,7 @@ build:
   stage: build
   script: ./build
   only:
-    - master
+    - main
 
 test:
   stage: test
@@ -76,7 +82,7 @@ deploy:
   stage: deploy
   script: ./deploy
   only:
-    - master
+    - main
 ```
 
 #### Excluding certain jobs
@@ -94,10 +100,10 @@ Consider the following pipeline, with jobs `A`, `B`, and `C`. Imagine you want:
 
 To achieve this, you can configure your `.gitlab-ci.yml` file as follows:
 
-``` yaml
+```yaml
 .only-default: &only-default
   only:
-    - master
+    - main
     - merge_requests
     - tags
 
@@ -131,7 +137,7 @@ save resources.
 #### Excluding certain branches
 
 Pipelines for merge requests require special treatment when
-using [`only`/`except`](../yaml/README.md#onlyexcept-basic). Unlike ordinary
+using [`only`/`except`](../yaml/README.md#only--except). Unlike ordinary
 branch refs (for example `refs/heads/my-feature-branch`), merge request refs
 use a special Git reference that looks like `refs/merge-requests/:iid/head`. Because
 of this, the following configuration will **not** work as expected:
@@ -147,7 +153,7 @@ Instead, you can use the
 [`$CI_COMMIT_REF_NAME` predefined environment
 variable](../variables/predefined_variables.md) in
 combination with
-[`only:variables`](../yaml/README.md#onlyvariablesexceptvariables) to
+[`only:variables`](../yaml/README.md#onlyvariables--exceptvariables) to
 accomplish this behavior:
 
 ```yaml
@@ -191,7 +197,7 @@ could mistakenly trust the merge request because it passed a faked pipeline.
 Parent project members with at least [Developer permissions](../../user/permissions.md)
 can create pipelines in the parent project for merge requests
 from a forked project. In the merge request, go to the **Pipelines** and click
-**Run Pipeline** button.
+**Run pipeline** button.
 
 WARNING:
 Fork merge requests could contain malicious code that tries to steal secrets in the
@@ -219,9 +225,9 @@ which helps you get your starting configuration correct.
 If you are seeing two pipelines when using `only/except`, please see the caveats
 related to using `only/except` above (or, consider moving to `rules`).
 
-It is not possible to run a job for branch pipelines first, then only for merge request
-pipelines after the merge request is created (skipping the duplicate branch pipeline). See
-the [related issue](https://gitlab.com/gitlab-org/gitlab/-/issues/201845) for more details.
+In [GitLab 13.7](https://gitlab.com/gitlab-org/gitlab/-/issues/201845) and later,
+you can add `workflow:rules` to [switch from branch pipelines to merge request pipelines](../yaml/README.md#switch-between-branch-pipelines-and-merge-request-pipelines)
+after a merge request is open on the branch.
 
 ### Two pipelines created when pushing an invalid CI configuration file
 

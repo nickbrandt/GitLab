@@ -26,8 +26,8 @@ module CacheMarkdownField
 
   # Returns the default Banzai render context for the cached markdown field.
   def banzai_render_context(field)
-    raise ArgumentError.new("Unknown field: #{field.inspect}") unless
-      cached_markdown_fields.markdown_fields.include?(field)
+    raise ArgumentError, "Unknown field: #{field.inspect}" unless
+      cached_markdown_fields.key?(field)
 
     # Always include a project key, or Banzai complains
     project = self.project if self.respond_to?(:project)
@@ -56,12 +56,12 @@ module CacheMarkdownField
   # Update every applicable column in a row if any one is invalidated, as we only store
   # one version per row
   def refresh_markdown_cache
-    updates = cached_markdown_fields.markdown_fields.map do |markdown_field|
+    updates = cached_markdown_fields.markdown_fields.to_h do |markdown_field|
       [
         cached_markdown_fields.html_field(markdown_field),
         rendered_field_content(markdown_field)
       ]
-    end.to_h
+    end
 
     updates['cached_markdown_version'] = latest_cached_markdown_version
 
@@ -99,8 +99,8 @@ module CacheMarkdownField
   end
 
   def cached_html_for(markdown_field)
-    raise ArgumentError.new("Unknown field: #{markdown_field}") unless
-      cached_markdown_fields.markdown_fields.include?(markdown_field)
+    raise ArgumentError, "Unknown field: #{markdown_field}" unless
+      cached_markdown_fields.key?(markdown_field)
 
     __send__(cached_markdown_fields.html_field(markdown_field)) # rubocop:disable GitlabSecurity/PublicSend
   end
@@ -108,7 +108,7 @@ module CacheMarkdownField
   # Updates the markdown cache if necessary, then returns the field
   # Unlike `cached_html_for` it returns `nil` if the field does not exist
   def updated_cached_html_for(markdown_field)
-    return unless cached_markdown_fields.markdown_fields.include?(markdown_field)
+    return unless cached_markdown_fields.key?(markdown_field)
 
     if attribute_invalidated?(cached_markdown_fields.html_field(markdown_field))
       # Invalidated due to Markdown content change

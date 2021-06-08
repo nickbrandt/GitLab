@@ -35,22 +35,29 @@ RSpec.describe Gitlab::GitalyClient::RemoteService do
   end
 
   describe '#find_remote_root_ref' do
+    let(:remote) { 'origin' }
+    let(:url) { 'http://git.example.com/my-repo.git' }
+    let(:auth) { 'Basic secret' }
+    let(:expected_params) { { remote_url: url, http_authorization_header: auth } }
+
     it 'sends an find_remote_root_ref message and returns the root ref' do
       expect_any_instance_of(Gitaly::RemoteService::Stub)
         .to receive(:find_remote_root_ref)
         .with(gitaly_request_with_path(storage_name, relative_path), kind_of(Hash))
+        .with(gitaly_request_with_params(expected_params), kind_of(Hash))
         .and_return(double(ref: 'master'))
 
-      expect(client.find_remote_root_ref('origin')).to eq 'master'
+      expect(client.find_remote_root_ref(remote, url, auth)).to eq 'master'
     end
 
     it 'ensure ref is a valid UTF-8 string' do
       expect_any_instance_of(Gitaly::RemoteService::Stub)
         .to receive(:find_remote_root_ref)
         .with(gitaly_request_with_path(storage_name, relative_path), kind_of(Hash))
+        .with(gitaly_request_with_params(expected_params), kind_of(Hash))
         .and_return(double(ref: "an_invalid_ref_\xE5"))
 
-      expect(client.find_remote_root_ref('origin')).to eq "an_invalid_ref_å"
+      expect(client.find_remote_root_ref(remote, url, auth)).to eq "an_invalid_ref_å"
     end
   end
 

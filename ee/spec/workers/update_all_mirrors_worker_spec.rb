@@ -32,10 +32,10 @@ RSpec.describe UpdateAllMirrorsWorker do
       outer_context = nil
 
       Gitlab::ApplicationContext.with_context(project: build(:project)) do
-        outer_context = Labkit::Context.current.to_h
+        outer_context = Gitlab::ApplicationContext.current
 
         expect(worker).to receive(:schedule_mirrors!) do
-          inner_context = Labkit::Context.current.to_h
+          inner_context = Gitlab::ApplicationContext.current
 
           # `schedule_mirrors!` needs to return an integer.
           0
@@ -160,7 +160,7 @@ RSpec.describe UpdateAllMirrorsWorker do
     context 'when the instance checks namespace plans' do
       def scheduled_mirror(at:, licensed:, public: false, subgroup: nil)
         group_args = [:group, :public, subgroup && :nested].compact
-        namespace = create(*group_args)
+        namespace = create(*group_args) # rubocop:disable Rails/SaveBang
         project = create(:project, :public, :mirror, namespace: namespace)
 
         create(:gitlab_subscription, (licensed ? :bronze : :free), namespace: namespace.root_ancestor)

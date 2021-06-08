@@ -39,4 +39,21 @@ export const testActions = {
     completed: false,
     svg: 'http://example.com/images/illustration.svg',
   },
+  issueCreated: {
+    url: 'http://example.com/',
+    completed: false,
+    svg: 'http://example.com/images/illustration.svg',
+  },
+};
+
+export const testSections = {
+  workspace: {
+    svg: 'workspace.svg',
+  },
+  deploy: {
+    svg: 'deploy.svg',
+  },
+  plan: {
+    svg: 'plan.svg',
+  },
 };

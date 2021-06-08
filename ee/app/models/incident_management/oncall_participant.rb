@@ -23,9 +23,6 @@ module IncidentManagement
 
     scope :not_removed, -> { where(is_removed: false) }
     scope :removed, -> { where(is_removed: true) }
-
-    def mark_as_removed
-      update_column(:is_removed, true)
-    end
+    scope :for_user, -> (user) { where(user: user) }
   end
 end

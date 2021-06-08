@@ -10,6 +10,8 @@ module Ci
     include TokenAuthenticatable
     include IgnorableColumns
     include FeatureGate
+    include Gitlab::Utils::StrongMemoize
+    include TaggableQueries
 
     add_authentication_token_field :token, encrypted: -> { Feature.enabled?(:ci_runners_tokens_optional_encryption, default_enabled: true) ? :optional : :required }
 
@@ -39,18 +41,16 @@ module Ci
 
     AVAILABLE_TYPES_LEGACY = %w[specific shared].freeze
     AVAILABLE_TYPES = runner_types.keys.freeze
-    AVAILABLE_STATUSES = %w[active paused online offline].freeze
+    AVAILABLE_STATUSES = %w[active paused online offline not_connected].freeze
     AVAILABLE_SCOPES = (AVAILABLE_TYPES_LEGACY + AVAILABLE_TYPES + AVAILABLE_STATUSES).freeze
 
     FORM_EDITABLE = %i[description tag_list active run_untagged locked access_level maximum_timeout_human_readable].freeze
     MINUTES_COST_FACTOR_FIELDS = %i[public_projects_minutes_cost_factor private_projects_minutes_cost_factor].freeze
 
-    ignore_column :is_shared, remove_after: '2019-12-15', remove_with: '12.6'
-
     has_many :builds
-    has_many :runner_projects, inverse_of: :runner, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
+    has_many :runner_projects, inverse_of: :runner, autosave: true, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
     has_many :projects, through: :runner_projects
-    has_many :runner_namespaces, inverse_of: :runner
+    has_many :runner_namespaces, inverse_of: :runner, autosave: true
     has_many :groups, through: :runner_namespaces
 
     has_one :last_build, -> { order('id DESC') }, class_name: 'Ci::Build'
@@ -60,6 +60,7 @@ module Ci
     scope :active, -> { where(active: true) }
     scope :paused, -> { where(active: false) }
     scope :online, -> { where('contacted_at > ?', online_contact_time_deadline) }
+    scope :recent, -> { where('ci_runners.created_at > :date OR ci_runners.contacted_at > :date', date: 3.months.ago) }
     # The following query using negation is cheaper than using `contacted_at <= ?`
     # because there are less runners online than have been created. The
     # resulting query is quickly finding online ones and then uses the regular
@@ -67,6 +68,7 @@ module Ci
     # did `contacted_at <= ?` the query would effectively have to do a seq
     # scan.
     scope :offline, -> { where.not(id: online) }
+    scope :not_connected, -> { where(contacted_at: nil) }
     scope :ordered, -> { order(id: :desc) }
 
     scope :with_recent_runner_queue, -> { where('contacted_at > ?', recent_queue_deadline) }
@@ -162,6 +164,8 @@ module Ci
       numericality: { greater_than_or_equal_to: 0.0,
                       message: 'needs to be non-negative' }
 
+    validates :config, json_schema: { filename: 'ci_runner_config' }
+
     # Searches for runners matching the given query.
     #
     # This method uses ILIKE on PostgreSQL.
@@ -195,6 +199,42 @@ module Ci
         order_contacted_at_asc
       else
         order_created_at_desc
+      end
+    end
+
+    def self.runner_matchers
+      unique_params = [
+        :runner_type,
+        :public_projects_minutes_cost_factor,
+        :private_projects_minutes_cost_factor,
+        :run_untagged,
+        :access_level,
+        Arel.sql("(#{arel_tag_names_array.to_sql})")
+      ]
+
+      # we use distinct to de-duplicate data
+      distinct.pluck(*unique_params).map do |values|
+        Gitlab::Ci::Matching::RunnerMatcher.new({
+          runner_type: values[0],
+          public_projects_minutes_cost_factor: values[1],
+          private_projects_minutes_cost_factor: values[2],
+          run_untagged: values[3],
+          access_level: values[4],
+          tag_list: values[5]
+        })
+      end
+    end
+
+    def runner_matcher
+      strong_memoize(:runner_matcher) do
+        Gitlab::Ci::Matching::RunnerMatcher.new({
+          runner_type: runner_type,
+          public_projects_minutes_cost_factor: public_projects_minutes_cost_factor,
+          private_projects_minutes_cost_factor: private_projects_minutes_cost_factor,
+          run_untagged: run_untagged,
+          access_level: access_level,
+          tag_list: tag_list
+        })
       end
     end
 
@@ -299,6 +339,14 @@ module Ci
     end
 
     def tick_runner_queue
+      ##
+      # We only stick a runner to primary database to be able to detect the
+      # replication lag in `EE::Ci::RegisterJobService#execute`. The
+      # intention here is not to execute `Ci::RegisterJobService#execute` on
+      # the primary database.
+      #
+      ::Gitlab::Database::LoadBalancing::Sticking.stick(:runner, id)
+
       SecureRandom.hex.tap do |new_update|
         ::Gitlab::Workhorse.set_key_and_notify(runner_queue_key, new_update,
           expire: RUNNER_QUEUE_EXPIRY_TIME, overwrite: true)
@@ -316,21 +364,24 @@ module Ci
     end
 
     def heartbeat(values)
-      values = values&.slice(:version, :revision, :platform, :architecture, :ip_address) || {}
-      values[:contacted_at] = Time.current
+      ##
+      # We can safely ignore writes performed by a runner heartbeat. We do
+      # not want to upgrade database connection proxy to use the primary
+      # database after heartbeat write happens.
+      #
+      ::Gitlab::Database::LoadBalancing::Session.without_sticky_writes do
+        values = values&.slice(:version, :revision, :platform, :architecture, :ip_address, :config) || {}
+        values[:contacted_at] = Time.current
 
-      cache_attributes(values)
+        cache_attributes(values)
 
-      # We save data without validation, it will always change due to `contacted_at`
-      self.update_columns(values) if persist_cached_data?
+        # We save data without validation, it will always change due to `contacted_at`
+        self.update_columns(values) if persist_cached_data?
+      end
     end
 
     def pick_build!(build)
-      if Feature.enabled?(:ci_reduce_queries_when_ticking_runner_queue, self, default_enabled: :yaml)
-        tick_runner_queue if matches_build?(build)
-      else
-        tick_runner_queue if can_pick?(build)
-      end
+      tick_runner_queue if matches_build?(build)
     end
 
     def uncached_contacted_at
@@ -396,15 +447,9 @@ module Ci
     end
 
     def matches_build?(build)
-      return false if self.ref_protected? && !build.protected?
-
-      accepting_tags?(build)
-    end
-
-    def accepting_tags?(build)
-      (run_untagged? || build.has_tags?) && (build.tag_list - tag_list).empty?
+      runner_matcher.matches?(build.build_matcher)
     end
   end
 end
 
-Ci::Runner.prepend_if_ee('EE::Ci::Runner')
+Ci::Runner.prepend_mod_with('Ci::Runner')

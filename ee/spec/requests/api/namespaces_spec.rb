@@ -3,6 +3,8 @@
 require 'spec_helper'
 
 RSpec.describe API::Namespaces do
+  include AfterNextHelpers
+
   let(:admin) { create(:admin) }
   let(:user) { create(:user) }
 
@@ -123,22 +125,34 @@ RSpec.describe API::Namespaces do
         create(:gitlab_subscription, namespace: group1, max_seats_used: 1, seats_in_use: 1)
       end
 
-      it "avoids additional N+1 database queries" do
-        control = ActiveRecord::QueryRecorder.new(skip_cached: false) { get api("/namespaces", user) }
+      # We seem to have some N+1 queries.
+      # The saml_provider association adds one for each group (saml_provider is
+      #   an association on group, not namespace).
+      # The route adds one for each namespace.
+      # And more...
+      context "avoids additional N+1 database queries" do
+        let(:control) { ActiveRecord::QueryRecorder.new(skip_cached: false) { get api("/namespaces", user) } }
 
-        create(:gitlab_subscription, namespace: group2, max_seats_used: 2)
-        group2.add_guest(user)
+        before do
+          create(:gitlab_subscription, namespace: group2, max_seats_used: 2)
+          group2.add_guest(user)
 
-        group3 = create(:group)
-        create(:gitlab_subscription, namespace: group3, max_seats_used: 3)
-        group3.add_guest(user)
+          group3 = create(:group)
+          create(:gitlab_subscription, namespace: group3, max_seats_used: 3)
+          group3.add_guest(user)
+        end
 
-        # We seem to have some N+1 queries.
-        # The saml_provider association adds one for each group (saml_provider is
-        #   an association on group, not namespace).
-        # The route adds one for each namespace.
-        # And more...
-        expect { get api("/namespaces", user) }.not_to exceed_all_query_limit(control).with_threshold(7)
+        context 'traversal_sync_ids feature flag is false' do
+          before do
+            stub_feature_flags(sync_traversal_ids: false)
+          end
+
+          it { expect { get api("/namespaces", user) }.not_to exceed_all_query_limit(control).with_threshold(7) }
+        end
+
+        context 'traversal_sync_ids feature flag is true' do
+          it { expect { get api("/namespaces", user) }.not_to exceed_all_query_limit(control).with_threshold(8) }
+        end
       end
 
       it 'includes max_seats_used' do
@@ -205,6 +219,34 @@ RSpec.describe API::Namespaces do
         expect(json_response['shared_runners_minutes_limit']).to eq(params[:shared_runners_minutes_limit])
         expect(json_response['additional_purchased_storage_size']).to eq(params[:additional_purchased_storage_size])
         expect(json_response['additional_purchased_storage_ends_on']).to eq(params[:additional_purchased_storage_ends_on])
+      end
+
+      it 'expires the CI minutes CachedQuota' do
+        expect_next(Gitlab::Ci::Minutes::CachedQuota).to receive(:expire!)
+
+        put api("/namespaces/#{group1.id}", admin), params: params
+      end
+
+      context 'when request has extra_shared_runners_minutes_limit param' do
+        before do
+          params[:extra_shared_runners_minutes_limit] = 1000
+          params.delete(:shared_runners_minutes_limit)
+        end
+
+        it 'expires the CI minutes CachedQuota' do
+          expect_next(Gitlab::Ci::Minutes::CachedQuota).to receive(:expire!)
+
+          put api("/namespaces/#{group1.id}", admin), params: params
+        end
+      end
+
+      context 'when neither minutes limit params is provided' do
+        it 'does not expire the CI minutes CachedQuota' do
+          params.delete(:shared_runners_minutes_limit)
+          expect(Gitlab::Ci::Minutes::CachedQuota).not_to receive(:new)
+
+          put api("/namespaces/#{group1.id}", admin), params: params
+        end
       end
     end
 
@@ -278,7 +320,8 @@ RSpec.describe API::Namespaces do
           auto_renew: true,
           trial: true,
           trial_ends_on: '2019-05-01',
-          trial_starts_on: '2019-06-01'
+          trial_starts_on: '2019-06-01',
+          trial_extension_type: GitlabSubscription.trial_extension_types[:reactivated]
         }
       end
 
@@ -298,7 +341,8 @@ RSpec.describe API::Namespaces do
           auto_renew: true,
           trial: true,
           trial_starts_on: Date.parse(gitlab_subscription[:trial_starts_on]),
-          trial_ends_on: Date.parse(gitlab_subscription[:trial_ends_on])
+          trial_ends_on: Date.parse(gitlab_subscription[:trial_ends_on]),
+          trial_extension_type: 'reactivated'
         )
       end
 
@@ -519,6 +563,12 @@ RSpec.describe API::Namespaces do
             seats: 20,
             max_seats_used: 42
           )
+        end
+
+        it 'updates the timestamp when the attributes are the same' do
+          expect do
+            do_put(namespace.id, admin, gitlab_subscription.attributes)
+          end.to change { gitlab_subscription.reload.updated_at }
         end
       end
     end

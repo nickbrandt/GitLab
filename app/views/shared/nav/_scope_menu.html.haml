@@ -1,0 +1,6 @@
+- if sidebar_refactor_enabled?
+  = nav_link(**scope_menu.active_routes, html_options: scope_menu.nav_link_html_options) do
+    = render 'shared/nav/scope_menu_body', scope_menu: scope_menu
+- else
+  .context-header
+    = render 'shared/nav/scope_menu_body', scope_menu: scope_menu

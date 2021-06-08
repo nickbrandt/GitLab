@@ -141,6 +141,13 @@ export default {
     },
   },
   methods: {
+    epicReference(epic) {
+      const reference = `${this.$options.epicSymbol}${epic.iid}`;
+      if (epic.group.fullPath !== this.groupFullPath) {
+        return `${epic.group.fullPath}${reference}`;
+      }
+      return reference;
+    },
     epicTimeframe({ startDate, dueDate }) {
       const start = startDate ? parsePikadayDate(startDate) : null;
       const due = dueDate ? parsePikadayDate(dueDate) : null;
@@ -200,7 +207,7 @@ export default {
     :current-tab="currentState"
     :tab-counts="epicsCount"
     :search-input-placeholder="__('Search or filter results...')"
-    :search-tokens="getFilteredSearchTokens()"
+    :search-tokens="getFilteredSearchTokens({ supportsEpic: false })"
     :sort-options="$options.EpicsSortOptions"
     :initial-filter-value="getFilteredSearchValue()"
     :initial-sort-by="sortedBy"
@@ -224,6 +231,9 @@ export default {
       <gl-button v-if="canCreateEpic" category="primary" variant="success" :href="epicNewPath">{{
         __('New epic')
       }}</gl-button>
+    </template>
+    <template #reference="{ issuable }">
+      <span class="issuable-reference">{{ epicReference(issuable) }}</span>
     </template>
     <template #timeframe="{ issuable }">
       <gl-icon name="calendar" />

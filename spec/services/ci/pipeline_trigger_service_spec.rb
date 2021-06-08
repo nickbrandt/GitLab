@@ -13,10 +13,33 @@ RSpec.describe Ci::PipelineTriggerService do
 
   describe '#execute' do
     let_it_be(:user) { create(:user) }
+
     let(:result) { described_class.new(project, user, params).execute }
 
     before do
       project.add_developer(user)
+    end
+
+    shared_examples 'detecting an unprocessable pipeline trigger' do
+      context 'when the pipeline was not created successfully' do
+        let(:fail_pipeline) do
+          receive(:execute).and_wrap_original do |original, *args|
+            pipeline = original.call(*args)
+            pipeline.update!(failure_reason: 'unknown_failure')
+            pipeline
+          end
+        end
+
+        before do
+          allow_next(Ci::CreatePipelineService).to fail_pipeline
+        end
+
+        it 'has the correct status code' do
+          expect { result }.to change { Ci::Pipeline.count }
+          expect(result).to be_error
+          expect(result.http_status).to eq(:unprocessable_entity)
+        end
+      end
     end
 
     context 'with a trigger token' do
@@ -55,17 +78,6 @@ RSpec.describe Ci::PipelineTriggerService do
             expect(var.variable_type).to eq('file')
           end
 
-          context 'when FF ci_trigger_payload_into_pipeline is disabled' do
-            before do
-              stub_feature_flags(ci_trigger_payload_into_pipeline: false)
-            end
-
-            it 'does not store the payload as a variable' do
-              expect { result }.not_to change { Ci::PipelineVariable.count }
-              expect(result[:pipeline].variables).to be_empty
-            end
-          end
-
           context 'when commit message has [ci skip]' do
             before do
               allow_next(Ci::Pipeline).to receive(:git_commit_message) { '[ci skip]' }
@@ -73,7 +85,7 @@ RSpec.describe Ci::PipelineTriggerService do
 
             it 'ignores [ci skip] and create as general' do
               expect { result }.to change { Ci::Pipeline.count }.by(1)
-              expect(result[:status]).to eq(:success)
+              expect(result).to be_success
             end
           end
 
@@ -88,19 +100,22 @@ RSpec.describe Ci::PipelineTriggerService do
               expect(result[:pipeline].trigger_requests.last.variables).to be_nil
             end
           end
+
+          it_behaves_like 'detecting an unprocessable pipeline trigger'
         end
 
-        context 'when params have a non-existsed ref' do
+        context 'when params have a non-existant ref' do
           let(:params) { { token: trigger.token, ref: 'invalid-ref', variables: nil } }
 
           it 'does not trigger a pipeline' do
             expect { result }.not_to change { Ci::Pipeline.count }
-            expect(result[:http_status]).to eq(400)
+            expect(result).to be_error
+            expect(result.http_status).to eq(:bad_request)
           end
         end
       end
 
-      context 'when params have a non-existsed trigger token' do
+      context 'when params have a non-existant trigger token' do
         let(:params) { { token: 'invalid-token', ref: nil, variables: nil } }
 
         it 'does not trigger a pipeline' do
@@ -183,14 +198,17 @@ RSpec.describe Ci::PipelineTriggerService do
               expect(job.sourced_pipelines.last.pipeline_id).to eq(result[:pipeline].id)
             end
           end
+
+          it_behaves_like 'detecting an unprocessable pipeline trigger'
         end
 
-        context 'when params have a non-existsed ref' do
+        context 'when params have a non-existant ref' do
           let(:params) { { token: job.token, ref: 'invalid-ref', variables: nil } }
 
-          it 'does not job a pipeline' do
+          it 'does not trigger a job in the pipeline' do
             expect { result }.not_to change { Ci::Pipeline.count }
-            expect(result[:http_status]).to eq(400)
+            expect(result).to be_error
+            expect(result.http_status).to eq(:bad_request)
           end
         end
       end

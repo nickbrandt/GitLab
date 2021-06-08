@@ -21,11 +21,11 @@ export const groupNodes = [
 ];
 
 export const groupNodeLabelValues = [
-  { text: 'Foo', value: '1' },
-  { text: 'Bar', value: '2' },
+  { label: 'Foo', value: '1' },
+  { label: 'Bar', value: '2' },
 ];
 
-export const groupIds = ['1', '2'];
+export const groupIds = [1, 2];
 
 export const groupGids = ['gid://gitlab/Group/1', 'gid://gitlab/Group/2'];
 
@@ -39,7 +39,7 @@ export const groupPageInfo = {
   nextPage: 2,
 };
 
-export const devopsAdoptionSegmentsData = {
+export const devopsAdoptionNamespaceData = {
   nodes: [
     {
       id: 1,
@@ -55,10 +55,11 @@ export const devopsAdoptionSegmentsData = {
         pipelineSucceeded: false,
         deploySucceeded: false,
         securityScanSucceeded: false,
+        codeOwnersUsedCount: 0,
         recordedAt: '2020-10-31T23:59:59Z',
         __typename: 'latestSnapshot',
       },
-      __typename: 'devopsSegment',
+      __typename: 'devopsAdoptionEnabledNamespace',
     },
     {
       id: 2,
@@ -67,13 +68,13 @@ export const devopsAdoptionSegmentsData = {
         id: 'gid://gitlab/Group/2',
       },
       latestSnapshot: null,
-      __typename: 'devopsSegment',
+      __typename: 'devopsAdoptionEnabledNamespace',
     },
   ],
-  __typename: 'devopsAdoptionSegments',
+  __typename: 'devopsAdoptionEnabledNamespaces',
 };
 
-export const devopsAdoptionSegmentsDataEmpty = {
+export const devopsAdoptionNamespaceDataEmpty = {
   nodes: [],
   __typename: 'devopsAdoptionSegments',
 };
@@ -87,40 +88,25 @@ export const devopsAdoptionTableHeaders = [
   {
     index: 1,
     label: 'Issues',
-    tooltip: 'At least 1 issue opened',
+    tooltip: 'At least one issue opened',
   },
   {
     index: 2,
     label: 'MRs',
-    tooltip: 'At least 1 MR opened',
+    tooltip: 'At least one MR opened',
   },
   {
     index: 3,
     label: 'Approvals',
-    tooltip: 'At least 1 approval on an MR',
+    tooltip: 'At least one approval on an MR',
   },
   {
     index: 4,
-    label: 'Runners',
-    tooltip: 'Runner configured for project/group',
+    label: 'Code owners',
+    tooltip: 'Code owners enabled for at least one project',
   },
   {
     index: 5,
-    label: 'Pipelines',
-    tooltip: 'At least 1 pipeline successfully run',
-  },
-  {
-    index: 6,
-    label: 'Deploys',
-    tooltip: 'At least 1 deploy',
-  },
-  {
-    index: 7,
-    label: 'Scanning',
-    tooltip: 'At least 1 security scan of any type run in pipeline',
-  },
-  {
-    index: 8,
     label: '',
     tooltip: null,
   },
@@ -128,7 +114,7 @@ export const devopsAdoptionTableHeaders = [
 
 export const segmentName = 'Foooo';
 
-export const genericErrorMessage = 'An error occurred while saving the group. Please try again.';
+export const genericErrorMessage = 'An error occurred while saving changes. Please try again.';
 
 export const dataErrorMessage = 'Name already taken.';
 

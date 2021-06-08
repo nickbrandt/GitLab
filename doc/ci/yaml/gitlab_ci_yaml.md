@@ -1,6 +1,6 @@
 ---
 stage: Verify
-group: Continuous Integration
+group: Pipeline Execution
 info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#designated-technical-writers
 type: reference
 ---
@@ -76,7 +76,7 @@ branch in the project.
 GitLab CI/CD not only executes the jobs but also shows you what's happening during execution,
 just as you would see in your terminal:
 
-![job running](img/job_running.png)
+![job running](img/job_running_v13_10.png)
 
 You create the strategy for your app and GitLab runs the pipeline
 according to what you've defined. Your pipeline status is also

@@ -50,6 +50,14 @@ module Resolvers
              required: false,
              description: 'Filter epics by given confidentiality.'
 
+    argument :my_reaction_emoji, GraphQL::STRING_TYPE,
+             required: false,
+             description: 'Filter by reaction emoji applied by the current user.'
+
+    argument :not, ::Types::Epics::NegatedEpicFilterInputType,
+             required: false,
+             description: 'Negated epic arguments.'
+
     type Types::EpicType, null: true
 
     def ready?(**args)
@@ -88,7 +96,7 @@ module Resolvers
     end
 
     def epic_feature_enabled?
-      group.feature_available?(:epics)
+      group.licensed_feature_available?(:epics)
     end
 
     def transform_args(args)

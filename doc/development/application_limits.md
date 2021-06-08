@@ -43,8 +43,6 @@ It's recommended to create two separate migration script files.
    class InsertProjectHooksPlanLimits < ActiveRecord::Migration[5.2]
      include Gitlab::Database::MigrationHelpers
 
-     DOWNTIME = false
-
      def up
        create_or_update_plan_limit('project_hooks', 'default', 0)
        create_or_update_plan_limit('project_hooks', 'free', 10)
@@ -139,14 +137,14 @@ end
 
 Self-managed:
 
-- `default` - Everyone
+- `default`: Everyone.
 
 GitLab.com:
 
-- `default` - Any system-wide feature
-- `free` - Namespaces and projects with a Free subscription
-- `bronze`- Namespaces and projects with a Bronze subscription
-- `silver` - Namespaces and projects with a Silver subscription
-- `gold` - Namespaces and projects with a Gold subscription
+- `default`: Any system-wide feature.
+- `free`: Namespaces and projects with a Free subscription.
+- `bronze`: Namespaces and projects with a Bronze subscription. This tier is no longer available for purchase.
+- `silver`: Namespaces and projects with a Premium subscription.
+- `gold`: Namespaces and projects with an Ultimate subscription.
 
 The `test` environment doesn't have any plans.

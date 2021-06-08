@@ -1,4 +1,4 @@
-import { DEFAULT_SORT } from '~/members/constants';
+import { DEFAULT_SORT, MEMBER_TYPES } from '~/members/constants';
 import {
   generateBadges,
   isGroup,
@@ -20,8 +20,9 @@ import {
   member2faEnabled,
   group,
   invite,
-  membersJsonString,
   members,
+  pagination,
+  dataAttribute,
 } from './mock_data';
 
 const IS_CURRENT_USER_ID = 123;
@@ -258,18 +259,20 @@ describe('Members Utils', () => {
 
     beforeEach(() => {
       el = document.createElement('div');
-      el.setAttribute('data-members', membersJsonString);
-      el.setAttribute('data-source-id', '234');
-      el.setAttribute('data-can-manage-members', 'true');
+      el.setAttribute('data-members-data', dataAttribute);
     });
 
     afterEach(() => {
       el = null;
     });
 
-    it('correctly parses the data attributes', () => {
-      expect(parseDataAttributes(el)).toEqual({
-        members,
+    it('correctly parses the data attribute', () => {
+      expect(parseDataAttributes(el)).toMatchObject({
+        [MEMBER_TYPES.user]: {
+          members,
+          pagination,
+          memberPath: '/groups/foo-bar/-/group_members/:id',
+        },
         sourceId: 234,
         canManageMembers: true,
       });

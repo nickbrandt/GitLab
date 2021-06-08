@@ -8,6 +8,9 @@ module Ci
     include ::Checksummable
     include ::Gitlab::ExclusiveLeaseHelpers
     include ::Gitlab::OptimisticLocking
+    include IgnorableColumns
+
+    ignore_columns :build_id_convert_to_bigint, remove_with: '14.1', remove_after: '2021-07-22'
 
     belongs_to :build, class_name: "Ci::Build", foreign_key: :build_id
 
@@ -30,9 +33,9 @@ module Ci
       fog: 3
     }.freeze
 
-    STORE_TYPES = DATA_STORES.keys.map do |store|
+    STORE_TYPES = DATA_STORES.keys.to_h do |store|
       [store, "Ci::BuildTraceChunks::#{store.capitalize}".constantize]
-    end.to_h.freeze
+    end.freeze
 
     enum data_store: DATA_STORES
 
@@ -82,14 +85,8 @@ module Ci
       # change the behavior in CE.
       #
       def with_read_consistency(build, &block)
-        return yield unless consistent_reads_enabled?(build)
-
         ::Gitlab::Database::Consistency
           .with_read_consistency(&block)
-      end
-
-      def consistent_reads_enabled?(build)
-        Feature.enabled?(:gitlab_ci_trace_read_consistency, build.project, type: :development, default_enabled: true)
       end
 
       ##

@@ -10,9 +10,9 @@ info: To determine the technical writer assigned to the Stage/Group associated w
 
 Maintenance Mode allows administrators to reduce write operations to a minimum while maintenance tasks are performed. The main goal is to block all external actions that change the internal state, including the PostgreSQL database, but especially files, Git repositories, Container repositories, etc.
 
-Once Maintenance Mode is enabled, in-progress actions will finish relatively quickly since no new actions are coming in, and internal state changes will be minimal.
+Once Maintenance Mode is enabled, in-progress actions finish relatively quickly since no new actions are coming in, and internal state changes are minimal.
 In that state, various maintenance tasks are easier, and services can be stopped completely or be
-further degraded for a much shorter period of time than might otherwise be needed, for example stopping cron jobs and draining queues should be fairly quick.
+further degraded for a much shorter period of time than might otherwise be needed. For example, stopping cron jobs and draining queues should be fairly quick.
 
 Maintenance Mode allows most external actions that do not change internal state. On a high-level, HTTP POST, PUT, PATCH, and DELETE requests are blocked and a detailed overview of [how special cases are handled](#rest-api) is available.
 
@@ -67,40 +67,40 @@ The banner can be customized with a specific message.
 
 An error is displayed when a user tries to perform a write operation that isn't allowed.
 
-![Maintenance Mode banner and error message](maintenance_mode_error_message.png)
+![Maintenance Mode banner and error message](img/maintenance_mode_error_message.png)
 
 NOTE:
 In some cases, the visual feedback from an action could be misleading, for example when starring a project, the **Star** button changes to show the **Unstar** action, however, this is only the frontend update, and it doesn't take into account the failed status of the POST request. These visual bugs are to be fixed [in follow-up iterations](https://gitlab.com/gitlab-org/gitlab/-/issues/295197).
 
 ### Admin functions
 
-Systems administrators can edit the application settings. This will allow
+Systems administrators can edit the application settings. This allows
 them to disable Maintenance Mode after it's been enabled.
 
 ### Authentication
 
 All users can log in and out of the GitLab instance but no new users can be created.
 
-If there are [LDAP syncs](../auth/ldap/index.md) scheduled for that time, they will fail since user creation is disabled. Similarly, [user creations based on SAML](../../integration/saml.md#general-setup) will fail.
+If there are [LDAP syncs](../auth/ldap/index.md) scheduled for that time, they fail since user creation is disabled. Similarly, [user creations based on SAML](../../integration/saml.md#general-setup) fail.
 
 ### Git actions
 
-All read-only Git operations will continue to work, for example
-`git clone` and `git pull`. All write operations will fail, both through the CLI and Web IDE with the error message: `Git push is not allowed because this GitLab instance is currently in (read-only) maintenance mode.`
+All read-only Git operations continue to work, for example
+`git clone` and `git pull`. All write operations fail, both through the CLI and Web IDE with the error message: `Git push is not allowed because this GitLab instance is currently in (read-only) maintenance mode.`
 
-If Geo is enabled, Git pushes to both primary and secondaries will fail.
+If Geo is enabled, Git pushes to both primary and secondaries fail.
 
 ### Merge requests, issues, epics
 
-All write actions except those mentioned above will fail. For example, a user cannot update merge requests or issues.
+All write actions except those mentioned above fail. For example, a user cannot update merge requests or issues.
 
 ### Incoming email
 
-Creating new issue replies, issues (including new Service Desk issues), merge requests [by email](../incoming_email.md) will fail.
+Creating new issue replies, issues (including new Service Desk issues), merge requests [by email](../incoming_email.md) fail.
 
 ### Outgoing email
 
-Notification emails will continue to arrive, but emails that require database writes, like resetting the password, will not arrive.
+Notification emails continue to arrive, but emails that require database writes, like resetting the password, do not arrive.
 
 ### REST API
 
@@ -143,25 +143,25 @@ is turned off.
 
 ### Deployments
 
-Deployments won't go through because pipelines will be unfinished.
+Deployments don't go through because pipelines are unfinished.
 
 It is recommended to disable auto deploys during Maintenance Mode, and enable them once it is disabled.
 
 #### Terraform integration
 
-Terraform integration depends on running CI pipelines, hence it will be blocked.
+Terraform integration depends on running CI pipelines, hence it is blocked.
 
 ### Container Registry
 
-`docker push` will fail with this error: `denied: requested access to the resource is denied`, but `docker pull` will work.
+`docker push` fails with this error: `denied: requested access to the resource is denied`, but `docker pull` works.
 
 ### Package Registry
 
-Package Registry will allow you to install but not publish packages.
+Package Registry allows you to install but not publish packages.
 
 ### Background jobs
 
-Background jobs (cron jobs, Sidekiq) will continue running as is, because background jobs are not automatically disabled.
+Background jobs (cron jobs, Sidekiq) continue running as is, because background jobs are not automatically disabled.
 
 [During a planned Geo failover](../geo/disaster_recovery/planned_failover.md#prevent-updates-to-the-primary-node),
 it is recommended that you disable all cron jobs except for those related to Geo.
@@ -170,34 +170,34 @@ You can monitor queues and disable jobs in **Admin Area > Monitoring > Backgroun
 
 ### Incident management
 
-[Incident management](../../operations/incident_management/index.md) functions will be limited. The creation of [alerts](../../operations/incident_management/alerts.md) and [incidents](../../operations/incident_management/incidents.md#incident-creation) will be paused entirely. Notifications and paging on alerts and incidents will therefore be disabled.
+[Incident management](../../operations/incident_management/index.md) functions are limited. The creation of [alerts](../../operations/incident_management/alerts.md) and [incidents](../../operations/incident_management/incidents.md#incident-creation) are paused entirely. Notifications and paging on alerts and incidents are therefore disabled.
 
-### Feature flags 
+### Feature flags
 
 - [Development feature flags](../../development/feature_flags/index.md) cannot be turned on or off through the API, but can be toggled through the Rails console.
-- [The feature flag service](../../operations/feature_flags.md) will respond to feature flag checks but feature flags cannot be toggled
+- [The feature flag service](../../operations/feature_flags.md) responds to feature flag checks but feature flags cannot be toggled
 
 ### Geo secondaries
 
-When primary is in Maintenance Mode, secondary will also automatically go into Maintenance Mode.
+When primary is in Maintenance Mode, secondary also automatically goes into Maintenance Mode.
 
 It is important that you do not disable replication before enabling Maintenance Mode.
 
-Replication and verification will continue to work but proxied Git pushes to primary will not work.
+Replication and verification continues to work but proxied Git pushes to primary do not work.
 
 ### Secure features
 
-Features that depend on creating issues or creating or approving Merge Requests, will not work.
+Features that depend on creating issues or creating or approving Merge Requests, do not work.
 
-Exporting a vulnerability list from a Vulnerability Report page will not work.
+Exporting a vulnerability list from a Vulnerability Report page does not work.
 
-Changing the status on a finding or vulnerability object will not work, even though no error is shown in the UI.
+Changing the status on a finding or vulnerability object does not work, even though no error is shown in the UI.
 
 SAST and Secret Detection cannot be initiated because they depend on passing CI jobs to create artifacts.
 
 ## An example use case: a planned failover
 
-In the use case of [a planned failover](../geo/disaster_recovery/planned_failover.md), a few writes in the primary database are acceptable, since they will be replicated quickly and are not significant in number.
+In the use case of [a planned failover](../geo/disaster_recovery/planned_failover.md), a few writes in the primary database are acceptable, since they are replicated quickly and are not significant in number.
 
 For the same reason we don't automatically block background jobs when Maintenance Mode is enabled.
 

@@ -41,9 +41,9 @@ For example, the following policy document allows assuming a role whose name sta
 }
 ```
 
-### Administration settings
+### Configure Amazon authentication
 
-Generate an access key for the IAM user, and configure GitLab with the credentials:
+To configure Amazon authentication in GitLab, generate an access key for the IAM user in the Amazon AWS console, and following the steps below.
 
 1. Navigate to **Admin Area > Settings > General** and expand the **Amazon EKS** section.
 1. Check **Enable Amazon EKS integration**.
@@ -77,7 +77,7 @@ To create and add a new Kubernetes cluster to your project, group, or instance:
    - Project's **Operations > Kubernetes** page, for a project-level cluster.
    - Group's **Kubernetes** page, for a group-level cluster.
    - **Admin Area > Kubernetes**, for an instance-level cluster.
-1. Click **Add Kubernetes cluster**.
+1. Click **Integrate with a cluster certificate**.
 1. Under the **Create new cluster** tab, click **Amazon EKS** to display an
    `Account ID` and `External ID` needed for later steps.
 1. In the [IAM Management Console](https://console.aws.amazon.com/iam/home), create an IAM policy:
@@ -188,9 +188,7 @@ After about 10 minutes, your cluster is ready to go. You can now proceed
 to install some [pre-defined applications](index.md#installing-applications).
 
 NOTE:
-You must add your AWS external ID to the
-[IAM Role in the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-role.html#cli-configure-role-xaccount)
-to manage your cluster using `kubectl`.
+If you have [installed and configured](https://docs.aws.amazon.com/eks/latest/userguide/getting-started.html#get-started-kubectl)  `kubectl`  and you would like to manage your cluster with it, you must add your AWS external ID in the AWS configuration. For more information on how to configure AWS CLI, see [using an IAM role in the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-role.html#cli-configure-role-xaccount).
 
 ### Cluster creation flow
 
@@ -232,7 +230,7 @@ sequenceDiagram
 First, GitLab must obtain an initial set of credentials to communicate with the AWS API.
 These credentials can be retrieved in one of two ways:
 
-- Statically through the [Administration settings](#administration-settings).
+- Statically through the [Configure Amazon authentication](#configure-amazon-authentication).
 - Dynamically via an IAM instance profile ([introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/291015) in GitLab 13.7).
 
 After GitLab retrieves the AWS credentials, it makes an
@@ -272,7 +270,7 @@ arn:aws:iam::123456789012:role/gitlab-eks-provision'
 #### Access denied: User `arn:aws:iam::x` is not authorized to perform: `sts:AssumeRole` on resource: `arn:aws:iam::y`
 
 This error occurs when the credentials defined in the
-[Administration settings](#administration-settings) cannot assume the role defined by the
+[Configure Amazon authentication](#configure-amazon-authentication) cannot assume the role defined by the
 Provision Role ARN. Check that:
 
 1. The initial set of AWS credentials [has the AssumeRole policy](#additional-requirements-for-self-managed-instances).
@@ -289,6 +287,10 @@ When populating options in the configuration form, GitLab returns this error
 because GitLab has successfully assumed your provided role, but the role has
 insufficient permissions to retrieve the resources needed for the form. Make sure
 you've assigned the role the correct permissions.
+
+### Key Pairs are not loaded
+
+GitLab loads the key pairs from the **Cluster Region** specified. Ensure that key pair exists in that region. 
 
 #### `ROLLBACK_FAILED` during cluster creation
 

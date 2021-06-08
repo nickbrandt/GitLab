@@ -93,16 +93,6 @@ RSpec.describe IncidentManagement::OncallRotation do
           expect(subject.errors.full_messages).to include(/Restricted shift times are not available for hourly shifts/)
         end
       end
-
-      context 'end time before start time' do
-        it 'raises a validation error if an active period is set' do
-          subject.active_period_start = '17:00'
-          subject.active_period_end = '08:00'
-
-          expect(subject.valid?).to eq(false)
-          expect(subject.errors.full_messages).to include('Active period end must be later than active period start')
-        end
-      end
     end
   end
 
@@ -117,6 +107,27 @@ RSpec.describe IncidentManagement::OncallRotation do
 
       it { is_expected.to contain_exactly(rotation_1, rotation_2) }
     end
+
+    describe '.with_active_period' do
+      subject { described_class.with_active_period }
+
+      it { is_expected.to be_empty }
+
+      context 'rotation has active period' do
+        let(:rotation) { create(:incident_management_oncall_rotation, :with_active_period, schedule: schedule) }
+
+        it { is_expected.to contain_exactly(rotation) }
+      end
+    end
+  end
+
+  describe '.for_project' do
+    let_it_be(:schedule_rotation) { create(:incident_management_oncall_rotation, schedule: schedule) }
+    let_it_be(:another_rotation) { create(:incident_management_oncall_rotation) }
+
+    subject { described_class.for_project(schedule_rotation.project) }
+
+    it { is_expected.to contain_exactly(schedule_rotation) }
   end
 
   describe '#shift_cycle_duration' do

@@ -10,7 +10,7 @@ type: reference, howto
 GitLab can be configured to use one or multiple repository storages. These storages can be:
 
 - Accessed via [Gitaly](gitaly/index.md), optionally on
-  [its own server](gitaly/index.md#run-gitaly-on-its-own-server).
+  [its own server](gitaly/configure_gitaly.md#run-gitaly-on-its-own-server).
 - Mounted to the local disk. This [method](repository_storage_paths.md#configure-repository-storage-paths)
   is deprecated and [scheduled to be removed](https://gitlab.com/groups/gitlab-org/-/epics/2320) in
   GitLab 14.0.
@@ -131,7 +131,7 @@ forks use the object pool for shared objects. For more information, see
 [How Git object deduplication works in GitLab](../development/git_object_deduplication.md).
 
 Objects are moved from the source project to the object pool when housekeeping is run on the source
-project. Object pool repositories are stored similarly to regular repositories:
+project. Object pool repositories are stored similarly to regular repositories in a directory called `@pools` instead of `@hashed`
 
 ```ruby
 # object pool paths
@@ -139,8 +139,8 @@ project. Object pool repositories are stored similarly to regular repositories:
 ```
 
 WARNING:
-Do not run `git prune` or `git gc` in object pool repositories. This can cause data loss in the
-regular repositories that depend on the object pool.
+Do not run `git prune` or `git gc` in object pool repositories, which are stored in the `@pools` directory.
+This can cause data loss in the regular repositories that depend on the object pool.
 
 ### Object storage support
 

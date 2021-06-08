@@ -7,6 +7,7 @@ RSpec.describe DesignManagement::CopyDesignCollection::CopyService, :clean_gitla
   let_it_be(:user) { create(:user) }
   let_it_be(:project) { create(:project) }
   let_it_be(:issue, refind: true) { create(:issue, project: project) }
+
   let(:target_issue) { create(:issue) }
 
   subject { described_class.new(project, user, issue: issue, target_issue: target_issue).execute }
@@ -192,6 +193,14 @@ RSpec.describe DesignManagement::CopyDesignCollection::CopyService, :clean_gitla
 
           it 'creates a master branch if none previously existed' do
             expect { subject }.to change { target_repository.branch_names }.from([]).to(['master'])
+          end
+
+          it 'does not create default branch when one exists' do
+            target_repository.create_if_not_exists
+            target_repository.create_file(user, '.meta', '.gitlab', branch_name: 'new-branch', message: 'message')
+
+            expect { subject }.not_to change { target_repository.branch_names }
+            expect(target_repository.branch_names).to eq(['new-branch'])
           end
 
           it 'leaves the design collection in the correct copy state' do

@@ -1,3 +1,4 @@
+import { IntrospectionFragmentMatcher } from 'apollo-cache-inmemory';
 import Vue from 'vue';
 import VueApollo from 'vue-apollo';
 import { mapActions, mapGetters } from 'vuex';
@@ -10,28 +11,22 @@ import {
   setWeightFetchingState,
   setEpicFetchingState,
   getMilestoneTitle,
-  getBoardsModalData,
 } from 'ee_else_ce/boards/ee_functions';
 import toggleEpicsSwimlanes from 'ee_else_ce/boards/toggle_epics_swimlanes';
 import toggleLabels from 'ee_else_ce/boards/toggle_labels';
 import BoardAddNewColumnTrigger from '~/boards/components/board_add_new_column_trigger.vue';
 import BoardContent from '~/boards/components/board_content.vue';
-import BoardExtraActions from '~/boards/components/board_extra_actions.vue';
 import './models/label';
 import './models/assignee';
 import '~/boards/models/milestone';
 import '~/boards/models/project';
 import '~/boards/filters/due_date_filters';
-import BoardAddIssuesModal from '~/boards/components/modal/index.vue';
 import { issuableTypes } from '~/boards/constants';
 import eventHub from '~/boards/eventhub';
 import FilteredSearchBoards from '~/boards/filtered_search_boards';
-import modalMixin from '~/boards/mixins/modal_mixins';
 import store from '~/boards/stores';
 import boardsStore from '~/boards/stores/boards_store';
-import ModalStore from '~/boards/stores/modal_store';
 import toggleFocusMode from '~/boards/toggle_focus';
-import { deprecatedCreateFlash as Flash } from '~/flash';
 import createDefaultClient from '~/lib/graphql';
 import {
   NavigationType,
@@ -40,20 +35,33 @@ import {
 } from '~/lib/utils/common_utils';
 import { __ } from '~/locale';
 import sidebarEventHub from '~/sidebar/event_hub';
+import introspectionQueryResultData from '~/sidebar/fragmentTypes.json';
+import { fullBoardId } from './boards_util';
 import boardConfigToggle from './config_toggle';
 import mountMultipleBoardsSwitcher from './mount_multiple_boards_switcher';
 
 Vue.use(VueApollo);
 
+const fragmentMatcher = new IntrospectionFragmentMatcher({
+  introspectionQueryResultData,
+});
+
 const apolloProvider = new VueApollo({
-  defaultClient: createDefaultClient(),
+  defaultClient: createDefaultClient(
+    {},
+    {
+      cacheConfig: {
+        fragmentMatcher,
+      },
+      assumeImmutableResults: true,
+    },
+  ),
 });
 
 let issueBoardsApp;
 
 export default () => {
   const $boardApp = document.getElementById('board-app');
-
   // check for browser back and trigger a hard reload to circumvent browser caching.
   window.addEventListener('pageshow', (event) => {
     const isNavTypeBackForward =
@@ -79,7 +87,6 @@ export default () => {
     components: {
       BoardContent,
       BoardSidebar,
-      BoardAddIssuesModal,
       BoardSettingsSidebar: () => import('~/boards/components/board_settings_sidebar.vue'),
     },
     provide: {
@@ -88,15 +95,25 @@ export default () => {
       rootPath: $boardApp.dataset.rootPath,
       currentUserId: gon.current_user_id || null,
       canUpdate: parseBoolean($boardApp.dataset.canUpdate),
-      labelsFetchPath: $boardApp.dataset.labelsFetchPath,
+      canAdminList: parseBoolean($boardApp.dataset.canAdminList),
       labelsManagePath: $boardApp.dataset.labelsManagePath,
       labelsFilterBasePath: $boardApp.dataset.labelsFilterBasePath,
       timeTrackingLimitToHours: parseBoolean($boardApp.dataset.timeTrackingLimitToHours),
+      multipleAssigneesFeatureAvailable: parseBoolean(
+        $boardApp.dataset.multipleAssigneesFeatureAvailable,
+      ),
+      epicFeatureAvailable: parseBoolean($boardApp.dataset.epicFeatureAvailable),
+      iterationFeatureAvailable: parseBoolean($boardApp.dataset.iterationFeatureAvailable),
       weightFeatureAvailable: parseBoolean($boardApp.dataset.weightFeatureAvailable),
       boardWeight: $boardApp.dataset.boardWeight
         ? parseInt($boardApp.dataset.boardWeight, 10)
         : null,
       scopedLabelsAvailable: parseBoolean($boardApp.dataset.scopedLabels),
+      milestoneListsAvailable: parseBoolean($boardApp.dataset.milestoneListsAvailable),
+      assigneeListsAvailable: parseBoolean($boardApp.dataset.assigneeListsAvailable),
+      iterationListsAvailable: parseBoolean($boardApp.dataset.iterationListsAvailable),
+      issuableType: issuableTypes.issue,
+      emailsDisabled: parseBoolean($boardApp.dataset.emailsDisabled),
     },
     store,
     apolloProvider,
@@ -122,6 +139,7 @@ export default () => {
     created() {
       this.setInitialBoardData({
         boardId: $boardApp.dataset.boardId,
+        fullBoardId: fullBoardId($boardApp.dataset.boardId),
         fullPath: $boardApp.dataset.fullPath,
         boardType: this.parent,
         disabled: this.disabled,
@@ -165,6 +183,7 @@ export default () => {
     },
     mounted() {
       this.filterManager = new FilteredSearchBoards(boardsStore.filter, true, boardsStore.cantEdit);
+
       this.filterManager.setup();
 
       this.performSearch();
@@ -176,7 +195,7 @@ export default () => {
       }
     },
     methods: {
-      ...mapActions(['setInitialBoardData', 'performSearch']),
+      ...mapActions(['setInitialBoardData', 'performSearch', 'setError']),
       initialBoardLoad() {
         boardsStore
           .all()
@@ -185,8 +204,11 @@ export default () => {
             lists.forEach((list) => boardsStore.addList(list));
             this.loading = false;
           })
-          .catch(() => {
-            Flash(__('An error occurred while fetching the board lists. Please try again.'));
+          .catch((error) => {
+            this.setError({
+              error,
+              message: __('An error occurred while fetching the board lists. Please try again.'),
+            });
           });
       },
       updateTokens() {
@@ -230,7 +252,7 @@ export default () => {
             .catch(() => {
               newIssue.setFetchingState('subscriptions', false);
               setWeightFetchingState(newIssue, false);
-              Flash(__('An error occurred while fetching sidebar data'));
+              this.setError({ message: __('An error occurred while fetching sidebar data') });
             });
         }
 
@@ -267,7 +289,9 @@ export default () => {
             })
             .catch(() => {
               issue.setFetchingState('subscriptions', false);
-              Flash(__('An error occurred when toggling the notification subscription'));
+              this.setError({
+                message: __('An error occurred when toggling the notification subscription'),
+              });
             });
         }
       },
@@ -306,52 +330,10 @@ export default () => {
 
   boardConfigToggle(boardsStore);
 
-  const issueBoardsModal = document.getElementById('js-add-issues-btn');
-
-  if (issueBoardsModal && gon.features.addIssuesButton) {
-    // eslint-disable-next-line no-new
-    new Vue({
-      el: issueBoardsModal,
-      mixins: [modalMixin],
-      data() {
-        return {
-          modal: ModalStore.store,
-          store: boardsStore.state,
-          ...getBoardsModalData(),
-          canAdminList: this.$options.el.hasAttribute('data-can-admin-list'),
-        };
-      },
-      computed: {
-        disabled() {
-          if (!this.store) {
-            return true;
-          }
-          return !this.store.lists.filter((list) => !list.preset).length;
-        },
-      },
-      methods: {
-        openModal() {
-          if (!this.disabled) {
-            this.toggleModal(true);
-          }
-        },
-      },
-      render(createElement) {
-        return createElement(BoardExtraActions, {
-          props: {
-            canAdminList: this.$options.el.hasAttribute('data-can-admin-list'),
-            openModal: this.openModal,
-            disabled: this.disabled,
-          },
-        });
-      },
-    });
-  }
-
-  toggleFocusMode(ModalStore, boardsStore);
+  toggleFocusMode();
   toggleLabels();
 
-  if (gon.features?.swimlanes) {
+  if (gon.licensed_features?.swimlanes) {
     toggleEpicsSwimlanes();
   }
 

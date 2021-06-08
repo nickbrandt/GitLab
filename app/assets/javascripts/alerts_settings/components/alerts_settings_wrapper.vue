@@ -1,11 +1,11 @@
 <script>
-import { GlButton } from '@gitlab/ui';
+import { GlButton, GlAlert, GlTabs, GlTab } from '@gitlab/ui';
 import createHttpIntegrationMutation from 'ee_else_ce/alerts_settings/graphql/mutations/create_http_integration.mutation.graphql';
 import updateHttpIntegrationMutation from 'ee_else_ce/alerts_settings/graphql/mutations/update_http_integration.mutation.graphql';
 import createFlash, { FLASH_TYPES } from '~/flash';
 import { fetchPolicies } from '~/lib/graphql';
-import { s__ } from '~/locale';
-import { typeSet } from '../constants';
+import httpStatusCodes from '~/lib/utils/http_status';
+import { typeSet, i18n, tabIndices } from '../constants';
 import createPrometheusIntegrationMutation from '../graphql/mutations/create_prometheus_integration.mutation.graphql';
 import destroyHttpIntegrationMutation from '../graphql/mutations/destroy_http_integration.mutation.graphql';
 import resetHttpTokenMutation from '../graphql/mutations/reset_http_token.mutation.graphql';
@@ -14,13 +14,12 @@ import updateCurrentHttpIntegrationMutation from '../graphql/mutations/update_cu
 import updateCurrentPrometheusIntegrationMutation from '../graphql/mutations/update_current_prometheus_integration.mutation.graphql';
 import updatePrometheusIntegrationMutation from '../graphql/mutations/update_prometheus_integration.mutation.graphql';
 import getCurrentIntegrationQuery from '../graphql/queries/get_current_integration.query.graphql';
-import getHttpIntegrationsQuery from '../graphql/queries/get_http_integrations.query.graphql';
+import getHttpIntegrationQuery from '../graphql/queries/get_http_integration.query.graphql';
 import getIntegrationsQuery from '../graphql/queries/get_integrations.query.graphql';
 import service from '../services';
 import {
   updateStoreAfterIntegrationDelete,
   updateStoreAfterIntegrationAdd,
-  updateStoreAfterHttpIntegrationAdd,
 } from '../utils/cache_updates';
 import {
   DELETE_INTEGRATION_ERROR,
@@ -28,36 +27,26 @@ import {
   RESET_INTEGRATION_TOKEN_ERROR,
   UPDATE_INTEGRATION_ERROR,
   INTEGRATION_PAYLOAD_TEST_ERROR,
+  INTEGRATION_INACTIVE_PAYLOAD_TEST_ERROR,
+  DEFAULT_ERROR,
 } from '../utils/error_messages';
+import AlertsForm from './alerts_form.vue';
 import IntegrationsList from './alerts_integrations_list.vue';
 import AlertSettingsForm from './alerts_settings_form.vue';
-
-export const i18n = {
-  changesSaved: s__(
-    'AlertsIntegrations|The integration has been successfully saved. Alerts from this new integration should now appear on your alerts list.',
-  ),
-  integrationRemoved: s__('AlertsIntegrations|The integration has been successfully removed.'),
-  alertSent: s__(
-    'AlertsIntegrations|The test alert has been successfully sent, and should now be visible on your alerts list.',
-  ),
-  addNewIntegration: s__('AlertSettings|Add new integration'),
-};
 
 export default {
   typeSet,
   i18n,
   components: {
     IntegrationsList,
+    AlertsForm,
     AlertSettingsForm,
+    GlAlert,
     GlButton,
+    GlTabs,
+    GlTab,
   },
   inject: {
-    generic: {
-      default: {},
-    },
-    prometheus: {
-      default: {},
-    },
     projectPath: {
       default: '',
     },
@@ -82,33 +71,8 @@ export default {
         };
       },
       update(data) {
-        const { alertManagementIntegrations: { nodes: list = [] } = {} } = data.project || {};
-
-        return {
-          list,
-        };
-      },
-      error(err) {
-        createFlash({ message: err });
-      },
-    },
-    // TODO: we'll need to update the logic to request specific http integration by its id on edit
-    // when BE adds support for it https://gitlab.com/gitlab-org/gitlab/-/issues/321674
-    // currently the request for ALL http integrations is made and on specific integration edit we search it in the list
-    httpIntegrations: {
-      fetchPolicy: fetchPolicies.CACHE_AND_NETWORK,
-      query: getHttpIntegrationsQuery,
-      variables() {
-        return {
-          projectPath: this.projectPath,
-        };
-      },
-      update(data) {
-        const { alertManagementHttpIntegrations: { nodes: list = [] } = {} } = data.project || {};
-
-        return {
-          list,
-        };
+        const { alertManagementIntegrations: { nodes = [] } = {} } = data.project || {};
+        return nodes;
       },
       error(err) {
         createFlash({ message: err });
@@ -121,10 +85,13 @@ export default {
   data() {
     return {
       isUpdating: false,
-      integrations: {},
-      httpIntegrations: {},
+      integrations: [],
       currentIntegration: null,
+      currentHttpIntegration: null,
+      newIntegration: null,
       formVisible: false,
+      showSuccessfulCreateAlert: false,
+      tabIndex: tabIndices.configureDetails,
     };
   },
   computed: {
@@ -132,17 +99,17 @@ export default {
       return this.$apollo.queries.integrations.loading;
     },
     canAddIntegration() {
-      return this.multiIntegrations || this.integrations?.list?.length < 2;
+      return this.multiIntegrations || this.integrations.length < 2;
     },
   },
   methods: {
     isHttp(type) {
       return type === typeSet.http;
     },
-    createNewIntegration({ type, variables }) {
+    createNewIntegration({ type, variables }, testAfterSubmit) {
       const { projectPath } = this;
-
       const isHttp = this.isHttp(type);
+
       this.isUpdating = true;
       this.$apollo
         .mutate({
@@ -153,26 +120,24 @@ export default {
           },
           update(store, { data }) {
             updateStoreAfterIntegrationAdd(store, getIntegrationsQuery, data, { projectPath });
-            if (isHttp) {
-              updateStoreAfterHttpIntegrationAdd(store, getHttpIntegrationsQuery, data, {
-                projectPath,
-              });
-            }
           },
         })
         .then(({ data: { httpIntegrationCreate, prometheusIntegrationCreate } = {} } = {}) => {
           const error = httpIntegrationCreate?.errors[0] || prometheusIntegrationCreate?.errors[0];
           if (error) {
-            return createFlash({ message: error });
+            createFlash({ message: error });
+            return;
           }
+
           const { integration } = httpIntegrationCreate || prometheusIntegrationCreate;
+          this.newIntegration = integration;
+          this.showSuccessfulCreateAlert = true;
 
-          this.editIntegration(integration);
-
-          return createFlash({
-            message: this.$options.i18n.changesSaved,
-            type: FLASH_TYPES.SUCCESS,
-          });
+          if (testAfterSubmit) {
+            this.viewIntegration(this.newIntegration, tabIndices.sendTestAlert);
+          } else {
+            this.setFormVisibility(false);
+          }
         })
         .catch(() => {
           createFlash({ message: ADD_INTEGRATION_ERROR });
@@ -181,9 +146,9 @@ export default {
           this.isUpdating = false;
         });
     },
-    updateIntegration({ type, variables }) {
+    updateIntegration({ type, variables }, testAfterSubmit) {
       this.isUpdating = true;
-      this.$apollo
+      return this.$apollo
         .mutate({
           mutation: this.isHttp(type)
             ? updateHttpIntegrationMutation
@@ -196,12 +161,20 @@ export default {
         .then(({ data: { httpIntegrationUpdate, prometheusIntegrationUpdate } = {} } = {}) => {
           const error = httpIntegrationUpdate?.errors[0] || prometheusIntegrationUpdate?.errors[0];
           if (error) {
-            return createFlash({ message: error });
+            createFlash({ message: error });
+            return;
           }
 
-          this.clearCurrentIntegration({ type });
+          const integration =
+            httpIntegrationUpdate?.integration || prometheusIntegrationUpdate?.integration;
 
-          return createFlash({
+          if (testAfterSubmit) {
+            this.viewIntegration(integration, tabIndices.sendTestAlert);
+          } else {
+            this.clearCurrentIntegration({ type });
+          }
+
+          createFlash({
             message: this.$options.i18n.changesSaved,
             type: FLASH_TYPES.SUCCESS,
           });
@@ -253,21 +226,54 @@ export default {
         });
     },
     editIntegration({ id, type }) {
-      let currentIntegration = this.integrations.list.find((integration) => integration.id === id);
-      if (this.isHttp(type)) {
-        const httpIntegrationMappingData = this.httpIntegrations.list.find(
-          (integration) => integration.id === id,
-        );
-        currentIntegration = { ...currentIntegration, ...httpIntegrationMappingData };
-      }
+      const currentIntegration = this.integrations.find((integration) => integration.id === id);
 
-      this.$apollo.mutate({
-        mutation: this.isHttp(type)
-          ? updateCurrentHttpIntegrationMutation
-          : updateCurrentPrometheusIntegrationMutation,
-        variables: currentIntegration,
-      });
-      this.setFormVisibility(true);
+      if (this.multiIntegrations && this.isHttp(type)) {
+        this.$apollo.addSmartQuery('currentHttpIntegration', {
+          query: getHttpIntegrationQuery,
+          variables() {
+            return {
+              projectPath: this.projectPath,
+              id,
+            };
+          },
+          update(data) {
+            const {
+              project: {
+                alertManagementHttpIntegrations: { nodes = [{}] },
+              },
+            } = data;
+            return nodes[0];
+          },
+          result() {
+            this.viewIntegration(
+              { ...currentIntegration, ...this.currentHttpIntegration },
+              tabIndices.viewCredentials,
+            );
+          },
+          error() {
+            createFlash({ message: DEFAULT_ERROR });
+          },
+        });
+      } else {
+        this.viewIntegration(currentIntegration, tabIndices.viewCredentials);
+      }
+    },
+    viewIntegration(integration, tabIndex) {
+      this.$apollo
+        .mutate({
+          mutation: this.isHttp(integration.type)
+            ? updateCurrentHttpIntegrationMutation
+            : updateCurrentPrometheusIntegrationMutation,
+          variables: integration,
+        })
+        .then(() => {
+          this.setFormVisibility(true);
+          this.tabIndex = tabIndex;
+        })
+        .catch(() => {
+          createFlash({ message: DEFAULT_ERROR });
+        });
     },
     deleteIntegration({ id, type }) {
       const { projectPath } = this;
@@ -319,45 +325,77 @@ export default {
             type: FLASH_TYPES.SUCCESS,
           });
         })
-        .catch(() => {
-          createFlash({ message: INTEGRATION_PAYLOAD_TEST_ERROR });
+        .catch((error) => {
+          let message = INTEGRATION_PAYLOAD_TEST_ERROR;
+          if (error.response?.status === httpStatusCodes.FORBIDDEN) {
+            message = INTEGRATION_INACTIVE_PAYLOAD_TEST_ERROR;
+          }
+          createFlash({ message });
         });
+    },
+    saveAndTestAlertPayload(integration, payload) {
+      return this.updateIntegration(integration, false).then(() => {
+        this.testAlertPayload(payload);
+      });
     },
     setFormVisibility(visible) {
       this.formVisible = visible;
+    },
+    viewCreatedIntegration() {
+      this.viewIntegration(this.newIntegration, tabIndices.viewCredentials);
+      this.showSuccessfulCreateAlert = false;
+      this.newIntegration = null;
     },
   },
 };
 </script>
 
 <template>
-  <div>
-    <integrations-list
-      :integrations="integrations.list"
-      :loading="loading"
-      @edit-integration="editIntegration"
-      @delete-integration="deleteIntegration"
-    />
-    <gl-button
-      v-if="canAddIntegration && !formVisible"
-      category="secondary"
-      variant="confirm"
-      data-testid="add-integration-btn"
-      class="gl-mt-3"
-      @click="setFormVisibility(true)"
-    >
-      {{ $options.i18n.addNewIntegration }}
-    </gl-button>
-    <alert-settings-form
-      v-if="formVisible"
-      :loading="isUpdating"
-      :can-add-integration="canAddIntegration"
-      :alert-fields="alertFields"
-      @create-new-integration="createNewIntegration"
-      @update-integration="updateIntegration"
-      @reset-token="resetToken"
-      @clear-current-integration="clearCurrentIntegration"
-      @test-alert-payload="testAlertPayload"
-    />
-  </div>
+  <gl-tabs data-testid="alert-integration-settings">
+    <gl-tab :title="$options.i18n.settingsTabs.currentIntegrations">
+      <gl-alert
+        v-if="showSuccessfulCreateAlert"
+        class="gl-mt-n2"
+        :primary-button-text="$options.i18n.integrationCreated.btnCaption"
+        :title="$options.i18n.integrationCreated.title"
+        @primaryAction="viewCreatedIntegration"
+        @dismiss="showSuccessfulCreateAlert = false"
+      >
+        {{ $options.i18n.integrationCreated.successMsg }}
+      </gl-alert>
+
+      <integrations-list
+        :integrations="integrations"
+        :loading="loading"
+        @edit-integration="editIntegration"
+        @delete-integration="deleteIntegration"
+      />
+      <gl-button
+        v-if="canAddIntegration && !formVisible"
+        category="secondary"
+        variant="confirm"
+        data-testid="add-integration-btn"
+        class="gl-mt-3"
+        @click="setFormVisibility(true)"
+      >
+        {{ $options.i18n.addNewIntegration }}
+      </gl-button>
+      <alert-settings-form
+        v-if="formVisible"
+        :loading="isUpdating"
+        :can-add-integration="canAddIntegration"
+        :alert-fields="alertFields"
+        :tab-index="tabIndex"
+        @create-new-integration="createNewIntegration"
+        @update-integration="updateIntegration"
+        @reset-token="resetToken"
+        @clear-current-integration="clearCurrentIntegration"
+        @test-alert-payload="testAlertPayload"
+        @save-and-test-alert-payload="saveAndTestAlertPayload"
+      />
+    </gl-tab>
+    <gl-tab :title="$options.i18n.settingsTabs.integrationSettings">
+      <alerts-form class="gl-pt-3" data-testid="alert-integration-settings-tab" />
+    </gl-tab>
+  </gl-tabs>
 </template>

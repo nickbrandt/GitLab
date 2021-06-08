@@ -5,7 +5,7 @@ group: Access
 info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#assignments
 ---
 
-# LDAP Troubleshooting for Administrators
+# LDAP Troubleshooting for Administrators **(FREE SELF)**
 
 ## Common Problems & Workflows
 
@@ -27,7 +27,7 @@ Could not authenticate you from Ldapmain because "Connection timed out - user sp
 ```
 
 If your configured LDAP provider and/or endpoint is offline or otherwise
-unreachable by GitLab, no LDAP user will be able to authenticate and sign-in.
+unreachable by GitLab, no LDAP user is able to authenticate and sign-in.
 GitLab does not cache or store credentials for LDAP users to provide authentication
 during an LDAP outage.
 
@@ -181,17 +181,32 @@ user = User.find_by_any_email('email@example.com')
 user.username
 ```
 
-This will show you which user has this email address. One of two steps will
-have to be taken here:
+This shows you which user has this email address. One of two steps must be taken here:
 
 - To create a new GitLab user/username for this user when signing in with LDAP,
   remove the secondary email to remove the conflict.
 - To use an existing GitLab user/username for this user to use with LDAP,
   remove this email as a secondary email and make it a primary one so GitLab
-  will associate this profile to the LDAP identity.
+  associates this profile to the LDAP identity.
 
 The user can do either of these steps [in their
-profile](../../../user/profile/index.md#user-profile) or an administrator can do it.
+profile](../../../user/profile/index.md#access-your-user-profile) or an administrator can do it.
+
+#### Projects limit errors
+
+The following errors indicate that a limit or restriction is activated, but an associated data
+field contains no data:
+
+- `Projects limit can't be blank`.
+- `Projects limit is not a number`.
+
+To resolve this:
+
+1. Go to both of the following in the Admin Area (**{admin}**):
+    - **Settings > General > Account and limit**
+    - **Settings > General > Sign-up restrictions**.
+1. Check, for example, the **Default projects limit** or **Allowed domains for sign-ups**
+   fields and ensure that a relevant value is configured.
 
 #### Debug LDAP user filter
 
@@ -227,7 +242,7 @@ output](#example-console-output-after-a-user-sync).
 
 ##### Example console output after a user sync **(PREMIUM SELF)**
 
-The output from a [manual user sync](#sync-all-users) will be very verbose, and a
+The output from a [manual user sync](#sync-all-users) is very verbose, and a
 single user's successful sync can look like this:
 
 ```shell
@@ -255,8 +270,8 @@ uid: John
 
 There's a lot here, so let's go over what could be helpful when debugging.
 
-First, GitLab will look for all users that have previously
-signed in with LDAP and iterate on them. Each user's sync will start with
+First, GitLab looks for all users that have previously
+signed in with LDAP and iterate on them. Each user's sync starts with
 the following line that contains the user's username and email, as they
 exist in GitLab now:
 
@@ -274,7 +289,7 @@ link between this user and the configured LDAP provider(s):
   Identity Load (0.9ms)  SELECT  "identities".* FROM "identities" WHERE "identities"."user_id" = 20 AND (provider LIKE 'ldap%') LIMIT 1
 ```
 
-The identity object will have the DN that GitLab will use to look for the user
+The identity object has the DN that GitLab uses to look for the user
 in LDAP. If the DN isn't found, the email is used instead. We can see that
 this user is found in LDAP:
 
@@ -294,18 +309,18 @@ following message instead:
 LDAP search error: No Such Object
 ```
 
-...in which case the user will be blocked:
+...in which case the user is blocked:
 
 ```shell
   User Update (0.4ms)  UPDATE "users" SET "state" = $1, "updated_at" = $2 WHERE "users"."id" = $3  [["state", "ldap_blocked"], ["updated_at", "2019-10-18 15:46:22.902177"], ["id", 20]]
 ```
 
-Once the user is found in LDAP the rest of the output will update the GitLab
+Once the user is found in LDAP, the rest of the output updates the GitLab
 database with any changes.
 
 #### Query a user in LDAP
 
-This will test that GitLab can reach out to LDAP and read a particular user.
+This tests that GitLab can reach out to LDAP and read a particular user.
 It can expose potential errors connecting to and/or querying LDAP
 that may seem to fail silently in the GitLab UI.
 
@@ -330,10 +345,10 @@ things to check to debug the situation.
   group](index.md#adding-group-links).
 - Check that the user has an LDAP identity:
   1. Sign in to GitLab as an administrator user.
-  1. Navigate to **Admin area -> Users**.
+  1. Go to **Admin area > Users**.
   1. Search for the user
-  1. Open the user, by clicking on their name. Do not click 'Edit'.
-  1. Navigate to the **Identities** tab. There should be an LDAP identity with
+  1. Open the user by clicking their name. Do not click **Edit**.
+  1. Select the **Identities** tab. There should be an LDAP identity with
      an LDAP DN as the 'Identifier'. If not, this user hasn't signed in with
      LDAP yet and must do so first.
 - You've waited an hour or [the configured
@@ -668,7 +683,7 @@ adfind -h ad.example.org:636 -ssl -u "CN=GitLabSRV,CN=Users,DC=GitLab,DC=org" -u
 You can also retrieve a single object by **specifying** the object name or full **DN**. In this example we specify the object name only `CN=Leroy Fox`.
 
 ```shell
-adfind -h ad.example.org:636 -ssl -u "CN=GitLabSRV,CN=Users,DC=GitLab,DC=org" -up Password1 -b "OU=GitLab INT,DC=GitLab,DC=org" -f (&(objectcategory=person)(CN=Leroy Fox))”
+adfind -h ad.example.org:636 -ssl -u "CN=GitLabSRV,CN=Users,DC=GitLab,DC=org" -up Password1 -b "OU=GitLab INT,DC=GitLab,DC=org" -f "(&(objectcategory=person)(CN=Leroy Fox))"
 ```
 
 ### Rails console

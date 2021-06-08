@@ -4,7 +4,7 @@ group: Project Management
 info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#assignments
 ---
 
-# Labels
+# Labels **(FREE)**
 
 As your count of issues, merge requests, and epics grows in GitLab, it's more and more challenging
 to keep track of those items. Especially as your organization grows from just a few people to
@@ -162,7 +162,7 @@ Scoped labels allow teams to use the label feature to annotate issues, merge req
 and epics with mutually exclusive labels. This can enable more complicated workflows
 by preventing certain labels from being used together.
 
-A label is scoped when it uses a special double-colon (`::`) syntax in the label’s
+A label is scoped when it uses a special double-colon (`::`) syntax in the label's
 title, for example:
 
 ![Scoped labels](img/labels_key_value_v13_5.png)

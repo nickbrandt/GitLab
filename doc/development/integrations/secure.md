@@ -68,8 +68,8 @@ so the [`allow_failure`](../../ci/yaml/README.md#allow_failure) parameter should
 ### Artifacts
 
 Scanning jobs must declare a report that corresponds to the type of scanning they perform,
-using the [`artifacts:reports`](../../ci/pipelines/job_artifacts.md#artifactsreports) keyword.
-Valid reports are: `dependency_scanning`, `container_scanning`, `dast`, and `sast`.
+using the [`artifacts:reports`](../../ci/yaml/README.md#artifactsreports) keyword.
+Valid reports are: `dependency_scanning`, `container_scanning`, `dast`, `api_fuzzing`, `coverage_fuzzing`, and `sast`.
 
 For example, here is the definition of a SAST job that generates a file named `gl-sast-report.json`,
 and uploads it as a SAST report:
@@ -209,7 +209,7 @@ It is recommended to name the output file after the type of scanning, and to use
 Since all Secure reports are JSON files, it is recommended to use `.json` as a file extension.
 For instance, a suggested filename for a Dependency Scanning report is `gl-dependency-scanning.json`.
 
-The [`artifacts:reports`](../../ci/pipelines/job_artifacts.md#artifactsreports) keyword
+The [`artifacts:reports`](../../ci/yaml/README.md#artifactsreports) keyword
 of the job definition must be consistent with the file path where the Security report is written.
 For instance, if a Dependency Scanning analyzer writes its report to the CI project directory,
 and if this report filename is `depscan.json`,
@@ -290,6 +290,8 @@ You can find the schemas for these scanners here:
 - [DAST](https://gitlab.com/gitlab-org/security-products/security-report-schemas/-/blob/master/dist/dast-report-format.json)
 - [Dependency Scanning](https://gitlab.com/gitlab-org/security-products/security-report-schemas/-/blob/master/dist/dependency-scanning-report-format.json)
 - [Container Scanning](https://gitlab.com/gitlab-org/security-products/security-report-schemas/-/blob/master/dist/container-scanning-report-format.json)
+- [Coverage Fuzzing](https://gitlab.com/gitlab-org/security-products/security-report-schemas/-/blob/master/dist/coverage-fuzzing-report-format.json)
+- [Secret Detection](https://gitlab.com/gitlab-org/security-products/security-report-schemas/-/blob/master/dist/secret-detection-report-format.json)
 
 ### Version
 
@@ -384,7 +386,7 @@ It is recommended to reuse the identifiers the GitLab scanners already define:
 | [ELSA](https://linux.oracle.com/security/) | `elsa` | ELSA-2020-0085 |
 
 The generic identifiers listed above are defined in the [common library](https://gitlab.com/gitlab-org/security-products/analyzers/common),
-which is shared by the analyzers that GitLab maintains. You can [contribute](https://gitlab.com/gitlab-org/security-products/analyzers/common/blob/master/issue/identifier.go)
+which is shared by some of the analyzers that GitLab maintains. You can [contribute](https://gitlab.com/gitlab-org/security-products/analyzers/common/blob/master/issue/identifier.go)
 new generic identifiers to if needed. Analyzers may also produce vendor-specific or product-specific
 identifiers, which don't belong in the [common library](https://gitlab.com/gitlab-org/security-products/analyzers/common).
 
@@ -548,7 +550,7 @@ of the available SAST Analyzers and what data is currently available.
 
 The `remediations` field of the report is an array of remediation objects.
 Each remediation describes a patch that can be applied to
-[automatically fix](../../user/application_security/#automatic-remediation-for-vulnerabilities)
+[resolve](../../user/application_security/vulnerabilities/index.md#resolve-a-vulnerability)
 a set of vulnerabilities.
 
 Here is an example of a report that contains remediations.

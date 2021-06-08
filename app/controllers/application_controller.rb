@@ -16,13 +16,13 @@ class ApplicationController < ActionController::Base
   include SessionlessAuthentication
   include SessionsHelper
   include ConfirmEmailWarning
-  include Gitlab::Tracking::ControllerConcern
   include Gitlab::Experimentation::ControllerConcern
   include InitializesCurrentUserMode
   include Impersonation
   include Gitlab::Logging::CloudflareHelper
   include Gitlab::Utils::StrongMemoize
   include ::Gitlab::WithFeatureCategory
+  include FlocOptOut
 
   before_action :authenticate_user!, except: [:route_not_found]
   before_action :enforce_terms!, if: :should_enforce_terms?
@@ -104,6 +104,10 @@ class ApplicationController < ActionController::Base
 
   def redirect_back_or_default(default: root_path, options: {})
     redirect_back(fallback_location: default, **options)
+  end
+
+  def check_if_gl_com_or_dev
+    render_404 unless ::Gitlab.dev_env_or_com?
   end
 
   def not_found
@@ -208,13 +212,13 @@ class ApplicationController < ActionController::Base
       end
 
     respond_to do |format|
-      format.any { head status }
       format.html do
         render template,
                layout: "errors",
                status: status,
                locals: { message: message }
       end
+      format.any { head status }
     end
   end
 
@@ -224,8 +228,8 @@ class ApplicationController < ActionController::Base
 
   def render_403
     respond_to do |format|
-      format.any { head :forbidden }
       format.html { render "errors/access_denied", layout: "errors", status: :forbidden }
+      format.any { head :forbidden }
     end
   end
 
@@ -453,9 +457,7 @@ class ApplicationController < ActionController::Base
 
   def set_current_context(&block)
     Gitlab::ApplicationContext.with_context(
-      # Avoid loading the auth_user again after the request. Otherwise calling
-      # `auth_user` again would also trigger the Warden callbacks again
-      user: -> { auth_user if strong_memoized?(:auth_user) },
+      user: -> { context_user },
       project: -> { @project if @project&.persisted? },
       namespace: -> { @group if @group&.persisted? },
       caller_id: caller_id,
@@ -463,7 +465,7 @@ class ApplicationController < ActionController::Base
       feature_category: feature_category) do
       yield
     ensure
-      @current_context = Labkit::Context.current.to_h
+      @current_context = Gitlab::ApplicationContext.current
     end
   end
 
@@ -483,7 +485,7 @@ class ApplicationController < ActionController::Base
   end
 
   def set_current_admin(&block)
-    return yield unless Feature.enabled?(:user_mode_in_session)
+    return yield unless Gitlab::CurrentSettings.admin_mode
     return yield unless current_user
 
     Gitlab::Auth::CurrentUserMode.with_current_admin(current_user, &block)
@@ -538,6 +540,12 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  # Avoid loading the auth_user again after the request. Otherwise calling
+  # `auth_user` again would also trigger the Warden callbacks again
+  def context_user
+    auth_user if strong_memoized?(:auth_user)
+  end
+
   def caller_id
     "#{self.class.name}##{action_name}"
   end
@@ -556,4 +564,4 @@ class ApplicationController < ActionController::Base
   end
 end
 
-ApplicationController.prepend_ee_mod
+ApplicationController.prepend_mod

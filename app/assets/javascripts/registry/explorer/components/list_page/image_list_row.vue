@@ -13,6 +13,7 @@ import {
   CLEANUP_TIMED_OUT_ERROR_MESSAGE,
   IMAGE_DELETE_SCHEDULED_STATUS,
   IMAGE_FAILED_DELETED_STATUS,
+  ROOT_IMAGE_TEXT,
 } from '../../constants/index';
 import DeleteButton from '../delete_button.vue';
 
@@ -74,6 +75,12 @@ export default {
       }
       return null;
     },
+    imageName() {
+      return this.item.name ? this.item.path : `${this.item.path}/ ${ROOT_IMAGE_TEXT}`;
+    },
+    routerLinkEvent() {
+      return this.deleting ? '' : 'click';
+    },
   },
 };
 </script>
@@ -93,9 +100,10 @@ export default {
         class="gl-text-body gl-font-weight-bold"
         data-testid="details-link"
         data-qa-selector="registry_image_content"
+        :event="routerLinkEvent"
         :to="{ name: 'details', params: { id } }"
       >
-        {{ item.path }}
+        {{ imageName }}
       </router-link>
       <clipboard-button
         v-if="item.location"

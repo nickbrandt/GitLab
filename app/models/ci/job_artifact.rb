@@ -131,16 +131,10 @@ module Ci
     update_project_statistics project_statistics_name: :build_artifacts_size
 
     scope :not_expired, -> { where('expire_at IS NULL OR expire_at > ?', Time.current) }
-    scope :with_files_stored_locally, -> { where(file_store: ::JobArtifactUploader::Store::LOCAL) }
-    scope :with_files_stored_remotely, -> { where(file_store: ::JobArtifactUploader::Store::REMOTE) }
     scope :for_sha, ->(sha, project_id) { joins(job: :pipeline).where(ci_pipelines: { sha: sha, project_id: project_id }) }
     scope :for_job_name, ->(name) { joins(:job).where(ci_builds: { name: name }) }
 
-    scope :with_job, -> do
-      if Feature.enabled?(:non_public_artifacts, type: :development)
-        joins(:job).includes(:job)
-      end
-    end
+    scope :with_job, -> { joins(:job).includes(:job) }
 
     scope :with_file_types, -> (file_types) do
       types = self.file_types.select { |file_type| file_types.include?(file_type) }.values
@@ -267,6 +261,22 @@ module Ci
       self.where(project: project).sum(:size)
     end
 
+    ##
+    # FastDestroyAll concerns
+    # rubocop: disable CodeReuse/ServiceClass
+    def self.begin_fast_destroy
+      service = ::Ci::JobArtifacts::DestroyAssociationsService.new(self)
+      service.destroy_records
+      service
+    end
+    # rubocop: enable CodeReuse/ServiceClass
+
+    ##
+    # FastDestroyAll concerns
+    def self.finalize_fast_destroy(service)
+      service.update_statistics
+    end
+
     def local_store?
       [nil, ::JobArtifactUploader::Store::LOCAL].include?(self.file_store)
     end
@@ -296,8 +306,12 @@ module Ci
         end
     end
 
+    def archived_trace_exists?
+      file&.file&.exists?
+    end
+
     def self.archived_trace_exists_for?(job_id)
-      where(job_id: job_id).trace.take&.file&.file&.exists?
+      where(job_id: job_id).trace.take&.archived_trace_exists?
     end
 
     def self.max_artifact_size(type:, project:)
@@ -311,12 +325,12 @@ module Ci
       max_size&.megabytes.to_i
     end
 
-    def to_deleted_object_attrs
+    def to_deleted_object_attrs(pick_up_at = nil)
       {
         file_store: file_store,
         store_dir: file.store_dir.to_s,
         file: file_identifier,
-        pick_up_at: expire_at || Time.current
+        pick_up_at: pick_up_at || expire_at || Time.current
       }
     end
 
@@ -333,4 +347,4 @@ module Ci
   end
 end
 
-Ci::JobArtifact.prepend_if_ee('EE::Ci::JobArtifact')
+Ci::JobArtifact.prepend_mod_with('Ci::JobArtifact')

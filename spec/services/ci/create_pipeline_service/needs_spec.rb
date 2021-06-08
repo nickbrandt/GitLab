@@ -202,21 +202,37 @@ RSpec.describe Ci::CreatePipelineService do
         YAML
       end
 
-      it 'creates a pipeline with build_a and test_b pending; deploy_b manual' do
-        processables = pipeline.processables
+      context 'when there are runners matching the builds' do
+        before do
+          create(:ci_runner, :online)
+        end
 
-        build_a = processables.find { |processable| processable.name == 'build_a' }
-        test_a = processables.find { |processable| processable.name == 'test_a' }
-        test_b = processables.find { |processable| processable.name == 'test_b' }
-        deploy_a = processables.find { |processable| processable.name == 'deploy_a' }
-        deploy_b = processables.find { |processable| processable.name == 'deploy_b' }
+        it 'creates a pipeline with build_a and test_b pending; deploy_b manual', :sidekiq_inline do
+          processables = pipeline.processables
 
-        expect(pipeline).to be_persisted
-        expect(build_a.status).to eq('pending')
-        expect(test_a.status).to eq('created')
-        expect(test_b.status).to eq('pending')
-        expect(deploy_a.status).to eq('created')
-        expect(deploy_b.status).to eq('manual')
+          build_a = processables.find { |processable| processable.name == 'build_a' }
+          test_a = processables.find { |processable| processable.name == 'test_a' }
+          test_b = processables.find { |processable| processable.name == 'test_b' }
+          deploy_a = processables.find { |processable| processable.name == 'deploy_a' }
+          deploy_b = processables.find { |processable| processable.name == 'deploy_b' }
+
+          expect(pipeline).to be_created_successfully
+          expect(build_a.status).to eq('pending')
+          expect(test_a.status).to eq('created')
+          expect(test_b.status).to eq('pending')
+          expect(deploy_a.status).to eq('created')
+          expect(deploy_b.status).to eq('manual')
+        end
+      end
+
+      context 'when there are no runners matching the builds' do
+        it 'creates a pipeline but all jobs failed', :sidekiq_inline do
+          processables = pipeline.processables
+
+          expect(pipeline).to be_created_successfully
+          expect(processables).to all be_failed
+          expect(processables.map(&:failure_reason)).to all eq('no_matching_runner')
+        end
       end
     end
 
@@ -236,6 +252,52 @@ RSpec.describe Ci::CreatePipelineService do
       it 'raises error' do
         expect(pipeline.yaml_errors)
           .to eq('jobs:invalid_dag_job:needs config can not be an empty hash')
+      end
+    end
+
+    context 'when the needed job has rules' do
+      let(:config) do
+        <<~YAML
+          build:
+            stage: build
+            script: exit 0
+            rules:
+              - if: $CI_COMMIT_REF_NAME == "invalid"
+
+          test:
+            stage: test
+            script: exit 0
+            needs: [build]
+        YAML
+      end
+
+      it 'returns error' do
+        expect(pipeline.yaml_errors)
+          .to eq("'test' job needs 'build' job, but it was not added to the pipeline")
+      end
+
+      context 'when need is optional' do
+        let(:config) do
+          <<~YAML
+            build:
+              stage: build
+              script: exit 0
+              rules:
+                - if: $CI_COMMIT_REF_NAME == "invalid"
+
+            test:
+              stage: test
+              script: exit 0
+              needs:
+                - job: build
+                  optional: true
+          YAML
+        end
+
+        it 'creates the pipeline without an error' do
+          expect(pipeline).to be_persisted
+          expect(pipeline.builds.pluck(:name)).to contain_exactly('test')
+        end
       end
     end
   end

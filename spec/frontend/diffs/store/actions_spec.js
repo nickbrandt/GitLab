@@ -54,7 +54,7 @@ import {
 } from '~/diffs/store/actions';
 import * as types from '~/diffs/store/mutation_types';
 import * as utils from '~/diffs/store/utils';
-import { deprecatedCreateFlash as createFlash } from '~/flash';
+import createFlash from '~/flash';
 import axios from '~/lib/utils/axios_utils';
 import * as commonUtils from '~/lib/utils/common_utils';
 import { mergeUrlParams } from '~/lib/utils/url_utility';
@@ -80,7 +80,7 @@ describe('DiffsStoreActions', () => {
     jest.spyOn(utils, 'idleCallback').mockImplementation(() => null);
     ['requestAnimationFrame', 'requestIdleCallback'].forEach((method) => {
       global[method] = (cb) => {
-        cb();
+        cb({ timeRemaining: () => 10 });
       };
     });
   });
@@ -198,7 +198,7 @@ describe('DiffsStoreActions', () => {
           { type: types.VIEW_DIFF_FILE, payload: 'test2' },
           { type: types.SET_RETRIEVING_BATCHES, payload: false },
         ],
-        [],
+        [{ type: 'startRenderDiffsQueue' }, { type: 'startRenderDiffsQueue' }],
         done,
       );
     });
@@ -251,6 +251,8 @@ describe('DiffsStoreActions', () => {
           { type: types.SET_LOADING, payload: false },
           { type: types.SET_MERGE_REQUEST_DIFFS, payload: diffMetadata.merge_request_diffs },
           { type: types.SET_DIFF_METADATA, payload: noFilesData },
+          // Workers are synchronous in Jest environment (see https://gitlab.com/gitlab-org/gitlab/-/merge_requests/58805)
+          { type: types.SET_TREE_DATA, payload: utils.generateTreeList(diffMetadata.diff_files) },
         ],
         [],
         () => {
@@ -291,7 +293,9 @@ describe('DiffsStoreActions', () => {
 
       testAction(fetchCoverageFiles, {}, { endpointCoverage }, [], [], () => {
         expect(createFlash).toHaveBeenCalledTimes(1);
-        expect(createFlash).toHaveBeenCalledWith(expect.stringMatching('Something went wrong'));
+        expect(createFlash).toHaveBeenCalledWith({
+          message: expect.stringMatching('Something went wrong'),
+        });
         done();
       });
     });
@@ -1459,19 +1463,42 @@ describe('DiffsStoreActions', () => {
   });
 
   describe('setFileByFile', () => {
+    const updateUserEndpoint = 'user/prefs';
+    let putSpy;
+    let mock;
+
+    beforeEach(() => {
+      mock = new MockAdapter(axios);
+      putSpy = jest.spyOn(axios, 'put');
+
+      mock.onPut(updateUserEndpoint).reply(200, {});
+    });
+
+    afterEach(() => {
+      mock.restore();
+    });
+
     it.each`
       value
       ${true}
       ${false}
-    `('commits SET_FILE_BY_FILE with the new value $value', ({ value }) => {
-      return testAction(
-        setFileByFile,
-        { fileByFile: value },
-        { viewDiffsFileByFile: null },
-        [{ type: types.SET_FILE_BY_FILE, payload: value }],
-        [],
-      );
-    });
+    `(
+      'commits SET_FILE_BY_FILE and persists the File-by-File user preference with the new value $value',
+      async ({ value }) => {
+        await testAction(
+          setFileByFile,
+          { fileByFile: value },
+          {
+            viewDiffsFileByFile: null,
+            endpointUpdateUser: updateUserEndpoint,
+          },
+          [{ type: types.SET_FILE_BY_FILE, payload: value }],
+          [],
+        );
+
+        expect(putSpy).toHaveBeenCalledWith(updateUserEndpoint, { view_diffs_file_by_file: value });
+      },
+    );
   });
 
   describe('reviewFile', () => {

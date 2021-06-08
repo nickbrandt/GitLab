@@ -96,18 +96,20 @@ As soon as a requirement is reopened, it no longer appears in the **Archived** t
 
 ## Search for a requirement
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/212543) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 13.1.
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/212543) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 13.1.
+> - Searching by status [introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/224614) in GitLab 13.10.
 
 You can search for a requirement from the requirements list page based on the following criteria:
 
-- Requirement title
+- Title
 - Author's username
+- Status (satisfied, failed, or missing)
 
 To search for a requirement:
 
 1. In a project, go to  **Requirements > List**.
 1. Select the **Search or filter results** field. A dropdown menu appears.
-1. Select the requirement author from the dropdown or enter plain text to search by requirement title.
+1. Select the requirement author or status from the dropdown or enter plain text to search by requirement title.
 1. Press <kbd>Enter</kbd> on your keyboard to filter the list.
 
 You can also sort the requirements list by:
@@ -120,8 +122,7 @@ You can also sort the requirements list by:
 > - [Introduced](https://gitlab.com/groups/gitlab-org/-/epics/2859) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 13.1.
 > - [Added](https://gitlab.com/gitlab-org/gitlab/-/issues/215514) ability to specify individual requirements and their statuses in [GitLab Ultimate](https://about.gitlab.com/pricing/) 13.2.
 
-GitLab supports [requirements test
-reports](../../../ci/pipelines/job_artifacts.md#artifactsreportsrequirements) now.
+GitLab supports [requirements test reports](../../../ci/yaml/README.md#artifactsreportsrequirements) now.
 You can add a job to your CI pipeline that, when triggered, marks all existing
 requirements as Satisfied (you may manually satisfy a requirement in the edit form [edit a requirement](#edit-a-requirement)).
 

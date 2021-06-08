@@ -928,7 +928,8 @@ RSpec.describe API::Users do
     end
 
     it "creates user with random password" do
-      params = attributes_for(:user, force_random_password: true, reset_password: true)
+      params = attributes_for(:user, force_random_password: true)
+      params.delete(:password)
       post api('/users', admin), params: params
 
       expect(response).to have_gitlab_http_status(:created)
@@ -936,8 +937,7 @@ RSpec.describe API::Users do
       user_id = json_response['id']
       new_user = User.find(user_id)
 
-      expect(new_user.valid_password?(params[:password])).to eq(false)
-      expect(new_user.recently_sent_password_reset?).to eq(true)
+      expect(new_user.encrypted_password).to be_present
     end
 
     it "creates user with private profile" do
@@ -1449,6 +1449,48 @@ RSpec.describe API::Users do
     end
   end
 
+  describe "PUT /user/:id/credit_card_validation" do
+    let(:credit_card_validated_time) { Time.utc(2020, 1, 1) }
+
+    context 'when unauthenticated' do
+      it 'returns authentication error' do
+        put api("/user/#{user.id}/credit_card_validation"), params: { credit_card_validated_at: credit_card_validated_time }
+
+        expect(response).to have_gitlab_http_status(:unauthorized)
+      end
+    end
+
+    context 'when authenticated as non-admin' do
+      it "does not allow updating user's credit card validation", :aggregate_failures do
+        put api("/user/#{user.id}/credit_card_validation", user), params: { credit_card_validated_at: credit_card_validated_time }
+
+        expect(response).to have_gitlab_http_status(:forbidden)
+      end
+    end
+
+    context 'when authenticated as admin' do
+      it "updates user's credit card validation", :aggregate_failures do
+        put api("/user/#{user.id}/credit_card_validation", admin), params: { credit_card_validated_at: credit_card_validated_time }
+
+        expect(response).to have_gitlab_http_status(:ok)
+        expect(user.reload.credit_card_validated_at).to eq(credit_card_validated_time)
+      end
+
+      it "returns 400 error if credit_card_validated_at is missing" do
+        put api("/user/#{user.id}/credit_card_validation", admin), params: {}
+
+        expect(response).to have_gitlab_http_status(:bad_request)
+      end
+
+      it 'returns 404 error if user not found' do
+        put api("/user/#{non_existing_record_id}/credit_card_validation", admin), params: { credit_card_validated_at: credit_card_validated_time }
+
+        expect(response).to have_gitlab_http_status(:not_found)
+        expect(json_response['message']).to eq('404 User Not Found')
+      end
+    end
+  end
+
   describe "DELETE /users/:id/identities/:provider" do
     let(:test_user) { create(:omniauth_user, provider: 'ldapmain') }
 
@@ -1795,8 +1837,7 @@ RSpec.describe API::Users do
         post api("/users/#{user.id}/emails", admin), params: email_attrs
       end.to change { user.emails.count }.by(1)
 
-      email = Email.find_by(user_id: user.id, email: email_attrs[:email])
-      expect(email).not_to be_confirmed
+      expect(json_response['confirmed_at']).to be_nil
     end
 
     it "returns a 400 for invalid ID" do
@@ -1813,8 +1854,7 @@ RSpec.describe API::Users do
 
       expect(response).to have_gitlab_http_status(:created)
 
-      email = Email.find_by(user_id: user.id, email: email_attrs[:email])
-      expect(email).to be_confirmed
+      expect(json_response['confirmed_at']).not_to be_nil
     end
   end
 

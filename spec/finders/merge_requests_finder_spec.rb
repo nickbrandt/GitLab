@@ -156,6 +156,18 @@ RSpec.describe MergeRequestsFinder do
 
           it { is_expected.to eq([merge_request2]) }
         end
+
+        context 'when project_id is given' do
+          subject(:query) { described_class.new(user, merged_after: 15.days.ago, merged_before: 6.days.ago, project_id: merge_request2.project).execute }
+
+          it { is_expected.to eq([merge_request2]) }
+
+          it 'queries merge_request_metrics.target_project_id table' do
+            expect(query.to_sql).to include(%{"merge_request_metrics"."target_project_id" = #{merge_request2.target_project_id}})
+
+            expect(query.to_sql).not_to include(%{"merge_requests"."target_project_id"})
+          end
+        end
       end
 
       context 'filtering by group' do
@@ -851,6 +863,37 @@ RSpec.describe MergeRequestsFinder do
           it 'returns merge requests from the project' do
             expect(merge_requests).to eq([mr_internal_private_repo_access, mr_internal, mr_public])
           end
+        end
+      end
+    end
+
+    describe '#count_by_state' do
+      let_it_be(:user) { create(:user) }
+      let_it_be(:project) { create(:project, :repository) }
+      let_it_be(:labels) { create_list(:label, 2, project: project) }
+      let_it_be(:merge_requests) { create_list(:merge_request, 4, :unique_branches, author: user, target_project: project, source_project: project, labels: labels) }
+
+      before do
+        project.add_developer(user)
+      end
+
+      context 'when filtering by multiple labels' do
+        it 'returns the correnct counts' do
+          counts = described_class.new(user, { label_name: labels.map(&:name) }).count_by_state
+
+          expect(counts[:all]).to eq(merge_requests.size)
+        end
+      end
+
+      context 'when filtering by approved_by_usernames' do
+        before do
+          merge_requests.each { |mr| mr.approved_by_users << user }
+        end
+
+        it 'returns the correnct counts' do
+          counts = described_class.new(user, { approved_by_usernames: [user.username] }).count_by_state
+
+          expect(counts[:all]).to eq(merge_requests.size)
         end
       end
     end

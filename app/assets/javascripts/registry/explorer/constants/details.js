@@ -2,7 +2,6 @@ import { helpPagePath } from '~/helpers/help_page_helper';
 import { s__, __ } from '~/locale';
 
 //  Translations strings
-export const DETAILS_PAGE_TITLE = s__('ContainerRegistry|%{imageName} tags');
 export const DELETE_TAG_ERROR_MESSAGE = s__(
   'ContainerRegistry|Something went wrong while marking the tag for deletion.',
 );
@@ -32,7 +31,7 @@ export const CONFIGURATION_DETAILS_ROW_TEST = s__(
 );
 
 export const REMOVE_TAG_BUTTON_TITLE = s__('ContainerRegistry|Remove tag');
-export const REMOVE_TAGS_BUTTON_TITLE = s__('ContainerRegistry|Delete selected');
+export const REMOVE_TAGS_BUTTON_TITLE = s__('ContainerRegistry|Delete selected tags');
 
 export const REMOVE_TAG_CONFIRMATION_TEXT = s__(
   `ContainerRegistry|You are about to remove %{item}. Are you sure?`,
@@ -53,7 +52,8 @@ export const MISSING_OR_DELETED_IMAGE_TITLE = s__(
 export const MISSING_OR_DELETED_IMAGE_MESSAGE = s__(
   'ContainerRegistry|The requested image repository does not exist or has been deleted. If you think this is an error, try refreshing the page.',
 );
-export const MISSING_OR_DELETE_IMAGE_BREADCRUMB = s__(
+
+export const MISSING_OR_DELETED_IMAGE_BREADCRUMB = s__(
   'ContainerRegistry|Image repository not found',
 );
 
@@ -110,6 +110,10 @@ export const FAILED_DELETION_STATUS_TITLE = s__(
 );
 export const FAILED_DELETION_STATUS_MESSAGE = s__(
   'ContainerRegistry|This image repository has failed to be deleted',
+);
+
+export const ROOT_IMAGE_TOOLTIP = s__(
+  'ContainerRegistry|Image repository with no name located at the project URL.',
 );
 
 // Parameters

@@ -1,25 +1,25 @@
 import { GlModal } from '@gitlab/ui';
-import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
+import Vue from 'vue';
 import Vuex from 'vuex';
 
 import BoardForm from 'ee/boards/components/board_form.vue';
 import createEpicBoardMutation from 'ee/boards/graphql/epic_board_create.mutation.graphql';
+import destroyEpicBoardMutation from 'ee/boards/graphql/epic_board_destroy.mutation.graphql';
+import updateEpicBoardMutation from 'ee/boards/graphql/epic_board_update.mutation.graphql';
 
 import { TEST_HOST } from 'helpers/test_constants';
 import waitForPromises from 'helpers/wait_for_promises';
 
 import { formType } from '~/boards/constants';
-import { deprecatedCreateFlash as createFlash } from '~/flash';
 import { visitUrl } from '~/lib/utils/url_utility';
 
 jest.mock('~/lib/utils/url_utility', () => ({
   visitUrl: jest.fn().mockName('visitUrlMock'),
   stripFinalUrlSegment: jest.requireActual('~/lib/utils/url_utility').stripFinalUrlSegment,
 }));
-jest.mock('~/flash');
 
-const localVue = createLocalVue();
-localVue.use(Vuex);
+Vue.use(Vuex);
 
 const currentBoard = {
   id: 1,
@@ -55,7 +55,10 @@ describe('BoardForm', () => {
   const createStore = () => {
     return new Vuex.Store({
       getters: {
+        isIssueBoard: () => false,
         isEpicBoard: () => true,
+        isGroupBoard: () => true,
+        isProjectBoard: () => false,
       },
     });
   };
@@ -64,7 +67,6 @@ describe('BoardForm', () => {
 
   const createComponent = (props) => {
     wrapper = shallowMount(BoardForm, {
-      localVue,
       propsData: { ...defaultProps, ...props },
       provide: {
         rootPath: 'root',
@@ -164,9 +166,10 @@ describe('BoardForm', () => {
         expect(visitUrl).toHaveBeenCalledWith('test-path');
       });
 
-      it('shows an error flash if GraphQL mutation fails', async () => {
+      it('shows a GlAlert if GraphQL mutation fails', async () => {
         mutate = jest.fn().mockRejectedValue('Houston, we have a problem');
         createComponent({ canAdminBoard: true, currentPage: formType.new });
+        jest.spyOn(wrapper.vm, 'setError').mockImplementation(() => {});
         fillForm();
 
         await waitForPromises();
@@ -175,8 +178,99 @@ describe('BoardForm', () => {
 
         await waitForPromises();
         expect(visitUrl).not.toHaveBeenCalled();
-        expect(createFlash).toHaveBeenCalled();
+        expect(wrapper.vm.setError).toHaveBeenCalled();
       });
+    });
+  });
+
+  describe('when editing an epic board', () => {
+    it('calls GraphQL mutation with correct parameters', async () => {
+      mutate = jest.fn().mockResolvedValue({
+        data: {
+          epicBoardUpdate: {
+            epicBoard: { id: 'gid://gitlab/Boards::EpicBoard/321', webPath: 'test-path' },
+          },
+        },
+      });
+      window.location = new URL('https://test/boards/1');
+      createComponent({ canAdminBoard: true, currentPage: formType.edit });
+
+      findInput().trigger('keyup.enter', { metaKey: true });
+
+      await waitForPromises();
+
+      expect(mutate).toHaveBeenCalledWith({
+        mutation: updateEpicBoardMutation,
+        variables: {
+          input: expect.objectContaining({
+            id: `gid://gitlab/Boards::EpicBoard/${currentBoard.id}`,
+          }),
+        },
+      });
+
+      await waitForPromises();
+      expect(visitUrl).toHaveBeenCalledWith('test-path');
+    });
+
+    it('shows a GlAlert if GraphQL mutation fails', async () => {
+      mutate = jest.fn().mockRejectedValue('Houston, we have a problem');
+      createComponent({ canAdminBoard: true, currentPage: formType.edit });
+      jest.spyOn(wrapper.vm, 'setError').mockImplementation(() => {});
+      findInput().trigger('keyup.enter', { metaKey: true });
+
+      await waitForPromises();
+
+      expect(mutate).toHaveBeenCalled();
+
+      await waitForPromises();
+      expect(visitUrl).not.toHaveBeenCalled();
+      expect(wrapper.vm.setError).toHaveBeenCalled();
+    });
+  });
+
+  describe('when deleting an epic board', () => {
+    it('passes correct primary action text and variant', () => {
+      createComponent({ canAdminBoard: true, currentPage: formType.delete });
+      expect(findModalActionPrimary().text).toBe('Delete');
+      expect(findModalActionPrimary().attributes[0].variant).toBe('danger');
+    });
+
+    it('renders delete confirmation message', () => {
+      createComponent({ canAdminBoard: true, currentPage: formType.delete });
+      expect(findDeleteConfirmation().exists()).toBe(true);
+    });
+
+    it('calls a correct GraphQL mutation and redirects to correct page after deleting board', async () => {
+      mutate = jest.fn().mockResolvedValue({});
+      createComponent({ canAdminBoard: true, currentPage: formType.delete });
+      findModal().vm.$emit('primary');
+
+      await waitForPromises();
+
+      expect(mutate).toHaveBeenCalledWith({
+        mutation: destroyEpicBoardMutation,
+        variables: {
+          id: 'gid://gitlab/Boards::EpicBoard/1',
+        },
+      });
+
+      await waitForPromises();
+      expect(visitUrl).toHaveBeenCalledWith('root');
+    });
+
+    it('shows a GlAlert if GraphQL mutation fails', async () => {
+      mutate = jest.fn().mockRejectedValue('Houston, we have a problem');
+      createComponent({ canAdminBoard: true, currentPage: formType.delete });
+      jest.spyOn(wrapper.vm, 'setError').mockImplementation(() => {});
+      findModal().vm.$emit('primary');
+
+      await waitForPromises();
+
+      expect(mutate).toHaveBeenCalled();
+
+      await waitForPromises();
+      expect(visitUrl).not.toHaveBeenCalled();
+      expect(wrapper.vm.setError).toHaveBeenCalled();
     });
   });
 });

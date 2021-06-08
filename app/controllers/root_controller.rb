@@ -13,7 +13,6 @@ class RootController < Dashboard::ProjectsController
 
   before_action :redirect_unlogged_user, if: -> { current_user.nil? }
   before_action :redirect_logged_user, if: -> { current_user.present? }
-  before_action :customize_homepage, only: :index, if: -> { current_user.present? }
   # We only need to load the projects when the user is logged in but did not
   # configure a dashboard. In which case we render projects. We can do that straight
   # from the #index action.
@@ -69,10 +68,6 @@ class RootController < Dashboard::ProjectsController
 
     root_urls.exclude?(home_page_url)
   end
-
-  def customize_homepage
-    @customize_homepage = Feature.enabled?(:customize_homepage, default_enabled: :yaml)
-  end
 end
 
-RootController.prepend_if_ee('EE::RootController')
+RootController.prepend_mod_with('RootController')

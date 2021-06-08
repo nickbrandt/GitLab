@@ -5,6 +5,7 @@ class Admin::LicensesController < Admin::ApplicationController
 
   before_action :license, only: [:show, :download, :destroy]
   before_action :require_license, only: [:download, :destroy]
+  before_action :check_cloud_license, only: [:show]
 
   respond_to :html
 
@@ -27,15 +28,11 @@ class Admin::LicensesController < Admin::ApplicationController
   end
 
   def create
-    unless params[:license][:data].present? || params[:license][:data_file].present?
-      flash[:alert] = _('Please enter or upload a license.')
-
-      @license = License.new
-      redirect_to new_admin_license_path
-      return
-    end
+    return upload_license_error if license_params[:data].blank? && license_params[:data_file].blank?
 
     @license = License.new(license_params)
+
+    return upload_license_error if @license.cloud_license?
 
     respond_with(@license, location: admin_license_path) do
       if @license.save
@@ -51,7 +48,7 @@ class Admin::LicensesController < Admin::ApplicationController
   end
 
   def destroy
-    license.destroy
+    Licenses::DestroyService.new(license, current_user).execute
 
     if License.current
       flash[:notice] = _('The license was removed. GitLab has fallen back on the previous license.')
@@ -60,6 +57,22 @@ class Admin::LicensesController < Admin::ApplicationController
     end
 
     redirect_to admin_license_path, status: :found
+  rescue Licenses::DestroyService::DestroyCloudLicenseError => e
+    flash[:error] = e.message
+
+    redirect_to admin_license_path, status: :found
+  end
+
+  def sync_seat_link
+    respond_to do |format|
+      format.json do
+        if Gitlab::SeatLinkData.new.sync
+          render json: { success: true }
+        else
+          render json: { success: false }, status: :unprocessable_entity
+        end
+      end
+    end
   end
 
   private
@@ -68,9 +81,19 @@ class Admin::LicensesController < Admin::ApplicationController
     @license ||= License.new(data: params[:trial_key])
   end
 
+  def check_cloud_license
+    redirect_to admin_cloud_license_path if Gitlab::CurrentSettings.cloud_license_enabled?
+  end
+
   def license_params
     license_params = params.require(:license).permit(:data_file, :data)
     license_params.delete(:data) if license_params[:data_file]
     license_params
+  end
+
+  def upload_license_error
+    flash[:alert] = _('Please enter or upload a valid license.')
+    @license = License.new
+    redirect_to new_admin_license_path
   end
 end

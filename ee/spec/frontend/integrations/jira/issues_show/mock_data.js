@@ -20,12 +20,24 @@ export const mockJiraIssue = {
     {
       title: 'In Progress',
       description: 'Work that is still in progress',
-      color: '#EBECF0',
-      text_color: '#283856',
+      color: '#0052CC',
+      text_color: '#FFFFFF',
     },
   ],
   references: {
     relative: 'FE-2',
   },
   state: 'opened',
+  status: 'In Progress',
+};
+
+export const mockJiraIssueComment = {
+  body_html: '<p>hi</p>',
+  created_at: '"2021-02-01T04:04:40.833Z"',
+  author: {
+    name: 'Justin Ho',
+    web_url: 'http://127.0.0.1:3000/root',
+    avatar_url: 'http://127.0.0.1:3000/uploads/-/system/user/avatar/1/avatar.png?width=90',
+  },
+  id: 10000,
 };

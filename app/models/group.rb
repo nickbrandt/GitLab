@@ -16,8 +16,7 @@ class Group < Namespace
   include Gitlab::Utils::StrongMemoize
   include GroupAPICompatibility
   include EachBatch
-
-  ACCESS_REQUEST_APPROVERS_TO_BE_NOTIFIED_LIMIT = 10
+  include BulkMemberAccessLoad
 
   has_many :all_group_members, -> { where(requested_at: nil) }, dependent: :destroy, as: :source, class_name: 'GroupMember' # rubocop:disable Cop/ActiveRecordDependent
   has_many :group_members, -> { where(requested_at: nil).where.not(members: { access_level: Gitlab::Access::MINIMAL_ACCESS }) }, dependent: :destroy, as: :source # rubocop:disable Cop/ActiveRecordDependent
@@ -33,7 +32,7 @@ class Group < Namespace
   has_many :members_and_requesters, as: :source, class_name: 'GroupMember'
 
   has_many :milestones
-  has_many :services
+  has_many :integrations
   has_many :shared_group_links, foreign_key: :shared_with_group_id, class_name: 'GroupGroupLink'
   has_many :shared_with_group_links, foreign_key: :shared_group_id, class_name: 'GroupGroupLink'
   has_many :shared_groups, through: :shared_group_links, source: :shared_group
@@ -66,10 +65,13 @@ class Group < Namespace
 
   has_one :import_state, class_name: 'GroupImportState', inverse_of: :group
 
+  has_many :bulk_import_exports, class_name: 'BulkImports::Export', inverse_of: :group
+
   has_many :group_deploy_keys_groups, inverse_of: :group
   has_many :group_deploy_keys, through: :group_deploy_keys_groups
   has_many :group_deploy_tokens
   has_many :deploy_tokens, through: :group_deploy_tokens
+  has_many :oauth_applications, class_name: 'Doorkeeper::Application', as: :owner, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
 
   has_one :dependency_proxy_setting, class_name: 'DependencyProxy::GroupSetting'
   has_many :dependency_proxy_blobs, class_name: 'DependencyProxy::Blob'
@@ -84,7 +86,7 @@ class Group < Namespace
   validate :visibility_level_allowed_by_sub_groups
   validate :visibility_level_allowed_by_parent
   validate :two_factor_authentication_allowed
-  validates :variables, nested_attributes_duplicates: true
+  validates :variables, nested_attributes_duplicates: { scope: :environment_scope }
 
   validates :two_factor_grace_period, presence: true, numericality: { greater_than_or_equal_to: 0 }
 
@@ -103,20 +105,20 @@ class Group < Namespace
 
   scope :with_users, -> { includes(:users) }
 
+  scope :with_onboarding_progress, -> { joins(:onboarding_progress) }
+
   scope :by_id, ->(groups) { where(id: groups) }
 
   scope :for_authorized_group_members, -> (user_ids) do
     joins(:group_members)
-      .where("members.user_id IN (?)", user_ids)
+      .where(members: { user_id: user_ids })
       .where("access_level >= ?", Gitlab::Access::GUEST)
   end
 
   scope :for_authorized_project_members, -> (user_ids) do
     joins(projects: :project_authorizations)
-      .where("project_authorizations.user_id IN (?)", user_ids)
+      .where(project_authorizations: { user_id: user_ids })
   end
-
-  delegate :default_branch_name, to: :namespace_settings
 
   class << self
     def sort_by_attribute(method)
@@ -153,7 +155,7 @@ class Group < Namespace
     def select_for_project_authorization
       if current_scope.joins_values.include?(:shared_projects)
         joins('INNER JOIN namespaces project_namespace ON project_namespace.id = projects.namespace_id')
-          .where('project_namespace.share_with_group_lock = ?', false)
+          .where(project_namespace: { share_with_group_lock: false })
           .select("projects.id AS project_id, LEAST(project_group_links.group_access, members.access_level) AS access_level")
       else
         super
@@ -161,12 +163,12 @@ class Group < Namespace
     end
 
     def without_integration(integration)
-      services = Service
+      integrations = Integration
         .select('1')
         .where('services.group_id = namespaces.id')
         .where(type: integration.type)
 
-      where('NOT EXISTS (?)', services)
+      where('NOT EXISTS (?)', integrations)
     end
 
     # This method can be used only if all groups have the same top-level
@@ -176,6 +178,25 @@ class Group < Namespace
 
       root = groups.first.root_ancestor
       groups.drop(1).each { |group| group.root_ancestor = root }
+    end
+
+    # Returns the ids of the passed group models where the `emails_disabled`
+    # column is set to true anywhere in the ancestor hierarchy.
+    def ids_with_disabled_email(groups)
+      innner_query = Gitlab::ObjectHierarchy
+        .new(Group.where('id = namespaces_with_emails_disabled.id'))
+        .base_and_ancestors
+        .where(emails_disabled: true)
+        .select('1')
+        .limit(1)
+
+      group_ids = Namespace
+        .from('(SELECT * FROM namespaces) as namespaces_with_emails_disabled')
+        .where(namespaces_with_emails_disabled: { id: groups })
+        .where('EXISTS (?)', innner_query)
+        .pluck(:id)
+
+      Set.new(group_ids)
     end
 
     private
@@ -325,6 +346,10 @@ class Group < Namespace
     members_with_parents.owners.exists?(user_id: user)
   end
 
+  def blocked_owners
+    members.blocked.where(access_level: Gitlab::Access::OWNER)
+  end
+
   def has_maintainer?(user)
     return false unless user
 
@@ -337,7 +362,29 @@ class Group < Namespace
 
   # Check if user is a last owner of the group.
   def last_owner?(user)
-    has_owner?(user) && members_with_parents.owners.size == 1
+    has_owner?(user) && single_owner?
+  end
+
+  def member_last_owner?(member)
+    return member.last_owner unless member.last_owner.nil?
+
+    last_owner?(member.user)
+  end
+
+  def single_owner?
+    members_with_parents.owners.size == 1
+  end
+
+  def single_blocked_owner?
+    blocked_owners.size == 1
+  end
+
+  def member_last_blocked_owner?(member)
+    return member.last_blocked_owner unless member.last_blocked_owner.nil?
+
+    return false if members_with_parents.owners.any?
+
+    single_blocked_owner? && blocked_owners.exists?(user_id: member.user)
   end
 
   def ldap_synced?
@@ -399,6 +446,20 @@ class Group < Namespace
     GroupMember.active_without_invites_and_requests
                .non_minimal_access
                .where(source_id: id)
+  end
+
+  def authorizable_members_with_parents
+    source_ids =
+      if has_parent?
+        self_and_ancestors.reorder(nil).select(:id)
+      else
+        id
+      end
+
+    group_hierarchy_members = GroupMember.where(source_id: source_ids)
+
+    GroupMember.from_union([group_hierarchy_members,
+                            members_from_self_and_ancestor_group_shares]).authorizable
   end
 
   def members_with_parents
@@ -505,14 +566,9 @@ class Group < Namespace
   # @param only_concrete_membership [Bool] whether require admin concrete membership status
   def max_member_access_for_user(user, only_concrete_membership: false)
     return GroupMember::NO_ACCESS unless user
-    return GroupMember::OWNER if user.admin? && !only_concrete_membership
+    return GroupMember::OWNER if user.can_admin_all_resources? && !only_concrete_membership
 
-    max_member_access = members_with_parents.where(user_id: user)
-                                            .reorder(access_level: :desc)
-                                            .first
-                                            &.access_level
-
-    max_member_access || GroupMember::NO_ACCESS
+    max_member_access([user.id])[user.id]
   end
 
   def mattermost_team_params
@@ -525,15 +581,11 @@ class Group < Namespace
     }
   end
 
-  def ci_variables_for(ref, project)
-    cache_key = "ci_variables_for:group:#{self&.id}:project:#{project&.id}:ref:#{ref}"
+  def ci_variables_for(ref, project, environment: nil)
+    cache_key = "ci_variables_for:group:#{self&.id}:project:#{project&.id}:ref:#{ref}:environment:#{environment}"
 
     ::Gitlab::SafeRequestStore.fetch(cache_key) do
-      list_of_ids = [self] + ancestors
-      variables = Ci::GroupVariable.where(group: list_of_ids)
-      variables = variables.unprotected unless project.protected_for?(ref)
-      variables = variables.group_by(&:group_id)
-      list_of_ids.reverse.flat_map { |group| variables[group.id] }.compact
+      uncached_ci_variables_for(ref, project, environment: environment)
     end
   end
 
@@ -579,7 +631,7 @@ class Group < Namespace
   end
 
   def access_request_approvers_to_be_notified
-    members.owners.order_recent_sign_in.limit(ACCESS_REQUEST_APPROVERS_TO_BE_NOTIFIED_LIMIT)
+    members.owners.connected_to_user.order_recent_sign_in.limit(Member::ACCESS_REQUEST_APPROVERS_TO_BE_NOTIFIED_LIMIT)
   end
 
   def supports_events?
@@ -650,7 +702,21 @@ class Group < Namespace
     Gitlab::ServiceDesk.supported? && all_projects.service_desk_enabled.exists?
   end
 
+  def to_ability_name
+    model_name.singular
+  end
+
+  def activity_path
+    Gitlab::Routing.url_helpers.activity_group_path(self)
+  end
+
   private
+
+  def max_member_access(user_ids)
+    max_member_access_for_resource_ids(User, user_ids) do |user_ids|
+      members_with_parents.where(user_id: user_ids).group(:user_id).maximum(:access_level)
+    end
+  end
 
   def update_two_factor_requirement
     return unless saved_change_to_require_two_factor_authentication? || saved_change_to_two_factor_grace_period?
@@ -775,6 +841,26 @@ class Group < Namespace
   def enable_shared_runners!
     update!(shared_runners_enabled: true)
   end
+
+  def uncached_ci_variables_for(ref, project, environment: nil)
+    list_of_ids = if root_ancestor.use_traversal_ids?
+                    [self] + ancestors(hierarchy_order: :asc)
+                  else
+                    [self] + ancestors
+                  end
+
+    variables = Ci::GroupVariable.where(group: list_of_ids)
+    variables = variables.unprotected unless project.protected_for?(ref)
+
+    variables = if environment
+                  variables.on_environment(environment)
+                else
+                  variables.where(environment_scope: '*')
+                end
+
+    variables = variables.group_by(&:group_id)
+    list_of_ids.reverse.flat_map { |group| variables[group.id] }.compact
+  end
 end
 
-Group.prepend_if_ee('EE::Group')
+Group.prepend_mod_with('Group')

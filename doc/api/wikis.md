@@ -9,7 +9,8 @@ type: reference, api
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/13372) in GitLab 10.0.
 
-Available only in APIv4.
+The project [wikis](../user/project/wiki/index.md) API is available only in APIv4.
+An API for [group wikis](group_wikis.md) is also available.
 
 ## List wiki pages
 
@@ -63,7 +64,7 @@ GET /projects/:id/wikis/:slug
 | Attribute | Type    | Required | Description           |
 | --------- | ------- | -------- | --------------------- |
 | `id`      | integer/string    | yes      | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
-| `slug` | string  | yes       | The slug (a unique string) of the wiki page |
+| `slug` | string  | yes       | URLencoded slug (a unique string) of the wiki page, such as `dir%2Fpage_name`  |
 
 ```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/1/wikis/home"
@@ -96,7 +97,8 @@ POST /projects/:id/wikis
 | `format` | string  | no       | The format of the wiki page. Available formats are: `markdown` (default), `rdoc`, `asciidoc` and `org` |
 
 ```shell
-curl --data "format=rdoc&title=Hello&content=Hello world" --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/1/wikis"
+curl --data "format=rdoc&title=Hello&content=Hello world" \
+     --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/1/wikis"
 ```
 
 Example response:
@@ -124,10 +126,11 @@ PUT /projects/:id/wikis/:slug
 | `content`       | string  | yes if `title` is not provided     | The content of the wiki page |
 | `title`        | string  | yes if `content` is not provided      | The title of the wiki page        |
 | `format` | string  | no       | The format of the wiki page. Available formats are: `markdown` (default), `rdoc`, `asciidoc` and `org` |
-| `slug` | string  | yes       | The slug (a unique string) of the wiki page |
+| `slug` | string  | yes       | URL-encoded slug (a unique string) of the wiki page, such as `dir%2Fpage_name` |
 
 ```shell
-curl --request PUT --data "format=rdoc&content=documentation&title=Docs" --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/1/wikis/foo"
+curl --request PUT --data "format=rdoc&content=documentation&title=Docs" \
+     --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/1/wikis/foo"
 ```
 
 Example response:
@@ -152,7 +155,7 @@ DELETE /projects/:id/wikis/:slug
 | Attribute | Type    | Required | Description           |
 | --------- | ------- | -------- | --------------------- |
 | `id`      | integer/string    | yes      | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
-| `slug` | string  | yes       | The slug (a unique string) of the wiki page |
+| `slug` | string  | yes       | URL-encoded slug (a unique string) of the wiki page, such as `dir%2Fpage_name` |
 
 ```shell
 curl --request DELETE --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/1/wikis/foo"
@@ -181,7 +184,8 @@ The `file=` parameter must point to a file on your file system and be preceded
 by `@`. For example:
 
 ```shell
-curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" --form "file=@dk.png" "https://gitlab.example.com/api/v4/projects/1/wikis/attachments"
+curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" \
+     --form "file=@dk.png" "https://gitlab.example.com/api/v4/projects/1/wikis/attachments"
 ```
 
 Example response:

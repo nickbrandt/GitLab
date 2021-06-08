@@ -15,10 +15,26 @@ module Ci
         "build_stage" => @build.stage,
         "log_state" => '',
         "build_options" => javascript_build_options,
-        "retry_outdated_job_docs_url" => help_page_path('ci/pipelines/settings', anchor: 'retry-outdated-jobs')
+        "retry_outdated_job_docs_url" => help_page_path('ci/pipelines/settings', anchor: 'retry-outdated-jobs'),
+        "code_quality_help_url" => help_page_path('user/project/merge_requests/code_quality', anchor: 'troubleshooting')
       }
+    end
+
+    def job_counts
+      {
+        "all" => limited_counter_with_delimiter(@all_builds),
+        "pending" => limited_counter_with_delimiter(@all_builds.pending),
+        "running" => limited_counter_with_delimiter(@all_builds.running),
+        "finished" => limited_counter_with_delimiter(@all_builds.finished)
+      }
+    end
+
+    def job_statuses
+      statuses = Ci::HasStatus::AVAILABLE_STATUSES
+
+      statuses.to_h { |status| [status, status.upcase] }
     end
   end
 end
 
-Ci::JobsHelper.prepend_if_ee('::EE::Ci::JobsHelper')
+Ci::JobsHelper.prepend_mod_with('Ci::JobsHelper')

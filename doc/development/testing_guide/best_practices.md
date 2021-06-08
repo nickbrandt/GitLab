@@ -86,7 +86,7 @@ a parent context. Examples of these are:
 - `:clean_gitlab_redis_cache` which provides a clean Redis cache to the examples.
 - `:request_store` which provides a request store to the examples.
 
-Obviously we should reduce test dependencies, and avoiding
+We should reduce test dependencies, and avoiding
 capabilities also reduces the amount of set-up needed.
 
 `:js` is particularly important to avoid. This must only be used if the feature
@@ -168,7 +168,7 @@ can be used:
 
 ```ruby
 RSpec.describe API::Search, factory_default: :keep do
-  let_it_be(:namespace) { create_default(:namespace).freeze }
+  let_it_be(:namespace) { create_default(:namespace) }
 ```
 
 Then every project we create uses this `namespace`, without us having to pass
@@ -176,9 +176,9 @@ it as `namespace: namespace`. In order to make it work along with `let_it_be`, `
 must be explicitly specified. That keeps the default factory for every example in a suite instead of
 recreating it for each example.
 
-Objects created inside a `factory_default: :keep`, and using
-`create_default` inside a `let_it_be` should be frozen to prevent accidental reliance
-between test examples.
+To prevent accidental reliance between test examples, objects created
+with `create_default` are
+[frozen](https://gitlab.com/gitlab-org/gitlab/-/blob/master/spec/support/factory_default.rb).
 
 Maybe we don't need to create 208 different projects - we
 can create one and reuse it. In addition, we can see that only about 1/3 of the
@@ -186,7 +186,7 @@ projects we create are ones we ask for (76/208). There is benefit in setting
 a default value for projects as well:
 
 ```ruby
-  let_it_be(:project) { create_default(:project).freeze }
+  let_it_be(:project) { create_default(:project) }
 ```
 
 In this case, the `total time` and `top-level time` numbers match more closely:
@@ -350,11 +350,139 @@ writing one](testing_levels.md#consider-not-writing-a-system-test)!
 - It's ok to look for DOM elements, but don't abuse it, because it makes the tests
   more brittle
 
-#### Debugging Capybara
+#### UI testing
 
-Sometimes you may need to debug Capybara tests by observing browser behavior.
+When testing the UI, write tests that simulate what a user sees and how they interact with the UI.
+This means preferring Capybara's semantic methods and avoiding querying by IDs, classes, or attributes.
+
+The benefits of testing in this way are that:
+
+- It ensures all interactive elements have an [accessible name](../fe_guide/accessibility.md#provide-accessible-names-for-screen-readers).
+- It is more readable, as it uses more natural language.
+- It is less brittle, as it avoids querying by IDs, classes, and attributes, which are not visible to the user.
+
+We strongly recommend that you query by the element's text label instead of by ID, class name, or `data-testid`.
+
+If needed, you can scope interactions within a specific area of the page by using `within`.
+As you will likely be scoping to an element such as a `div`, which typically does not have a label,
+you may use a `data-testid` selector in this case.
+
+##### Actions
+
+Where possible, use more specific [actions](https://rubydoc.info/github/teamcapybara/capybara/master/Capybara/Node/Actions), such as the ones below.
+
+```ruby
+# good
+click_button 'Submit review'
+
+click_link 'UI testing docs'
+
+fill_in 'Search projects', with: 'gitlab' # fill in text input with text
+
+select 'Last updated', from: 'Sort by' # select an option from a select input
+
+check 'Checkbox label'
+uncheck 'Checkbox label'
+
+choose 'Radio input label'
+
+attach_file('Attach a file', '/path/to/file.png')
+
+# bad - interactive elements must have accessible names, so
+# we should be able to use one of the specific actions above
+find('.group-name', text: group.name).click
+find('.js-show-diff-settings').click
+find('[data-testid="submit-review"]').click
+find('input[type="checkbox"]').click
+find('.search').native.send_keys('gitlab')
+```
+
+##### Finders
+
+Where possible, use more specific [finders](https://rubydoc.info/github/teamcapybara/capybara/master/Capybara/Node/Finders), such as the ones below.
+
+```ruby
+# good
+find_button 'Submit review'
+find_button 'Submit review', disabled: true
+
+find_link 'UI testing docs'
+find_link 'UI testing docs', href: docs_url
+
+find_field 'Search projects'
+find_field 'Search projects', with: 'gitlab' # find the input field with text
+find_field 'Search projects', disabled: true
+find_field 'Checkbox label', checked: true
+find_field 'Checkbox label', unchecked: true
+
+# acceptable when finding a element that is not a button, link, or field
+find('[data-testid="element"]')
+```
+
+##### Matchers
+
+Where possible, use more specific [matchers](https://rubydoc.info/github/teamcapybara/capybara/master/Capybara/RSpecMatchers), such as the ones below.
+
+```ruby
+# good
+expect(page).to have_button 'Submit review'
+expect(page).to have_button 'Submit review', disabled: true
+expect(page).to have_button 'Notifications', class: 'is-checked' # assert the "Notifications" GlToggle is checked
+
+expect(page).to have_link 'UI testing docs'
+expect(page).to have_link 'UI testing docs', href: docs_url # assert the link has an href
+
+expect(page).to have_field 'Search projects'
+expect(page).to have_field 'Search projects', disabled: true
+expect(page).to have_field 'Search projects', with: 'gitlab' # assert the input field has text
+
+expect(page).to have_checked_field 'Checkbox label'
+expect(page).to have_unchecked_field 'Radio input label'
+
+expect(page).to have_select 'Sort by'
+expect(page).to have_select 'Sort by', selected: 'Last updated' # assert the option is selected
+expect(page).to have_select 'Sort by', options: ['Last updated', 'Created date', 'Due date'] # assert an exact list of options
+expect(page).to have_select 'Sort by', with_options: ['Created date', 'Due date'] # assert a partial list of options
+
+expect(page).to have_text 'Some paragraph text.'
+expect(page).to have_text 'Some paragraph text.', exact: true # assert exact match
+
+expect(page).to have_current_path 'gitlab/gitlab-test/-/issues'
+
+expect(page).to have_title 'Not Found'
+
+# acceptable when a more specific matcher above is not possible
+expect(page).to have_css 'h2', text: 'Issue title'
+expect(page).to have_css 'p', text: 'Issue description', exact: true
+expect(page).to have_css '[data-testid="weight"]', text: 2
+expect(page).to have_css '.atwho-view ul', visible: true
+```
+
+##### Other useful methods
+
+After you retrieve an element using a [finder method](#finders), you can invoke a number of
+[element methods](https://rubydoc.info/github/teamcapybara/capybara/master/Capybara/Node/Element)
+on it, such as `hover`.
+
+Capybara tests also have a number of [session methods](https://rubydoc.info/github/teamcapybara/capybara/master/Capybara/Session) available, such as `accept_confirm`.
+
+Some other useful methods are shown below:
+
+```ruby
+refresh # refresh the page
+
+send_keys([:shift, 'i']) # press Shift+I keys to go to the Issues dashboard page
+
+current_window.resize_to(1000, 1000) # resize the window
+
+scroll_to(find_field('Comment')) # scroll to an element
+```
+
+You can also find a number of GitLab custom helpers in the `spec/support/helpers/` directory.
 
 #### Live debug
+
+Sometimes you may need to debug Capybara tests by observing browser behavior.
 
 You can pause Capybara and view the website on the browser by using the
 `live_debug` method in your spec. The current page is automatically opened
@@ -545,7 +673,7 @@ end
 
 ### Feature flags in tests
 
-This section was moved to [developing with feature flags](../feature_flags/development.md).
+This section was moved to [developing with feature flags](../feature_flags/index.md).
 
 ### Pristine test environments
 
@@ -723,6 +851,46 @@ using expectations, or dependency injection along with stubs, to avoid the need
 for modifications. If you have no other choice, an `around` block like the global
 variables example can be used, but avoid this if at all possible.
 
+#### Elasticsearch specs
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/61171) in GitLab 14.0.
+
+Specs that require Elasticsearch must be marked with the `:elastic` trait. This
+creates and deletes indices between examples to ensure a clean index, so that there is no room
+for polluting the tests with nonessential data.
+Most tests for Elasticsearch logic relate to:
+
+- Creating data in Postgres and waiting for it to be indexed in Elasticsearch.
+- Searching for that data.
+- Ensuring that the test gives the expected result.
+
+There are some exceptions, such as checking for structural changes rather than individual records in an index. 
+
+The `:elastic_with_delete_by_query` trait was added to reduce run time for pipelines by creating and deleting indices
+at the start and end of each context only. The [Elasticsearch DeleteByQuery API](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-delete-by-query.html) 
+is used to delete data in all indices in between examples to ensure a clean index.
+
+Note that Elasticsearch indexing uses [`Gitlab::Redis::SharedState`](../../../ee/development/redis.md#gitlabrediscachesharedstatequeues).
+Therefore, it is recommended to use `:clean_gitlab_redis_shared_state` in conjunction with the Elasticsearch traits.
+
+Specs using Elasticsearch require that you:
+
+- Create data in Postgres and then index it into Elasticsearch.
+- Enable Application Settings for Elasticsearch (which is disabled by default).
+
+To do so, use:
+
+```ruby
+before do
+  stub_ee_application_setting(elasticsearch_search: true, elasticsearch_indexing: true)
+end
+```
+
+Additionally, you can use the `ensure_elasticsearch_index!` method to overcome the asynchronous nature of Elasticsearch.
+It uses the [Elasticsearch Refresh API](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-refresh.html#refresh-api-desc)
+to make sure all operations performed on an index since the last refresh are available for search. This method is typically
+called after loading data into Postgres to ensure the data is indexed and searchable.
+
 #### Test Snowplow events
 
 WARNING:
@@ -766,6 +934,27 @@ When you want to ensure that no event got called, you can use `expect_no_snowplo
     end
   end
 ```
+
+#### Test Snowplow context against the schema
+
+The [Snowplow schema matcher](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/60480)
+helps to reduce validation errors by testing Snowplow context against the JSON schema.
+The schema matcher accepts the following parameters:
+
+- `schema path`
+- `context`
+
+To add a schema matcher spec:
+
+1. Add a new schema to the [Iglu repository](https://gitlab.com/gitlab-org/iglu),
+   then copy the same schema to the `spec/fixtures/product_intelligence/` directory.
+1. In the copied schema, remove the `"$schema"` key and value. We do not need it for specs
+   and the spec fails if we keep the key, as it tries to look for the schema in the URL.
+1. Use the following snippet to call the schema matcher:
+
+   ```ruby
+   match_snowplow_context_schema(schema_path: '<filename from step 1>', context: <Context Hash> )
+   ```
 
 ### Table-based / Parameterized tests
 

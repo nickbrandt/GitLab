@@ -7,38 +7,46 @@ info: To determine the technical writer assigned to the Stage/Group associated w
 
 # Reference architecture: up to 3,000 users **(PREMIUM SELF)**
 
-This page describes GitLab reference architecture for up to 3,000 users.
-It is designed to help your organization achieve a
-highly-available GitLab deployment. If you do not have the expertise or need to
-maintain a highly-available environment, you can have a simpler and less
-costly-to-operate environment by using the
-[2,000-user reference architecture](2k_users.md).
-If you have fewer than 3,000 users and still want a highly-available GitLab deployment,
-you should still use this reference architecture but scale down the node sizes.
+This GitLab reference architecture can help you deploy GitLab to up to 3,000
+users, and then maintain uptime and access for those users. You can also use
+this architecture to provide improved GitLab uptime and availability for fewer
+than 3,000 users. For fewer users, reduce the stated node sizes as needed.
+
+If maintaining a high level of uptime for your GitLab environment isn't a
+requirement, or if you don't have the expertise to maintain this sort of
+environment, we recommend using the non-HA [2,000-user reference architecture](2k_users.md)
+for your GitLab installation. If HA is still a requirement, there's several supported
+tweaks you can make to this architecture to reduce complexity as detailed here.
 
 For a full list of reference architectures, see
 [Available reference architectures](index.md#available-reference-architectures).
 
 > - **Supported users (approximate):** 3,000
-> - **High Availability:** Yes ([Praefect](#configure-praefect-postgresql) needs a third-party PostgreSQL solution for HA)
+> - **High Availability:** Yes, although [Praefect](#configure-praefect-postgresql) needs a third-party PostgreSQL solution
 > - **Test requests per second (RPS) rates:** API: 60 RPS, Web: 6 RPS, Git (Pull): 6 RPS, Git (Push): 1 RPS
 
-| Service                                    | Nodes       | Configuration         | GCP            | AWS         | Azure   |
-|--------------------------------------------|-------------|-----------------------|----------------|-------------|---------|
-| External load balancing node               | 1           | 2 vCPU, 1.8 GB memory | n1-highcpu-2   | c5.large    | F2s v2  |
-| Redis                                      | 3           | 2 vCPU, 7.5 GB memory | n1-standard-2  | m5.large    | D2s v3  |
-| Consul + Sentinel                          | 3           | 2 vCPU, 1.8 GB memory | n1-highcpu-2   | c5.large    | F2s v2  |
-| PostgreSQL                                 | 3           | 2 vCPU, 7.5 GB memory | n1-standard-2  | m5.large    | D2s v3  |
-| PgBouncer                                  | 3           | 2 vCPU, 1.8 GB memory | n1-highcpu-2   | c5.large    | F2s v2  |
-| Internal load balancing node               | 1           | 2 vCPU, 1.8 GB memory | n1-highcpu-2   | c5.large    | F2s v2  |
-| Gitaly                                     | 3           | 4 vCPU, 15 GB memory  | n1-standard-4  | m5.xlarge   | D4s v3  |
-| Praefect                                   | 3           | 2 vCPU, 1.8 GB memory | n1-highcpu-2   | c5.large    | F2s v2  |
-| Praefect PostgreSQL                        | 1+*         | 2 vCPU, 1.8 GB memory | n1-highcpu-2   | c5.large    | F2s v2  |
-| Sidekiq                                    | 4           | 2 vCPU, 7.5 GB memory | n1-standard-2  | m5.large    | D2s v3  |
-| GitLab Rails                               | 3           | 8 vCPU, 7.2 GB memory | n1-highcpu-8   | c5.2xlarge  | F8s v2  |
-| Monitoring node                            | 1           | 2 vCPU, 1.8 GB memory | n1-highcpu-2   | c5.large    | F2s v2  |
-| Object storage                             | n/a         | n/a                   | n/a            | n/a         | n/a     |
-| NFS server (optional, not recommended)     | 1           | 4 vCPU, 3.6 GB memory | n1-highcpu-4   | c5.xlarge   | F4s v2  |
+| Service                                    | Nodes       | Configuration         | GCP             | AWS          | Azure    |
+|--------------------------------------------|-------------|-----------------------|-----------------|--------------|----------|
+| External load balancing node               | 1           | 2 vCPU, 1.8 GB memory | `n1-highcpu-2`  | `c5.large`   | `F2s v2` |
+| Redis**                                    | 3           | 2 vCPU, 7.5 GB memory | `n1-standard-2` | `m5.large`   | `D2s v3` |
+| Consul* + Sentinel**                       | 3           | 2 vCPU, 1.8 GB memory | `n1-highcpu-2`  | `c5.large`   | `F2s v2` |
+| PostgreSQL*                                | 3           | 2 vCPU, 7.5 GB memory | `n1-standard-2` | `m5.large`   | `D2s v3` |
+| PgBouncer*                                 | 3           | 2 vCPU, 1.8 GB memory | `n1-highcpu-2`  | `c5.large`   | `F2s v2` |
+| Internal load balancing node               | 1           | 2 vCPU, 1.8 GB memory | `n1-highcpu-2`  | `c5.large`   | `F2s v2` |
+| Gitaly                                     | 3           | 4 vCPU, 15 GB memory  | `n1-standard-4` | `m5.xlarge`  | `D4s v3` |
+| Praefect                                   | 3           | 2 vCPU, 1.8 GB memory | `n1-highcpu-2`  | `c5.large`   | `F2s v2` |
+| Praefect PostgreSQL*                       | 1+          | 2 vCPU, 1.8 GB memory | `n1-highcpu-2`  | `c5.large`   | `F2s v2` |
+| Sidekiq                                    | 4           | 2 vCPU, 7.5 GB memory | `n1-standard-2` | `m5.large`   | `D2s v3` |
+| GitLab Rails                               | 3           | 8 vCPU, 7.2 GB memory | `n1-highcpu-8`  | `c5.2xlarge` | `F8s v2` |
+| Monitoring node                            | 1           | 2 vCPU, 1.8 GB memory | `n1-highcpu-2`  | `c5.large`   | `F2s v2` |
+| Object storage                             | n/a         | n/a                   | n/a             | n/a          | n/a      |
+| NFS server (optional, not recommended)     | 1           | 4 vCPU, 3.6 GB memory | `n1-highcpu-4`  | `c5.xlarge`  | `F4s v2` |
+
+NOTE:
+Components marked with * can be optionally run on reputable
+third party external PaaS PostgreSQL solutions. Google Cloud SQL and AWS RDS are known to work.
+Components marked with ** can be optionally run on reputable
+third party external PaaS Redis solutions. Google Memorystore and AWS ElastiCache are known to work.
 
 ```plantuml
 @startuml 3k
@@ -128,17 +136,22 @@ The Google Cloud Platform (GCP) architectures were built and tested using the
 CPU platform. On different hardware you may find that adjustments, either lower
 or higher, are required for your CPU or node counts. For more information, see
 our [Sysbench](https://github.com/akopytov/sysbench)-based
-[CPU benchmark](https://gitlab.com/gitlab-org/quality/performance/-/wikis/Reference-Architectures/GCP-CPU-Benchmarks).
+[CPU benchmarks](https://gitlab.com/gitlab-org/quality/performance/-/wikis/Reference-Architectures/GCP-CPU-Benchmarks).
 
 Due to better performance and availability, for data objects (such as LFS,
 uploads, or artifacts), using an [object storage service](#configure-the-object-storage)
 is recommended instead of using NFS. Using an object storage service also
 doesn't require you to provision and maintain a node.
 
-It's also worth noting that at this time [Praefect requires its own database server](../gitaly/praefect.md#postgresql) and
-that to achieve full High Availability a third party PostgreSQL database solution will be required.
-We hope to offer a built in solutions for these restrictions in the future but in the meantime a non HA PostgreSQL server
-can be set up via Omnibus GitLab, which the above specs reflect. Refer to the following issues for more information: [`omnibus-gitlab#5919`](https://gitlab.com/gitlab-org/omnibus-gitlab/-/issues/5919) & [`gitaly#3398`](https://gitlab.com/gitlab-org/gitaly/-/issues/3398)
+[Praefect requires its own database server](../gitaly/praefect.md#postgresql),
+and a third-party PostgreSQL database solution is required to achieve full
+high availability. Although we hope to offer a built-in solution for these
+restrictions in the future, you can set up a non-HA PostgreSQL server by using
+Omnibus GitLab (which the previous specifications reflect). Refer to the
+following issues for more information:
+
+- [`omnibus-gitlab#5919`](https://gitlab.com/gitlab-org/omnibus-gitlab/-/issues/5919)
+- [`gitaly#3398`](https://gitlab.com/gitlab-org/gitaly/-/issues/3398)
 
 ## Setup components
 
@@ -156,7 +169,7 @@ To set up GitLab and its components to accommodate up to 3,000 users:
    provides access to the Git repositories.
 1. [Configure Sidekiq](#configure-sidekiq).
 1. [Configure the main GitLab Rails application](#configure-gitlab-rails)
-   to run Puma/Unicorn, Workhorse, GitLab Shell, and to serve all frontend
+   to run Puma, Workhorse, GitLab Shell, and to serve all frontend
    requests (which include UI, API, and Git over HTTP/SSH).
 1. [Configure Prometheus](#configure-prometheus) to monitor your GitLab
    environment.
@@ -206,11 +219,12 @@ The following list includes descriptions of each server and its assigned IP:
 
 ## Configure the external load balancer
 
-In an active/active GitLab configuration, you'll need a load balancer to route
+In a multi-node GitLab configuration, you'll need a load balancer to route
 traffic to the application servers. The specifics on which load balancer to use
-or its exact configuration is beyond the scope of GitLab documentation. We hope
+or its exact configuration is beyond the scope of GitLab documentation. We assume
 that if you're managing multi-node systems like GitLab, you already have a load
-balancer of choice. Some load balancer examples include HAProxy (open-source),
+balancer of choice and that the routing methods used are distributing calls evenly
+between all nodes. Some load balancer examples include HAProxy (open-source),
 F5 Big-IP LTM, and Citrix Net Scaler. This documentation outline the ports and
 protocols needed for use with GitLab.
 
@@ -383,6 +397,8 @@ backend praefect
 ```
 
 Refer to your preferred Load Balancer's documentation for further guidance.
+Also ensure that the routing methods used are distributing calls evenly across
+all nodes.
 
 <div align="right">
   <a type="button" class="btn btn-default" href="#setup-components">
@@ -488,7 +504,7 @@ a node and change its status from primary to replica (and vice versa).
         'redis.password' => 'redis-password-goes-here',
    }
 
-   # Disable auto migrations
+   # Prevent database migrations from running on upgrade automatically
    gitlab_rails['auto_migrate'] = false
    ```
 
@@ -571,7 +587,7 @@ run: redis-exporter: (pid 30075) 76861s; run: log: (pid 29674) 76896s
         'redis.password' => 'redis-password-goes-here',
    }
 
-   # Disable auto migrations
+   # Prevent database migrations from running on upgrade automatically
    gitlab_rails['auto_migrate'] = false
    ```
 
@@ -700,7 +716,7 @@ To configure the Sentinel:
    node_exporter['listen_address'] = '0.0.0.0:9100'
    redis_exporter['listen_address'] = '0.0.0.0:9121'
 
-   # Disable auto migrations
+   # Prevent database migrations from running on upgrade automatically
    gitlab_rails['auto_migrate'] = false
    ```
 
@@ -825,7 +841,7 @@ in the second step, do not supply the `EXTERNAL_URL` value.
    # Incoming recommended value for max connections is 500. See https://gitlab.com/gitlab-org/omnibus-gitlab/-/issues/5691.
    patroni['postgresql']['max_connections'] = 500
 
-   # Disable automatic database migrations
+   # Prevent database migrations from running on upgrade automatically
    gitlab_rails['auto_migrate'] = false
 
    # Configure the Consul agent
@@ -1089,6 +1105,7 @@ in the second step, do not supply the `EXTERNAL_URL` value.
    postgresql['listen_address'] = '0.0.0.0'
    postgresql['max_connections'] = 200
 
+   # Prevent database migrations from running on upgrade automatically
    gitlab_rails['auto_migrate'] = false
 
    # Configure the Consul agent
@@ -1196,7 +1213,7 @@ Praefect requires several secret tokens to secure communications across the Clus
 
 Gitaly Cluster nodes are configured in Praefect via a `virtual storage`. Each storage contains
 the details of each Gitaly node that makes up the cluster. Each storage is also given a name
-and this name is used in several areas of the config. In this guide, the name of the storage will be
+and this name is used in several areas of the configuration. In this guide, the name of the storage will be
 `default`. Also, this guide is geared towards new installs, if upgrading an existing environment
 to use Gitaly Cluster, you may need to use a different name.
 Refer to the [Praefect documentation](../gitaly/praefect.md#praefect) for more info.
@@ -1221,7 +1238,6 @@ To configure the Praefect nodes, on each one:
    redis['enable'] = false
    nginx['enable'] = false
    puma['enable'] = false
-   unicorn['enable'] = false
    sidekiq['enable'] = false
    gitlab_workhorse['enable'] = false
    grafana['enable'] = false
@@ -1234,7 +1250,8 @@ To configure the Praefect nodes, on each one:
    praefect['enable'] = true
    praefect['listen_addr'] = '0.0.0.0:2305'
 
-   gitlab_rails['rake_cache_clear'] = false
+   # Prevent database migrations from running on upgrade automatically
+   praefect['auto_migrate'] = false
    gitlab_rails['auto_migrate'] = false
 
    # Configure the Consul agent
@@ -1349,7 +1366,6 @@ On each node:
    redis['enable'] = false
    nginx['enable'] = false
    puma['enable'] = false
-   unicorn['enable'] = false
    sidekiq['enable'] = false
    gitlab_workhorse['enable'] = false
    grafana['enable'] = false
@@ -1358,8 +1374,7 @@ On each node:
    alertmanager['enable'] = false
    prometheus['enable'] = false
 
-   # Prevent database connections during 'gitlab-ctl reconfigure'
-   gitlab_rails['rake_cache_clear'] = false
+   # Prevent database migrations from running on upgrade automatically
    gitlab_rails['auto_migrate'] = false
 
    # Configure the gitlab-shell API callback URL. Without this, `git push` will
@@ -1527,7 +1542,6 @@ To configure the Sidekiq nodes, one each one:
    nginx['enable'] = false
    grafana['enable'] = false
    prometheus['enable'] = false
-   gitlab_rails['auto_migrate'] = false
    alertmanager['enable'] = false
    gitaly['enable'] = false
    gitlab_workhorse['enable'] = false
@@ -1578,12 +1592,19 @@ To configure the Sidekiq nodes, one each one:
    gitlab_rails['db_password'] = '<postgresql_user_password>'
    gitlab_rails['db_adapter'] = 'postgresql'
    gitlab_rails['db_encoding'] = 'unicode'
+   # Prevent database migrations from running on upgrade automatically
    gitlab_rails['auto_migrate'] = false
 
    #######################################
    ###      Sidekiq configuration      ###
    #######################################
    sidekiq['listen_address'] = "0.0.0.0"
+
+   # Set number of Sidekiq queue processes to the same number as available CPUs
+   sidekiq['queue_groups'] = ['*'] * 2
+
+   # Set number of Sidekiq threads per queue process to the recommend number of 10
+   sidekiq['max_concurrency'] = 10
 
    #######################################
    ###     Monitoring configuration    ###
@@ -1640,7 +1661,9 @@ To configure the Sidekiq nodes, one each one:
    ```
 
 NOTE:
-You can also run [multiple Sidekiq processes](../operations/extra_sidekiq_processes.md).
+If you find that the environment's Sidekiq job processing is slow with long queues,
+more nodes can be added as required. You can also tune your Sidekiq nodes to
+run [multiple Sidekiq processes](../operations/extra_sidekiq_processes.md).
 
 <div align="right">
   <a type="button" class="btn btn-default" href="#setup-components">
@@ -1714,6 +1737,7 @@ On each node perform the following:
    gitlab_rails['db_host'] = '10.6.0.20' # internal load balancer IP
    gitlab_rails['db_port'] = 6432
    gitlab_rails['db_password'] = '<postgresql_user_password>'
+   # Prevent database migrations from running on upgrade automatically
    gitlab_rails['auto_migrate'] = false
 
    ## Redis connection details
@@ -1879,7 +1903,6 @@ running [Prometheus](../monitoring/prometheus/index.md) and
    external_url 'http://gitlab.example.com'
 
    # Disable all other services
-   gitlab_rails['auto_migrate'] = false
    alertmanager['enable'] = false
    gitaly['enable'] = false
    gitlab_exporter['enable'] = false
@@ -1891,7 +1914,6 @@ running [Prometheus](../monitoring/prometheus/index.md) and
    redis_exporter['enable'] = false
    sidekiq['enable'] = false
    puma['enable'] = false
-   unicorn['enable'] = false
    node_exporter['enable'] = false
    gitlab_exporter['enable'] = false
 
@@ -1913,6 +1935,9 @@ running [Prometheus](../monitoring/prometheus/index.md) and
    consul['configuration'] = {
       retry_join: %w(10.6.0.11 10.6.0.12 10.6.0.13)
    }
+
+   # Prevent database migrations from running on upgrade automatically
+   gitlab_rails['auto_migrate'] = false
    ```
 
 1. Save the file and [reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure).
@@ -1997,7 +2022,7 @@ in the future.
   </a>
 </div>
 
-## Configure Advanced Search **(PREMIUM SELF)**
+## Configure Advanced Search
 
 You can leverage Elasticsearch and [enable Advanced Search](../../integration/elasticsearch.md)
 for faster, more advanced code search across your entire GitLab instance.
@@ -2022,10 +2047,31 @@ to use GitLab Pages, this currently [requires NFS](troubleshooting.md#gitlab-pag
 See how to [configure NFS](../nfs.md).
 
 WARNING:
-From GitLab 13.0, using NFS for Git repositories is deprecated.
-From GitLab 14.0, technical support for NFS for Git repositories
-will no longer be provided. Upgrade to [Gitaly Cluster](../gitaly/praefect.md)
-as soon as possible.
+From GitLab 14.0, enhancements and bug fixes for NFS for Git repositories will no longer be
+considered and customer technical support will be considered out of scope.
+[Read more about Gitaly and NFS](../gitaly/index.md#nfs-deprecation-notice) and
+[the correct mount options to use](../nfs.md#upgrade-to-gitaly-cluster-or-disable-caching-if-experiencing-data-loss).
+
+## Supported modifications for lower user counts (HA)
+
+The 3k GitLab reference architecture is the smallest we recommend that achieves High Availability (HA).
+However, for environments that need to serve less users but maintain HA, there's several
+supported modifications you can make to this architecture to reduce complexity and cost.
+
+It should be noted that to achieve HA with GitLab, this architecture's makeup is ultimately what is
+required. Each component has various considerations and rules to follow and this architecture
+meets all of these. Smaller versions of this architecture will be fundamentally the same,
+but with smaller performance requirements, several modifications can be considered as follows:
+
+- Lowering node specs: Depending on your user count, you can lower all suggested node specs as desired. However, it's recommended that you don't go lower than the [general requirements](../../install/requirements.md).
+- Combining select nodes: Some nodes can be combined to reduce complexity at the cost of some performance:
+  - GitLab Rails and Sidekiq: Sidekiq nodes can be removed and the component instead enabled on the GitLab Rails nodes.
+  - PostgreSQL and PgBouncer: PgBouncer nodes can be removed and the component instead enabled on PostgreSQL with the Internal Load Balancer pointing to them instead.
+- Running select components in reputable Cloud PaaS solutions: Select components of the GitLab setup can instead be run on Cloud Provider PaaS solutions. By doing this, additional dependent components can also be removed:
+  - PostgreSQL: Can be run on reputable Cloud PaaS solutions such as Google Cloud SQL or AWS RDS. In this setup, the PgBouncer and Consul nodes are no longer required:
+    - Consul may still be desired if [Prometheus](../monitoring/prometheus/index.md) auto discovery is a requirement, otherwise you would need to [manually add scrape configurations](../monitoring/prometheus/index.md#adding-custom-scrape-configurations) for all nodes.
+      - As Redis Sentinel runs on the same box as Consul in this architecture, it may need to be run on a separate box if Redis is still being run via Omnibus.
+  - Redis: Can be run on reputable Cloud PaaS solutions such as Google Memorystore and AWS ElastiCache. In this setup, the Redis Sentinel is no longer required.
 
 <div align="right">
   <a type="button" class="btn btn-default" href="#setup-components">

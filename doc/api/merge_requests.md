@@ -405,6 +405,16 @@ Parameters:
 ]
 ```
 
+The `merge_status` field may hold one of the following values:
+
+| Value                      | Interpretation                                                        |
+|----------------------------|-----------------------------------------------------------------------|
+| `unchecked`                | We have not checked this yet                                          |
+| `checking`                 | We are currently checking if the merge request can be merged          |
+| `can_be_merged`            | This merge request can be merged without conflict                     |
+| `cannot_be_merged`         | There are merge conflicts between the source and target branches      |
+| `cannot_be_merged_recheck` | Currently unchecked. Before the current changes, there were conflicts |
+
 Users on GitLab Premium or higher also see
 the `approvals_before_merge` parameter:
 
@@ -457,7 +467,7 @@ Parameters:
 | `author_id`                     | integer        | no       | Returns merge requests created by the given user `id`. Mutually exclusive with `author_username`. _([Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/13060) in GitLab 9.5)_. |
 | `author_username`               | string         | no       | Returns merge requests created by the given `username`. Mutually exclusive with `author_id`. _([Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/13060) in GitLab 12.10)_. |
 | `assignee_id`                   | integer        | no       | Returns merge requests assigned to the given user `id`. `None` returns unassigned merge requests. `Any` returns merge requests with an assignee. _([Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/13060) in GitLab 9.5)_. |
-| `approver_ids` **(PREMIUM))**    | integer array  | no       | Returns merge requests which have specified all the users with the given `id`s as individual approvers. `None` returns merge requests without approvers. `Any` returns merge requests with an approver. |
+| `approver_ids` **(PREMIUM)**    | integer array  | no       | Returns merge requests which have specified all the users with the given `id`s as individual approvers. `None` returns merge requests without approvers. `Any` returns merge requests with an approver. |
 | `approved_by_ids` **(PREMIUM)** | integer array  | no       | Returns merge requests which have been approved by all the users with the given `id`s (Max: 5). `None` returns merge requests with no approvals. `Any` returns merge requests with an approval. |
 | `reviewer_id`                   | integer        | no       | Returns merge requests which have the user as a [reviewer](../user/project/merge_requests/getting_started.md#reviewer) with the given user `id`. `None` returns merge requests with no reviewers. `Any` returns merge requests with any reviewer. Mutually exclusive with `reviewer_username`.  |
 | `reviewer_username`             | string         | no       | Returns merge requests which have the user as a [reviewer](../user/project/merge_requests/getting_started.md#reviewer) with the given `username`. `None` returns merge requests with no reviewers. `Any` returns merge requests with any reviewer. Mutually exclusive with `reviewer_id`. |
@@ -760,6 +770,8 @@ the `approvals_before_merge` parameter:
   ...
 }
 ```
+
+The `diff_refs` in the response correspond to the latest diff version of the merge request.
 
 ## Get single MR participants
 
@@ -1064,7 +1076,7 @@ POST /projects/:id/merge_requests
 | `title`                    | string  | yes      | Title of MR.                                                                     |
 | `assignee_id`              | integer | no       | Assignee user ID.                                                                |
 | `assignee_ids`             | integer array | no | The ID of the user(s) to assign the MR to. Set to `0` or provide an empty value to unassign all assignees. |
-| `reviewer_ids`             | integer array | no | The ID of the user(s) added as a reviewer to the MR. If set to `0` or left empty, there will be no reviewers added.  |
+| `reviewer_ids`             | integer array | no | The ID of the user(s) added as a reviewer to the MR. If set to `0` or left empty, no reviewers are added.  |
 | `description`              | string  | no       | Description of MR. Limited to 1,048,576 characters. |
 | `target_project_id`        | integer | no       | The target project (numeric ID).                                                 |
 | `labels`                   | string  | no       | Labels for MR as a comma-separated list.                                         |
@@ -2317,7 +2329,7 @@ Example response:
       "short": "!1",
       "relative": "!1",
       "full": "my-group/my-project!1"
-    },
+    }
   },
   "target_url": "https://gitlab.example.com/gitlab-org/gitlab-ci/merge_requests/7",
   "body": "Et voluptas laudantium minus nihil recusandae ut accusamus earum aut non.",
@@ -2328,7 +2340,8 @@ Example response:
 
 ## Get MR diff versions
 
-Get a list of merge request diff versions.
+Get a list of merge request diff versions. For an explanation of the SHAs in the response,
+read [SHAs in the API response](#shas-in-the-api-response).
 
 ```plaintext
 GET /projects/:id/merge_requests/:merge_request_iid/versions
@@ -2367,9 +2380,16 @@ Example response:
 }]
 ```
 
+### SHAs in the API response
+
+- `head_commit_sha`: The HEAD commit of the source branch.
+- `base_commit_sha`: The merge-base commit SHA between the source branch and the target branches.
+- `start_commit_sha`: The HEAD commit SHA of the target branch when this version of the diff was created.
+
 ## Get a single MR diff version
 
-Get a single merge request diff version.
+Get a single merge request diff version. For an explanation of the SHAs in the response,
+read [SHAs in the API response](#shas-in-the-api-response).
 
 ```plaintext
 GET /projects/:id/merge_requests/:merge_request_iid/versions/:version_id

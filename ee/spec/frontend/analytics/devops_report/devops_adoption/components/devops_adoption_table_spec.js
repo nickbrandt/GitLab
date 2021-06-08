@@ -1,23 +1,29 @@
-import { GlTable, GlButton, GlIcon } from '@gitlab/ui';
+import { GlTable, GlButton, GlIcon, GlBadge } from '@gitlab/ui';
 import { mount } from '@vue/test-utils';
 import { nextTick } from 'vue';
 import DevopsAdoptionDeleteModal from 'ee/analytics/devops_report/devops_adoption/components/devops_adoption_delete_modal.vue';
 import DevopsAdoptionTable from 'ee/analytics/devops_report/devops_adoption/components/devops_adoption_table.vue';
 import DevopsAdoptionTableCellFlag from 'ee/analytics/devops_report/devops_adoption/components/devops_adoption_table_cell_flag.vue';
-import { DEVOPS_ADOPTION_TABLE_TEST_IDS as TEST_IDS } from 'ee/analytics/devops_report/devops_adoption/constants';
+import {
+  DEVOPS_ADOPTION_TABLE_TEST_IDS as TEST_IDS,
+  DEVOPS_ADOPTION_TABLE_CONFIGURATION,
+} from 'ee/analytics/devops_report/devops_adoption/constants';
 import { createMockDirective, getBinding } from 'helpers/vue_mock_directive';
 import LocalStorageSync from '~/vue_shared/components/local_storage_sync.vue';
-import { devopsAdoptionSegmentsData, devopsAdoptionTableHeaders } from '../mock_data';
+import { devopsAdoptionNamespaceData, devopsAdoptionTableHeaders } from '../mock_data';
 
 describe('DevopsAdoptionTable', () => {
   let wrapper;
 
-  const createComponent = () => {
+  const createComponent = (options = {}) => {
+    const { provide = {} } = options;
+
     wrapper = mount(DevopsAdoptionTable, {
       propsData: {
-        segments: devopsAdoptionSegmentsData.nodes,
-        selectedSegment: devopsAdoptionSegmentsData.nodes[0],
+        cols: DEVOPS_ADOPTION_TABLE_CONFIGURATION[0].cols,
+        segments: devopsAdoptionNamespaceData.nodes,
       },
+      provide,
       directives: {
         GlTooltip: createMockDirective(),
       },
@@ -26,12 +32,10 @@ describe('DevopsAdoptionTable', () => {
 
   beforeEach(() => {
     localStorage.clear();
-    createComponent();
   });
 
   afterEach(() => {
     wrapper.destroy();
-    wrapper = null;
   });
 
   const findTable = () => wrapper.find(GlTable);
@@ -53,6 +57,7 @@ describe('DevopsAdoptionTable', () => {
     let headers;
 
     beforeEach(() => {
+      createComponent();
       headers = findTable().findAll(`[data-testid="${TEST_IDS.TABLE_HEADERS}"]`);
     });
 
@@ -96,11 +101,38 @@ describe('DevopsAdoptionTable', () => {
 
   describe('table fields', () => {
     describe('segment name', () => {
+      beforeEach(() => {
+        createComponent();
+      });
+
       it('displays the correct segment name', () => {
+        createComponent();
+
         expect(findCol(TEST_IDS.SEGMENT).text()).toBe('Group 1');
       });
 
+      describe('"This group" badge', () => {
+        const thisGroupGid = devopsAdoptionNamespaceData.nodes[0].namespace.id;
+
+        it.each`
+          scenario                            | expected | provide
+          ${'is not shown by default'}        | ${false} | ${null}
+          ${'is not shown for other groups'}  | ${false} | ${{ groupGid: 'anotherGroupGid' }}
+          ${'is shown for the current group'} | ${true}  | ${{ groupGid: thisGroupGid }}
+        `('$scenario', ({ expected, provide }) => {
+          createComponent({ provide });
+
+          const badge = findColSubComponent(TEST_IDS.SEGMENT, GlBadge);
+
+          expect(badge.exists()).toBe(expected);
+        });
+      });
+
       describe('pending state (no snapshot data available)', () => {
+        beforeEach(() => {
+          createComponent();
+        });
+
         it('grays the text out', () => {
           const name = findColRowChild(TEST_IDS.SEGMENT, 1, 'span');
 
@@ -122,31 +154,54 @@ describe('DevopsAdoptionTable', () => {
       });
     });
 
-    it.each`
-      id                    | field          | flag
-      ${TEST_IDS.ISSUES}    | ${'issues'}    | ${true}
-      ${TEST_IDS.MRS}       | ${'MRs'}       | ${true}
-      ${TEST_IDS.APPROVALS} | ${'approvals'} | ${false}
-      ${TEST_IDS.RUNNERS}   | ${'runners'}   | ${true}
-      ${TEST_IDS.PIPELINES} | ${'pipelines'} | ${false}
-      ${TEST_IDS.DEPLOYS}   | ${'deploys'}   | ${false}
-      ${TEST_IDS.SCANNING}  | ${'scanning'}  | ${false}
-    `('displays the correct $field snapshot value', ({ id, flag }) => {
-      const booleanFlag = findColSubComponent(id, DevopsAdoptionTableCellFlag);
+    const testCols = DEVOPS_ADOPTION_TABLE_CONFIGURATION[0].cols.map((col) => [col.label, col]);
 
-      expect(booleanFlag.props('enabled')).toBe(flag);
+    it.each(testCols)('displays the cell flag component for %s', (label, { testId }) => {
+      createComponent();
+
+      const booleanFlag = findColSubComponent(testId, DevopsAdoptionTableCellFlag);
+
+      expect(booleanFlag.exists()).toBe(true);
     });
 
-    it('displays the actions icon', () => {
-      const button = findColSubComponent(TEST_IDS.ACTIONS, GlButton);
+    describe.each`
+      scenario              | tooltipText                                            | provide                                                            | disabled
+      ${'not active group'} | ${'Remove Group from the table.'}                      | ${{}}                                                              | ${false}
+      ${'active group'}     | ${'You cannot remove the group you are currently in.'} | ${{ groupGid: devopsAdoptionNamespaceData.nodes[0].namespace.id }} | ${true}
+    `('actions column when $scenario', ({ tooltipText, provide, disabled }) => {
+      beforeEach(() => {
+        createComponent({ provide });
+      });
 
-      expect(button.exists()).toBe(true);
-      expect(button.props('icon')).toBe('remove');
-      expect(button.props('category')).toBe('tertiary');
+      it('displays the actions icon', () => {
+        const button = findColSubComponent(TEST_IDS.ACTIONS, GlButton);
+
+        expect(button.exists()).toBe(true);
+        expect(button.props('disabled')).toBe(disabled);
+        expect(button.props('icon')).toBe('remove');
+        expect(button.props('category')).toBe('tertiary');
+      });
+
+      it('wraps the icon in an element with a tooltip', () => {
+        const iconWrapper = findCol(TEST_IDS.ACTIONS);
+        const tooltip = getBinding(iconWrapper.element, 'gl-tooltip');
+
+        expect(iconWrapper.exists()).toBe(true);
+        expect(tooltip).toBeDefined();
+        expect(tooltip.value).toBe(tooltipText);
+      });
     });
   });
 
   describe('delete modal integration', () => {
+    beforeEach(() => {
+      createComponent();
+
+      wrapper.setData({
+        selectedSegment: devopsAdoptionNamespaceData.nodes[0],
+      });
+    });
+
     it('re emits trackModalOpenState with the given value', async () => {
       findDeleteModal().vm.$emit('trackModalOpenState', true);
 
@@ -158,6 +213,7 @@ describe('DevopsAdoptionTable', () => {
     let headers;
 
     beforeEach(() => {
+      createComponent();
       headers = findTable().findAll(`[data-testid="${TEST_IDS.TABLE_HEADERS}"]`);
     });
 

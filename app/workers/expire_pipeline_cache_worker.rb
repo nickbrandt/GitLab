@@ -2,6 +2,8 @@
 
 class ExpirePipelineCacheWorker
   include ApplicationWorker
+
+  sidekiq_options retry: 3
   include PipelineQueue
 
   queue_namespace :pipeline_cache
@@ -12,7 +14,7 @@ class ExpirePipelineCacheWorker
 
   # rubocop: disable CodeReuse/ActiveRecord
   def perform(pipeline_id)
-    pipeline = Ci::Pipeline.find_by(id: pipeline_id)
+    pipeline = Ci::Pipeline.eager_load_project.find_by(id: pipeline_id)
     return unless pipeline
 
     Ci::ExpirePipelineCacheService.new.execute(pipeline)

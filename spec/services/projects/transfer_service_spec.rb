@@ -130,7 +130,7 @@ RSpec.describe Projects::TransferService do
           execute_transfer
 
           expect(project.slack_service.webhook).to eq(group_integration.webhook)
-          expect(Service.count).to eq(3)
+          expect(Integration.count).to eq(3)
         end
       end
 
@@ -195,8 +195,6 @@ RSpec.describe Projects::TransferService do
     end
 
     it 'does not update storage location' do
-      create(:project_repository, project: project)
-
       attempt_project_transfer
 
       expect(project.project_repository).to have_attributes(

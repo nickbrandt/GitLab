@@ -532,10 +532,6 @@ table.code {
       &.parallel {
         display: table-cell;
         width: 46%;
-
-        span {
-          word-break: break-all;
-        }
       }
 
       &.old {
@@ -602,7 +598,9 @@ table.code {
   .diff-grid-left,
   .diff-grid-right {
     display: grid;
-    grid-template-columns: 50px 8px 1fr;
+    // Zero width column is a placeholder for the EE inline code quality diff
+    // see ee/.../diffs.scss for more details
+    grid-template-columns: 50px 8px 0 1fr;
   }
 
   .diff-grid-comments {
@@ -632,7 +630,9 @@ table.code {
 
     .diff-grid-left,
     .diff-grid-right {
-      grid-template-columns: 50px 50px 8px 1fr;
+      // Zero width column is a placeholder for the EE inline code quality diff
+      // see ee/../diffs.scss for more details
+      grid-template-columns: 50px 50px 8px 0 1fr;
     }
   }
 }
@@ -672,10 +672,6 @@ table.code {
 
 .inline-parallel-buttons {
   float: right;
-}
-
-.files-changed {
-  border-bottom: 0;
 }
 
 .merge-request-details .file-content.image_file img {
@@ -737,7 +733,7 @@ table.code {
 }
 
 .files {
-  .diff-file:last-child {
+  .diff-file:not(.is-virtual-scrolling):last-child {
     margin-bottom: 0;
   }
 }

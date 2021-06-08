@@ -5,7 +5,7 @@ info: "To determine the technical writer assigned to the Stage/Group associated 
 type: reference
 ---
 
-# File hooks **(FREE)**
+# File hooks **(FREE SELF)**
 
 > - Introduced in GitLab 10.6.
 > - Until GitLab 12.8, the feature name was Plugins.
@@ -79,7 +79,7 @@ require 'json'
 require 'mail'
 
 # The incoming variables are in JSON format so we need to parse it first.
-ARGS = JSON.parse(STDIN.read)
+ARGS = JSON.parse($stdin.read)
 
 # We only want to trigger this file hook on the event project_create
 return unless ARGS['event_name'] == 'project_create'

@@ -75,8 +75,8 @@ RSpec.describe Issue do
     context 'epics' do
       let_it_be(:epic1) { create(:epic) }
       let_it_be(:epic2) { create(:epic) }
-      let_it_be(:epic_issue1) { create(:epic_issue, epic: epic1) }
-      let_it_be(:epic_issue2) { create(:epic_issue, epic: epic2) }
+      let_it_be(:epic_issue1) { create(:epic_issue, epic: epic1, relative_position: 2) }
+      let_it_be(:epic_issue2) { create(:epic_issue, epic: epic2, relative_position: 1) }
       let_it_be(:issue_no_epic) { create(:issue) }
 
       before do
@@ -128,6 +128,12 @@ RSpec.describe Issue do
           end
         end
       end
+
+      describe '.sorted_by_epic_position' do
+        it 'sorts by epic relative position' do
+          expect(described_class.sorted_by_epic_position.ids).to eq([epic_issue2.issue_id, epic_issue1.issue_id])
+        end
+      end
     end
 
     context 'iterations' do
@@ -165,7 +171,7 @@ RSpec.describe Issue do
       describe '.not_in_iterations' do
         it 'returns issues not in selected iterations' do
           expect(described_class.count).to eq 3
-          expect(described_class.not_in_iterations([iteration1])).to eq [iteration2_issue, issue_no_iteration]
+          expect(described_class.not_in_iterations([iteration1])).to contain_exactly(iteration2_issue, issue_no_iteration)
         end
       end
 
@@ -529,11 +535,13 @@ RSpec.describe Issue do
 
   describe 'relative positioning with group boards' do
     let_it_be(:group) { create(:group) }
+    let_it_be(:subgroup) { create(:group, parent: group) }
     let_it_be(:board) { create(:board, group: group) }
-    let_it_be(:project) { create(:project, namespace: group) }
-    let_it_be(:project1) { create(:project, namespace: group) }
+    let_it_be(:project) { create(:project, group: subgroup) }
+    let_it_be(:project1) { create(:project, group: group) }
     let_it_be_with_reload(:issue) { create(:issue, project: project) }
     let_it_be_with_reload(:issue1) { create(:issue, project: project1, relative_position: issue.relative_position + RelativePositioning::IDEAL_DISTANCE) }
+
     let(:new_issue) { build(:issue, project: project1, relative_position: nil) }
 
     describe '.relative_positioning_query_base' do
@@ -889,6 +897,7 @@ RSpec.describe Issue do
     end
 
     let_it_be(:user) { create(:user) }
+
     let(:group) { nil }
 
     subject { issue.can_be_promoted_to_epic?(user, group) }
@@ -1006,6 +1015,26 @@ RSpec.describe Issue do
 
       it 'returns the expected value' do
         expect(subject).to eq(sla_available)
+      end
+    end
+  end
+
+  describe '#supports_time_tracking?' do
+    let_it_be(:project) { create(:project) }
+    let_it_be_with_refind(:issue) { create(:incident, project: project) }
+
+    where(:issue_type, :supports_time_tracking) do
+      :requirement | false
+      :test_case | false
+    end
+
+    with_them do
+      before do
+        issue.update!(issue_type: issue_type)
+      end
+
+      it do
+        expect(issue.supports_time_tracking?).to eq(supports_time_tracking)
       end
     end
   end

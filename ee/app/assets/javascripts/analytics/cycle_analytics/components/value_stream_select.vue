@@ -10,7 +10,9 @@ import {
   GlSprintf,
 } from '@gitlab/ui';
 import { mapState, mapActions } from 'vuex';
+import { slugifyWithUnderscore } from '~/lib/utils/text_utility';
 import { sprintf, __, s__ } from '~/locale';
+import Tracking from '~/tracking';
 import { generateInitialStageData } from './create_value_stream_form/utils';
 import ValueStreamForm from './value_stream_form.vue';
 
@@ -40,13 +42,7 @@ export default {
   directives: {
     GlModalDirective,
   },
-  props: {
-    hasExtendedFormFields: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-  },
+  mixins: [Tracking.mixin()],
   data() {
     return {
       showCreateModal: false,
@@ -101,6 +97,7 @@ export default {
       return this.deleteValueStream(this.selectedValueStreamId).then(() => {
         if (!this.deleteValueStreamError) {
           this.onSuccess(sprintf(this.$options.i18n.DELETED, { name }));
+          this.track('delete_value_stream', { extra: { name } });
         }
       });
     },
@@ -120,6 +117,9 @@ export default {
         stages: generateInitialStageData(this.defaultStageConfig, this.selectedValueStreamStages),
       };
     },
+    slugify(valueStreamTitle) {
+      return slugifyWithUnderscore(valueStreamTitle);
+    },
   },
   i18n,
 };
@@ -130,6 +130,8 @@ export default {
       v-if="isCustomValueStream"
       v-gl-modal-directive="'value-stream-form-modal'"
       data-testid="edit-value-stream"
+      data-track-action="click_button"
+      data-track-label="edit_value_stream_form_open"
       @click="onEdit"
       >{{ $options.i18n.EDIT_VALUE_STREAM }}</gl-button
     >
@@ -144,6 +146,8 @@ export default {
         :key="id"
         :is-check-item="true"
         :is-checked="isSelected(id)"
+        data-track-action="click_dropdown"
+        :data-track-label="slugify(streamName)"
         @click="onSelect(id)"
         >{{ streamName }}</gl-dropdown-item
       >
@@ -151,6 +155,8 @@ export default {
       <gl-dropdown-item
         v-gl-modal-directive="'value-stream-form-modal'"
         data-testid="create-value-stream"
+        data-track-action="click_dropdown"
+        data-track-label="create_value_stream_form_open"
         @click="onCreate"
         >{{ $options.i18n.CREATE_VALUE_STREAM }}</gl-dropdown-item
       >
@@ -159,6 +165,8 @@ export default {
         v-gl-modal-directive="'delete-value-stream-modal'"
         variant="danger"
         data-testid="delete-value-stream"
+        data-track-action="click_dropdown"
+        data-track-label="delete_value_stream_form_open"
       >
         <gl-sprintf :message="$options.i18n.DELETE_NAME">
           <template #name>{{ selectedValueStreamName }}</template>
@@ -169,6 +177,8 @@ export default {
       v-else
       v-gl-modal-directive="'value-stream-form-modal'"
       data-testid="create-value-stream-button"
+      data-track-action="click_button"
+      data-track-label="create_value_stream_form_open"
       @click="onCreate"
       >{{ $options.i18n.CREATE_VALUE_STREAM }}</gl-button
     >
@@ -176,7 +186,6 @@ export default {
       v-if="showCreateModal"
       :initial-data="initialData"
       :initial-form-errors="initialFormErrors"
-      :has-extended-form-fields="hasExtendedFormFields"
       :default-stage-config="defaultStageConfig"
       :is-editing="isEditing"
       @hidden="showCreateModal = false"

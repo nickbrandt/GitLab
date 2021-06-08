@@ -22,7 +22,7 @@ module Gitlab
       auth_download: 'You are not allowed to download code.',
       deploy_key_upload: 'This deploy key does not have write access to this project.',
       no_repo: 'A repository for this project does not exist yet.',
-      project_not_found: 'The project you were looking for could not be found.',
+      project_not_found: "The project you were looking for could not be found or you don't have permission to view it.",
       command_not_allowed: "The command you're trying to execute is not allowed.",
       upload_pack_disabled_over_http: 'Pulling over HTTP is not allowed.',
       receive_pack_disabled_over_http: 'Pushing over HTTP is not allowed.',
@@ -91,6 +91,7 @@ module Gitlab
       when *PUSH_COMMANDS
         check_push_access!
       end
+      check_additional_conditions!
 
       success_result
     end
@@ -530,7 +531,11 @@ module Gitlab
     def size_checker
       container.repository_size_checker
     end
+
+    # overriden in EE
+    def check_additional_conditions!
+    end
   end
 end
 
-Gitlab::GitAccess.prepend_if_ee('EE::Gitlab::GitAccess')
+Gitlab::GitAccess.prepend_mod_with('Gitlab::GitAccess')

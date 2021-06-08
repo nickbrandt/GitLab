@@ -4,6 +4,7 @@ require 'spec_helper'
 
 RSpec.describe Projects::ServicesController do
   include JiraServiceHelper
+  include AfterNextHelpers
 
   let(:project) { create(:project, :repository) }
   let(:user)    { create(:user) }
@@ -13,13 +14,12 @@ RSpec.describe Projects::ServicesController do
   before do
     sign_in(user)
     project.add_maintainer(user)
-    allow(Gitlab::UrlBlocker).to receive(:validate!).and_return([URI.parse('http://example.com'), nil])
   end
 
   describe '#test' do
     context 'when can_test? returns false' do
       it 'renders 404' do
-        allow_any_instance_of(Service).to receive(:can_test?).and_return(false)
+        allow_any_instance_of(Integration).to receive(:can_test?).and_return(false)
 
         put :test, params: project_params
 
@@ -47,7 +47,7 @@ RSpec.describe Projects::ServicesController do
           let(:service) { project.create_microsoft_teams_service(webhook: 'http://webhook.com') }
 
           it 'returns success' do
-            allow_any_instance_of(MicrosoftTeams::Notifier).to receive(:ping).and_return(true)
+            allow_any_instance_of(::MicrosoftTeams::Notifier).to receive(:ping).and_return(true)
 
             put :test, params: project_params
 
@@ -95,7 +95,7 @@ RSpec.describe Projects::ServicesController do
 
           expect(response).to be_successful
           expect(json_response).to be_empty
-          expect(BuildkiteService.first).to be_present
+          expect(Integrations::Buildkite.first).to be_present
         end
 
         it 'creates the ServiceHook object' do
@@ -103,7 +103,7 @@ RSpec.describe Projects::ServicesController do
 
           expect(response).to be_successful
           expect(json_response).to be_empty
-          expect(BuildkiteService.first.service_hook).to be_present
+          expect(Integrations::Buildkite.first.service_hook).to be_present
         end
 
         def do_put
@@ -114,7 +114,7 @@ RSpec.describe Projects::ServicesController do
     end
 
     context 'failure' do
-      it 'returns success status code and the error message' do
+      it 'returns an error response when the integration test fails' do
         stub_request(:get, 'http://example.com/rest/api/2/serverInfo')
           .to_return(status: 404)
 
@@ -127,6 +127,36 @@ RSpec.describe Projects::ServicesController do
           'service_response' => '',
           'test_failed' => true
         )
+      end
+
+      context 'with the Slack integration' do
+        let_it_be(:service) { build(:slack_service) }
+
+        it 'returns an error response when the URL is blocked' do
+          put :test, params: project_params(service: { webhook: 'http://127.0.0.1' })
+
+          expect(response).to be_successful
+          expect(json_response).to eq(
+            'error' => true,
+            'message' => 'Connection failed. Please check your settings.',
+            'service_response' => "URL 'http://127.0.0.1' is blocked: Requests to localhost are not allowed",
+            'test_failed' => true
+          )
+        end
+
+        it 'returns an error response when a network exception is raised' do
+          expect_next(Integrations::Slack).to receive(:test).and_raise(Errno::ECONNREFUSED)
+
+          put :test, params: project_params
+
+          expect(response).to be_successful
+          expect(json_response).to eq(
+            'error' => true,
+            'message' => 'Connection failed. Please check your settings.',
+            'service_response' => 'Connection refused',
+            'test_failed' => true
+          )
+        end
       end
     end
   end
@@ -241,7 +271,7 @@ RSpec.describe Projects::ServicesController do
           expect(response).to redirect_to(edit_project_service_path(project, service))
           expected_alert = "You can now manage your Prometheus settings on the <a href=\"#{project_settings_operations_path(project)}\">Operations</a> page. Fields on this page has been deprecated."
 
-          expect(response).to set_flash.now[:alert].to(expected_alert)
+          expect(controller).to set_flash.now[:alert].to(expected_alert)
         end
 
         it 'does not modify service' do
@@ -287,7 +317,7 @@ RSpec.describe Projects::ServicesController do
 
         it 'renders deprecation warning notice' do
           expected_alert = "You can now manage your Prometheus settings on the <a href=\"#{project_settings_operations_path(project)}\">Operations</a> page. Fields on this page has been deprecated."
-          expect(response).to set_flash.now[:alert].to(expected_alert)
+          expect(controller).to set_flash.now[:alert].to(expected_alert)
         end
       end
 
@@ -298,7 +328,7 @@ RSpec.describe Projects::ServicesController do
         end
 
         it 'does not render deprecation warning notice' do
-          expect(response).not_to set_flash.now[:alert]
+          expect(controller).not_to set_flash.now[:alert]
         end
       end
     end

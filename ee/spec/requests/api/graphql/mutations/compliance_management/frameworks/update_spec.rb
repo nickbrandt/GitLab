@@ -42,10 +42,9 @@ RSpec.describe 'Update a compliance framework' do
                     errors: ["The resource that you are attempting to access does not exist or you don't have permission to perform this action"]
   end
 
-  context 'feature is licensed and enabled' do
+  context 'feature is licensed' do
     before do
       stub_licensed_features(custom_compliance_frameworks: true)
-      stub_feature_flags(ff_custom_compliance_frameworks: true)
     end
 
     context 'with valid params' do
@@ -83,6 +82,19 @@ RSpec.describe 'Update a compliance framework' do
         context 'when compliance pipeline configuration feature is not available' do
           before do
             stub_licensed_features(custom_compliance_frameworks: true, evaluate_group_level_compliance_pipeline: false)
+          end
+
+          it 'returns an error' do
+            subject
+
+            expect(mutation_response['errors']).to contain_exactly "Pipeline configuration full path feature is not available"
+          end
+        end
+
+        context 'when compliance pipeline configuration feature flag is not enabled' do
+          before do
+            stub_licensed_features(custom_compliance_frameworks: true, evaluate_group_level_compliance_pipeline: true)
+            stub_feature_flags(ff_evaluate_group_level_compliance_pipeline: false)
           end
 
           it 'returns an error' do

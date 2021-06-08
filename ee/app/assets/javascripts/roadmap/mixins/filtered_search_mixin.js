@@ -2,21 +2,29 @@ import { GlFilteredSearchToken } from '@gitlab/ui';
 
 import Api from '~/api';
 import axios from '~/lib/utils/axios_utils';
+import { joinPaths } from '~/lib/utils/url_utility';
 import { __ } from '~/locale';
 
+import { OPERATOR_IS_ONLY } from '~/vue_shared/components/filtered_search_bar/constants';
 import AuthorToken from '~/vue_shared/components/filtered_search_bar/tokens/author_token.vue';
+import EmojiToken from '~/vue_shared/components/filtered_search_bar/tokens/emoji_token.vue';
+import EpicToken from '~/vue_shared/components/filtered_search_bar/tokens/epic_token.vue';
 import LabelToken from '~/vue_shared/components/filtered_search_bar/tokens/label_token.vue';
 import MilestoneToken from '~/vue_shared/components/filtered_search_bar/tokens/milestone_token.vue';
 
-import { FilterTokenOperators } from '../constants';
-
 export default {
-  inject: ['groupFullPath', 'groupMilestonesPath'],
+  inject: ['groupFullPath', 'groupMilestonesPath', 'listEpicsPath'],
   computed: {
     urlParams() {
-      const { search, authorUsername, labelName, milestoneTitle, confidential } =
-        this.filterParams || {};
-
+      const {
+        search,
+        authorUsername,
+        labelName,
+        milestoneTitle,
+        confidential,
+        myReactionEmoji,
+        epicIid,
+      } = this.filterParams || {};
       return {
         state: this.currentState || this.epicsState,
         page: this.currentPage,
@@ -27,13 +35,15 @@ export default {
         'label_name[]': labelName,
         milestone_title: milestoneTitle,
         confidential,
+        my_reaction_emoji: myReactionEmoji,
+        epic_iid: epicIid,
         search,
       };
     },
   },
   methods: {
-    getFilteredSearchTokens() {
-      return [
+    getFilteredSearchTokens({ supportsEpic = true } = {}) {
+      const tokens = [
         {
           type: 'author_username',
           icon: 'user',
@@ -41,7 +51,8 @@ export default {
           unique: true,
           symbol: '@',
           token: AuthorToken,
-          operators: FilterTokenOperators,
+          operators: OPERATOR_IS_ONLY,
+          recentTokenValuesStorageKey: `${this.groupFullPath}-epics-recent-tokens-author_username`,
           fetchAuthors: Api.users.bind(Api),
         },
         {
@@ -51,7 +62,8 @@ export default {
           unique: false,
           symbol: '~',
           token: LabelToken,
-          operators: FilterTokenOperators,
+          operators: OPERATOR_IS_ONLY,
+          recentTokenValuesStorageKey: `${this.groupFullPath}-epics-recent-tokens-label_name`,
           fetchLabels: (search = '') => {
             const params = {
               only_group_labels: true,
@@ -75,7 +87,7 @@ export default {
           unique: true,
           symbol: '%',
           token: MilestoneToken,
-          operators: FilterTokenOperators,
+          operators: OPERATOR_IS_ONLY,
           fetchMilestones: (search = '') => {
             return axios.get(this.groupMilestonesPath).then(({ data }) => {
               // TODO: Remove below condition check once either of the following is supported.
@@ -96,17 +108,82 @@ export default {
           title: __('Confidential'),
           unique: true,
           token: GlFilteredSearchToken,
-          operators: FilterTokenOperators,
+          operators: OPERATOR_IS_ONLY,
           options: [
             { icon: 'eye-slash', value: true, title: __('Yes') },
             { icon: 'eye', value: false, title: __('No') },
           ],
         },
       ];
+
+      if (supportsEpic) {
+        tokens.push({
+          type: 'epic_iid',
+          icon: 'epic',
+          title: __('Epic'),
+          unique: true,
+          symbol: '&',
+          token: EpicToken,
+          operators: OPERATOR_IS_ONLY,
+          defaultEpics: [],
+          fetchEpics: ({ epicPath = '', search = '' }) => {
+            const epicId = Number(search) || null;
+
+            // No search criteria or path has been provided, fetch all epics.
+            if (!epicPath && !search) {
+              return axios.get(this.listEpicsPath);
+            } else if (epicPath) {
+              // Just epicPath has been provided, fetch a specific epic.
+              return axios.get(epicPath).then(({ data }) => [data]);
+            } else if (!epicPath && epicId) {
+              // Exact epic ID provided, fetch the epic.
+              return axios
+                .get(joinPaths(this.listEpicsPath, String(epicId)))
+                .then(({ data }) => [data]);
+            }
+
+            // Search for an epic.
+            return axios.get(this.listEpicsPath, { params: { search } });
+          },
+        });
+      }
+
+      if (gon.current_user_id) {
+        // Appending to tokens only when logged-in
+        tokens.push({
+          type: 'my_reaction_emoji',
+          icon: 'thumb-up',
+          title: __('My-Reaction'),
+          unique: true,
+          token: EmojiToken,
+          operators: OPERATOR_IS_ONLY,
+          fetchEmojis: (search = '') => {
+            return axios
+              .get(`${gon.relative_url_root || ''}/-/autocomplete/award_emojis`)
+              .then(({ data }) => {
+                if (search) {
+                  return {
+                    data: data.filter((e) => e.name.toLowerCase().includes(search.toLowerCase())),
+                  };
+                }
+                return { data };
+              });
+          },
+        });
+      }
+
+      return tokens;
     },
     getFilteredSearchValue() {
-      const { authorUsername, labelName, milestoneTitle, confidential, search } =
-        this.filterParams || {};
+      const {
+        authorUsername,
+        labelName,
+        milestoneTitle,
+        confidential,
+        myReactionEmoji,
+        search,
+        epicIid,
+      } = this.filterParams || {};
       const filteredSearchValue = [];
 
       if (authorUsername) {
@@ -139,6 +216,20 @@ export default {
         });
       }
 
+      if (myReactionEmoji) {
+        filteredSearchValue.push({
+          type: 'my_reaction_emoji',
+          value: { data: myReactionEmoji },
+        });
+      }
+
+      if (epicIid) {
+        filteredSearchValue.push({
+          type: 'epic_iid',
+          value: { data: epicIid },
+        });
+      }
+
       if (search) {
         filteredSearchValue.push(search);
       }
@@ -163,6 +254,12 @@ export default {
             break;
           case 'confidential':
             filterParams.confidential = filter.value.data;
+            break;
+          case 'my_reaction_emoji':
+            filterParams.myReactionEmoji = filter.value.data;
+            break;
+          case 'epic_iid':
+            filterParams.epicIid = filter.value.data;
             break;
           case 'filtered-search-term':
             if (filter.value.data) plainText.push(filter.value.data);

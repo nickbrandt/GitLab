@@ -4,7 +4,7 @@ module Projects
   class SlackApplicationInstallService < BaseService
     include Gitlab::Routing
 
-    SLACK_EXCHANGE_TOKEN_URL = 'https://slack.com/api/oauth.access'.freeze
+    SLACK_EXCHANGE_TOKEN_URL = 'https://slack.com/api/oauth.access'
 
     def execute
       slack_data = exchange_slack_token
@@ -37,7 +37,7 @@ module Projects
       service = project.gitlab_slack_application_service
 
       chat_name = ChatName.find_by(
-        service: service.id,
+        service_id: service.id,
         team_id: slack_data['team_id'],
         chat_id: slack_data['user_id']
       )

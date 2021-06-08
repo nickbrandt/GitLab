@@ -22,7 +22,7 @@ The access levels are defined in the `ProtectedRefAccess.allowed_access_levels` 
 
 ## List protected branches
 
-Gets a list of protected branches from a project.
+Gets a list of protected branches from a project as they are defined [in the UI](../user/project/protected_branches.md#configure-a-protected-branch). If a wildcard is set, it is returned instead of the exact name of the branches that match that wildcard.
 
 ```plaintext
 GET /projects/:id/protected_branches
@@ -56,7 +56,26 @@ Example response:
         "access_level_description": "Maintainers"
       }
     ],
-    "code_owner_approval_required": "false"
+    "allow_force_push":false,
+    "code_owner_approval_required": false
+  },
+  {
+    "id": 1,
+    "name": "release/*",
+    "push_access_levels": [
+      {
+        "access_level": 40,
+        "access_level_description": "Maintainers"
+      }
+    ],
+    "merge_access_levels": [
+      {
+        "access_level": 40,
+        "access_level_description": "Maintainers"
+      }
+    ],
+    "allow_force_push":false,
+    "code_owner_approval_required": false
   },
   ...
 ]
@@ -88,7 +107,8 @@ Example response:
         "access_level_description": "Example Merge Group"
       }
     ],
-    "code_owner_approval_required": "false"
+    "allow_force_push":false,
+    "code_owner_approval_required": false
   },
   ...
 ]
@@ -129,7 +149,8 @@ Example response:
       "access_level_description": "Maintainers"
     }
   ],
-  "code_owner_approval_required": "false"
+  "allow_force_push":false,
+  "code_owner_approval_required": false
 }
 ```
 
@@ -158,7 +179,8 @@ Example response:
       "access_level_description": "Example Merge Group"
     }
   ],
-  "code_owner_approval_required": "false"
+  "allow_force_push":false,
+  "code_owner_approval_required": false
 }
 ```
 
@@ -179,9 +201,10 @@ curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" "https://gitla
 | --------- | ---- | -------- | ----------- |
 | `id`                            | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) owned by the authenticated user |
 | `name`                          | string         | yes | The name of the branch or wildcard |
-| `push_access_level`             | string         | no  | Access levels allowed to push (defaults: `40`, maintainer access level) |
-| `merge_access_level`            | string         | no  | Access levels allowed to merge (defaults: `40`, maintainer access level) |
-| `unprotect_access_level`        | string         | no  | Access levels allowed to unprotect (defaults: `40`, maintainer access level) |
+| `push_access_level`             | string         | no  | Access levels allowed to push (defaults: `40`, Maintainer role) |
+| `merge_access_level`            | string         | no  | Access levels allowed to merge (defaults: `40`, Maintainer role) |
+| `unprotect_access_level`        | string         | no  | Access levels allowed to unprotect (defaults: `40`, Maintainer role) |
+| `allow_force_push`              | boolean        | no  | Allow all users with push access to force push. (default: `false`) |
 | `allowed_to_push`               | array          | no  | **(PREMIUM)** Array of access levels allowed to push, with each described by a hash |
 | `allowed_to_merge`              | array          | no  | **(PREMIUM)** Array of access levels allowed to merge, with each described by a hash |
 | `allowed_to_unprotect`          | array          | no  | **(PREMIUM)** Array of access levels allowed to unprotect, with each described by a hash |
@@ -211,7 +234,8 @@ Example response:
       "access_level_description": "Maintainers"
     }
   ],
-  "code_owner_approval_required": "false"
+  "allow_force_push":false,
+  "code_owner_approval_required": false
 }
 ```
 
@@ -248,7 +272,8 @@ Example response:
       "access_level_description": "Maintainers"
     }
   ],
-  "code_owner_approval_required": "false"
+  "allow_force_push":false,
+  "code_owner_approval_required": false
 }
 ```
 
@@ -291,7 +316,8 @@ Example response:
       "access_level_description": "Maintainers"
     }
   ],
-  "code_owner_approval_required": "false"
+  "allow_force_push":false,
+  "code_owner_approval_required": false
 }
 ```
 
@@ -354,6 +380,7 @@ Example response:
             "group_id": null
         }
     ],
+    "allow_force_push":false,
     "code_owner_approval_required": false
 }
 ```

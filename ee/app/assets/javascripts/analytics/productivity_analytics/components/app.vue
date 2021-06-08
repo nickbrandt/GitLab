@@ -326,7 +326,12 @@ export default {
                     </span>
                   </gl-dropdown-item>
                 </gl-dropdown>
-                <gl-button v-gl-tooltip.hover :title="sortTooltipTitle" @click="toggleSortOrder">
+                <gl-button
+                  v-gl-tooltip.hover
+                  :title="sortTooltipTitle"
+                  :aria-label="sortTooltipTitle"
+                  @click="toggleSortOrder"
+                >
                   <gl-icon :name="sortIcon" />
                 </gl-button>
               </div>
@@ -346,7 +351,7 @@ export default {
             @columnMetricChange="setColumnMetric"
             @pageChange="setPage"
           />
-          <gl-alert v-if="showMergeRequestTableNoData" variant="info" :dismissable="false">
+          <gl-alert v-if="showMergeRequestTableNoData" variant="info" :dismissible="false">
             {{ __('There is no data available. Please change your selection.') }}
           </gl-alert>
         </div>

@@ -20,6 +20,7 @@ RSpec.describe Note do
     it { is_expected.to include_module(Participable) }
     it { is_expected.to include_module(Mentionable) }
     it { is_expected.to include_module(Awardable) }
+    it { is_expected.to include_module(Sortable) }
   end
 
   describe 'validation' do
@@ -332,6 +333,25 @@ RSpec.describe Note do
         it 'returns false' do
           expect(note.noteable_author?(noteable)).to be false
         end
+      end
+    end
+  end
+
+  describe "last_edited_at" do
+    let(:timestamp) { Time.current }
+    let(:note) { build(:note, last_edited_at: nil, created_at: timestamp, updated_at: timestamp + 5.hours) }
+
+    context "with last_edited_at" do
+      it "returns last_edited_at" do
+        note.last_edited_at = timestamp
+
+        expect(note.last_edited_at).to eq(timestamp)
+      end
+    end
+
+    context "without last_edited_at" do
+      it "returns updated_at" do
+        expect(note.last_edited_at).to eq(timestamp + 5.hours)
       end
     end
   end
@@ -837,6 +857,22 @@ RSpec.describe Note do
     end
   end
 
+  describe '.simple_sorts' do
+    it 'does not contain name sorts' do
+      expect(described_class.simple_sorts.grep(/name/)).to be_empty
+    end
+  end
+
+  describe '.cherry_picked_merge_requests' do
+    it 'returns merge requests that match the given merge commit' do
+      note = create(:track_mr_picking_note, commit_id: '456abc')
+
+      create(:track_mr_picking_note, project: create(:project), commit_id: '456def')
+
+      expect(MergeRequest.id_in(described_class.cherry_picked_merge_requests('456abc'))).to eq([note.noteable])
+    end
+  end
+
   describe '#for_project_snippet?' do
     it 'returns true for a project snippet note' do
       expect(build(:note_on_project_snippet).for_project_snippet?).to be true
@@ -1303,7 +1339,7 @@ RSpec.describe Note do
     let_it_be(:note1) { create(:note, note: 'Test 345') }
     let_it_be(:note2) { create(:note, note: 'Test 789') }
 
-    describe '#for_note_or_capitalized_note' do
+    describe '.for_note_or_capitalized_note' do
       it 'returns the expected matching note' do
         notes = described_class.for_note_or_capitalized_note('Test 345')
 
@@ -1325,7 +1361,7 @@ RSpec.describe Note do
       end
     end
 
-    describe '#like_note_or_capitalized_note' do
+    describe '.like_note_or_capitalized_note' do
       it 'returns the expected matching note' do
         notes = described_class.like_note_or_capitalized_note('Test 345')
 
@@ -1349,68 +1385,78 @@ RSpec.describe Note do
       end
     end
 
-    describe '#noteable_assignee_or_author' do
-      let(:user) { create(:user) }
-      let(:noteable) { create(:issue) }
-      let(:note) { create(:note, project: noteable.project, noteable: noteable) }
+    describe '.with_suggestions' do
+      it 'returns the correct note' do
+        note_with_suggestion = create(:note, suggestions: [create(:suggestion)])
+        note_without_suggestion = create(:note)
 
-      subject { note.noteable_assignee_or_author?(user) }
+        expect(described_class.with_suggestions).to include(note_with_suggestion)
+        expect(described_class.with_suggestions).not_to include(note_without_suggestion)
+      end
+    end
+  end
 
-      shared_examples 'assignee check' do
-        context 'when the provided user is one of the assignees' do
-          before do
-            note.noteable.update(assignees: [user, create(:user)])
-          end
+  describe '#noteable_assignee_or_author?' do
+    let(:user) { create(:user) }
+    let(:noteable) { create(:issue) }
+    let(:note) { create(:note, project: noteable.project, noteable: noteable) }
 
-          it 'returns true' do
-            expect(subject).to be_truthy
-          end
+    subject { note.noteable_assignee_or_author?(user) }
+
+    shared_examples 'assignee check' do
+      context 'when the provided user is one of the assignees' do
+        before do
+          note.noteable.update(assignees: [user, create(:user)])
+        end
+
+        it 'returns true' do
+          expect(subject).to be_truthy
+        end
+      end
+    end
+
+    shared_examples 'author check' do
+      context 'when the provided user is the author' do
+        before do
+          note.noteable.update(author: user)
+        end
+
+        it 'returns true' do
+          expect(subject).to be_truthy
         end
       end
 
-      shared_examples 'author check' do
-        context 'when the provided user is the author' do
-          before do
-            note.noteable.update(author: user)
-          end
-
-          it 'returns true' do
-            expect(subject).to be_truthy
-          end
-        end
-
-        context 'when the provided user is neither author nor assignee' do
-          it 'returns true' do
-            expect(subject).to be_falsey
-          end
-        end
-      end
-
-      context 'when user is nil' do
-        let(:user) { nil }
-
-        it 'returns false' do
+      context 'when the provided user is neither author nor assignee' do
+        it 'returns true' do
           expect(subject).to be_falsey
         end
       end
+    end
 
-      context 'when noteable is an issue' do
-        it_behaves_like 'author check'
-        it_behaves_like 'assignee check'
+    context 'when user is nil' do
+      let(:user) { nil }
+
+      it 'returns false' do
+        expect(subject).to be_falsey
       end
+    end
 
-      context 'when noteable is a merge request' do
-        let(:noteable) { create(:merge_request) }
+    context 'when noteable is an issue' do
+      it_behaves_like 'author check'
+      it_behaves_like 'assignee check'
+    end
 
-        it_behaves_like 'author check'
-        it_behaves_like 'assignee check'
-      end
+    context 'when noteable is a merge request' do
+      let(:noteable) { create(:merge_request) }
 
-      context 'when noteable is a snippet' do
-        let(:noteable) { create(:personal_snippet) }
+      it_behaves_like 'author check'
+      it_behaves_like 'assignee check'
+    end
 
-        it_behaves_like 'author check'
-      end
+    context 'when noteable is a snippet' do
+      let(:noteable) { create(:personal_snippet) }
+
+      it_behaves_like 'author check'
     end
   end
 
@@ -1474,6 +1520,18 @@ RSpec.describe Note do
       let(:note) { build(:note, :with_review) }
 
       it { is_expected.to be_truthy }
+    end
+  end
+
+  describe '#attachment' do
+    it 'is cleaned up correctly when project is destroyed' do
+      note = create(:note_on_issue, :with_attachment)
+
+      attachment = note.attachment
+
+      note.project.destroy!
+
+      expect(attachment).not_to be_exist
     end
   end
 end

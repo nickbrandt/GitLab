@@ -10,6 +10,7 @@ import { s__, __, sprintf } from '~/locale';
 import ReportSection from '~/reports/components/report_section.vue';
 import CEWidgetOptions from '~/vue_merge_request_widget/mr_widget_options.vue';
 import BlockingMergeRequestsReport from './components/blocking_merge_requests/blocking_merge_requests_report.vue';
+import MrWidgetJiraAssociationMissing from './components/states/mr_widget_jira_association_missing.vue';
 import MrWidgetPolicyViolation from './components/states/mr_widget_policy_violation.vue';
 import MrWidgetGeoSecondaryNode from './components/states/mr_widget_secondary_geo_node.vue';
 
@@ -18,6 +19,7 @@ export default {
     MrWidgetLicenses,
     MrWidgetGeoSecondaryNode,
     MrWidgetPolicyViolation,
+    MrWidgetJiraAssociationMissing,
     BlockingMergeRequestsReport,
     GroupedSecurityReportsApp: () =>
       import('ee/vue_shared/security_reports/grouped_security_reports_app.vue'),
@@ -250,7 +252,12 @@ export default {
 </script>
 <template>
   <div v-if="isLoaded" class="mr-state-widget gl-mt-3">
-    <mr-widget-header :mr="mr" />
+    <header class="gl-rounded-base gl-border-solid gl-border-1 gl-border-gray-100">
+      <mr-widget-alert-message v-if="shouldRenderCollaborationStatus" type="info">
+        {{ s__('mrWidget|Members who can merge are allowed to add commits.') }}
+      </mr-widget-alert-message>
+      <mr-widget-header :mr="mr" />
+    </header>
     <mr-widget-suggest-pipeline
       v-if="shouldSuggestPipelines"
       class="mr-widget-workflow"
@@ -273,13 +280,29 @@ export default {
       :service="service"
     />
     <div class="mr-section-container mr-widget-workflow">
+      <div v-if="hasAlerts" class="gl-overflow-hidden mr-widget-alert-container">
+        <mr-widget-alert-message v-if="mr.mergeError" type="danger" dismissible>
+          <span v-safe-html="mergeError"></span>
+        </mr-widget-alert-message>
+        <mr-widget-alert-message
+          v-if="showMergePipelineForkWarning"
+          type="warning"
+          :help-path="mr.mergeRequestPipelinesHelpPath"
+        >
+          {{
+            s__(
+              'mrWidget|If the last pipeline ran in the fork project, it may be inaccurate. Before merge, we advise running a pipeline in this project.',
+            )
+          }}
+          <template #link-content>
+            {{ __('Learn more') }}
+          </template>
+        </mr-widget-alert-message>
+      </div>
       <blocking-merge-requests-report :mr="mr" />
       <grouped-codequality-reports-app
         v-if="shouldRenderCodeQuality"
         :base-path="mr.codeclimate.base_path"
-        :head-path="mr.codeclimate.head_path"
-        :head-blob-path="mr.headBlobPath"
-        :base-blob-path="mr.baseBlobPath"
         :codequality-reports-path="mr.codequalityReportsPath"
         :codequality-help-path="mr.codequalityHelpPath"
       />
@@ -372,7 +395,7 @@ export default {
         :can-manage-licenses="mr.licenseScanning.can_manage_licenses"
         :full-report-path="mr.licenseScanning.full_report_path"
         :license-management-settings-path="mr.licenseScanning.settings_path"
-        :security-approvals-help-page-path="mr.securityApprovalsHelpPagePath"
+        :license-compliance-docs-path="mr.licenseComplianceDocsPath"
         report-section-class="mr-widget-border-top"
       />
 
@@ -380,6 +403,7 @@ export default {
         v-if="mr.testResultsPath"
         class="js-reports-container"
         :endpoint="mr.testResultsPath"
+        :head-blob-path="mr.headBlobPath"
         :pipeline-path="mr.pipeline.path"
       />
 
@@ -393,38 +417,15 @@ export default {
       <div class="mr-widget-section">
         <component :is="componentName" :mr="mr" :service="service" />
         <div class="mr-widget-info">
-          <section v-if="mr.allowCollaboration" class="mr-info-list gl-ml-7">
-            <p>
-              {{ s__('mrWidget|Allows commits from members who can merge to the target branch') }}
-            </p>
-          </section>
-
           <mr-widget-related-links
             v-if="shouldRenderRelatedLinks"
             :state="mr.state"
             :related-links="mr.relatedLinks"
           />
 
-          <mr-widget-alert-message
-            v-if="showMergePipelineForkWarning"
-            type="warning"
-            :help-path="mr.mergeRequestPipelinesHelpPath"
-          >
-            {{
-              s__(
-                'mrWidget|Fork project merge requests do not create merge request pipelines that validate a post merge result unless invoked by a project member.',
-              )
-            }}
-          </mr-widget-alert-message>
-
-          <mr-widget-alert-message v-if="mr.mergeError" type="danger">
-            <span v-safe-html="mergeError"></span>
-          </mr-widget-alert-message>
-
           <source-branch-removal-status v-if="shouldRenderSourceBranchRemovalStatus" />
         </div>
       </div>
-      <div v-if="shouldRenderMergeHelp" class="mr-widget-footer"><mr-widget-merge-help /></div>
     </div>
     <mr-widget-pipeline-container
       v-if="shouldRenderMergedPipeline"

@@ -4,7 +4,7 @@ import { unwrapStagesWithNeeds } from '~/pipelines/components/unwrapping_utils';
 export const mockProjectNamespace = 'user1';
 export const mockProjectPath = 'project1';
 export const mockProjectFullPath = `${mockProjectNamespace}/${mockProjectPath}`;
-export const mockDefaultBranch = 'master';
+export const mockDefaultBranch = 'main';
 export const mockNewMergeRequestPath = '/-/merge_requests/new';
 export const mockCommitSha = 'aabbccdd';
 export const mockCommitNextSha = 'eeffgghh';
@@ -138,6 +138,55 @@ export const mergeUnwrappedCiConfig = (mergedConfig) => {
   };
 };
 
+export const mockProjectBranches = {
+  data: {
+    project: {
+      repository: {
+        branchNames: [
+          'main',
+          'develop',
+          'production',
+          'test',
+          'better-feature',
+          'feature-abc',
+          'update-ci',
+          'mock-feature',
+          'test-merge-request',
+          'staging',
+        ],
+      },
+    },
+  },
+};
+
+export const mockTotalBranchResults =
+  mockProjectBranches.data.project.repository.branchNames.length;
+
+export const mockSearchBranches = {
+  data: {
+    project: {
+      repository: {
+        branchNames: ['test', 'better-feature', 'update-ci', 'test-merge-request'],
+      },
+    },
+  },
+};
+
+export const mockTotalSearchResults = mockSearchBranches.data.project.repository.branchNames.length;
+
+export const mockEmptySearchBranches = {
+  data: {
+    project: {
+      repository: {
+        branchNames: [],
+      },
+    },
+  },
+};
+
+export const mockBranchPaginationLimit = 10;
+export const mockTotalBranches = 20; // must be greater than mockBranchPaginationLimit to test pagination
+
 export const mockProjectPipeline = {
   pipeline: {
     commitPath: '/-/commit/aabbccdd',
@@ -172,7 +221,7 @@ export const mockLintResponse = {
       when: 'on_success',
       allow_failure: false,
       only: null,
-      except: { refs: ['master@gitlab-org/gitlab', '/^release/.*$/@gitlab-org/gitlab'] },
+      except: { refs: ['main@gitlab-org/gitlab', '/^release/.*$/@gitlab-org/gitlab'] },
     },
     {
       name: 'job_2',
@@ -185,7 +234,7 @@ export const mockLintResponse = {
       when: 'on_success',
       allow_failure: true,
       only: { refs: ['web', 'chat', 'pushes'] },
-      except: { refs: ['master@gitlab-org/gitlab', '/^release/.*$/@gitlab-org/gitlab'] },
+      except: { refs: ['main@gitlab-org/gitlab', '/^release/.*$/@gitlab-org/gitlab'] },
     },
   ],
 };
@@ -228,7 +277,7 @@ export const mockJobs = [
     when: 'on_success',
     allowFailure: false,
     only: { refs: ['branches@gitlab-org/gitlab'] },
-    except: { refs: ['master@gitlab-org/gitlab', '/^release/.*$/@gitlab-org/gitlab'] },
+    except: { refs: ['main@gitlab-org/gitlab', '/^release/.*$/@gitlab-org/gitlab'] },
   },
 ];
 

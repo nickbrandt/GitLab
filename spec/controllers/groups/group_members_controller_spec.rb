@@ -5,12 +5,15 @@ require 'spec_helper'
 RSpec.describe Groups::GroupMembersController do
   include ExternalAuthorizationServiceHelpers
 
-  let(:user) { create(:user) }
-  let(:group) { create(:group, :public) }
-  let(:membership) { create(:group_member, group: group) }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:group, reload: true) { create(:group, :public) }
 
-  around do |example|
-    travel_to DateTime.new(2019, 4, 1) { example.run }
+  before do
+    travel_to DateTime.new(2019, 4, 1)
+  end
+
+  after do
+    travel_back
   end
 
   describe 'GET index' do
@@ -21,8 +24,8 @@ RSpec.describe Groups::GroupMembersController do
       expect(response).to render_template(:index)
     end
 
-    context 'user with owner access' do
-      let!(:invited) { create_list(:group_member, 3, :invited, group: group) }
+    context 'when user can manage members' do
+      let_it_be(:invited) { create_list(:group_member, 3, :invited, group: group) }
 
       before do
         group.add_owner(user)
@@ -60,9 +63,22 @@ RSpec.describe Groups::GroupMembersController do
       end
     end
 
+    context 'when user cannot manage members' do
+      before do
+        sign_in(user)
+      end
+
+      it 'does not assign invited members or skip_groups', :aggregate_failures do
+        get :index, params: { group_id: group }
+
+        expect(assigns(:invited_members)).to be_nil
+        expect(assigns(:skip_groups)).to be_nil
+      end
+    end
+
     context 'when user has owner access to subgroup' do
-      let(:nested_group) { create(:group, parent: group) }
-      let(:nested_group_user) { create(:user) }
+      let_it_be(:nested_group) { create(:group, parent: group) }
+      let_it_be(:nested_group_user) { create(:user) }
 
       before do
         group.add_owner(user)
@@ -91,7 +107,7 @@ RSpec.describe Groups::GroupMembersController do
   end
 
   describe 'POST create' do
-    let(:group_user) { create(:user) }
+    let_it_be(:group_user) { create(:user) }
 
     before do
       sign_in(user)
@@ -126,7 +142,7 @@ RSpec.describe Groups::GroupMembersController do
                         access_level: Gitlab::Access::GUEST
                       }
 
-        expect(response).to set_flash.to 'Users were successfully added.'
+        expect(controller).to set_flash.to 'Users were successfully added.'
         expect(response).to redirect_to(group_group_members_path(group))
         expect(group.users).to include group_user
       end
@@ -138,7 +154,7 @@ RSpec.describe Groups::GroupMembersController do
                         access_level: Gitlab::Access::GUEST
                       }
 
-        expect(response).to set_flash.to 'No users specified.'
+        expect(controller).to set_flash.to 'No users specified.'
         expect(response).to redirect_to(group_group_members_path(group))
         expect(group.users).not_to include group_user
       end
@@ -176,7 +192,7 @@ RSpec.describe Groups::GroupMembersController do
         it 'adds user to members' do
           subject
 
-          expect(response).to set_flash.to 'Users were successfully added.'
+          expect(controller).to set_flash.to 'Users were successfully added.'
           expect(response).to redirect_to(group_group_members_path(group))
           expect(group.users).to include group_user
         end
@@ -185,7 +201,7 @@ RSpec.describe Groups::GroupMembersController do
   end
 
   describe 'PUT update' do
-    let(:requester) { create(:group_member, :access_request, group: group) }
+    let_it_be(:requester) { create(:group_member, :access_request, group: group) }
 
     before do
       group.add_owner(user)
@@ -288,7 +304,9 @@ RSpec.describe Groups::GroupMembersController do
   end
 
   describe 'DELETE destroy' do
-    let(:member) { create(:group_member, :developer, group: group) }
+    let_it_be(:sub_group) { create(:group, parent: group) }
+    let_it_be(:member) { create(:group_member, :developer, group: group) }
+    let_it_be(:sub_member) { create(:group_member, :developer, group: sub_group, user: member.user) }
 
     before do
       sign_in(user)
@@ -324,9 +342,19 @@ RSpec.describe Groups::GroupMembersController do
         it '[HTML] removes user from members' do
           delete :destroy, params: { group_id: group, id: member }
 
-          expect(response).to set_flash.to 'User was successfully removed from group and any subresources.'
+          expect(controller).to set_flash.to 'User was successfully removed from group.'
           expect(response).to redirect_to(group_group_members_path(group))
           expect(group.members).not_to include member
+          expect(sub_group.members).to include sub_member
+        end
+
+        it '[HTML] removes user from members including subgroups and projects' do
+          delete :destroy, params: { group_id: group, id: member, remove_sub_memberships: true }
+
+          expect(controller).to set_flash.to 'User was successfully removed from group and any subgroups and projects.'
+          expect(response).to redirect_to(group_group_members_path(group))
+          expect(group.members).not_to include member
+          expect(sub_group.members).not_to include sub_member
         end
 
         it '[JS] removes user from members' do
@@ -361,7 +389,7 @@ RSpec.describe Groups::GroupMembersController do
         it 'removes user from members' do
           delete :leave, params: { group_id: group }
 
-          expect(response).to set_flash.to "You left the \"#{group.name}\" group."
+          expect(controller).to set_flash.to "You left the \"#{group.name}\" group."
           expect(response).to redirect_to(dashboard_groups_path)
           expect(group.users).not_to include user
         end
@@ -387,6 +415,8 @@ RSpec.describe Groups::GroupMembersController do
       end
 
       context 'and is a requester' do
+        let(:group) { create(:group, :public) }
+
         before do
           group.request_access(user)
         end
@@ -394,7 +424,7 @@ RSpec.describe Groups::GroupMembersController do
         it 'removes user from members' do
           delete :leave, params: { group_id: group }
 
-          expect(response).to set_flash.to 'Your access request to the group has been withdrawn.'
+          expect(controller).to set_flash.to 'Your access request to the group has been withdrawn.'
           expect(response).to redirect_to(group_path(group))
           expect(group.requesters).to be_empty
           expect(group.users).not_to include user
@@ -411,7 +441,7 @@ RSpec.describe Groups::GroupMembersController do
     it 'creates a new GroupMember that is not a team member' do
       post :request_access, params: { group_id: group }
 
-      expect(response).to set_flash.to 'Your request for access has been queued for review.'
+      expect(controller).to set_flash.to 'Your request for access has been queued for review.'
       expect(response).to redirect_to(group_path(group))
       expect(group.requesters.exists?(user_id: user)).to be_truthy
       expect(group.users).not_to include user
@@ -419,7 +449,7 @@ RSpec.describe Groups::GroupMembersController do
   end
 
   describe 'POST approve_access_request' do
-    let(:member) { create(:group_member, :access_request, group: group) }
+    let_it_be(:member) { create(:group_member, :access_request, group: group) }
 
     before do
       sign_in(user)
@@ -463,6 +493,8 @@ RSpec.describe Groups::GroupMembersController do
   end
 
   context 'with external authorization enabled' do
+    let_it_be(:membership) { create(:group_member, group: group) }
+
     before do
       enable_external_authorization_service_check
       group.add_owner(user)

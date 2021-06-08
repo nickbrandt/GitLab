@@ -18,6 +18,75 @@ The list of dashboards for each stage group is accessible at <https://dashboards
 
 The dashboards for stage groups are at a very early stage. All contributions are welcome. If you have any questions or suggestions, please submit an issue in the [Scalability Team issues tracker](https://gitlab.com/gitlab-com/gl-infra/scalability/-/issues/new).
 
+## Dashboard content
+
+### Error budget
+
+Read more about how we are using error budgets overall in our
+[handbook](https://about.gitlab.com/handbook/engineering/error-budgets/).
+
+By default, the first row of panels on the dashboard will show the [error
+budget for the stage
+group](https://about.gitlab.com/handbook/engineering/error-budgets/#budget-spend-by-stage-group). This
+row shows how the features owned by
+the group are contributing to our [overall
+availability](https://about.gitlab.com/handbook/engineering/infrastructure/performance-indicators/#gitlabcom-availability).
+
+The budget is always aggregated over the 28 days before the [time
+selected on the dashboard](#time-range-controls).
+
+We're currently displaying the information in 2 formats:
+
+1. Availability: This number can be compared to GitLab.com's overall
+   availability target of 99.95% uptime.
+1. Budget Spent: This shows the time over the past 28 days that
+   features owned by the group have not been performing adequately.
+
+We're still discussing which of these is more understandable, please
+contribute in
+[Scalability issue #946](https://gitlab.com/gitlab-com/gl-infra/scalability/-/issues/946)
+if you have thoughts on this topic.
+
+The budget is calculated based on indicators per component. Each
+component has 2 indicators:
+
+1. [Apdex](https://en.wikipedia.org/wiki/Apdex): The rate of
+   operations that performed adequately.
+
+   The threshold for 'performed adequately' is stored in our [metrics
+   catalog](https://gitlab.com/gitlab-com/runbooks/-/tree/master/metrics-catalog)
+   and depends on the service in question. For the Puma (Rails)
+   component of the
+   [API](https://gitlab.com/gitlab-com/runbooks/-/blob/f22f40b2c2eab37d85e23ccac45e658b2c914445/metrics-catalog/services/api.jsonnet#L127),
+   [Git](https://gitlab.com/gitlab-com/runbooks/-/blob/f22f40b2c2eab37d85e23ccac45e658b2c914445/metrics-catalog/services/git.jsonnet#L216),
+   and
+   [Web](https://gitlab.com/gitlab-com/runbooks/-/blob/f22f40b2c2eab37d85e23ccac45e658b2c914445/metrics-catalog/services/web.jsonnet#L154)
+   services, that threshold is **1 second**.
+
+   For Sidekiq job execution, the threshold depends on the [job
+   urgency](sidekiq_style_guide.md#job-urgency). It is
+   [currently](https://gitlab.com/gitlab-com/runbooks/-/blob/f22f40b2c2eab37d85e23ccac45e658b2c914445/metrics-catalog/services/lib/sidekiq-helpers.libsonnet#L25-38)
+   **10 seconds** for high-urgency jobs and **5 minutes** for other
+   jobs.
+
+   Some stage groups may have more services than these, and the
+   thresholds for those will be in the metrics catalog as well.
+
+1. Error rate: The rate of operations that had errors.
+
+The calculation to a ratio then happens as follows:
+
+```math
+\frac {operations\_meeting\_apdex + (total\_operations - operations\_with\_errors)} {total\_apdex\_measurements + total\_operations}
+```
+
+*Caveat:* Not all components are included, causing the
+calculation to be less accurate for some groups. We're working on
+adding all components in
+[&437](https://gitlab.com/groups/gitlab-com/gl-infra/-/epics/437). This
+could cause the dashboard to display "No Data" for features with lower
+traffic.
+
 ## Usage
 
 Inside a stage group dashboard, there are some notable components. Let's take the [Source Code group's dashboard](https://dashboards.gitlab.net/d/stage-groups-source_code/stage-groups-group-dashboard-create-source-code?orgId=1) as an example.
@@ -117,7 +186,7 @@ stageGroupDashboards.dashboard('source_code')
     mode='markdown',
     content=|||
       Useful link for the Source Code Management group dashboard:
-      - [Issue list](https://gitlab.com/groups/gitlab-org/-/issues?scope=all&utf8=%E2%9C%93&state=opened&label_name%5B%5D=repository)
+      - [Issue list](https://gitlab.com/groups/gitlab-org/-/issues?scope=all&state=opened&label_name%5B%5D=repository)
       - [Epic list](https://gitlab.com/groups/gitlab-org/-/epics?label_name[]=repository)
     |||,
   ),

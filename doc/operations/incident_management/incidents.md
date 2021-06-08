@@ -1,6 +1,6 @@
 ---
 stage: Monitor
-group: Health
+group: Monitor
 info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#assignments
 ---
 
@@ -39,7 +39,7 @@ Incident, you have two options to do this manually.
 1. Go to **Issues > List**, and select **New issue**.
 1. In the **Type** dropdown, select **Incident**. Only fields relevant to
    incidents are displayed on the page.
-1. Create the incident as needed, and select **Submit issue** to save the
+1. Create the incident as needed, and select **Create issue** to save the
    incident.
 
 ![Incident List Create](img/new_incident_create_v13_4.png)
@@ -69,7 +69,7 @@ You can set up a webhook with PagerDuty to automatically create a GitLab inciden
 for each PagerDuty incident. This configuration requires you to make changes
 in both PagerDuty and GitLab:
 
-1. Sign in as a user with Maintainer [permissions](../../user/permissions.md).
+1. Sign in as a user with the [Maintainer role](../../user/permissions.md).
 1. Navigate to **Settings > Operations > Incidents** and expand **Incidents**.
 1. Select the **PagerDuty integration** tab:
 
@@ -204,7 +204,9 @@ un-threaded and ordered chronologically, newest to oldest:
 You can enable the Service Level Agreement Countdown timer on incidents to track
 the Service Level Agreements (SLAs) you hold with your customers. The timer is
 automatically started when the incident is created, and shows the time
-remaining before the SLA period expires. To configure the timer:
+remaining before the SLA period expires. The timer is also dynamically updated
+every 15 minutes so you do not have to refresh the page to see the time remaining.
+To configure the timer:
 
 1. Navigate to **Settings > Operations**.
 1. Scroll to **Incidents** and click **Expand**, then select the
@@ -267,3 +269,19 @@ any other Markdown text field in GitLab by
 You can embed both [GitLab-hosted metrics](../metrics/embed.md) and
 [Grafana metrics](../metrics/embed_grafana.md) in incidents and issue
 templates.
+
+### Automatically close incidents via recovery alerts
+
+> - [Introduced for Prometheus Integrations](https://gitlab.com/gitlab-org/gitlab/-/issues/13401) in GitLab 12.5.
+> - [Introduced for HTTP Integrations](https://gitlab.com/gitlab-org/gitlab/-/issues/13402) in GitLab 13.4.
+
+With Maintainer or higher [permissions](../../user/permissions.md), you can enable
+ GitLab to close an incident automatically when a **Recovery Alert** is received:
+
+1. Navigate to **Settings > Operations > Incidents** and expand **Incidents**.
+1. Check the **Automatically close associated Incident** checkbox.
+1. Click **Save changes**.
+
+When GitLab receives a **Recovery Alert**, it closes the associated incident.
+This action is recorded as a system message on the incident indicating that it
+was closed automatically by the GitLab Alert bot.

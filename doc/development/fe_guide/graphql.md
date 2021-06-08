@@ -43,12 +43,8 @@ can help you learn how to integrate Vue Apollo.
 
 For other use cases, check out the [Usage outside of Vue](#usage-outside-of-vue) section.
 
-<!-- vale gitlab.Spelling = NO -->
-
-We use [Immer](https://immerjs.github.io/immer/docs/introduction) for immutable cache updates;
+We use [Immer](https://immerjs.github.io/immer/) for immutable cache updates;
 see [Immutability and cache updates](#immutability-and-cache-updates) for more information.
-
-<!-- vale gitlab.Spelling = YES -->
 
 ### Tooling
 
@@ -110,6 +106,12 @@ Default client accepts two parameters: `resolvers` and `config`.
   - `assumeImmutableResults` (set to `false` by default) - this setting, when set to `true`, assumes that every single operation on updating Apollo Cache is immutable. It also sets `freezeResults` to `true`, so any attempt on mutating Apollo Cache throws a console warning in development environment. Please ensure you're following the immutability pattern on cache update operations before setting this option to `true`.
   - `fetchPolicy` determines how you want your component to interact with the Apollo cache. Defaults to "cache-first".
 
+### Multiple client queries for the same object
+
+If you are make multiple queries to the same Apollo client object you might encounter the following error: "Store error: the application attempted to write an object with no provided ID but the store already contains an ID of SomeEntity". [This error only should occur when you have made a query with an ID field for a portion, then made another that returns what would be the same object, but is missing the ID field.](https://github.com/apollographql/apollo-client/issues/2510#issue-271829009)
+
+Please note this is being tracked in [this issue](https://gitlab.com/gitlab-org/gitlab/-/issues/326101) and the documentation will be updated when this issue is resolved.
+
 ## GraphQL Queries
 
 To save query compilation at runtime, webpack can directly import `.graphql`
@@ -121,6 +123,8 @@ To distinguish queries from mutations and fragments, the following naming conven
 - `all_users.query.graphql` for queries;
 - `add_user.mutation.graphql` for mutations;
 - `basic_user.fragment.graphql` for fragments.
+
+If you are using queries for the [CustomersDot GraphQL endpoint](https://gitlab.com/gitlab-org/gitlab/-/blob/be78ccd832fd40315c5e63bb48ee1596ae146f56/app/controllers/customers_dot/proxy_controller.rb), end the filename with `.customer.query.graphql`, `.customer.mutation.graphql`, or `.customer.fragment.graphql`.
 
 ### Fragments
 
@@ -173,13 +177,9 @@ const primaryKeyId = getIdFromGraphQLId(data.id);
 From Apollo version 3.0.0 all the cache updates need to be immutable. It needs to be replaced entirely
 with a **new and updated** object.
 
-<!-- vale gitlab.Spelling = NO -->
-
 To facilitate the process of updating the cache and returning the new object we
-use the library [Immer](https://immerjs.github.io/immer/docs/introduction).
+use the library [Immer](https://immerjs.github.io/immer/).
 When possible, follow these conventions:
-
-<!-- vale gitlab.Spelling = YES -->
 
 - The updated cache is named `data`.
 - The original cache data is named `sourceData`.
@@ -238,17 +238,33 @@ Read more about [Vue Apollo](https://github.com/vuejs/vue-apollo) in the [Vue Ap
 
 It is possible to manage an application state with Apollo by passing
 in a resolvers object when creating the default client. The default state can be set by writing
-to the cache after setting up the default client.
+to the cache after setting up the default client. In the example below, we are using query with `@client` Apollo directive to write the initial data to Apollo cache and then get this state in the Vue component:
 
 ```javascript
+// user.query.graphql
+
+query User {
+  user @client {
+    name
+    surname
+    age
+  }
+}
+```
+
+```javascript
+// index.js
+
 import Vue from 'vue';
 import VueApollo from 'vue-apollo';
 import createDefaultClient from '~/lib/graphql';
+import userQuery from '~/user/user.query.graphql'
 Vue.use(VueApollo);
 
 const defaultClient = createDefaultClient();
 
-defaultClient.cache.writeData({
+defaultClient.cache.writeQuery({
+  query: userQuery,
   data: {
     user: {
       name: 'John',
@@ -263,16 +279,15 @@ const apolloProvider = new VueApollo({
 });
 ```
 
-We can query local data with `@client` Apollo directive:
-
 ```javascript
-// user.query.graphql
+// App.vue
+import userQuery from '~/user/user.query.graphql'
 
-query User {
-  user @client {
-    name
-    surname
-    age
+export default {
+  apollo: {
+    user: {
+      query: userQuery
+    }
   }
 }
 ```
@@ -423,7 +438,7 @@ query getAuthorData($authorNameEnabled: Boolean = false) {
 ```
 
 Then in the Vue (or JavaScript) call to the query we can pass in our feature flag. This feature
-flag needs to be already set up correctly. See the [feature flag documentation](../feature_flags/development.md)
+flag needs to be already set up correctly. See the [feature flag documentation](../feature_flags/index.md)
 for the correct way to do this.
 
 ```javascript
@@ -767,6 +782,66 @@ export default {
 };
 ```
 
+#### Polling and Performance
+
+While the Apollo client has support for simple polling, for performance reasons, our [Etag-based caching](../polling.md) is preferred to hitting the database each time.
+
+Once the backend is set up, there are a few changes to make on the frontend.
+
+First, get your resource ETag path from the backend. In the example of the pipelines graph, this is called the `graphql_resource_etag`. This will be used to create new headers to add to the Apollo context:
+
+```javascript
+/* pipelines/components/graph/utils.js */
+
+/* eslint-disable @gitlab/require-i18n-strings */
+const getQueryHeaders = (etagResource) => {
+  return {
+    fetchOptions: {
+      method: 'GET',
+    },
+    headers: {
+      /* This will depend on your feature */
+      'X-GITLAB-GRAPHQL-FEATURE-CORRELATION': 'verify/ci/pipeline-graph',
+      'X-GITLAB-GRAPHQL-RESOURCE-ETAG': etagResource,
+      'X-REQUESTED-WITH': 'XMLHttpRequest',
+    },
+  };
+};
+/* eslint-enable @gitlab/require-i18n-strings */
+
+/* component.vue */
+
+apollo: {
+  pipeline: {
+    context() {
+      return getQueryHeaders(this.graphqlResourceEtag);
+    },
+    query: getPipelineDetails,
+    pollInterval: 10000,
+    ..
+  },
+},
+```
+
+Then, because ETags depend on the request being a `GET` instead of GraphQL's usual `POST`, but our default link library does not support `GET` we need to let our default Apollo client know to use a different library.
+
+```javascript
+/* componentMountIndex.js */
+
+const apolloProvider = new VueApollo({
+  defaultClient: createDefaultClient(
+    {},
+    {
+      useGet: true,
+    },
+  ),
+});
+```
+
+Keep in mind, this means your app will not batch queries.
+
+Once subscriptions are mature, this process can be replaced by using them and we can remove the separate link library and return to batching queries.
+
 ### Testing
 
 #### Generating the GraphQL schema
@@ -1022,7 +1097,7 @@ it('renders a loading state', () => {
   const mockApollo = createMockApolloProvider();
   const wrapper = createComponent({ mockApollo });
 
-  expect(wrapper.find(LoadingSpinner).exists()).toBe(true)
+  expect(wrapper.findComponent(LoadingSpinner).exists()).toBe(true)
 });
 
 it('renders designs list', async () => {
@@ -1324,7 +1399,6 @@ describe('My Index test with `createMockApollo`', () => {
 
   afterEach(() => {
     wrapper.destroy();
-    wrapper = null;
     fetchLocalUserSpy = null;
   });
 
@@ -1375,6 +1449,34 @@ describe('My Index test with `createMockApollo`', () => {
     });
   });
 });
+```
+
+When you need to configure the mocked apollo client's caching behavior,
+provide additional cache options when creating a mocked client instance and the provided options will merge with the default cache option:
+
+```javascript
+const defaultCacheOptions = {
+  fragmentMatcher: { match: () => true },
+  addTypename: false,
+};
+```
+
+```javascript
+function createMockApolloProvider({ props = {}, requestHandlers } = {}) {
+  Vue.use(VueApollo);
+
+  const mockApollo = createMockApollo(
+    requestHandlers,
+    {},
+    {
+      dataIdFromObject: (object) =>
+        // eslint-disable-next-line no-underscore-dangle
+        object.__typename === 'Requirement' ? object.iid : defaultDataIdFromObject(object),
+    },
+  );
+
+  return mockApollo;
+}
 ```
 
 ## Handling errors

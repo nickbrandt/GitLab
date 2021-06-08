@@ -1,6 +1,6 @@
 ---
 stage: Verify
-group: Continuous Integration
+group: Pipeline Execution
 info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#assignments
 disqus_identifier: 'https://docs.gitlab.com/ee/user/project/pipelines/schedules.html'
 type: reference, howto
@@ -36,7 +36,7 @@ Otherwise the pipeline is not created.
 
 To schedule a pipeline for project:
 
-1. Navigate to the project's **CI / CD > Schedules** page.
+1. Navigate to the project's **CI/CD > Schedules** page.
 1. Click the **New schedule** button.
 1. Fill in the **Schedule a new pipeline** form.
 1. Click the **Save pipeline schedule** button.
@@ -65,7 +65,7 @@ GitLab CI/CD so that they can be used in your [`.gitlab-ci.yml` file](../../ci/y
 
 To configure a job to be executed only when the pipeline has been
 scheduled (or the opposite), use
-[only and except](../yaml/README.md#onlyexcept-basic) configuration keywords.
+[only and except](../yaml/README.md#only--except) configuration keywords.
 
 In the example below `make world` runs in scheduled pipelines, and `make build` runs in pipelines that are not scheduled:
 

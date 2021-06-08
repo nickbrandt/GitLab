@@ -1,0 +1,73 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ee/BoardContentSidebar matches the snapshot 1`] = `
+<div>
+  Issue details
+  <boardsidebartitle-stub />
+   
+  <sidebarassigneeswidget-stub
+    fullpath="gitlab-org/gitlab-test"
+    iid="27"
+    initialassignees="[object Object],[object Object]"
+    issuabletype="issue"
+  />
+   
+  <sidebardropdownwidget-stub
+    attrworkspacepath="gitlab-org"
+    data-testid="sidebar-epic"
+    iid="27"
+    issuableattribute="epic"
+    issuabletype="issue"
+    workspacepath="gitlab-org/gitlab-test"
+  />
+   
+  <div>
+    <sidebardropdownwidget-stub
+      attrworkspacepath="gitlab-org/gitlab-test"
+      data-testid="sidebar-milestones"
+      iid="27"
+      issuableattribute="milestone"
+      issuabletype="issue"
+      workspacepath="gitlab-org/gitlab-test"
+    />
+     
+    <sidebardropdownwidget-stub
+      attrworkspacepath="gitlab-org"
+      class="gl-mt-5"
+      data-qa-selector="iteration_container"
+      data-testid="iteration-edit"
+      iid="27"
+      issuableattribute="iteration"
+      issuabletype="issue"
+      workspacepath="gitlab-org/gitlab-test"
+    />
+  </div>
+   
+  <boardsidebartimetracker-stub
+    class="swimlanes-sidebar-time-tracker"
+  />
+   
+  <boardsidebarduedate-stub />
+   
+  <boardsidebarlabelsselect-stub
+    class="labels"
+  />
+   
+  <boardsidebarweightinput-stub
+    class="weight"
+  />
+   
+  <sidebarconfidentialitywidget-stub
+    fullpath="gitlab-org/gitlab-test"
+    iid="27"
+    issuabletype="issue"
+  />
+   
+  <sidebarsubscriptionswidget-stub
+    data-testid="sidebar-notifications"
+    fullpath="gitlab-org/gitlab-test"
+    iid="27"
+    issuabletype="issue"
+  />
+</div>
+`;

@@ -11,7 +11,7 @@ RSpec.describe AvatarsHelper do
     shared_examples 'resource with a default avatar' do |source_type|
       it 'returns a default avatar div' do
         expect(public_send("#{source_type}_icon", *helper_args))
-          .to match(%r{<div class="identicon bg\d+">F</div>})
+          .to match(%r{<span class="identicon bg\d+">F</span>})
       end
     end
 
@@ -121,27 +121,13 @@ RSpec.describe AvatarsHelper do
       end
     end
 
-    context "when :avatar_cache_for_email flag is enabled" do
-      before do
-        stub_feature_flags(avatar_cache_for_email: true)
-      end
+    it_behaves_like "returns avatar for email"
 
-      it_behaves_like "returns avatar for email"
+    it "caches the request" do
+      expect(User).to receive(:find_by_any_email).once.and_call_original
 
-      it "caches the request" do
-        expect(User).to receive(:find_by_any_email).once.and_call_original
-
-        expect(helper.avatar_icon_for_email(user.email).to_s).to eq(user.avatar.url)
-        expect(helper.avatar_icon_for_email(user.email).to_s).to eq(user.avatar.url)
-      end
-    end
-
-    context "when :avatar_cache_for_email flag is disabled" do
-      before do
-        stub_feature_flags(avatar_cache_for_email: false)
-      end
-
-      it_behaves_like "returns avatar for email"
+      expect(helper.avatar_icon_for_email(user.email).to_s).to eq(user.avatar.url)
+      expect(helper.avatar_icon_for_email(user.email).to_s).to eq(user.avatar.url)
     end
   end
 
@@ -420,6 +406,35 @@ RSpec.describe AvatarsHelper do
 
       it 'will return default alt text for avatar' do
         expect(subject).to include("default avatar")
+      end
+    end
+  end
+
+  describe '#avatar_without_link' do
+    let(:options) { { size: 32 } }
+
+    subject { helper.avatar_without_link(resource, options) }
+
+    context 'with users' do
+      let(:resource) { user }
+
+      it 'displays user avatar' do
+        is_expected.to eq tag(
+          :img,
+          alt: "#{user.name}'s avatar",
+          src: avatar_icon_for_user(user, 32),
+          data: { container: 'body' },
+          class: 'avatar s32 has-tooltip',
+          title: user.name
+        )
+      end
+    end
+
+    context 'with groups' do
+      let(:resource) { build_stubbed(:group, name: 'foo') }
+
+      it 'displays group avatar' do
+        is_expected.to match(%r{<span class="avatar identicon bg\d+ s32">F</span>})
       end
     end
   end

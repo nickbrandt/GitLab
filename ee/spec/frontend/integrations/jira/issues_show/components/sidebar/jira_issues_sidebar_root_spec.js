@@ -1,9 +1,10 @@
 import { shallowMount } from '@vue/test-utils';
 import Assignee from 'ee/integrations/jira/issues_show/components/sidebar/assignee.vue';
 import IssueDueDate from 'ee/integrations/jira/issues_show/components/sidebar/issue_due_date.vue';
-import IssueReference from 'ee/integrations/jira/issues_show/components/sidebar/issue_reference.vue';
+import IssueField from 'ee/integrations/jira/issues_show/components/sidebar/issue_field.vue';
 import Sidebar from 'ee/integrations/jira/issues_show/components/sidebar/jira_issues_sidebar_root.vue';
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
+import CopyableField from '~/vue_shared/components/sidebar/copyable_field.vue';
 import LabelsSelect from '~/vue_shared/components/sidebar/labels_select_vue/labels_select_root.vue';
 import { mockJiraIssue as mockJiraIssueData } from '../../mock_data';
 
@@ -33,7 +34,8 @@ describe('JiraIssuesSidebar', () => {
   const findLabelsSelect = () => wrapper.findComponent(LabelsSelect);
   const findAssignee = () => wrapper.findComponent(Assignee);
   const findIssueDueDate = () => wrapper.findComponent(IssueDueDate);
-  const findIssueReference = () => wrapper.findComponent(IssueReference);
+  const findIssueField = () => wrapper.findComponent(IssueField);
+  const findCopyableField = () => wrapper.findComponent(CopyableField);
 
   it('renders Labels block', () => {
     createComponent();
@@ -55,8 +57,17 @@ describe('JiraIssuesSidebar', () => {
     expect(dueDate.props('dueDate')).toBe(mockJiraIssue.dueDate);
   });
 
+  it('renders IssueField', () => {
+    createComponent();
+    const field = findIssueField();
+
+    expect(field.props('icon')).toBe('progress');
+    expect(field.props('title')).toBe('Status');
+    expect(field.props('value')).toBe(mockJiraIssue.status);
+  });
+
   describe('when references.relative is null', () => {
-    it('does not render IssueReference', () => {
+    it('does not render issue reference', () => {
       createComponent({
         props: {
           issue: {
@@ -65,15 +76,17 @@ describe('JiraIssuesSidebar', () => {
         },
       });
 
-      expect(findIssueReference().exists()).toBe(false);
+      expect(findCopyableField().exists()).toBe(false);
     });
   });
 
   describe('when references.relative is provided', () => {
-    it('renders IssueReference', () => {
+    it('renders issue reference', () => {
       createComponent();
+      const issueReference = findCopyableField();
 
-      expect(findIssueReference().exists()).toBe(true);
+      expect(issueReference.exists()).toBe(true);
+      expect(issueReference.props('value')).toBe(defaultProps.issue.references.relative);
     });
   });
 });

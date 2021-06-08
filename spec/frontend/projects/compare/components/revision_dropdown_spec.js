@@ -1,15 +1,10 @@
-import { GlDropdown } from '@gitlab/ui';
+import { GlDropdown, GlDropdownItem, GlSearchBoxByType } from '@gitlab/ui';
 import { shallowMount } from '@vue/test-utils';
 import AxiosMockAdapter from 'axios-mock-adapter';
 import createFlash from '~/flash';
 import axios from '~/lib/utils/axios_utils';
 import RevisionDropdown from '~/projects/compare/components/revision_dropdown.vue';
-
-const defaultProps = {
-  refsProjectPath: 'some/refs/path',
-  paramsName: 'from',
-  paramsBranch: 'master',
-};
+import { revisionDropdownDefaultProps as defaultProps } from './mock_data';
 
 jest.mock('~/flash');
 
@@ -22,6 +17,10 @@ describe('RevisionDropdown component', () => {
       propsData: {
         ...defaultProps,
         ...props,
+      },
+      stubs: {
+        GlDropdown,
+        GlSearchBoxByType,
       },
     });
   };
@@ -36,6 +35,7 @@ describe('RevisionDropdown component', () => {
   });
 
   const findGlDropdown = () => wrapper.find(GlDropdown);
+  const findSearchBox = () => wrapper.find(GlSearchBoxByType);
 
   it('sets hidden input', () => {
     createComponent();
@@ -85,6 +85,40 @@ describe('RevisionDropdown component', () => {
     expect(axios.get).toHaveBeenLastCalledWith(newRefsProjectPath);
   });
 
+  describe('search', () => {
+    it('shows flash message on error', async () => {
+      axiosMock.onGet('some/invalid/path').replyOnce(404);
+
+      createComponent();
+
+      await wrapper.vm.searchBranchesAndTags();
+      expect(createFlash).toHaveBeenCalled();
+    });
+
+    it('makes request with search param', async () => {
+      jest.spyOn(axios, 'get').mockResolvedValue({
+        data: {
+          Branches: [],
+          Tags: [],
+        },
+      });
+
+      const mockSearchTerm = 'foobar';
+      createComponent();
+      findSearchBox().vm.$emit('input', mockSearchTerm);
+      await axios.waitForAll();
+
+      expect(axios.get).toHaveBeenCalledWith(
+        defaultProps.refsProjectPath,
+        expect.objectContaining({
+          params: {
+            search: mockSearchTerm,
+          },
+        }),
+      );
+    });
+  });
+
   describe('GlDropdown component', () => {
     it('renders props', () => {
       createComponent();
@@ -101,6 +135,19 @@ describe('RevisionDropdown component', () => {
     it('display params branch text', () => {
       createComponent();
       expect(findGlDropdown().props('text')).toBe(defaultProps.paramsBranch);
+    });
+  });
+
+  it('emits `selectRevision` event when another revision is selected', async () => {
+    createComponent();
+    wrapper.vm.branches = ['some-branch'];
+    await wrapper.vm.$nextTick();
+
+    findGlDropdown().findAll(GlDropdownItem).at(0).vm.$emit('click');
+
+    expect(wrapper.emitted('selectRevision')[0][0]).toEqual({
+      direction: 'to',
+      revision: 'some-branch',
     });
   });
 });

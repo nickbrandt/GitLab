@@ -16,7 +16,9 @@ RSpec.shared_examples 'store ActiveRecord info in RequestStore' do |db_role|
             db_primary_duration_s:  record_query ? 0.002 : 0,
             db_replica_cached_count:  0,
             db_replica_count:  0,
-            db_replica_duration_s:  0.0
+            db_replica_duration_s:  0.0,
+            db_primary_wal_count: record_wal_query ? 1 : 0,
+            db_replica_wal_count: 0
           )
         elsif db_role == :replica
           expect(described_class.db_counter_payload).to eq(
@@ -28,7 +30,9 @@ RSpec.shared_examples 'store ActiveRecord info in RequestStore' do |db_role|
             db_primary_duration_s:  0.0,
             db_replica_cached_count:  record_cached_query ? 1 : 0,
             db_replica_count:  record_query ? 1 : 0,
-            db_replica_duration_s:  record_query ? 0.002 : 0
+            db_replica_duration_s:  record_query ? 0.002 : 0,
+            db_replica_wal_count: record_wal_query ? 1 : 0,
+            db_primary_wal_count: 0
           )
         else
           expect(described_class.db_counter_payload).to eq(
@@ -42,7 +46,7 @@ RSpec.shared_examples 'store ActiveRecord info in RequestStore' do |db_role|
   end
 end
 
-RSpec.shared_examples 'record ActiveRecord metrics' do |db_role|
+RSpec.shared_examples 'record ActiveRecord metrics in a metrics transaction' do |db_role|
   it 'increments only db counters' do
     if record_query
       expect(transaction).to receive(:increment).with(:gitlab_transaction_db_count_total, 1)
@@ -66,6 +70,12 @@ RSpec.shared_examples 'record ActiveRecord metrics' do |db_role|
       expect(transaction).not_to receive(:increment).with("gitlab_transaction_db_#{db_role}_cached_count_total".to_sym, 1) if db_role
     end
 
+    if record_wal_query
+      expect(transaction).to receive(:increment).with("gitlab_transaction_db_#{db_role}_wal_count_total".to_sym, 1) if db_role
+    else
+      expect(transaction).not_to receive(:increment).with("gitlab_transaction_db_#{db_role}_wal_count_total".to_sym, 1) if db_role
+    end
+
     subscriber.sql(event)
   end
 
@@ -78,5 +88,60 @@ RSpec.shared_examples 'record ActiveRecord metrics' do |db_role|
     end
 
     subscriber.sql(event)
+  end
+end
+
+RSpec.shared_examples 'record ActiveRecord metrics' do |db_role|
+  context 'when both web and background transaction are available' do
+    let(:transaction) { double('Gitlab::Metrics::WebTransaction') }
+    let(:background_transaction) { double('Gitlab::Metrics::WebTransaction') }
+
+    before do
+      allow(::Gitlab::Metrics::WebTransaction).to receive(:current)
+        .and_return(transaction)
+      allow(::Gitlab::Metrics::BackgroundTransaction).to receive(:current)
+        .and_return(background_transaction)
+      allow(transaction).to receive(:increment)
+      allow(transaction).to receive(:observe)
+    end
+
+    it_behaves_like 'record ActiveRecord metrics in a metrics transaction', db_role
+
+    it 'captures the metrics for web only' do
+      expect(background_transaction).not_to receive(:observe)
+      expect(background_transaction).not_to receive(:increment)
+
+      subscriber.sql(event)
+    end
+  end
+
+  context 'when web transaction is available' do
+    let(:transaction) { double('Gitlab::Metrics::WebTransaction') }
+
+    before do
+      allow(::Gitlab::Metrics::WebTransaction).to receive(:current)
+        .and_return(transaction)
+      allow(::Gitlab::Metrics::BackgroundTransaction).to receive(:current)
+        .and_return(nil)
+      allow(transaction).to receive(:increment)
+      allow(transaction).to receive(:observe)
+    end
+
+    it_behaves_like 'record ActiveRecord metrics in a metrics transaction', db_role
+  end
+
+  context 'when background transaction is available' do
+    let(:transaction) { double('Gitlab::Metrics::BackgroundTransaction') }
+
+    before do
+      allow(::Gitlab::Metrics::WebTransaction).to receive(:current)
+        .and_return(nil)
+      allow(::Gitlab::Metrics::BackgroundTransaction).to receive(:current)
+        .and_return(transaction)
+      allow(transaction).to receive(:increment)
+      allow(transaction).to receive(:observe)
+    end
+
+    it_behaves_like 'record ActiveRecord metrics in a metrics transaction', db_role
   end
 end

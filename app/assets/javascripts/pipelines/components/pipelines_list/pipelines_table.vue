@@ -1,16 +1,14 @@
 <script>
 import { GlTable, GlTooltipDirective } from '@gitlab/ui';
 import { s__ } from '~/locale';
-import glFeatureFlagMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import eventHub from '../../event_hub';
+import PipelineMiniGraph from './pipeline_mini_graph.vue';
 import PipelineOperations from './pipeline_operations.vue';
 import PipelineStopModal from './pipeline_stop_modal.vue';
 import PipelineTriggerer from './pipeline_triggerer.vue';
 import PipelineUrl from './pipeline_url.vue';
 import PipelinesCommit from './pipelines_commit.vue';
 import PipelinesStatusBadge from './pipelines_status_badge.vue';
-import PipelinesTableRowComponent from './pipelines_table_row.vue';
-import PipelineStage from './stage.vue';
 import PipelinesTimeago from './time_ago.vue';
 
 const DEFAULT_TD_CLASS = 'gl-p-5!';
@@ -70,7 +68,6 @@ export default {
     },
     {
       key: 'actions',
-      label: '',
       thClass: DEFAULT_TH_CLASSES,
       tdClass: DEFAULT_TD_CLASS,
       columnClass: 'gl-w-20p',
@@ -80,11 +77,10 @@ export default {
   components: {
     GlTable,
     PipelinesCommit,
+    PipelineMiniGraph,
     PipelineOperations,
-    PipelineStage,
     PipelinesStatusBadge,
     PipelineStopModal,
-    PipelinesTableRowComponent,
     PipelinesTimeago,
     PipelineTriggerer,
     PipelineUrl,
@@ -92,7 +88,6 @@ export default {
   directives: {
     GlTooltip: GlTooltipDirective,
   },
-  mixins: [glFeatureFlagMixin()],
   props: {
     pipelines: {
       type: Array,
@@ -142,46 +137,15 @@ export default {
       eventHub.$emit('postAction', this.endpoint);
       this.cancelingPipeline = this.pipelineId;
     },
+    onPipelineActionRequestComplete() {
+      eventHub.$emit('refreshPipelinesTable');
+    },
   },
 };
 </script>
 <template>
   <div class="ci-table">
-    <div v-if="!glFeatures.newPipelinesTable" data-testid="legacy-ci-table">
-      <div class="gl-responsive-table-row table-row-header" role="row">
-        <div class="table-section section-10 js-pipeline-status" role="rowheader">
-          {{ s__('Pipeline|Status') }}
-        </div>
-        <div class="table-section section-10 js-pipeline-info pipeline-info" role="rowheader">
-          {{ s__('Pipeline|Pipeline') }}
-        </div>
-        <div class="table-section section-10 js-triggerer-info triggerer-info" role="rowheader">
-          {{ s__('Pipeline|Triggerer') }}
-        </div>
-        <div class="table-section section-20 js-pipeline-commit pipeline-commit" role="rowheader">
-          {{ s__('Pipeline|Commit') }}
-        </div>
-        <div class="table-section section-15 js-pipeline-stages pipeline-stages" role="rowheader">
-          {{ s__('Pipeline|Stages') }}
-        </div>
-        <div class="table-section section-15" role="rowheader"></div>
-        <div class="table-section section-20" role="rowheader">
-          <slot name="table-header-actions"></slot>
-        </div>
-      </div>
-      <pipelines-table-row-component
-        v-for="model in pipelines"
-        :key="model.id"
-        :pipeline="model"
-        :pipeline-schedule-url="pipelineScheduleUrl"
-        :update-graph-dropdown="updateGraphDropdown"
-        :view-type="viewType"
-        :canceling-pipeline="cancelingPipeline"
-      />
-    </div>
-
     <gl-table
-      v-else
       :fields="$options.fields"
       :items="pipelines"
       tbody-tr-class="commit"
@@ -190,6 +154,7 @@ export default {
       fixed
     >
       <template #head(actions)>
+        <span class="gl-display-block gl-lg-display-none!">{{ s__('Pipeline|Actions') }}</span>
         <slot name="table-header-actions"></slot>
       </template>
 
@@ -202,11 +167,7 @@ export default {
       </template>
 
       <template #cell(pipeline)="{ item }">
-        <pipeline-url
-          class="gl-text-truncate"
-          :pipeline="item"
-          :pipeline-schedule-url="pipelineScheduleUrl"
-        />
+        <pipeline-url :pipeline="item" :pipeline-schedule-url="pipelineScheduleUrl" />
       </template>
 
       <template #cell(triggerer)="{ item }">
@@ -219,21 +180,14 @@ export default {
 
       <template #cell(stages)="{ item }">
         <div class="stage-cell">
+          <!-- This empty div should be removed, see https://gitlab.com/gitlab-org/gitlab/-/issues/323488 -->
           <div></div>
-          <template v-if="item.details.stages.length > 0">
-            <div
-              v-for="(stage, index) in item.details.stages"
-              :key="index"
-              class="stage-container dropdown"
-              data-testid="widget-mini-pipeline-graph"
-            >
-              <pipeline-stage
-                :type="$options.pipelinesTable"
-                :stage="stage"
-                :update-dropdown="updateGraphDropdown"
-              />
-            </div>
-          </template>
+          <pipeline-mini-graph
+            v-if="item.details && item.details.stages && item.details.stages.length > 0"
+            :stages="item.details.stages"
+            :update-dropdown="updateGraphDropdown"
+            @pipelineActionRequestComplete="onPipelineActionRequestComplete"
+          />
         </div>
       </template>
 

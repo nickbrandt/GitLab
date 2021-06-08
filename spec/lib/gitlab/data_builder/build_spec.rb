@@ -9,6 +9,10 @@ RSpec.describe Gitlab::DataBuilder::Build do
   let(:build) { create(:ci_build, :running, runner: runner, user: user) }
 
   describe '.build' do
+    around do |example|
+      travel_to(Time.current) { example.run }
+    end
+
     let(:data) do
       described_class.build(build)
     end
@@ -19,6 +23,11 @@ RSpec.describe Gitlab::DataBuilder::Build do
     it { expect(data[:tag]).to eq(build.tag) }
     it { expect(data[:build_id]).to eq(build.id) }
     it { expect(data[:build_status]).to eq(build.status) }
+    it { expect(data[:build_created_at]).to eq(build.created_at) }
+    it { expect(data[:build_started_at]).to eq(build.started_at) }
+    it { expect(data[:build_finished_at]).to eq(build.finished_at) }
+    it { expect(data[:build_duration]).to eq(build.duration) }
+    it { expect(data[:build_queued_duration]).to eq(build.queued_duration) }
     it { expect(data[:build_allow_failure]).to eq(false) }
     it { expect(data[:build_failure_reason]).to eq(build.failure_reason) }
     it { expect(data[:project_id]).to eq(build.project.id) }
@@ -38,6 +47,8 @@ RSpec.describe Gitlab::DataBuilder::Build do
     it { expect(data[:runner][:id]).to eq(build.runner.id) }
     it { expect(data[:runner][:tags]).to match_array(tag_names) }
     it { expect(data[:runner][:description]).to eq(build.runner.description) }
+    it { expect(data[:runner][:runner_type]).to eq(build.runner.runner_type) }
+    it { expect(data[:runner][:is_shared]).to eq(build.runner.instance_type?) }
     it { expect(data[:environment]).to be_nil }
 
     context 'commit author_url' do

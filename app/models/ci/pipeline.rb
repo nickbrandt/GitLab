@@ -17,6 +17,7 @@ module Ci
     include FromUnion
     include UpdatedAtFilterable
     include EachBatch
+    include FastDestroyAll::Helpers
 
     MAX_OPEN_MERGE_REQUESTS_REFS = 4
 
@@ -70,7 +71,9 @@ module Ci
     has_many :deployments, through: :builds
     has_many :environments, -> { distinct }, through: :deployments
     has_many :latest_builds, -> { latest.with_project_and_metadata }, foreign_key: :commit_id, inverse_of: :pipeline, class_name: 'Ci::Build'
-    has_many :downloadable_artifacts, -> { not_expired.downloadable.with_job }, through: :latest_builds, source: :job_artifacts
+    has_many :downloadable_artifacts, -> do
+      not_expired.or(where_exists(::Ci::Pipeline.artifacts_locked.where('ci_pipelines.id = ci_builds.commit_id'))).downloadable.with_job
+    end, through: :latest_builds, source: :job_artifacts
 
     has_many :messages, class_name: 'Ci::PipelineMessage', inverse_of: :pipeline
 
@@ -123,6 +126,8 @@ module Ci
     validates :source, exclusion: { in: %w(unknown), unless: :importing? }, on: :create
 
     after_create :keep_around_commits, unless: :importing?
+
+    use_fast_destroy :job_artifacts
 
     # We use `Enums::Ci::Pipeline.sources` here so that EE can more easily extend
     # this `Hash` with new values.
@@ -286,9 +291,11 @@ module Ci
       end
 
       after_transition any => [:failed] do |pipeline|
-        next unless pipeline.auto_devops_source?
+        pipeline.run_after_commit do
+          ::Gitlab::Ci::Pipeline::Metrics.pipeline_failure_reason_counter.increment(reason: pipeline.failure_reason)
 
-        pipeline.run_after_commit { AutoDevops::DisableWorker.perform_async(pipeline.id) }
+          AutoDevops::DisableWorker.perform_async(pipeline.id) if pipeline.auto_devops_source?
+        end
       end
     end
 
@@ -309,6 +316,7 @@ module Ci
     scope :created_after, -> (time) { where('ci_pipelines.created_at > ?', time) }
     scope :created_before_id, -> (id) { where('ci_pipelines.id < ?', id) }
     scope :before_pipeline, -> (pipeline) { created_before_id(pipeline.id).outside_pipeline_family(pipeline) }
+    scope :eager_load_project, -> { eager_load(project: [:route, { namespace: :route }]) }
 
     scope :outside_pipeline_family, ->(pipeline) do
       where.not(id: pipeline.same_family_pipeline_ids)
@@ -393,26 +401,13 @@ module Ci
     #       given we simply get the latest pipelines for the commits, regardless
     #       of what refs the pipelines belong to.
     def self.latest_pipeline_per_commit(commits, ref = nil)
-      p1 = arel_table
-      p2 = arel_table.alias
+      sql = select('DISTINCT ON (sha) *')
+              .where(sha: commits)
+              .order(:sha, id: :desc)
 
-      # This LEFT JOIN will filter out all but the newest row for every
-      # combination of (project_id, sha) or (project_id, sha, ref) if a ref is
-      # given.
-      cond = p1[:sha].eq(p2[:sha])
-        .and(p1[:project_id].eq(p2[:project_id]))
-        .and(p1[:id].lt(p2[:id]))
+      sql = sql.where(ref: ref) if ref
 
-      cond = cond.and(p1[:ref].eq(p2[:ref])) if ref
-      join = p1.join(p2, Arel::Nodes::OuterJoin).on(cond)
-
-      relation = where(sha: commits)
-        .where(p2[:id].eq(nil))
-        .joins(join.join_sources)
-
-      relation = relation.where(ref: ref) if ref
-
-      relation.each_with_object({}) do |pipeline, hash|
+      sql.each_with_object({}) do |pipeline, hash|
         hash[pipeline.sha] = pipeline
       end
     end
@@ -443,6 +438,10 @@ module Ci
 
     def self.auto_devops_pipelines_completed_total
       @auto_devops_pipelines_completed_total ||= Gitlab::Metrics.counter(:auto_devops_pipelines_completed_total, 'Number of completed auto devops pipelines')
+    end
+
+    def uses_needs?
+      builds.where(scheduling_type: :dag).any?
     end
 
     def stages_count
@@ -510,6 +509,12 @@ module Ci
       end
     end
 
+    def git_author_full_text
+      strong_memoize(:git_author_full_text) do
+        commit.try(:author_full_text)
+      end
+    end
+
     def git_commit_message
       strong_memoize(:git_commit_message) do
         commit.try(:message)
@@ -573,10 +578,18 @@ module Ci
     end
 
     def cancel_running(retries: nil)
-      retry_optimistic_lock(cancelable_statuses, retries, name: 'ci_pipeline_cancel_running') do |cancelable|
-        cancelable.find_each do |job|
-          yield(job) if block_given?
-          job.cancel
+      commit_status_relations = [:project, :pipeline]
+      ci_build_relations = [:deployment, :taggings]
+
+      retry_optimistic_lock(cancelable_statuses, retries, name: 'ci_pipeline_cancel_running') do |cancelables|
+        cancelables.find_in_batches do |batch|
+          ActiveRecord::Associations::Preloader.new.preload(batch, commit_status_relations)
+          ActiveRecord::Associations::Preloader.new.preload(batch.select { |job| job.is_a?(Ci::Build) }, ci_build_relations)
+
+          batch.each do |job|
+            yield(job) if block_given?
+            job.cancel
+          end
         end
       end
     end
@@ -647,15 +660,9 @@ module Ci
     # Return a hash of file type => array of 1 job artifact
     def latest_report_artifacts
       ::Gitlab::SafeRequestStore.fetch("pipeline:#{self.id}:latest_report_artifacts") do
-        # Note we use read_attribute(:project_id) to read the project
-        # ID instead of self.project_id. The latter appears to load
-        # the Project model. This extra filter doesn't appear to
-        # affect query plan but included to ensure we don't leak the
-        # wrong informaiton.
         ::Ci::JobArtifact.where(
           id: job_artifacts.with_reports
             .select('max(ci_job_artifacts.id) as id')
-            .where(project_id: self.read_attribute(:project_id))
             .group(:file_type)
         )
           .preload(:job)
@@ -664,7 +671,9 @@ module Ci
     end
 
     def has_kubernetes_active?
-      project.deployment_platform&.active?
+      strong_memoize(:has_kubernetes_active) do
+        project.deployment_platform&.active?
+      end
     end
 
     def freeze_period?
@@ -777,6 +786,7 @@ module Ci
       Gitlab::Ci::Variables::Collection.new.tap do |variables|
         variables.append(key: 'CI_PIPELINE_IID', value: iid.to_s)
         variables.append(key: 'CI_PIPELINE_SOURCE', value: source.to_s)
+        variables.append(key: 'CI_PIPELINE_CREATED_AT', value: created_at&.iso8601)
 
         variables.concat(predefined_commit_variables)
 
@@ -821,6 +831,7 @@ module Ci
         variables.append(key: 'CI_COMMIT_DESCRIPTION', value: git_commit_description.to_s)
         variables.append(key: 'CI_COMMIT_REF_PROTECTED', value: (!!protected_ref?).to_s)
         variables.append(key: 'CI_COMMIT_TIMESTAMP', value: git_commit_timestamp.to_s)
+        variables.append(key: 'CI_COMMIT_AUTHOR', value: git_author_full_text.to_s)
 
         # legacy variables
         variables.append(key: 'CI_BUILD_REF', value: sha)
@@ -896,7 +907,7 @@ module Ci
 
     def same_family_pipeline_ids
       ::Gitlab::Ci::PipelineObjectHierarchy.new(
-        self.class.where(id: root_ancestor), options: { same_project: true }
+        self.class.default_scoped.where(id: root_ancestor), options: { same_project: true }
       ).base_and_descendants.select(:id)
     end
 
@@ -909,6 +920,12 @@ module Ci
 
     def builds_in_self_and_descendants
       Ci::Build.latest.where(pipeline: self_and_descendants)
+    end
+
+    def environments_in_self_and_descendants
+      environment_ids = self_and_descendants.joins(:deployments).select(:'deployments.environment_id')
+
+      Environment.where(id: environment_ids)
     end
 
     # Without using `unscoped`, caller scope is also included into the query.
@@ -1081,6 +1098,8 @@ module Ci
           merge_request.modified_paths
         elsif branch_updated?
           push_details.modified_paths
+        elsif external_pull_request? && ::Feature.enabled?(:ci_modified_paths_of_external_prs, project, default_enabled: :yaml)
+          external_pull_request.modified_paths
         end
       end
     end
@@ -1103,6 +1122,10 @@ module Ci
 
     def merge_request?
       merge_request_id.present?
+    end
+
+    def external_pull_request?
+      external_pull_request_id.present?
     end
 
     def detached_merge_request_pipeline?
@@ -1198,11 +1221,18 @@ module Ci
     # We need `base_and_ancestors` in a specific order to "break" when needed.
     # If we use `find_each`, then the order is broken.
     # rubocop:disable Rails/FindEach
-    def reset_ancestor_bridges!
-      base_and_ancestors.includes(:source_bridge).each do |pipeline|
-        break unless pipeline.bridge_waiting?
+    def reset_source_bridge!(current_user)
+      if ::Feature.enabled?(:ci_reset_bridge_with_subsequent_jobs, project, default_enabled: :yaml)
+        return unless bridge_waiting?
 
-        pipeline.source_bridge.pending!
+        source_bridge.pending!
+        Ci::AfterRequeueJobService.new(project, current_user).execute(source_bridge) # rubocop:disable CodeReuse/ServiceClass
+      else
+        base_and_ancestors.includes(:source_bridge).each do |pipeline|
+          break unless pipeline.bridge_waiting?
+
+          pipeline.source_bridge.pending!
+        end
       end
     end
     # rubocop:enable Rails/FindEach
@@ -1222,11 +1252,13 @@ module Ci
       end
     end
 
+    def build_matchers
+      self.builds.build_matchers(project)
+    end
+
     private
 
     def add_message(severity, content)
-      return unless Gitlab::Ci::Features.store_pipeline_messages?(project)
-
       messages.build(severity: severity, content: content)
     end
 
@@ -1282,4 +1314,4 @@ module Ci
   end
 end
 
-Ci::Pipeline.prepend_if_ee('EE::Ci::Pipeline')
+Ci::Pipeline.prepend_mod_with('Ci::Pipeline')

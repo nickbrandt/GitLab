@@ -13,7 +13,7 @@ module EE
       # ::SystemNoteService wants the methods to be available as both class and
       # instance methods. This removes the need for having to both `include` and
       # `extend` this module everywhere it is used.
-      extend_if_ee('EE::SystemNoteService') # rubocop: disable Cop/InjectEnterpriseEditionModule
+      extend_mod_with('SystemNoteService') # rubocop: disable Cop/InjectEnterpriseEditionModule
     end
 
     def epic_issue(epic, issue, user, type)
@@ -119,15 +119,15 @@ module EE
     end
 
     def epics_service(noteable, author)
-      EE::SystemNotes::EpicsService.new(noteable: noteable, author: author)
+      ::SystemNotes::EpicsService.new(noteable: noteable, author: author)
     end
 
     def merge_trains_service(noteable, project, author)
-      EE::SystemNotes::MergeTrainService.new(noteable: noteable, project: project, author: author)
+      ::SystemNotes::MergeTrainService.new(noteable: noteable, project: project, author: author)
     end
 
     def vulnerabilities_service(noteable, project, author)
-      EE::SystemNotes::VulnerabilitiesService.new(noteable: noteable, project: project, author: author)
+      ::SystemNotes::VulnerabilitiesService.new(noteable: noteable, project: project, author: author)
     end
   end
 end

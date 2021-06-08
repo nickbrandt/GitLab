@@ -37,6 +37,12 @@ RSpec.describe Admin::GroupsController do
         post :create, params: { group: {  path: 'test', name: 'test' } }
       end.to change { NamespaceSetting.count }.by(1)
     end
+
+    it 'creates admin_note for group' do
+      expect do
+        post :create, params: { group: {  path: 'test', name: 'test', admin_note_attributes: { note: 'test' } } }
+      end.to change { Namespace::AdminNote.count }.by(1)
+    end
   end
 
   describe 'PUT #members_update' do
@@ -49,7 +55,7 @@ RSpec.describe Admin::GroupsController do
                              access_level: Gitlab::Access::GUEST
                            }
 
-      expect(response).to set_flash.to 'Users were successfully added.'
+      expect(controller).to set_flash.to 'Users were successfully added.'
       expect(response).to redirect_to(admin_group_path(group))
       expect(group.users).to include group_user
     end
@@ -61,7 +67,7 @@ RSpec.describe Admin::GroupsController do
                              access_level: Gitlab::Access::GUEST
                            }
 
-      expect(response).to set_flash.to 'Users were successfully added.'
+      expect(controller).to set_flash.to 'Users were successfully added.'
       expect(response).to redirect_to(admin_group_path(group))
     end
 
@@ -72,7 +78,7 @@ RSpec.describe Admin::GroupsController do
                              access_level: Gitlab::Access::GUEST
                            }
 
-      expect(response).to set_flash.to 'No users specified.'
+      expect(controller).to set_flash.to 'No users specified.'
       expect(response).to redirect_to(admin_group_path(group))
       expect(group.users).not_to include group_user
     end

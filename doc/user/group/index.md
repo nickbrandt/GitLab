@@ -7,21 +7,17 @@ info: To determine the technical writer assigned to the Stage/Group associated w
 
 # Groups **(FREE)**
 
-In GitLab, you can put related projects together in a group.
+In GitLab, you use groups to manage one or more related projects at the same time.
 
-For example, you might create a group for your company members and a subgroup for each individual team.
-You can name the group `company-team`, and the subgroups `backend-team`, `frontend-team`, and `production-team`.
+You can use groups to manage permissions for your projects. If someone has access to
+the group, they get access to all the projects in the group.
 
-Then you can:
+You can also view all of the issues and merge requests for the projects in the group,
+and view analytics that show the group's activity.
 
-- Grant members access to multiple projects at once.
-- Add to-do items for all of the group members at once.
-- View the [issues](../project/issues/index.md#issues-list) and
-  [merge requests](../project/merge_requests/reviewing_and_managing_merge_requests.md#view-merge-requests-for-all-projects-in-a-group)
-  for all projects in the group, together in a single list view.
-- [Bulk edit](../group/bulk_editing/index.md) issues, epics, and merge requests.
+You can use groups to communicate with all of the members of the group at once.
 
-You can also create [subgroups](subgroups/index.md).
+For larger organizations, you can also create [subgroups](subgroups/index.md).
 
 ## View groups
 
@@ -55,6 +51,7 @@ To create a group:
 1. From the top menu, either:
    - Select **Groups > Your Groups**, and on the right, select the **New group** button.
    - To the left of the search box, select the plus sign and then **New group**.
+1. Select **Create group**.
 1. For the **Group name**, use only:
    - Alphanumeric characters
    - Emojis
@@ -82,7 +79,7 @@ You can give a user access to all projects in a group.
 1. Find your group and select it.
 1. From the left sidebar, select **Members**.
 1. Fill in the fields.
-   - The role applies to all projects in the group. [Learn more about permissions](../permissions.md#permissions).
+   - The role applies to all projects in the group. [Learn more about permissions](../permissions.md).
    - On the **Access expiration date**, the user can no longer access projects in the group.
 
 ## Request access to a group
@@ -114,22 +111,22 @@ your group.
 ## Change the owner of a group
 
 You can change the owner of a group. Each group must always have at least one
-member with [Owner permission](../permissions.md#group-members-permissions).
+member with the [Owner role](../permissions.md#group-members-permissions).
 
 - As an administrator:
   1. Go to the group and from the left menu, select **Members**.
-  1. Give a different member **Owner** permissions.
-  1. Refresh the page. You can now remove **Owner** permissions from the original owner.
+  1. Give a different member the **Owner** role.
+  1. Refresh the page. You can now remove the **Owner** role from the original owner.
 - As the current group's owner:
   1. Go to the group and from the left menu, select **Members**.
-  1. Give a different member **Owner** permissions.
-  1. Have the new owner sign in and remove **Owner** permissions from you.
+  1. Give a different member the **Owner** role.
+  1. Have the new owner sign in and remove the **Owner** role from you.
 
 ## Remove a member from the group
 
 Prerequisites:
 
-- You must have [Owner permissions](../permissions.md#group-members-permissions).
+- You must have the [Owner role](../permissions.md#group-members-permissions).
 - The member must have direct membership in the group. If
   membership is inherited from a parent group, then the member can be removed
   from the parent group only.
@@ -140,7 +137,7 @@ To remove a member from a group:
 1. From the left menu, select **Members**.
 1. Next to the member you want to remove, select **Delete**.
 1. Optional. On the **Remove member** confirmation box, select the
-  **Also unassign this user from related issues and merge requests** checkbox.
+  **Also unassign this user from linked issues and merge requests** checkbox.
 1. Select **Remove member**.
 
 ## Filter and sort members in a group
@@ -220,9 +217,8 @@ There are two different ways to add a new project to a group:
 
 ### Specify who can add projects to a group
 
-> - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/2534) in [GitLab Premium](https://about.gitlab.com/pricing/) 10.5.
-> - Brought to [GitLab Starter](https://about.gitlab.com/pricing/) in 10.7.
-> - [Moved](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/25975) to [GitLab Free](https://about.gitlab.com/pricing/) in 11.10.
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/2534) in GitLab Premium 10.5.
+> - [Moved](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/25975) to GitLab Free in 11.10.
 
 By default, [Developers and Maintainers](../permissions.md#group-members-permissions) can create projects under a group.
 
@@ -237,12 +233,12 @@ To change this setting globally, see [Default project creation protection](../ad
 
 ## Group activity analytics **(PREMIUM)**
 
-> - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/207164) in GitLab [Starter](https://about.gitlab.com/pricing/) 12.10 as
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/207164) in GitLab 12.10 as
 a [beta feature](https://about.gitlab.com/handbook/product/#beta).
 
 For a group, you can view how many merge requests, issues, and members were created in the last 90 days.
 
-These Group Activity Analytics can be enabled with the `group_activity_analytics` [feature flag](../../development/feature_flags/development.md#enabling-a-feature-flag-locally-in-development).
+These Group Activity Analytics can be enabled with the `group_activity_analytics` [feature flag](../../development/feature_flags/index.md#enabling-a-feature-flag-locally-in-development).
 
 ![Recent Group Activity](img/group_activity_analytics_v13_10.png)
 
@@ -261,9 +257,12 @@ To view the activity feed in Atom format, select the
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/18328) in GitLab 12.7.
 
+NOTE:
+In GitLab 13.11, you can [replace this form with a modal window](#share-a-group-modal-window).
+
 Similar to how you [share a project with a group](../project/members/share_project_with_groups.md),
 you can share a group with another group. Members get direct access
-to the shared group. This is not valid for inherited members.
+to the shared group. This includes members who inherited group membership from a parent group.
 
 To share a given group, for example, `Frontend` with another group, for example,
 `Engineering`:
@@ -276,6 +275,27 @@ To share a given group, for example, `Frontend` with another group, for example,
 1. Select **Invite**.
 
 All the members of the `Engineering` group are added to the `Frontend` group.
+
+### Share a group modal window
+
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/247208) in GitLab 13.11.
+> - [Deployed behind a feature flag](../feature_flags.md), disabled by default.
+> - Enabled on GitLab.com.
+> - Recommended for production use.
+> - Replaces the existing form with buttons to open a modal window.
+> - To use in GitLab self-managed instances, ask a GitLab administrator to [enable it](../project/members/index.md#enable-or-disable-modal-window). **(FREE SELF)**
+
+WARNING:
+This feature might not be available to you. Check the **version history** note above for details.
+
+In GitLab 13.11, you can optionally replace the sharing form with a modal window.
+To share a group after enabling this feature:
+
+1. Go to your group's page.
+1. In the left sidebar, go to **Members**, and then select **Invite a group**.
+1. Select a group, and select a **Max access level**.
+1. (Optional) Select an **Access expiration date**.
+1. Select **Invite**.
 
 ## Manage group memberships via LDAP **(PREMIUM SELF)**
 
@@ -322,25 +342,6 @@ LDAP user permissions can be manually overridden by an administrator. To overrid
 
 Now you can edit the user's permissions from the **Members** page.
 
-## Group wikis **(PREMIUM)**
-
-> - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/13195) in [GitLab Premium](https://about.gitlab.com/pricing/) 13.5.
-
-Group wikis work the same way as [project wikis](../project/wiki/index.md).
-
-Group wikis can be edited by members with [Developer permissions](../../user/permissions.md#group-members-permissions)
-and above.
-
-You can move group wiki repositories by using the [Group repository storage moves API](../../api/group_repository_storage_moves.md).
-
-There are a few limitations compared to project wikis:
-
-- Git LFS is not supported.
-- Group wikis are not included in global search and Geo replication.
-- Changes to group wikis don't show up in the group's activity feed.
-
-For updates, follow [the epic that tracks feature parity with project wikis](https://gitlab.com/groups/gitlab-org/-/epics/2782).
-
 ## Transfer a group
 
 You can transfer groups in the following ways:
@@ -351,7 +352,7 @@ You can transfer groups in the following ways:
 
 When transferring groups, note:
 
-- Changing a group's parent can have unintended side effects. See [Redirects when changing repository paths](../project/repository/index.md#redirects-when-changing-repository-paths).
+- Changing a group's parent can have unintended side effects. See [what happens when a repository path changes](../project/repository/index.md#what-happens-when-a-repository-path-changes).
 - You can only transfer groups to groups you manage.
 - You must update your local repositories to point to the new location.
 - If the immediate parent group's visibility is lower than the group's current visibility, visibility levels for subgroups and projects change to match the new parent group's visibility.
@@ -361,7 +362,7 @@ When transferring groups, note:
 ## Change a group's path
 
 Changing a group's path (group URL) can have unintended side effects. Read
-[how redirects behave](../project/repository/index.md#redirects-when-changing-repository-paths)
+[how redirects behave](../project/repository/index.md#what-happens-when-a-repository-path-changes)
 before you proceed.
 
 If you are changing the path so it can be claimed by another group or user,
@@ -387,16 +388,10 @@ because the project cannot be moved.
 
 > - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/43290) in GitLab 13.6.
 
-By default, when you create a new project in GitLab, the initial branch is called `master`.
-For groups, a group owner can customize the initial branch name to something
-else. This way, every new project created under that group from then on starts from the custom branch name rather than `master`.
-
-To use a custom name for the initial branch:
-
-1. Go to the group's **Settings > Repository** page.
-1. Expand the **Default initial branch name** section.
-1. Change the default initial branch to a custom name of your choice.
-1. Select **Save changes**.
+When you create a new project in GitLab, a default branch is created with the
+first push. The group owner can
+[customize the initial branch](../project/repository/branches/default.md#group-level-custom-initial-branch-name)
+for the group's projects to meet your group's needs.
 
 ## Remove a group
 
@@ -430,30 +425,26 @@ To restore a group that is marked for deletion:
 Prevent projects in a group from [sharing
 a project with another group](../project/members/share_project_with_groups.md) to enable tighter control over project access.
 
-For example, let's say you have two distinct teams (Group A and Group B) working together in a project, and to inherit the group membership, you share the project between the
-two groups A and B. **Share with group lock** prevents any project in
-the group from being shared with another group,
-guaranteeing that only the right group members have access to those projects.
-
-To prevent a project from being shared with groups:
+To prevent a project from being shared with other groups:
 
 1. Go to the group's **Settings > General** page.
-1. Select **Share with group lock**.
-1. Select **Save the group**.
+1. Expand the **Permissions, LFS, 2FA** section.
+1. Select **Prevent sharing a project within `<group_name>` with other groups**.
+1. Select **Save changes**.
 
 ## Prevent members from being added to a group **(PREMIUM)**
 
-Member lock lets a group owner prevent any new project membership to all of the
+As a group owner, you can prevent any new project membership for all
 projects in a group, allowing tighter control over project membership.
 
 For example, if you want to lock the group for an [Audit Event](../../administration/audit_events.md),
-enable member lock to guarantee that project membership cannot be modified during the audit.
+you can guarantee that project membership cannot be modified during the audit.
 
 To prevent members from being added to a group:
 
 1. Go to the group's **Settings > General** page.
 1. Expand the **Permissions, LFS, 2FA** section.
-1. Select **Member lock**.
+1. Under **Member lock**, select **Prevent adding new members to project membership within this group**.
 1. Select **Save changes**.
 
 All users who previously had permissions can no longer add members to a group.
@@ -464,38 +455,36 @@ API requests to add a new user to a project are not possible.
 > - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/1985) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 12.0.
 > - [Moved](https://gitlab.com/gitlab-org/gitlab/-/issues/215410) to [GitLab Premium](https://about.gitlab.com/pricing/) in 13.1.
 
-NOTE:
-IP access restrictions are not functioning as expected on GitLab.com. If enabled,
-users cannot perform Git operations through SSH, or access projects in the UI.
-For more information, [see this issue](https://gitlab.com/gitlab-org/gitlab/-/issues/271673).
-
 To ensure only people from your organization can access particular
-resources, you can restrict access to groups and their
-underlying subgroups, projects, issues, and so on, by IP address. This can help ensure that
-particular content doesn't leave the premises, while not blocking off access to
-the entire instance. IP access restrictions can only be configured at the group level.
+resources, you can restrict access to groups by IP address. This group-level setting
+applies to:
 
-Add one or more allowed IP subnets using CIDR notation to the group settings and anyone
-coming from a different IP address won't be able to access the restricted
-content.
+- The GitLab UI, including subgroups, projects, and issues.
+- [In GitLab 12.3 and later](https://gitlab.com/gitlab-org/gitlab/-/issues/12874), the API.
 
-Restriction currently applies to:
+You should consider these security implications before configuring IP address restrictions:
 
-- UI.
-- [From GitLab 12.3](https://gitlab.com/gitlab-org/gitlab/-/issues/12874), API access.
-- [From GitLab 12.4](https://gitlab.com/gitlab-org/gitlab/-/issues/32113), Git actions via SSH.
-
-To avoid accidental lock-out, admins and group owners are able to access
-the group regardless of the IP restriction.
+- **SSH requests**: While you can restrict HTTP traffic on GitLab.com with IP address restrictions,
+  they cause SSH requests, including Git operations over SSH, to fail. For more information,
+  read [issue 271673](https://gitlab.com/gitlab-org/gitlab/-/issues/271673).
+- **Administrators and group owners**: Users with these permission levels can always
+  access the group settings, regardless of IP restriction, but they cannot access projects
+  belonging to the group when accessing from a disallowed IP address.
+- **GitLab API and runner activities**: Only the [Groups](../../api/groups.md)
+  and [Projects](../../api/projects.md) APIs are protected by IP address restrictions.
+  When you register a runner, it is not bound by the IP restrictions. When the runner
+  requests a new job or an update to a job's state, it is also not bound by
+  the IP restrictions. But when the running CI/CD job sends Git requests from a
+  restricted IP address, the IP restriction prevents code from being cloned.
 
 To restrict group access by IP address:
 
-1. Go to the group’s **Settings > General** page.
+1. Go to the group's **Settings > General** page.
 1. Expand the **Permissions, LFS, 2FA** section.
-1. In the **Allow access to the following IP addresses** field, enter IP address ranges.
+1. In the **Allow access to the following IP addresses** field, enter IP address ranges in CIDR notation.
 1. Select **Save changes**.
 
-![Domain restriction by IP address](img/restrict-by-ip.gif)
+   ![Domain restriction by IP address](img/restrict-by-ip.gif)
 
 ## Restrict group access by domain **(PREMIUM)**
 
@@ -540,20 +529,20 @@ You can configure this feature for both subgroups and immediate parent groups. A
 in a subgroup has access to the templates for that subgroup, as well as
 any immediate parent groups.
 
-To enable group file templates:
-
-1. Go to the group settings page.
-1. Expand the **Templates** section.
-1. Choose a project to act as the template repository.
-1. Select **Save group**.
-
 To learn how to create templates for issues and merge requests, see
 [Description templates](../project/description_templates.md).
 
-### Group-level project templates **(PREMIUM)**
-
 Define project templates at a group level by setting a group as the template source.
-[Learn more about group-level project templates](custom_project_templates.md).
+[Learn more about group-level project templates](custom_project_templates.md). **(PREMIUM)**
+
+### Enable group file template **(PREMIUM)**
+
+To enable group file templates:
+
+1. Go to the group's **Settings > General** page.
+1. Expand the **Templates** section.
+1. Choose a project to act as the template repository.
+1. Select **Save changes**.
 
 ## Disable email notifications
 
@@ -588,7 +577,8 @@ To disable group mentions:
 
 ## Enable delayed project removal **(PREMIUM)**
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/220382) in GitLab 13.2.
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/220382) in GitLab 13.2.
+> - [Inheritance and enforcement added](https://gitlab.com/gitlab-org/gitlab/-/issues/321724) in GitLab 13.11.
 
 By default, projects in a group are deleted immediately.
 Optionally, on [Premium](https://about.gitlab.com/pricing/) or higher tiers,
@@ -602,10 +592,11 @@ To enable delayed deletion of projects:
 1. Go to the group's **Settings > General** page.
 1. Expand the **Permissions, LFS, 2FA** section.
 1. Check **Enable delayed project removal**.
+1. Optional. To prevent subgroups from changing this setting, select **Enforce for all subgroups**.
 1. Select **Save changes**.
 
 NOTE:
-The group setting for delayed deletion is not inherited by subgroups and has to be individually defined for each group.
+In GitLab 13.11 and above the group setting for delayed project removal is inherited by subgroups. As discussed in [Cascading settings](../../development/cascading_settings.md) inheritance can be overridden, unless enforced by an ancestor.
 
 ## Prevent project forking outside group **(PREMIUM)**
 
@@ -616,7 +607,8 @@ Optionally, on [Premium](https://about.gitlab.com/pricing/) or higher tiers,
 you can prevent the projects in a group from being forked outside of the current top-level group.
 
 Previously this setting was available only for groups enforcing group managed account. This setting will be
-removed from SAML setting page and migrated to group setting, but in the interim period of changes both of those settings will be taken into consideration, if even one is set to `true` then it will be assumed group does not allow forking projects outside.
+removed from SAML setting page and migrated to group settings. In the interim period, both of these settings are taken into consideration.
+If even one is set to `true` then it will be assumed the group does not allow forking projects outside.
 
 To enable prevent project forking:
 
@@ -627,7 +619,7 @@ To enable prevent project forking:
 
 ## Group push rules **(PREMIUM)**
 
-> - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/34370) in [GitLab Starter](https://about.gitlab.com/pricing/) 12.8.
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/34370) in GitLab 12.8.
 > - [Feature flag removed](https://gitlab.com/gitlab-org/gitlab/-/issues/224129) in GitLab 13.4.
 
 Group push rules allow group maintainers to set
@@ -646,16 +638,13 @@ The group's new subgroups have push rules set for them based on either:
 
 ## Related topics
 
+- [Group wikis](../project/wiki/index.md)
 - [Maximum artifacts size](../admin_area/settings/continuous_integration.md#maximum-artifacts-size). **(FREE SELF)**
-- [Repositories analytics](repositories_analytics/index.md): View overall activity of all projects with code coverage.
-  [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/263478) in GitLab 13.6. **(PREMIUM)**
+- [Repositories analytics](repositories_analytics/index.md): View overall activity of all projects with code coverage. **(PREMIUM)**
 - [Contribution analytics](contribution_analytics/index.md): View the contributions (pushes, merge requests,
   and issues) of group members. **(PREMIUM)**
 - [Issue analytics](issues_analytics/index.md): View a bar chart of your group's number of issues per month. **(PREMIUM)**
 - Use GitLab as a [dependency proxy](../packages/dependency_proxy/index.md) for upstream Docker images.
-- [DORA4 Project Analytics API](../../api/dora4_group_analytics.md): View deployment frequency analytics.
-  [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/291747) in GitLab Ultimate 13.9 as a
-  [Beta feature](https://about.gitlab.com/handbook/product/gitlab-the-product/#beta). **(ULTIMATE SELF)**
 - [Epics](epics/index.md): Track groups of issues that share a theme. **(ULTIMATE)**
 - [Security Dashboard](../application_security/security_dashboard/index.md): View the vulnerabilities of all
   the projects in a group and its subgroups. **(ULTIMATE)**
@@ -671,3 +660,15 @@ The group's new subgroups have push rules set for them based on either:
 - [Lock the sharing with group feature](#prevent-a-project-from-being-shared-with-groups).
 - [Enforce two-factor authentication (2FA)](../../security/two_factor_authentication.md#enforcing-2fa-for-all-users-in-a-group): Enforce 2FA
   for all group members.
+
+## Troubleshooting
+
+### Verify if access is blocked by IP restriction
+
+If a user sees a 404 when they would normally expect access, and the problem is limited to a specific group, search the `auth.log` rails log for one or more of the following:
+
+- `json.message`: `'Attempting to access IP restricted group'`
+- `json.allowed`: `false`
+
+In viewing the log entries, compare the `remote.ip` with the list of
+[allowed IPs](#restrict-group-access-by-ip-address) for the group.

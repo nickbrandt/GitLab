@@ -3,6 +3,8 @@
 require 'spec_helper'
 
 RSpec.describe BulkImports::Pipeline do
+  let(:context) { instance_double(BulkImports::Pipeline::Context, tracker: nil) }
+
   before do
     stub_const('BulkImports::Extractor', Class.new)
     stub_const('BulkImports::Transformer', Class.new)
@@ -44,7 +46,7 @@ RSpec.describe BulkImports::Pipeline do
         end
 
         it 'returns itself when retrieving extractor & loader' do
-          pipeline = BulkImports::AnotherPipeline.new(nil)
+          pipeline = BulkImports::AnotherPipeline.new(context)
 
           expect(pipeline.send(:extractor)).to eq(pipeline)
           expect(pipeline.send(:loader)).to eq(pipeline)
@@ -61,6 +63,7 @@ RSpec.describe BulkImports::Pipeline do
         BulkImports::MyPipeline.transformer(klass, options)
         BulkImports::MyPipeline.loader(klass, options)
         BulkImports::MyPipeline.abort_on_failure!
+        BulkImports::MyPipeline.ndjson_pipeline!
 
         expect(BulkImports::MyPipeline.get_extractor).to eq({ klass: klass, options: options })
 
@@ -72,6 +75,7 @@ RSpec.describe BulkImports::Pipeline do
         expect(BulkImports::MyPipeline.get_loader).to eq({ klass: klass, options: options })
 
         expect(BulkImports::MyPipeline.abort_on_failure?).to eq(true)
+        expect(BulkImports::MyPipeline.ndjson_pipeline?).to eq(true)
       end
     end
   end
@@ -83,7 +87,7 @@ RSpec.describe BulkImports::Pipeline do
         expect(BulkImports::Transformer).to receive(:new).with(foo: :bar)
         expect(BulkImports::Loader).to receive(:new).with(foo: :bar)
 
-        pipeline = BulkImports::MyPipeline.new(nil)
+        pipeline = BulkImports::MyPipeline.new(context)
 
         pipeline.send(:extractor)
         pipeline.send(:transformers)
@@ -109,7 +113,7 @@ RSpec.describe BulkImports::Pipeline do
         expect(BulkImports::Transformer).to receive(:new).with(no_args)
         expect(BulkImports::Loader).to receive(:new).with(no_args)
 
-        pipeline = BulkImports::NoOptionsPipeline.new(nil)
+        pipeline = BulkImports::NoOptionsPipeline.new(context)
 
         pipeline.send(:extractor)
         pipeline.send(:transformers)
@@ -135,7 +139,7 @@ RSpec.describe BulkImports::Pipeline do
       transformer = double
       allow(BulkImports::Transformer).to receive(:new).and_return(transformer)
 
-      pipeline = BulkImports::TransformersPipeline.new(nil)
+      pipeline = BulkImports::TransformersPipeline.new(context)
 
       expect(pipeline.send(:transformers)).to eq([pipeline, transformer])
     end

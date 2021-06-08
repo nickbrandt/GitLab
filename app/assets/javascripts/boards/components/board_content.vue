@@ -3,10 +3,9 @@ import { GlAlert } from '@gitlab/ui';
 import { sortBy } from 'lodash';
 import Draggable from 'vuedraggable';
 import { mapState, mapGetters, mapActions } from 'vuex';
-import { sortableEnd, sortableStart } from '~/boards/mixins/sortable_default_options';
+import BoardAddNewColumn from 'ee_else_ce/boards/components/board_add_new_column.vue';
 import defaultSortableConfig from '~/sortable/sortable_config';
 import glFeatureFlagMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
-import BoardAddNewColumn from './board_add_new_column.vue';
 import BoardColumn from './board_column.vue';
 import BoardColumnDeprecated from './board_column_deprecated.vue';
 
@@ -17,20 +16,19 @@ export default {
       gon.features?.graphqlBoardLists || gon.features?.epicBoards
         ? BoardColumn
         : BoardColumnDeprecated,
-    BoardContentSidebar: () => import('ee_component/boards/components/board_content_sidebar.vue'),
+    BoardContentSidebar: () => import('~/boards/components/board_content_sidebar.vue'),
+    EpicBoardContentSidebar: () =>
+      import('ee_component/boards/components/epic_board_content_sidebar.vue'),
     EpicsSwimlanes: () => import('ee_component/boards/components/epics_swimlanes.vue'),
     GlAlert,
   },
   mixins: [glFeatureFlagMixin()],
+  inject: ['canAdminList'],
   props: {
     lists: {
       type: Array,
       required: false,
       default: () => [],
-    },
-    canAdminList: {
-      type: Boolean,
-      required: true,
     },
     disabled: {
       type: Boolean,
@@ -49,7 +47,7 @@ export default {
         : this.lists;
     },
     canDragColumns() {
-      return this.glFeatures.graphqlBoardLists && this.canAdminList;
+      return (this.isEpicBoard || this.glFeatures.graphqlBoardLists) && this.canAdminList;
     },
     boardColumnWrapper() {
       return this.canDragColumns ? Draggable : 'div';
@@ -69,18 +67,12 @@ export default {
     },
   },
   methods: {
-    ...mapActions(['moveList']),
+    ...mapActions(['moveList', 'unsetError']),
     afterFormEnters() {
       const el = this.canDragColumns ? this.$refs.list.$el : this.$refs.list;
       el.scrollTo({ left: el.scrollWidth, behavior: 'smooth' });
     },
-    handleDragOnStart() {
-      sortableStart();
-    },
-
     handleDragOnEnd(params) {
-      sortableEnd();
-
       const { item, newIndex, oldIndex, to } = params;
 
       const listId = item.dataset.id;
@@ -98,8 +90,8 @@ export default {
 </script>
 
 <template>
-  <div>
-    <gl-alert v-if="error" variant="danger" :dismissible="false">
+  <div v-cloak data-qa-selector="boards_list">
+    <gl-alert v-if="error" variant="danger" :dismissible="true" @dismiss="unsetError">
       {{ error }}
     </gl-alert>
     <component
@@ -108,7 +100,6 @@ export default {
       ref="list"
       v-bind="draggableOptions"
       class="boards-list gl-w-full gl-py-5 gl-px-3 gl-white-space-nowrap"
-      @start="handleDragOnStart"
       @end="handleDragOnEnd"
     >
       <board-column
@@ -126,13 +117,23 @@ export default {
     </component>
 
     <epics-swimlanes
-      v-else
+      v-else-if="boardListsToUse.length"
       ref="swimlanes"
       :lists="boardListsToUse"
       :can-admin-list="canAdminList"
       :disabled="disabled"
     />
 
-    <board-content-sidebar v-if="isSwimlanesOn || glFeatures.graphqlBoardLists" />
+    <board-content-sidebar
+      v-if="isSwimlanesOn || glFeatures.graphqlBoardLists"
+      class="boards-sidebar"
+      data-testid="issue-boards-sidebar"
+    />
+
+    <epic-board-content-sidebar
+      v-else-if="isEpicBoard"
+      class="boards-sidebar"
+      data-testid="epic-boards-sidebar"
+    />
   </div>
 </template>

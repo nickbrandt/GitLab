@@ -2,9 +2,9 @@
 
 import $ from 'jquery';
 import initPopover from '~/blob/suggest_gitlab_ci_yml';
-import { deprecatedCreateFlash as createFlash } from '~/flash';
+import initCodeQualityWalkthrough from '~/code_quality_walkthrough';
+import createFlash from '~/flash';
 import { disableButtonIfEmptyField, setCookie } from '~/lib/utils/common_utils';
-import { initUploadFileTrigger } from '~/projects/upload_file_experiment';
 import Tracking from '~/tracking';
 import BlobFileDropzone from '../blob/blob_file_dropzone';
 import NewCommitForm from '../new_commit_form';
@@ -39,6 +39,13 @@ const initPopovers = () => {
   }
 };
 
+const initCodeQualityWalkthroughStep = () => {
+  const codeQualityWalkthroughEl = document.querySelector('.js-code-quality-walkthrough');
+  if (codeQualityWalkthroughEl) {
+    initCodeQualityWalkthrough(codeQualityWalkthroughEl);
+  }
+};
+
 export const initUploadForm = () => {
   const uploadBlobForm = $('.js-upload-blob-form');
   if (uploadBlobForm.length) {
@@ -48,7 +55,6 @@ export const initUploadForm = () => {
     new NewCommitForm(uploadBlobForm);
 
     disableButtonIfEmptyField(uploadBlobForm.find('.js-commit-message'), '.btn-upload-file');
-    initUploadFileTrigger();
   }
 };
 
@@ -76,8 +82,13 @@ export default () => {
           isMarkdown,
         });
         initPopovers();
+        initCodeQualityWalkthroughStep();
       })
-      .catch((e) => createFlash(e));
+      .catch((e) =>
+        createFlash({
+          message: e,
+        }),
+      );
 
     cancelLink.on('click', () => {
       window.onbeforeunload = null;

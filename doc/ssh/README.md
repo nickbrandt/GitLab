@@ -23,9 +23,6 @@ To use SSH to communicate with GitLab, you need:
 
 To view the version of SSH installed on your system, run `ssh -V`.
 
-GitLab does [not support installation on Microsoft Windows](../install/requirements.md#microsoft-windows),
-but you can set up SSH keys on the Windows [client](#use-ssh-on-microsoft-windows).
-
 ## Supported SSH key types
 
 To communicate with GitLab, you can use the following SSH key types:
@@ -58,8 +55,10 @@ Review the `man` page for your installed `ssh-keygen` command for details.
 
 Before you create a key pair, see if a key pair already exists.
 
-1. On Linux or macOS, go to your home directory.
-1. Go to the `.ssh/` subdirectory.
+1. On Windows, Linux, or macOS, go to your home directory.
+1. Go to the `.ssh/` subdirectory. If the `.ssh/` subdirectory doesn't exist,
+   you are either not in the home directory, or you haven't used `ssh` before.
+   In the latter case, you need to [generate an SSH key pair](#generate-an-ssh-key-pair).
 1. See if a file with one of the following formats exists:
 
    | Algorithm | Public key | Private key |
@@ -207,7 +206,7 @@ To use SSH with GitLab, copy your public key to your GitLab account.
 
 1. Sign in to GitLab.
 1. In the top right corner, select your avatar.
-1. Select **Settings**.
+1. Select **Preferences**.
 1. From the left sidebar, select **SSH Keys**.
 1. In the **Key** box, paste the contents of your public key.
    If you manually copied the key, make sure you copy the entire key,
@@ -218,6 +217,8 @@ To use SSH with GitLab, copy your public key to your GitLab account.
    The expiration date is informational only, and does not prevent you from using
    the key. However, administrators can view expiration dates and
    use them for guidance when [deleting keys](../user/admin_area/credentials_inventory.md#delete-a-users-ssh-key).
+   - GitLab checks all SSH keys at 02:00 AM UTC every day. It emails an expiration notice for all SSH keys that expire on the current date. ([Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/322637) in GitLab 13.11.)
+   - GitLab checks all SSH keys at 01:00 AM UTC every day. It emails an expiration notice for all SSH keys that are scheduled to expire seven days from now. ([Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/322637) in GitLab 13.11.)
 1. Select **Add key**.
 
 ## Verify that you can connect
@@ -322,12 +323,18 @@ If you are using [EGit](https://www.eclipse.org/egit/), you can [add your SSH ke
 
 ## Use SSH on Microsoft Windows
 
-If you're running Windows 10, you can use the [Windows Subsystem for Linux (WSL)](https://docs.microsoft.com/en-us/windows/wsl/install-win10)
-with [WSL 2](https://docs.microsoft.com/en-us/windows/wsl/install-win10#update-to-wsl-2).
-You can use WSL to install Linux distributions, which include the Git and SSH clients.
+If you're running Windows 10, you can either use the [Windows Subsystem for Linux (WSL)](https://docs.microsoft.com/en-us/windows/wsl/install-win10)
+with [WSL 2](https://docs.microsoft.com/en-us/windows/wsl/install-win10#update-to-wsl-2) which
+has both `git` and `ssh` preinstalled, or install [Git for Windows](https://gitforwindows.org) to
+use SSH through Powershell.
 
-For other versions of Windows, you can install the Git and SSH clients by using
-[Git for Windows](https://gitforwindows.org).
+The SSH key generated in WSL is not directly available for Git for Windows, and vice versa,
+as both have a different home directory:
+
+- WSL: `/home/<user>`
+- Git for Windows: `C:\Users\<user>`
+
+You can either copy over the `.ssh/` directory to use the same key, or generate a key in each environment.
 
 Alternative tools include:
 
@@ -359,7 +366,7 @@ Git user has default SSH configuration? ... no
   sudo mv /var/lib/git/.ssh/id_rsa ~/gitlab-check-backup-1504540051
   sudo mv /var/lib/git/.ssh/id_rsa.pub ~/gitlab-check-backup-1504540051
   For more information see:
-  doc/ssh/README.md in section "SSH on the GitLab server"
+  [Overriding SSH settings on the GitLab server](#overriding-ssh-settings-on-the-gitlab-server)
   Please fix the error above and rerun the checks.
 ```
 

@@ -15,8 +15,7 @@ module Gitlab
       :rails_runner,
       :rake,
       :sidekiq,
-      :test_suite,
-      :unicorn
+      :test_suite
     ].freeze
 
     class << self
@@ -26,23 +25,14 @@ module Gitlab
         if matches.one?
           matches.first
         elsif matches.none?
-          raise UnknownProcessError.new(
-            "Failed to identify runtime for process #{Process.pid} (#{$0})"
-          )
+          raise UnknownProcessError, "Failed to identify runtime for process #{Process.pid} (#{$0})"
         else
-          raise AmbiguousProcessError.new(
-            "Ambiguous runtime #{matches} for process #{Process.pid} (#{$0})"
-          )
+          raise AmbiguousProcessError, "Ambiguous runtime #{matches} for process #{Process.pid} (#{$0})"
         end
       end
 
       def puma?
         !!defined?(::Puma)
-      end
-
-      # For unicorn, we need to check for actual server instances to avoid false positives.
-      def unicorn?
-        !!(defined?(::Unicorn) && defined?(::Unicorn::HttpServer))
       end
 
       def sidekiq?
@@ -70,7 +60,7 @@ module Gitlab
       end
 
       def web_server?
-        puma? || unicorn?
+        puma?
       end
 
       def action_cable?
@@ -91,7 +81,7 @@ module Gitlab
       def max_threads
         threads = 1 # main thread
 
-        if puma?
+        if puma? && Puma.respond_to?(:cli_config)
           threads += Puma.cli_config.options[:max_threads]
         elsif sidekiq?
           # An extra thread for the poller in Sidekiq Cron:

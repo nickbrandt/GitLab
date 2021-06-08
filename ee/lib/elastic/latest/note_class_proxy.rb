@@ -13,7 +13,7 @@ module Elastic
         options[:in] = ['note']
         query_hash = basic_query_hash(%w[note], query, count_only: options[:count_only])
 
-        options[:no_join_project] = Elastic::DataMigrationService.migration_has_finished?(:add_permissions_data_to_notes_documents)
+        options[:no_join_project] = true
         context.name(:note) do
           query_hash = context.name(:authorized) { project_ids_filter(query_hash, options) }
           query_hash = context.name(:confidentiality) { confidentiality_filter(query_hash, options) }
@@ -23,6 +23,12 @@ module Elastic
 
         search(query_hash, options)
       end
+
+      # rubocop: disable CodeReuse/ActiveRecord
+      def preload_indexing_data(relation)
+        relation.includes(noteable: :assignees, project: [:project_feature, :route])
+      end
+      # rubocop: enable CodeReuse/ActiveRecord
 
       private
 

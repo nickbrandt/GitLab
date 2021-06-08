@@ -93,10 +93,6 @@ class ProjectPresenter < Gitlab::View::Presenter::Delegated
     filename_path(repository.license_blob&.name)
   end
 
-  def ci_configuration_path
-    filename_path(repository.gitlab_ci_yml&.name)
-  end
-
   def contribution_guide_path
     if project && contribution_guide = repository.contribution_guide
       project_blob_path(
@@ -112,7 +108,7 @@ class ProjectPresenter < Gitlab::View::Presenter::Delegated
   end
 
   def add_license_ide_path
-    ide_edit_path(project, default_branch_or_master, 'LICENSE')
+    ide_edit_path(project, default_branch_or_main, 'LICENSE')
   end
 
   def add_changelog_path
@@ -120,7 +116,7 @@ class ProjectPresenter < Gitlab::View::Presenter::Delegated
   end
 
   def add_changelog_ide_path
-    ide_edit_path(project, default_branch_or_master, 'CHANGELOG')
+    ide_edit_path(project, default_branch_or_main, 'CHANGELOG')
   end
 
   def add_contribution_guide_path
@@ -128,11 +124,7 @@ class ProjectPresenter < Gitlab::View::Presenter::Delegated
   end
 
   def add_contribution_guide_ide_path
-    ide_edit_path(project, default_branch_or_master, 'CONTRIBUTING.md')
-  end
-
-  def add_ci_yml_path
-    add_special_file_path(file_name: ci_config_path_or_default)
+    ide_edit_path(project, default_branch_or_main, 'CONTRIBUTING.md')
   end
 
   def add_readme_path
@@ -140,7 +132,22 @@ class ProjectPresenter < Gitlab::View::Presenter::Delegated
   end
 
   def add_readme_ide_path
-    ide_edit_path(project, default_branch_or_master, 'README.md')
+    ide_edit_path(project, default_branch_or_main, 'README.md')
+  end
+
+  def add_ci_yml_path
+    add_special_file_path(file_name: ci_config_path_or_default)
+  end
+
+  def add_code_quality_ci_yml_path
+    add_special_file_path(
+      file_name: ci_config_path_or_default,
+      commit_message: s_("CommitMessage|Add %{file_name} and create a code quality job") % { file_name: ci_config_path_or_default },
+      additional_params: {
+        template: 'Code-Quality',
+        code_quality_walkthrough: true
+      }
+    )
   end
 
   def license_short_name
@@ -214,7 +221,7 @@ class ProjectPresenter < Gitlab::View::Presenter::Delegated
                      strong_start: '<strong class="project-stat-value">'.html_safe,
                      strong_end: '</strong>'.html_safe
                    },
-                   empty_repo? ? nil : project_commits_path(project, repository.root_ref))
+                   empty_repo? ? nil : project_commits_path(project, default_branch_or_main))
   end
 
   def branches_anchor_data
@@ -253,8 +260,11 @@ class ProjectPresenter < Gitlab::View::Presenter::Delegated
                          nil,
                          nil,
                          {
-                           'toggle' => 'modal',
-                           'target' => '#modal-upload-blob'
+                           'target_branch' => default_branch_or_main,
+                           'original_branch' => default_branch_or_main,
+                           'can_push_code' => 'true',
+                           'path' => project_create_blob_path(project, default_branch_or_main),
+                           'project_path' => project.path
                          }
                         )
         end
@@ -269,7 +279,7 @@ class ProjectPresenter < Gitlab::View::Presenter::Delegated
 
   def new_file_anchor_data
     if can_current_user_push_to_default_branch?
-      new_file_path = empty_repo? ? ide_edit_path(project, default_branch_or_master) : project_new_blob_path(project, default_branch_or_master)
+      new_file_path = empty_repo? ? ide_edit_path(project, default_branch_or_main) : project_new_blob_path(project, default_branch_or_main)
 
       AnchorData.new(false,
                      statistic_icon + _('New file'),
@@ -381,26 +391,26 @@ class ProjectPresenter < Gitlab::View::Presenter::Delegated
     if cicd_missing?
       AnchorData.new(false,
                      statistic_icon + _('Set up CI/CD'),
-                     add_ci_yml_path)
+                     project_ci_pipeline_editor_path(project))
     elsif repository.gitlab_ci_yml.present?
       AnchorData.new(false,
                      statistic_icon('doc-text') + _('CI/CD configuration'),
-                     ci_configuration_path,
+                     project_ci_pipeline_editor_path(project),
                     'btn-default')
     end
   end
 
   def topics_to_show
-    project.tag_list.take(MAX_TOPICS_TO_SHOW) # rubocop: disable CodeReuse/ActiveRecord
+    project.topic_list.take(MAX_TOPICS_TO_SHOW) # rubocop: disable CodeReuse/ActiveRecord
   end
 
   def topics_not_shown
-    project.tag_list - topics_to_show
+    project.topic_list - topics_to_show
   end
 
   def count_of_extra_topics_not_shown
-    if project.tag_list.count > MAX_TOPICS_TO_SHOW
-      project.tag_list.count - MAX_TOPICS_TO_SHOW
+    if project.topic_list.count > MAX_TOPICS_TO_SHOW
+      project.topic_list.count - MAX_TOPICS_TO_SHOW
     else
       0
     end
@@ -469,16 +479,17 @@ class ProjectPresenter < Gitlab::View::Presenter::Delegated
     end
   end
 
-  def add_special_file_path(file_name:, commit_message: nil, branch_name: nil)
+  def add_special_file_path(file_name:, commit_message: nil, branch_name: nil, additional_params: {})
     commit_message ||= s_("CommitMessage|Add %{file_name}") % { file_name: file_name }
     project_new_blob_path(
       project,
-      default_branch_or_master,
+      default_branch_or_main,
       file_name:      file_name,
       commit_message: commit_message,
-      branch_name:    branch_name
+      branch_name:    branch_name,
+      **additional_params
     )
   end
 end
 
-ProjectPresenter.prepend_if_ee('EE::ProjectPresenter')
+ProjectPresenter.prepend_mod_with('ProjectPresenter')

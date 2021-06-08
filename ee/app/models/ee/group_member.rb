@@ -22,6 +22,7 @@ module EE
       end
 
       scope :reporters, -> { where(access_level: ::Gitlab::Access::REPORTER) }
+      scope :guests, -> { where(access_level: ::Gitlab::Access::GUEST) }
       scope :non_owners, -> { where("members.access_level < ?", ::Gitlab::Access::OWNER) }
       scope :by_user_id, ->(user_id) { where(user_id: user_id) }
     end
@@ -33,7 +34,7 @@ module EE
     end
 
     def group_has_domain_limitations?
-      group.feature_available?(:group_allowed_email_domains) && group_allowed_email_domains.any?
+      group.licensed_feature_available?(:group_allowed_email_domains) && group_allowed_email_domains.any?
     end
 
     def group_domain_limitations

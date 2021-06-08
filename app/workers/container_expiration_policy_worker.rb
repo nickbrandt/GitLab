@@ -2,6 +2,8 @@
 
 class ContainerExpirationPolicyWorker # rubocop:disable Scalability/IdempotentWorker
   include ApplicationWorker
+
+  sidekiq_options retry: 3
   include CronjobQueue
   include ExclusiveLeaseGuard
 
@@ -9,13 +11,20 @@ class ContainerExpirationPolicyWorker # rubocop:disable Scalability/IdempotentWo
 
   InvalidPolicyError = Class.new(StandardError)
 
-  BATCH_SIZE = 1000.freeze
+  BATCH_SIZE = 1000
 
   def perform
+    process_stale_ongoing_cleanups
     throttling_enabled? ? perform_throttled : perform_unthrottled
   end
 
   private
+
+  def process_stale_ongoing_cleanups
+    threshold = delete_tags_service_timeout.seconds + 30.minutes
+    ContainerRepository.with_stale_ongoing_cleanup(threshold.ago)
+                       .update_all(expiration_policy_cleanup_status: :cleanup_unfinished)
+  end
 
   def perform_unthrottled
     with_runnable_policy(preloaded: true) do |policy|
@@ -29,13 +38,15 @@ class ContainerExpirationPolicyWorker # rubocop:disable Scalability/IdempotentWo
 
   def perform_throttled
     try_obtain_lease do
-      with_runnable_policy do |policy|
-        ContainerExpirationPolicy.transaction do
-          policy.schedule_next_run!
-          ContainerRepository.for_project_id(policy.id)
-                             .each_batch do |relation|
-                               relation.update_all(expiration_policy_cleanup_status: :cleanup_scheduled)
-                             end
+      unless loopless_enabled?
+        with_runnable_policy do |policy|
+          ContainerExpirationPolicy.transaction do
+            policy.schedule_next_run!
+            ContainerRepository.for_project_id(policy.id)
+                               .each_batch do |relation|
+                                 relation.update_all(expiration_policy_cleanup_status: :cleanup_scheduled)
+                               end
+          end
         end
       end
 
@@ -75,7 +86,15 @@ class ContainerExpirationPolicyWorker # rubocop:disable Scalability/IdempotentWo
     Feature.enabled?(:container_registry_expiration_policies_throttling)
   end
 
+  def loopless_enabled?
+    Feature.enabled?(:container_registry_expiration_policies_loopless)
+  end
+
   def lease_timeout
     5.hours
+  end
+
+  def delete_tags_service_timeout
+    ::Gitlab::CurrentSettings.current_application_settings.container_registry_delete_tags_service_timeout || 0
   end
 end

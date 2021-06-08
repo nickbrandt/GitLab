@@ -3,7 +3,6 @@ import { mapState, mapActions, mapGetters } from 'vuex';
 import { s__, sprintf } from '~/locale';
 import { componentNames } from '~/reports/components/issue_body';
 import ReportSection from '~/reports/components/report_section.vue';
-import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import createStore from './store';
 
 export default {
@@ -12,22 +11,8 @@ export default {
   components: {
     ReportSection,
   },
-  mixins: [glFeatureFlagsMixin()],
   props: {
-    headPath: {
-      type: String,
-      required: true,
-    },
-    headBlobPath: {
-      type: String,
-      required: true,
-    },
     basePath: {
-      type: String,
-      required: false,
-      default: null,
-    },
-    baseBlobPath: {
       type: String,
       required: false,
       default: null,
@@ -55,14 +40,11 @@ export default {
   created() {
     this.setPaths({
       basePath: this.basePath,
-      headPath: this.headPath,
-      baseBlobPath: this.baseBlobPath,
-      headBlobPath: this.headBlobPath,
       reportsPath: this.codequalityReportsPath,
       helpPath: this.codequalityHelpPath,
     });
 
-    this.fetchReports(this.glFeatures.codequalityBackendComparison);
+    this.fetchReports();
   },
   methods: {
     ...mapActions(['fetchReports', 'setPaths']),
@@ -87,6 +69,7 @@ export default {
     :component="$options.componentNames.CodequalityIssueBody"
     :popover-options="codequalityPopover"
     :show-report-section-status-icon="false"
+    track-action="users_expanding_testing_code_quality_report"
     class="js-codequality-widget mr-widget-border-top mr-report"
   >
     <template v-if="hasError" #sub-heading>{{ statusReason }}</template>

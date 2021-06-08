@@ -5,6 +5,7 @@ require 'spec_helper'
 RSpec.describe Ci::CreatePipelineService, '#execute' do
   let_it_be(:project) { create(:project, :repository) }
   let_it_be(:user) { create(:user) }
+
   let(:ref_name) { 'master' }
 
   let(:service) do
@@ -91,6 +92,7 @@ RSpec.describe Ci::CreatePipelineService, '#execute' do
 
       it 'creates bridge job with resource group', :aggregate_failures do
         pipeline = create_pipeline!
+        Ci::InitialPipelineProcessWorker.new.perform(pipeline.id)
 
         test = pipeline.statuses.find_by(name: 'instrumentation_test')
         expect(pipeline).to be_created_successfully

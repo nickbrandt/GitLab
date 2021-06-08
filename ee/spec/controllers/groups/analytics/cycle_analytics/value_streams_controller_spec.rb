@@ -5,6 +5,7 @@ require 'spec_helper'
 RSpec.describe Groups::Analytics::CycleAnalytics::ValueStreamsController do
   let_it_be(:user) { create(:user) }
   let_it_be(:group, refind: true) { create(:group) }
+
   let(:params) { { group_id: group } }
 
   before do
@@ -111,6 +112,28 @@ RSpec.describe Groups::Analytics::CycleAnalytics::ValueStreamsController do
         expect(json_response['name']).to eq('new name')
       end
 
+      context 'when updating value stream with in-memory stages' do
+        let(:value_stream_params) do
+          {
+            name: 'updated name',
+            stages: [
+              {
+                id: 'issue', # in memory stage
+                name: 'issue',
+                custom: false
+              }
+            ]
+          }
+        end
+
+        it 'returns a successful 200 response' do
+          put :update, params: { id: value_stream.id, group_id: group, value_stream: value_stream_params }
+
+          expect(response).to have_gitlab_http_status(:ok)
+          expect(json_response['name']).to eq('updated name')
+        end
+      end
+
       context 'with stages' do
         let!(:stage) { create(:cycle_analytics_group_stage, group: group, value_stream: value_stream, name: 'stage 1', custom: true) }
 
@@ -153,17 +176,6 @@ RSpec.describe Groups::Analytics::CycleAnalytics::ValueStreamsController do
   describe 'DELETE #destroy' do
     def destroy_value_stream
       delete :destroy, params: { group_id: group, id: value_stream }
-    end
-
-    context 'when it is a default value stream' do
-      let!(:value_stream) { create(:cycle_analytics_group_value_stream, group: group, name: 'default') }
-
-      it 'returns an unprocessable entity 422 response without deleting the value stream' do
-        expect { destroy_value_stream }.not_to change { Analytics::CycleAnalytics::GroupValueStream.count }
-
-        expect(response).to have_gitlab_http_status(:unprocessable_entity)
-        expect(json_response["message"]).to eq('The Default Value Stream cannot be deleted')
-      end
     end
 
     context 'when it is a custom value stream' do

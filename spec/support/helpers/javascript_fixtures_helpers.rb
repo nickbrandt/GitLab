@@ -31,7 +31,7 @@ module JavaScriptFixturesHelpers
   #
   def clean_frontend_fixtures(directory_name)
     full_directory_name = File.expand_path(directory_name, fixture_root_path)
-    Dir[File.expand_path('*.html', full_directory_name)].each do |file_name|
+    Dir[File.expand_path('*.{html,json,md}', full_directory_name)].each do |file_name|
       FileUtils.rm(file_name)
     end
   end
@@ -66,6 +66,14 @@ module JavaScriptFixturesHelpers
     File.write(full_fixture_path, fixture)
   end
 
+  def parse_html(fixture)
+    if respond_to?(:use_full_html) && public_send(:use_full_html)
+      Nokogiri::HTML::Document.parse(fixture)
+    else
+      Nokogiri::HTML::DocumentFragment.parse(fixture)
+    end
+  end
+
   # Private: Prepare a response object for use as a frontend fixture
   #
   # response - response object to prepare
@@ -76,7 +84,7 @@ module JavaScriptFixturesHelpers
 
     response_mime_type = Mime::Type.lookup(response.media_type)
     if response_mime_type.html?
-      doc = Nokogiri::HTML::DocumentFragment.parse(fixture)
+      doc = parse_html(fixture)
 
       link_tags = doc.css('link')
       link_tags.remove

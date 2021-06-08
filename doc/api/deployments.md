@@ -266,7 +266,7 @@ Example of response
       "status": "success",
       "updated_at": "2016-08-11T07:43:52.143Z",
       "web_url": "http://gitlab.dev/root/project/pipelines/5"
-    }
+    },
     "runner": null
   }
 }
@@ -296,7 +296,8 @@ The status can be one of the following values:
 - canceled
 
 ```shell
-curl --data "environment=production&sha=a91957a858320c0e17f3a0eca7cfacbff50ea29a&ref=master&tag=false&status=success" --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/1/deployments"
+curl --data "environment=production&sha=a91957a858320c0e17f3a0eca7cfacbff50ea29a&ref=master&tag=false&status=success" \
+     --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/1/deployments"
 ```
 
 Example of a response:

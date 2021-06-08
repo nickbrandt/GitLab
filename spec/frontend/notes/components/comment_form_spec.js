@@ -1,22 +1,27 @@
-import { GlDropdown } from '@gitlab/ui';
+import { GlAlert } from '@gitlab/ui';
 import { mount, shallowMount } from '@vue/test-utils';
 import Autosize from 'autosize';
 import MockAdapter from 'axios-mock-adapter';
-import { nextTick } from 'vue';
+import Vue, { nextTick } from 'vue';
+import Vuex from 'vuex';
 import { extendedWrapper } from 'helpers/vue_test_utils_helper';
+import batchComments from '~/batch_comments/stores/modules/batch_comments';
 import { refreshUserMergeRequestCounts } from '~/commons/nav/user_merge_requests';
 import { deprecatedCreateFlash as flash } from '~/flash';
 import axios from '~/lib/utils/axios_utils';
 import CommentForm from '~/notes/components/comment_form.vue';
 import * as constants from '~/notes/constants';
 import eventHub from '~/notes/event_hub';
-import createStore from '~/notes/stores';
+import { COMMENT_FORM } from '~/notes/i18n';
+import notesModule from '~/notes/stores/modules';
 import { loggedOutnoteableData, notesDataMock, userDataMock, noteableDataMock } from '../mock_data';
 
 jest.mock('autosize');
 jest.mock('~/commons/nav/user_merge_requests');
 jest.mock('~/flash');
 jest.mock('~/gl_form');
+
+Vue.use(Vuex);
 
 describe('issue_comment_form component', () => {
   let store;
@@ -25,9 +30,38 @@ describe('issue_comment_form component', () => {
 
   const findCloseReopenButton = () => wrapper.findByTestId('close-reopen-button');
   const findTextArea = () => wrapper.findByTestId('comment-field');
+  const findAddToReviewButton = () => wrapper.findByTestId('add-to-review-button');
+  const findAddCommentNowButton = () => wrapper.findByTestId('add-comment-now-button');
   const findConfidentialNoteCheckbox = () => wrapper.findByTestId('confidential-note-checkbox');
-  const findCommentGlDropdown = () => wrapper.find(GlDropdown);
+  const findCommentGlDropdown = () => wrapper.findByTestId('comment-button');
   const findCommentButton = () => findCommentGlDropdown().find('button');
+  const findErrorAlerts = () => wrapper.findAllComponents(GlAlert).wrappers;
+
+  async function clickCommentButton({ waitForComponent = true, waitForNetwork = true } = {}) {
+    findCommentButton().trigger('click');
+
+    if (waitForComponent || waitForNetwork) {
+      // Wait for the click to bubble out and trigger the handler
+      await nextTick();
+
+      if (waitForNetwork) {
+        // Wait for the network request promise to resolve
+        await nextTick();
+      }
+    }
+  }
+
+  function createStore({ actions = {} } = {}) {
+    const baseModule = notesModule();
+
+    return new Vuex.Store({
+      ...baseModule,
+      actions: {
+        ...baseModule.actions,
+        ...actions,
+      },
+    });
+  }
 
   const createNotableDataMock = (data = {}) => {
     return {
@@ -101,6 +135,83 @@ describe('issue_comment_form component', () => {
         expect(wrapper.vm.saveNote).toHaveBeenCalled();
         expect(wrapper.vm.stopPolling).toHaveBeenCalled();
         expect(wrapper.vm.resizeTextarea).toHaveBeenCalled();
+      });
+
+      it('does not report errors in the UI when the save succeeds', async () => {
+        mountComponent({ mountFunction: mount, initialData: { note: '/label ~sdfghj' } });
+
+        jest.spyOn(wrapper.vm, 'saveNote').mockResolvedValue();
+
+        await clickCommentButton();
+
+        // findErrorAlerts().exists returns false if *any* wrapper is empty,
+        //   not necessarily that there aren't any at all.
+        // We want to check here that there are none found, so we use the
+        //   raw wrapper array length instead.
+        expect(findErrorAlerts().length).toBe(0);
+      });
+
+      it.each`
+        httpStatus | errors
+        ${400}     | ${[COMMENT_FORM.GENERIC_UNSUBMITTABLE_NETWORK]}
+        ${422}     | ${['error 1']}
+        ${422}     | ${['error 1', 'error 2']}
+        ${422}     | ${['error 1', 'error 2', 'error 3']}
+      `(
+        'displays the correct errors ($errors) for a $httpStatus network response',
+        async ({ errors, httpStatus }) => {
+          store = createStore({
+            actions: {
+              saveNote: jest.fn().mockRejectedValue({
+                response: { status: httpStatus, data: { errors: { commands_only: errors } } },
+              }),
+            },
+          });
+
+          mountComponent({ mountFunction: mount, initialData: { note: '/label ~sdfghj' } });
+
+          await clickCommentButton();
+
+          const errorAlerts = findErrorAlerts();
+
+          expect(errorAlerts.length).toBe(errors.length);
+          errors.forEach((msg, index) => {
+            const alert = errorAlerts[index];
+
+            expect(alert.text()).toBe(msg);
+          });
+        },
+      );
+
+      it('should remove the correct error from the list when it is dismissed', async () => {
+        const commandErrors = ['1', '2', '3'];
+        store = createStore({
+          actions: {
+            saveNote: jest.fn().mockRejectedValue({
+              response: { status: 422, data: { errors: { commands_only: [...commandErrors] } } },
+            }),
+          },
+        });
+
+        mountComponent({ mountFunction: mount, initialData: { note: '/label ~sdfghj' } });
+
+        await clickCommentButton();
+
+        let errorAlerts = findErrorAlerts();
+
+        expect(errorAlerts.length).toBe(commandErrors.length);
+
+        // dismiss the second error
+        extendedWrapper(errorAlerts[1]).findByTestId('close-icon').trigger('click');
+        // Wait for the dismissal to bubble out of the Alert component and be handled in this component
+        await nextTick();
+        // Refresh the list of alerts
+        errorAlerts = findErrorAlerts();
+
+        expect(errorAlerts.length).toBe(commandErrors.length - 1);
+        // We want to know that the *correct* error was dismissed, not just that any one is gone
+        expect(errorAlerts[0].text()).toBe(commandErrors[0]);
+        expect(errorAlerts[1].text()).toBe(commandErrors[2]);
       });
 
       it('should toggle issue state when no note', () => {
@@ -217,20 +328,45 @@ describe('issue_comment_form component', () => {
           mountComponent({ mountFunction: mount });
         });
 
-        it('should save note when cmd+enter is pressed', () => {
-          jest.spyOn(wrapper.vm, 'handleSave');
+        describe('when no draft exists', () => {
+          it('should save note when cmd+enter is pressed', () => {
+            jest.spyOn(wrapper.vm, 'handleSave');
 
-          findTextArea().trigger('keydown.enter', { metaKey: true });
+            findTextArea().trigger('keydown.enter', { metaKey: true });
 
-          expect(wrapper.vm.handleSave).toHaveBeenCalled();
+            expect(wrapper.vm.handleSave).toHaveBeenCalledWith();
+          });
+
+          it('should save note when ctrl+enter is pressed', () => {
+            jest.spyOn(wrapper.vm, 'handleSave');
+
+            findTextArea().trigger('keydown.enter', { ctrlKey: true });
+
+            expect(wrapper.vm.handleSave).toHaveBeenCalledWith();
+          });
         });
 
-        it('should save note when ctrl+enter is pressed', () => {
-          jest.spyOn(wrapper.vm, 'handleSave');
+        describe('when a draft exists', () => {
+          beforeEach(() => {
+            store.registerModule('batchComments', batchComments());
+            store.state.batchComments.drafts = [{ note: 'A' }];
+          });
 
-          findTextArea().trigger('keydown.enter', { ctrlKey: true });
+          it('should save note draft when cmd+enter is pressed', () => {
+            jest.spyOn(wrapper.vm, 'handleSaveDraft');
 
-          expect(wrapper.vm.handleSave).toHaveBeenCalled();
+            findTextArea().trigger('keydown.enter', { metaKey: true });
+
+            expect(wrapper.vm.handleSaveDraft).toHaveBeenCalledWith();
+          });
+
+          it('should save note draft when ctrl+enter is pressed', () => {
+            jest.spyOn(wrapper.vm, 'handleSaveDraft');
+
+            findTextArea().trigger('keydown.enter', { ctrlKey: true });
+
+            expect(wrapper.vm.handleSaveDraft).toHaveBeenCalledWith();
+          });
         });
       });
     });
@@ -326,6 +462,7 @@ describe('issue_comment_form component', () => {
               await findCloseReopenButton().trigger('click');
 
               await wrapper.vm.$nextTick;
+              await wrapper.vm.$nextTick;
 
               expect(flash).toHaveBeenCalledWith(
                 `Something went wrong while closing the ${type}. Please try again later.`,
@@ -361,6 +498,7 @@ describe('issue_comment_form component', () => {
             await findCloseReopenButton().trigger('click');
 
             await wrapper.vm.$nextTick;
+            await wrapper.vm.$nextTick;
 
             expect(flash).toHaveBeenCalledWith(
               `Something went wrong while reopening the ${type}. Please try again later.`,
@@ -377,6 +515,8 @@ describe('issue_comment_form component', () => {
           jest.spyOn(wrapper.vm, 'closeIssuable').mockResolvedValue();
 
           await findCloseReopenButton().trigger('click');
+
+          await wrapper.vm.$nextTick();
 
           expect(refreshUserMergeRequestCounts).toHaveBeenCalled();
         });
@@ -472,6 +612,66 @@ describe('issue_comment_form component', () => {
 
     it('should not render submission form', () => {
       expect(findTextArea().exists()).toBe(false);
+    });
+  });
+
+  describe('with batchComments in store', () => {
+    beforeEach(() => {
+      store.registerModule('batchComments', batchComments());
+    });
+
+    describe('add to review and comment now buttons', () => {
+      it('when no drafts exist, should not render', () => {
+        mountComponent();
+
+        expect(findCommentGlDropdown().exists()).toBe(true);
+        expect(findAddToReviewButton().exists()).toBe(false);
+        expect(findAddCommentNowButton().exists()).toBe(false);
+      });
+
+      describe('when drafts exist', () => {
+        beforeEach(() => {
+          store.state.batchComments.drafts = [{ note: 'A' }];
+        });
+
+        it('should render', () => {
+          mountComponent();
+
+          expect(findCommentGlDropdown().exists()).toBe(false);
+          expect(findAddToReviewButton().exists()).toBe(true);
+          expect(findAddCommentNowButton().exists()).toBe(true);
+        });
+
+        it('clicking `add to review`, should call draft endpoint, set `isDraft` true', () => {
+          mountComponent({ mountFunction: mount, initialData: { note: 'a draft note' } });
+
+          jest.spyOn(store, 'dispatch').mockResolvedValue();
+          findAddToReviewButton().trigger('click');
+
+          expect(store.dispatch).toHaveBeenCalledWith(
+            'saveNote',
+            expect.objectContaining({
+              endpoint: notesDataMock.draftsPath,
+              isDraft: true,
+            }),
+          );
+        });
+
+        it('clicking `add comment now`, should call note endpoint, set `isDraft` false ', () => {
+          mountComponent({ mountFunction: mount, initialData: { note: 'a comment' } });
+
+          jest.spyOn(store, 'dispatch').mockResolvedValue();
+          findAddCommentNowButton().trigger('click');
+
+          expect(store.dispatch).toHaveBeenCalledWith(
+            'saveNote',
+            expect.objectContaining({
+              endpoint: noteableDataMock.create_note_path,
+              isDraft: false,
+            }),
+          );
+        });
+      });
     });
   });
 });

@@ -4,8 +4,8 @@
 module PreferencesHelper
   def layout_choices
     [
-        ['Fixed', :fixed],
-        ['Fluid', :fluid]
+      ['Fixed', :fixed],
+      ['Fluid', :fluid]
     ]
   end
 
@@ -33,7 +33,7 @@ module PreferencesHelper
       groups: _("Your Groups"),
       todos: _("Your To-Do List"),
       issues: _("Assigned Issues"),
-      merge_requests: _("Assigned Merge Requests"),
+      merge_requests: _("Assigned merge requests"),
       operations: _("Operations Dashboard")
     }.with_indifferent_access.freeze
   end
@@ -76,19 +76,23 @@ module PreferencesHelper
 
   def language_choices
     options_for_select(
-      Gitlab::I18n.selectable_locales.map(&:reverse).sort,
+      selectable_locales_with_translation_level.sort,
       current_user.preferred_language
     )
   end
 
   def integration_views
     [].tap do |views|
-      views << { name: 'gitpod', message: gitpod_enable_description, message_url: 'https://gitpod.io/', help_link: help_page_path('integration/gitpod.md') } if Gitlab::CurrentSettings.gitpod_enabled
+      views << { name: 'gitpod', message: gitpod_enable_description, message_url: gitpod_url_placeholder, help_link: help_page_path('integration/gitpod.md') } if Gitlab::CurrentSettings.gitpod_enabled
       views << { name: 'sourcegraph', message: sourcegraph_url_message, message_url: Gitlab::CurrentSettings.sourcegraph_url, help_link: help_page_path('user/profile/preferences.md', anchor: 'sourcegraph') } if Gitlab::Sourcegraph.feature_available? && Gitlab::CurrentSettings.sourcegraph_enabled
     end
   end
 
   private
+
+  def gitpod_url_placeholder
+    Gitlab::CurrentSettings.gitpod_url.presence || 'https://gitpod.io/'
+  end
 
   # Ensure that anyone adding new options updates `DASHBOARD_CHOICES` too
   def validate_dashboard_choices!(user_dashboards)
@@ -107,6 +111,18 @@ module PreferencesHelper
   def default_first_day_of_week
     first_day_of_week_choices.rassoc(Gitlab::CurrentSettings.first_day_of_week).first
   end
+
+  def selectable_locales_with_translation_level
+    Gitlab::I18n.selectable_locales.map do |code, language|
+      [
+        s_("i18n|%{language} (%{percent_translated}%% translated)") % {
+          language: language,
+          percent_translated: Gitlab::I18n.percentage_translated_for(code)
+        },
+        code
+      ]
+    end
+  end
 end
 
-PreferencesHelper.prepend_if_ee('EE::PreferencesHelper')
+PreferencesHelper.prepend_mod_with('PreferencesHelper')

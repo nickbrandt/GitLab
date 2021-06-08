@@ -227,25 +227,54 @@ RSpec.shared_examples 'Value Stream Analytics Stages controller' do
         end
 
         it 'accepts sort params' do
-          expect(Gitlab::Analytics::CycleAnalytics::Sorting).to receive(:apply).with(kind_of(ActiveRecord::Relation), kind_of(Analytics::CycleAnalytics::GroupStage), :duration, :asc).and_call_original
+          expect_next_instance_of(Gitlab::Analytics::CycleAnalytics::Sorting) do |sort|
+            expect(sort).to receive(:apply).with(:duration, :asc).and_call_original
+          end
 
           subject
 
           expect(response).to have_gitlab_http_status(:ok)
         end
       end
+
+      context 'pagination' do
+        it 'exposes pagination headers' do
+          create_list(:merge_request, 3)
+          stub_const('Gitlab::Analytics::CycleAnalytics::RecordsFetcher::MAX_RECORDS', 2)
+          allow_any_instance_of(Gitlab::Analytics::CycleAnalytics::RecordsFetcher).to receive(:query).and_return(MergeRequest.join_metrics.all)
+
+          subject
+
+          expect(response.headers['X-Next-Page']).to eq('2')
+          expect(response.headers['Link']).to include('rel="next"')
+        end
+      end
     end
 
-    describe 'GET #duration_chart' do
-      subject { get :duration_chart, params: params }
+    describe 'GET #average_duration_chart' do
+      subject { get :average_duration_chart, params: params }
 
       it 'matches the response schema' do
-        fake_result = [double(MergeRequest, duration_in_seconds: 10, finished_at: Time.current)]
-        expect_any_instance_of(Gitlab::Analytics::CycleAnalytics::DataForDurationChart).to receive(:load).and_return(fake_result)
+        fake_result = [double(MergeRequest, average_duration_in_seconds: 10, date: Time.current.to_date)]
+        expect_any_instance_of(Gitlab::Analytics::CycleAnalytics::DataForDurationChart).to receive(:average_by_day).and_return(fake_result)
 
         subject
 
-        expect(response).to match_response_schema('analytics/cycle_analytics/duration_chart', dir: 'ee')
+        expect(response).to match_response_schema('analytics/cycle_analytics/average_duration_chart', dir: 'ee')
+      end
+
+      include_examples 'Value Stream Analytics data endpoint examples'
+      include_examples 'group permission check on the controller level'
+    end
+
+    describe 'GET #count' do
+      subject { get :count, params: params }
+
+      it 'matches the response schema' do
+        subject
+
+        expect(response).to be_successful
+        expect(json_response['count']).to eq(0)
       end
 
       include_examples 'Value Stream Analytics data endpoint examples'

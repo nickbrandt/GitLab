@@ -10,7 +10,13 @@ export default {
       type: Object,
       required: true,
     },
-    showSearchBox: {
+    // Number of options that must exist for the search box to show.
+    searchBoxShowThreshold: {
+      type: Number,
+      required: false,
+      default: 20,
+    },
+    loading: {
       type: Boolean,
       required: false,
       default: false,
@@ -35,12 +41,8 @@ export default {
     selectedOptionsOrAll() {
       return this.selectedOptions.length ? this.selectedOptions : [this.filter.allOption];
     },
-    queryObject() {
-      // This is the object used to update the querystring.
-      return { [this.filter.id]: this.selectedOptionsOrAll.map((x) => x.id) };
-    },
     filterObject() {
-      // This is the object used by the GraphQL query.
+      // This is passed to the vulnerability list's GraphQL query as a variable.
       return { [this.filter.id]: this.selectedOptions.map((x) => x.id) };
     },
     filteredOptions() {
@@ -48,19 +50,27 @@ export default {
         option.name.toLowerCase().includes(this.searchTerm.toLowerCase()),
       );
     },
-    routeQueryIds() {
+    querystringIds() {
       const ids = this.$route?.query[this.filter.id] || [];
       return Array.isArray(ids) ? ids : [ids];
     },
-    routeQueryOptions() {
-      const options = this.options.filter((x) => this.routeQueryIds.includes(x.id));
-      const hasAllId = this.routeQueryIds.includes(this.filter.allOption.id);
-
-      if (options.length && !hasAllId) {
-        return options;
+    querystringOptions() {
+      // If the querystring IDs includes the All option, return an empty array. We'll do this even
+      // if there are other IDs because the special All option takes precedence.
+      if (this.querystringIds.includes(this.filter.allOption.id)) {
+        return [];
       }
 
-      return hasAllId ? [] : this.filter.defaultOptions;
+      const options = this.options.filter((x) => this.querystringIds.includes(x.id));
+      // If the querystring IDs didn't match any options, return the default options.
+      if (!options.length) {
+        return this.filter.defaultOptions;
+      }
+
+      return options;
+    },
+    showSearchBox() {
+      return this.options.length >= this.searchBoxShowThreshold;
     },
   },
   watch: {
@@ -69,32 +79,31 @@ export default {
     },
   },
   created() {
-    this.selectedOptions = this.routeQueryOptions;
+    this.selectedOptions = this.querystringOptions;
     // When the user clicks the forward/back browser buttons, update the selected options.
     window.addEventListener('popstate', () => {
-      this.selectedOptions = this.routeQueryOptions;
+      this.selectedOptions = this.querystringOptions;
     });
   },
   methods: {
     toggleOption(option) {
       // Toggle the option's existence in the array.
       this.selectedOptions = xor(this.selectedOptions, [option]);
-      this.updateRouteQuery();
+      this.updateQuerystring();
     },
     deselectAllOptions() {
       this.selectedOptions = [];
-      this.updateRouteQuery();
+      this.updateQuerystring();
     },
-    updateRouteQuery() {
-      if (!this.$router) {
+    updateQuerystring() {
+      const options = this.selectedOptionsOrAll.map((x) => x.id);
+      // To avoid a console error, don't update the querystring if it's the same as the current one.
+      if (!this.$router || isEqual(this.querystringIds, options)) {
         return;
       }
 
-      const query = { query: { ...this.$route?.query, ...this.queryObject } };
-      // To avoid a console error, don't update the querystring if it's the same as the current one.
-      if (!isEqual(this.routeQueryIds, this.queryObject[this.filter.id])) {
-        this.$router.push(query);
-      }
+      const query = { ...this.$route.query, [this.filter.id]: options };
+      this.$router.push({ query });
     },
     isSelected(option) {
       return this.selectedSet.has(option);
@@ -109,6 +118,7 @@ export default {
     :name="filter.name"
     :selected-options="selectedOptionsOrAll"
     :show-search-box="showSearchBox"
+    :loading="loading"
   >
     <filter-item
       v-if="filter.allOption && !searchTerm.length"
@@ -122,7 +132,7 @@ export default {
       :key="option.id"
       :is-checked="isSelected(option)"
       :text="option.name"
-      data-testid="filterOption"
+      :data-testid="`${filter.id}:${option.id}`"
       @click="toggleOption(option)"
     />
   </filter-body>

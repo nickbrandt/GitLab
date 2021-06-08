@@ -210,7 +210,7 @@ end
 
 Behind the scenes, `be_signed_in` is a
 [predicate matcher](https://relishapp.com/rspec/rspec-expectations/v/3-8/docs/built-in-matchers/predicate-matchers)
-that [implements checking the user avatar](https://gitlab.com/gitlab-org/gitlab/-/blob/master/qa/qa/page/main/menu.rb#L74).
+that [implements checking the user avatar](https://gitlab.com/gitlab-org/gitlab/-/blob/master/qa/qa/page/main/menu.rb#L92).
 
 ## De-duplicate your code
 
@@ -332,17 +332,19 @@ can see it.
 
 ## Run the spec
 
-Before running the spec, confirm:
+Before running the spec, make sure that:
 
-- The GDK is installed.
-- The GDK is running on port 3000 locally.
+- GDK is installed.
+- GDK is running locally on port 3000.
 - No additional [RSpec metadata tags](rspec_metadata_tests.md) have been applied.
 - Your working directory is `qa/` within your GDK GitLab installation.
+- Your GitLab instance-level settings are default. If you changed the default settings, some tests might have unexpected results.
+- Because the GDK requires a password change on first login, you must include the GDK password for `root` user
 
 To run the spec, run the following command:
 
 ```ruby
-bundle exec bin/qa Test::Instance::All http://localhost:3000 -- <test_file>
+GITLAB_PASSWORD=<GDK root password> bundle exec bin/qa Test::Instance::All http://localhost:3000 -- <test_file>
 ```
 
 Where `<test_file>` is:

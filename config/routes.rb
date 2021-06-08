@@ -51,10 +51,12 @@ Rails.application.routes.draw do
       Gitlab.ee do
         get :trial_getting_started, on: :collection
         get :trial_onboarding_board, on: :collection
+        get :continuous_onboarding_getting_started, on: :collection
       end
     end
 
     resource :experience_level, only: [:show, :update]
+    resources :invites, only: [:new, :create]
 
     Gitlab.ee do
       resources :groups, only: [:new, :create]
@@ -74,6 +76,9 @@ Rails.application.routes.draw do
 
   # Health check
   get 'health_check(/:checks)' => 'health_check#index', as: :health_check
+
+  # Terraform service discovery
+  get '.well-known/terraform.json' => 'terraform/services#index', as: :terraform_services
 
   # Begin of the /-/ scope.
   # Use this scope for all new global routes.
@@ -179,6 +184,7 @@ Rails.application.routes.draw do
         get :db_spin
         get :sleep
         get :kill
+        get :quit
         post :gc
       end
     end
@@ -220,6 +226,12 @@ Rails.application.routes.draw do
         post :authorize_aws_role
       end
 
+      resource :integration, controller: 'clusters/integrations', only: [] do
+        collection do
+          post :create_or_update
+        end
+      end
+
       member do
         Gitlab.ee do
           get :metrics, format: :json
@@ -240,38 +252,6 @@ Rails.application.routes.draw do
     end
   end
 
-  # Deprecated routes.
-  # Will be removed as part of https://gitlab.com/gitlab-org/gitlab/-/issues/210024
-  scope as: :deprecated do
-    # Autocomplete
-    get '/autocomplete/users' => 'autocomplete#users'
-    get '/autocomplete/users/:id' => 'autocomplete#user'
-    get '/autocomplete/projects' => 'autocomplete#projects'
-    get '/autocomplete/award_emojis' => 'autocomplete#award_emojis'
-    get '/autocomplete/merge_request_target_branches' => 'autocomplete#merge_request_target_branches'
-
-    Gitlab.ee do
-      get '/autocomplete/project_groups' => 'autocomplete#project_groups'
-      get '/autocomplete/project_routes' => 'autocomplete#project_routes'
-      get '/autocomplete/namespace_routes' => 'autocomplete#namespace_routes'
-    end
-
-    resources :invites, only: [:show], constraints: { id: /[A-Za-z0-9_-]+/ } do
-      member do
-        post :accept
-        match :decline, via: [:get, :post]
-      end
-    end
-
-    resources :sent_notifications, only: [], constraints: { id: /\h{32}/ } do
-      member do
-        get :unsubscribe
-      end
-    end
-
-    resources :abuse_reports, only: [:new, :create]
-  end
-
   resources :groups, only: [:index, :new, :create] do
     post :preview_markdown
   end
@@ -284,6 +264,7 @@ Rails.application.routes.draw do
 
   draw :git_http
   draw :api
+  draw :customers_dot
   draw :sidekiq
   draw :help
   draw :google_api
@@ -298,9 +279,13 @@ Rails.application.routes.draw do
 
   # Issue https://gitlab.com/gitlab-org/gitlab/-/issues/210024
   scope as: 'deprecated' do
-    draw :snippets
+    # Issue https://gitlab.com/gitlab-org/gitlab/-/issues/223719
+    get '/snippets/:id/raw',
+      to: 'snippets#raw',
+      format: false,
+      constraints: { id: /\d+/ }
 
-    Gitlab::Routing.redirect_legacy_paths(self, :profile)
+    Gitlab::Routing.redirect_legacy_paths(self, :profile, :snippets)
   end
 
   Gitlab.ee do

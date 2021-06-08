@@ -9,8 +9,11 @@ info: To determine the technical writer assigned to the Stage/Group associated w
 > - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/5811) in GitLab Premium 11.3.
 > - [Moved](https://gitlab.com/gitlab-org/gitlab/-/issues/221259) to GitLab Free in 13.3.
 
-Publish [Maven](https://maven.apache.org) artifacts in your project’s Package Registry.
+Publish [Maven](https://maven.apache.org) artifacts in your project's Package Registry.
 Then, install the packages whenever you need to use them as a dependency.
+
+For documentation of the specific API endpoints that the Maven package manager
+client uses, see the [Maven API documentation](../../../api/packages/maven.md).
 
 ## Build a Maven package
 
@@ -338,7 +341,7 @@ file:
 ```groovy
 repositories {
     maven {
-        url "https://gitlab.example.com/api/v4/groups/<group>/-/packages/maven"
+        url "${CI_API_V4_URL}/groups/<group>/-/packages/maven"
         name "GitLab"
         credentials(HttpHeaderCredentials) {
             name = 'Job-Token'
@@ -622,7 +625,7 @@ In the UI:
 1. For your group, go to **Settings > Packages & Registries**.
 1. Expand the **Package Registry** section.
 1. Turn on the **Reject duplicates** toggle.
-1. Optional. To allow some duplicate packages, in the **Exceptions** box, enter a regex pattern that matches the names of packages you want to allow.
+1. Optional. To allow some duplicate packages, in the **Exceptions** box, enter a regex pattern that matches the names and/or versions of packages you want to allow.
 
 Your changes are automatically saved.
 
@@ -739,17 +742,17 @@ You can create a new package each time the `master` branch is updated.
    <repositories>
      <repository>
        <id>gitlab-maven</id>
-       <url>${env.CI_SERVER_URL}/api/v4/projects/${env.CI_PROJECT_ID}/packages/maven</url>
+       <url>$env{CI_API_V4_URL}/projects/${env.CI_PROJECT_ID}/packages/maven</url>
      </repository>
    </repositories>
    <distributionManagement>
      <repository>
        <id>gitlab-maven</id>
-       <url>${env.CI_SERVER_URL}/api/v4/projects/${env.CI_PROJECT_ID}/packages/maven</url>
+       <url>${CI_API_V4_URL}/projects/${env.CI_PROJECT_ID}/packages/maven</url>
      </repository>
      <snapshotRepository>
        <id>gitlab-maven</id>
-       <url>${env.CI_SERVER_URL}/api/v4/projects/${env.CI_PROJECT_ID}/packages/maven</url>
+       <url>${CI_API_V4_URL}/projects/${env.CI_PROJECT_ID}/packages/maven</url>
      </snapshotRepository>
    </distributionManagement>
    ```
@@ -868,3 +871,11 @@ package:
     - 'mvn help:system'
     - 'mvn package'
 ```
+
+## Supported CLI commands
+
+The GitLab Maven repository supports the following Maven CLI commands:
+
+- `mvn deploy`: Publish your package to the Package Registry.
+- `mvn install`: Install packages specified in your Maven project.
+- `mvn dependency:get`: Install a specific package.

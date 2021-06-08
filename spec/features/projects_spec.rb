@@ -128,23 +128,23 @@ RSpec.describe 'Project' do
     end
 
     it 'shows project topics' do
-      project.update_attribute(:tag_list, 'topic1')
+      project.update_attribute(:topic_list, 'topic1')
 
       visit path
 
       expect(page).to have_css('.home-panel-topic-list')
-      expect(page).to have_link('Topic1', href: explore_projects_path(tag: 'topic1'))
+      expect(page).to have_link('Topic1', href: explore_projects_path(topic: 'topic1'))
     end
 
-    it 'shows up to 3 project tags' do
-      project.update_attribute(:tag_list, 'topic1, topic2, topic3, topic4')
+    it 'shows up to 3 project topics' do
+      project.update_attribute(:topic_list, 'topic1, topic2, topic3, topic4')
 
       visit path
 
       expect(page).to have_css('.home-panel-topic-list')
-      expect(page).to have_link('Topic1', href: explore_projects_path(tag: 'topic1'))
-      expect(page).to have_link('Topic2', href: explore_projects_path(tag: 'topic2'))
-      expect(page).to have_link('Topic3', href: explore_projects_path(tag: 'topic3'))
+      expect(page).to have_link('Topic1', href: explore_projects_path(topic: 'topic1'))
+      expect(page).to have_link('Topic2', href: explore_projects_path(topic: 'topic2'))
+      expect(page).to have_link('Topic3', href: explore_projects_path(topic: 'topic3'))
       expect(page).to have_content('+ 1 more')
     end
   end
@@ -171,26 +171,6 @@ RSpec.describe 'Project' do
         expect(find('.mobile-git-clone')).to be_visible
         expect(find('.git-clone-holder', visible: false)).not_to be_visible
       end
-    end
-  end
-
-  describe 'remove forked relationship', :js do
-    let(:user)    { create(:user) }
-    let(:project) { fork_project(create(:project, :public), user, namespace: user.namespace) }
-
-    before do
-      sign_in user
-      visit edit_project_path(project)
-    end
-
-    it 'removes fork' do
-      expect(page).to have_content 'Remove fork relationship'
-
-      remove_with_confirm('Remove fork relationship', project.path)
-
-      expect(page).to have_content 'The fork relationship has been removed.'
-      expect(project.reload.forked?).to be_falsey
-      expect(page).not_to have_content 'Remove fork relationship'
     end
   end
 

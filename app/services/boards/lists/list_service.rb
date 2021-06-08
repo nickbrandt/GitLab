@@ -23,15 +23,13 @@ module Boards
       end
 
       def hidden_lists_for(board)
-        hidden = []
-
-        hidden << ::List.list_types[:backlog] if board.hide_backlog_list
-        hidden << ::List.list_types[:closed] if board.hide_closed_list
-
-        hidden
+        [].tap do |hidden|
+          hidden << ::List.list_types[:backlog] if board.hide_backlog_list?
+          hidden << ::List.list_types[:closed] if board.hide_closed_list?
+        end
       end
     end
   end
 end
 
-Boards::Lists::ListService.prepend_if_ee('EE::Boards::Lists::ListService')
+Boards::Lists::ListService.prepend_mod_with('Boards::Lists::ListService')

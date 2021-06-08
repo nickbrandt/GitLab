@@ -13,6 +13,10 @@ class Namespace < ApplicationRecord
   include Gitlab::Utils::StrongMemoize
   include IgnorableColumns
   include Namespaces::Traversal::Recursive
+  include Namespaces::Traversal::Linear
+  include EachBatch
+
+  ignore_column :delayed_project_removal, remove_with: '14.1', remove_after: '2021-05-22'
 
   # Prevent users from creating unreasonably deep level of nesting.
   # The number 20 was taken based on maximum nesting level of
@@ -42,6 +46,9 @@ class Namespace < ApplicationRecord
   has_one :root_storage_statistics, class_name: 'Namespace::RootStorageStatistics'
   has_one :aggregation_schedule, class_name: 'Namespace::AggregationSchedule'
   has_one :package_setting_relation, inverse_of: :namespace, class_name: 'PackageSetting'
+
+  has_one :admin_note, inverse_of: :namespace
+  accepts_nested_attributes_for :admin_note, update_only: true
 
   validates :owner, presence: true, unless: ->(n) { n.type == "Group" }
   validates :name,
@@ -82,12 +89,16 @@ class Namespace < ApplicationRecord
   after_update :move_dir, if: :saved_change_to_path_or_parent?
   before_destroy(prepend: true) { prepare_for_destroy }
   after_destroy :rm_dir
+  after_commit :expire_child_caches, on: :update, if: -> {
+    Feature.enabled?(:cached_route_lookups, self, type: :ops, default_enabled: :yaml) &&
+      saved_change_to_name? || saved_change_to_path? || saved_change_to_parent_id?
+  }
 
-  before_save :ensure_delayed_project_removal_assigned_to_namespace_settings, if: :delayed_project_removal_changed?
-
-  scope :for_user, -> { where('type IS NULL') }
+  scope :for_user, -> { where(type: nil) }
   scope :sort_by_type, -> { order(Gitlab::Database.nulls_first_order(:type)) }
   scope :include_route, -> { includes(:route) }
+  scope :by_parent, -> (parent) { where(parent_id: parent) }
+  scope :filter_by_path, -> (query) { where('lower(path) = :query', query: query.downcase) }
 
   scope :with_statistics, -> do
     joins('LEFT JOIN project_statistics ps ON ps.namespace_id = namespaces.id')
@@ -107,7 +118,7 @@ class Namespace < ApplicationRecord
 
   # Make sure that the name is same as strong_memoize name in root_ancestor
   # method
-  attr_writer :root_ancestor
+  attr_writer :root_ancestor, :emails_disabled_memoized
 
   class << self
     def by_path(path)
@@ -192,7 +203,7 @@ class Namespace < ApplicationRecord
   end
 
   def any_project_has_container_registry_tags?
-    all_projects.any?(&:has_container_registry_tags?)
+    all_projects.includes(:container_repositories).any?(&:has_container_registry_tags?)
   end
 
   def first_project_with_container_registry_tags
@@ -235,7 +246,7 @@ class Namespace < ApplicationRecord
 
   # any ancestor can disable emails for all descendants
   def emails_disabled?
-    strong_memoize(:emails_disabled) do
+    strong_memoize(:emails_disabled_memoized) do
       if parent_id
         self_and_ancestors.where(emails_disabled: true).exists?
       else
@@ -260,14 +271,9 @@ class Namespace < ApplicationRecord
   # Includes projects from this namespace and projects from all subgroups
   # that belongs to this namespace
   def all_projects
-    namespace = user? ? self : self_and_descendants
-    Project.where(namespace: namespace)
-  end
+    namespace = user? ? self : self_and_descendant_ids
 
-  # Includes pipelines from this namespace and pipelines from all subgroups
-  # that belongs to this namespace
-  def all_pipelines
-    Ci::Pipeline.where(project: all_projects)
+    Project.where(namespace: namespace)
   end
 
   def has_parent?
@@ -283,8 +289,13 @@ class Namespace < ApplicationRecord
     false
   end
 
+  # Deprecated, use #licensed_feature_available? instead. Remove once Namespace#feature_available? isn't used anymore.
+  def feature_available?(feature)
+    licensed_feature_available?(feature)
+  end
+
   # Overridden in EE::Namespace
-  def feature_available?(_feature)
+  def licensed_feature_available?(_feature)
     false
   end
 
@@ -340,6 +351,10 @@ class Namespace < ApplicationRecord
 
   def actual_plan
     Plan.default
+  end
+
+  def paid?
+    root? && actual_plan.paid?
   end
 
   def actual_limits
@@ -405,22 +420,23 @@ class Namespace < ApplicationRecord
     created_at >= 90.days.ago
   end
 
+  def issue_repositioning_disabled?
+    Feature.enabled?(:block_issue_repositioning, self, type: :ops, default_enabled: :yaml)
+  end
+
   private
 
-  def ensure_delayed_project_removal_assigned_to_namespace_settings
-    return if Feature.disabled?(:migrate_delayed_project_removal, default_enabled: true)
+  def expire_child_caches
+    Namespace.where(id: descendants).each_batch do |namespaces|
+      namespaces.touch_all
+    end
 
-    self.namespace_settings || build_namespace_settings
-    namespace_settings.delayed_project_removal = delayed_project_removal
+    all_projects.each_batch do |projects|
+      projects.touch_all
+    end
   end
 
   def all_projects_with_pages
-    if all_projects.pages_metadata_not_migrated.exists?
-      Gitlab::BackgroundMigration::MigratePagesMetadata.new.perform_on_relation(
-        all_projects.pages_metadata_not_migrated
-      )
-    end
-
     all_projects.with_pages_deployed
   end
 
@@ -482,4 +498,4 @@ class Namespace < ApplicationRecord
   end
 end
 
-Namespace.prepend_if_ee('EE::Namespace')
+Namespace.prepend_mod_with('Namespace')

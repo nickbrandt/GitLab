@@ -63,9 +63,9 @@ module Issuable
 
     has_many :note_authors, -> { distinct }, through: :notes, source: :author
 
-    has_many :label_links, as: :target, dependent: :destroy, inverse_of: :target # rubocop:disable Cop/ActiveRecordDependent
+    has_many :label_links, as: :target, inverse_of: :target
     has_many :labels, through: :label_links
-    has_many :todos, as: :target, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
+    has_many :todos, as: :target
 
     has_one :metrics, inverse_of: model_name.singular.to_sym, autosave: true
 
@@ -101,20 +101,19 @@ module Issuable
     scope :unassigned, -> do
       where("NOT EXISTS (SELECT TRUE FROM #{to_ability_name}_assignees WHERE #{to_ability_name}_id = #{to_ability_name}s.id)")
     end
-    scope :assigned_to, ->(u) do
-      assignees_table = Arel::Table.new("#{to_ability_name}_assignees")
-      sql = assignees_table.project('true').where(assignees_table[:user_id].in(u)).where(Arel::Nodes::SqlLiteral.new("#{to_ability_name}_id = #{to_ability_name}s.id"))
-      where("EXISTS (#{sql.to_sql})")
+    scope :assigned_to, ->(users) do
+      assignees_class = self.reflect_on_association("#{to_ability_name}_assignees").klass
+
+      condition = assignees_class.where(user_id: users).where(Arel.sql("#{to_ability_name}_id = #{to_ability_name}s.id"))
+      where(condition.arel.exists)
+    end
+    scope :not_assigned_to, ->(users) do
+      assignees_class = self.reflect_on_association("#{to_ability_name}_assignees").klass
+
+      condition = assignees_class.where(user_id: users).where(Arel.sql("#{to_ability_name}_id = #{to_ability_name}s.id"))
+      where(condition.arel.exists.not)
     end
     # rubocop:enable GitlabSecurity/SqlInjection
-
-    scope :not_assigned_to, ->(users) do
-      assignees_table = Arel::Table.new("#{to_ability_name}_assignees")
-      sql = assignees_table.project('true')
-                .where(assignees_table[:user_id].in(users))
-                .where(Arel::Nodes::SqlLiteral.new("#{to_ability_name}_id = #{to_ability_name}s.id"))
-      where(sql.exists.not)
-    end
 
     scope :without_particular_labels, ->(label_names) do
       labels_table = Label.arel_table
@@ -136,6 +135,14 @@ module Issuable
     scope :inc_notes_with_associations, -> { includes(notes: [:project, :author, :award_emoji]) }
     scope :references_project, -> { references(:project) }
     scope :non_archived, -> { join_project.where(projects: { archived: false }) }
+
+    scope :includes_for_bulk_update, -> do
+      associations = %i[author assignees epic group labels metrics project source_project target_project].select do |association|
+        reflect_on_association(association)
+      end
+
+      includes(*associations)
+    end
 
     attr_mentionable :title, pipeline: :single_line
     attr_mentionable :description
@@ -324,7 +331,7 @@ module Issuable
       # This prevents errors when ignored columns are present in the database.
       issuable_columns = with_cte ? issue_grouping_columns(use_cte: with_cte) : "#{table_name}.*"
 
-      extra_select_columns = extra_select_columns.unshift("(#{highest_priority}) AS highest_priority")
+      extra_select_columns.unshift("(#{highest_priority}) AS highest_priority")
 
       select(issuable_columns)
         .select(extra_select_columns)
@@ -437,7 +444,7 @@ module Issuable
   end
 
   def subscribed_without_subscriptions?(user, project)
-    participants(user).include?(user)
+    participant?(user)
   end
 
   def can_assign_epic?(user)
@@ -556,4 +563,4 @@ module Issuable
   end
 end
 
-Issuable.prepend_if_ee('EE::Issuable')
+Issuable.prepend_mod_with('Issuable')

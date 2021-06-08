@@ -5,11 +5,15 @@ export default () => ({
 
   canAdminEpic: false,
   isShowingEpicsSwimlanes: false,
-  epicsSwimlanesFetchInProgress: false,
-  // The epic data stored in 'epics' do not always persist
-  // and will be cleared with changes to the filter.
+  epicsSwimlanesFetchInProgress: {
+    epicLanesFetchInProgress: false,
+    listItemsFetchInProgress: false,
+  },
   epics: [],
-  epicsCacheById: {},
-  epicFetchInProgress: false,
-  epicsFlags: {},
+  milestones: [],
+  milestonesLoading: false,
+  iterations: [],
+  iterationsLoading: false,
+  assignees: [],
+  assigneesLoading: false,
 });

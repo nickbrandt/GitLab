@@ -31,8 +31,7 @@ module Mutations
 
         argument :branch_name, GraphQL::STRING_TYPE,
                  required: false,
-                 description: 'The associated branch. Will be ignored ' \
-                              'if `dast_branch_selection` feature flag is disabled.'
+                 description: 'The associated branch.'
 
         argument :dast_site_profile_id, ::Types::GlobalIDType[::DastSiteProfile],
                  required: true,
@@ -61,14 +60,14 @@ module Mutations
           dast_site_profile = project.dast_site_profiles.find(site_profile_id.model_id)
           dast_scanner_profile = project.dast_scanner_profiles.find(scanner_profile_id.model_id)
 
-          response = ::Dast::Profiles::CreateService.new(
+          response = ::AppSec::Dast::Profiles::CreateService.new(
             container: project,
             current_user: current_user,
             params: {
               project: project,
               name: name,
               description: description,
-              branch_name: feature_flagged_branch_name(project, branch_name),
+              branch_name: branch_name,
               dast_site_profile: dast_site_profile,
               dast_scanner_profile: dast_scanner_profile,
               run_after_create: run_after_create
@@ -83,14 +82,7 @@ module Mutations
         private
 
         def allowed?(project)
-          project.feature_available?(:security_on_demand_scans) &&
-            Feature.enabled?(:dast_saved_scans, project, default_enabled: :yaml)
-        end
-
-        def feature_flagged_branch_name(project, branch_name)
-          return unless Feature.enabled?(:dast_branch_selection, project, default_enabled: :yaml)
-
-          branch_name
+          project.feature_available?(:security_on_demand_scans)
         end
       end
     end

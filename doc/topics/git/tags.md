@@ -4,7 +4,7 @@ group: Source Code
 info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#assignments
 ---
 
-# Tags
+# Tags **(FREE)**
 
 Tags are useful for marking certain deployments and releases for later
 reference. Git supports two types of tags:
@@ -28,7 +28,7 @@ git checkout master
 git tag my_lightweight_tag
 
 # Annotated tag
-git tag -a v1.0 -m ‘Version 1.0’
+git tag -a v1.0 -m 'Version 1.0'
 
 # Show list of the existing tags
 git tag

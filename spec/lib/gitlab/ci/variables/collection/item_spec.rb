@@ -70,6 +70,43 @@ RSpec.describe Gitlab::Ci::Variables::Collection::Item do
     end
   end
 
+  describe '.possible_var_reference?' do
+    context 'table tests' do
+      using RSpec::Parameterized::TableSyntax
+
+      where do
+        {
+          "empty value": {
+            value: '',
+            result: false
+          },
+          "normal value": {
+            value: 'some value',
+            result: false
+          },
+          "simple expansions": {
+            value: 'key$variable',
+            result: true
+          },
+          "complex expansions": {
+            value: 'key${variable}${variable2}',
+            result: true
+          },
+          "complex expansions for Windows": {
+            value: 'key%variable%%variable2%',
+            result: true
+          }
+        }
+      end
+
+      with_them do
+        subject { Gitlab::Ci::Variables::Collection::Item.possible_var_reference?(value) }
+
+        it { is_expected.to eq(result) }
+      end
+    end
+  end
+
   describe '#depends_on' do
     let(:item) { Gitlab::Ci::Variables::Collection::Item.new(**variable) }
 
@@ -128,7 +165,7 @@ RSpec.describe Gitlab::Ci::Variables::Collection::Item do
     end
 
     it 'supports using an active record resource' do
-      variable = create(:ci_variable, key: 'CI_VAR', value: '123')
+      variable = build(:ci_variable, key: 'CI_VAR', value: '123')
       resource = described_class.fabricate(variable)
 
       expect(resource).to be_a(described_class)
@@ -199,6 +236,26 @@ RSpec.describe Gitlab::Ci::Variables::Collection::Item do
 
         expect(runner_variable)
           .to eq(key: 'VAR', value: 'value', public: true, file: true, masked: false)
+      end
+    end
+
+    context 'when variable is raw' do
+      it 'does not export raw value when it is false' do
+        runner_variable = described_class
+                            .new(key: 'VAR', value: 'value', raw: false)
+                            .to_runner_variable
+
+        expect(runner_variable)
+          .to eq(key: 'VAR', value: 'value', public: true, masked: false)
+      end
+
+      it 'exports raw value when it is true' do
+        runner_variable = described_class
+                            .new(key: 'VAR', value: 'value', raw: true)
+                            .to_runner_variable
+
+        expect(runner_variable)
+          .to eq(key: 'VAR', value: 'value', public: true, raw: true, masked: false)
       end
     end
 

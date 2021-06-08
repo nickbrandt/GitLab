@@ -23,10 +23,25 @@ class SyncSeatLinkRequestWorker
       body: request_body(timestamp, license_key, max_historical_user_count, active_users)
     )
 
-    raise RequestError, request_error_message(response) unless response.success?
+    if response.success?
+      reset_license!(response['license']) if response['license']
+    else
+      raise RequestError, request_error_message(response)
+    end
   end
 
   private
+
+  def reset_license!(license_data)
+    current_license = License.current if License.current&.cloud_license?
+
+    License.transaction do
+      current_license&.destroy!
+      License.create!(data: license_data, cloud: true)
+    end
+  rescue StandardError => e
+    Gitlab::ErrorTracking.track_and_raise_for_dev_exception(e)
+  end
 
   def request_body(timestamp, license_key, max_historical_user_count, active_users)
     Gitlab::SeatLinkData.new(

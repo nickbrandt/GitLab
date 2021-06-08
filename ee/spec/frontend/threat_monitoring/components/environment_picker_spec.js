@@ -6,7 +6,7 @@ import {
   ALL_ENVIRONMENT_NAME,
 } from 'ee/threat_monitoring/constants';
 import createStore from 'ee/threat_monitoring/store';
-import { mockEnvironmentsResponse } from '../mock_data';
+import { mockEnvironmentsResponse } from '../mocks/mock_data';
 
 const mockEnvironments = mockEnvironmentsResponse.environments;
 const currentEnvironment = mockEnvironments[1];
@@ -99,24 +99,17 @@ describe('EnvironmentPicker component', () => {
   });
 
   describe.each`
-    context                            | isLoadingEnvironments | isLoadingWafStatistics | isLoadingNetworkPolicyStatistics | environments
-    ${'environments are loading'}      | ${true}               | ${false}               | ${false}                         | ${mockEnvironments}
-    ${'WAF statistics are loading'}    | ${false}              | ${true}                | ${false}                         | ${mockEnvironments}
-    ${'NetPol statistics are loading'} | ${false}              | ${false}               | ${true}                          | ${mockEnvironments}
-    ${'there are no environments'}     | ${false}              | ${false}               | ${false}                         | ${[]}
+    context                            | isLoadingEnvironments | isLoadingNetworkPolicyStatistics | environments
+    ${'environments are loading'}      | ${true}               | ${false}                         | ${mockEnvironments}
+    ${'NetPol statistics are loading'} | ${false}              | ${true}                          | ${mockEnvironments}
+    ${'there are no environments'}     | ${false}              | ${false}                         | ${[]}
   `(
     'given $context',
-    ({
-      isLoadingEnvironments,
-      isLoadingWafStatistics,
-      isLoadingNetworkPolicyStatistics,
-      environments,
-    }) => {
+    ({ isLoadingEnvironments, isLoadingNetworkPolicyStatistics, environments }) => {
       beforeEach(() => {
         factory({
           environments,
           isLoadingEnvironments,
-          isLoadingWafStatistics,
           isLoadingNetworkPolicyStatistics,
         });
 

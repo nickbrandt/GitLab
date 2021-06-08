@@ -31,18 +31,23 @@
 - container_scanning
 - continuous_delivery
 - continuous_integration
+- continuous_integration_scaling
 - database
+- dataops
 - dependency_firewall
 - dependency_proxy
 - dependency_scanning
 - design_management
 - devops_reports
 - disaster_recovery
-- dora_metrics
 - dynamic_application_security_testing
 - editor_extension
 - epics
 - error_tracking
+- experimentation_activation
+- experimentation_adoption
+- experimentation_conversion
+- experimentation_expansion
 - feature_flags
 - five_minute_production_app
 - foundations
@@ -61,6 +66,7 @@
 - insider_threat
 - insights
 - integrations
+- intel_code_security
 - interactive_application_security_testing
 - internationalization
 - issue_tracking
@@ -70,7 +76,6 @@
 - license
 - license_compliance
 - live_preview
-- load_testing
 - logging
 - memory
 - merge_trains
@@ -79,8 +84,11 @@
 - mobile_signing_deployment
 - navigation
 - omnibus_package
+- on_call_schedule_management
+- onboarding
 - package_registry
 - pages
+- performance_testing
 - pipeline_authoring
 - planning_analytics
 - privacy_control_center
@@ -102,6 +110,7 @@
 - self_monitoring
 - serverless
 - service_desk
+- sharding
 - snippets
 - source_code_management
 - static_application_security_testing
@@ -120,5 +129,5 @@
 - vulnerability_management
 - web_firewall
 - web_ide
-- web_performance
 - wiki
+- workflow_automation

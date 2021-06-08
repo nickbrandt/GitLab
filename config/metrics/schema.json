@@ -5,6 +5,10 @@
     "key_path": {
       "type": "string"
     },
+    "name": {
+      "type": ["string", "null"],
+      "pattern": "^([a-z]+_)*[a-z]+$"
+    },
     "description": {
       "type": "string"
     },
@@ -22,11 +26,11 @@
     },
     "value_type": {
       "type": "string",
-      "enum": ["string", "number", "boolean"]
+      "enum": ["string", "number", "boolean", "object"]
     },
     "status": {
       "type": ["string"],
-      "enum": ["data_available", "planned", "in_progress", "implemented", "not_used", "deprecated"]
+      "enum": ["data_available", "implemented", "not_used", "deprecated", "removed", "broken"]
     },
     "milestone": {
       "type": ["string", "null"],
@@ -39,13 +43,23 @@
     "introduced_by_url": {
       "type": ["string", "null"]
     },
+    "repair_issue_url": {
+      "type": ["string"]
+    },
+    "options": {
+      "type": "object"
+    },
     "time_frame": {
       "type": "string",
       "enum": ["7d", "28d", "all", "none"]
     },
     "data_source": {
       "type": "string",
-      "enum": ["database", "redis", "redis_hll", "prometheus", "ruby"]
+      "enum": ["database", "redis", "redis_hll", "prometheus", "system", "license"]
+    },
+    "instrumentation_class": {
+      "type": "string",
+      "pattern": "^(([A-Z][a-z]+)+::)*(([A-Z]+[a-z]+)+)$"
     },
     "distribution": {
       "type": "array",
@@ -63,6 +77,21 @@
     },
     "skip_validation": {
       "type": "boolean"
+    },
+    "value_json_schema": {
+      "type": "string"
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": { "const": "broken" }
+        }
+      },
+      "then": {
+        "required": ["repair_issue_url"]
+      }
+    }
+  ]
 }

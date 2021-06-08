@@ -5,7 +5,7 @@ module Mutations
     class AddProject < BaseMutation
       graphql_name 'AddProjectToSecurityDashboard'
 
-      authorize :developer_access
+      authorize :add_project_to_instance_security_dashboard
 
       field :project, Types::ProjectType,
             null: true,
@@ -37,7 +37,7 @@ module Mutations
 
       def add_project(project)
         Dashboard::Projects::CreateService
-          .new(current_user, current_user.security_dashboard_projects, ability: :read_vulnerability)
+          .new(current_user, current_user.security_dashboard_projects, ability: :read_security_resource)
           .execute([project.id])
       end
 

@@ -14,6 +14,22 @@ working on the GitLab codebase.
 This documentation does not yet include the internal API used by
 GitLab Pages.
 
+## Adding new endpoints
+
+API endpoints should be externally accessible by default, with proper authentication and authorization.
+Before adding a new internal endpoint, consider if the API would potentially be
+useful to the wider GitLab community and can be made externally accessible.
+
+One reason we might favor internal API endpoints sometimes is when using such an endpoint requires
+internal data that external actors can not have. For example, in the internal Pages API we might use
+a secret token that identifies a request as internal or sign a request with a public key that is
+not available to a wider community.
+
+Another reason to separate something into an internal API is when request to such API endpoint
+should never go through an edge (public) load balancer. This way we can configure different rate
+limiting rules and policies around how the endpoint is being accessed, because we know that only
+internal requests can be made to that endpoint going through an internal load balancer.
+
 ## Authentication
 
 These methods are all authenticated using a shared secret. This secret
@@ -60,7 +76,9 @@ POST /internal/allowed
 Example request:
 
 ```shell
-curl --request POST --header "Gitlab-Shared-Secret: <Base64 encoded token>" --data "key_id=11&project=gnuwget/wget2&action=git-upload-pack&protocol=ssh" "http://localhost:3001/api/v4/internal/allowed"
+curl --request POST --header "Gitlab-Shared-Secret: <Base64 encoded token>" \
+     --data "key_id=11&project=gnuwget/wget2&action=git-upload-pack&protocol=ssh" \
+     "http://localhost:3001/api/v4/internal/allowed"
 ```
 
 Example response:
@@ -108,7 +126,8 @@ information for LFS clients when the repository is accessed over SSH.
 Example request:
 
 ```shell
-curl --request POST --header "Gitlab-Shared-Secret: <Base64 encoded token>" --data "key_id=11&project=gnuwget/wget2" "http://localhost:3001/api/v4/internal/lfs_authenticate"
+curl --request POST --header "Gitlab-Shared-Secret: <Base64 encoded token>" \
+     --data "key_id=11&project=gnuwget/wget2" "http://localhost:3001/api/v4/internal/lfs_authenticate"
 ```
 
 ```json
@@ -242,7 +261,8 @@ GET /internal/two_factor_recovery_codes
 Example request:
 
 ```shell
-curl --request POST --header "Gitlab-Shared-Secret: <Base64 encoded secret>" --data "key_id=7" "http://localhost:3001/api/v4/internal/two_factor_recovery_codes"
+curl --request POST --header "Gitlab-Shared-Secret: <Base64 encoded secret>" \
+     --data "key_id=7" "http://localhost:3001/api/v4/internal/two_factor_recovery_codes"
 ```
 
 Example response:
@@ -289,7 +309,9 @@ POST /internal/personal_access_token
 Example request:
 
 ```shell
-curl --request POST --header "Gitlab-Shared-Secret: <Base64 encoded secret>" --data "user_id=29&name=mytokenname&scopes[]=read_user&scopes[]=read_repository&expires_at=2020-07-24" "http://localhost:3001/api/v4/internal/personal_access_token"
+curl --request POST --header "Gitlab-Shared-Secret: <Base64 encoded secret>" \
+     --data "user_id=29&name=mytokenname&scopes[]=read_user&scopes[]=read_repository&expires_at=2020-07-24" \
+     "http://localhost:3001/api/v4/internal/personal_access_token"
 ```
 
 Example response:
@@ -323,7 +345,8 @@ POST /internal/pre_receive
 Example request:
 
 ```shell
-curl --request POST --header "Gitlab-Shared-Secret: <Base64 encoded secret>" --data "gl_repository=project-7" "http://localhost:3001/api/v4/internal/pre_receive"
+curl --request POST --header "Gitlab-Shared-Secret: <Base64 encoded secret>" \
+     --data "gl_repository=project-7" "http://localhost:3001/api/v4/internal/pre_receive"
 ```
 
 Example response:
@@ -355,7 +378,10 @@ POST /internal/post_receive
 Example Request:
 
 ```shell
-curl --request POST --header "Gitlab-Shared-Secret: <Base64 encoded secret>" --data "gl_repository=project-7" --data "identifier=user-1" --data "changes=0000000000000000000000000000000000000000 fd9e76b9136bdd9fe217061b497745792fe5a5ee gh-pages\n" "http://localhost:3001/api/v4/internal/post_receive"
+curl --request POST --header "Gitlab-Shared-Secret: <Base64 encoded secret>" \
+     --data "gl_repository=project-7" --data "identifier=user-1" \
+     --data "changes=0000000000000000000000000000000000000000 fd9e76b9136bdd9fe217061b497745792fe5a5ee gh-pages\n" \
+     "http://localhost:3001/api/v4/internal/post_receive"
 ```
 
 Example response:
@@ -402,7 +428,8 @@ GET /internal/kubernetes/agent_info
 Example Request:
 
 ```shell
-curl --request GET --header "Gitlab-Kas-Api-Request: <JWT token>" --header "Authorization: Bearer <agent token>" "http://localhost:3000/api/v4/internal/kubernetes/agent_info"
+curl --request GET --header "Gitlab-Kas-Api-Request: <JWT token>" \
+     --header "Authorization: Bearer <agent token>" "http://localhost:3000/api/v4/internal/kubernetes/agent_info"
 ```
 
 ### Kubernetes agent project information
@@ -427,7 +454,8 @@ GET /internal/kubernetes/project_info
 Example Request:
 
 ```shell
-curl --request GET --header "Gitlab-Kas-Api-Request: <JWT token>" --header "Authorization: Bearer <agent token>" "http://localhost:3000/api/v4/internal/kubernetes/project_info?id=7"
+curl --request GET --header "Gitlab-Kas-Api-Request: <JWT token>" \
+     --header "Authorization: Bearer <agent token>" "http://localhost:3000/api/v4/internal/kubernetes/project_info?id=7"
 ```
 
 ### Kubernetes agent usage metrics
@@ -437,7 +465,8 @@ metric counters.
 
 | Attribute | Type   | Required | Description |
 |:----------|:-------|:---------|:------------|
-| `gitops_sync_count` | integer| yes | The number to increase the `gitops_sync_count` counter by |
+| `gitops_sync_count` | integer| no | The number to increase the `gitops_sync_count` counter by |
+| `k8s_api_proxy_request_count` | integer| no | The number to increase the `k8s_api_proxy_request_count` counter by |
 
 ```plaintext
 POST /internal/kubernetes/usage_metrics
@@ -446,7 +475,8 @@ POST /internal/kubernetes/usage_metrics
 Example Request:
 
 ```shell
-curl --request POST --header "Gitlab-Kas-Api-Request: <JWT token>" --header "Content-Type: application/json" --data '{"gitops_sync_count":1}' "http://localhost:3000/api/v4/internal/kubernetes/usage_metrics"
+curl --request POST --header "Gitlab-Kas-Api-Request: <JWT token>" --header "Content-Type: application/json" \
+     --data '{"gitops_sync_count":1}' "http://localhost:3000/api/v4/internal/kubernetes/usage_metrics"
 ```
 
 ### Kubernetes agent alert metrics
@@ -465,7 +495,10 @@ POST internal/kubernetes/modules/cilium_alert
 Example Request:
 
 ```shell
-curl --request POST   --header "Gitlab-Kas-Api-Request: <JWT token>" --header "Authorization: Bearer <agent token>" --header "Content-Type: application/json" --data '"{\"alert\":{\"title\":\"minimal\",\"message\":\"network problem\",\"evalMatches\":[{\"value\":1,\"metric\":\"Count\",\"tags\":{}}]}}"' "http://localhost:3000/api/v4/internal/kubernetes/modules/cilium_alert"
+curl --request POST --header "Gitlab-Kas-Api-Request: <JWT token>" \
+     --header "Authorization: Bearer <agent token>" --header "Content-Type: application/json" \
+     --data '"{\"alert\":{\"title\":\"minimal\",\"message\":\"network problem\",\"evalMatches\":[{\"value\":1,\"metric\":\"Count\",\"tags\":{}}]}}"' \
+     "http://localhost:3000/api/v4/internal/kubernetes/modules/cilium_alert"
 ```
 
 ## Subscriptions
@@ -488,7 +521,7 @@ POST /namespaces/:id/gitlab_subscription
 | `plan_code` | string  | no       | Subscription tier code |
 | `seats`     | integer | no       | Number of seats in subscription |
 | `max_seats_used` | integer | no  | Highest number of active users in the last month |
-| `auto_renew` | boolean | no      | Whether subscription will auto renew on end date |
+| `auto_renew` | boolean | no      | Whether subscription auto-renews on end date |
 | `trial`     | boolean | no       | Whether subscription is a trial |
 | `trial_starts_on` | date | no    | Start date of trial |
 | `trial_ends_on` | date | no      | End date of trial |
@@ -539,7 +572,7 @@ PUT /namespaces/:id/gitlab_subscription
 | `plan_code` | string  | no       | Subscription tier code |
 | `seats`     | integer | no       | Number of seats in subscription |
 | `max_seats_used` | integer | no  | Highest number of active users in the last month |
-| `auto_renew` | boolean | no      | Whether subscription will auto renew on end date |
+| `auto_renew` | boolean | no      | Whether subscription auto-renews on end date |
 | `trial`     | boolean | no       | Whether subscription is a trial |
 | `trial_starts_on` | date | no    | Start date of trial. Required if trial is true. |
 | `trial_ends_on` | date | no      | End date of trial |

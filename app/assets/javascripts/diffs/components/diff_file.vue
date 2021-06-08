@@ -2,9 +2,10 @@
 import { GlButton, GlLoadingIcon, GlSafeHtmlDirective as SafeHtml, GlSprintf } from '@gitlab/ui';
 import { escape } from 'lodash';
 import { mapActions, mapGetters, mapState } from 'vuex';
-import { deprecatedCreateFlash as createFlash } from '~/flash';
+import createFlash from '~/flash';
 import { hasDiff } from '~/helpers/diffs_helper';
 import { diffViewerErrors } from '~/ide/constants';
+import { scrollToElement } from '~/lib/utils/common_utils';
 import { sprintf } from '~/locale';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import notesEventHub from '../../notes/event_hub';
@@ -80,9 +81,9 @@ export default {
     genericError: GENERIC_ERROR,
   },
   computed: {
-    ...mapState('diffs', ['currentDiffFileId']),
+    ...mapState('diffs', ['currentDiffFileId', 'codequalityDiff']),
     ...mapGetters(['isNotesFetched']),
-    ...mapGetters('diffs', ['getDiffFileDiscussions']),
+    ...mapGetters('diffs', ['getDiffFileDiscussions', 'isVirtualScrollingEnabled']),
     viewBlobHref() {
       return escape(this.file.view_path);
     },
@@ -148,8 +149,16 @@ export default {
 
       return loggedIn && featureOn;
     },
+    codequalityDiffForFile() {
+      return this.codequalityDiff?.files?.[this.file.file_path] || [];
+    },
   },
   watch: {
+    'file.id': {
+      handler: function fileIdHandler() {
+        this.manageViewedEffects();
+      },
+    },
     'file.file_hash': {
       handler: function hashChangeWatch(newHash, oldHash) {
         this.isCollapsed = isCollapsed(this.file);
@@ -186,9 +195,7 @@ export default {
       this.postRender();
     }
 
-    if (this.reviewed && !this.isCollapsed && this.showLocalFileReviews) {
-      this.handleToggle();
-    }
+    this.manageViewedEffects();
   },
   beforeDestroy() {
     eventHub.$off(EVT_EXPAND_ALL_FILES, this.expandAllListener);
@@ -200,6 +207,11 @@ export default {
       'setRenderIt',
       'setFileCollapsedByUser',
     ]),
+    manageViewedEffects() {
+      if (this.reviewed && !this.isCollapsed && this.showLocalFileReviews) {
+        this.handleToggle();
+      }
+    },
     expandAllListener() {
       if (this.isCollapsed) {
         this.handleToggle();
@@ -222,15 +234,20 @@ export default {
         eventHub.$emit(event);
       });
     },
-    handleToggle() {
-      const currentCollapsedFlag = this.isCollapsed;
+    handleToggle({ viaUserInteraction = false } = {}) {
+      const collapsingNow = !this.isCollapsed;
+      const contentElement = this.$el.querySelector(`#diff-content-${this.file.file_hash}`);
 
       this.setFileCollapsedByUser({
         filePath: this.file.file_path,
-        collapsed: !currentCollapsedFlag,
+        collapsed: collapsingNow,
       });
 
-      if (!this.hasDiff && currentCollapsedFlag) {
+      if (collapsingNow && viaUserInteraction && contentElement) {
+        scrollToElement(contentElement, { duration: 1 });
+      }
+
+      if (!this.hasDiff && !collapsingNow) {
         this.requestDiff();
       }
     },
@@ -253,7 +270,9 @@ export default {
         })
         .catch(() => {
           this.isLoadingCollapsedDiff = false;
-          createFlash(this.$options.i18n.genericError);
+          createFlash({
+            message: this.$options.i18n.genericError,
+          });
         });
     },
     showForkMessage() {
@@ -273,6 +292,7 @@ export default {
       'is-active': currentDiffFileId === file.file_hash,
       'comments-disabled': Boolean(file.brokenSymlink),
       'has-body': showBody,
+      'is-virtual-scrolling': isVirtualScrollingEnabled,
     }"
     :data-path="file.new_path"
     class="diff-file file-holder gl-border-none"
@@ -286,9 +306,10 @@ export default {
       :add-merge-request-buttons="true"
       :view-diffs-file-by-file="viewDiffsFileByFile"
       :show-local-file-reviews="showLocalFileReviews"
+      :codequality-diff="codequalityDiffForFile"
       class="js-file-title file-title gl-border-1 gl-border-solid gl-border-gray-100"
       :class="hasBodyClasses.header"
-      @toggleFile="handleToggle"
+      @toggleFile="handleToggle({ viaUserInteraction: true })"
       @showForkMessage="showForkMessage"
     />
 

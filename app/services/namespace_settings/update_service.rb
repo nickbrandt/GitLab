@@ -13,13 +13,26 @@ module NamespaceSettings
     end
 
     def execute
+      validate_resource_access_token_creation_allowed_param
+
       if group.namespace_settings
         group.namespace_settings.attributes = settings_params
       else
         group.build_namespace_settings(settings_params)
       end
     end
+
+    private
+
+    def validate_resource_access_token_creation_allowed_param
+      return if settings_params[:resource_access_token_creation_allowed].nil?
+
+      unless can?(current_user, :admin_group, group)
+        settings_params.delete(:resource_access_token_creation_allowed)
+        group.namespace_settings.errors.add(:resource_access_token_creation_allowed, _('can only be changed by a group admin.'))
+      end
+    end
   end
 end
 
-NamespaceSettings::UpdateService.prepend_if_ee('EE::NamespaceSettings::UpdateService')
+NamespaceSettings::UpdateService.prepend_mod_with('NamespaceSettings::UpdateService')

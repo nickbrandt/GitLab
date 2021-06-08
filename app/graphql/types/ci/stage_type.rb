@@ -2,20 +2,29 @@
 
 module Types
   module Ci
-    # rubocop: disable Graphql/AuthorizeTypes
     class StageType < BaseObject
       graphql_name 'CiStage'
+      authorize :read_commit_status
 
-      field :name, GraphQL::STRING_TYPE, null: true,
-        description: 'Name of the stage.'
-      field :groups, Ci::GroupType.connection_type, null: true,
-        extras: [:lookahead],
-        description: 'Group of jobs for the stage.'
-      field :detailed_status, Types::Ci::DetailedStatusType, null: true,
+      field :name,
+            type: GraphQL::STRING_TYPE,
+            null: true,
+            description: 'Name of the stage.'
+      field :groups,
+            type: Ci::GroupType.connection_type,
+            null: true,
+            extras: [:lookahead],
+            description: 'Group of jobs for the stage.'
+      field :detailed_status, Types::Ci::DetailedStatusType,
+            null: true,
             description: 'Detailed status of the stage.'
+      field :jobs, Ci::JobType.connection_type,
+            null: true,
+            description: 'Jobs for the stage.',
+            method: 'latest_statuses'
 
       def detailed_status
-        object.detailed_status(context[:current_user])
+        object.detailed_status(current_user)
       end
 
       # Issues one query per pipeline
@@ -33,6 +42,7 @@ module Types
             jobs_for_pipeline(pl, indexed.keys, include_needs).each do |stage_id, statuses|
               key = indexed[stage_id]
               groups = ::Ci::Group.fabricate(project, key.stage, statuses)
+
               loader.call(key, groups)
             end
           end

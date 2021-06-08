@@ -21,7 +21,7 @@ RSpec.describe Gitlab::Prometheus::Adapter do
       end
 
       context 'with cluster with prometheus available' do
-        let!(:prometheus) { create(:clusters_applications_prometheus, :installed, cluster: cluster) }
+        let!(:prometheus) { create(:clusters_integrations_prometheus, cluster: cluster) }
 
         it 'returns prometheus service' do
           expect(subject.prometheus_adapter).to eq(prometheus_service)
@@ -32,8 +32,12 @@ RSpec.describe Gitlab::Prometheus::Adapter do
     context "prometheus service can't execute queries" do
       let(:prometheus_service) { double(:prometheus_service, can_query?: false) }
 
-      context 'with cluster with prometheus not available' do
-        let!(:prometheus) { create(:clusters_applications_prometheus, :installable, cluster: cluster) }
+      before do
+        allow(project).to receive(:find_or_initialize_service).with('prometheus').and_return prometheus_service
+      end
+
+      context 'with cluster with prometheus disabled' do
+        let!(:prometheus) { create(:clusters_integrations_prometheus, enabled: false, cluster: cluster) }
 
         it 'returns nil' do
           expect(subject.prometheus_adapter).to be_nil
@@ -41,7 +45,7 @@ RSpec.describe Gitlab::Prometheus::Adapter do
       end
 
       context 'with cluster with prometheus available' do
-        let!(:prometheus) { create(:clusters_applications_prometheus, :installed, cluster: cluster) }
+        let!(:prometheus) { create(:clusters_integrations_prometheus, cluster: cluster) }
 
         it 'returns application handling all environments' do
           expect(subject.prometheus_adapter).to eq(prometheus)

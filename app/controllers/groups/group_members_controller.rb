@@ -4,6 +4,7 @@ class Groups::GroupMembersController < Groups::ApplicationController
   include MembershipActions
   include MembersPresentation
   include SortingHelper
+  include Gitlab::Utils::StrongMemoize
 
   MEMBER_PER_PAGE_LIMIT = 50
 
@@ -21,16 +22,16 @@ class Groups::GroupMembersController < Groups::ApplicationController
 
   feature_category :authentication_and_authorization
 
+  helper_method :can_manage_members?
+
   def index
     @sort = params[:sort].presence || sort_value_name
-
-    @project = @group.projects.find(params[:project_id]) if params[:project_id]
 
     @members = GroupMembersFinder
       .new(@group, current_user, params: filter_params)
       .execute(include_relations: requested_relations)
 
-    if can_manage_members
+    if can_manage_members?
       @skip_groups = @group.related_group_ids
 
       @invited_members = @members.invite
@@ -52,8 +53,10 @@ class Groups::GroupMembersController < Groups::ApplicationController
 
   private
 
-  def can_manage_members
-    can?(current_user, :admin_group_member, @group)
+  def can_manage_members?
+    strong_memoize(:can_manage_members) do
+      can?(current_user, :admin_group_member, @group)
+    end
   end
 
   def present_invited_members(invited_members)
@@ -77,4 +80,4 @@ class Groups::GroupMembersController < Groups::ApplicationController
   end
 end
 
-Groups::GroupMembersController.prepend_if_ee('EE::Groups::GroupMembersController')
+Groups::GroupMembersController.prepend_mod_with('Groups::GroupMembersController')

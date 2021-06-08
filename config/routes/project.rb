@@ -50,6 +50,8 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           end
         end
 
+        resources :infrastructure_registry, only: [:index, :show], module: :packages
+
         resources :jobs, only: [:index, :show], constraints: { id: /\d+/ } do
           collection do
             resources :artifacts, only: [] do
@@ -127,6 +129,8 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
               put :revoke
             end
           end
+
+          resource :packages_and_registries, only: [:show]
         end
 
         resources :autocomplete_sources, only: [] do
@@ -263,6 +267,15 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         end
         get '/cycle_analytics', to: redirect('%{namespace_id}/%{project_id}/-/value_stream_analytics')
 
+        namespace :analytics do
+          resource :cycle_analytics, only: :show, path: 'value_stream_analytics'
+          scope module: :cycle_analytics, as: 'cycle_analytics', path: 'value_stream_analytics' do
+            resources :value_streams, only: [:index] do
+              resources :stages, only: [:index]
+            end
+          end
+        end
+
         concerns :clusterable
 
         namespace :serverless do
@@ -372,7 +385,6 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
 
         # The wiki and repository routing contains wildcard characters so
         # its preferable to keep it below all other project routes
-        draw :repository_scoped
         draw :repository
         draw :wiki
 
@@ -391,12 +403,24 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         resource :feature_flags_client, only: [] do
           post :reset_token
         end
-        resources :feature_flags_user_lists, param: :iid, only: [:new, :edit, :show]
+        resources :feature_flags_user_lists, param: :iid, only: [:index, :new, :edit, :show]
 
         get '/schema/:branch/*filename',
           to: 'web_ide_schemas#show',
           format: false,
           as: :schema
+
+        resources :hooks, only: [:index, :create, :edit, :update, :destroy], constraints: { id: /\d+/ } do
+          member do
+            post :test
+          end
+
+          resources :hook_logs, only: [:show] do
+            member do
+              post :retry
+            end
+          end
+        end
       end
       # End of the /-/ scope.
 
@@ -459,18 +483,6 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
             constraints: { endpoint_identifier: /[A-Za-z0-9]+/ }
 
       draw :legacy_builds
-
-      resources :hooks, only: [:index, :create, :edit, :update, :destroy], constraints: { id: /\d+/ } do # rubocop: disable Cop/PutProjectRoutesUnderScope
-        member do
-          post :test # rubocop:todo Cop/PutProjectRoutesUnderScope
-        end
-
-        resources :hook_logs, only: [:show] do # rubocop: disable Cop/PutProjectRoutesUnderScope
-          member do
-            post :retry # rubocop:todo Cop/PutProjectRoutesUnderScope
-          end
-        end
-      end
 
       resources :container_registry, only: [:index, :destroy, :show], # rubocop: disable Cop/PutProjectRoutesUnderScope
                                      controller: 'registry/repositories'
@@ -553,16 +565,15 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
       # Deprecated unscoped routing.
       scope as: 'deprecated' do
         # Issue https://gitlab.com/gitlab-org/gitlab/issues/118849
-        draw :pipelines
-        draw :repository
+        draw :repository_deprecated
 
-        # Issue https://gitlab.com/gitlab-org/gitlab/-/issues/29572
-        resources :snippets, concerns: :awardable, constraints: { id: /\d+/ } do # rubocop: disable Cop/PutProjectRoutesUnderScope
-          member do
-            get :raw # rubocop:todo Cop/PutProjectRoutesUnderScope
-            post :mark_as_spam # rubocop:todo Cop/PutProjectRoutesUnderScope
-          end
-        end
+        # Issue https://gitlab.com/gitlab-org/gitlab/-/issues/223719
+        # rubocop: disable Cop/PutProjectRoutesUnderScope
+        get '/snippets/:id/raw',
+          to: 'snippets#raw',
+          format: false,
+          constraints: { id: /\d+/ }
+        # rubocop: enable Cop/PutProjectRoutesUnderScope
       end
 
       # All new routes should go under /-/ scope.
@@ -571,12 +582,14 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
       # Legacy routes.
       # Introduced in 12.0.
       # Should be removed with https://gitlab.com/gitlab-org/gitlab/issues/28848.
-      Gitlab::Routing.redirect_legacy_paths(self, :mirror, :tags,
+      Gitlab::Routing.redirect_legacy_paths(self, :mirror, :tags, :hooks,
+                                            :commits, :commit, :find_file, :files, :compare,
                                             :cycle_analytics, :mattermost, :variables, :triggers,
                                             :environments, :protected_environments, :error_tracking, :alert_management,
                                             :tracing,
                                             :serverless, :clusters, :audit_events, :wikis, :merge_requests,
-                                            :vulnerability_feedback, :security, :dependencies, :issues)
+                                            :vulnerability_feedback, :security, :dependencies, :issues,
+                                            :pipelines, :pipeline_schedules, :snippets)
     end
 
     # rubocop: disable Cop/PutProjectRoutesUnderScope

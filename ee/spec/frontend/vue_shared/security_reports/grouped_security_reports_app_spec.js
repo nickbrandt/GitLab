@@ -442,7 +442,7 @@ describe('Grouped security reports app', () => {
     });
 
     it('renders', () => {
-      expect(wrapper.find('[data-qa-selector="coverage_fuzzing_report"]').exists()).toBe(true);
+      expect(wrapper.find('.js-coverage-fuzzing-widget').exists()).toBe(true);
     });
   });
 
@@ -556,7 +556,7 @@ describe('Grouped security reports app', () => {
     });
 
     it('shows the scanned URLs count and opens a modal', async () => {
-      const jobLink = wrapper.find('[data-qa-selector="dast-ci-job-link"]');
+      const jobLink = wrapper.find('[data-testid="dast-ci-job-link"]');
 
       expect(wrapper.text()).toContain('211 URLs scanned');
       expect(jobLink.exists()).toBe(true);
@@ -596,7 +596,40 @@ describe('Grouped security reports app', () => {
 
       return waitForMutation(wrapper.vm.$store, types.RECEIVE_DAST_DIFF_SUCCESS).then(() => {
         expect(wrapper.text()).not.toContain('0 URLs scanned');
-        expect(wrapper.find('[data-qa-selector="dast-ci-job-link"]').exists()).toBe(false);
+        expect(wrapper.find('[data-testid="dast-ci-job-link"]').exists()).toBe(false);
+      });
+    });
+
+    it('show download option when scanned resources are not available', () => {
+      mock.onGet(DAST_DIFF_ENDPOINT).reply(200, {
+        ...dastDiffSuccessMock,
+        base_report_out_of_date: true,
+      });
+
+      const summaryWithoutScannedResources = {
+        scannedResourcesCsvPath: 'http://test',
+      };
+
+      createWrapper(
+        {
+          ...props,
+          enabledReports: {
+            dast: true,
+          },
+        },
+        {
+          data: {
+            dastSummary: summaryWithoutScannedResources,
+          },
+        },
+      );
+
+      return waitForMutation(wrapper.vm.$store, types.RECEIVE_DAST_DIFF_SUCCESS).then(() => {
+        const findDownloadLink = wrapper.find('[data-testid="download-link"]');
+
+        expect(wrapper.text()).toContain('Download scanned resources');
+        expect(findDownloadLink.exists()).toBe(true);
+        expect(findDownloadLink.attributes('href')).toBe('http://test');
       });
     });
   });
@@ -624,7 +657,7 @@ describe('Grouped security reports app', () => {
       });
 
       it('should render the component', () => {
-        expect(wrapper.find('[data-qa-selector="secret_scan_report"]').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="secret-scan-report"]').exists()).toBe(true);
       });
 
       it('should set diffEndpoint', () => {
@@ -646,7 +679,7 @@ describe('Grouped security reports app', () => {
       });
 
       it('should not render the component', () => {
-        expect(wrapper.find('[data-qa-selector="secret_scan_report"]').exists()).toBe(false);
+        expect(wrapper.find('[data-testid="secret-scan-report"]').exists()).toBe(false);
       });
     });
   });
@@ -685,7 +718,7 @@ describe('Grouped security reports app', () => {
       createWrapper({
         ...props,
         ...extraProp,
-        targetBranch: 'master',
+        targetBranch: 'main',
         enabledReports: {
           sast: true,
         },
@@ -703,7 +736,7 @@ describe('Grouped security reports app', () => {
 
       it('should display out of date message', () => {
         expect(wrapper.vm.$el.textContent).toContain(
-          'Security report is out of date. Run a new pipeline for the target branch (master)',
+          'Security report is out of date. Run a new pipeline for the target branch (main)',
         );
       });
     });
@@ -715,7 +748,7 @@ describe('Grouped security reports app', () => {
 
       it('should display out of date message', () => {
         expect(wrapper.vm.$el.textContent).toContain(
-          'Security report is out of date. Please update your branch with the latest changes from the target branch (master)',
+          'Security report is out of date. Please update your branch with the latest changes from the target branch (main)',
         );
       });
     });

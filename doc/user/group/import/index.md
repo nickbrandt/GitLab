@@ -8,13 +8,11 @@ info: To determine the technical writer assigned to the Stage/Group associated w
 # Import groups from another instance of GitLab **(FREE)**
 
 > - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/249160) in GitLab 13.7.
-> - It's [deployed behind a feature flag](../../feature_flags.md), disabled by default.
-> - It's enabled on GitLab.com.
-
-## Overview
+> - [Deployed behind a feature flag](../../feature_flags.md), disabled by default.
+> - Enabled on GitLab.com.
 
 WARNING:
-This feature is [under construction](https://gitlab.com/groups/gitlab-org/-/epics/2771) and currently migrates only some of the Group data. Please see below for the full list of what is included in the migration at this time.
+This feature is [under construction](https://gitlab.com/groups/gitlab-org/-/epics/2771), and migrates only some of the group data. Refer to the following information for the list of what's included in the migration.
 
 Using GitLab Group Migration, you can migrate existing top-level groups from GitLab.com or a self-managed instance. Groups can be migrated to a target instance, as a top-level group, or as a subgroup of any existing top-level group.
 
@@ -49,6 +47,30 @@ The following resources are migrated to the target instance:
   - parent epic ([Introduced in 13.9](https://gitlab.com/gitlab-org/gitlab/-/issues/297459))
   - emoji award ([Introduced in 13.9](https://gitlab.com/gitlab-org/gitlab/-/issues/297466))
   - events ([Introduced in 13.10](https://gitlab.com/gitlab-org/gitlab/-/issues/297465))
+- Milestones ([Introduced in 13.10](https://gitlab.com/gitlab-org/gitlab/-/issues/292427))
+  - title
+  - description
+  - state (active / closed)
+  - start date
+  - due date
+  - created at
+  - updated at
+  - iid ([Introduced in 13.11](https://gitlab.com/gitlab-org/gitlab/-/issues/326157))
+- Iterations ([Introduced in 13.10](https://gitlab.com/gitlab-org/gitlab/-/issues/292428))
+  - iid
+  - title
+  - description
+  - state (upcoming / started / closed)
+  - start date
+  - due date
+  - created at
+  - updated at
+- Badges ([Introduced in 13.11](https://gitlab.com/gitlab-org/gitlab/-/issues/292431))
+  - name
+  - link URL
+  - image URL
+- Boards
+- Board Lists
 
 Any other items are **not** migrated.
 
@@ -85,7 +107,7 @@ on an existing group's page.
 
    ![Navigation paths to create a new group](img/new_group_navigation_v13_8.png)
 
-1. On the New Group page, select the **Import group** tab.
+1. On the New Group page, select **Import group**.
 
    ![Fill in import details](img/import_panel_v13_8.png)
 
@@ -95,7 +117,8 @@ on an existing group's page.
 
 ### Selecting which groups to import
 
-After you have authorized access to GitLab instance, you are redirected to the GitLab Group Migration importer page and your remote GitLab groups are listed.
+After you have authorized access to the GitLab instance, you are redirected to the GitLab Group
+Migration importer page. Your remote GitLab groups, which you have Owner access to, are listed.
 
 1. By default, the proposed group namespaces match the names as they exist in remote instance, but based on your permissions, you can choose to edit these names before you proceed to import any of them.
 

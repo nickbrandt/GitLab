@@ -1,4 +1,6 @@
-import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { GlLabel } from '@gitlab/ui';
+import { shallowMount, mount } from '@vue/test-utils';
+import Vue from 'vue';
 import Vuex from 'vuex';
 
 import BoardCard from '~/boards/components/board_card.vue';
@@ -6,18 +8,18 @@ import BoardCardInner from '~/boards/components/board_card_inner.vue';
 import { inactiveId } from '~/boards/constants';
 import { mockLabelList, mockIssue } from '../mock_data';
 
-describe('Board card layout', () => {
+describe('Board card', () => {
   let wrapper;
   let store;
   let mockActions;
 
-  const localVue = createLocalVue();
-  localVue.use(Vuex);
+  Vue.use(Vuex);
 
-  const createStore = ({ initialState = {}, isSwimlanesOn = false } = {}) => {
+  const createStore = ({ initialState = {} } = {}) => {
     mockActions = {
       toggleBoardItem: jest.fn(),
       toggleBoardItemMultiSelection: jest.fn(),
+      performSearch: jest.fn(),
     };
 
     store = new Vuex.Store({
@@ -28,23 +30,25 @@ describe('Board card layout', () => {
       },
       actions: mockActions,
       getters: {
-        isSwimlanesOn: () => isSwimlanesOn,
         isEpicBoard: () => false,
       },
     });
   };
 
   // this particular mount component needs to be used after the root beforeEach because it depends on list being initialized
-  const mountComponent = ({ propsData = {}, provide = {} } = {}) => {
-    wrapper = shallowMount(BoardCard, {
-      localVue,
-      stubs: {
-        BoardCardInner,
-      },
+  const mountComponent = ({
+    propsData = {},
+    provide = {},
+    mountFn = shallowMount,
+    stubs = { BoardCardInner },
+    item = mockIssue,
+  } = {}) => {
+    wrapper = mountFn(BoardCard, {
+      stubs,
       store,
       propsData: {
         list: mockLabelList,
-        issue: mockIssue,
+        item,
         disabled: false,
         index: 0,
         ...propsData,
@@ -68,79 +72,111 @@ describe('Board card layout', () => {
     await wrapper.vm.$nextTick();
   };
 
+  beforeEach(() => {
+    window.gon = { features: {} };
+  });
+
   afterEach(() => {
     wrapper.destroy();
     wrapper = null;
     store = null;
   });
 
-  describe.each`
-    isSwimlanesOn
-    ${true}       | ${false}
-  `('when isSwimlanesOn is $isSwimlanesOn', ({ isSwimlanesOn }) => {
-    it('should not highlight the card by default', async () => {
-      createStore({ isSwimlanesOn });
-      mountComponent();
+  describe('when GlLabel is clicked in BoardCardInner', () => {
+    it('doesnt call toggleBoardItem', () => {
+      createStore({ initialState: { isShowingLabels: true } });
+      mountComponent({ mountFn: mount, stubs: {} });
 
-      expect(wrapper.classes()).not.toContain('is-active');
-      expect(wrapper.classes()).not.toContain('multi-select');
+      wrapper.find(GlLabel).trigger('mouseup');
+
+      expect(mockActions.toggleBoardItem).toHaveBeenCalledTimes(0);
+    });
+  });
+
+  it('should not highlight the card by default', async () => {
+    createStore();
+    mountComponent();
+
+    expect(wrapper.classes()).not.toContain('is-active');
+    expect(wrapper.classes()).not.toContain('multi-select');
+  });
+
+  it('should highlight the card with a correct style when selected', async () => {
+    createStore({
+      initialState: {
+        activeId: mockIssue.id,
+      },
+    });
+    mountComponent();
+
+    expect(wrapper.classes()).toContain('is-active');
+    expect(wrapper.classes()).not.toContain('multi-select');
+  });
+
+  it('should highlight the card with a correct style when multi-selected', async () => {
+    createStore({
+      initialState: {
+        activeId: inactiveId,
+        selectedBoardItems: [mockIssue],
+      },
+    });
+    mountComponent();
+
+    expect(wrapper.classes()).toContain('multi-select');
+    expect(wrapper.classes()).not.toContain('is-active');
+  });
+
+  describe('when mouseup event is called on the card', () => {
+    beforeEach(() => {
+      createStore();
+      mountComponent();
     });
 
-    it('should highlight the card with a correct style when selected', async () => {
-      createStore({
-        initialState: {
-          activeId: mockIssue.id,
-        },
-        isSwimlanesOn,
+    describe('when not using multi-select', () => {
+      it('should call vuex action "toggleBoardItem" with correct parameters', async () => {
+        await selectCard();
+
+        expect(mockActions.toggleBoardItem).toHaveBeenCalledTimes(1);
+        expect(mockActions.toggleBoardItem).toHaveBeenCalledWith(expect.any(Object), {
+          boardItem: mockIssue,
+        });
       });
-      mountComponent();
-
-      expect(wrapper.classes()).toContain('is-active');
-      expect(wrapper.classes()).not.toContain('multi-select');
     });
 
-    it('should highlight the card with a correct style when multi-selected', async () => {
-      createStore({
-        initialState: {
-          activeId: inactiveId,
-          selectedBoardItems: [mockIssue],
-        },
-        isSwimlanesOn,
-      });
-      mountComponent();
-
-      expect(wrapper.classes()).toContain('multi-select');
-      expect(wrapper.classes()).not.toContain('is-active');
-    });
-
-    describe('when mouseup event is called on the issue card', () => {
+    describe('when using multi-select', () => {
       beforeEach(() => {
-        createStore({ isSwimlanesOn });
-        mountComponent();
+        window.gon = { features: { boardMultiSelect: true } };
       });
 
-      describe('when not using multi-select', () => {
-        it('should call vuex action "toggleBoardItem" with correct parameters', async () => {
-          await selectCard();
+      it('should call vuex action "multiSelectBoardItem" with correct parameters', async () => {
+        await multiSelectCard();
 
-          expect(mockActions.toggleBoardItem).toHaveBeenCalledTimes(1);
-          expect(mockActions.toggleBoardItem).toHaveBeenCalledWith(expect.any(Object), {
-            boardItem: mockIssue,
-          });
-        });
+        expect(mockActions.toggleBoardItemMultiSelection).toHaveBeenCalledTimes(1);
+        expect(mockActions.toggleBoardItemMultiSelection).toHaveBeenCalledWith(
+          expect.any(Object),
+          mockIssue,
+        );
       });
+    });
+  });
 
-      describe('when using multi-select', () => {
-        it('should call vuex action "multiSelectBoardItem" with correct parameters', async () => {
-          await multiSelectCard();
+  describe('when card is loading', () => {
+    it('card is disabled and user cannot drag', () => {
+      createStore();
+      mountComponent({ item: { ...mockIssue, isLoading: true } });
 
-          expect(mockActions.toggleBoardItemMultiSelection).toHaveBeenCalledTimes(1);
-          expect(mockActions.toggleBoardItemMultiSelection).toHaveBeenCalledWith(
-            expect.any(Object),
-            mockIssue,
-          );
-        });
-      });
+      expect(wrapper.classes()).toContain('is-disabled');
+      expect(wrapper.classes()).not.toContain('user-can-drag');
+    });
+  });
+
+  describe('when card is not loading', () => {
+    it('user can drag', () => {
+      createStore();
+      mountComponent();
+
+      expect(wrapper.classes()).not.toContain('is-disabled');
+      expect(wrapper.classes()).toContain('user-can-drag');
     });
   });
 });

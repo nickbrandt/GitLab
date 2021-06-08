@@ -54,6 +54,9 @@ module Types
     field :target_branch, GraphQL::STRING_TYPE, null: false,
           description: 'Target branch of the merge request.'
     field :work_in_progress, GraphQL::BOOLEAN_TYPE, method: :work_in_progress?, null: false,
+          deprecated: { reason: 'Use `draft`', milestone: '13.12' },
+          description: 'Indicates if the merge request is a draft.'
+    field :draft, GraphQL::BOOLEAN_TYPE, method: :draft?, null: false,
           description: 'Indicates if the merge request is a draft.'
     field :merge_when_pipeline_succeeds, GraphQL::BOOLEAN_TYPE, null: true,
           description: 'Indicates if the merge has been set to be merged when its pipeline succeeds (MWPS).'
@@ -79,7 +82,11 @@ module Types
     field :force_remove_source_branch, GraphQL::BOOLEAN_TYPE, method: :force_remove_source_branch?, null: true,
           description: 'Indicates if the project settings will lead to source branch deletion after merge.'
     field :merge_status, GraphQL::STRING_TYPE, method: :public_merge_status, null: true,
-          description: 'Status of the merge request.'
+          description: 'Status of the merge request.',
+          deprecated: { reason: :renamed, replacement: 'MergeRequest.mergeStatusEnum', milestone: '14.0' }
+    field :merge_status_enum, ::Types::MergeRequests::MergeStatusEnum,
+          method: :public_merge_status, null: true,
+          description: 'Merge status of the merge request.'
     field :in_progress_merge_commit_sha, GraphQL::STRING_TYPE, null: true,
           description: 'Commit SHA of the merge request if merge is in progress.'
     field :merge_error, GraphQL::STRING_TYPE, null: true,
@@ -130,9 +137,15 @@ module Types
 
     field :milestone, Types::MilestoneType, null: true,
           description: 'The milestone of the merge request.'
-    field :assignees, Types::UserType.connection_type, null: true, complexity: 5,
+    field :assignees,
+          type: Types::MergeRequests::AssigneeType.connection_type,
+          null: true,
+          complexity: 5,
           description: 'Assignees of the merge request.'
-    field :reviewers, Types::UserType.connection_type, null: true, complexity: 5,
+    field :reviewers,
+          type: Types::MergeRequests::ReviewerType.connection_type,
+          null: true,
+          complexity: 5,
           description: 'Users from whom a review has been requested.'
     field :author, Types::UserType, null: true,
           description: 'User who created this merge request.'
@@ -183,6 +196,8 @@ module Types
           description: 'Selected auto merge strategy.'
     field :merge_user, Types::UserType, null: true,
           description: 'User who merged this merge request.'
+    field :timelogs, Types::TimelogType.connection_type, null: false,
+          description: 'Timelogs on the merge request.'
 
     def approved_by
       object.approved_by_users
@@ -252,4 +267,4 @@ module Types
   end
 end
 
-Types::MergeRequestType.prepend_if_ee('::EE::Types::MergeRequestType')
+Types::MergeRequestType.prepend_mod_with('Types::MergeRequestType')

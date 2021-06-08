@@ -10,7 +10,7 @@ type: reference
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/31285) in GitLab 13.0.
 
 Project repositories including wiki and design repositories can be moved between storages. This can be useful when
-[migrating to Gitaly Cluster](../administration/gitaly/praefect.md#migrate-existing-repositories-to-gitaly-cluster),
+[migrating to Gitaly Cluster](../administration/gitaly/praefect.md#migrate-to-gitaly-cluster),
 for example.
 
 As project repository storage moves are processed, they transition through different states. Values
@@ -68,6 +68,7 @@ Example response:
       "path": "project1",
       "path_with_namespace": "namespace1/project1",
       "created_at": "2020-05-07T04:27:17.016Z"
+    }
   }
 ]
 ```
@@ -111,6 +112,7 @@ Example response:
       "path": "project1",
       "path_with_namespace": "namespace1/project1",
       "created_at": "2020-05-07T04:27:17.016Z"
+    }
   }
 ]
 ```
@@ -150,6 +152,7 @@ Example response:
     "path": "project1",
     "path_with_namespace": "namespace1/project1",
     "created_at": "2020-05-07T04:27:17.016Z"
+  }
 }
 ```
 
@@ -189,6 +192,7 @@ Example response:
     "path": "project1",
     "path_with_namespace": "namespace1/project1",
     "created_at": "2020-05-07T04:27:17.016Z"
+  }
 }
 ```
 
@@ -217,7 +221,8 @@ Example request:
 
 ```shell
 curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" --header "Content-Type: application/json" \
---data '{"destination_storage_name":"storage2"}' "https://gitlab.example.com/api/v4/projects/1/repository_storage_moves"
+     --data '{"destination_storage_name":"storage2"}' \
+     "https://gitlab.example.com/api/v4/projects/1/repository_storage_moves"
 ```
 
 Example response:
@@ -237,6 +242,7 @@ Example response:
     "path": "project1",
     "path_with_namespace": "namespace1/project1",
     "created_at": "2020-05-07T04:27:17.016Z"
+  }
 }
 ```
 
@@ -261,7 +267,8 @@ Example request:
 
 ```shell
 curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" --header "Content-Type: application/json" \
---data '{"source_storage_name":"default"}' "https://gitlab.example.com/api/v4/project_repository_storage_moves"
+     --data '{"source_storage_name":"default"}' \
+     "https://gitlab.example.com/api/v4/project_repository_storage_moves"
 ```
 
 Example response:

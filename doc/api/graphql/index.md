@@ -1,6 +1,6 @@
 ---
-stage: none
-group: unassigned
+stage: Create
+group: Ecosystem
 info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#assignments
 ---
 
@@ -70,13 +70,18 @@ possible.
 The GitLab GraphQL API is [versionless](https://graphql.org/learn/best-practices/#versioning) and
 changes are made to the API in a way that maintains backwards-compatibility.
 
-Occassionally GitLab needs to change the GraphQL API in a way that is not backwards-compatible.
+Occasionally GitLab needs to change the GraphQL API in a way that is not backwards-compatible.
 These changes include the removal or renaming of fields, arguments or other parts of the schema.
 
 In these situations, GitLab follows a [Deprecation and removal process](#deprecation-and-removal-process)
 where the deprecated part of the schema is supported for a period of time before being removed.
 
 Clients should familiarize themselves with the process to avoid breaking changes affecting their integrations.
+
+WARNING:
+While GitLab will make all attempts to follow the [deprecation and removal process](#deprecation-and-removal-process),
+GitLab may on very rare occasions need to make immediate breaking changes to the GraphQL API to patch critical security or performance
+concerns and where the deprecation process would be considered to pose significant risk.
 
 NOTE:
 Fields behind a feature flag and disabled by default are exempt from the deprecation process,
@@ -176,6 +181,59 @@ of a query may be altered.
 ### Request timeout
 
 Requests time out at 30 seconds.
+
+### Spam
+
+GraphQL mutations can be detected as spam. If this happens, a
+[GraphQL top-level error](https://spec.graphql.org/June2018/#sec-Errors) is raised. For example:
+
+```json
+{
+  "errors": [
+    {
+      "message": "Request denied. Spam detected",
+      "locations": [ { "line": 6, "column": 7 } ],
+      "path": [ "updateSnippet" ],
+      "extensions": {
+        "spam": true
+      }
+    }
+  ],
+  "data": {
+    "updateSnippet": {
+      "snippet": null
+    }
+  }
+}
+```
+
+If mutation is detected as potential spam and a CAPTCHA service is configured:
+
+- The `captchaSiteKey` should be used to obtain a CAPTCHA response value using the appropriate CAPTCHA API.
+  Only [Google reCAPTCHA v2](https://developers.google.com/recaptcha/docs/display) is supported.
+- The request can be resubmitted with the `X-GitLab-Captcha-Response` and `X-GitLab-Spam-Log-Id` headers set.
+
+```json
+{
+  "errors": [
+    {
+      "message": "Request denied. Solve CAPTCHA challenge and retry",
+      "locations": [ { "line": 6, "column": 7 } ],
+      "path": [ "updateSnippet" ],
+      "extensions": {
+        "needsCaptchaResponse": true,
+        "captchaSiteKey": "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI",
+        "spamLogId": 67
+      }
+    }
+  ],
+  "data": {
+    "updateSnippet": {
+      "snippet": null,
+    }
+  }
+}
+```
 
 ## Reference
 

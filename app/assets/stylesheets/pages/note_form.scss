@@ -48,7 +48,6 @@
 }
 
 .note-image-attach {
-  @extend .col-lg-4;
   margin-left: 45px;
   float: none;
 }
@@ -370,10 +369,6 @@ table {
     .btn {
       float: none;
       width: 100%;
-
-      &:not(:last-child) {
-        margin-bottom: 10px;
-      }
     }
   }
 }

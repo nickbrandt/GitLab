@@ -22,21 +22,32 @@ export const initPipelinesIndex = (selector = '#pipelines-list-vue') => {
 
   const {
     endpoint,
+    artifactsEndpoint,
+    artifactsEndpointPlaceholder,
     pipelineScheduleUrl,
     emptyStateSvgPath,
     errorStateSvgPath,
     noPipelinesSvgPath,
     newPipelinePath,
+    addCiYmlPath,
+    suggestedCiTemplates,
     canCreatePipeline,
     hasGitlabCi,
     ciLintPath,
     resetCachePath,
     projectId,
     params,
+    codeQualityPagePath,
   } = el.dataset;
 
   return new Vue({
     el,
+    provide: {
+      addCiYmlPath,
+      artifactsEndpoint,
+      artifactsEndpointPlaceholder,
+      suggestedCiTemplates: JSON.parse(suggestedCiTemplates),
+    },
     data() {
       return {
         store: new PipelinesStore(),
@@ -64,6 +75,7 @@ export const initPipelinesIndex = (selector = '#pipelines-list-vue') => {
           resetCachePath,
           projectId,
           params: JSON.parse(params),
+          codeQualityPagePath,
         },
       });
     },

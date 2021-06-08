@@ -16,7 +16,7 @@ Constants for snippet visibility levels are:
 
 | visibility | Description |
 | ---------- | ----------- |
-| `private`  | The snippet is visible only the snippet creator |
+| `private`  | The snippet is visible only to the snippet creator |
 | `internal` | The snippet is visible for any logged in user except [external users](../user/permissions.md#external-users) |
 | `public`   | The snippet can be accessed without any authentication |
 
@@ -114,7 +114,7 @@ curl --request POST "https://gitlab.com/api/v4/projects/:id/snippets" \
   "files": [
     {
       "file_path": "example.txt",
-      "content" : "source code \n with multiple lines\n",
+      "content" : "source code \n with multiple lines\n"
     }
   ]
 }
@@ -140,7 +140,7 @@ Parameters:
 | `description`         | string          | no       | Description of a snippet                                                                                        |
 | `visibility`          | string          | no       | Snippet's [visibility](#snippet-visibility-level)                                                               |
 | `files`               | array of hashes | no       | An array of snippet files                                                                                       |
-| `files:action`        | string          | yes      | Type of action to perform on the file, one of: 'create', 'update', 'delete', 'move'                             |
+| `files:action`        | string          | yes      | Type of action to perform on the file, one of: `create`, `update`, `delete`, `move`                             |
 | `files:file_path`     | string          | no       | File path of the snippet file                                                                                   |
 | `files:previous_path` | string          | no       | Previous path of the snippet file                                                                               |
 | `files:content`       | string          | no       | Content of the snippet file                                                                                     |
@@ -225,7 +225,7 @@ Parameters:
 
 - `id` (required) - The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) owned by the authenticated user
 - `snippet_id` (required) - The ID of a project's snippet
-- `ref` (required) - The name of a branch, tag or commit, such as `master`
+- `ref` (required) - The name of a branch, tag or commit, such as `main`
 - `file_path` (required) - The URL-encoded path to the file, such as `snippet%2Erb`
 
 Example request:

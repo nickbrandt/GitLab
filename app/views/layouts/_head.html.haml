@@ -32,9 +32,11 @@
   - if page_canonical_link
     %link{ rel: 'canonical', href: page_canonical_link }
 
+  = yield :prefetch_asset_tags
+
   = favicon_link_tag favicon, id: 'favicon', data: { original_href: favicon }, type: 'image/png'
 
-  = render 'layouts/startup_css'
+  = render 'layouts/startup_css', { startup_filename: local_assigns.fetch(:startup_filename, nil) }
   - if user_application_theme == 'gl-dark'
     = stylesheet_link_tag_defer "application_dark"
     = yield :page_specific_styles
@@ -61,7 +63,6 @@
   = yield :page_specific_javascripts
 
   = webpack_controller_bundle_tags
-  = webpack_bundle_tag "chrome_84_icon_fix" if browser.chrome?([">=84", "<84.0.4147.125"]) || browser.edge?([">=84", "<84.0.522.59"])
 
   = yield :project_javascripts
 

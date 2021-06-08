@@ -60,7 +60,7 @@ module NavHelper
   end
 
   def admin_monitoring_nav_links
-    %w(system_info background_jobs health_check requests_profiles)
+    %w(system_info background_migrations background_jobs health_check requests_profiles)
   end
 
   def admin_analytics_nav_links
@@ -68,7 +68,14 @@ module NavHelper
   end
 
   def group_issues_sub_menu_items
-    %w(groups#issues labels#index milestones#index boards#index boards#show)
+    %w[
+      groups#issues
+      milestones#index
+      boards#index
+      boards#show
+    ].tap do |paths|
+      paths << 'labels#index' if Feature.disabled?(:sidebar_refactor, current_user, default_enabled: :yaml)
+    end
   end
 
   private
@@ -92,14 +99,12 @@ module NavHelper
       links << :admin_impersonation
     end
 
-    if Feature.enabled?(:user_mode_in_session)
-      if current_user_mode.admin_mode?
-        links << :admin_mode
-      end
+    if Gitlab::CurrentSettings.admin_mode && current_user_mode.admin_mode?
+      links << :admin_mode
     end
 
     links
   end
 end
 
-NavHelper.prepend_if_ee('EE::NavHelper')
+NavHelper.prepend_mod_with('NavHelper')

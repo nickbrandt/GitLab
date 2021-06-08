@@ -36,7 +36,7 @@ class MergeRequestWidgetEntity < Grape::Entity
   end
 
   expose :merge_request_widget_path do |merge_request|
-    widget_project_json_merge_request_path(merge_request.target_project, merge_request, format: :json)
+    widget_project_json_merge_request_path(merge_request.target_project, merge_request, async_mergeability_check: true, format: :json)
   end
 
   expose :merge_request_cached_widget_path do |merge_request|
@@ -52,7 +52,7 @@ class MergeRequestWidgetEntity < Grape::Entity
   end
 
   expose :reviewing_and_managing_merge_requests_docs_path do |merge_request|
-    help_page_path('user/project/merge_requests/reviewing_and_managing_merge_requests.md', anchor: "checkout-merge-requests-locally-through-the-head-ref")
+    help_page_path('user/project/merge_requests/reviews/index.md', anchor: "checkout-merge-requests-locally-through-the-head-ref")
   end
 
   expose :merge_request_pipelines_docs_path do |merge_request|
@@ -176,4 +176,4 @@ class MergeRequestWidgetEntity < Grape::Entity
   end
 end
 
-MergeRequestWidgetEntity.prepend_if_ee('EE::MergeRequestWidgetEntity')
+MergeRequestWidgetEntity.prepend_mod_with('MergeRequestWidgetEntity')

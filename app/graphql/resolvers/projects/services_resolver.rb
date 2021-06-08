@@ -3,11 +3,11 @@
 module Resolvers
   module Projects
     class ServicesResolver < BaseResolver
-      prepend ManualAuthorization
       include Gitlab::Graphql::Authorize::AuthorizeResource
 
       type Types::Projects::ServiceType.connection_type, null: true
       authorize :admin_project
+      authorizes_object!
 
       argument :active,
                GraphQL::BOOLEAN_TYPE,
@@ -20,16 +20,8 @@ module Resolvers
 
       alias_method :project, :object
 
-      def resolve(**args)
-        authorize!(project)
-
-        services(args[:active], args[:type])
-      end
-
-      private
-
-      def services(active, type)
-        servs = project.services
+      def resolve(active: nil, type: nil)
+        servs = project.integrations
         servs = servs.by_active_flag(active) unless active.nil?
         servs = servs.by_type(type) unless type.blank?
         servs

@@ -7,13 +7,11 @@ type: reference, howto
 
 # Repository storage **(FREE SELF)**
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/4578) in GitLab 8.10.
-
 GitLab stores [repositories](../user/project/repository/index.md) on repository storage. Repository
 storage is either:
 
 - A `gitaly_address`, which points to a [Gitaly node](gitaly/index.md).
-- A `path`, which points directly a directory where the repositories are stored. This method is
+- A `path`, which points directly to the directory where the repositories are stored. This method is
   deprecated and [scheduled to be removed](https://gitlab.com/gitlab-org/gitaly/-/issues/1690) in
   GitLab 14.0.
 
@@ -83,7 +81,7 @@ For [backups](../raketasks/backup_restore.md) to work correctly:
 Omnibus GitLab takes care of these issues for you, but for source installations you should be extra
 careful.
 
-While restoring a backup, the current contents of `/home/git/repositories` are moved to 
+While restoring a backup, the current contents of `/home/git/repositories` are moved to
 `/home/git/repositories.old`. If `/home/git/repositories` is a mount point, then `mv` would be
 moving things between mount points, and problems can occur.
 
@@ -156,5 +154,5 @@ often it is chosen. That is, `(storage weight) / (sum of all weights) * 100 = ch
 
 ## Move repositories
 
-To move a repository to a different repository path, use
-the same process as [migrating existing repositories to Gitaly Cluster](gitaly/praefect.md#migrate-existing-repositories-to-gitaly-cluster).
+To move a repository to a different repository storage (for example, from `default` to `storage2`), use the 
+same process as [migrating to Gitaly Cluster](gitaly/praefect.md#migrate-to-gitaly-cluster).

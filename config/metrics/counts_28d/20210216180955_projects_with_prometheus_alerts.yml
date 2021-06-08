@@ -6,11 +6,14 @@ product_stage:
 product_group: group::monitor
 product_category: metrics
 value_type: number
-status: data_available
+status: removed
+milestone_removed: '14.0'
 time_frame: 28d
-data_source:
+data_source: database
 distribution:
-- ce
+  - ce
+  - ee
 tier:
-- free
-skip_validation: true
+  - free
+  - premium
+  - ultimate

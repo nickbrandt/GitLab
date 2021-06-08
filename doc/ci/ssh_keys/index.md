@@ -1,6 +1,6 @@
 ---
 stage: Verify
-group: Continuous Integration
+group: Pipeline Execution
 info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#assignments
 type: tutorial
 ---
@@ -36,7 +36,8 @@ with any type of [executor](https://docs.gitlab.com/runner/executors/)
    `~/.ssh/authorized_keys`) or add it as a [deploy key](../../user/project/deploy_keys/index.md)
    if you are accessing a private GitLab repository.
 
-The private key is displayed in the job log, unless you enable
+In the following example, the `ssh-add -` command does not display the value of
+`$SSH_PRIVATE_KEY` in the job log, though it could be exposed if you enable
 [debug logging](../variables/README.md#debug-logging). You might also want to
 check the [visibility of your pipelines](../pipelines/settings.md#visibility-of-pipelines).
 

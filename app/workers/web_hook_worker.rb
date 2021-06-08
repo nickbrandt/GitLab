@@ -1,11 +1,14 @@
 # frozen_string_literal: true
 
-class WebHookWorker # rubocop:disable Scalability/IdempotentWorker
+# Worker cannot be idempotent: https://gitlab.com/gitlab-org/gitlab/-/issues/218559
+# rubocop:disable Scalability/IdempotentWorker
+class WebHookWorker
   include ApplicationWorker
 
   feature_category :integrations
   worker_has_external_dependencies!
   loggable_arguments 2
+  data_consistency :delayed, feature_flag: :load_balancing_for_web_hook_worker
 
   sidekiq_options retry: 4, dead: false
 
@@ -16,3 +19,4 @@ class WebHookWorker # rubocop:disable Scalability/IdempotentWorker
     WebHookService.new(hook, data, hook_name).execute
   end
 end
+# rubocop:enable Scalability/IdempotentWorker

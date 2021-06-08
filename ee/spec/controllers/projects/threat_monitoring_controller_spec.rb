@@ -4,6 +4,7 @@ require 'spec_helper'
 
 RSpec.describe Projects::ThreatMonitoringController do
   let_it_be(:project) { create(:project, :repository, :private) }
+  let_it_be(:alert) { create(:alert_management_alert, :threat_monitoring, project: project) }
   let_it_be(:user) { create(:user) }
 
   describe 'GET show' do
@@ -138,6 +139,7 @@ RSpec.describe Projects::ThreatMonitoringController do
     end
 
     let_it_be(:environment) { create(:environment, :with_review_app, project: project) }
+
     let(:environment_id) { environment.id }
 
     context 'with authorized user' do
@@ -237,7 +239,9 @@ RSpec.describe Projects::ThreatMonitoringController do
   end
 
   describe 'GET threat monitoring alerts' do
-    subject { get :alert_details, params: { namespace_id: project.namespace, project_id: project, id: '5' } }
+    let(:alert_iid) { alert.iid }
+
+    subject { get :alert_details, params: { namespace_id: project.namespace, project_id: project, iid: alert_iid } }
 
     context 'with authorized user' do
       before do
@@ -253,15 +257,31 @@ RSpec.describe Projects::ThreatMonitoringController do
         it 'renders the show template' do
           subject
 
-          expect(response).to have_gitlab_http_status(:ok)
           expect(response).to render_template(:alert_details)
+        end
+
+        context 'when id is invalid' do
+          let(:alert_iid) { nil }
+
+          it 'raises an error' do
+            expect { subject }.to raise_error(ActionController::UrlGenerationError)
+          end
+        end
+
+        context 'when id is not found' do
+          let(:alert_iid) { non_existing_record_id }
+
+          it 'renders not found' do
+            subject
+
+            expect(response).to have_gitlab_http_status(:not_found)
+          end
         end
       end
 
       context 'when feature is not available' do
         before do
-          stub_licensed_features(threat_monitoring: true)
-          stub_feature_flags(threat_monitoring_alerts: false)
+          stub_licensed_features(threat_monitoring: false)
         end
 
         it 'returns 404' do

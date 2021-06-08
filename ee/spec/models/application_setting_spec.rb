@@ -29,18 +29,6 @@ RSpec.describe ApplicationSetting do
     it { is_expected.not_to allow_value(subject.mirror_max_capacity + 1).for(:mirror_capacity_threshold) }
     it { is_expected.to allow_value(nil).for(:custom_project_templates_group_id) }
 
-    it { is_expected.to allow_value(10).for(:elasticsearch_shards) }
-    it { is_expected.not_to allow_value(nil).for(:elasticsearch_shards) }
-    it { is_expected.not_to allow_value(0).for(:elasticsearch_shards) }
-    it { is_expected.not_to allow_value(1.1).for(:elasticsearch_shards) }
-    it { is_expected.not_to allow_value(-1).for(:elasticsearch_shards) }
-
-    it { is_expected.to allow_value(10).for(:elasticsearch_replicas) }
-    it { is_expected.to allow_value(0).for(:elasticsearch_replicas) }
-    it { is_expected.not_to allow_value(nil).for(:elasticsearch_replicas) }
-    it { is_expected.not_to allow_value(1.1).for(:elasticsearch_replicas) }
-    it { is_expected.not_to allow_value(-1).for(:elasticsearch_replicas) }
-
     it { is_expected.to allow_value(10).for(:elasticsearch_indexed_file_size_limit_kb) }
     it { is_expected.not_to allow_value(0).for(:elasticsearch_indexed_file_size_limit_kb) }
     it { is_expected.not_to allow_value(nil).for(:elasticsearch_indexed_file_size_limit_kb) }
@@ -70,6 +58,10 @@ RSpec.describe ApplicationSetting do
     it { is_expected.not_to allow_value(nil).for(:elasticsearch_client_request_timeout) }
     it { is_expected.not_to allow_value(1.1).for(:elasticsearch_client_request_timeout) }
     it { is_expected.not_to allow_value(-1).for(:elasticsearch_client_request_timeout) }
+
+    it { is_expected.to allow_value('').for(:elasticsearch_username) }
+    it { is_expected.to allow_value('a' * 255).for(:elasticsearch_username) }
+    it { is_expected.not_to allow_value('a' * 256).for(:elasticsearch_username) }
 
     it { is_expected.to allow_value(nil).for(:required_instance_ci_template) }
     it { is_expected.not_to allow_value("").for(:required_instance_ci_template) }
@@ -168,24 +160,6 @@ RSpec.describe ApplicationSetting do
       with_them do
         specify do
           setting.elasticsearch_url = elasticsearch_url
-
-          expect(setting.valid?).to eq(is_valid)
-        end
-      end
-    end
-
-    context 'when validating compliance_frameworks' do
-      where(:compliance_frameworks, :is_valid) do
-        [1, 2, 3, 4, 5] | true
-        nil             | true
-        1               | true
-        [2, 3, 4, 6]    | false
-        6               | false
-      end
-
-      with_them do
-        specify do
-          setting.compliance_frameworks = compliance_frameworks
 
           expect(setting.valid?).to eq(is_valid)
         end
@@ -330,10 +304,56 @@ RSpec.describe ApplicationSetting do
     end
   end
 
+  describe '#elasticsearch_url_with_credentials' do
+    it 'embeds credentials in the result' do
+      setting.elasticsearch_url = 'http://example.com,https://example2.com:9200'
+      setting.elasticsearch_username = 'foo'
+      setting.elasticsearch_password = 'bar'
+
+      expect(setting.elasticsearch_url_with_credentials).to eq(%w[http://foo:bar@example.com https://foo:bar@example2.com:9200])
+    end
+
+    it 'embeds username only' do
+      setting.elasticsearch_url = 'http://example.com,https://example2.com:9200'
+      setting.elasticsearch_username = 'foo'
+      setting.elasticsearch_password = ''
+
+      expect(setting.elasticsearch_url_with_credentials).to eq(%w[http://foo:@example.com https://foo:@example2.com:9200])
+    end
+
+    it 'overrides existing embedded credentials' do
+      setting.elasticsearch_url = 'http://username:password@example.com,https://test:test@example2.com:9200'
+      setting.elasticsearch_username = 'foo'
+      setting.elasticsearch_password = 'bar'
+
+      expect(setting.elasticsearch_url_with_credentials).to eq(%w[http://foo:bar@example.com https://foo:bar@example2.com:9200])
+    end
+
+    it 'returns original url if credentials blank' do
+      setting.elasticsearch_url = 'http://username:password@example.com,https://test:test@example2.com:9200'
+      setting.elasticsearch_username = ''
+      setting.elasticsearch_password = ''
+
+      expect(setting.elasticsearch_url_with_credentials).to eq(%w[http://username:password@example.com https://test:test@example2.com:9200])
+    end
+  end
+
+  describe '#elasticsearch_password' do
+    it 'does not modify password if it is unchanged in the form' do
+      setting.elasticsearch_password = 'foo'
+
+      setting.elasticsearch_password = ApplicationSetting::MASK_PASSWORD
+
+      expect(setting.elasticsearch_password).to eq('foo')
+    end
+  end
+
   describe '#elasticsearch_config' do
     it 'places all elasticsearch configuration values into a hash' do
       setting.update!(
         elasticsearch_url: 'http://example.com:9200',
+        elasticsearch_username: 'foo',
+        elasticsearch_password: 'bar',
         elasticsearch_aws: false,
         elasticsearch_aws_region:     'test-region',
         elasticsearch_aws_access_key: 'test-access-key',
@@ -344,7 +364,7 @@ RSpec.describe ApplicationSetting do
       )
 
       expect(setting.elasticsearch_config).to eq(
-        url: ['http://example.com:9200'],
+        url: ['http://foo:bar@example.com:9200'],
         aws: false,
         aws_region:     'test-region',
         aws_access_key: 'test-access-key',

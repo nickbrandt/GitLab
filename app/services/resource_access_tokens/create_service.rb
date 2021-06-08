@@ -39,7 +39,7 @@ module ResourceAccessTokens
     attr_reader :resource_type, :resource
 
     def has_permission_to_create?
-      %w(project group).include?(resource_type) && can?(current_user, :admin_resource_access_tokens, resource)
+      %w(project group).include?(resource_type) && can?(current_user, :create_resource_access_tokens, resource)
     end
 
     def create_user
@@ -48,7 +48,7 @@ module ResourceAccessTokens
       # since someone like a project maintainer does not inherently have the ability
       # to create a new user in the system.
 
-      Users::CreateService.new(current_user, default_user_params).execute(skip_authorization: true)
+      ::Users::AuthorizedCreateService.new(current_user, default_user_params).execute
     end
 
     def delete_failed_user(user)
@@ -120,4 +120,4 @@ module ResourceAccessTokens
   end
 end
 
-ResourceAccessTokens::CreateService.prepend_if_ee('EE::ResourceAccessTokens::CreateService')
+ResourceAccessTokens::CreateService.prepend_mod_with('ResourceAccessTokens::CreateService')

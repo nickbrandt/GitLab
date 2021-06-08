@@ -23,7 +23,11 @@
     - ~"development guidelines" when changing docs under `doc/development/*`, `CONTRIBUTING.md`, or `README.md`.
     - ~"development guidelines" and ~"Documentation guidelines" when changing docs under `development/documentation/*`.
     - ~"development guidelines" and ~"Description templates (.gitlab/\*)" when creating/updating issue and MR description templates.
-  - [ ] Assign the [designated Technical Writer](https://about.gitlab.com/handbook/engineering/ux/technical-writing/#assignments).
+  - [ ] [Request a review](https://docs.gitlab.com/ee/development/code_review.html#dogfooding-the-reviewers-feature)
+        from the [designated Technical Writer](https://about.gitlab.com/handbook/engineering/ux/technical-writing/#assignments).
+
+/label ~documentation
+/assign me
 
 Do not add the ~"feature", ~"frontend", ~"backend", ~"bug", or ~"database" labels if you are only updating documentation. These labels will cause the MR to be added to code verification QA issues.
 
@@ -48,8 +52,8 @@ All reviewers can help ensure accuracy, clarity, completeness, and adherence to 
 - [ ] Technical writer review. If not requested for this MR, must be scheduled post-merge. To request for this MR, assign the writer listed for the applicable [DevOps stage](https://about.gitlab.com/handbook/product/categories/#devops-stages).
   - [ ] Ensure docs metadata are present and up-to-date.
   - [ ] Ensure ~"Technical Writing" and ~"documentation" are added.
-  - [ ] Add the corresponding `docs::` [scoped label](https://gitlab.com/groups/gitlab-org/-/labels?utf8=%E2%9C%93&subscribed=&search=docs%3A%3A).
-  - [ ] If working on UI text, add the corresponding `UI Text` [scoped label](https://gitlab.com/groups/gitlab-org/-/labels?utf8=%E2%9C%93&subscribed=&search=ui+text).
+  - [ ] Add the corresponding `docs::` [scoped label](https://gitlab.com/groups/gitlab-org/-/labels?subscribed=&search=docs%3A%3A).
+  - [ ] If working on UI text, add the corresponding `UI Text` [scoped label](https://gitlab.com/groups/gitlab-org/-/labels?subscribed=&search=ui+text).
   - [ ] Add ~"tw::doing" when starting work on the MR.
   - [ ] Add ~"tw::finished" if Technical Writing team work on the MR is complete but it remains open.
 
@@ -68,5 +72,3 @@ For more information, see our documentation on [Merging a merge request](https:/
 1. [ ] Review by assigned maintainer, who can always request/require the above reviews. Maintainer's review can occur before or after a technical writer review.
 1. [ ] Ensure a release milestone is set.
 1. [ ] If there has not been a technical writer review, [create an issue for one using the Doc Review template](https://gitlab.com/gitlab-org/gitlab/issues/new?issuable_template=Doc%20Review).
-
-/label ~documentation

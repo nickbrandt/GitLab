@@ -1,4 +1,5 @@
-import { GlButton, GlFilteredSearch, GlLoadingIcon, GlPagination } from '@gitlab/ui';
+import '~/commons';
+import { GlButton, GlEmptyState, GlFilteredSearch, GlLoadingIcon, GlPagination } from '@gitlab/ui';
 import { mount } from '@vue/test-utils';
 import MockAdapter from 'axios-mock-adapter';
 import { chunk } from 'lodash';
@@ -6,10 +7,9 @@ import { nextTick } from 'vue';
 import { extendedWrapper } from 'helpers/vue_test_utils_helper';
 import waitForPromises from 'helpers/wait_for_promises';
 import Api from '~/api';
-import { deprecatedCreateFlash as createFlash } from '~/flash';
+import { getExperimentVariant } from '~/experimentation/utils';
+import createFlash from '~/flash';
 import axios from '~/lib/utils/axios_utils';
-import BlankState from '~/pipelines/components/pipelines_list/blank_state.vue';
-import EmptyState from '~/pipelines/components/pipelines_list/empty_state.vue';
 import NavigationControls from '~/pipelines/components/pipelines_list/nav_controls.vue';
 import PipelinesComponent from '~/pipelines/components/pipelines_list/pipelines.vue';
 import PipelinesTableComponent from '~/pipelines/components/pipelines_list/pipelines_table.vue';
@@ -21,6 +21,10 @@ import TablePagination from '~/vue_shared/components/pagination/table_pagination
 import { stageReply, users, mockSearch, branches } from './mock_data';
 
 jest.mock('~/flash');
+jest.mock('~/experimentation/utils', () => ({
+  ...jest.requireActual('~/experimentation/utils'),
+  getExperimentVariant: jest.fn().mockReturnValue('control'),
+}));
 
 const mockProjectPath = 'twitter/flight';
 const mockProjectId = '21';
@@ -43,6 +47,7 @@ describe('Pipelines', () => {
     ciLintPath: '/ci/lint',
     resetCachePath: `${mockProjectPath}/settings/ci_cd/reset_cache`,
     newPipelinePath: `${mockProjectPath}/pipelines/new`,
+    codeQualityPagePath: `${mockProjectPath}/-/new/master?commit_message=Add+.gitlab-ci.yml+and+create+a+code+quality+job&file_name=.gitlab-ci.yml&template=Code-Quality`,
   };
 
   const noPermissions = {
@@ -58,11 +63,10 @@ describe('Pipelines', () => {
   };
 
   const findFilteredSearch = () => wrapper.findComponent(GlFilteredSearch);
+  const findEmptyState = () => wrapper.findComponent(GlEmptyState);
   const findNavigationTabs = () => wrapper.findComponent(NavigationTabs);
   const findNavigationControls = () => wrapper.findComponent(NavigationControls);
   const findPipelinesTable = () => wrapper.findComponent(PipelinesTableComponent);
-  const findEmptyState = () => wrapper.findComponent(EmptyState);
-  const findBlankState = () => wrapper.findComponent(BlankState);
   const findTablePagination = () => wrapper.findComponent(TablePagination);
 
   const findTab = (tab) => wrapper.findByTestId(`pipelines-tab-${tab}`);
@@ -90,7 +94,10 @@ describe('Pipelines', () => {
   beforeAll(() => {
     origWindowLocation = window.location;
     delete window.location;
-    window.location = { search: '' };
+    window.location = {
+      search: '',
+      protocol: 'https:',
+    };
   });
 
   afterAll(() => {
@@ -194,16 +201,16 @@ describe('Pipelines', () => {
         expect(findNavigationControls().exists()).toBe(true);
       });
 
-      it('renders Run Pipeline link', () => {
+      it('renders Run pipeline link', () => {
         expect(findRunPipelineButton().attributes('href')).toBe(paths.newPipelinePath);
       });
 
-      it('renders CI Lint link', () => {
+      it('renders CI lint link', () => {
         expect(findCiLintButton().attributes('href')).toBe(paths.ciLintPath);
       });
 
-      it('renders Clear Runner Cache button', () => {
-        expect(findCleanCacheButton().text()).toBe('Clear Runner Caches');
+      it('renders Clear runner cache button', () => {
+        expect(findCleanCacheButton().text()).toBe('Clear runner caches');
       });
 
       it('renders pipelines in a table', () => {
@@ -268,7 +275,7 @@ describe('Pipelines', () => {
           });
 
           it('should filter pipelines', async () => {
-            expect(findBlankState().text()).toBe('There are currently no pipelines.');
+            expect(findEmptyState().text()).toBe('There are currently no pipelines.');
           });
 
           it('should update browser bar', () => {
@@ -292,7 +299,7 @@ describe('Pipelines', () => {
             page: '1',
             scope: 'all',
             username: 'root',
-            ref: 'master',
+            ref: 'main',
             status: 'pending',
           };
 
@@ -324,7 +331,7 @@ describe('Pipelines', () => {
           expect(window.history.pushState).toHaveBeenCalledWith(
             expect.anything(),
             expect.anything(),
-            `${window.location.pathname}?page=1&scope=all&username=root&ref=master&status=pending`,
+            `${window.location.pathname}?page=1&scope=all&username=root&ref=main&status=pending`,
           );
         });
       });
@@ -342,7 +349,7 @@ describe('Pipelines', () => {
 
         it('displays a warning message if raw text search is used', () => {
           expect(createFlash).toHaveBeenCalledTimes(1);
-          expect(createFlash).toHaveBeenCalledWith(RAW_TEXT_WARNING, 'warning');
+          expect(createFlash).toHaveBeenCalledWith({ message: RAW_TEXT_WARNING, type: 'warning' });
         });
 
         it('should update browser bar', () => {
@@ -502,20 +509,24 @@ describe('Pipelines', () => {
         expect(findTab('all').text()).toMatchInterpolatedText('All 0');
       });
 
-      it('renders Run Pipeline link', () => {
+      it('renders Run pipeline link', () => {
         expect(findRunPipelineButton().attributes('href')).toBe(paths.newPipelinePath);
       });
 
-      it('renders CI Lint link', () => {
+      it('renders CI lint link', () => {
         expect(findCiLintButton().attributes('href')).toBe(paths.ciLintPath);
       });
 
-      it('renders Clear Runner Cache button', () => {
-        expect(findCleanCacheButton().text()).toBe('Clear Runner Caches');
+      it('renders Clear runner cache button', () => {
+        expect(findCleanCacheButton().text()).toBe('Clear runner caches');
       });
 
       it('renders empty state', () => {
-        expect(findBlankState().text()).toBe('There are currently no pipelines.');
+        expect(findEmptyState().text()).toBe('There are currently no pipelines.');
+      });
+
+      it('renders filtered search', () => {
+        expect(findFilteredSearch().exists()).toBe(true);
       });
 
       it('renders tab empty state finished scope', async () => {
@@ -528,7 +539,7 @@ describe('Pipelines', () => {
 
         await waitForPromises();
 
-        expect(findBlankState().text()).toBe('There are currently no finished pipelines.');
+        expect(findEmptyState().text()).toBe('There are currently no finished pipelines.');
       });
     });
 
@@ -539,16 +550,32 @@ describe('Pipelines', () => {
       });
 
       it('renders empty state', () => {
-        expect(findEmptyState().find('[data-testid="header-text"]').text()).toBe(
-          'Build with confidence',
-        );
-        expect(findEmptyState().find('[data-testid="info-text"]').text()).toContain(
+        expect(findEmptyState().text()).toContain('Build with confidence');
+        expect(findEmptyState().text()).toContain(
           'GitLab CI/CD can automatically build, test, and deploy your code.',
         );
+
         expect(findEmptyState().find(GlButton).text()).toBe('Get started with CI/CD');
         expect(findEmptyState().find(GlButton).attributes('href')).toBe(
           '/help/ci/quick_start/index.md',
         );
+      });
+
+      describe('when the code_quality_walkthrough experiment is active', () => {
+        beforeAll(() => {
+          getExperimentVariant.mockReturnValue('candidate');
+        });
+
+        it('renders another CTA button', () => {
+          expect(findEmptyState().findComponent(GlButton).text()).toBe('Add a code quality job');
+          expect(findEmptyState().findComponent(GlButton).attributes('href')).toBe(
+            paths.codeQualityPagePath,
+          );
+        });
+      });
+
+      it('does not render filtered search', () => {
+        expect(findFilteredSearch().exists()).toBe(false);
       });
 
       it('does not render tabs nor buttons', () => {
@@ -600,7 +627,7 @@ describe('Pipelines', () => {
       });
 
       it('renders empty state', () => {
-        expect(findBlankState().text()).toBe('There are currently no pipelines.');
+        expect(findEmptyState().text()).toBe('There are currently no pipelines.');
       });
     });
   });
@@ -689,7 +716,7 @@ describe('Pipelines', () => {
       });
 
       it('shows error state', () => {
-        expect(findBlankState().text()).toBe(
+        expect(findEmptyState().text()).toBe(
           'There was an error fetching the pipelines. Try again in a few moments or contact your support team.',
         );
       });
@@ -710,11 +737,11 @@ describe('Pipelines', () => {
         expect(findRunPipelineButton().attributes('href')).toBe(paths.newPipelinePath);
 
         expect(findCiLintButton().attributes('href')).toBe(paths.ciLintPath);
-        expect(findCleanCacheButton().text()).toBe('Clear Runner Caches');
+        expect(findCleanCacheButton().text()).toBe('Clear runner caches');
       });
 
       it('shows error state', () => {
-        expect(findBlankState().text()).toBe(
+        expect(findEmptyState().text()).toBe(
           'There was an error fetching the pipelines. Try again in a few moments or contact your support team.',
         );
       });

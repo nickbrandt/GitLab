@@ -47,7 +47,6 @@ RSpec.describe 'parse alert payload fields' do
 
   before do
     stub_licensed_features(multiple_alert_http_integrations: license)
-    stub_feature_flags(multiple_http_integrations_custom_mapping: feature_flag)
 
     post_graphql(query, current_user: current_user)
   end
@@ -56,10 +55,12 @@ RSpec.describe 'parse alert payload fields' do
 
   specify do
     expect(parsed_fields).to eq([
-      { 'path' => %w[title], 'label' => 'Title', 'type' => 'STRING' },
-      { 'path' => %w[started_at], 'label' => 'Started at', 'type' => 'DATETIME' },
-      { 'path' => %w[nested key], 'label' => 'Key', 'type' => 'STRING' },
-      { 'path' => %w[arr], 'label' => 'Arr', 'type' => 'ARRAY' }
+      { 'path' => %w[title], 'label' => 'title', 'type' => 'STRING' },
+      { 'path' => %w[started_at], 'label' => 'started_at', 'type' => 'DATETIME' },
+      { 'path' => %w[nested key], 'label' => 'nested/key', 'type' => 'STRING' },
+      { 'path' => %w[arr], 'label' => 'arr', 'type' => 'ARRAY' },
+      { 'path' => ['arr', 1], 'label' => 'arr[1]', 'type' => 'STRING' },
+      { 'path' => ['arr', 0], 'label' => 'arr[0]', 'type' => 'STRING' }
     ])
   end
 
@@ -93,11 +94,5 @@ RSpec.describe 'parse alert payload fields' do
     let(:payload_json) { '1' }
 
     it_behaves_like 'query with error', 'Failed to parse payload'
-  end
-
-  context 'without feature flag' do
-    let(:feature_flag) { false }
-
-    it_behaves_like 'query with error', 'Feature not available'
   end
 end

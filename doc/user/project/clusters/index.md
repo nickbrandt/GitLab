@@ -1,6 +1,6 @@
 ---
 stage: Monitor
-group: Health
+group: Monitor
 info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#assignments
 ---
 
@@ -61,6 +61,9 @@ Kubernetes version to any supported version at any time:
 
 Some GitLab features may support versions outside the range provided here.
 
+NOTE:
+[GKE Cluster creation](add_remove_clusters.md#create-new-cluster) by GitLab is currently not supported for Kubernetes 1.19+. For these versions you can create the cluster through GCP, then [Add existing cluster](add_remove_clusters.md#add-existing-cluster). See [the related issue](https://gitlab.com/gitlab-org/gitlab/-/issues/331922) for more information.
+
 ### Adding and removing clusters
 
 See [Adding and removing Kubernetes clusters](add_remove_clusters.md) for details on how
@@ -86,7 +89,7 @@ differentiates the new cluster from the rest.
 
 When adding more than one Kubernetes cluster to your project, you need to differentiate
 them with an environment scope. The environment scope associates clusters with [environments](../../../ci/environments/index.md) similar to how the
-[environment-specific CI/CD variables](../../../ci/variables/README.md#limit-the-environment-scopes-of-cicd-variables) work.
+[environment-specific CI/CD variables](../../../ci/variables/README.md#limit-the-environment-scope-of-a-cicd-variable) work.
 
 The default environment scope is `*`, which means all jobs, regardless of their
 environment, use that cluster. Each scope can be used only by a single cluster
@@ -189,7 +192,7 @@ your cluster. This can cause deployment jobs to fail.
 
 To clear the cache:
 
-1. Navigate to your project’s **Operations > Kubernetes** page, and select your cluster.
+1. Navigate to your project's **Operations > Kubernetes** page, and select your cluster.
 1. Expand the **Advanced settings** section.
 1. Click **Clear cluster cache**.
 
@@ -351,16 +354,17 @@ You can customize the deployment namespace in a few ways:
 When you customize the namespace, existing environments remain linked to their current
 namespaces until you [clear the cluster cache](#clearing-the-cluster-cache).
 
-WARNING:
+#### Protecting credentials
+
 By default, anyone who can create a deployment job can access any CI/CD variable in
 an environment's deployment job. This includes `KUBECONFIG`, which gives access to
 any secret available to the associated service account in your cluster.
 To keep your production credentials safe, consider using
 [protected environments](../../../ci/environments/protected_environments.md),
-combined with either
+combined with *one* of the following:
 
-- a GitLab-managed cluster and namespace per environment,
-- *or*, an environment-scoped cluster per protected environment. The same cluster
+- A GitLab-managed cluster and namespace per environment.
+- An environment-scoped cluster per protected environment. The same cluster
   can be added multiple times with multiple restricted service accounts.
 
 ### Integrations

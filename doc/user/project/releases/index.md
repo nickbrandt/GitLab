@@ -5,7 +5,7 @@ group: Release
 info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#assignments
 ---
 
-# Releases
+# Releases **(FREE)**
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/issues/41766) in GitLab 11.7.
 
@@ -66,14 +66,11 @@ To create a new release through the GitLab UI:
 
 1. Navigate to **Project overview > Releases** and click the **New release**
    button.
-1. In the [**Tag name**](#tag-name) box, enter a name.
-
-   Creating a release based on an existing tag using the user
-   interface is not yet supported. However, this is possible using the
-   [Releases API](../../../api/releases/index.md#create-a-release).
-
-1. In the **Create from** list, select a branch, tag, or commit SHA to use when
-   creating the new tag.
+1. Open the [**Tag name**](#tag-name) dropdown. Select an existing tag or type
+   in a new tag name. Selecting an existing tag that is already associated with
+   a release will result in a validation error.
+1. If creating a new tag, open the **Create from** dropdown. Select a
+   branch, tag, or commit SHA to use when creating the new tag.
 1. Optionally, fill out any additional information about the release, such as its
    [title](#title), [milestones](#associate-milestones-with-a-release),
    [release notes](#release-notes-description), or [assets links](#links).
@@ -89,7 +86,7 @@ by using a `release` node in the job definition.
 The release is created only if the job processes without error. If the Rails API returns an error
 during release creation, the release job fails.
 
-### Schedule a future release
+### Upcoming releases
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/issues/38105) in GitLab 12.1.
 
@@ -212,19 +209,19 @@ deploy_to_production:
 
 To set a deploy freeze window in the UI, complete these steps:
 
-1. Sign in to GitLab as a user with project Maintainer [permissions](../../permissions.md).
+1. Sign in to GitLab as a user with the [Maintainer role](../../permissions.md).
 1. Navigate to **Project overview**.
-1. In the left navigation menu, navigate to **Settings > CI / CD**.
+1. In the left navigation menu, navigate to **Settings > CI/CD**.
 1. Scroll to **Deploy freezes**.
 1. Click **Expand** to see the deploy freeze table.
 1. Click **Add deploy freeze** to open the deploy freeze modal.
 1. Enter the start time, end time, and timezone of the desired deploy freeze period.
 1. Click **Add deploy freeze** in the modal.
-
-![Deploy freeze modal for setting a deploy freeze period](img/deploy_freeze_v13_2.png)
+1. After the deploy freeze is saved, you can edit it by selecting the edit button (**{pencil}**).
+   ![Deploy freeze modal for setting a deploy freeze period](img/deploy_freeze_v13_10.png)
 
 WARNING:
-To edit or delete a deploy freeze, use the [Freeze Periods API](../../../api/freeze_periods.md).
+To delete a deploy freeze, use the [Freeze Periods API](../../../api/freeze_periods.md).
 
 If a project contains multiple freeze periods, all periods apply. If they overlap, the freeze covers the
 complete overlapping period.
@@ -274,10 +271,15 @@ Release note descriptions are unrelated. Description supports [Markdown](../../m
 
 ### Release assets
 
-You can add the following types of assets to each release:
+A release contains the following types of assets:
 
 - [Source code](#source-code)
-- [Links](#links)
+- [Permanent links to release assets](#permanent-links-to-release-assets)
+
+#### Source code
+
+GitLab automatically generates `zip`, `tar.gz`, `tar.bz2`, and `tar`
+archived source code from the given Git tag. These are read-only assets.
 
 #### Permanent links to release assets
 
@@ -288,9 +290,21 @@ GitLab always redirects this URL to the actual asset
 location, so even if the assets move to a different location, you can continue
 to use the same URL. This is defined during [link creation](../../../api/releases/links.md#create-a-link) or [updating](../../../api/releases/links.md#update-a-link).
 
-Each asset has a name, a URL of the *actual* asset location, and optionally, a
-`filepath` parameter, which, if you specify it, creates a URL pointing
-to the asset for the Release. The format of the URL is:
+Each asset has a `name`, a `url` of the *actual* asset location, and optionally,
+`filepath` and `link_type` parameters.
+
+A `filepath` creates a URL pointing to the asset for the Release.
+
+The `link_type` parameter accepts one of the following four values:
+
+- `runbook`
+- `package`
+- `image`
+- `other` (default)
+
+This field has no effect on the URL and it's only used for visual purposes in the Releases page of your project.
+
+The format of the URL is:
 
 ```plaintext
 https://host/namespace/project/releases/:release/downloads/:filepath
@@ -303,7 +317,8 @@ namespace and `gitlab-runner` project on `gitlab.com`, for example:
 {
   "name": "linux amd64",
   "filepath": "/binaries/gitlab-runner-linux-amd64",
-  "url": "https://gitlab-runner-downloads.s3.amazonaws.com/v11.9.0-rc2/binaries/gitlab-runner-linux-amd64"
+  "url": "https://gitlab-runner-downloads.s3.amazonaws.com/v11.9.0-rc2/binaries/gitlab-runner-linux-amd64",
+  "link_type": "other"
 }
 ```
 
@@ -314,11 +329,6 @@ https://gitlab.com/gitlab-org/gitlab-runner/releases/v11.9.0-rc2/downloads/binar
 ```
 
 The physical location of the asset can change at any time and the direct link remains unchanged.
-
-### Source code
-
-GitLab automatically generates `zip`, `tar.gz`, `tar.bz2` and `tar`
-archived source code from the given Git tag. These are read-only assets.
 
 ### Links
 
@@ -419,14 +429,14 @@ Evidence collection snapshots are visible on the Releases page, along with the t
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/32773) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 13.2.
 
-When you create a release, if [job artifacts](../../../ci/pipelines/job_artifacts.md#artifactsreports) are included in the last pipeline that ran, they are automatically included in the release as release evidence.
+When you create a release, if [job artifacts](../../../ci/yaml/README.md#artifactsreports) are included in the last pipeline that ran, they are automatically included in the release as release evidence.
 
 Although job artifacts normally expire, artifacts included in release evidence do not expire.
 
 To enable job artifact collection you need to specify both:
 
 1. [`artifacts:paths`](../../../ci/yaml/README.md#artifactspaths)
-1. [`artifacts:reports`](../../../ci/pipelines/job_artifacts.md#artifactsreports)
+1. [`artifacts:reports`](../../../ci/yaml/README.md#artifactsreports)
 
 ```yaml
 ruby:

@@ -1,9 +1,18 @@
 <script>
 import { GlButton, GlLoadingIcon } from '@gitlab/ui';
+import { __ } from '~/locale';
 
 export default {
+  i18n: {
+    unassigned: __('Unassigned'),
+  },
   components: { GlButton, GlLoadingIcon },
-  inject: ['canUpdate'],
+  inject: {
+    canUpdate: {},
+    isClassicSidebar: {
+      default: false,
+    },
+  },
   props: {
     title: {
       type: String,
@@ -11,6 +20,16 @@ export default {
       default: '',
     },
     loading: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    initialLoading: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    isDirty: {
       type: Boolean,
       required: false,
       default: false,
@@ -24,11 +43,21 @@ export default {
         property: null,
       }),
     },
+    canEdit: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
   },
   data() {
     return {
       edit: false,
     };
+  },
+  computed: {
+    editButtonText() {
+      return this.isDirty ? __('Apply') : __('Edit');
+    },
   },
   destroyed() {
     window.removeEventListener('click', this.collapseWhenOffClick);
@@ -81,28 +110,37 @@ export default {
 <template>
   <div>
     <div class="gl-display-flex gl-align-items-center" @click.self="collapse">
-      <span class="hide-collapsed" data-testid="title">{{ title }}</span>
-      <gl-loading-icon v-if="loading" inline class="gl-ml-2 hide-collapsed" />
-      <gl-loading-icon v-if="loading" inline class="gl-mx-auto gl-my-0 hide-expanded" />
+      <span class="hide-collapsed" data-testid="title" @click="collapse">{{ title }}</span>
+      <slot name="title-extra"></slot>
+      <gl-loading-icon v-if="loading || initialLoading" inline class="gl-ml-2 hide-collapsed" />
+      <gl-loading-icon
+        v-if="loading && isClassicSidebar"
+        inline
+        class="gl-mx-auto gl-my-0 hide-expanded"
+      />
+      <slot name="collapsed-right"></slot>
       <gl-button
-        v-if="canUpdate"
+        v-if="canUpdate && !initialLoading && canEdit"
         variant="link"
         class="gl-text-gray-900! gl-hover-text-blue-800! gl-ml-auto hide-collapsed"
         data-testid="edit-button"
         :data-track-event="tracking.event"
         :data-track-label="tracking.label"
         :data-track-property="tracking.property"
+        data-qa-selector="edit_link"
         @keyup.esc="toggle"
         @click="toggle"
       >
-        {{ __('Edit') }}
+        {{ editButtonText }}
       </gl-button>
     </div>
-    <div v-show="!edit" data-testid="collapsed-content">
-      <slot name="collapsed">{{ __('None') }}</slot>
-    </div>
-    <div v-show="edit" data-testid="expanded-content">
-      <slot :edit="edit"></slot>
-    </div>
+    <template v-if="!initialLoading">
+      <div v-show="!edit" data-testid="collapsed-content">
+        <slot name="collapsed">{{ __('None') }}</slot>
+      </div>
+      <div v-show="edit" data-testid="expanded-content" :class="{ 'gl-mt-3': !isClassicSidebar }">
+        <slot :edit="edit"></slot>
+      </div>
+    </template>
   </div>
 </template>

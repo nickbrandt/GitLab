@@ -16,9 +16,7 @@ class UserCallout < ApplicationRecord
     tabs_position_highlight: 10,
     threat_monitoring_info: 11,                # EE-only
     account_recovery_regular_check: 12,        # EE-only
-    webhooks_moved: 13,
-    service_templates_deprecated: 14,
-    admin_integrations_moved: 15,
+    service_templates_deprecated_callout: 14,
     web_ide_alert_dismissed: 16,               # no longer in use
     active_user_count_threshold: 18,           # EE-only
     buy_pipeline_minutes_notification_dot: 19, # EE-only
@@ -29,7 +27,10 @@ class UserCallout < ApplicationRecord
     registration_enabled_callout: 25,
     new_user_signups_cap_reached: 26,          # EE-only
     unfinished_tag_cleanup_callout: 27,
-    eoa_bronze_plan_banner: 28                 # EE-only
+    eoa_bronze_plan_banner: 28,                # EE-only
+    pipeline_needs_banner: 29,
+    pipeline_needs_hover_tip: 30,
+    web_ide_ci_environments_guidance: 31
   }
 
   validates :user, presence: true
@@ -38,6 +39,7 @@ class UserCallout < ApplicationRecord
     uniqueness: { scope: :user_id },
     inclusion: { in: UserCallout.feature_names.keys }
 
-  scope :with_feature_name, -> (feature_name) { where(feature_name: UserCallout.feature_names[feature_name]) }
-  scope :with_dismissed_after, -> (dismissed_after) { where('dismissed_at > ?', dismissed_after) }
+  def dismissed_after?(dismissed_after)
+    dismissed_at > dismissed_after
+  end
 end

@@ -5,10 +5,11 @@ class Groups::BoardsController < Groups::ApplicationController
   include RecordUserLastActivity
   include Gitlab::Utils::StrongMemoize
 
-  before_action :authorize_read_board!, only: [:index, :show]
   before_action :assign_endpoint_vars
   before_action do
     push_frontend_feature_flag(:graphql_board_lists, group, default_enabled: false)
+    push_frontend_feature_flag(:board_multi_select, group, default_enabled: :yaml)
+    push_frontend_feature_flag(:swimlanes_buffered_rendering, group, default_enabled: :yaml)
   end
 
   feature_category :boards

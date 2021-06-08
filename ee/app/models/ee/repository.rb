@@ -9,7 +9,7 @@ module EE
     extend ActiveSupport::Concern
     extend ::Gitlab::Utils::Override
 
-    MIRROR_REMOTE = "upstream".freeze
+    MIRROR_REMOTE = "upstream"
 
     prepended do
       include Elastic::RepositoriesSearch
@@ -81,7 +81,7 @@ module EE
       ::Geo::RepositoryUpdatedService.new(self).execute
     end
 
-    def code_owners_blob(ref: 'HEAD')
+    def code_owners_blob(ref:)
       possible_code_owner_blobs = ::Gitlab::CodeOwners::FILE_PATHS.map { |path| [ref, path] }
       blobs_at(possible_code_owner_blobs).compact.first
     end

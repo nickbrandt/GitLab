@@ -30,6 +30,7 @@ module API
       success Entities::ApplicationSetting
     end
     params do
+      optional :admin_mode, type: Boolean, desc: 'Require admin users to re-authenticate for administrative (i.e. potentially dangerous) operations'
       optional :admin_notification_email, type: String, desc: 'Deprecated: Use :abuse_notification_email instead. Abuse reports will be sent to this address if it is set. Abuse reports are always available in the admin area.'
       optional :abuse_notification_email, type: String, desc: 'Abuse reports will be sent to this address if it is set. Abuse reports are always available in the admin area.'
       optional :after_sign_up_text, type: String, desc: 'Text shown after sign up'
@@ -153,6 +154,7 @@ module API
       optional :spam_check_endpoint_enabled, type: Boolean, desc: 'Enable Spam Check via external API endpoint'
       given spam_check_endpoint_enabled: ->(val) { val } do
         requires :spam_check_endpoint_url, type: String, desc: 'The URL of the external Spam Check service endpoint'
+        requires :spam_check_api_key, type: String, desc: 'The API key used by GitLab for accessing the Spam Check service endpoint'
       end
       optional :terminal_max_session_time, type: Integer, desc: 'Maximum time for web terminal websocket connection (in seconds). Set to 0 for unlimited time.'
       optional :usage_ping_enabled, type: Boolean, desc: 'Every week GitLab will report license usage back to GitLab, Inc.'
@@ -168,6 +170,8 @@ module API
       optional :raw_blob_request_limit, type: Integer, desc: "Maximum number of requests per minute for each raw path. Set to 0 for unlimited requests per minute."
       optional :wiki_page_max_content_bytes, type: Integer, desc: "Maximum wiki page content size in bytes"
       optional :require_admin_approval_after_user_signup, type: Boolean, desc: 'Require explicit admin approval for new signups'
+      optional :whats_new_variant, type: String, values: ApplicationSetting.whats_new_variants.keys, desc: "What's new variant, possible values: `all_tiers`, `current_tier`, and `disabled`."
+      optional :floc_enabled, type: Grape::API::Boolean, desc: 'Enable FloC (Federated Learning of Cohorts)'
 
       ApplicationSetting::SUPPORTED_KEY_TYPES.each do |type|
         optional :"#{type}_key_restriction",
@@ -231,4 +235,4 @@ module API
   end
 end
 
-API::Settings.prepend_if_ee('EE::API::Settings')
+API::Settings.prepend_mod_with('API::Settings')

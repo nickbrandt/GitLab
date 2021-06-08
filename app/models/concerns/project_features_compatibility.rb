@@ -86,6 +86,10 @@ module ProjectFeaturesCompatibility
     write_feature_attribute_string(:security_and_compliance_access_level, value)
   end
 
+  def container_registry_access_level=(value)
+    write_feature_attribute_string(:container_registry_access_level, value)
+  end
+
   private
 
   def write_feature_attribute_boolean(field, value)
@@ -105,4 +109,4 @@ module ProjectFeaturesCompatibility
   end
 end
 
-ProjectFeaturesCompatibility.prepend_if_ee('EE::ProjectFeaturesCompatibility')
+ProjectFeaturesCompatibility.prepend_mod_with('ProjectFeaturesCompatibility')

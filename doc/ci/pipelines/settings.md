@@ -1,6 +1,6 @@
 ---
 stage: Verify
-group: Continuous Integration
+group: Pipeline Execution
 info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#assignments
 disqus_identifier: 'https://docs.gitlab.com/ee/user/project/pipelines/settings.html'
 type: reference, howto
@@ -82,7 +82,7 @@ directory. If needed, you can specify an alternate path and filename, including 
 
 To customize the path:
 
-1. Go to the project's **Settings > CI / CD**.
+1. Go to the project's **Settings > CI/CD**.
 1. Expand the **General pipelines** section.
 1. Provide a value in the **CI/CD configuration file** field.
 1. Click **Save changes**.
@@ -120,7 +120,7 @@ able to edit it.
 If you use test coverage in your code, GitLab can capture its output in the
 job log using a regular expression.
 
-In your project, go to **Settings > CI / CD** and expand the **General pipelines**
+In your project, go to **Settings > CI/CD** and expand the **General pipelines**
 section. Enter the regular expression in the **Test coverage parsing** field.
 
 Leave blank if you want to disable it or enter a Ruby regular expression. You
@@ -137,21 +137,19 @@ averaged.
 
 <!-- vale gitlab.Spelling = NO -->
 
-| Coverage Tool                                  | Sample regular expression                     |
-|------------------------------------------------|-----------------------------------------------|
-| Simplecov (Ruby)                               | `\(\d+.\d+\%\) covered`                       |
-| pytest-cov (Python)                            | `^TOTAL.+?(\d+\%)$`                           |
-| Scoverage (Scala)                              | `Statement coverage[A-Za-z\.*]\s*:\s*([^%]+)` |
-| `phpunit --coverage-text --colors=never` (PHP) | `^\s*Lines:\s*\d+.\d+\%`                      |
-| gcovr (C/C++)                                  | `^TOTAL.*\s+(\d+\%)$`                         |
-| `tap --coverage-report=text-summary` (NodeJS)  | `^Statements\s*:\s*([^%]+)`                   |
-| `nyc npm test` (NodeJS)                        | `All files[^|]*\|[^|]*\s+([\d\.]+)`           |
-| excoveralls (Elixir)                           | `\[TOTAL\]\s+(\d+\.\d+)%`                     |
-| `mix test --cover` (Elixir)                    | `\d+.\d+\%\s+\|\s+Total`                      |
-| JaCoCo (Java/Kotlin)                           | `Total.*?([0-9]{1,3})%`                       |
-| `go test -cover` (Go)                          | `coverage: \d+.\d+% of statements`            |
-| .Net (OpenCover)                               | `(Visited Points).*\((.*)\)`                  |
-| .Net (`dotnet test` line coverage)             | `Total\s*\|\s*(\d+\.?\d+)`                    |
+- Simplecov (Ruby). Example: `\(\d+.\d+\%\) covered`.
+- pytest-cov (Python). Example: `^TOTAL.+?(\d+\%)$`.
+- Scoverage (Scala). Example: `Statement coverage[A-Za-z\.*]\s*:\s*([^%]+)`.
+- `phpunit --coverage-text --colors=never` (PHP). Example: `^\s*Lines:\s*\d+.\d+\%`.
+- gcovr (C/C++). Example: `^TOTAL.*\s+(\d+\%)$`.
+- `tap --coverage-report=text-summary` (NodeJS). Example: `^Statements\s*:\s*([^%]+)`.
+- `nyc npm test` (NodeJS). Example: `All files[^|]*\|[^|]*\s+([\d\.]+)`.
+- excoveralls (Elixir). Example: `\[TOTAL\]\s+(\d+\.\d+)%`.
+- `mix test --cover` (Elixir). Example: `\d+.\d+\%\s+\|\s+Total`.
+- JaCoCo (Java/Kotlin). Example: `Total.*?([0-9]{1,3})%`.
+- `go test -cover` (Go). Example: `coverage: \d+.\d+% of statements`.
+- .Net (OpenCover). Example: `(Visited Points).*\((.*)\)`.
+- .Net (`dotnet test` line coverage). Example: `Total\s*\|\s*(\d+\.?\d+)`.
 
 <!-- vale gitlab.Spelling = YES -->
 
@@ -225,7 +223,7 @@ If **Public pipelines** is disabled:
 
 You can set pending or running pipelines to cancel automatically when a new pipeline runs on the same branch. You can enable this in the project settings:
 
-1. Go to **Settings > CI / CD**.
+1. Go to **Settings > CI/CD**.
 1. Expand **General Pipelines**.
 1. Check the **Auto-cancel redundant pipelines** checkbox.
 1. Click **Save changes**.
@@ -245,7 +243,7 @@ newer one, which may not be what you want.
 
 To avoid this scenario:
 
-1. Go to **Settings > CI / CD**.
+1. Go to **Settings > CI/CD**.
 1. Expand **General pipelines**.
 1. Check the **Skip outdated deployment jobs** checkbox.
 1. Click **Save changes**.
@@ -320,7 +318,7 @@ Markdown code embeds the test coverage report badge of the `coverage` job
 into your `README.md`:
 
 ```markdown
-![coverage](https://gitlab.com/gitlab-org/gitlab/badges/master/coverage.svg?job=coverage)
+![coverage](https://gitlab.com/gitlab-org/gitlab/badges/main/coverage.svg?job=coverage)
 ```
 
 ### Badge styles
@@ -333,7 +331,7 @@ Pipeline badges can be rendered in different styles by adding the `style=style_n
   https://gitlab.example.com/<namespace>/<project>/badges/<branch>/coverage.svg?style=flat
   ```
 
-  ![Badge flat style](https://gitlab.com/gitlab-org/gitlab/badges/master/coverage.svg?job=coverage&style=flat)
+  ![Badge flat style](https://gitlab.com/gitlab-org/gitlab/badges/main/coverage.svg?job=coverage&style=flat)
 
 - Flat square ([Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/issues/30120) in GitLab 11.8):
 
@@ -341,7 +339,7 @@ Pipeline badges can be rendered in different styles by adding the `style=style_n
   https://gitlab.example.com/<namespace>/<project>/badges/<branch>/coverage.svg?style=flat-square
   ```
 
-  ![Badge flat square style](https://gitlab.com/gitlab-org/gitlab/badges/master/coverage.svg?job=coverage&style=flat-square)
+  ![Badge flat square style](https://gitlab.com/gitlab-org/gitlab/badges/main/coverage.svg?job=coverage&style=flat-square)
 
 ### Custom badge text
 
@@ -350,10 +348,10 @@ Pipeline badges can be rendered in different styles by adding the `style=style_n
 The text for a badge can be customized to differentiate between multiple coverage jobs that run in the same pipeline. Customize the badge text and width by adding the `key_text=custom_text` and `key_width=custom_key_width` parameters to the URL:
 
 ```plaintext
-https://gitlab.com/gitlab-org/gitlab/badges/master/coverage.svg?job=karma&key_text=Frontend+Coverage&key_width=130
+https://gitlab.com/gitlab-org/gitlab/badges/main/coverage.svg?job=karma&key_text=Frontend+Coverage&key_width=130
 ```
 
-![Badge with custom text and width](https://gitlab.com/gitlab-org/gitlab/badges/master/coverage.svg?job=karma&key_text=Frontend+Coverage&key_width=130)
+![Badge with custom text and width](https://gitlab.com/gitlab-org/gitlab/badges/main/coverage.svg?job=karma&key_text=Frontend+Coverage&key_width=130)
 
 <!-- ## Troubleshooting
 

@@ -66,9 +66,6 @@ Monaco uses the [Monarch](https://microsoft.github.io/monaco-editor/monarch.html
 
 If you are missing Syntax Highlighting support for any language, we prepared a short guide on how to [add support for a missing language Syntax Highlighting.](https://gitlab.com/gitlab-org/gitlab/-/blob/master/app/assets/javascripts/ide/lib/languages/README.md)
 
-NOTE:
-Single file editing is based on the [Ace Editor](https://ace.c9.io).
-
 ### Themes
 
 > - [Introduced](https://gitlab.com/groups/gitlab-org/-/epics/2389) in GitLab 13.0.
@@ -81,6 +78,12 @@ You can pick a theme from your [profile preferences](../../profile/preferences.m
 | Solarized Dark Theme                                        | Dark Theme                              |
 |-------------------------------------------------------------|-----------------------------------------|
 | ![Solarized Dark Theme](img/solarized_dark_theme_v13_1.png) | ![Dark Theme](img/dark_theme_v13_0.png) |
+
+## Highlight lines
+
+WebIDE is built with the [Web Editor](../repository/web_editor.md). This enables WebIDE to share the
+same core features for highlighting and linking to particular lines in the edited files
+[described for the Web Editor](../repository/web_editor.md#highlight-lines).
 
 ## Schema based validation
 
@@ -187,7 +190,7 @@ To discard a change in a particular file, click the **Discard changes** button o
 file in the changes tab. To discard all the changes, click the trash icon on the
 top-right corner of the changes sidebar.
 
-![Commit changes](img/commit_changes_v12_9.png)
+![Commit changes](img/commit_changes_v13_11.png)
 
 ## Reviewing changes
 
@@ -256,19 +259,27 @@ Additionally, for public projects an **Open in CodeSandbox** button is available
 to transfer the contents of the project into a public CodeSandbox project to
 quickly share your project with others.
 
-### Enabling Live Preview
+### Enable Live Preview
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/268288) in GitLab 12.9, third-party assets and libraries required for Live Preview are hosted at `https://sandbox-prod.gitlab-static.net` when it is enabled. However, some libraries are still served from other third-party services which may or may not be desirable in your environment.
+With Live Preview enabled, you can preview projects with a `package.json` file and
+a `main` entry point inside the Web IDE.
 
-The Live Preview feature needs to be enabled in the GitLab instance's
-Admin Area. Live Preview is enabled for all projects on
-GitLab.com
+Live Preview is enabled for all projects on GitLab.com. If you are an administrator
+of a self-managed GitLab instance, and you want to enable Live Preview:
 
-![Administrator Live Preview setting](img/admin_live_preview_v13_0.png)
+1. In the top navigation bar, go to **Admin Area**.
+1. In the left sidebar, select **Settings > General**.
+1. Scroll to **Web IDE** and select **Expand**:
+   ![Administrator Live Preview setting](img/admin_live_preview_v13_0.png)
+1. Select **Enable Live Preview** and select **Save changes**.
 
-After you have done that, you can preview projects with a `package.json` file and
-a `main` entry point inside the Web IDE. An example `package.json` is shown
-below.
+[In GitLab 12.9 and later](https://gitlab.com/gitlab-org/gitlab/-/issues/268288),
+third-party assets and libraries required for Live Preview are hosted at
+`https://sandbox-prod.gitlab-static.net` when it is enabled. However, some libraries
+are still served from other third-party services, which may or may not be desirable
+in your environment.
+
+An example `package.json`:
 
 ```json
 {
@@ -341,7 +352,7 @@ terminal:
   # This can be any image that has the necessary runtime environment for your project.
   image: node:10-alpine
   before_script:
-    - apt-get update
+    - apk update
   script: sleep 60
   variables:
     RAILS_ENV: "test"

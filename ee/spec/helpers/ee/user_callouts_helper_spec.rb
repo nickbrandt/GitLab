@@ -135,9 +135,10 @@ RSpec.describe EE::UserCalloutsHelper do
   describe '#render_dashboard_ultimate_trial' do
     let_it_be(:namespace) { create(:namespace) }
     let_it_be(:ultimate_plan) { create(:ultimate_plan) }
+
     let(:user) { namespace.owner }
 
-    where(:any_namespace_without_trial?, :show_ultimate_trial?, :user_default_dashboard?, :has_no_trial_or_paid_plan?, :should_render?) do
+    where(:owns_group_without_trial?, :show_ultimate_trial?, :user_default_dashboard?, :has_no_trial_or_paid_plan?, :should_render?) do
       true  | true  | true  | true  | true
       true  | true  | true  | false | false
       true  | true  | false | true  | false
@@ -160,7 +161,7 @@ RSpec.describe EE::UserCalloutsHelper do
       before do
         allow(helper).to receive(:show_ultimate_trial?) { show_ultimate_trial? }
         allow(helper).to receive(:user_default_dashboard?) { user_default_dashboard? }
-        allow(user).to receive(:any_namespace_without_trial?) { any_namespace_without_trial? }
+        allow(user).to receive(:owns_group_without_trial?) { owns_group_without_trial? }
 
         unless has_no_trial_or_paid_plan?
           create(:gitlab_subscription, hosted_plan: ultimate_plan, namespace: namespace)
@@ -212,28 +213,6 @@ RSpec.describe EE::UserCalloutsHelper do
 
         helper.render_account_recovery_regular_check
       end
-    end
-  end
-
-  describe '.show_threat_monitoring_info?' do
-    subject { helper.show_threat_monitoring_info? }
-
-    let(:user) { create(:user) }
-
-    before do
-      allow(helper).to receive(:current_user).and_return(user)
-    end
-
-    context 'when the threat monitoring info has not been dismissed' do
-      it { is_expected.to be_truthy }
-    end
-
-    context 'when the threat monitoring info was dismissed' do
-      before do
-        create(:user_callout, user: user, feature_name: described_class::THREAT_MONITORING_INFO)
-      end
-
-      it { is_expected.to be_falsy }
     end
   end
 

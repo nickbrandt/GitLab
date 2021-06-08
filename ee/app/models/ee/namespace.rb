@@ -12,8 +12,8 @@ module EE
 
     NAMESPACE_PLANS_TO_LICENSE_PLANS = {
       ::Plan::BRONZE => License::STARTER_PLAN,
-      [::Plan::SILVER, ::Plan::PREMIUM] => License::PREMIUM_PLAN,
-      [::Plan::GOLD, ::Plan::ULTIMATE] => License::ULTIMATE_PLAN
+      [::Plan::SILVER, ::Plan::PREMIUM, ::Plan::PREMIUM_TRIAL] => License::PREMIUM_PLAN,
+      [::Plan::GOLD, ::Plan::ULTIMATE, ::Plan::ULTIMATE_TRIAL] => License::ULTIMATE_PLAN
     }.freeze
 
     LICENSE_PLANS_TO_NAMESPACE_PLANS = NAMESPACE_PLANS_TO_LICENSE_PLANS.invert.freeze
@@ -27,6 +27,7 @@ module EE
       has_one :namespace_limit, inverse_of: :namespace
       has_one :gitlab_subscription
       has_one :elasticsearch_indexed_namespace
+      has_one :upcoming_reconciliation, inverse_of: :namespace, class_name: "GitlabSubscriptions::UpcomingReconciliation"
 
       has_many :compliance_management_frameworks, class_name: "ComplianceManagement::Framework"
 
@@ -47,10 +48,6 @@ module EE
           .where(plans: { name: [nil, *::Plan.default_plans] })
       end
 
-      scope :eligible_for_subscription, -> do
-        top_most.in_active_trial.or(top_most.in_default_plan)
-      end
-
       scope :eligible_for_trial, -> do
         left_joins(gitlab_subscription: :hosted_plan)
           .where(
@@ -67,6 +64,11 @@ module EE
           .where("gitlab_subscriptions.namespace_id = namespaces.id")
           .select('1')
         where("EXISTS (?)", matcher)
+      end
+
+      scope :without_last_ci_minutes_notification, -> do
+        where.not(last_ci_minutes_notification_at: nil)
+          .or(where.not(last_ci_minutes_usage_notification_level: nil))
       end
 
       delegate :shared_runners_seconds, :shared_runners_seconds_last_reset, to: :namespace_statistics, allow_nil: true
@@ -89,13 +91,18 @@ module EE
                                 less_than: ::Gitlab::Pages::MAX_SIZE / 1.megabyte }
 
       delegate :trial?, :trial_ends_on, :trial_starts_on, :trial_days_remaining,
-        :trial_percentage_complete, :upgradable?,
+        :trial_percentage_complete, :upgradable?, :trial_extended_or_reactivated?,
         to: :gitlab_subscription, allow_nil: true
 
       before_create :sync_membership_lock_with_parent
 
       # Changing the plan or other details may invalidate this cache
       before_save :clear_feature_available_cache
+    end
+
+    # Only groups can be marked for deletion
+    def marked_for_deletion?
+      false
     end
 
     def namespace_limit
@@ -136,11 +143,8 @@ module EE
     # Checks features (i.e. https://about.gitlab.com/pricing/) availabily
     # for a given Namespace plan. This method should consider ancestor groups
     # being licensed.
-    override :feature_available?
-    def feature_available?(feature)
-      # This feature might not be behind a feature flag at all, so default to true
-      return false unless ::Feature.enabled?(feature, type: :licensed, default_enabled: true)
-
+    override :licensed_feature_available?
+    def licensed_feature_available?(feature)
       available_features = strong_memoize(:feature_available) do
         Hash.new do |h, f|
           h[f] = load_feature_available(f)
@@ -200,22 +204,15 @@ module EE
 
     def total_repository_size_excess
       strong_memoize(:total_repository_size_excess) do
-        namespace_size_limit = actual_size_limit
-        namespace_limit_arel = Arel::Nodes::SqlLiteral.new(namespace_size_limit.to_s.presence || 'NULL')
+        total_excess = (total_repository_size_arel - repository_size_limit_arel).sum
 
-        total_excess = total_repository_size_excess_calculation(::Project.arel_table[:repository_size_limit])
-        total_excess += total_repository_size_excess_calculation(namespace_limit_arel, project_level: false) if namespace_size_limit.to_i > 0
-        total_excess
+        projects_for_repository_size_excess.pluck(total_excess).first || 0
       end
     end
 
     def repository_size_excess_project_count
       strong_memoize(:repository_size_excess_project_count) do
-        namespace_size_limit = actual_size_limit
-
-        count = projects_for_repository_size_excess.count
-        count += projects_for_repository_size_excess(namespace_size_limit).count if namespace_size_limit.to_i > 0
-        count
+        projects_for_repository_size_excess.count
       end
     end
 
@@ -281,7 +278,13 @@ module EE
     # This method is overwritten in Group where we made the calculation
     # for Group namespaces.
     def billed_user_ids(_requested_hosted_plan = nil)
-      [owner_id]
+      {
+        user_ids: [owner_id],
+        group_member_user_ids: [],
+        project_member_user_ids: [],
+        shared_group_user_ids: [],
+        shared_project_user_ids: []
+      }
     end
 
     def eligible_for_trial?
@@ -291,8 +294,18 @@ module EE
         plan_eligible_for_trial?
     end
 
+    # Be sure to call this on root_ancestor since plans are only associated
+    # with the top-level namespace, not with subgroups.
     def trial_active?
       trial? && trial_ends_on.present? && trial_ends_on >= Date.today
+    end
+
+    def can_extend?
+      trial_active? && !trial_extended_or_reactivated?
+    end
+
+    def can_reactivate?
+      !trial_active? && !never_had_trial? && !trial_extended_or_reactivated? && free_plan?
     end
 
     def never_had_trial?
@@ -338,6 +351,10 @@ module EE
       actual_plan_name == ::Plan::PREMIUM
     end
 
+    def premium_trial_plan?
+      actual_plan_name == ::Plan::PREMIUM_TRIAL
+    end
+
     def gold_plan?
       actual_plan_name == ::Plan::GOLD
     end
@@ -346,8 +363,16 @@ module EE
       actual_plan_name == ::Plan::ULTIMATE
     end
 
+    def ultimate_trial_plan?
+      actual_plan_name == ::Plan::ULTIMATE_TRIAL
+    end
+
     def plan_eligible_for_trial?
       ::Plan::PLANS_ELIGIBLE_FOR_TRIAL.include?(actual_plan_name)
+    end
+
+    def free_personal?
+      user? && !paid?
     end
 
     def use_elasticsearch?
@@ -426,26 +451,34 @@ module EE
       )
     end
 
-    def total_repository_size_excess_calculation(repository_size_limit, project_level: true)
-      total_excess = (total_repository_size_arel - repository_size_limit).sum
-      relation = projects_for_repository_size_excess((repository_size_limit unless project_level))
-      relation.pluck(total_excess).first || 0 # rubocop:disable Rails/Pick
-    end
-
     def total_repository_size_arel
       arel_table = ::ProjectStatistics.arel_table
       arel_table[:repository_size] + arel_table[:lfs_objects_size]
     end
 
-    def projects_for_repository_size_excess(limit = nil)
-      if limit
-        all_projects
-          .with_total_repository_size_greater_than(limit)
-          .without_repository_size_limit
+    def projects_for_repository_size_excess
+      projects_with_limits = ::Project.without_unlimited_repository_size_limit
+
+      if actual_size_limit.to_i > 0
+        # When the instance or namespace level limit is set, we need to include those without project level limits
+        projects_with_limits = projects_with_limits.or(::Project.without_repository_size_limit)
+      end
+
+      all_projects
+        .merge(projects_with_limits)
+        .with_total_repository_size_greater_than(repository_size_limit_arel)
+    end
+
+    def repository_size_limit_arel
+      instance_size_limit = actual_size_limit.to_i
+
+      if instance_size_limit > 0
+        self.class.arel_table.coalesce(
+          ::Project.arel_table[:repository_size_limit],
+          instance_size_limit
+        )
       else
-        all_projects
-          .with_total_repository_size_greater_than(::Project.arel_table[:repository_size_limit])
-          .without_unlimited_repository_size_limit
+        ::Project.arel_table[:repository_size_limit]
       end
     end
 

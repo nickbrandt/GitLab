@@ -1,11 +1,11 @@
 ---
 stage: Verify
-group: Continuous Integration
+group: Pipeline Authoring
 info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#assignments
 type: reference
 ---
 
-# Predefined variables reference
+# Predefined variables reference **(FREE)**
 
 Predefined [CI/CD variables](README.md) are available in every GitLab CI/CD pipeline.
 
@@ -23,6 +23,7 @@ There are also [Kubernetes-specific deployment variables](../../user/project/clu
 | `CI`                                     | all    | 0.4    | Available for all jobs executed in CI/CD. `true` when available. |
 | `CI_API_V4_URL`                          | 11.7   | all    | The GitLab API v4 root URL. |
 | `CI_BUILDS_DIR`                          | all    | 11.10  | The top-level directory where builds are executed. |
+| `CI_COMMIT_AUTHOR`                       | 13.11  | all    | The author of the commit in `Name <email>` format. |
 | `CI_COMMIT_BEFORE_SHA`                   | 11.2   | all    | The previous latest commit present on a branch. Is always `0000000000000000000000000000000000000000` in pipelines for merge requests. |
 | `CI_COMMIT_BRANCH`                       | 12.6   | 0.5    | The commit branch name. Available in branch pipelines, including pipelines for the default branch. Not available in merge request pipelines or tag pipelines. |
 | `CI_COMMIT_DESCRIPTION`                  | 10.8   | all    | The description of the commit. If the title is shorter than 100 characters, the message without the first line. |
@@ -49,8 +50,9 @@ There are also [Kubernetes-specific deployment variables](../../user/project/clu
 | `CI_DEPLOY_USER`                         | 10.8   | all    | The authentication username of the [GitLab Deploy Token](../../user/project/deploy_tokens/index.md#gitlab-deploy-token), if the project has one. |
 | `CI_DISPOSABLE_ENVIRONMENT`              | all    | 10.1   | Only available if the job is executed in a disposable environment (something that is created only for this job and disposed of/destroyed after the execution - all executors except `shell` and `ssh`). `true` when available. |
 | `CI_ENVIRONMENT_NAME`                    | 8.15   | all    | The name of the environment for this job. Available if [`environment:name`](../yaml/README.md#environmentname) is set. |
-| `CI_ENVIRONMENT_SLUG`                    | 8.15   | all    | The simplified version of the environment name, suitable for inclusion in DNS, URLs, Kubernetes labels, and so on. Available if [`environment:name`](../yaml/README.md#environmentname) is set. |
+| `CI_ENVIRONMENT_SLUG`                    | 8.15   | all    | The simplified version of the environment name, suitable for inclusion in DNS, URLs, Kubernetes labels, and so on. Available if [`environment:name`](../yaml/README.md#environmentname) is set. The slug is [truncated to 24 characters](https://gitlab.com/gitlab-org/gitlab/-/issues/20941). |
 | `CI_ENVIRONMENT_URL`                     | 9.3    | all    | The URL of the environment for this job. Available if [`environment:url`](../yaml/README.md#environmenturl) is set. |
+| `CI_ENVIRONMENT_ACTION`                  | 13.11  | all    | The action annotation specified for this job's environment. Available if [`environment:action`](../yaml/README.md#environmentaction) is set. Can be `start`, `prepare`, or `stop`. |
 | `CI_HAS_OPEN_REQUIREMENTS`               | 13.1   | all    | Only available if the pipeline's project has an open [requirement](../../user/project/requirements/index.md). `true` when available. |
 | `CI_JOB_ID`                              | 9.0    | all    | The internal ID of the job, unique across all jobs in the GitLab instance. |
 | `CI_JOB_IMAGE`                           | 12.9   | 12.9   | The name of the Docker image running the job. |
@@ -59,8 +61,9 @@ There are also [Kubernetes-specific deployment variables](../../user/project/clu
 | `CI_JOB_NAME`                            | 9.0    | 0.5    | The name of the job. |
 | `CI_JOB_STAGE`                           | 9.0    | 0.5    | The name of the job's stage. |
 | `CI_JOB_STATUS`                          | all    | 13.5   | The status of the job as each runner stage is executed. Use with [`after_script`](../yaml/README.md#after_script). Can be `success`, `failed`, or `canceled`. |
-| `CI_JOB_TOKEN`                           | 9.0    | 1.2    | A token to authenticate with [certain API endpoints](../../api/README.md#gitlab-ci-job-token) or download [dependent repositories](../../user/project/new_ci_build_permissions_model.md#dependent-repositories). The token is valid as long as the job is running. |
+| `CI_JOB_TOKEN`                           | 9.0    | 1.2    | A token to authenticate with [certain API endpoints](../../api/README.md#gitlab-cicd-job-token). The token is valid as long as the job is running. |
 | `CI_JOB_URL`                             | 11.1   | 0.5    | The job details URL. |
+| `CI_JOB_STARTED_AT`                      | 13.10  | all    | The UTC datetime when a job started, in [ISO 8601](https://tools.ietf.org/html/rfc3339#appendix-A) format. |
 | `CI_KUBERNETES_ACTIVE`                   | 13.0   | all    | Only available if the pipeline has a Kubernetes cluster available for deployments. `true` when available. |
 | `CI_NODE_INDEX`                          | 11.5   | all    | The index of the job in the job set. Only available if the job uses [`parallel`](../yaml/README.md#parallel). |
 | `CI_NODE_TOTAL`                          | 11.5   | all    | The total number of instances of this job running in parallel. Set to `1` if the job does not use [`parallel`](../yaml/README.md#parallel). |
@@ -72,6 +75,7 @@ There are also [Kubernetes-specific deployment variables](../../user/project/clu
 | `CI_PIPELINE_SOURCE`                     | 10.0   | all    | How the pipeline was triggered. Can be `push`, `web`, `schedule`, `api`, `external`, `chat`, `webide`, `merge_request_event`, `external_pull_request_event`, `parent_pipeline`, [`trigger`, or `pipeline`](../triggers/README.md#authentication-tokens). |
 | `CI_PIPELINE_TRIGGERED`                  | all    | all    | `true` if the job was [triggered](../triggers/README.md). |
 | `CI_PIPELINE_URL`                        | 11.1   | 0.5    | The URL for the pipeline details. |
+| `CI_PIPELINE_CREATED_AT`                 | 13.10  | all    | The UTC datetime when the pipeline was created, in [ISO 8601](https://tools.ietf.org/html/rfc3339#appendix-A) format. |
 | `CI_PROJECT_CONFIG_PATH`                 | 13.8   | all    | (Deprecated) The CI configuration path for the project. [Deprecated](https://gitlab.com/gitlab-org/gitlab/-/issues/321334) in GitLab 13.10. [Removal planned](https://gitlab.com/gitlab-org/gitlab/-/issues/322807) for GitLab 14.0. |
 | `CI_PROJECT_DIR`                         | all    | all    | The full path the repository is cloned to, and where the job runs from. If the GitLab Runner `builds_dir` parameter is set, this variable is set relative to the value of `builds_dir`. For more information, see the [Advanced GitLab Runner configuration](https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-runners-section). |
 | `CI_PROJECT_ID`                          | all    | all    | The ID of the current project. This ID is unique across all projects on the GitLab instance. |

@@ -14,7 +14,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 
-	"gitlab.com/gitlab-org/gitaly/proto/go/gitalypb"
+	"gitlab.com/gitlab-org/gitaly/v14/proto/go/gitalypb"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/config"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/gitaly"
@@ -149,9 +149,11 @@ type Response struct {
 	ProcessLsifReferences bool
 	// The maximum accepted size in bytes of the upload
 	MaximumSize int64
+	// DEPRECATED: Feature flag used to determine whether to strip the multipart filename of any directories
+	FeatureFlagExtractBase bool
 }
 
-// singleJoiningSlash is taken from reverseproxy.go:NewSingleHostReverseProxy
+// singleJoiningSlash is taken from reverseproxy.go:singleJoiningSlash
 func singleJoiningSlash(a, b string) string {
 	aslash := strings.HasSuffix(a, "/")
 	bslash := strings.HasPrefix(b, "/")
@@ -164,14 +166,39 @@ func singleJoiningSlash(a, b string) string {
 	return a + b
 }
 
+// joinURLPath is taken from reverseproxy.go:joinURLPath
+func joinURLPath(a *url.URL, b string) (path string, rawpath string) {
+	// Avoid adding a trailing slash if the suffix is empty
+	if b == "" {
+		return a.Path, a.RawPath
+	} else if a.RawPath == "" {
+		return singleJoiningSlash(a.Path, b), ""
+	}
+
+	// Same as singleJoiningSlash, but uses EscapedPath to determine
+	// whether a slash should be added
+	apath := a.EscapedPath()
+	bpath := b
+
+	aslash := strings.HasSuffix(apath, "/")
+	bslash := strings.HasPrefix(bpath, "/")
+
+	switch {
+	case aslash && bslash:
+		return a.Path + bpath[1:], apath + bpath[1:]
+	case !aslash && !bslash:
+		return a.Path + "/" + bpath, apath + "/" + bpath
+	}
+	return a.Path + bpath, apath + bpath
+}
+
 // rebaseUrl is taken from reverseproxy.go:NewSingleHostReverseProxy
 func rebaseUrl(url *url.URL, onto *url.URL, suffix string) *url.URL {
 	newUrl := *url
 	newUrl.Scheme = onto.Scheme
 	newUrl.Host = onto.Host
-	if suffix != "" {
-		newUrl.Path = singleJoiningSlash(url.Path, suffix)
-	}
+	newUrl.Path, newUrl.RawPath = joinURLPath(url, suffix)
+
 	if onto.RawQuery == "" || newUrl.RawQuery == "" {
 		newUrl.RawQuery = onto.RawQuery + newUrl.RawQuery
 	} else {
@@ -281,7 +308,7 @@ func (api *API) PreAuthorizeHandler(next HandleFunc, suffix string) http.Handler
 			return
 		}
 
-		httpResponse.Body.Close() // Free up the Unicorn worker
+		httpResponse.Body.Close() // Free up the Puma thread
 
 		copyAuthHeader(httpResponse, w)
 
@@ -320,7 +347,7 @@ func copyAuthHeader(httpResponse *http.Response, w http.ResponseWriter) {
 
 func passResponseBack(httpResponse *http.Response, w http.ResponseWriter, r *http.Request) {
 	// NGINX response buffering is disabled on this path (with
-	// X-Accel-Buffering: no) but we still want to free up the Unicorn worker
+	// X-Accel-Buffering: no) but we still want to free up the Puma thread
 	// that generated httpResponse as fast as possible. To do this we buffer
 	// the entire response body in memory before sending it on.
 	responseBody, err := bufferResponse(httpResponse.Body)
@@ -328,7 +355,7 @@ func passResponseBack(httpResponse *http.Response, w http.ResponseWriter, r *htt
 		helper.Fail500(w, r, err)
 		return
 	}
-	httpResponse.Body.Close() // Free up the Unicorn worker
+	httpResponse.Body.Close() // Free up the Puma thread
 	bytesTotal.Add(float64(responseBody.Len()))
 
 	for k, v := range httpResponse.Header {

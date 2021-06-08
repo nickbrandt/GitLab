@@ -12,6 +12,10 @@ GitLab uses two primary types of pagination: **offset** and **keyset**
 (sometimes called cursor-based) pagination.
 The GraphQL API mainly uses keyset pagination, falling back to offset pagination when needed.
 
+### Performance considerations
+
+See the [general pagination guidelines section](../database/pagination_guidelines.md) for more information.
+
 ### Offset pagination
 
 This is the traditional, page-by-page pagination, that is most common,
@@ -218,6 +222,26 @@ in [`issuable.rb`](https://gitlab.com/gitlab-org/gitlab/-/blob/master/app/models
 the `order_due_date_and_labels_priority` method creates a very complex query.
 
 These types of queries are not supported. In these instances, you can use offset pagination.
+
+#### Gotchas
+
+Do not define a collection's order using the string syntax:
+
+```ruby
+# Bad
+items.order('created_at DESC')
+```
+
+Instead, use the hash syntax:
+
+```ruby
+# Good
+items.order(created_at: :desc)
+```
+
+The first example won't correctly embed the sort information (`created_at`, in
+the example above) into the pagination cursors, which will result in an
+incorrect sort order.
 
 ### Offset pagination
 

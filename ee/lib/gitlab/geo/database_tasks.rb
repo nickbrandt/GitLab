@@ -5,9 +5,9 @@ module Gitlab
     module DatabaseTasks
       extend self
 
-      DATABASE_CONFIG = 'config/database.yml'.freeze
-      GEO_DATABASE_CONFIG = 'config/database_geo.yml'.freeze
-      GEO_DB_DIR = 'ee/db/geo'.freeze
+      DATABASE_CONFIG = 'config/database.yml'
+      GEO_DATABASE_CONFIG = 'config/database_geo.yml'
+      GEO_DB_DIR = 'ee/db/geo'
 
       def method_missing(method_name, *args, &block)
         with_geo_db do
@@ -114,7 +114,7 @@ module Gitlab
               ['up', version, '********** NO FILE **********']
             end
             # output
-            puts "\ndatabase: #{ActiveRecord::Base.connection_config[:database]}\n\n"
+            puts "\ndatabase: #{ActiveRecord::Base.connection_db_config.database}\n\n"
             puts "#{'Status'.center(8)}  #{'Migration ID'.ljust(14)}  Migration Name"
             puts "-" * 50
             (db_list + file_list).sort_by { |_, version, _| version }.each do |status, version, name|

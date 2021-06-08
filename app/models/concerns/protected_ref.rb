@@ -4,7 +4,7 @@ module ProtectedRef
   extend ActiveSupport::Concern
 
   included do
-    belongs_to :project
+    belongs_to :project, touch: true
 
     validates :name, presence: true
     validates :project, presence: true
@@ -78,4 +78,4 @@ end
 # since these are defined in a ClassMethods constant. As such, we prepend the
 # module directly into ProtectedRef::ClassMethods, instead of prepending it into
 # ProtectedRef.
-ProtectedRef::ClassMethods.prepend_if_ee('EE::ProtectedRef')
+ProtectedRef::ClassMethods.prepend_mod_with('ProtectedRef')

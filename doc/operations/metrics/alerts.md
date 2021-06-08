@@ -1,6 +1,6 @@
 ---
 stage: Monitor
-group: Health
+group: Monitor
 info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#assignments
 ---
 
@@ -16,6 +16,10 @@ your team when environment performance falls outside of the boundaries you set.
 ## Managed Prometheus instances
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/6590) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 11.2 for [custom metrics](index.md#adding-custom-metrics), and GitLab 11.3 for [library metrics](../../user/project/integrations/prometheus_library/index.md).
+
+WARNING:
+Managed Prometheus on Kubernetes is [deprecated](https://gitlab.com/gitlab-org/gitlab/-/issues/327796)
+and scheduled for [removal in GitLab 14.0](https://gitlab.com/groups/gitlab-org/-/epics/4280).
 
 For managed Prometheus instances using auto configuration, you can
 [configure alerts for metrics](index.md#adding-custom-metrics) directly in the
@@ -35,7 +39,15 @@ To remove the alert, click back on the alert icon for the desired metric, and cl
 
 ### Link runbooks to alerts
 
-> Runbook URLs [introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/39315) in GitLab 13.3.
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/39315) in GitLab 13.3.
+> - [Deprecated](https://gitlab.com/groups/gitlab-org/-/epics/5877) in GitLab 13.11.
+> - [Removed](https://gitlab.com/groups/gitlab-org/-/epics/4280) in GitLab 14.0.
+
+WARNING:
+Linking runbooks to alerts through the alerts UI is [deprecated](https://gitlab.com/groups/gitlab-org/-/epics/5877)
+and scheduled for [removal in GitLab 14.0](https://gitlab.com/groups/gitlab-org/-/epics/4280).
+However, you can still add runbooks to your alert payload. They show up in the alert UI when the
+alert is triggered.
 
 When creating alerts from the metrics dashboard for [managed Prometheus instances](#managed-prometheus-instances),
 you can also link a runbook. When the alert triggers, the
@@ -44,6 +56,10 @@ links to the runbook, making it easy for you to locate and access the correct ru
 as soon as the alert fires:
 
 ![Linked Runbook in charts](img/linked_runbooks_on_charts.png)
+
+## Prometheus cluster integrations
+
+Alerts are not currently supported for [Prometheus cluster integrations](../../user/clusters/integrations.md).
 
 ## External Prometheus instances
 
@@ -88,12 +104,11 @@ Prometheus server to use the
 ## Trigger actions from alerts **(ULTIMATE)**
 
 > - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/4925) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 11.11.
-> - [From GitLab Ultimate 12.5](https://gitlab.com/gitlab-org/gitlab/-/issues/13401), when GitLab receives a recovery alert, it automatically closes the associated issue.
 
 Alerts can be used to trigger actions, like opening an issue automatically
 (disabled by default since `13.1`). To configure the actions:
 
-1. Navigate to your project's **Settings > Operations > Incidents**.
+1. Navigate to your project's **Settings > Operations > Alerts**.
 1. Enable the option to create issues.
 1. Choose the [issue template](../../user/project/description_templates.md) to create the issue from.
 1. Optionally, select whether to send an email notification to the developers of the project.
@@ -119,10 +134,6 @@ values extracted from the [`alerts` field in webhook payload](https://prometheus
   - **Low**: `low`, `s4`, `p4`, `warn`, `warning`
   - **Info**: `info`, `s5`, `p5`, `debug`, `information`, `notice`
 
-When GitLab receives a **Recovery Alert**, it closes the associated issue.
-This action is recorded as a system message on the issue indicating that it
-was closed automatically by the GitLab Alert bot.
-
 To further customize the issue, you can add labels, mentions, or any other supported
 [quick action](../../user/project/quick_actions.md) in the selected issue template,
 which applies to all incidents. To limit quick actions or other information to
@@ -135,3 +146,12 @@ does not yet exist, it is also created automatically.
 If the metric exceeds the threshold of the alert for over 5 minutes, GitLab sends
 an email to all [Maintainers and Owners](../../user/permissions.md#project-members-permissions)
 of the project.
+
+### Recovery alerts
+
+> - [From GitLab Ultimate 12.5](https://gitlab.com/gitlab-org/gitlab/-/issues/13401), when GitLab receives a recovery alert, it automatically closes the associated issue.
+
+The alert in GitLab will be automatically resolved when Prometheus
+sends a payload with the field `status` set to `resolved`.
+
+You can also configure the associated [incident to be closed automatically](../incident_management/incidents.md#automatically-close-incidents-via-recovery-alerts) when the alert resolves.

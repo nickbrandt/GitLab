@@ -5,7 +5,7 @@ module Gitlab
     module Ldap
       class Adapter
         SEARCH_RETRY_FACTOR = [1, 1, 2, 3].freeze
-        MAX_SEARCH_RETRIES = Rails.env.test? ? 1 : SEARCH_RETRY_FACTOR.size.freeze
+        MAX_SEARCH_RETRIES = Rails.env.test? ? 1 : SEARCH_RETRY_FACTOR.size
 
         attr_reader :provider, :ldap
 
@@ -141,4 +141,4 @@ module Gitlab
   end
 end
 
-Gitlab::Auth::Ldap::Adapter.prepend_if_ee('::EE::Gitlab::Auth::Ldap::Adapter')
+Gitlab::Auth::Ldap::Adapter.prepend_mod_with('Gitlab::Auth::Ldap::Adapter')

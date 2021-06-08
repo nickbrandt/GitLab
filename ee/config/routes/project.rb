@@ -40,7 +40,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         resources :subscriptions, only: [:create, :destroy]
 
         resource :threat_monitoring, only: [:show], controller: :threat_monitoring do
-          get '/alerts/:id', action: 'alert_details'
+          get '/alerts/:iid', action: 'alert_details', constraints: { iid: /\d+/ }, as: :threat_monitoring_alert
           resources :policies, only: [:new, :edit], controller: :threat_monitoring
         end
 
@@ -64,17 +64,20 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           resources :dashboard, only: [:index], controller: :dashboard
           resources :vulnerability_report, only: [:index], controller: :vulnerability_report
 
-          resource :policy, only: [:show]
+          resource :policy, only: [:show] do
+            post :assign
+          end
 
           resource :configuration, only: [], controller: :configuration do
             post :auto_fix, on: :collection
             resource :corpus_management, only: [:show], controller: :corpus_management
             resource :sast, only: [:show], controller: :sast_configuration
             resource :api_fuzzing, only: :show, controller: :api_fuzzing_configuration
-            resource :dast_profiles, only: [:show] do
+            resource :dast_scans, only: [:show], controller: :dast_profiles do
               resources :dast_site_profiles, only: [:new, :edit]
               resources :dast_scanner_profiles, only: [:new, :edit]
             end
+            resource :dast, only: :show, controller: :dast_configuration
           end
 
           resource :discover, only: [:show], controller: :discover
@@ -126,6 +129,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
 
         namespace :incident_management, path: '' do
           resources :oncall_schedules, only: [:index], path: 'oncall_schedules'
+          resources :escalation_policies, only: [:index], path: 'escalation_policies'
         end
 
         resources :cluster_agents, only: [:show], param: :name

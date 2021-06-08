@@ -433,6 +433,13 @@ RSpec.describe Gitlab::GitAccess do
       expect { pull_access_check }.to raise_forbidden("Your account has been deactivated by your administrator. Please log back in from a web browser to reactivate your account at #{Gitlab.config.gitlab.url}")
     end
 
+    it 'disallows users with expired password to pull' do
+      project.add_maintainer(user)
+      user.update!(password_expires_at: 2.minutes.ago)
+
+      expect { pull_access_check }.to raise_forbidden("Your password expired. Please access GitLab from a web browser to update your password.")
+    end
+
     context 'when the project repository does not exist' do
       before do
         project.add_guest(user)
@@ -554,19 +561,19 @@ RSpec.describe Gitlab::GitAccess do
             context 'when the repository is public' do
               let(:options) { %i[repository_enabled] }
 
-              it { expect { pull_access_check }.to raise_error('The project you were looking for could not be found.') }
+              it { expect { pull_access_check }.to raise_error("The project you were looking for could not be found or you don't have permission to view it.") }
             end
 
             context 'when the repository is private' do
               let(:options) { %i[repository_private] }
 
-              it { expect { pull_access_check }.to raise_error('The project you were looking for could not be found.') }
+              it { expect { pull_access_check }.to raise_error("The project you were looking for could not be found or you don't have permission to view it.") }
             end
 
             context 'when the repository is disabled' do
               let(:options) { %i[repository_disabled] }
 
-              it { expect { pull_access_check }.to raise_error('The project you were looking for could not be found.') }
+              it { expect { pull_access_check }.to raise_error("The project you were looking for could not be found or you don't have permission to view it.") }
             end
           end
         end
@@ -596,13 +603,13 @@ RSpec.describe Gitlab::GitAccess do
             context 'when the repository is private' do
               let(:options) { %i[repository_private] }
 
-              it { expect { pull_access_check }.to raise_error('The project you were looking for could not be found.') }
+              it { expect { pull_access_check }.to raise_error("The project you were looking for could not be found or you don't have permission to view it.") }
             end
 
             context 'when the repository is disabled' do
               let(:options) { %i[repository_disabled] }
 
-              it { expect { pull_access_check }.to raise_error('The project you were looking for could not be found.') }
+              it { expect { pull_access_check }.to raise_error("The project you were looking for could not be found or you don't have permission to view it.") }
             end
           end
         end
@@ -969,6 +976,13 @@ RSpec.describe Gitlab::GitAccess do
         expect { push_access_check }.to raise_forbidden("Your account has been deactivated by your administrator. Please log back in from a web browser to reactivate your account at #{Gitlab.config.gitlab.url}")
       end
 
+      it 'disallows users with expired password to push' do
+        project.add_maintainer(user)
+        user.update!(password_expires_at: 2.minutes.ago)
+
+        expect { push_access_check }.to raise_forbidden("Your password expired. Please access GitLab from a web browser to update your password.")
+      end
+
       it 'cleans up the files' do
         expect(project.repository).to receive(:clean_stale_repository_files).and_call_original
         expect { push_access_check }.not_to raise_error
@@ -1034,7 +1048,7 @@ RSpec.describe Gitlab::GitAccess do
     end
   end
 
-  context 'when the repository is read only' do
+  context 'when the repository is read-only' do
     let(:project) { create(:project, :repository, :read_only) }
 
     it 'denies push access' do

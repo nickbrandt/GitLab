@@ -49,6 +49,18 @@ RSpec.describe IssuesFinder do
           let(:expected_issuables) { [issue3, issue4] }
         end
 
+        it_behaves_like 'assignee OR filter' do
+          let(:params) { { or: { assignee_id: [user.id, user2.id] } } }
+          let(:expected_issuables) { [issue1, issue2, issue3, issue5] }
+        end
+
+        context 'when assignee_id does not exist' do
+          it_behaves_like 'assignee NOT ID filter' do
+            let(:params) { { not: { assignee_id: -100 } } }
+            let(:expected_issuables) { [issue1, issue2, issue3, issue4, issue5] }
+          end
+        end
+
         context 'filter by username' do
           let_it_be(:user3) { create(:user) }
 
@@ -70,6 +82,22 @@ RSpec.describe IssuesFinder do
 
             let(:params) { { not: { assignee_username: [user.username, user2.username] } } }
             let(:expected_issuables) { [issue3, issue4] }
+          end
+
+          it_behaves_like 'assignee OR filter' do
+            let(:params) { { or: { assignee_username: [user2.username, user3.username] } } }
+            let(:expected_issuables) { [issue2, issue3] }
+          end
+
+          context 'when assignee_username does not exist' do
+            it_behaves_like 'assignee NOT username filter' do
+              before do
+                issue2.assignees = [user2]
+              end
+
+              let(:params) { { not: { assignee_username: 'non_existent_username' } } }
+              let(:expected_issuables) { [issue1, issue2, issue3, issue4, issue5] }
+            end
           end
         end
 
@@ -1160,6 +1188,7 @@ RSpec.describe IssuesFinder do
 
         it 'returns true' do
           expect(finder.use_cte_for_search?).to be_truthy
+          expect(finder.execute.to_sql).to match(/^WITH "issues" AS #{Gitlab::Database::AsWithMaterialized.materialized_if_supported}/)
         end
       end
 
@@ -1168,6 +1197,7 @@ RSpec.describe IssuesFinder do
 
         it 'returns true' do
           expect(finder.use_cte_for_search?).to be_truthy
+          expect(finder.execute.to_sql).to match(/^WITH "issues" AS #{Gitlab::Database::AsWithMaterialized.materialized_if_supported}/)
         end
       end
     end

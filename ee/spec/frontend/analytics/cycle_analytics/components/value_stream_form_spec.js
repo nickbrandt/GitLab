@@ -5,6 +5,7 @@ import { PRESET_OPTIONS_BLANK } from 'ee/analytics/cycle_analytics/components/cr
 import CustomStageFields from 'ee/analytics/cycle_analytics/components/create_value_stream_form/custom_stage_fields.vue';
 import DefaultStageFields from 'ee/analytics/cycle_analytics/components/create_value_stream_form/default_stage_fields.vue';
 import ValueStreamForm from 'ee/analytics/cycle_analytics/components/value_stream_form.vue';
+import { mockTracking, unmockTracking } from 'helpers/tracking_helper';
 import { extendedWrapper } from 'helpers/vue_test_utils_helper';
 import {
   convertObjectPropsToCamelCase,
@@ -12,11 +13,15 @@ import {
 } from '~/lib/utils/common_utils';
 import { customStageEvents as formEvents, defaultStageConfig, rawCustomStage } from '../mock_data';
 
+const scrollIntoViewMock = jest.fn();
+HTMLElement.prototype.scrollIntoView = scrollIntoViewMock;
+
 const localVue = createLocalVue();
 localVue.use(Vuex);
 
 describe('ValueStreamForm', () => {
   let wrapper = null;
+  let trackingSpy = null;
 
   const createValueStreamMock = jest.fn(() => Promise.resolve());
   const updateValueStreamMock = jest.fn(() => Promise.resolve());
@@ -45,18 +50,11 @@ describe('ValueStreamForm', () => {
     new Vuex.Store({
       state: {
         isCreatingValueStream: false,
+        formEvents,
       },
       actions: {
         createValueStream: createValueStreamMock,
         updateValueStream: updateValueStreamMock,
-      },
-      modules: {
-        customStages: {
-          namespaced: true,
-          state: {
-            formEvents,
-          },
-        },
       },
     });
 
@@ -91,7 +89,6 @@ describe('ValueStreamForm', () => {
   const findExtendedFormFields = () => wrapper.findByTestId('extended-form-fields');
   const findPresetSelector = () => wrapper.findByTestId('vsa-preset-selector');
   const findBtn = (btn) => findModal().props(btn);
-  const findSubmitAttribute = (attribute) => findBtn('actionPrimary').attributes[1][attribute];
   const expectFieldError = (testId, error = '') =>
     expect(wrapper.findByTestId(testId).attributes('invalid-feedback')).toBe(error);
 
@@ -103,30 +100,6 @@ describe('ValueStreamForm', () => {
   describe('default state', () => {
     beforeEach(() => {
       wrapper = createComponent();
-    });
-
-    it('submit button is enabled', () => {
-      expect(findSubmitAttribute('disabled')).toBeUndefined();
-    });
-
-    it('does not include extended fields', () => {
-      expect(findExtendedFormFields().exists()).toBe(false);
-    });
-
-    it('does not include add stage button', () => {
-      expect(findBtn('actionSecondary').attributes).toContainEqual({
-        class: 'gl-display-none',
-      });
-    });
-
-    it('does not include the preset selector', () => {
-      expect(findPresetSelector().exists()).toBe(false);
-    });
-  });
-
-  describe('with hasExtendedFormFields=true', () => {
-    beforeEach(() => {
-      wrapper = createComponent({ props: { hasExtendedFormFields: true } });
     });
 
     it('has the extended fields', () => {
@@ -144,22 +117,30 @@ describe('ValueStreamForm', () => {
     });
 
     describe('Add stage button', () => {
+      beforeEach(() => {
+        wrapper = createComponent({
+          stubs: {
+            CustomStageFields,
+          },
+        });
+      });
+
       it('has the add stage button', () => {
         expect(findBtn('actionSecondary')).toMatchObject({ text: 'Add another stage' });
       });
 
-      it('adds a blank custom stage when clicked', () => {
-        expect(wrapper.vm.stages.length).toBe(defaultStageConfig.length);
+      it('adds a blank custom stage when clicked', async () => {
+        expect(wrapper.vm.stages).toHaveLength(defaultStageConfig.length);
 
-        clickAddStage();
+        await clickAddStage();
 
         expect(wrapper.vm.stages.length).toBe(defaultStageConfig.length + 1);
       });
 
-      it('validates existing fields when clicked', () => {
-        expect(wrapper.vm.nameError).toEqual([]);
+      it('validates existing fields when clicked', async () => {
+        expect(wrapper.vm.nameError).toHaveLength(0);
 
-        clickAddStage();
+        await clickAddStage();
 
         expect(wrapper.vm.nameError).toEqual(['Name is required']);
       });
@@ -168,7 +149,6 @@ describe('ValueStreamForm', () => {
     describe('form errors', () => {
       const commonExtendedData = {
         props: {
-          hasExtendedFormFields: true,
           initialFormErrors: initialFormStageErrors,
         },
       };
@@ -211,7 +191,6 @@ describe('ValueStreamForm', () => {
             initialPreset,
             initialData,
             isEditing: true,
-            hasExtendedFormFields: true,
           },
         });
       });
@@ -225,24 +204,36 @@ describe('ValueStreamForm', () => {
       });
 
       describe('Add stage button', () => {
+        beforeEach(() => {
+          wrapper = createComponent({
+            props: {
+              initialPreset,
+              initialData,
+              isEditing: true,
+            },
+            stubs: {
+              CustomStageFields,
+            },
+          });
+        });
+
         it('has the add stage button', () => {
           expect(findBtn('actionSecondary')).toMatchObject({ text: 'Add another stage' });
         });
 
-        it('adds a blank custom stage when clicked', () => {
+        it('adds a blank custom stage when clicked', async () => {
           expect(wrapper.vm.stages.length).toBe(stageCount);
 
-          clickAddStage();
+          await clickAddStage();
 
           expect(wrapper.vm.stages.length).toBe(stageCount + 1);
         });
 
-        it('validates existing fields when clicked', () => {
+        it('validates existing fields when clicked', async () => {
           expect(wrapper.vm.nameError).toEqual([]);
 
           wrapper.findByTestId('create-value-stream-name').find(GlFormInput).vm.$emit('input', '');
-
-          clickAddStage();
+          await clickAddStage();
 
           expect(wrapper.vm.nameError).toEqual(['Name is required']);
         });
@@ -250,14 +241,19 @@ describe('ValueStreamForm', () => {
 
       describe('with valid fields', () => {
         beforeEach(() => {
+          trackingSpy = mockTracking(undefined, wrapper.element, jest.spyOn);
           wrapper = createComponent({
             props: {
               initialPreset,
               initialData,
               isEditing: true,
-              hasExtendedFormFields: true,
             },
           });
+        });
+
+        afterEach(() => {
+          unmockTracking();
+          wrapper.destroy();
         });
 
         describe('form submitted successfully', () => {
@@ -277,6 +273,12 @@ describe('ValueStreamForm', () => {
           it('displays a toast message', () => {
             expect(mockToastShow).toHaveBeenCalledWith(`'${initialData.name}' Value Stream saved`, {
               position: 'top-center',
+            });
+          });
+
+          it('sends tracking information', () => {
+            expect(trackingSpy).toHaveBeenCalledWith(undefined, 'submit_form', {
+              label: 'edit_value_stream',
             });
           });
         });
@@ -327,6 +329,12 @@ describe('ValueStreamForm', () => {
   describe('with valid fields', () => {
     beforeEach(() => {
       wrapper = createComponent({ data: { name: streamName } });
+      trackingSpy = mockTracking(undefined, wrapper.element, jest.spyOn);
+    });
+
+    afterEach(() => {
+      unmockTracking();
+      wrapper.destroy();
     });
 
     describe('form submitted successfully', () => {
@@ -337,7 +345,20 @@ describe('ValueStreamForm', () => {
       it('calls the "createValueStream" event when submitted', () => {
         expect(createValueStreamMock).toHaveBeenCalledWith(expect.any(Object), {
           name: streamName,
-          stages: [],
+          stages: [
+            {
+              custom: false,
+              name: 'issue',
+            },
+            {
+              custom: false,
+              name: 'plan',
+            },
+            {
+              custom: false,
+              name: 'code',
+            },
+          ],
         });
       });
 
@@ -348,6 +369,12 @@ describe('ValueStreamForm', () => {
       it('displays a toast message', () => {
         expect(mockToastShow).toHaveBeenCalledWith(`'${streamName}' Value Stream created`, {
           position: 'top-center',
+        });
+      });
+
+      it('sends tracking information', () => {
+        expect(trackingSpy).toHaveBeenCalledWith(undefined, 'submit_form', {
+          label: 'create_value_stream',
         });
       });
     });

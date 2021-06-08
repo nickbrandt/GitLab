@@ -11,14 +11,14 @@ type: reference, api
 
 ## Placeholder tokens
 
-Badges support placeholders that will be replaced in real time in both the link and image URL. The allowed placeholders are:
+Badges support placeholders that are replaced in real time in both the link and image URL. The allowed placeholders are:
 
 <!-- vale gitlab.Spelling = NO -->
 
-- **%{project_path}**: will be replaced by the project path.
-- **%{project_id}**: will be replaced by the project ID.
-- **%{default_branch}**: will be replaced by the project default branch.
-- **%{commit_sha}**: will be replaced by the last project's commit SHA.
+- **%{project_path}**: Replaced by the project path.
+- **%{project_id}**: Replaced by the project ID.
+- **%{default_branch}**: Replaced by the project default branch.
+- **%{commit_sha}**: Replaced by the last project's commit SHA.
 
 <!-- vale gitlab.Spelling = YES -->
 ## List all badges of a project
@@ -59,7 +59,7 @@ Example response:
     "rendered_link_url": "http://example.com/ci_status.svg?project=example-org/example-project&ref=master",
     "rendered_image_url": "https://shields.io/my/badge",
     "kind": "group"
-  },
+  }
 ]
 ```
 
@@ -109,7 +109,9 @@ POST /projects/:id/badges
 | `name` | string | no | Name of the badge |
 
 ```shell
-curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" --data "link_url=https://gitlab.com/gitlab-org/gitlab-foss/commits/master&image_url=https://shields.io/my/badge1&name=mybadge" "https://gitlab.example.com/api/v4/projects/:id/badges"
+curl --request POST --header "PRIVATE-TOKEN: <your_access_token>" \
+     --data "link_url=https://gitlab.com/gitlab-org/gitlab-foss/commits/master&image_url=https://shields.io/my/badge1&name=mybadge" \
+     "https://gitlab.example.com/api/v4/projects/:id/badges"
 ```
 
 Example response:
@@ -162,7 +164,7 @@ Example response:
 
 ## Remove a badge from a project
 
-Removes a badge from a project. Only project's badges will be removed by using this endpoint.
+Removes a badge from a project. Only project badges are removed by using this endpoint.
 
 ```plaintext
 DELETE /projects/:id/badges/:badge_id
@@ -202,6 +204,6 @@ Example response:
   "link_url": "http://example.com/ci_status.svg?project=%{project_path}&ref=%{default_branch}",
   "image_url": "https://shields.io/my/badge",
   "rendered_link_url": "http://example.com/ci_status.svg?project=example-org/example-project&ref=master",
-  "rendered_image_url": "https://shields.io/my/badge",
+  "rendered_image_url": "https://shields.io/my/badge"
 }
 ```

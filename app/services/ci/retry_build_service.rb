@@ -2,8 +2,6 @@
 
 module Ci
   class RetryBuildService < ::BaseService
-    include Gitlab::OptimisticLocking
-
     def self.clone_accessors
       %i[pipeline project ref tag options name
          allow_failure stage stage_id stage_idx trigger_request
@@ -16,39 +14,29 @@ module Ci
       build.ensure_scheduling_type!
 
       reprocess!(build).tap do |new_build|
-        mark_subsequent_stages_as_processable(build)
-        build.pipeline.reset_ancestor_bridges!
-
         Gitlab::OptimisticLocking.retry_lock(new_build, name: 'retry_build', &:enqueue)
+        AfterRequeueJobService.new(project, current_user).execute(build)
 
-        MergeRequests::AddTodoWhenBuildFailsService
-          .new(project, current_user)
+        ::MergeRequests::AddTodoWhenBuildFailsService
+          .new(project: project, current_user: current_user)
           .close(new_build)
       end
     end
 
     # rubocop: disable CodeReuse/ActiveRecord
     def reprocess!(build)
-      unless can?(current_user, :update_build, build)
-        raise Gitlab::Access::AccessDeniedError
-      end
+      check_access!(build)
 
-      attributes = self.class.clone_accessors.map do |attribute|
+      attributes = self.class.clone_accessors.to_h do |attribute|
         [attribute, build.public_send(attribute)] # rubocop:disable GitlabSecurity/PublicSend
-      end.to_h
+      end
 
       attributes[:user] = current_user
 
       Ci::Build.transaction do
-        # mark all other builds of that name as retried
-        build.pipeline.builds.latest
-          .where(name: build.name)
-          .update_all(retried: true, processed: true)
-
-        create_build!(attributes).tap do
-          # mark existing object as retried/processed without a reload
-          build.retried = true
-          build.processed = true
+        create_build!(attributes).tap do |new_build|
+          new_build.update_older_statuses_retried!
+          build.reset # refresh the data to get new values of `retried` and `processed`.
         end
       end
     end
@@ -56,22 +44,21 @@ module Ci
 
     private
 
+    def check_access!(build)
+      unless can?(current_user, :update_build, build)
+        raise Gitlab::Access::AccessDeniedError
+      end
+    end
+
     def create_build!(attributes)
       build = project.builds.new(attributes)
       build.assign_attributes(::Gitlab::Ci::Pipeline::Seed::Build.environment_attributes_for(build))
-      build.retried = false
       BulkInsertableAssociations.with_bulk_insert do
         build.save!
       end
       build
     end
-
-    def mark_subsequent_stages_as_processable(build)
-      build.pipeline.processables.skipped.after_stage(build.stage_idx).find_each do |skipped|
-        retry_optimistic_lock(skipped, name: 'ci_retry_build_mark_subsequent_stages') { |build| build.process(current_user) }
-      end
-    end
   end
 end
 
-Ci::RetryBuildService.prepend_if_ee('EE::Ci::RetryBuildService')
+Ci::RetryBuildService.prepend_mod_with('Ci::RetryBuildService')

@@ -45,24 +45,21 @@ export default {
       required: false,
       default: '',
     },
-    wafLogEnabled: {
-      type: Boolean,
-      required: false,
-    },
     ciliumLogEnabled: {
       type: Boolean,
       required: false,
     },
   },
-  data: () => ({
-    currentServerSideSettings: {
-      host: null,
-      port: null,
-      protocol: null,
-      wafLogEnabled: null,
-      ciliumLogEnabled: null,
-    },
-  }),
+  data() {
+    return {
+      currentServerSideSettings: {
+        host: null,
+        port: null,
+        protocol: null,
+        ciliumLogEnabled: null,
+      },
+    };
+  },
   computed: {
     isSaving() {
       return [UPDATING].includes(this.status);
@@ -107,7 +104,6 @@ export default {
           port: this.port,
           protocol: this.protocol,
           host: this.host,
-          waf_log_enabled: this.wafLogEnabled,
           cilium_log_enabled: this.ciliumLogEnabled,
         },
       });
@@ -148,9 +144,6 @@ export default {
     },
     portChanged(port) {
       this.setFluentdSettings({ port: Number(port) });
-    },
-    wafLogChanged(wafLogEnabled) {
-      this.setFluentdSettings({ wafLogEnabled });
     },
     ciliumLogChanged(ciliumLogEnabled) {
       this.setFluentdSettings({ ciliumLogEnabled });
@@ -208,9 +201,6 @@ export default {
         </gl-dropdown>
       </div>
       <div class="form-group flex flex-wrap">
-        <gl-form-checkbox :checked="wafLogEnabled" @input="wafLogChanged">
-          <strong>{{ s__('ClusterIntegration|Send Web Application Firewall Logs') }}</strong>
-        </gl-form-checkbox>
         <gl-form-checkbox :checked="ciliumLogEnabled" @input="ciliumLogChanged">
           <strong>{{ s__('ClusterIntegration|Send Container Network Policies Logs') }}</strong>
         </gl-form-checkbox>

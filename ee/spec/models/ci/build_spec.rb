@@ -4,6 +4,7 @@ require 'spec_helper'
 
 RSpec.describe Ci::Build do
   let_it_be(:group) { create(:group_with_plan, plan: :bronze_plan) }
+
   let(:project) { create(:project, :repository, group: group) }
 
   let(:pipeline) do
@@ -106,20 +107,6 @@ RSpec.describe Ci::Build do
     end
   end
 
-  describe '#stick_build_if_status_changed' do
-    it 'sticks the build if the status changed' do
-      job = create(:ci_build, :pending)
-
-      allow(Gitlab::Database::LoadBalancing).to receive(:enable?)
-        .and_return(true)
-
-      expect(Gitlab::Database::LoadBalancing::Sticking).to receive(:stick)
-        .with(:build, job.id)
-
-      job.update!(status: :running)
-    end
-  end
-
   describe '#variables' do
     subject { job.variables }
 
@@ -145,6 +132,64 @@ RSpec.describe Ci::Build do
           expect(subject.to_runner_variables).to include({ key: 'GITLAB_FEATURES', value: anything, public: true, masked: false })
           features_variable = subject.find { |v| v[:key] == 'GITLAB_FEATURES' }
           expect(features_variable[:value]).to include('multiple_ldap_servers')
+        end
+      end
+
+      context 'when there is a dast_profile associated with the pipeline' do
+        let_it_be(:project) { create(:project, :repository) }
+        let_it_be(:user) { create(:user, developer_projects: [project]) }
+        let_it_be(:dast_profile) { create(:dast_profile, project: project) }
+        let_it_be(:dast_site_profile_secret_variable) { create(:dast_site_profile_secret_variable, key: 'DAST_PASSWORD_BASE64', dast_site_profile: dast_profile.dast_site_profile) }
+
+        let(:pipeline) { create(:ci_pipeline, pipeline_params.merge!(project: project, dast_profile: dast_profile, user: user) ) }
+
+        let(:key) { dast_site_profile_secret_variable.key }
+        let(:value) { dast_site_profile_secret_variable.value }
+
+        before do
+          stub_licensed_features(security_on_demand_scans: true)
+        end
+
+        shared_examples 'a pipeline with no dast on-demand variables' do
+          it 'does not include variables associated with the profile' do
+            keys = subject.to_runner_variables.map { |var| var[:key] }
+
+            expect(keys).not_to include(key)
+          end
+        end
+
+        it_behaves_like 'a pipeline with no dast on-demand variables' do
+          let(:pipeline_params) { { config_source: :parameter_source } }
+        end
+
+        it_behaves_like 'a pipeline with no dast on-demand variables' do
+          let(:pipeline_params) { { source: :ondemand_dast_scan } }
+        end
+
+        context 'when the dast on-demand pipeline is correctly configured' do
+          let(:pipeline_params) { { source: :ondemand_dast_scan, config_source: :parameter_source } }
+
+          it 'includes variables associated with the profile' do
+            expect(subject.to_runner_variables).to include(key: key, value: value, public: false, masked: true)
+          end
+
+          context 'when user cannot read secrets' do
+            before do
+              stub_licensed_features(security_on_demand_scans: false)
+            end
+
+            it 'does not include variables associated with the profile' do
+              expect(subject.to_runner_variables).not_to include(key: key, value: value, public: false, masked: true)
+            end
+          end
+
+          context 'when there is no user associated with the pipeline' do
+            let_it_be(:user) { nil }
+
+            it 'does not include variables associated with the profile' do
+              expect(subject.to_runner_variables).not_to include(key: key, value: value, public: false, masked: true)
+            end
+          end
         end
       end
     end
@@ -183,7 +228,7 @@ RSpec.describe Ci::Build do
         it 'parses blobs and add the results to the report' do
           subject
 
-          expect(security_reports.get_report('sast', artifact).findings.size).to eq(33)
+          expect(security_reports.get_report('sast', artifact).findings.size).to eq(5)
         end
 
         it 'adds the created date to the report' do
@@ -202,7 +247,7 @@ RSpec.describe Ci::Build do
         it 'parses blobs and adds the results to the reports' do
           subject
 
-          expect(security_reports.get_report('sast', sast_artifact).findings.size).to eq(33)
+          expect(security_reports.get_report('sast', sast_artifact).findings.size).to eq(5)
           expect(security_reports.get_report('dependency_scanning', ds_artifact).findings.size).to eq(4)
           expect(security_reports.get_report('container_scanning', cs_artifact).findings.size).to eq(8)
           expect(security_reports.get_report('dast', dast_artifact).findings.size).to eq(20)
@@ -216,6 +261,31 @@ RSpec.describe Ci::Build do
           subject
 
           expect(security_reports.get_report('sast', artifact)).to be_errored
+        end
+      end
+
+      context 'vulnerability_finding_tracking_signatures' do
+        let!(:artifact) { create(:ee_ci_job_artifact, :sast, job: job, project: job.project) }
+
+        where(vulnerability_finding_signatures_enabled: [true, false])
+        with_them do
+          it 'parses the report' do
+            stub_licensed_features(
+              sast: true,
+              vulnerability_finding_signatures: vulnerability_finding_signatures_enabled
+            )
+            stub_feature_flags(
+              vulnerability_finding_tracking_signatures: vulnerability_finding_signatures_enabled
+            )
+
+            expect(::Gitlab::Ci::Parsers::Security::Sast).to receive(:new).with(
+              artifact.file.read,
+              kind_of(::Gitlab::Ci::Reports::Security::Report),
+              vulnerability_finding_signatures_enabled
+            )
+
+            subject
+          end
         end
       end
     end
@@ -336,13 +406,8 @@ RSpec.describe Ci::Build do
 
       it 'parses blobs and add the results to the report' do
         subject
-        blob_path = "/#{project.full_path}/-/blob/#{job.sha}/sast-sample-rails/Gemfile.lock"
-        netty = dependency_list_report.dependencies.first
-        ffi = dependency_list_report.dependencies.last
 
-        expect(dependency_list_report.dependencies.count).to eq(4)
-        expect(netty[:name]).to eq('io.netty/netty')
-        expect(ffi[:location][:blob_path]).to eq(blob_path)
+        expect(dependency_list_report.dependencies.count).to eq(0)
       end
     end
 
@@ -597,6 +662,36 @@ RSpec.describe Ci::Build do
         expect(Gitlab::UsageDataCounters::HLLRedisCounter).not_to receive(:track_event)
 
         create(:ci_build, secrets: {})
+      end
+    end
+  end
+
+  describe '#validate_schema?' do
+    let(:ci_build) { build(:ci_build) }
+
+    subject { ci_build.validate_schema? }
+
+    before do
+      ci_build.yaml_variables = variables
+    end
+
+    context 'when the yaml variables does not have the configuration' do
+      let(:variables) { [] }
+
+      it { is_expected.to be_falsey }
+    end
+
+    context 'when the yaml variables has the configuration' do
+      context 'when the configuration is set as `false`' do
+        let(:variables) { [{ key: 'VALIDATE_SCHEMA', value: 'false' }] }
+
+        it { is_expected.to be_falsey }
+      end
+
+      context 'when the configuration is set as `true`' do
+        let(:variables) { [{ key: 'VALIDATE_SCHEMA', value: 'true' }] }
+
+        it { is_expected.to be_truthy }
       end
     end
   end

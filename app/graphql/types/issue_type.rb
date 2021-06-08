@@ -124,6 +124,9 @@ module Types
     field :create_note_email, GraphQL::STRING_TYPE, null: true,
           description: 'User specific email address for the issue.'
 
+    field :timelogs, Types::TimelogType.connection_type, null: false,
+          description: 'Timelogs on the issue.'
+
     def author
       Gitlab::Graphql::Loaders::BatchModelLoader.new(User, object.author_id).find
     end
@@ -150,4 +153,4 @@ module Types
   end
 end
 
-Types::IssueType.prepend_if_ee('::EE::Types::IssueType')
+Types::IssueType.prepend_mod_with('Types::IssueType')

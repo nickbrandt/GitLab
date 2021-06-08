@@ -14,7 +14,7 @@ class ProjectsController < Projects::ApplicationController
 
   around_action :allow_gitaly_ref_name_caching, only: [:index, :show]
 
-  before_action :whitelist_query_limiting, only: [:show, :create]
+  before_action :disable_query_limiting, only: [:show, :create]
   before_action :authenticate_user!, except: [:index, :show, :activity, :refs, :resolve, :unfoldered_environment_names]
   before_action :redirect_git_extension, only: [:show]
   before_action :project, except: [:index, :new, :create, :resolve]
@@ -35,17 +35,25 @@ class ProjectsController < Projects::ApplicationController
     push_frontend_feature_flag(:allow_editing_commit_messages, @project)
   end
 
+  before_action do
+    push_frontend_feature_flag(:refactor_blob_viewer, @project, default_enabled: :yaml)
+  end
+
+  before_action only: [:new] do
+    # Run experiment before render so it will be written to the `gon` for FE
+    helpers.new_repo_experiment_text
+  end
+
   layout :determine_layout
 
   feature_category :projects, [
                      :index, :show, :new, :create, :edit, :update, :transfer,
-                     :destroy, :resolve, :archive, :unarchive, :toggle_star
+                     :destroy, :resolve, :archive, :unarchive, :toggle_star, :activity
                    ]
 
   feature_category :source_code_management, [:remove_fork, :housekeeping, :refs]
   feature_category :issue_tracking, [:preview_markdown, :new_issuable_address]
   feature_category :importers, [:export, :remove_export, :generate_new_export, :download_export]
-  feature_category :audit_events, [:activity]
   feature_category :code_review, [:unfoldered_environment_names]
 
   def index
@@ -70,6 +78,7 @@ class ProjectsController < Projects::ApplicationController
     @project = ::Projects::CreateService.new(current_user, project_params(attributes: project_params_create_attributes)).execute
 
     if @project.saved?
+      experiment(:new_repo, user: current_user).track(:project_created)
       experiment(:new_project_readme, actor: current_user).track(
         :created,
         property: active_new_project_tab,
@@ -80,7 +89,7 @@ class ProjectsController < Projects::ApplicationController
         notice: _("Project '%{project_name}' was successfully created.") % { project_name: @project.name }
       )
     else
-      render 'new', locals: { active_tab: active_new_project_tab }
+      render 'new'
     end
   end
 
@@ -306,7 +315,7 @@ class ProjectsController < Projects::ApplicationController
   def unfoldered_environment_names
     respond_to do |format|
       format.json do
-        render json: EnvironmentNamesFinder.new(@project, current_user).execute
+        render json: Environments::EnvironmentNamesFinder.new(@project, current_user).execute
       end
     end
   end
@@ -326,11 +335,7 @@ class ProjectsController < Projects::ApplicationController
         experiment(:empty_repo_upload, project: @project).track(:view_project_show, property: property)
       end
 
-      if @project.empty_repo?
-        record_experiment_user(:invite_members_empty_project_version_a)
-
-        render 'projects/empty'
-      end
+      render 'projects/empty' if @project.empty_repo?
     else
       if can?(current_user, :read_wiki, @project)
         @wiki = @project.wiki
@@ -399,6 +404,7 @@ class ProjectsController < Projects::ApplicationController
       show_default_award_emojis
       squash_option
       allow_editing_commit_messages
+      mr_default_target_self
     ]
   end
 
@@ -430,6 +436,7 @@ class ProjectsController < Projects::ApplicationController
       :request_access_enabled,
       :runners_token,
       :tag_list,
+      :topics,
       :visibility_level,
       :template_name,
       :template_project_id,
@@ -505,13 +512,13 @@ class ProjectsController < Projects::ApplicationController
 
     # `project` calls `find_routable!`, so this will trigger the usual not-found
     # behaviour when the user isn't authorized to see the project
-    return unless project
+    return if project.nil? || performed?
 
     redirect_to(request.original_url.sub(%r{\.git/?\Z}, ''))
   end
 
-  def whitelist_query_limiting
-    Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab/-/issues/20826')
+  def disable_query_limiting
+    Gitlab::QueryLimiting.disable!('https://gitlab.com/gitlab-org/gitlab/-/issues/20826')
   end
 
   def present_project
@@ -521,7 +528,7 @@ class ProjectsController < Projects::ApplicationController
   def export_rate_limit
     prefixed_action = "project_#{params[:action]}".to_sym
 
-    project_scope = params[:action] == :download_export ? @project : nil
+    project_scope = params[:action] == 'download_export' ? @project : nil
 
     if rate_limiter.throttled?(prefixed_action, scope: [current_user, project_scope].compact)
       rate_limiter.log_request(request, "#{prefixed_action}_request_limit".to_sym, current_user)
@@ -539,4 +546,4 @@ class ProjectsController < Projects::ApplicationController
   end
 end
 
-ProjectsController.prepend_if_ee('EE::ProjectsController')
+ProjectsController.prepend_mod_with('ProjectsController')

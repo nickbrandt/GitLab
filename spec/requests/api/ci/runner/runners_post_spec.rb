@@ -39,18 +39,32 @@ RSpec.describe API::Ci::Runner, :clean_gitlab_redis_shared_state do
           post api('/runners'), params: { token: token }
         end
 
-        it 'creates runner with default values' do
-          post api('/runners'), params: { token: registration_token }
+        context 'with a registration token' do
+          let(:token) { registration_token }
 
-          runner = ::Ci::Runner.first
+          it 'creates runner with default values' do
+            request
 
-          expect(response).to have_gitlab_http_status(:created)
-          expect(json_response['id']).to eq(runner.id)
-          expect(json_response['token']).to eq(runner.token)
-          expect(runner.run_untagged).to be true
-          expect(runner.active).to be true
-          expect(runner.token).not_to eq(registration_token)
-          expect(runner).to be_instance_type
+            runner = ::Ci::Runner.first
+
+            expect(response).to have_gitlab_http_status(:created)
+            expect(json_response['id']).to eq(runner.id)
+            expect(json_response['token']).to eq(runner.token)
+            expect(runner.run_untagged).to be true
+            expect(runner.active).to be true
+            expect(runner.token).not_to eq(registration_token)
+            expect(runner).to be_instance_type
+          end
+
+          it_behaves_like 'storing arguments in the application context' do
+            subject { request }
+
+            let(:expected_params) { { client_id: "runner/#{::Ci::Runner.first.id}" } }
+          end
+
+          it_behaves_like 'not executing any extra queries for the application context' do
+            let(:subject_proc) { proc { request } }
+          end
         end
 
         context 'when project token is used' do
@@ -71,11 +85,42 @@ RSpec.describe API::Ci::Runner, :clean_gitlab_redis_shared_state do
           it_behaves_like 'storing arguments in the application context' do
             subject { request }
 
-            let(:expected_params) { { project: project.full_path } }
+            let(:expected_params) { { project: project.full_path, client_id: "runner/#{::Ci::Runner.first.id}" } }
           end
 
           it_behaves_like 'not executing any extra queries for the application context' do
             let(:subject_proc) { proc { request } }
+          end
+
+          context 'when it exceeds the application limits' do
+            before do
+              create(:ci_runner, runner_type: :project_type, projects: [project], contacted_at: 1.second.ago)
+              create(:plan_limits, :default_plan, ci_registered_project_runners: 1)
+            end
+
+            it 'does not create runner' do
+              request
+
+              expect(response).to have_gitlab_http_status(:bad_request)
+              expect(json_response['message']).to include('runner_projects.base' => ['Maximum number of ci registered project runners (1) exceeded'])
+              expect(project.runners.reload.size).to eq(1)
+            end
+          end
+
+          context 'when abandoned runners cause application limits to not be exceeded' do
+            before do
+              create(:ci_runner, runner_type: :project_type, projects: [project], created_at: 14.months.ago, contacted_at: 13.months.ago)
+              create(:plan_limits, :default_plan, ci_registered_project_runners: 1)
+            end
+
+            it 'creates runner' do
+              request
+
+              expect(response).to have_gitlab_http_status(:created)
+              expect(json_response['message']).to be_nil
+              expect(project.runners.reload.size).to eq(2)
+              expect(project.runners.recent.size).to eq(1)
+            end
           end
         end
 
@@ -97,11 +142,43 @@ RSpec.describe API::Ci::Runner, :clean_gitlab_redis_shared_state do
           it_behaves_like 'storing arguments in the application context' do
             subject { request }
 
-            let(:expected_params) { { root_namespace: group.full_path_components.first } }
+            let(:expected_params) { { root_namespace: group.full_path_components.first, client_id: "runner/#{::Ci::Runner.first.id}" } }
           end
 
           it_behaves_like 'not executing any extra queries for the application context' do
             let(:subject_proc) { proc { request } }
+          end
+
+          context 'when it exceeds the application limits' do
+            before do
+              create(:ci_runner, runner_type: :group_type, groups: [group], contacted_at: nil, created_at: 1.month.ago)
+              create(:plan_limits, :default_plan, ci_registered_group_runners: 1)
+            end
+
+            it 'does not create runner' do
+              request
+
+              expect(response).to have_gitlab_http_status(:bad_request)
+              expect(json_response['message']).to include('runner_namespaces.base' => ['Maximum number of ci registered group runners (1) exceeded'])
+              expect(group.runners.reload.size).to eq(1)
+            end
+          end
+
+          context 'when abandoned runners cause application limits to not be exceeded' do
+            before do
+              create(:ci_runner, runner_type: :group_type, groups: [group], created_at: 4.months.ago, contacted_at: 3.months.ago)
+              create(:ci_runner, runner_type: :group_type, groups: [group], contacted_at: nil, created_at: 4.months.ago)
+              create(:plan_limits, :default_plan, ci_registered_group_runners: 1)
+            end
+
+            it 'creates runner' do
+              request
+
+              expect(response).to have_gitlab_http_status(:created)
+              expect(json_response['message']).to be_nil
+              expect(group.runners.reload.size).to eq(3)
+              expect(group.runners.recent.size).to eq(1)
+            end
           end
         end
       end

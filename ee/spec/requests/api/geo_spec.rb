@@ -189,7 +189,7 @@ RSpec.describe API::Geo do
 
       context 'when attachment has mount_point nil' do
         it 'responds with 200 with X-Sendfile' do
-          resource.update(mount_point: nil)
+          resource.update!(mount_point: nil)
 
           get api("/geo/transfers/attachment/#{resource.id}"), headers: req_header
 
@@ -224,7 +224,7 @@ RSpec.describe API::Geo do
 
       context 'avatar has mount_point nil' do
         it 'responds with 200 with X-Sendfile' do
-          resource.update(mount_point: nil)
+          resource.update!(mount_point: nil)
 
           get api("/geo/transfers/avatar/#{resource.id}"), headers: req_header
 
@@ -267,59 +267,6 @@ RSpec.describe API::Geo do
             File.unlink(resource.absolute_path)
 
             get api("/geo/transfers/file/#{resource.id}"), headers: req_header
-
-            expect(response).to have_gitlab_http_status(:not_found)
-            expect(json_response['geo_code']).to eq(Gitlab::Geo::Replication::FILE_NOT_FOUND_GEO_CODE)
-          end
-        end
-      end
-    end
-
-    describe 'GET /geo/transfers/lfs/1' do
-      let(:resource) { create(:lfs_object, :with_file) }
-      let(:transfer) { Gitlab::Geo::Replication::LfsTransfer.new(resource) }
-      let(:req_header) { Gitlab::Geo::TransferRequest.new(transfer.request_data).headers }
-
-      context 'invalid requests' do
-        before do
-          allow_next_instance_of(Gitlab::Geo::TransferRequest) do |instance|
-            allow(instance).to receive(:requesting_node).and_return(secondary_node)
-          end
-        end
-
-        it 'responds with 401 when an invalid auth header is provided' do
-          get api("/geo/transfers/lfs/#{resource.id}"), headers: invalid_geo_auth_header
-
-          expect(response).to have_gitlab_http_status(:unauthorized)
-        end
-
-        it 'responds with 404 when resource does not exist' do
-          get api("/geo/transfers/lfs/100000"), headers: not_found_req_header
-
-          expect(response).to have_gitlab_http_status(:not_found)
-        end
-      end
-
-      context 'LFS object exists' do
-        context 'file exists' do
-          subject(:request) { get api("/geo/transfers/lfs/#{resource.id}"), headers: req_header }
-
-          it 'responds with 200 with X-Sendfile' do
-            request
-
-            expect(response).to have_gitlab_http_status(:ok)
-            expect(response.headers['Content-Type']).to eq('application/octet-stream')
-            expect(response.headers['X-Sendfile']).to eq(resource.file.path)
-          end
-
-          it_behaves_like 'with terms enforced'
-        end
-
-        context 'file does not exist' do
-          it 'responds with 404 and a specific geo code' do
-            File.unlink(resource.file.path)
-
-            get api("/geo/transfers/lfs/#{resource.id}"), headers: req_header
 
             expect(response).to have_gitlab_http_status(:not_found)
             expect(json_response['geo_code']).to eq(Gitlab::Geo::Replication::FILE_NOT_FOUND_GEO_CODE)
@@ -375,7 +322,6 @@ RSpec.describe API::Geo do
           container_repositories_replication_enabled: true,
           design_repositories_replication_enabled: false,
           job_artifacts_replication_enabled: true,
-          lfs_objects_replication_enabled: true,
           repositories_replication_enabled: true,
           repository_verification_enabled: true
         }
@@ -432,7 +378,7 @@ RSpec.describe API::Geo do
       end
 
       it 'ignores invalid attributes upon update' do
-        GeoNodeStatus.create(data)
+        GeoNodeStatus.create!(data)
         data.merge!(
           {
             'id' => nil,

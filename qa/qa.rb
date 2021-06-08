@@ -8,6 +8,8 @@ require_relative '../lib/gitlab'
 require_relative '../lib/gitlab/utils'
 require_relative '../config/initializers/0_inject_enterprise_edition_module'
 
+require 'chemlab'
+
 module QA
   ##
   # Helper classes to represent frequently used sequences of actions
@@ -43,6 +45,7 @@ module QA
     autoload :IPAddress, 'qa/runtime/ip_address'
     autoload :Search, 'qa/runtime/search'
     autoload :ApplicationSettings, 'qa/runtime/application_settings'
+    autoload :AllureReport, 'qa/runtime/allure_report'
 
     module API
       autoload :Client, 'qa/runtime/api/client'
@@ -65,11 +68,15 @@ module QA
     autoload :ApiFabricator, 'qa/resource/api_fabricator'
     autoload :Base, 'qa/resource/base'
 
+    autoload :GroupBase, 'qa/resource/group_base'
     autoload :Sandbox, 'qa/resource/sandbox'
     autoload :Group, 'qa/resource/group'
     autoload :Issue, 'qa/resource/issue'
+    autoload :ProjectIssueNote, 'qa/resource/project_issue_note'
     autoload :Project, 'qa/resource/project'
-    autoload :Label, 'qa/resource/label'
+    autoload :LabelBase, 'qa/resource/label_base'
+    autoload :ProjectLabel, 'qa/resource/project_label'
+    autoload :GroupLabel, 'qa/resource/group_label'
     autoload :MergeRequest, 'qa/resource/merge_request'
     autoload :ProjectImportedFromGithub, 'qa/resource/project_imported_from_github'
     autoload :MergeRequestFromFork, 'qa/resource/merge_request_from_fork'
@@ -80,6 +87,7 @@ module QA
     autoload :CiVariable, 'qa/resource/ci_variable'
     autoload :Runner, 'qa/resource/runner'
     autoload :PersonalAccessToken, 'qa/resource/personal_access_token'
+    autoload :ProjectAccessToken, 'qa/resource/project_access_token'
     autoload :User, 'qa/resource/user'
     autoload :ProjectMilestone, 'qa/resource/project_milestone'
     autoload :GroupMilestone, 'qa/resource/group_milestone'
@@ -96,6 +104,8 @@ module QA
     autoload :ProjectSnippet, 'qa/resource/project_snippet'
     autoload :Design, 'qa/resource/design'
     autoload :RegistryRepository, 'qa/resource/registry_repository'
+    autoload :Package, 'qa/resource/package'
+    autoload :PipelineSchedules, 'qa/resource/pipeline_schedules'
 
     module KubernetesCluster
       autoload :Base, 'qa/resource/kubernetes_cluster/base'
@@ -121,6 +131,7 @@ module QA
 
     module Wiki
       autoload :ProjectPage, 'qa/resource/wiki/project_page'
+      autoload :GroupPage, 'qa/resource/wiki/group_page'
     end
   end
 
@@ -220,6 +231,7 @@ module QA
       autoload :Show, 'qa/page/group/show'
       autoload :Menu, 'qa/page/group/menu'
       autoload :Members, 'qa/page/group/members'
+      autoload :BulkImport, 'qa/page/group/bulk_import'
 
       module Milestone
         autoload :Index, 'qa/page/group/milestone/index'
@@ -256,11 +268,14 @@ module QA
 
     module Project
       autoload :New, 'qa/page/project/new'
-      autoload :NewExperiment, 'qa/page/project/new_experiment'
       autoload :Show, 'qa/page/project/show'
       autoload :Activity, 'qa/page/project/activity'
       autoload :Menu, 'qa/page/project/menu'
       autoload :Members, 'qa/page/project/members'
+
+      module Artifact
+        autoload :Show, 'qa/page/project/artifact/show'
+      end
 
       module Branches
         autoload :Show, 'qa/page/project/branches/show'
@@ -316,6 +331,7 @@ module QA
         autoload :MirroringRepositories, 'qa/page/project/settings/mirroring_repositories'
         autoload :ProtectedTags, 'qa/page/project/settings/protected_tags'
         autoload :VisibilityFeaturesPermissions, 'qa/page/project/settings/visibility_features_permissions'
+        autoload :AccessTokens, 'qa/page/project/settings/access_tokens'
 
         module Services
           autoload :Jira, 'qa/page/project/settings/services/jira'
@@ -323,7 +339,7 @@ module QA
           autoload :Prometheus, 'qa/page/project/settings/services/prometheus'
         end
         autoload :Operations, 'qa/page/project/settings/operations'
-        autoload :Incidents, 'qa/page/project/settings/incidents'
+        autoload :Alerts, 'qa/page/project/settings/alerts'
         autoload :Integrations, 'qa/page/project/settings/integrations'
       end
 
@@ -380,7 +396,6 @@ module QA
         autoload :Edit, 'qa/page/project/wiki/edit'
         autoload :Show, 'qa/page/project/wiki/show'
         autoload :GitAccess, 'qa/page/project/wiki/git_access'
-        autoload :Sidebar, 'qa/page/project/wiki/sidebar'
         autoload :List, 'qa/page/project/wiki/list'
       end
 
@@ -408,12 +423,17 @@ module QA
       end
     end
 
+    module User
+      autoload :Show, 'qa/page/user/show'
+    end
+
     module Issuable
       autoload :New, 'qa/page/issuable/new'
     end
 
     module Alert
       autoload :AutoDevopsAlert, 'qa/page/alert/auto_devops_alert'
+      autoload :FreeTrial, 'qa/page/alert/free_trial'
     end
 
     module Layout
@@ -496,6 +516,12 @@ module QA
       autoload :Snippet, 'qa/page/component/snippet'
       autoload :NewSnippet, 'qa/page/component/new_snippet'
       autoload :InviteMembersModal, 'qa/page/component/invite_members_modal'
+      autoload :Wiki, 'qa/page/component/wiki'
+      autoload :WikiSidebar, 'qa/page/component/wiki_sidebar'
+      autoload :WikiPageForm, 'qa/page/component/wiki_page_form'
+      autoload :AccessTokens, 'qa/page/component/access_tokens'
+      autoload :CommitModal, 'qa/page/component/commit_modal'
+      autoload :VisibilitySetting, 'qa/page/component/visibility_setting'
 
       module Issuable
         autoload :Common, 'qa/page/component/issuable/common'
@@ -517,6 +543,11 @@ module QA
       module Project
         autoload :Templates, 'qa/page/component/project/templates'
       end
+    end
+
+    module Trials
+      autoload :New, 'qa/page/trials/new'
+      autoload :Select, 'qa/page/trials/select'
     end
 
     module Modal
@@ -573,7 +604,9 @@ module QA
     autoload :LoopRunner, 'qa/specs/loop_runner'
 
     module Helpers
+      autoload :ContextSelector, 'qa/specs/helpers/context_selector'
       autoload :Quarantine, 'qa/specs/helpers/quarantine'
+      autoload :RSpec, 'qa/specs/helpers/rspec'
     end
   end
 

@@ -1,5 +1,6 @@
 <script>
 import {
+  GlAlert,
   GlButton,
   GlIcon,
   GlFormCheckbox,
@@ -14,6 +15,8 @@ import { mapActions, mapGetters, mapState } from 'vuex';
 import Autosave from '~/autosave';
 import { refreshUserMergeRequestCounts } from '~/commons/nav/user_merge_requests';
 import { deprecatedCreateFlash as Flash } from '~/flash';
+import { statusBoxState } from '~/issuable/components/status_box.vue';
+import httpStatusCodes from '~/lib/utils/http_status';
 import {
   capitalizeFirstCharacter,
   convertToCamelCase,
@@ -34,6 +37,8 @@ import CommentFieldLayout from './comment_field_layout.vue';
 import discussionLockedWidget from './discussion_locked_widget.vue';
 import noteSignedOutWidget from './note_signed_out_widget.vue';
 
+const { UNPROCESSABLE_ENTITY } = httpStatusCodes;
+
 export default {
   name: 'CommentForm',
   i18n: COMMENT_FORM,
@@ -43,6 +48,7 @@ export default {
     noteSignedOutWidget,
     discussionLockedWidget,
     markdownField,
+    GlAlert,
     GlButton,
     TimelineEntryItem,
     GlIcon,
@@ -66,6 +72,7 @@ export default {
     return {
       note: '',
       noteType: constants.COMMENT,
+      errors: [],
       noteIsConfidential: false,
       isSubmitting: false,
     };
@@ -78,6 +85,7 @@ export default {
       'getNoteableDataByProp',
       'getNotesData',
       'openState',
+      'hasDrafts',
     ]),
     ...mapState(['isToggleStateButtonLoading']),
     isNoteTypeComment() {
@@ -155,7 +163,7 @@ export default {
     canToggleIssueState() {
       return (
         this.getNoteableData.current_user.can_update &&
-        this.getNoteableData.state !== constants.MERGED &&
+        this.openState !== constants.MERGED &&
         !this.closedAndLocked
       );
     },
@@ -164,6 +172,9 @@ export default {
     },
     endpoint() {
       return this.getNoteableData.create_note_path;
+    },
+    draftEndpoint() {
+      return this.getNotesData.draftsPath;
     },
     issuableTypeTitle() {
       return this.noteableType === constants.MERGE_REQUEST_NOTEABLE_TYPE
@@ -201,11 +212,22 @@ export default {
       'reopenIssuable',
       'toggleIssueLocalState',
     ]),
-    handleSave(withIssueAction) {
+    handleSaveError({ data, status }) {
+      if (status === UNPROCESSABLE_ENTITY && data.errors?.commands_only?.length) {
+        this.errors = data.errors.commands_only;
+      } else {
+        this.errors = [this.$options.i18n.GENERIC_UNSUBMITTABLE_NETWORK];
+      }
+    },
+    handleSaveDraft() {
+      this.handleSave({ isDraft: true });
+    },
+    handleSave({ withIssueAction = false, isDraft = false } = {}) {
+      this.errors = [];
+
       if (this.note.length) {
         const noteData = {
-          endpoint: this.endpoint,
-          flashContainer: this.$el,
+          endpoint: isDraft ? this.draftEndpoint : this.endpoint,
           data: {
             note: {
               noteable_type: this.noteableType,
@@ -215,6 +237,7 @@ export default {
             },
             merge_request_diff_head_sha: this.getNoteableData.diff_head_sha,
           },
+          isDraft,
         };
 
         if (this.noteType === constants.DISCUSSION) {
@@ -236,10 +259,10 @@ export default {
               this.toggleIssueState();
             }
           })
-          .catch(() => {
+          .catch(({ response }) => {
+            this.handleSaveError(response);
+
             this.discard(false);
-            const msg = this.$options.i18n.GENERIC_UNSUBMITTABLE_NETWORK;
-            Flash(msg, 'alert', this.$el);
             this.note = noteData.data.note.note; // Restore textarea content.
             this.removePlaceholderNotes();
           })
@@ -248,6 +271,13 @@ export default {
           });
       } else {
         this.toggleIssueState();
+      }
+    },
+    handleEnter() {
+      if (this.hasDrafts) {
+        this.handleSaveDraft();
+      } else {
+        this.handleSave();
       }
     },
     toggleIssueState() {
@@ -261,6 +291,7 @@ export default {
       const toggleState = this.isOpen ? this.closeIssuable : this.reopenIssuable;
 
       toggleState()
+        .then(() => statusBoxState.updateStatus && statusBoxState.updateStatus())
         .then(refreshUserMergeRequestCounts)
         .catch(() => Flash(constants.toggleStateErrorMessage[this.noteableType][this.openState]));
     },
@@ -318,6 +349,9 @@ export default {
     hasEmailParticipants() {
       return this.getNoteableData.issue_email_participants?.length;
     },
+    dismissError(index) {
+      this.errors.splice(index, 1);
+    },
   },
 };
 </script>
@@ -328,7 +362,15 @@ export default {
     <discussion-locked-widget v-else-if="!canCreateNote" :issuable-type="issuableTypeTitle" />
     <ul v-else-if="canCreateNote" class="notes notes-form timeline">
       <timeline-entry-item class="note-form">
-        <div class="flash-container error-alert timeline-content"></div>
+        <gl-alert
+          v-for="(error, index) in errors"
+          :key="index"
+          variant="danger"
+          class="gl-mb-2"
+          @dismiss="() => dismissError(index)"
+        >
+          {{ error }}
+        </gl-alert>
         <div class="timeline-content timeline-content-form">
           <form ref="commentForm" class="new-note common-note-form gfm-form js-main-target-form">
             <comment-field-layout
@@ -360,69 +402,89 @@ export default {
                     :aria-label="$options.i18n.comment"
                     :placeholder="$options.i18n.bodyPlaceholder"
                     @keydown.up="editCurrentUserLastNote()"
-                    @keydown.meta.enter="handleSave()"
-                    @keydown.ctrl.enter="handleSave()"
+                    @keydown.meta.enter="handleEnter()"
+                    @keydown.ctrl.enter="handleEnter()"
                   ></textarea>
                 </template>
               </markdown-field>
             </comment-field-layout>
             <div class="note-form-actions">
-              <gl-form-checkbox
-                v-if="confidentialNotesEnabled && canSetConfidential"
-                v-model="noteIsConfidential"
-                class="gl-mb-6"
-                data-testid="confidential-note-checkbox"
-              >
-                {{ $options.i18n.confidential }}
-                <gl-icon
-                  v-gl-tooltip:tooltipcontainer.bottom
-                  name="question"
-                  :size="16"
-                  :title="$options.i18n.confidentialVisibility"
-                  class="gl-text-gray-500"
-                />
-              </gl-form-checkbox>
-              <gl-dropdown
-                split
-                :text="commentButtonTitle"
-                class="gl-mr-3 js-comment-button js-comment-submit-button comment-type-dropdown"
-                category="primary"
-                variant="success"
-                :disabled="disableSubmitButton"
-                data-testid="comment-button"
-                data-qa-selector="comment_button"
-                :data-track-label="trackingLabel"
-                data-track-event="click_button"
-                @click="handleSave()"
-              >
-                <gl-dropdown-item
-                  is-check-item
-                  :is-checked="isNoteTypeComment"
-                  :selected="isNoteTypeComment"
-                  @click="setNoteTypeToComment"
+              <template v-if="hasDrafts">
+                <gl-button
+                  :disabled="disableSubmitButton"
+                  data-testid="add-to-review-button"
+                  type="submit"
+                  category="primary"
+                  variant="success"
+                  @click.prevent="handleSaveDraft()"
+                  >{{ __('Add to review') }}</gl-button
                 >
-                  <strong>{{ $options.i18n.submitButton.comment }}</strong>
-                  <p class="gl-m-0">{{ commentDescription }}</p>
-                </gl-dropdown-item>
-                <gl-dropdown-divider />
-                <gl-dropdown-item
-                  is-check-item
-                  :is-checked="isNoteTypeDiscussion"
-                  :selected="isNoteTypeDiscussion"
-                  data-qa-selector="discussion_menu_item"
-                  @click="setNoteTypeToDiscussion"
+                <gl-button
+                  :disabled="disableSubmitButton"
+                  data-testid="add-comment-now-button"
+                  category="secondary"
+                  @click.prevent="handleSave()"
+                  >{{ __('Add comment now') }}</gl-button
                 >
-                  <strong>{{ $options.i18n.submitButton.startThread }}</strong>
-                  <p class="gl-m-0">{{ startDiscussionDescription }}</p>
-                </gl-dropdown-item>
-              </gl-dropdown>
+              </template>
+              <template v-else>
+                <gl-form-checkbox
+                  v-if="confidentialNotesEnabled && canSetConfidential"
+                  v-model="noteIsConfidential"
+                  class="gl-mb-6"
+                  data-testid="confidential-note-checkbox"
+                >
+                  {{ $options.i18n.confidential }}
+                  <gl-icon
+                    v-gl-tooltip:tooltipcontainer.bottom
+                    name="question"
+                    :size="16"
+                    :title="$options.i18n.confidentialVisibility"
+                    class="gl-text-gray-500"
+                  />
+                </gl-form-checkbox>
+                <gl-dropdown
+                  split
+                  :text="commentButtonTitle"
+                  class="gl-mr-3 js-comment-button js-comment-submit-button comment-type-dropdown"
+                  category="primary"
+                  variant="confirm"
+                  :disabled="disableSubmitButton"
+                  data-testid="comment-button"
+                  data-qa-selector="comment_button"
+                  :data-track-label="trackingLabel"
+                  data-track-event="click_button"
+                  @click="handleSave()"
+                >
+                  <gl-dropdown-item
+                    is-check-item
+                    :is-checked="isNoteTypeComment"
+                    :selected="isNoteTypeComment"
+                    @click="setNoteTypeToComment"
+                  >
+                    <strong>{{ $options.i18n.submitButton.comment }}</strong>
+                    <p class="gl-m-0">{{ commentDescription }}</p>
+                  </gl-dropdown-item>
+                  <gl-dropdown-divider />
+                  <gl-dropdown-item
+                    is-check-item
+                    :is-checked="isNoteTypeDiscussion"
+                    :selected="isNoteTypeDiscussion"
+                    data-qa-selector="discussion_menu_item"
+                    @click="setNoteTypeToDiscussion"
+                  >
+                    <strong>{{ $options.i18n.submitButton.startThread }}</strong>
+                    <p class="gl-m-0">{{ startDiscussionDescription }}</p>
+                  </gl-dropdown-item>
+                </gl-dropdown>
+              </template>
               <gl-button
                 v-if="canToggleIssueState"
                 :loading="isToggleStateButtonLoading"
                 :class="[actionButtonClassNames, 'btn-comment btn-comment-and-close']"
                 :disabled="isSubmitting"
                 data-testid="close-reopen-button"
-                @click="handleSave(true)"
+                @click="handleSave({ withIssueAction: true })"
                 >{{ issueActionButtonTitle }}</gl-button
               >
             </div>

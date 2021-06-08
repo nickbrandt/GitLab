@@ -1,18 +1,24 @@
 <script>
 import { GlToggle } from '@gitlab/ui';
 import { mapState, mapActions } from 'vuex';
-import { severityFilter, scannerFilter } from 'ee/security_dashboard/helpers';
+import { severityFilter, pipelineScannerFilter } from 'ee/security_dashboard/helpers';
+import { s__ } from '~/locale';
 import { DISMISSAL_STATES } from '../store/modules/filters/constants';
 import StandardFilter from './filters/standard_filter.vue';
 
 export default {
+  i18n: {
+    toggleLabel: s__('SecurityReports|Hide dismissed'),
+  },
   components: {
     StandardFilter,
     GlToggle,
   },
-  data: () => ({
-    filterConfigs: [severityFilter, scannerFilter],
-  }),
+  data() {
+    return {
+      filterConfigs: [severityFilter, pipelineScannerFilter],
+    };
+  },
   computed: {
     ...mapState('filters', ['filters']),
     hideDismissed: {
@@ -38,13 +44,13 @@ export default {
         :key="filter.id"
         class="col-sm-6 col-md-4 col-lg-2 p-2 js-filter"
         :filter="filter"
+        :data-testid="filter.id"
         @filter-changed="setFilter"
       />
       <div class="gl-display-flex ml-lg-auto p-2">
         <slot name="buttons"></slot>
-        <div class="pl-md-6">
-          <strong>{{ s__('SecurityReports|Hide dismissed') }}</strong>
-          <gl-toggle v-model="hideDismissed" class="gl-mt-2 js-toggle" />
+        <div class="pl-md-6 gl-pt-1">
+          <gl-toggle v-model="hideDismissed" :label="$options.i18n.toggleLabel" />
         </div>
       </div>
     </div>

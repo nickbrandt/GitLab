@@ -37,13 +37,8 @@ module ApplicationSettingsHelper
   end
 
   def storage_weights
-    ApplicationSetting.repository_storages_weighted_attributes.map do |attribute|
-      storage = attribute.to_s.delete_prefix('repository_storages_weighted_')
-      {
-        name: attribute,
-        label: storage,
-        value: @application_setting.repository_storages_weighted[storage] || 0
-      }
+    Gitlab.config.repositories.storages.keys.each_with_object(OpenStruct.new) do |storage, weights|
+      weights[storage.to_sym] = @application_setting.repository_storages_weighted[storage] || 0
     end
   end
 
@@ -107,15 +102,20 @@ module ApplicationSettingsHelper
   def oauth_providers_checkboxes
     button_based_providers.map do |source|
       disabled = @application_setting.disabled_oauth_sign_in_sources.include?(source.to_s)
-      css_class = ['btn']
-      css_class << 'active' unless disabled
-      checkbox_name = 'application_setting[enabled_oauth_sign_in_sources][]'
       name = Gitlab::Auth::OAuth::Provider.label_for(source)
+      checkbox_name = 'application_setting[enabled_oauth_sign_in_sources][]'
+      checkbox_id = "application_setting_enabled_oauth_sign_in_sources_#{name.parameterize(separator: '_')}"
 
-      label_tag(checkbox_name, class: css_class.join(' ')) do
-        check_box_tag(checkbox_name, source, !disabled,
-                      autocomplete: 'off',
-                      id: name.tr(' ', '_')) + name
+      content_tag :div, class: 'form-check' do
+        check_box_tag(
+          checkbox_name,
+          source,
+          !disabled,
+          autocomplete: 'off',
+          id: checkbox_id,
+          class: 'form-check-input'
+        ) +
+        label_tag(checkbox_id, name, class: 'form-check-label')
       end
     end
   end
@@ -179,6 +179,7 @@ module ApplicationSettingsHelper
   def visible_attributes
     [
       :abuse_notification_email,
+      :admin_mode,
       :after_sign_out_path,
       :after_sign_up_text,
       :akismet_api_key,
@@ -228,7 +229,11 @@ module ApplicationSettingsHelper
       :email_author_in_body,
       :enabled_git_access_protocol,
       :enforce_terms,
+      :external_pipeline_validation_service_timeout,
+      :external_pipeline_validation_service_token,
+      :external_pipeline_validation_service_url,
       :first_day_of_week,
+      :floc_enabled,
       :force_pages_access_control,
       :gitaly_timeout_default,
       :gitaly_timeout_medium,
@@ -298,6 +303,7 @@ module ApplicationSettingsHelper
       :sourcegraph_public_only,
       :spam_check_endpoint_enabled,
       :spam_check_endpoint_url,
+      :spam_check_api_key,
       :terminal_max_session_time,
       :terms,
       :throttle_authenticated_api_enabled,
@@ -306,9 +312,15 @@ module ApplicationSettingsHelper
       :throttle_authenticated_web_enabled,
       :throttle_authenticated_web_period_in_seconds,
       :throttle_authenticated_web_requests_per_period,
+      :throttle_authenticated_packages_api_enabled,
+      :throttle_authenticated_packages_api_period_in_seconds,
+      :throttle_authenticated_packages_api_requests_per_period,
       :throttle_unauthenticated_enabled,
       :throttle_unauthenticated_period_in_seconds,
       :throttle_unauthenticated_requests_per_period,
+      :throttle_unauthenticated_packages_api_enabled,
+      :throttle_unauthenticated_packages_api_period_in_seconds,
+      :throttle_unauthenticated_packages_api_requests_per_period,
       :throttle_protected_paths_enabled,
       :throttle_protected_paths_period_in_seconds,
       :throttle_protected_paths_requests_per_period,
@@ -354,8 +366,11 @@ module ApplicationSettingsHelper
       :rate_limiting_response_text,
       :container_registry_expiration_policies_worker_capacity,
       :container_registry_cleanup_tags_service_max_list_size,
-      :keep_latest_artifact
-    ]
+      :keep_latest_artifact,
+      :whats_new_variant
+    ].tap do |settings|
+      settings << :deactivate_dormant_users unless Gitlab.com?
+    end
   end
 
   def external_authorization_service_attributes
@@ -383,7 +398,7 @@ module ApplicationSettingsHelper
   end
 
   def integration_expanded?(substring)
-    @application_setting.errors.any? { |k| k.to_s.start_with?(substring) }
+    @application_setting.errors.messages.any? { |k, _| k.to_s.start_with?(substring) }
   end
 
   def instance_clusters_enabled?
@@ -425,8 +440,8 @@ module ApplicationSettingsHelper
   end
 end
 
-ApplicationSettingsHelper.prepend_if_ee('EE::ApplicationSettingsHelper')
+ApplicationSettingsHelper.prepend_mod_with('ApplicationSettingsHelper')
 
 # The methods in `EE::ApplicationSettingsHelper` should be available as both
 # instance and class methods.
-ApplicationSettingsHelper.extend_if_ee('EE::ApplicationSettingsHelper')
+ApplicationSettingsHelper.extend_mod_with('ApplicationSettingsHelper')

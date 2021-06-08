@@ -24,6 +24,8 @@ class Issue < ApplicationRecord
   include Todoable
   include FromUnion
 
+  extend ::Gitlab::Utils::Override
+
   DueDateStruct                   = Struct.new(:title, :name).freeze
   NoDueDate                       = DueDateStruct.new('No Due Date', '0').freeze
   AnyDueDate                      = DueDateStruct.new('Any Due Date', '').freeze
@@ -85,10 +87,10 @@ class Issue < ApplicationRecord
   enum issue_type: {
     issue: 0,
     incident: 1,
-    test_case: 2 ## EE-only
+    test_case: 2, ## EE-only
+    requirement: 3 ## EE-only
   }
 
-  alias_attribute :parent_ids, :project_id
   alias_method :issuing_parent, :project
 
   alias_attribute :external_author, :service_desk_reply_to
@@ -107,20 +109,21 @@ class Issue < ApplicationRecord
   scope :order_due_date_desc, -> { reorder(::Gitlab::Database.nulls_last_order('due_date', 'DESC')) }
   scope :order_closest_future_date, -> { reorder(Arel.sql('CASE WHEN issues.due_date >= CURRENT_DATE THEN 0 ELSE 1 END ASC, ABS(CURRENT_DATE - issues.due_date) ASC')) }
   scope :order_relative_position_asc, -> { reorder(::Gitlab::Database.nulls_last_order('relative_position', 'ASC')) }
+  scope :order_relative_position_desc, -> { reorder(::Gitlab::Database.nulls_first_order('relative_position', 'DESC')) }
   scope :order_closed_date_desc, -> { reorder(closed_at: :desc) }
   scope :order_created_at_desc, -> { reorder(created_at: :desc) }
   scope :order_severity_asc, -> { includes(:issuable_severity).order('issuable_severities.severity ASC NULLS FIRST') }
   scope :order_severity_desc, -> { includes(:issuable_severity).order('issuable_severities.severity DESC NULLS LAST') }
 
   scope :preload_associated_models, -> { preload(:assignees, :labels, project: :namespace) }
-  scope :with_web_entity_associations, -> { preload(:author, :project) }
-  scope :with_api_entity_associations, -> { preload(:timelogs, :assignees, :author, :notes, :labels, project: [:route, { namespace: :route }] ) }
+  scope :with_web_entity_associations, -> { preload(:author, project: [:project_feature, :route, namespace: :route]) }
+  scope :preload_awardable, -> { preload(:award_emoji) }
   scope :with_label_attributes, ->(label_attributes) { joins(:labels).where(labels: label_attributes) }
   scope :with_alert_management_alerts, -> { joins(:alert_management_alert) }
   scope :with_prometheus_alert_events, -> { joins(:issues_prometheus_alert_events) }
   scope :with_self_managed_prometheus_alert_events, -> { joins(:issues_self_managed_prometheus_alert_events) }
   scope :with_api_entity_associations, -> {
-    preload(:timelogs, :closed_by, :assignees, :author, :notes, :labels,
+    preload(:timelogs, :closed_by, :assignees, :author, :labels,
       milestone: { project: [:route, { namespace: :route }] },
       project: [:route, { namespace: :route }])
   }
@@ -173,8 +176,16 @@ class Issue < ApplicationRecord
     state :opened, value: Issue.available_states[:opened]
     state :closed, value: Issue.available_states[:closed]
 
-    before_transition any => :closed do |issue|
+    before_transition any => :closed do |issue, transition|
+      args = transition.args
+
       issue.closed_at = issue.system_note_timestamp
+
+      next if args.empty?
+
+      next unless args.first.is_a?(User)
+
+      issue.closed_by = args.first
     end
 
     before_transition closed: :opened do |issue|
@@ -191,7 +202,8 @@ class Issue < ApplicationRecord
   end
 
   def self.relative_positioning_query_base(issue)
-    in_projects(issue.parent_ids)
+    projects = issue.project.group&.root_ancestor&.all_projects || issue.project
+    in_projects(projects)
   end
 
   def self.relative_positioning_parent_column
@@ -258,6 +270,18 @@ class Issue < ApplicationRecord
       .reorder(Gitlab::Database.nulls_last_order('relative_position', 'ASC'),
               Gitlab::Database.nulls_last_order('highest_priority', 'ASC'),
               "id DESC")
+  end
+
+  # Temporary disable moving null elements because of performance problems
+  # For more information check https://gitlab.com/gitlab-com/gl-infra/production/-/issues/4321
+  def check_repositioning_allowed!
+    if blocked_for_repositioning?
+      raise ::Gitlab::RelativePositioning::IssuePositioningDisabled, "Issue relative position changes temporarily disabled."
+    end
+  end
+
+  def blocked_for_repositioning?
+    resource_parent.root_namespace&.issue_repositioning_disabled?
   end
 
   def hook_attrs
@@ -341,6 +365,8 @@ class Issue < ApplicationRecord
 	                             (issue_links.target_id = issues.id AND issue_links.source_id = #{id})")
                        .preload(preload)
                        .reorder('issue_link_id')
+
+    related_issues = yield related_issues if block_given?
 
     cross_project_filter = -> (issues) { issues.where(project: project) }
     Ability.issues_readable_by_user(related_issues,
@@ -438,14 +464,32 @@ class Issue < ApplicationRecord
     issue_type_supports?(:assignee)
   end
 
-  def email_participants_downcase
+  def supports_time_tracking?
+    issue_type_supports?(:time_tracking)
+  end
+
+  def email_participants_emails
+    issue_email_participants.pluck(:email)
+  end
+
+  def email_participants_emails_downcase
     issue_email_participants.pluck(IssueEmailParticipant.arel_table[:email].lower)
+  end
+
+  def issue_assignee_user_ids
+    issue_assignees.pluck(:user_id)
   end
 
   private
 
+  # Ensure that the metrics association is safely created and respecting the unique constraint on issue_id
+  override :ensure_metrics
   def ensure_metrics
-    super
+    if !association(:metrics).loaded? || metrics.blank?
+      metrics_record = Issue::Metrics.safe_find_or_create_by(issue: self)
+      self.metrics = metrics_record
+    end
+
     metrics.record!
   end
 
@@ -484,8 +528,8 @@ class Issue < ApplicationRecord
 
   def could_not_move(exception)
     # Symptom of running out of space - schedule rebalancing
-    IssueRebalancingWorker.perform_async(nil, project_id)
+    IssueRebalancingWorker.perform_async(nil, *project.self_or_root_group_ids)
   end
 end
 
-Issue.prepend_if_ee('EE::Issue')
+Issue.prepend_mod_with('Issue')

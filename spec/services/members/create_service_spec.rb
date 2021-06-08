@@ -2,15 +2,16 @@
 
 require 'spec_helper'
 
-RSpec.describe Members::CreateService, :clean_gitlab_redis_shared_state, :sidekiq_inline do
+RSpec.describe Members::CreateService, :aggregate_failures, :clean_gitlab_redis_shared_state, :sidekiq_inline do
   let_it_be(:source) { create(:project) }
   let_it_be(:user) { create(:user) }
   let_it_be(:member) { create(:user) }
   let_it_be(:user_ids) { member.id.to_s }
   let_it_be(:access_level) { Gitlab::Access::GUEST }
-  let(:params) { { user_ids: user_ids, access_level: access_level } }
+  let(:additional_params) { {} }
+  let(:params) { { user_ids: user_ids, access_level: access_level }.merge(additional_params) }
 
-  subject(:execute_service) { described_class.new(user, params).execute(source) }
+  subject(:execute_service) { described_class.new(user, params.merge({ source: source })).execute }
 
   before do
     if source.is_a?(Project)
@@ -80,6 +81,54 @@ RSpec.describe Members::CreateService, :clean_gitlab_redis_shared_state, :sideki
       expect(execute_service[:status]).to eq(:error)
       expect(execute_service[:message]).to eq('Invite email has already been taken')
       expect(OnboardingProgress.completed?(source.namespace, :user_added)).to be(false)
+    end
+  end
+
+  context 'when tracking the invite source', :snowplow do
+    context 'when invite_source is not passed' do
+      it 'tracks the invite source as unknown' do
+        execute_service
+
+        expect_snowplow_event(
+          category: described_class.name,
+          action: 'create_member',
+          label: 'unknown',
+          property: 'existing_user',
+          user: user
+        )
+      end
+    end
+
+    context 'when invite_source is not passed' do
+      let(:additional_params) { { invite_source: '_invite_source_' } }
+
+      it 'tracks the invite source from params' do
+        execute_service
+
+        expect_snowplow_event(
+          category: described_class.name,
+          action: 'create_member',
+          label: '_invite_source_',
+          property: 'existing_user',
+          user: user
+        )
+      end
+    end
+
+    context 'when it is a net_new_user' do
+      let(:additional_params) { { user_ids: 'email@example.org' } }
+
+      it 'tracks the invite source from params' do
+        execute_service
+
+        expect_snowplow_event(
+          category: described_class.name,
+          action: 'create_member',
+          label: 'unknown',
+          property: 'net_new_user',
+          user: user
+        )
+      end
     end
   end
 end

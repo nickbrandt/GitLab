@@ -1,6 +1,6 @@
 ---
 stage: Verify
-group: Continuous Integration
+group: Pipeline Execution
 info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#assignments
 type: index, concepts, howto
 ---
@@ -10,6 +10,9 @@ type: index, concepts, howto
 Development guides that are specific to CI/CD are listed here.
 
 If you are creating new CI/CD templates, please read [the development guide for GitLab CI/CD templates](templates.md).
+
+See the [CI/CD YAML reference documentation guide](cicd_reference_documentation_guide.md)
+to learn how to update the [reference page](../../ci/yaml/README.md).
 
 ## CI Architecture overview
 
@@ -23,7 +26,7 @@ On the left side we have the events that can trigger a pipeline based on various
 
 - A `git push` is the most common event that triggers a pipeline.
 - The [Web API](../../api/pipelines.md#create-a-new-pipeline).
-- A user clicking the "Run Pipeline" button in the UI.
+- A user clicking the "Run pipeline" button in the UI.
 - When a [merge request is created or updated](../../ci/merge_request_pipelines/index.md#pipelines-for-merge-requests).
 - When an MR is added to a [Merge Train](../../ci/merge_request_pipelines/pipelines_for_merged_results/merge_trains/index.md#merge-trains).
 - A [scheduled pipeline](../../ci/pipelines/schedules.md#pipeline-schedules).

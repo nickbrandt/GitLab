@@ -1,6 +1,6 @@
 ---
 stage: Monitor
-group: Health
+group: Monitor
 info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#assignments
 ---
 
@@ -9,7 +9,7 @@ info: To determine the technical writer assigned to the Stage/Group associated w
 To enable the GitLab Prometheus metrics:
 
 1. Log into GitLab as a user with [administrator permissions](../../../user/permissions.md).
-1. Navigate to **Admin Area > Settings > Metrics and profiling**.
+1. Go to **Admin Area > Settings > Metrics and profiling**.
 1. Find the **Metrics - Prometheus** section, and click **Enable Prometheus Metrics**.
 1. [Restart GitLab](../../restart_gitlab.md#omnibus-gitlab-restart) for the changes to take effect.
 
@@ -74,8 +74,6 @@ The following metrics are available:
 | `gitlab_transaction_event_import_repository_total`               | Counter     | 9.4     | Counter for repository imports (RepositoryImportWorker)                                                               |                                                           |
 | `gitlab_transaction_event_patch_hard_limit_bytes_hit_total`      | Counter     | 13.9    | Counter for diff patch size limit hits                                                                                |                                                           |
 | `gitlab_transaction_event_push_branch_total`                     | Counter     | 9.4     | Counter for all branch pushes                                                                                         |                                                           |
-| `gitlab_transaction_event_push_commit_total`                     | Counter     | 9.4     | Counter for commits                                                                                                   | `branch`                                                  |
-| `gitlab_transaction_event_push_tag_total`                        | Counter     | 9.4     | Counter for tag pushes                                                                                                |                                                           |
 | `gitlab_transaction_event_rails_exception_total`                 | Counter     | 9.4     | Counter for number of rails exceptions                                                                                |                                                           |
 | `gitlab_transaction_event_receive_email_total`                   | Counter     | 9.4     | Counter for received emails                                                                                           | `handler`                                                 |
 | `gitlab_transaction_event_remote_mirrors_failed_total`           | Counter     | 10.8    | Counter for failed remote mirrors                                                                                     |                                                           |
@@ -110,12 +108,16 @@ The following metrics are available:
 | `auto_devops_pipelines_completed_total`                          | Counter     | 12.7    | Counter of completed Auto DevOps pipelines, labeled by status                                                         |                                                           |
 | `gitlab_metrics_dashboard_processing_time_ms`                    | Summary     | 12.10   | Metrics dashboard processing time in milliseconds                                                                     | service, stages                                           |
 | `action_cable_active_connections`                                | Gauge       | 13.4    | Number of ActionCable WS clients currently connected                                                                  | `server_mode`                                             |
+| `action_cable_broadcasts_total`                                  | Counter     | 13.10   | The number of ActionCable broadcasts emitted                                                                          | `server_mode`                                             |
 | `action_cable_pool_min_size`                                     | Gauge       | 13.4    | Minimum number of worker threads in ActionCable thread pool                                                           | `server_mode`                                             |
 | `action_cable_pool_max_size`                                     | Gauge       | 13.4    | Maximum number of worker threads in ActionCable thread pool                                                           | `server_mode`                                             |
 | `action_cable_pool_current_size`                                 | Gauge       | 13.4    | Current number of worker threads in ActionCable thread pool                                                           | `server_mode`                                             |
 | `action_cable_pool_largest_size`                                 | Gauge       | 13.4    | Largest number of worker threads observed so far in ActionCable thread pool                                           | `server_mode`                                             |
 | `action_cable_pool_pending_tasks`                                | Gauge       | 13.4    | Number of tasks waiting to be executed in ActionCable thread pool                                                     | `server_mode`                                             |
 | `action_cable_pool_tasks_total`                                  | Gauge       | 13.4    | Total number of tasks executed in ActionCable thread pool                                                             | `server_mode`                                             |
+| `action_cable_single_client_transmissions_total`                 | Counter     | 13.10   | The number of ActionCable messages transmitted to any client in any channel                                           | `server_mode`                                             |
+| `action_cable_subscription_confirmations_total`                  | Counter     | 13.10   | The number of ActionCable subscriptions from clients confirmed                                                        | `server_mode`                                             |
+| `action_cable_subscription_rejections_total`                     | Counter     | 13.10   | The number of ActionCable subscriptions from clients rejected                                                         | `server_mode`                                             |
 | `gitlab_issuable_fast_count_by_state_total`                      | Counter     | 13.5    | Total number of row count operations on issue/merge request list pages                                                |                                                           |
 | `gitlab_issuable_fast_count_by_state_failures_total`             | Counter     | 13.5    | Number of soft-failed row count operations on issue/merge request list pages                                          |                                                           |
 | `gitlab_external_http_total`                                     | Counter     | 13.8    | Total number of HTTP calls to external systems                                                                        | `controller`, `action`                                    |
@@ -125,6 +127,11 @@ The following metrics are available:
 | `pipeline_graph_link_calculation_duration_seconds`               | Histogram   | 13.9    | Total time spent calculating links, in seconds                                                                        |                                                           |
 | `pipeline_graph_links_total`                                     | Histogram   | 13.9    | Number of links per graph                                                                                             |                                                           |
 | `pipeline_graph_links_per_job_ratio`                             | Histogram   | 13.9    | Ratio of links to job per graph                                                                                       |                                                           |
+| `gitlab_ci_pipeline_security_orchestration_policy_processing_duration_seconds` | Histogram   | 13.12    | Time in seconds it takes to process Security Policies in CI/CD pipeline                                                                    |                                                           |
+| `gitlab_ci_difference_live_vs_actual_minutes`                    | Histogram   | 13.12    | Difference between CI minute consumption counted while jobs were running (live) vs when jobs are complete (actual). Used to enforce CI minute consumption limits on long running jobs. | `plan` |
+| `gitlab_spamcheck_request_duration_seconds`                      | Histogram   | 13.12   | The duration for requests between Rails and the anti-spam engine                                                        |                                                           |
+| `service_desk_thank_you_email`                                   | Counter     | 14.0    | Total number of email responses to new service desk emails                                                            |                                                           |
+| `service_desk_new_note_email`                                    | Counter     | 14.0    | Total number of email notifications on new service desk comment                                                       |                                                           |
 
 ## Metrics controlled by a feature flag
 
@@ -134,6 +141,18 @@ The following metrics can be controlled by feature flags:
 |:---------------------------------------------------------------|:-------------------------------------------------------------------|
 | `gitlab_method_call_duration_seconds`                          | `prometheus_metrics_method_instrumentation`                        |
 | `gitlab_view_rendering_duration_seconds`                       | `prometheus_metrics_view_instrumentation`                          |
+
+## Praefect metrics
+
+You can [configure Praefect to report metrics](../../gitaly/praefect.md#praefect).
+These are some of the Praefect metrics served from the `/metrics` path on the [configured port](index.md#changing-the-port-and-address-prometheus-listens-on)
+(9652 by default).
+
+| Metric | Type | Since | Description | Labels |
+| :----- | :--- | ----: | :---------- | :----- |
+| `gitaly_praefect_replication_latency_bucket` | Histogram | 12.10 | The amount of time it takes for replication to complete once the replication job starts. |  |
+| `gitaly_praefect_replication_delay_bucket` | Histogram | 12.10 | A measure of how much time passes between when the replication job is created and when it starts. |  |
+| `gitaly_praefect_node_latency_bucket` | Histogram | 12.10 | The latency in Gitaly returning health check information to Praefect. This indicates Praefect connection saturation. |  |
 
 ## Sidekiq metrics
 
@@ -198,11 +217,15 @@ configuration option in `gitlab.yml`. These metrics are served from the
 | `geo_package_files_failed`                     | Gauge   | 13.3  | Number of syncable package files failed to sync on secondary | `url` |
 | `geo_package_files_registry`                   | Gauge   | 13.3  | Number of package files in the registry | `url` |
 | `geo_terraform_state_versions`                 | Gauge   | 13.5  | Number of terraform state versions on primary | `url` |
-| `geo_terraform_state_versions_checksummed`     | Gauge   | 13.5  | Number of terraform state versions checksummed on primary | `url` |
+| `geo_terraform_state_versions_checksummed`     | Gauge   | 13.5  | Number of terraform state versions checksummed successfully on primary | `url` |
 | `geo_terraform_state_versions_checksum_failed` | Gauge   | 13.5  | Number of terraform state versions failed to calculate the checksum on primary | `url` |
+| `geo_terraform_state_versions_checksum_total`  | Gauge   | 13.12  | Number of terraform state versions tried to checksum on primary | `url` |
 | `geo_terraform_state_versions_synced`          | Gauge   | 13.5  | Number of syncable terraform state versions synced on secondary | `url` |
 | `geo_terraform_state_versions_failed`          | Gauge   | 13.5  | Number of syncable terraform state versions failed to sync on secondary | `url` |
 | `geo_terraform_state_versions_registry`        | Gauge   | 13.5  | Number of terraform state versions in the registry | `url` |
+| `geo_terraform_state_versions_verified`        | Gauge   | 13.12  | Number of terraform state versions verified on secondary | `url` |
+| `geo_terraform_state_versions_verification_failed` | Gauge   | 13.12  | Number of terraform state versions verifications failed on secondary | `url` |
+| `geo_terraform_state_versions_verification_total` | Gauge   | 13.12  | Number of terraform state versions verifications tried on secondary | `url` |
 | `global_search_bulk_cron_queue_size`           | Gauge   | 12.10 | Number of database records waiting to be synchronized to Elasticsearch | |
 | `global_search_awaiting_indexing_queue_size`   | Gauge   | 13.2  | Number of database updates waiting to be synchronized to Elasticsearch while indexing is paused | |
 | `geo_merge_request_diffs`                      | Gauge   | 13.4  | Number of merge request diffs on primary | `url` |
@@ -217,6 +240,12 @@ configuration option in `gitlab.yml`. These metrics are served from the
 | `geo_snippet_repositories_synced`              | Gauge   | 13.4  | Number of syncable snippets synced on secondary | `url` |
 | `geo_snippet_repositories_failed`              | Gauge   | 13.4  | Number of syncable snippets failed on secondary | `url` |
 | `geo_snippet_repositories_registry`            | Gauge   | 13.4  | Number of syncable snippets in the registry | `url` |
+| `geo_group_wiki_repositories`                  | Gauge   | 13.10 | Number of group wikis on primary | `url` |
+| `geo_group_wiki_repositories_checksummed`      | Gauge   | 13.10 | Number of group wikis checksummed on primary | `url` |
+| `geo_group_wiki_repositories_checksum_failed`  | Gauge   | 13.10 | Number of group wikis failed to calculate the checksum on primary | `url` |
+| `geo_group_wiki_repositories_synced`           | Gauge   | 13.10 | Number of syncable group wikis synced on secondary | `url` |
+| `geo_group_wiki_repositories_failed`           | Gauge   | 13.10 | Number of syncable group wikis failed on secondary | `url` |
+| `geo_group_wiki_repositories_registry`         | Gauge   | 13.10 | Number of syncable group wikis in the registry | `url` |
 | `limited_capacity_worker_running_jobs`         | Gauge   | 13.5  | Number of running jobs | `worker` |
 | `limited_capacity_worker_max_running_jobs`     | Gauge   | 13.5  | Maximum number of running jobs | `worker` |
 | `limited_capacity_worker_remaining_work_count` | Gauge   | 13.5  | Number of jobs waiting to be enqueued | `worker` |
@@ -228,9 +257,10 @@ configuration option in `gitlab.yml`. These metrics are served from the
 
 The following metrics are available:
 
-| Metric                            | Type      | Since                                                         | Description                            |
-|:--------------------------------- |:--------- |:------------------------------------------------------------- |:-------------------------------------- |
-| `db_load_balancing_hosts`         | Gauge     | [12.3](https://gitlab.com/gitlab-org/gitlab/-/issues/13630)     | Current number of load balancing hosts |
+| Metric                            | Type      | Since                                                         | Description                            | Labels                                                    |
+|:--------------------------------- |:--------- |:------------------------------------------------------------- |:-------------------------------------- |:--------------------------------------------------------- |
+| `db_load_balancing_hosts`         | Gauge     | [12.3](https://gitlab.com/gitlab-org/gitlab/-/issues/13630)   | Current number of load balancing hosts | |
+| `sidekiq_load_balancing_count`    | Counter   | 13.11                                                         | Sidekiq jobs using load balancing with data consistency set to :sticky or :delayed | `queue`, `boundary`, `external_dependencies`, `feature_category`, `job_status`, `urgency`, `data_consistency`, `database_chosen` |
 
 ## Database partitioning metrics **(PREMIUM SELF)**
 
@@ -280,19 +310,7 @@ Some basic Ruby runtime metrics are available:
 | `ruby_process_proportional_memory_bytes` | Gauge     | 13.0  | Memory usage by process (PSS/Proportional Set Size) |
 | `ruby_process_start_time_seconds`        | Gauge     | 12.0  | UNIX timestamp of process start time |
 
-## Unicorn Metrics
-
-Unicorn specific metrics, when Unicorn is used.
-
-| Metric                       | Type  | Since | Description                                        |
-|:-----------------------------|:------|:------|:---------------------------------------------------|
-| `unicorn_active_connections` | Gauge | 11.0  | The number of active Unicorn connections (workers) |
-| `unicorn_queued_connections` | Gauge | 11.0  | The number of queued Unicorn connections           |
-| `unicorn_workers`            | Gauge | 12.0  | The number of Unicorn workers                      |
-
 ## Puma Metrics
-
-When Puma is used instead of Unicorn, the following metrics are available:
 
 | Metric                            | Type    | Since | Description |
 |:--------------------------------- |:------- |:----- |:----------- |
@@ -324,8 +342,8 @@ instance (`cache`, `shared_state` etc.).
 ## Metrics shared directory
 
 The GitLab Prometheus client requires a directory to store metrics data shared between multi-process services.
-Those files are shared among all instances running under Unicorn server.
-The directory must be accessible to all running Unicorn's processes, or
+Those files are shared among all instances running under Puma server.
+The directory must be accessible to all running Puma's processes, or
 metrics can't function correctly.
 
 This directory's location is configured using environment variable `prometheus_multiproc_dir`.
