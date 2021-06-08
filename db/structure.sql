@@ -13783,6 +13783,7 @@ CREATE TABLE incident_management_alert_escalations (
     id bigint NOT NULL,
     policy_id bigint NOT NULL,
     alert_id bigint NOT NULL,
+    last_notified_at timestamp with time zone NOT NULL,
     created_at timestamp with time zone NOT NULL,
     updated_at timestamp with time zone NOT NULL
 );
