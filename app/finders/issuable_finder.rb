@@ -156,9 +156,18 @@ class IssuableFinder
   end
 
   def row_count
-    Gitlab::IssuablesCountForState
-      .new(self, nil, fast_fail: true)
-      .for_state_or_opened(params[:state])
+    group = params.group? ? params.group : params.project&.group
+    parent_object = group.presence || params.project
+
+    if ::Feature.enabled?(:cached_issuables_state_count, group, default_enabled: :yaml)
+      Gitlab::CachedIssuablesCountForState
+        .new(self, parent_object, fast_fail: true)
+        .for_state_or_opened(params[:state])
+    else
+      Gitlab::IssuablesCountForState
+        .new(self, nil, fast_fail: true)
+        .for_state_or_opened(params[:state])
+    end
   end
 
   # We often get counts for each state by running a query per state, and
@@ -168,6 +177,7 @@ class IssuableFinder
   #
   # rubocop: disable CodeReuse/ActiveRecord
   def count_by_state
+    binding.pry
     count_params = params.merge(state: nil, sort: nil, force_cte: true)
     finder = self.class.new(current_user, count_params)
 

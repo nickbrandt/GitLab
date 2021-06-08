@@ -4,6 +4,8 @@ module IssuablesHelper
   include GitlabRoutingHelper
   include IssuablesDescriptionTemplatesHelper
 
+  ROUNDED_COUNT_THRESHOLD = 1000
+
   def sidebar_gutter_toggle_icon
     content_tag(:span, class: 'js-sidebar-toggle-container', data: { is_expanded: !sidebar_gutter_collapsed? }) do
       sprite_icon('chevron-double-lg-left', css_class: "js-sidebar-expand #{'hidden' unless sidebar_gutter_collapsed?}") +
@@ -196,7 +198,7 @@ module IssuablesHelper
 
     return html.html_safe unless display_count
 
-    count = issuables_count_for_state(issuable_type, state)
+    count = issuables_count_for_state(issuable_type, state, cached: true)
 
     if count != -1
       html << " " << content_tag(:span, number_with_delimiter(count), class: 'badge badge-muted badge-pill gl-badge gl-tab-counter-badge sm')
@@ -282,8 +284,21 @@ module IssuablesHelper
     }
   end
 
-  def issuables_count_for_state(issuable_type, state)
-    Gitlab::IssuablesCountForState.new(finder)[state]
+  def issuables_count_for_state(issuable_type, state, cached: false)
+    if cached && can_cache_issuables_count?
+      Gitlab::CachedIssuablesCountForState.new(finder, parent)[state]
+    else
+      Gitlab::IssuablesCountForState.new(finder)[state]
+    end
+  end
+
+  def can_cache_issuables_count?
+    Feature.enabled?(:cached_issuables_state_count, default_enabled: :yaml) && no_filters_set?
+  end
+
+  def no_filters_set?
+    filters = finder.class.valid_params.collect { |item| item.is_a?(Hash) ? item.keys : item }.flatten
+    params.slice(*filters).empty?
   end
 
   def close_issuable_path(issuable)
