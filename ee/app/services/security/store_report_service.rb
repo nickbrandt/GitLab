@@ -69,13 +69,16 @@ module Security
         return
       end
 
+      raw_metadata = Gitlab::Json.parse(finding.to_hash.dig(:raw_metadata))
+
       vulnerability_params = finding.to_hash.except(:compare_key, :identifiers, :location, :scanner, :scan, :links, :signatures)
-      entity_params = Gitlab::Json.parse(vulnerability_params&.dig(:raw_metadata)).slice('description', 'message', 'solution', 'cve', 'location')
+      entity_params = raw_metadata.slice('description', 'message', 'solution', 'cve', 'location')
       # Vulnerabilities::Finding (`vulnerability_occurrences`)
       vulnerability_finding = vulnerability_findings_by_uuid[finding.uuid] ||
         find_or_create_vulnerability_finding(finding, vulnerability_params.merge(entity_params))
 
       vulnerability_finding_to_finding_map[vulnerability_finding] = finding
+      Vulnerabilities::Finding::Evidence.evidence_from_hash(vulnerability_finding, raw_metadata.dig('evidence'))
 
       update_vulnerability_finding(vulnerability_finding, vulnerability_params)
       reset_remediations_for(vulnerability_finding, finding)

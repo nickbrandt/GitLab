@@ -11,8 +11,9 @@ RSpec.describe Vulnerabilities::Finding::Evidence do
 
   describe '.new_evidence' do
     let_it_be(:finding) { create(:vulnerabilities_finding) }
+    let_it_be(:evidence_hash) { Gitlab::Json.parse(finding.raw_metadata).dig('evidence') }
 
-    subject(:evidence) { Vulnerabilities::Finding::Evidence.new_evidence(finding) }
+    subject(:evidence) { Vulnerabilities::Finding::Evidence.evidence_from_hash(finding, evidence_hash) }
 
     it 'creates a new finding evidence' do
       expect(evidence).not_to be_nil

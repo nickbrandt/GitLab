@@ -27,6 +27,7 @@ RSpec.describe Security::StoreReportService, '#execute' do
         dependency_scanning: true,
         container_scanning: true,
         security_dashboard: true,
+        api_fuzzing: true,
         vulnerability_finding_signatures: vulnerability_finding_signatures_enabled
       )
       allow(Security::AutoFixWorker).to receive(:perform_async)
@@ -44,11 +45,12 @@ RSpec.describe Security::StoreReportService, '#execute' do
       end
 
       context 'for different security reports' do
-        where(:case_name, :trait, :scanners, :identifiers, :findings, :finding_identifiers, :finding_pipelines, :remediations, :signatures, :finding_links) do
-          'with SAST report'                | :sast                            | 1 | 6  | 5  | 7  | 5  | 0 | 2 | 0
-          'with exceeding identifiers'      | :with_exceeding_identifiers      | 1 | 20 | 1  | 20 | 1  | 0 | 0 | 0
-          'with Dependency Scanning report' | :dependency_scanning_remediation | 1 | 3  | 2  | 3  | 2  | 1 | 0 | 6
-          'with Container Scanning report'  | :container_scanning              | 1 | 8  | 8  | 8  | 8  | 0 | 0 | 8
+        where(:case_name, :trait, :scanners, :identifiers, :findings, :finding_identifiers, :finding_pipelines, :remediations, :signatures, :finding_links, :evidences) do
+          'with SAST report'                | :sast                            | 1 | 6  | 5  | 7  | 5  | 0 | 2 | 0 | 0
+          'with exceeding identifiers'      | :with_exceeding_identifiers      | 1 | 20 | 1  | 20 | 1  | 0 | 0 | 0 | 0
+          'with Dependency Scanning report' | :dependency_scanning_remediation | 1 | 3  | 2  | 3  | 2  | 1 | 0 | 6 | 0
+          'with Container Scanning report'  | :container_scanning              | 1 | 8  | 8  | 8  | 8  | 0 | 0 | 8 | 0
+          'with API Fuzzing report'         | :api_fuzzing                     | 1 | 7  | 15 | 15 | 15 | 0 | 0 | 0 | 15
         end
 
         with_them do
@@ -87,6 +89,13 @@ RSpec.describe Security::StoreReportService, '#execute' do
           it 'inserts all signatures' do
             signatures_count = vulnerability_finding_signatures_enabled ? signatures : 0
             expect { subject }.to change { Vulnerabilities::FindingSignature.count }.by(signatures_count)
+          end
+
+          it 'inserts all evidences' do
+            # subject
+            # binding.pry
+            expect { subject }.to change { Vulnerabilities::Finding::Evidence.count }.by(evidences)
+            # expect { Vulnerabilities::Finding::Evidence.count }.to eq(evidences)
           end
         end
       end

@@ -14,19 +14,16 @@ module Vulnerabilities
 
       validates :summary, length: { maximum: 8_000_000 }
 
-      def self.new_evidence(finding)
-        evidence = finding.metadata.dig('evidence')
+      def self.evidence_from_hash(finding, evidence_hash)
+        return unless evidence_hash
 
-        request_headers = evidence.dig('request', 'headers')
-        response_headers = evidence.dig('response', 'headers')
+        request_hash = evidence_hash['request']&.slice(*Request.column_names)&.merge(headers_attributes: evidence_hash.dig('request', 'headers'))
+        response_hash = evidence_hash['response']&.slice(*Response.column_names)&.merge(headers_attributes: evidence_hash.dig('response', 'headers'))
 
-        request_hash = evidence.dig('request').slice(*Request.column_names).merge(headers_attributes: request_headers)
-        response_hash = evidence.dig('response').slice(*Response.column_names).merge(headers_attributes: response_headers)
-
-        create(finding: finding,
-               summary: evidence.dig('summary'),
-               request_attributes: request_hash,
-               response_attributes: response_hash)
+        create!(finding: finding,
+                summary: evidence_hash.dig('summary'),
+                request_attributes: request_hash,
+                response_attributes: response_hash)
       end
     end
   end
