@@ -27990,6 +27990,9 @@ msgstr[1] ""
 msgid "Requires values to meet regular expression requirements."
 msgstr ""
 
+msgid "Requires your primary GitLab email address."
+msgstr ""
+
 msgid "Resend"
 msgstr ""
 
