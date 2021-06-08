@@ -7,7 +7,7 @@
         = f.label :email
         = f.email_field :email, class: "form-control gl-form-input", required: true, value: params[:user_email], autofocus: true, title: _('Please provide a valid email address.')
         .form-text.text-muted
-          = _('Must be the primary email address of the GitLab account')
+          = _('Requires your primary GitLab email address.')
       .clearfix
         = f.submit _("Reset password"), class: "gl-button btn-confirm btn"
 
