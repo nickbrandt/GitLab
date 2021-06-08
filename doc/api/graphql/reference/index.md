@@ -1205,6 +1205,10 @@ Input type: `CreateIssueInput`
 
 ### `Mutation.createIteration`
 
+WARNING:
+**Deprecated** in 14.0.
+Use iterationCreate.
+
 Input type: `CreateIterationInput`
 
 #### Arguments
@@ -1215,6 +1219,7 @@ Input type: `CreateIterationInput`
 | <a id="mutationcreateiterationdescription"></a>`description` | [`String`](#string) | The description of the iteration. |
 | <a id="mutationcreateiterationduedate"></a>`dueDate` | [`String`](#string) | The end date of the iteration. |
 | <a id="mutationcreateiterationgrouppath"></a>`groupPath` | [`ID`](#id) | Full path of the group with which the resource is associated. |
+| <a id="mutationcreateiterationiterationscadenceid"></a>`iterationsCadenceId` | [`IterationsCadenceID`](#iterationscadenceid) | Global ID of the iterations cadence to be assigned to newly created iteration. |
 | <a id="mutationcreateiterationprojectpath"></a>`projectPath` | [`ID`](#id) | Full path of the project with which the resource is associated. |
 | <a id="mutationcreateiterationstartdate"></a>`startDate` | [`String`](#string) | The start date of the iteration. |
 | <a id="mutationcreateiterationtitle"></a>`title` | [`String`](#string) | The title of the iteration. |
@@ -2634,6 +2639,31 @@ Input type: `IterationCadenceUpdateInput`
 | <a id="mutationiterationcadenceupdateclientmutationid"></a>`clientMutationId` | [`String`](#string) | A unique identifier for the client performing the mutation. |
 | <a id="mutationiterationcadenceupdateerrors"></a>`errors` | [`[String!]!`](#string) | Errors encountered during execution of the mutation. |
 | <a id="mutationiterationcadenceupdateiterationcadence"></a>`iterationCadence` | [`IterationCadence`](#iterationcadence) | The updated iteration cadence. |
+
+### `Mutation.iterationCreate`
+
+Input type: `iterationCreateInput`
+
+#### Arguments
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| <a id="mutationiterationcreateclientmutationid"></a>`clientMutationId` | [`String`](#string) | A unique identifier for the client performing the mutation. |
+| <a id="mutationiterationcreatedescription"></a>`description` | [`String`](#string) | The description of the iteration. |
+| <a id="mutationiterationcreateduedate"></a>`dueDate` | [`String`](#string) | The end date of the iteration. |
+| <a id="mutationiterationcreategrouppath"></a>`groupPath` | [`ID`](#id) | Full path of the group with which the resource is associated. |
+| <a id="mutationiterationcreateiterationscadenceid"></a>`iterationsCadenceId` | [`IterationsCadenceID`](#iterationscadenceid) | Global ID of the iterations cadence to be assigned to newly created iteration. |
+| <a id="mutationiterationcreateprojectpath"></a>`projectPath` | [`ID`](#id) | Full path of the project with which the resource is associated. |
+| <a id="mutationiterationcreatestartdate"></a>`startDate` | [`String`](#string) | The start date of the iteration. |
+| <a id="mutationiterationcreatetitle"></a>`title` | [`String`](#string) | The title of the iteration. |
+
+#### Fields
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| <a id="mutationiterationcreateclientmutationid"></a>`clientMutationId` | [`String`](#string) | A unique identifier for the client performing the mutation. |
+| <a id="mutationiterationcreateerrors"></a>`errors` | [`[String!]!`](#string) | Errors encountered during execution of the mutation. |
+| <a id="mutationiterationcreateiteration"></a>`iteration` | [`Iteration`](#iteration) | The created iteration. |
 
 ### `Mutation.iterationDelete`
 
