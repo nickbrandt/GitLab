@@ -31,10 +31,6 @@ module Ci
         end
       EOS
 
-      def available?
-        true
-      end
-
       def data(model)
         Gitlab::Redis::SharedState.with do |redis|
           redis.get(key(model))

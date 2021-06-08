@@ -25,8 +25,6 @@ module Ci
 
     FailedToPersistDataError = Class.new(StandardError)
 
-    # Note: The ordering of this hash is related to the precedence of persist store.
-    # The bottom item takes the highest precedence, and the top item takes the lowest precedence.
     DATA_STORES = {
       redis: 1,
       database: 2,
@@ -48,8 +46,7 @@ module Ci
       end
 
       def persistable_store
-        # get first available store from the back of the list
-        all_stores.reverse.find { |store| get_store_class(store).available? }
+        STORE_TYPES[:fog].available? ? :fog : :database
       end
 
       def get_store_class(store)
