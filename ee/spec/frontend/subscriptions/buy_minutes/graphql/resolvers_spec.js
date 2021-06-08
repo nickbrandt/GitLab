@@ -47,7 +47,7 @@ const countries = [
   ['Uruguay', 'UY'],
 ];
 
-const states = { 'California': 'CA' };
+const states = { California: 'CA' };
 
 describe('~/subscriptions/buy_minutes/graphql/resolvers', () => {
   describe('Query', () => {

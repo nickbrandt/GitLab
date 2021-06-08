@@ -42,7 +42,7 @@ export default {
           return;
         }
 
-        const {customer} = data;
+        const { customer } = data;
         this.country = customer.country;
         this.address1 = customer.address1;
         this.address2 = customer.address2;
@@ -57,7 +57,9 @@ export default {
     },
     states: {
       query: STATES_QUERY,
-      skip() { return !this.country; },
+      skip() {
+        return !this.country;
+      },
       variables() {
         return {
           countryId: this.country,
@@ -142,16 +144,18 @@ export default {
     },
   },
   methods: {
-   updateState(payload) {
-      this.$apollo.mutate({
-        mutation: UPDATE_STATE,
-        variables: {
-          input: payload,
-        },
-      }).catch((error) => {
-        createFlash({ message: GENERAL_ERROR_MESSAGE, error, captureError: true });
-      });
-    }
+    updateState(payload) {
+      this.$apollo
+        .mutate({
+          mutation: UPDATE_STATE,
+          variables: {
+            input: payload,
+          },
+        })
+        .catch((error) => {
+          createFlash({ message: GENERAL_ERROR_MESSAGE, error, captureError: true });
+        });
+    },
   },
   i18n: {
     stepTitle: s__('Checkout|Billing address'),

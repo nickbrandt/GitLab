@@ -13,7 +13,7 @@ import { sprintf, s__, __ } from '~/locale';
 import autofocusonshow from '~/vue_shared/directives/autofocusonshow';
 
 export default {
-    components: {
+  components: {
     GlFormGroup,
     GlFormSelect,
     GlFormInput,
@@ -121,10 +121,14 @@ export default {
     },
     isValid() {
       if (this.isSetupForCompany) {
-        return this.isNumberOfUsersValid && !isEmpty(this.selectedPlanId) && (!isEmpty(this.customer.company) || this.isGroupSelected);
+        return (
+          this.isNumberOfUsersValid &&
+          !isEmpty(this.selectedPlanId) &&
+          (!isEmpty(this.customer.company) || this.isGroupSelected)
+        );
       }
 
-      return (this.subscription.quantity === 1) && !isEmpty(this.selectedPlanId);
+      return this.subscription.quantity === 1 && !isEmpty(this.selectedPlanId);
     },
     isShowingGroupSelector() {
       return !this.isNewUser && this.namespaces.length;
@@ -159,14 +163,16 @@ export default {
   },
   methods: {
     updateState(payload = {}) {
-      this.$apollo.mutate({
-        mutation: UPDATE_STATE,
-        variables: {
-          input: payload,
-        },
-      }).catch((error) => {
-        createFlash({ message: GENERAL_ERROR_MESSAGE, error, captureError: true });
-      });
+      this.$apollo
+        .mutate({
+          mutation: UPDATE_STATE,
+          variables: {
+            input: payload,
+          },
+        })
+        .catch((error) => {
+          createFlash({ message: GENERAL_ERROR_MESSAGE, error, captureError: true });
+        });
     },
     toggleIsSetupForCompany() {
       this.updateSubscription({ isSetupForCompany: !this.isSetupForCompany });
@@ -181,31 +187,32 @@ export default {
       const planIdFromSearchParams = getParameterValues('planId');
 
       if (planIdFromSearchParams.length > 0) {
-        preselectedPlan = this.plans.find((plan) => plan.id === planIdFromSearchParams[0].id) || preselectedPlan;
+        preselectedPlan =
+          this.plans.find((plan) => plan.id === planIdFromSearchParams[0].id) || preselectedPlan;
       }
 
       this.updateState({ selectedPlanId: preselectedPlan.id });
     },
   },
-    i18n: {
-      stepTitle: s__('Checkout|Subscription details'),
-      nextStepButtonText: s__('Checkout|Continue to billing'),
-      selectedPlanLabel: s__('Checkout|GitLab plan'),
-      selectedGroupLabel: s__('Checkout|GitLab group'),
-      groupSelectPrompt: __('Select'),
-      groupSelectCreateNewOption: s__('Checkout|Create a new group'),
-      selectedGroupDescription: s__('Checkout|Your subscription will be applied to this group'),
-      createNewGroupDescription: s__("Checkout|You'll create your new group after checkout"),
-      organizationNameLabel: s__('Checkout|Name of company or organization using GitLab'),
-      numberOfUsersLabel: s__('Checkout|Number of users'),
-      needMoreUsersLink: s__('Checkout|Need more users? Purchase GitLab for your %{company}.'),
-      companyOrTeam: s__('Checkout|company or team'),
-      selectedPlan: s__('Checkout|%{selectedPlanText} plan'),
-      group: __('Group'),
-      users: __('Users'),
-    },
-    stepId: STEPS[0].id,
-  };
+  i18n: {
+    stepTitle: s__('Checkout|Subscription details'),
+    nextStepButtonText: s__('Checkout|Continue to billing'),
+    selectedPlanLabel: s__('Checkout|GitLab plan'),
+    selectedGroupLabel: s__('Checkout|GitLab group'),
+    groupSelectPrompt: __('Select'),
+    groupSelectCreateNewOption: s__('Checkout|Create a new group'),
+    selectedGroupDescription: s__('Checkout|Your subscription will be applied to this group'),
+    createNewGroupDescription: s__("Checkout|You'll create your new group after checkout"),
+    organizationNameLabel: s__('Checkout|Name of company or organization using GitLab'),
+    numberOfUsersLabel: s__('Checkout|Number of users'),
+    needMoreUsersLink: s__('Checkout|Need more users? Purchase GitLab for your %{company}.'),
+    companyOrTeam: s__('Checkout|company or team'),
+    selectedPlan: s__('Checkout|%{selectedPlanText} plan'),
+    group: __('Group'),
+    users: __('Users'),
+  },
+  stepId: STEPS[0].id,
+};
 </script>
 <template>
   <step

@@ -2,10 +2,7 @@ import { produce } from 'immer';
 import { merge } from 'lodash';
 import Api from 'ee/api';
 import * as SubscriptionsApi from 'ee/api/subscriptions_api';
-import {
-  ERROR_FETCHING_COUNTRIES,
-  ERROR_FETCHING_STATES,
-} from 'ee/subscriptions/constants';
+import { ERROR_FETCHING_COUNTRIES, ERROR_FETCHING_STATES } from 'ee/subscriptions/constants';
 import STATE_QUERY from 'ee/subscriptions/graphql/queries/state.query.graphql';
 import createFlash from '~/flash';
 
@@ -27,7 +24,11 @@ export const resolvers = {
       return Api.fetchStates(countryId)
         .then(({ data }) => {
           // eslint-disable-next-line @gitlab/require-i18n-strings
-          return Object.entries(data).map(([key, value]) => ({ id: value, name: key, __typename: 'State' }));
+          return Object.entries(data).map(([key, value]) => ({
+            id: value,
+            name: key,
+            __typename: 'State',
+          }));
         })
         .catch(() => createFlash({ message: ERROR_FETCHING_STATES }));
     },
