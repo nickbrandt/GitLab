@@ -6,9 +6,9 @@ import {
   RuleTypeEntity,
   RuleTypeCIDR,
   RuleTypeFQDN,
-} from 'ee/threat_monitoring/components/policy_editor/constants';
-import humanizeNetworkPolicy from 'ee/threat_monitoring/components/policy_editor/lib/humanize';
-import { buildRule } from 'ee/threat_monitoring/components/policy_editor/lib/rules';
+  humanizeNetworkPolicy,
+  buildRule,
+} from 'ee/threat_monitoring/components/policy_editor/network_policy/lib';
 
 describe('humanizeNetworkPolicy', () => {
   let policy;
