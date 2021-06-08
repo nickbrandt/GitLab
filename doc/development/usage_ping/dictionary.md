@@ -8614,6 +8614,30 @@ Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
+### `redis_hll_counters.code_review.i_code_review_click_diff_view_setting_monthly`
+
+Count of users clicking diff view setting
+
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_28d/20210607113556_i_code_review_click_diff_view_setting_monthly.yml)
+
+Group: `group::code review`
+
+Status: `implemented`
+
+Tiers: `free`, `premium`, `ultimate`
+
+### `redis_hll_counters.code_review.i_code_review_click_diff_view_setting_weekly`
+
+Count of users clicking diff view setting
+
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_7d/20210607113552_i_code_review_click_diff_view_setting_weekly.yml)
+
+Group: `group::code review`
+
+Status: `implemented`
+
+Tiers: `free`, `premium`, `ultimate`
+
 ### `redis_hll_counters.code_review.i_code_review_click_file_browser_setting_monthly`
 
 Count of users clicking merge request file browser setting
