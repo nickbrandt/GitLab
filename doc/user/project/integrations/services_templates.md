@@ -7,7 +7,7 @@ info: To determine the technical writer assigned to the Stage/Group associated w
 # Service templates **(FREE)**
 
 WARNING:
-Service templates are [deprecated and scheduled to be removed](https://gitlab.com/gitlab-org/gitlab/-/issues/268032)
+Service templates were [removed](https://gitlab.com/gitlab-org/gitlab/-/issues/268032)
 in GitLab 14.0. Use [project integration management](#central-administration-of-project-integrations) instead.
 
 Using a service template, GitLab administrators can:
