@@ -32,7 +32,7 @@ module API
         package_file = ::Packages::PackageFileFinder
           .new(package, params[:file_name]).execute!
 
-        not_found!('Package') unless package_file.pipeline&.success?
+        not_found!('Package') unless package_file.push&.pipeline&.success?
 
         track_package_event('pull_package', package, category: 'API::NpmPackages')
 
