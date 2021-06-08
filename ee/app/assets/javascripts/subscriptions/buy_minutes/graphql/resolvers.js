@@ -23,10 +23,10 @@ export const resolvers = {
     states: (_, { countryId }) => {
       return Api.fetchStates(countryId)
         .then(({ data }) => {
-          // eslint-disable-next-line @gitlab/require-i18n-strings
           return Object.entries(data).map(([key, value]) => ({
             id: value,
             name: key,
+            // eslint-disable-next-line @gitlab/require-i18n-strings
             __typename: 'State',
           }));
         })
