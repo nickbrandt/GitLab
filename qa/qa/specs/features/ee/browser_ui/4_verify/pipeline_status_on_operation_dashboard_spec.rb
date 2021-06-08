@@ -108,7 +108,7 @@ module QA
       end
 
       def remove_projects_from_api
-        [project_with_success_run, project_without_ci, project_with_failed_run].each { |project| project.remove_via_api! }
+        [project_with_success_run, project_without_ci, project_with_failed_run].each(&:remove_via_api!)
       end
 
       def ci_file_with_tag
