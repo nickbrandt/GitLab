@@ -11,8 +11,8 @@ module IncidentManagement
       feature_category :incident_management
 
       def perform
-        IncidentManagement::AlertEscalation.all.each do |escalation|
-          IncidentManagement::Escalations::EscalationCheckWorker.perform_async(escalation.class.name, escalation.id)
+        IncidentManagement::AlertEscalation.ids.each do |escalation_id| # rubocop: disable CodeReuse/ActiveRecord
+          IncidentManagement::Escalations::EscalationCheckWorker.perform_async('IncidentManagement::AlertEscalation', escalation_id)
         end
       end
     end
