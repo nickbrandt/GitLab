@@ -1050,8 +1050,6 @@ module API
         detail 'This feature was introduced in GitLab 14.0.'
       end
       get "preferences", feature_category: :users do
-        authenticate!
-
         present current_user.user_preference, with: Entities::UserPreferences
       end
 
