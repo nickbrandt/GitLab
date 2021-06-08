@@ -1,6 +1,6 @@
 query issueSuggestion($fullPath: ID!, $search: String) {
   project(fullPath: $fullPath) {
-    issues(search: $search, sort: updated_desc, first: 5) {
+    issues(search: $search, sort: UPDATED_DESC, first: 5) {
       edges {
         node {
           iid

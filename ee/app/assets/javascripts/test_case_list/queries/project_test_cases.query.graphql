@@ -9,7 +9,7 @@ query projectIssues(
   $authorUsername: String = ""
   $labelName: [String]
   $search: String = ""
-  $sortBy: IssueSort = created_desc
+  $sortBy: IssueSort = CREATED_DESC
   $firstPageSize: Int
   $lastPageSize: Int
   $prevPageCursor: String = ""
