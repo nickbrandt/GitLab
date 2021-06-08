@@ -766,7 +766,7 @@
   :tags: []
 - :name: security_scans:scan_security_report_secrets
   :worker_name: ScanSecurityReportSecretsWorker
-  :feature_category: :static_application_security_testing
+  :feature_category: :secret_detection
   :has_external_dependencies: true
   :urgency: :low
   :resource_boundary: :cpu
@@ -775,7 +775,7 @@
   :tags: []
 - :name: security_scans:security_store_scans
   :worker_name: Security::StoreScansWorker
-  :feature_category: :static_application_security_testing
+  :feature_category: :vulnerability_management
   :has_external_dependencies:
   :urgency: :low
   :resource_boundary: :unknown
@@ -785,7 +785,7 @@
   - :exclude_from_kubernetes
 - :name: security_scans:store_security_reports
   :worker_name: StoreSecurityReportsWorker
-  :feature_category: :static_application_security_testing
+  :feature_category: :vulnerability_management
   :has_external_dependencies:
   :urgency: :low
   :resource_boundary: :cpu
@@ -794,7 +794,7 @@
   :tags: []
 - :name: security_scans:store_security_scans
   :worker_name: StoreSecurityScansWorker
-  :feature_category: :static_application_security_testing
+  :feature_category: :vulnerability_management
   :has_external_dependencies:
   :urgency: :low
   :resource_boundary: :unknown
@@ -803,7 +803,7 @@
   :tags: []
 - :name: security_scans:sync_security_reports_to_report_approval_rules
   :worker_name: SyncSecurityReportsToReportApprovalRulesWorker
-  :feature_category: :static_application_security_testing
+  :feature_category: :vulnerability_management
   :has_external_dependencies:
   :urgency: :high
   :resource_boundary: :cpu
