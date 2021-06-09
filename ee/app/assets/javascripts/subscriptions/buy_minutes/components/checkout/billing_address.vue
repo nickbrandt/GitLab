@@ -2,10 +2,10 @@
 import { GlFormGroup, GlFormInput, GlFormSelect } from '@gitlab/ui';
 import { isEmpty } from 'lodash';
 import { STEPS } from 'ee/subscriptions/constants';
-import UPDATE_STATE from 'ee/subscriptions/graphql/mutations/update_state.mutation.graphql';
-import COUNTRIES_QUERY from 'ee/subscriptions/graphql/queries/countries.query.graphql';
-import STATE_QUERY from 'ee/subscriptions/graphql/queries/state.query.graphql';
-import STATES_QUERY from 'ee/subscriptions/graphql/queries/states.query.graphql';
+import updateStateMutation from 'ee/subscriptions/graphql/mutations/update_state.mutation.graphql';
+import countriesQuery from 'ee/subscriptions/graphql/queries/countries.query.graphql';
+import stateQuery from 'ee/subscriptions/graphql/queries/state.query.graphql';
+import statesQuery from 'ee/subscriptions/graphql/queries/states.query.graphql';
 import Step from 'ee/vue_shared/purchase_flow/components/step.vue';
 import { GENERAL_ERROR_MESSAGE } from 'ee/vue_shared/purchase_flow/constants';
 import createFlash from '~/flash';
@@ -24,45 +24,24 @@ export default {
   },
   data() {
     return {
-      country: null,
-      address1: null,
-      address2: null,
-      city: null,
-      state: null,
-      zipCode: null,
-      company: null,
+      countries: [],
     };
   },
   apollo: {
-    state: {
-      query: STATE_QUERY,
-      manual: true,
-      result({ data, loading }) {
-        if (loading) {
-          return;
-        }
-
-        const { customer } = data;
-        this.country = customer.country;
-        this.address1 = customer.address1;
-        this.address2 = customer.address2;
-        this.city = customer.city;
-        this.state = customer.state;
-        this.zipCode = customer.zipCode;
-        this.company = customer.company;
-      },
+    customer: {
+      query: stateQuery,
     },
     countries: {
-      query: COUNTRIES_QUERY,
+      query: countriesQuery,
     },
     states: {
-      query: STATES_QUERY,
+      query: statesQuery,
       skip() {
-        return !this.country;
+        return !this.customer.country;
       },
       variables() {
         return {
-          countryId: this.country,
+          countryId: this.customer.country,
         };
       },
     },
@@ -70,15 +49,15 @@ export default {
   computed: {
     countryModel: {
       get() {
-        return this.country;
+        return this.customer.country;
       },
       set(country) {
-        this.updateState({ customer: { country } });
+        this.updateState({ customer: { country, state: null } });
       },
     },
     streetAddressLine1Model: {
       get() {
-        return this.address1;
+        return this.customer.address1;
       },
       set(address1) {
         this.updateState({ customer: { address1 } });
@@ -86,7 +65,7 @@ export default {
     },
     streetAddressLine2Model: {
       get() {
-        return this.address2;
+        return this.customer.address2;
       },
       set(address2) {
         this.updateState({ customer: { address2 } });
@@ -94,7 +73,7 @@ export default {
     },
     cityModel: {
       get() {
-        return this.city;
+        return this.customer.city;
       },
       set(city) {
         this.updateState({ customer: { city } });
@@ -102,7 +81,7 @@ export default {
     },
     countryStateModel: {
       get() {
-        return this.state;
+        return this.customer.state;
       },
       set(state) {
         this.updateState({ customer: { state } });
@@ -110,7 +89,7 @@ export default {
     },
     zipCodeModel: {
       get() {
-        return this.zipCode;
+        return this.customer.zipCode;
       },
       set(zipCode) {
         this.updateState({ customer: { zipCode } });
@@ -118,10 +97,10 @@ export default {
     },
     isValid() {
       return (
-        !isEmpty(this.country) &&
-        !isEmpty(this.address1) &&
-        !isEmpty(this.city) &&
-        !isEmpty(this.zipCode)
+        !isEmpty(this.customer.country) &&
+        !isEmpty(this.customer.address1) &&
+        !isEmpty(this.customer.city) &&
+        !isEmpty(this.customer.zipCode)
       );
     },
     countryOptionsWithDefault() {
@@ -142,12 +121,19 @@ export default {
         ...this.states,
       ];
     },
+    selectedStateName() {
+      if (!this.customer.state || !this.states) {
+        return '';
+      }
+
+      return this.states.find((state) => state.id === this.customer.state).name;
+    },
   },
   methods: {
     updateState(payload) {
       this.$apollo
         .mutate({
-          mutation: UPDATE_STATE,
+          mutation: updateStateMutation,
           variables: {
             input: payload,
           },
@@ -173,14 +159,19 @@ export default {
 </script>
 <template>
   <step
-    v-if="!$apollo.loading"
+    v-if="!$apollo.loading.customer"
     :step-id="$options.stepId"
     :title="$options.i18n.stepTitle"
     :is-valid="isValid"
     :next-step-button-text="$options.i18n.nextStepButtonText"
   >
     <template #body>
-      <gl-form-group :label="$options.i18n.countryLabel" label-size="sm" class="mb-3">
+      <gl-form-group
+        v-if="!$apollo.loading.countries"
+        :label="$options.i18n.countryLabel"
+        label-size="sm"
+        class="mb-3"
+      >
         <gl-form-select
           v-model="countryModel"
           v-autofocusonshow
@@ -207,9 +198,13 @@ export default {
         <gl-form-input v-model="cityModel" type="text" data-qa-selector="city" />
       </gl-form-group>
       <div class="combined d-flex">
-        <gl-form-group :label="$options.i18n.stateLabel" label-size="sm" class="mr-3 w-50">
+        <gl-form-group
+          v-if="!$apollo.loading.states && states"
+          :label="$options.i18n.stateLabel"
+          label-size="sm"
+          class="mr-3 w-50"
+        >
           <gl-form-select
-            v-if="states"
             v-model="countryStateModel"
             :options="stateOptionsWithDefault"
             value-field="id"
@@ -223,9 +218,11 @@ export default {
       </div>
     </template>
     <template #summary>
-      <div class="js-summary-line-1">{{ address1 }}</div>
-      <div class="js-summary-line-2">{{ address2 }}</div>
-      <div class="js-summary-line-3">{{ city }}, {{ country }} {{ state }} {{ zipCode }}</div>
+      <div class="js-summary-line-1">{{ customer.address1 }}</div>
+      <div class="js-summary-line-2">{{ customer.address2 }}</div>
+      <div class="js-summary-line-3">
+        {{ customer.city }}, {{ customer.country }} {{ selectedStateName }} {{ customer.zipCode }}
+      </div>
     </template>
   </step>
 </template>

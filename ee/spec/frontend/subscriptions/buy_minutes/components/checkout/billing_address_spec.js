@@ -4,7 +4,7 @@ import VueApollo from 'vue-apollo';
 import BillingAddress from 'ee/subscriptions/buy_minutes/components/checkout/billing_address.vue';
 import { resolvers } from 'ee/subscriptions/buy_minutes/graphql/resolvers';
 import { STEPS } from 'ee/subscriptions/constants';
-import STATE_QUERY from 'ee/subscriptions/graphql/queries/state.query.graphql';
+import stateQuery from 'ee/subscriptions/graphql/queries/state.query.graphql';
 import Step from 'ee/vue_shared/purchase_flow/components/step.vue';
 import { stateData as initialStateData } from 'ee_jest/subscriptions/buy_minutes/mock_data';
 import { createMockApolloProvider } from 'ee_jest/vue_shared/purchase_flow/spec_helper';
@@ -18,7 +18,11 @@ describe('Billing Address', () => {
 
   const apolloResolvers = {
     Query: {
-      countries: jest.fn().mockResolvedValue([{ id: 'NL', name: 'Netherlands' }]),
+      countries: jest.fn().mockResolvedValue([
+        { id: 'NL', name: 'Netherlands' },
+        { id: 'US', name: 'United States of America' },
+      ]),
+      states: jest.fn().mockResolvedValue([{ id: 'CA', name: 'California' }]),
     },
   };
 
@@ -28,7 +32,7 @@ describe('Billing Address', () => {
       ...apolloResolvers,
     });
     apolloProvider.clients.defaultClient.cache.writeQuery({
-      query: STATE_QUERY,
+      query: stateQuery,
       data: merge({}, initialStateData, apolloLocalState),
     });
 
@@ -125,15 +129,15 @@ describe('Billing Address', () => {
     });
 
     it('should show the entered address line 1', () => {
-      expect(wrapper.find('.js-summary-line-1').text()).toEqual('address line 1');
+      expect(wrapper.find('.js-summary-line-1').text()).toBe('address line 1');
     });
 
     it('should show the entered address line 2', () => {
-      expect(wrapper.find('.js-summary-line-2').text()).toEqual('address line 2');
+      expect(wrapper.find('.js-summary-line-2').text()).toBe('address line 2');
     });
 
     it('should show the entered address city, state and zip code', () => {
-      expect(wrapper.find('.js-summary-line-3').text()).toEqual('city, US CA zip');
+      expect(wrapper.find('.js-summary-line-3').text()).toBe('city, US California zip');
     });
   });
 });
