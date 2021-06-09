@@ -14083,9 +14083,6 @@ msgstr ""
 msgid "Filter by name"
 msgstr ""
 
-msgid "Filter by status"
-msgstr ""
-
 msgid "Filter by test cases that are currently archived."
 msgstr ""
 
@@ -14725,6 +14722,9 @@ msgstr ""
 msgid "Geo|Failed"
 msgstr ""
 
+msgid "Geo|Filter by name"
+msgstr ""
+
 msgid "Geo|Filter by status"
 msgstr ""
 
@@ -14899,6 +14899,12 @@ msgstr ""
 msgid "Geo|Resync all"
 msgstr ""
 
+msgid "Geo|Resync all %{replicableType}"
+msgstr ""
+
+msgid "Geo|Resync all projects"
+msgstr ""
+
 msgid "Geo|Retry count"
 msgstr ""
 
@@ -14906,6 +14912,9 @@ msgid "Geo|Reverify"
 msgstr ""
 
 msgid "Geo|Reverify all"
+msgstr ""
+
+msgid "Geo|Reverify all projects"
 msgstr ""
 
 msgid "Geo|Review replication status, and resynchronize and reverify items with the primary node."
@@ -14960,6 +14969,15 @@ msgid "Geo|There was an error deleting the Geo Node"
 msgstr ""
 
 msgid "Geo|There was an error fetching the Geo Nodes"
+msgstr ""
+
+msgid "Geo|This will resync all %{replicableType}. It may take some time to complete. Are you sure you want to continue?"
+msgstr ""
+
+msgid "Geo|This will resync all projects. It may take some time to complete. Are you sure you want to continue?"
+msgstr ""
+
+msgid "Geo|This will reverify all projects. It may take some time to complete. Are you sure you want to continue?"
 msgstr ""
 
 msgid "Geo|Tracking database entry will be removed. Are you sure?"
@@ -28138,12 +28156,6 @@ msgid "Resume"
 msgstr ""
 
 msgid "Resync"
-msgstr ""
-
-msgid "Resync all"
-msgstr ""
-
-msgid "Resync all %{replicableType}"
 msgstr ""
 
 msgid "Retry"
