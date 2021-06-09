@@ -3501,6 +3501,9 @@ msgstr ""
 msgid "An error occurred while enabling Service Desk."
 msgstr ""
 
+msgid "An error occurred while fetching ancestors"
+msgstr ""
+
 msgid "An error occurred while fetching branches.  Retry the search."
 msgstr ""
 
