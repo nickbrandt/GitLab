@@ -58,6 +58,7 @@ export default {
       'stages',
       'summary',
       'startDate',
+      'permissions',
     ]),
     ...mapGetters(['pathNavigationData']),
     displayStageEvents() {
@@ -67,10 +68,9 @@ export default {
     displayNotEnoughData() {
       return this.selectedStageReady && this.isEmptyStage;
     },
-    // TODO: double check if we need to still check this ??
-    // displayNoAccess() {
-    //   return this.selectedStageReady && !this.selectedStage.isUserAllowed;
-    // },
+    displayNoAccess() {
+      return this.selectedStageReady && !this.isUserAllowed(this.selectedStage.id);
+    },
     selectedStageReady() {
       return !this.isLoadingStage && this.selectedStage;
     },
@@ -92,8 +92,6 @@ export default {
     ]),
     handleDateSelect(startDate) {
       this.setDateRange({ startDate });
-      this.fetchStageData();
-      this.fetchCycleAnalyticsData();
     },
     isActiveStage(stage) {
       return stage.slug === this.selectedStage.slug;
@@ -104,6 +102,10 @@ export default {
     dismissOverviewDialog() {
       this.isOverviewDialogDismissed = true;
       Cookies.set(OVERVIEW_DIALOG_COOKIE, '1', { expires: 365 });
+    },
+    isUserAllowed(id) {
+      const { permissions } = this;
+      return permissions?.[id];
     },
   },
   dayRangeOptions: [7, 30, 90],
@@ -199,29 +201,29 @@ export default {
             <section class="stage-events gl-overflow-auto gl-w-full">
               <gl-loading-icon v-if="isLoadingStage" size="lg" />
               <template v-else>
-                <!--<gl-empty-state
+                <gl-empty-state
                   v-if="displayNoAccess"
                   class="js-empty-state"
                   :title="__('You need permission.')"
                   :svg-path="noAccessSvgPath"
                   :description="__('Want to see the data? Please ask an administrator for access.')"
                 />
-                <template v-else>-->
-                <gl-empty-state
-                  v-if="displayNotEnoughData"
-                  class="js-empty-state"
-                  :description="emptyStageText"
-                  :svg-path="noDataSvgPath"
-                  :title="emptyStageTitle"
-                />
-                <component
-                  :is="selectedStage.component"
-                  v-if="displayStageEvents"
-                  :stage="selectedStage"
-                  :items="selectedStageEvents"
-                  data-testid="stage-table-events"
-                />
-                <!--</template>-->
+                <template v-else>
+                  <gl-empty-state
+                    v-if="displayNotEnoughData"
+                    class="js-empty-state"
+                    :description="emptyStageText"
+                    :svg-path="noDataSvgPath"
+                    :title="emptyStageTitle"
+                  />
+                  <component
+                    :is="selectedStage.component"
+                    v-if="displayStageEvents"
+                    :stage="selectedStage"
+                    :items="selectedStageEvents"
+                    data-testid="stage-table-events"
+                  />
+                </template>
               </template>
             </section>
           </div>
