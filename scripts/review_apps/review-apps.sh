@@ -368,9 +368,7 @@ EOF
 function verify_deploy() {
   echoinfo "Verifying deployment at ${CI_ENVIRONMENT_URL}"
 
-  local status=$(curl -sL -w "%{http_code}\\n" "${CI_ENVIRONMENT_URL}" -o curl_output.txt)
-
-  if [[ $status == '200' ]]; then
+  if wait_for_url "${CI_ENVIRONMENT_URL}" curl_output.txt; then
     echoinfo "Review app is deployed to ${CI_ENVIRONMENT_URL}"
     return 0
   else
