@@ -1,17 +1,16 @@
 ---
-key_path: usage_activity_by_stage_monthly.manage.user_auth_by_provider.two-factor-via-u2f-device
-description: Number of unique user logins using two factor via a U2F device
+key_path: usage_activity_by_stage_monthly.manage.ldap_keys
+description: Number of users creating keys synced as part of LDAP for last 28 days.
 product_section: dev
 product_stage: manage
-product_group: group::access
+product_group: group::acess
 product_category: authentication_and_authorization
 value_type: number
 status: data_available
 time_frame: 28d
 data_source: database
 distribution:
-- ce
+- ee
 tier:
-- free
 - premium
 - ultimate
