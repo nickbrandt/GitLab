@@ -184,9 +184,9 @@ export default {
               :aria-label="__('Confidential')"
             />
             <gl-link :href="webUrl" v-bind="issuableTitleProps">
-              {{ issuable.title }}
-              <gl-icon v-if="isIssuableUrlExternal" name="external-link" class="gl-ml-1" />
-            </gl-link>
+              {{ issuable.title
+              }}<gl-icon v-if="isIssuableUrlExternal" name="external-link" class="gl-ml-2"
+            /></gl-link>
           </span>
           <span
             v-if="taskStatus"
