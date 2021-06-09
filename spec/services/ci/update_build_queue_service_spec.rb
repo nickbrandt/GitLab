@@ -146,8 +146,9 @@ RSpec.describe Ci::UpdateBuildQueueService do
 
       context 'when duplicate entry exists' do
         before do
-          ::Ci::SharedRunnerBuild
-            .create!(build: build, project: project, runner: runner)
+          ::Ci::RunningBuild.create!(
+            build: build, project: project, runner: runner, runner_type: runner.runner_type
+          )
         end
 
         it 'does nothing and returns build id' do
@@ -168,8 +169,9 @@ RSpec.describe Ci::UpdateBuildQueueService do
 
       context 'when shared runner build tracking entry exists' do
         before do
-          Ci::SharedRunnerBuild
-            .create!(build: build, project: project, runner: runner)
+          Ci::RunningBuild.create!(
+            build: build, project: project, runner: runner, runner_type: runner.runner_type
+          )
         end
 
         it 'removes shared runner build' do

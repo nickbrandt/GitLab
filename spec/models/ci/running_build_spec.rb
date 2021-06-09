@@ -2,30 +2,33 @@
 
 require 'spec_helper'
 
-RSpec.describe Ci::SharedRunnerBuild do
+RSpec.describe Ci::RunningBuild do
   let_it_be(:project) { create(:project) }
   let_it_be(:pipeline) { create(:ci_pipeline, project: project) }
 
   let(:runner) { create(:ci_runner, :instance_type) }
   let(:build) { create(:ci_build, :running, runner: runner, pipeline: pipeline) }
 
-  describe '.upsert_from_build!' do
+  describe '.upsert_shared_runner_build!' do
     context 'another pending entry does not exist' do
       it 'creates a new pending entry' do
-        result = described_class.upsert_from_build!(build)
+        result = described_class.upsert_shared_runner_build!(build)
 
         expect(result.rows.dig(0, 0)).to eq build.id
-        expect(build.reload.shared_runner_metadata).to be_present
+        expect(build.reload.runtime_metadata).to be_present
       end
     end
 
     context 'when another queuing entry exists for given build' do
       before do
-        described_class.create!(build: build, project: project, runner: runner)
+        described_class.create!(build: build,
+                                project: project,
+                                runner: runner,
+                                runner_type: runner.runner_type)
       end
 
       it 'returns a build id as a result' do
-        result = described_class.upsert_from_build!(build)
+        result = described_class.upsert_shared_runner_build!(build)
 
         expect(result.rows.dig(0, 0)).to eq build.id
       end
@@ -35,7 +38,7 @@ RSpec.describe Ci::SharedRunnerBuild do
       let(:runner) { create(:ci_runner, :project) }
 
       it 'raises an error' do
-        expect { described_class.upsert_from_build!(build) }
+        expect { described_class.upsert_shared_runner_build!(build) }
           .to raise_error(ArgumentError, 'build has not been picked by a shared runner')
       end
     end
@@ -44,7 +47,7 @@ RSpec.describe Ci::SharedRunnerBuild do
       let(:build) { create(:ci_build, pipeline: pipeline) }
 
       it 'raises an error' do
-        expect { described_class.upsert_from_build!(build) }
+        expect { described_class.upsert_shared_runner_build!(build) }
           .to raise_error(ArgumentError, 'build has not been picked by a shared runner')
       end
     end
