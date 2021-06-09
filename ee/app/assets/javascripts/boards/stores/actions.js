@@ -245,6 +245,9 @@ export default {
     { state, commit, getters },
     { listId, fetchNext = false, noEpicIssues = false, forSwimlanes = false },
   ) => {
+    if (!fetchNext && !state.isShowingEpicsSwimlanes) {
+      commit(types.RESET_ITEMS_FOR_LIST, listId);
+    }
     commit(types.REQUEST_ITEMS_FOR_LIST, { listId, fetchNext });
 
     const { epicId, ...filterParams } = state.filterParams;
