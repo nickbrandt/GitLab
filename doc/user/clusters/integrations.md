@@ -14,6 +14,10 @@ To enable cluster integrations, first add a Kubernetes cluster to a GitLab
 [group](../group/clusters/index.md#group-level-kubernetes-clusters) or
 [instance](../instance/clusters/index.md).
 
+You can install your applications by any means. But GitLab provides a 
+[Cluster management project template](management_project_template.md) to support you with
+this task.
+
 ## Prometheus cluster integration
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/55244) in GitLab 13.11.
