@@ -143,17 +143,15 @@ RSpec.describe Gitlab::Highlight do
     end
 
     describe 'highlight timeouts' do
-      context 'when there is an attempt' do
-        let(:result) { described_class.highlight(file_name, content) }
+      let(:result) { described_class.highlight(file_name, content) }
 
-        it "increments the foreground counter if it's in the foreground" do
+      context 'when there is an attempt' do
+        it "increments the attempt counter" do
           expect { result }.to change { highlight_attempt_total("undefined") }
         end
       end
 
       context 'when there is a timeout error while highlighting' do
-        let(:result) { described_class.highlight(file_name, content) }
-
         before do
           allow(Timeout).to receive(:timeout).twice.and_raise(Timeout::Error)
           # This is done twice because it's rescued first and then
