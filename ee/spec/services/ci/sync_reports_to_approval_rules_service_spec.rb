@@ -285,9 +285,9 @@ RSpec.describe Ci::SyncReportsToApprovalRulesService, '#execute' do
         allow(pipeline).to receive(:complete?).and_return(true)
       end
 
-      it "won't lower approvals_required count" do
+      it "lowers approvals_required count" do
         expect { sync_rules }
-          .not_to change { report_approver_rule.reload.approvals_required }
+          .to change { report_approver_rule.reload.approvals_required }.from(2).to(0)
       end
     end
   end
