@@ -8,13 +8,15 @@ export const initQrtlyReconciliationAlert = (selector = '#js-qrtly-reconciliatio
     return false;
   }
 
+  const { reconciliationDate, cookieKey } = el.dataset;
+
   return new Vue({
     el,
     render(createElement) {
       return createElement(QrtlyReconciliationAlert, {
         props: {
-          date: new Date(el.dataset.reconciliationDate),
-          cookieKey: el.dataset.cookieKey,
+          date: new Date(reconciliationDate),
+          cookieKey: cookieKey,
         },
       });
     },
