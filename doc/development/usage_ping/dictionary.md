@@ -1702,6 +1702,30 @@ Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
+### `counts.groups_inheriting_mock_ci_active`
+
+Count of active groups inheriting integrations for Mock CI
+
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/20210216182732_groups_inheriting_mock_ci_active.yml)
+
+Group: `group::ecosystem`
+
+Status: `removed`
+
+Tiers: `free`, `premium`, `ultimate`
+
+### `counts.groups_inheriting_mock_monitoring_active`
+
+Count of active groups inheriting integrations for Mock Monitoring
+
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/20210216182743_groups_inheriting_mock_monitoring_active.yml)
+
+Group: `group::ecosystem`
+
+Status: `removed`
+
+Tiers: `free`, `premium`, `ultimate`
+
 ### `counts.groups_inheriting_packagist_active`
 
 Count of active groups inheriting integrations for Packagist
@@ -1915,6 +1939,30 @@ Count of groups with active integrations for Microsoft Teams
 Group: `group::ecosystem`
 
 Status: `data_available`
+
+Tiers: `free`, `premium`, `ultimate`
+
+### `counts.groups_mock_ci_active`
+
+Count of groups with active integrations for Mock CI
+
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/20210216182724_groups_mock_ci_active.yml)
+
+Group: `group::ecosystem`
+
+Status: `removed`
+
+Tiers: `free`, `premium`, `ultimate`
+
+### `counts.groups_mock_monitoring_active`
+
+Count of groups with active integrations for Mock Monitoring
+
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/20210216182736_groups_mock_monitoring_active.yml)
+
+Group: `group::ecosystem`
+
+Status: `removed`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -2791,6 +2839,30 @@ Count of active instance-level integrations for Microsoft Teams
 Group: `group::ecosystem`
 
 Status: `data_available`
+
+Tiers: `free`, `premium`, `ultimate`
+
+### `counts.instances_mock_ci_active`
+
+Count of active instance-level integrations for  Mock CI
+
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/20210216182728_instances_mock_ci_active.yml)
+
+Group: `group::ecosystem`
+
+Status: `removed`
+
+Tiers: `free`, `premium`, `ultimate`
+
+### `counts.instances_mock_monitoring_active`
+
+Count of active instance-level integrations for  Mock Monitoring
+
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/20210216182739_instances_mock_monitoring_active.yml)
+
+Group: `group::ecosystem`
+
+Status: `removed`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -4654,6 +4726,30 @@ Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
+### `counts.projects_inheriting_mock_ci_active`
+
+Count of active projects inheriting integrations for Mock CI
+
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/20210216182730_projects_inheriting_mock_ci_active.yml)
+
+Group: `group::ecosystem`
+
+Status: `removed`
+
+Tiers: `free`, `premium`, `ultimate`
+
+### `counts.projects_inheriting_mock_monitoring_active`
+
+Count of active projects inheriting integrations for Mock Monitoring
+
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/20210216182741_projects_inheriting_mock_monitoring_active.yml)
+
+Group: `group::ecosystem`
+
+Status: `removed`
+
+Tiers: `free`, `premium`, `ultimate`
+
 ### `counts.projects_inheriting_packagist_active`
 
 Count of active projects inheriting integrations for Packagist
@@ -4941,6 +5037,30 @@ Group: `group::continuous integration`
 Status: `data_available`
 
 Tiers: `premium`, `ultimate`
+
+### `counts.projects_mock_ci_active`
+
+Count of projects with active integrations for Mock CI
+
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/20210216182722_projects_mock_ci_active.yml)
+
+Group: `group::ecosystem`
+
+Status: `removed`
+
+Tiers: `free`, `premium`, `ultimate`
+
+### `counts.projects_mock_monitoring_active`
+
+Count of projects with active integrations for Mock Monitoring
+
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/20210216182734_projects_mock_monitoring_active.yml)
+
+Group: `group::ecosystem`
+
+Status: `removed`
+
+Tiers: `free`, `premium`, `ultimate`
 
 ### `counts.projects_packagist_active`
 
@@ -6055,6 +6175,30 @@ Count of active service templates for Microsoft Teams
 Group: `group::ecosystem`
 
 Status: `data_available`
+
+Tiers: `free`, `premium`, `ultimate`
+
+### `counts.templates_mock_ci_active`
+
+Count of active service templates for Mock CI
+
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/20210216182726_templates_mock_ci_active.yml)
+
+Group: `group::ecosystem`
+
+Status: `removed`
+
+Tiers: `free`, `premium`, `ultimate`
+
+### `counts.templates_mock_monitoring_active`
+
+Count of active service templates for Mock Monitoring
+
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/20210216182738_templates_mock_monitoring_active.yml)
+
+Group: `group::ecosystem`
+
+Status: `removed`
 
 Tiers: `free`, `premium`, `ultimate`
 
