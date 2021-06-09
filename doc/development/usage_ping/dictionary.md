@@ -11208,7 +11208,7 @@ Tiers: `premium`, `ultimate`
 
 ### `redis_hll_counters.epics_usage.g_project_management_users_epic_issue_added_from_epic_monthly`
 
-Counts of creating an issue from an epic
+Number of users creating an issue from an epic
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_28d/20210608191652_g_project_management_users_epic_issue_added_from_epic_monthly.yml)
 
@@ -11220,7 +11220,7 @@ Tiers: `ultimate`
 
 ### `redis_hll_counters.epics_usage.g_project_management_users_epic_issue_added_from_epic_weekly`
 
-Counts of creating an issue from an epic
+Number of users creating an issue from an epic
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_7d/20210608191647_g_project_management_users_epic_issue_added_from_epic_weekly.yml)
 
