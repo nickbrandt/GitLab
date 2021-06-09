@@ -21639,9 +21639,6 @@ msgstr ""
 msgid "Multiple uploaders found: %{uploader_types}"
 msgstr ""
 
-msgid "Must have a unique policy, status, and elapsed time"
-msgstr ""
-
 msgid "Must match with the %{codeStart}external_url%{codeEnd} in %{codeStart}/etc/gitlab/gitlab.rb%{codeEnd}."
 msgstr ""
 
@@ -39253,6 +39250,9 @@ msgid "must be after start"
 msgstr ""
 
 msgid "must be greater than start date"
+msgstr ""
+
+msgid "must have a unique schedule, status, and elapsed time"
 msgstr ""
 
 msgid "my-awesome-group"
