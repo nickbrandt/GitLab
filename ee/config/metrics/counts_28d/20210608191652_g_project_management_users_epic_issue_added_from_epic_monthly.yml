@@ -1,6 +1,6 @@
 ---
 key_path: redis_hll_counters.epics_usage.g_project_management_users_epic_issue_added_from_epic_monthly
-description: Counts of creating an issue from an epic
+description: Number of users creating an issue from an epic
 product_section: dev
 product_stage: plan
 product_group: group::product planning
@@ -14,5 +14,4 @@ data_source: redis_hll
 distribution:
 - ee
 tier:
-#- premium
 - ultimate
