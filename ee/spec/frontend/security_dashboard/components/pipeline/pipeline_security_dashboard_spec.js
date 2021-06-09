@@ -2,6 +2,7 @@ import { GlEmptyState } from '@gitlab/ui';
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
 import PipelineSecurityDashboard from 'ee/security_dashboard/components/pipeline/pipeline_security_dashboard.vue';
+import ScanErrorsAlert from 'ee/security_dashboard/components/pipeline/scan_errors_alert.vue';
 import SecurityDashboard from 'ee/security_dashboard/components/pipeline/security_dashboard_vuex.vue';
 import SecurityReportsSummary from 'ee/security_dashboard/components/pipeline/security_reports_summary.vue';
 import VulnerabilityReport from 'ee/security_dashboard/components/vulnerability_report.vue';
@@ -28,6 +29,7 @@ describe('Pipeline Security Dashboard component', () => {
 
   const findSecurityDashboard = () => wrapper.findComponent(SecurityDashboard);
   const findVulnerabilityReport = () => wrapper.findComponent(VulnerabilityReport);
+  const findScanErrorsAlert = () => wrapper.findComponent(ScanErrorsAlert);
 
   const factory = ({ data, stubs, provide } = {}) => {
     store = new Vuex.Store({
@@ -136,7 +138,7 @@ describe('Pipeline Security Dashboard component', () => {
     });
 
     it('renders empty state component with correct props', () => {
-      const emptyState = wrapper.find(GlEmptyState);
+      const emptyState = wrapper.findComponent(GlEmptyState);
 
       expect(emptyState.props()).toMatchObject({
         svgPath: '/svgs/empty/svg',
@@ -144,6 +146,69 @@ describe('Pipeline Security Dashboard component', () => {
         description: `While it's rare to have no vulnerabilities for your pipeline, it can happen. In any event, we ask that you double check your settings to make sure all security scanning jobs have passed successfully.`,
         primaryButtonLink: '/help/docs',
         primaryButtonText: 'Learn more about setting up your dashboard',
+      });
+    });
+  });
+
+  describe('scans error alert', () => {
+    describe('with errors', () => {
+      const securityReportSummary = {
+        scanner_1: {
+          // this scan contains errors
+          scans: [
+            { errors: ['scanner 1 - error 1', 'scanner 1 - error 2'], name: 'foo' },
+            { errors: ['scanner 1 - error 3', 'scanner 1 - error 4'], name: 'bar' },
+          ],
+        },
+        scanner_2: null,
+        scanner_3: {
+          // this scan contains errors
+          scans: [{ errors: ['scanner 3 - error 1', 'scanner 3 - error 2'], name: 'baz' }],
+        },
+        scanner_4: {
+          scans: [{ errors: [], name: 'quz' }],
+        },
+      };
+      const scansWithErrors = [
+        ...securityReportSummary.scanner_1.scans,
+        ...securityReportSummary.scanner_3.scans,
+      ];
+
+      beforeEach(() => {
+        factory({
+          data: {
+            securityReportSummary,
+          },
+        });
+      });
+
+      it('shows an alert with information about each scan with errors', () => {
+        expect(findScanErrorsAlert().props('scans')).toEqual(scansWithErrors);
+      });
+    });
+
+    describe('without errors', () => {
+      const securityReportSummary = {
+        dast: {
+          scans: [
+            {
+              name: 'dast',
+              errors: [],
+            },
+          ],
+        },
+      };
+
+      beforeEach(() => {
+        factory({
+          data: {
+            securityReportSummary,
+          },
+        });
+      });
+
+      it('does not show the alert', () => {
+        expect(findScanErrorsAlert().exists()).toBe(false);
       });
     });
   });
@@ -161,7 +226,7 @@ describe('Pipeline Security Dashboard component', () => {
           securityReportSummary,
         },
       });
-      expect(wrapper.find(SecurityReportsSummary).exists()).toBe(true);
+      expect(wrapper.findComponent(SecurityReportsSummary).exists()).toBe(true);
     });
 
     it('does not show the summary if it is empty', () => {
@@ -170,7 +235,7 @@ describe('Pipeline Security Dashboard component', () => {
           securityReportSummary: null,
         },
       });
-      expect(wrapper.find(SecurityReportsSummary).exists()).toBe(false);
+      expect(wrapper.findComponent(SecurityReportsSummary).exists()).toBe(false);
     });
   });
 });
