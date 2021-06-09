@@ -10,6 +10,9 @@ module API
       desc 'Download the group avatar' do
         detail 'This feature was introduced in GitLab 14.0'
       end
+      params do
+        requires :id, type: String, desc: 'The group id'
+      end
       get ':id/avatar' do
         present_carrierwave_file!(user_group.avatar)
       end
