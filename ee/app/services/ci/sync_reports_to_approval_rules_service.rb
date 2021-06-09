@@ -59,13 +59,8 @@ module Ci
       pipeline.merge_requests_as_head_pipeline.reject do |merge_request|
         base_pipeline = merge_request.base_pipeline
 
-        if base_pipeline.present?
-          pipeline.coverage < base_pipeline.coverage
-        else
-          # base pipeline is missing so we can't make an assumption
-          # if the coverage is better or not. We default to require approval.
-          true
-        end
+        # if base pipeline is missing we just default to not require approval.
+        pipeline.coverage < base_pipeline.coverage if base_pipeline.present?
       end
     end
 
