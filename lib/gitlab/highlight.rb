@@ -95,7 +95,7 @@ module Gitlab
     def add_highlight_attempt_metric
       return unless Feature.enabled?(:track_highlight_timeouts)
 
-      highlighting_attempt.increment(source: @language || "undefined")
+      highlighting_attempt.increment(source: @language.try(:language) || "undefined")
     end
 
     def add_highlight_timeout_metric
