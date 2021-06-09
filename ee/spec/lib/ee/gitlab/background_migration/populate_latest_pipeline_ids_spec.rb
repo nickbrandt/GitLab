@@ -21,7 +21,8 @@ RSpec.describe Gitlab::BackgroundMigration::PopulateLatestPipelineIds do
       container_scanning: 7,
       dast: 8,
       secret_detection: 21,
-      coverage_fuzzing: 23
+      coverage_fuzzing: 23,
+      api_fuzzing: 26
     }
   end
 
