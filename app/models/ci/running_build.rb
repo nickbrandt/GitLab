@@ -11,7 +11,7 @@ module Ci
     enum runner_type: ::Ci::Runner.runner_types
 
     def self.upsert_shared_runner_build!(build)
-      unless build.runner && build.runner.instance_type?
+      unless build.shared_runner_build?
         raise ArgumentError, 'build has not been picked by a shared runner'
       end
 
