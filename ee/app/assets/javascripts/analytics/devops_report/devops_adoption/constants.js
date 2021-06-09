@@ -2,6 +2,8 @@ import { s__, __ } from '~/locale';
 
 export const DEFAULT_POLLING_INTERVAL = 30000;
 
+export const MAX_REQUEST_COUNT = 10;
+
 export const PER_PAGE = 100;
 
 export const DEVOPS_ADOPTION_SEGMENT_MODAL_ID = 'devopsSegmentModal';
