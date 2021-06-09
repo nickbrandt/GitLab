@@ -300,7 +300,7 @@ module Ci
       end
 
       # rubocop:disable CodeReuse/ServiceClass
-      after_transition any => [:pending] do |build, transition|
+      after_transition any: :pending do |build, transition|
         Ci::UpdateBuildQueueService.new.push(build, transition)
 
         build.run_after_commit do
@@ -311,7 +311,22 @@ module Ci
       after_transition pending: any do |build, transition|
         Ci::UpdateBuildQueueService.new.pop(build, transition)
       end
+
+      after_transition any: :running do |build, transition|
+        Ci::UpdateBuildQueueService.new.track(build, transition)
+      end
+
+      after_transition running: any do |build|
+        Ci::UpdateBuildQueueService.new.untrack(build, transition)
+
+        Ci::BuildRunnerSession.where(build: build).delete_all
+      end
+
       # rubocop:enable CodeReuse/ServiceClass
+      #
+      after_transition pending: :running do |build|
+        build.ensure_metadata.update_timeout_state
+      end
 
       after_transition pending: :running do |build|
         build.deployment&.run
@@ -363,14 +378,6 @@ module Ci
             Gitlab::AppLogger.error "Unable to auto-retry job #{build.id}: #{ex}"
           end
         end
-      end
-
-      after_transition pending: :running do |build|
-        build.ensure_metadata.update_timeout_state
-      end
-
-      after_transition running: any do |build|
-        Ci::BuildRunnerSession.where(build: build).delete_all
       end
 
       after_transition any => [:skipped, :canceled] do |build, transition|
@@ -1085,6 +1092,12 @@ module Ci
 
     def all_runtime_metadata
       ::Ci::RunningBuild.where(build_id: self.id)
+    end
+
+    def shared_runner_build?
+      return false if runner.nil?
+
+      runner.instance_type?
     end
 
     protected
