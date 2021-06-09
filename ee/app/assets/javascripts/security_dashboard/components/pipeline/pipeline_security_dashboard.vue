@@ -71,6 +71,20 @@ export default {
         primaryButtonText: s__('SecurityReports|Learn more about setting up your dashboard'),
       };
     },
+    scansWithErrors() {
+      const getScans = (reportSummary) => reportSummary?.scans || [];
+      const hasErrors = (scan) => Boolean(scan.errors?.length);
+
+      return this.securityReportSummary
+        ? Object.values(this.securityReportSummary)
+            // generate flat array of all scans
+            .flatMap(getScans)
+            .filter(hasErrors)
+        : [];
+    },
+    hasScansWithErrors() {
+      return this.scansWithErrors.length > 0;
+    },
   },
   created() {
     this.setSourceBranch(this.pipeline.sourceBranch);
@@ -87,7 +101,7 @@ export default {
 <template>
   <div>
     <div v-if="securityReportSummary" class="gl-my-5">
-      <scan-errors-alert :security-report-summary="securityReportSummary" class="gl-mb-5" />
+      <scan-errors-alert v-if="hasScansWithErrors" :scans="scansWithErrors" class="gl-mb-5" />
       <security-reports-summary :summary="securityReportSummary" />
     </div>
     <security-dashboard

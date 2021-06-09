@@ -29078,9 +29078,6 @@ msgstr ""
 msgid "SecurityOrchestration|Security policy project"
 msgstr ""
 
-msgid "SecurityReports|%{errorName} (%{errorCount})"
-msgstr ""
-
 msgid "SecurityReports|%{firstProject} and %{secondProject}"
 msgstr ""
 

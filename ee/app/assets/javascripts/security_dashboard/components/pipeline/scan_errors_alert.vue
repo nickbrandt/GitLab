@@ -1,6 +1,6 @@
 <script>
 import { GlAccordion, GlAccordionItem, GlAlert, GlButton, GlSprintf } from '@gitlab/ui';
-import { sprintf, s__ } from '~/locale';
+import { s__ } from '~/locale';
 
 export default {
   components: {
@@ -12,34 +12,17 @@ export default {
   },
   inject: ['securityReportHelpPageLink'],
   props: {
-    securityReportSummary: {
-      type: Object,
-      required: false,
-      default: () => ({}),
+    scans: {
+      type: Array,
+      required: true,
     },
   },
   computed: {
-    scansWithErrors() {
-      const getScans = (reportSummary) => reportSummary?.scans || [];
-      const hasErrors = (scan) => Boolean(scan.errors?.length);
-      const addTitle = (scan) => ({
+    scansWithTitles() {
+      return this.scans.map((scan) => ({
         ...scan,
-        title: sprintf(s__('SecurityReports|%{errorName} (%{errorCount})'), {
-          errorName: scan.name,
-          errorCount: scan.errors.length,
-        }),
-      });
-
-      return this.securityReportSummary
-        ? Object.values(this.securityReportSummary)
-            // generate flat array of all scans
-            .flatMap(getScans)
-            .filter(hasErrors)
-            .map(addTitle)
-        : [];
-    },
-    hasScansWithErrors() {
-      return this.scansWithErrors.length > 0;
+        title: `${scan.name} (${scan.errors.length})`,
+      }));
     },
   },
   i18n: {
@@ -52,7 +35,7 @@ export default {
 </script>
 
 <template>
-  <gl-alert v-if="hasScansWithErrors" variant="danger" :dismissible="false">
+  <gl-alert variant="danger" :dismissible="false">
     <strong role="heading">
       {{ $options.i18n.title }}
     </strong>
@@ -72,7 +55,7 @@ export default {
     </p>
     <gl-accordion :header-level="3">
       <gl-accordion-item
-        v-for="{ name, errors, title } in scansWithErrors"
+        v-for="{ name, errors, title } in scansWithTitles"
         :key="name"
         :title="title"
       >

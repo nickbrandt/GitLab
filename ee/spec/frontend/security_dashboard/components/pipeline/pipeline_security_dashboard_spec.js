@@ -150,32 +150,66 @@ describe('Pipeline Security Dashboard component', () => {
     });
   });
 
-  describe('scan errors alert', () => {
-    const securityReportSummary = {
-      dast: {
-        scans: [
-          {
-            name: 'dast',
-            errors: [],
-          },
-        ],
-      },
-    };
-
-    beforeEach(() => {
-      factory({
-        data: {
-          securityReportSummary,
+  describe('scans error alert', () => {
+    describe('with errors', () => {
+      const securityReportSummary = {
+        scanner_1: {
+          // this scan contains errors
+          scans: [
+            { errors: ['scanner 1 - error 1', 'scanner 1 - error 2'], name: 'foo' },
+            { errors: ['scanner 1 - error 3', 'scanner 1 - error 4'], name: 'bar' },
+          ],
         },
+        scanner_2: null,
+        scanner_3: {
+          // this scan contains errors
+          scans: [{ errors: ['scanner 3 - error 1', 'scanner 3 - error 2'], name: 'baz' }],
+        },
+        scanner_4: {
+          scans: [{ errors: [], name: 'quz' }],
+        },
+      };
+      const scansWithErrors = [
+        ...securityReportSummary.scanner_1.scans,
+        ...securityReportSummary.scanner_3.scans,
+      ];
+
+      beforeEach(() => {
+        factory({
+          data: {
+            securityReportSummary,
+          },
+        });
+      });
+
+      it('shows an alert with information about each scan with errors', () => {
+        expect(findScanErrorsAlert().props('scans')).toEqual(scansWithErrors);
       });
     });
 
-    it('includes the alert', () => {
-      expect(findScanErrorsAlert().exists()).toBe(true);
-    });
+    describe('without errors', () => {
+      const securityReportSummary = {
+        dast: {
+          scans: [
+            {
+              name: 'dast',
+              errors: [],
+            },
+          ],
+        },
+      };
 
-    it('passes the security report summary to the alert', () => {
-      expect(findScanErrorsAlert().props('securityReportSummary')).toBe(securityReportSummary);
+      beforeEach(() => {
+        factory({
+          data: {
+            securityReportSummary,
+          },
+        });
+      });
+
+      it('does not show the alert', () => {
+        expect(findScanErrorsAlert().exists()).toBe(false);
+      });
     });
   });
 

@@ -4,36 +4,22 @@ import PipelineScanErrorsAlert from 'ee/security_dashboard/components/pipeline/s
 import { trimText } from 'helpers/text_helper';
 import { extendedWrapper } from 'helpers/vue_test_utils_helper';
 
-const TEST_SECURITY_REPORT_SUMMARY = {
-  scanner_1: {
-    // this scan contains errors
-    scans: [
-      { errors: ['scanner 1 - error 1', 'scanner 1 - error 2'], name: 'foo' },
-      { errors: ['scanner 1 - error 3', 'scanner 1 - error 4'], name: 'bar' },
-    ],
-  },
-  scanner_2: null,
-  scanner_3: {
-    // this scan contains errors
-    scans: [{ errors: ['scanner 3 - error 1', 'scanner 3 - error 2'], name: 'baz' }],
-  },
-  scanner_4: {
-    scans: [{ errors: [], name: 'quz' }],
-  },
-};
 const TEST_HELP_PAGE_LINK = 'http://help.com';
 const TEST_SCANS_WITH_ERRORS = [
-  ...TEST_SECURITY_REPORT_SUMMARY.scanner_1.scans,
-  ...TEST_SECURITY_REPORT_SUMMARY.scanner_3.scans,
+  { errors: ['scanner 1 - error 1', 'scanner 1 - error 2'], name: 'foo' },
+  { errors: ['scanner 1 - error 3', 'scanner 1 - error 4'], name: 'bar' },
+  { errors: ['scanner 3 - error 1', 'scanner 3 - error 2'], name: 'baz' },
 ];
 
 describe('ee/security_dashboard/components/pipeline_scan_errors_alert.vue', () => {
   let wrapper;
 
-  const createWrapper = (options) =>
+  const createWrapper = () =>
     extendedWrapper(
       shallowMount(PipelineScanErrorsAlert, {
-        ...options,
+        propsData: {
+          scans: TEST_SCANS_WITH_ERRORS,
+        },
         provide: {
           securityReportHelpPageLink: TEST_HELP_PAGE_LINK,
         },
@@ -55,70 +41,54 @@ describe('ee/security_dashboard/components/pipeline_scan_errors_alert.vue', () =
     wrapper.destroy();
   });
 
-  describe('without scanner errors', () => {
-    beforeEach(() => {
-      wrapper = createWrapper({ propsData: { securityReportSummary: {} } });
-    });
+  beforeEach(() => {
+    wrapper = createWrapper();
+  });
 
-    it('does not show error alert', () => {
-      expect(findAlert().exists()).toBe(false);
+  it('shows a non-dismissible error alert', () => {
+    expect(findAlert().props()).toMatchObject({
+      variant: 'danger',
+      dismissible: false,
     });
   });
 
-  describe('with scanner errors', () => {
-    beforeEach(() => {
-      wrapper = createWrapper({
-        propsData: { securityReportSummary: TEST_SECURITY_REPORT_SUMMARY },
-      });
+  it('shows the correct title for the error alert', () => {
+    expect(findAlert().text()).toContain('Error parsing security reports');
+  });
+
+  it('shows the correct description for the error-alert', () => {
+    expect(trimText(findAlert().text())).toContain(
+      'The security reports below contain one or more vulnerability findings that could not be parsed and were not recorded. Download the artifacts in the job output to investigate. Ensure any security report created conforms to the relevant JSON schema',
+    );
+  });
+
+  it('links to the security-report help page', () => {
+    expect(findHelpPageLink().attributes('href')).toBe(TEST_HELP_PAGE_LINK);
+  });
+
+  describe('errors details', () => {
+    it('shows an accordion containing a list of scans with errors', () => {
+      expect(findAccordion().exists()).toBe(true);
+      expect(findAllAccordionItems()).toHaveLength(TEST_SCANS_WITH_ERRORS.length);
     });
 
-    it('shows a non-dismissible error alert', () => {
-      expect(findAlert().exists()).toBe(true);
-      expect(findAlert().props()).toMatchObject({
-        variant: 'danger',
-        dismissible: false,
-      });
+    it('shows a list containing details about each error', () => {
+      expect(findErrorList().exists()).toBe(true);
     });
 
-    it('shows the correct title for the error alert', () => {
-      expect(findAlert().text()).toContain('Error parsing security reports');
-    });
+    describe.each(TEST_SCANS_WITH_ERRORS)('scan errors', (scan) => {
+      const currentScanTitle = `${scan.name} (${scan.errors.length})`;
+      const findAllAccordionItemsForCurrentScan = () =>
+        findAccordionItemsWithTitle(currentScanTitle);
+      const findAccordionItemForCurrentScan = () => findAllAccordionItemsForCurrentScan().at(0);
 
-    it('shows the correct description for the error-alert', () => {
-      expect(trimText(findAlert().text())).toContain(
-        'The security reports below contain one or more vulnerability findings that could not be parsed and were not recorded. Download the artifacts in the job output to investigate. Ensure any security report created conforms to the relevant JSON schema',
-      );
-    });
-
-    it('links to the security-report help page', () => {
-      expect(findHelpPageLink().exists()).toBe(true);
-      expect(findHelpPageLink().attributes('href')).toBe(TEST_HELP_PAGE_LINK);
-    });
-
-    describe('errors details', () => {
-      it('shows an accordion containing a list of scans with errors', () => {
-        expect(findAccordion().exists()).toBe(true);
-        expect(findAllAccordionItems()).toHaveLength(TEST_SCANS_WITH_ERRORS.length);
+      it(`contains an accordion item with the correct title for scan "${scan.name}"`, () => {
+        expect(findAllAccordionItemsForCurrentScan()).toHaveLength(1);
       });
 
-      it('shows a list containing details about each error', () => {
-        expect(findErrorList().exists()).toBe(true);
-      });
-
-      describe.each(TEST_SCANS_WITH_ERRORS)('scan errors', (scan) => {
-        const currentScanTitle = `${scan.name} (${scan.errors.length})`;
-        const findAllAccordionItemsForCurrentScan = () =>
-          findAccordionItemsWithTitle(currentScanTitle);
-        const findAccordionItemForCurrentScan = () => findAllAccordionItemsForCurrentScan().at(0);
-
-        it(`contains an accordion item with the correct title for scan "${scan.name}"`, () => {
-          expect(findAllAccordionItemsForCurrentScan()).toHaveLength(1);
-        });
-
-        it(`contains a detailed list of errors for scan "${scan.name}}"`, () => {
-          expect(findAccordionItemForCurrentScan().find('ul').exists()).toBe(true);
-          expect(findAccordionItemForCurrentScan().findAll('li')).toHaveLength(scan.errors.length);
-        });
+      it(`contains a detailed list of errors for scan "${scan.name}}"`, () => {
+        expect(findAccordionItemForCurrentScan().find('ul').exists()).toBe(true);
+        expect(findAccordionItemForCurrentScan().findAll('li')).toHaveLength(scan.errors.length);
       });
     });
   });
