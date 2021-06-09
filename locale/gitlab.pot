@@ -38219,9 +38219,6 @@ msgstr ""
 msgid "cannot merge"
 msgstr ""
 
-msgid "child-pipeline"
-msgstr ""
-
 msgid "ciReport|%{degradedNum} degraded"
 msgstr ""
 
