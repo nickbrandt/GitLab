@@ -364,6 +364,18 @@ EOF
   eval "${HELM_CMD}"
 }
 
+function verify_deploy() {
+  echoinfo "Verifying deployment at ${CI_ENVIRONMENT_URL}"
+
+  if wait_for_url "${CI_ENVIRONMENT_URL}" curl_output.txt; then
+    echoinfo "Review app is deployed to ${CI_ENVIRONMENT_URL}"
+    return 0
+  else
+    echoerr "Review app is not available at ${CI_ENVIRONMENT_URL}. See curl_output.txt artifact for detail."
+    return 1
+  fi
+}
+
 function display_deployment_debug() {
   local namespace="${CI_ENVIRONMENT_SLUG}"
   local release="${CI_ENVIRONMENT_SLUG}"
