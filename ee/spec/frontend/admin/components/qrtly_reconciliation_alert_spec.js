@@ -20,6 +20,8 @@ describe('Qrtly Reconciliation Alert', () => {
     });
   };
 
+  const findAlert = () => wrapper.find(GlAlert);
+
   beforeEach(() => {
     wrapper = createComponent();
   });
@@ -30,17 +32,17 @@ describe('Qrtly Reconciliation Alert', () => {
 
   describe('Rendering', () => {
     it('renders alert title with date', () => {
-      expect(wrapper.find(GlAlert).attributes('title')).toContain(`occur on 2020-07-10`);
+      expect(findAlert().attributes('title')).toContain(`occur on 2020-07-10`);
     });
 
     it('has the correct link to the help page', () => {
-      expect(wrapper.find(GlAlert).attributes('primarybuttonlink')).toBe(
+      expect(findAlert().attributes('primarybuttonlink')).toBe(
         '/help/subscriptions/self_managed/index#quarterly-subscription-reconciliation',
       );
     });
 
     it('has the correct link to contact support', () => {
-      expect(wrapper.find(GlAlert).attributes('secondarybuttonlink')).toBe(
+      expect(findAlert().attributes('secondarybuttonlink')).toBe(
         'https://about.gitlab.com/support/#contact-support',
       );
     });
@@ -48,7 +50,7 @@ describe('Qrtly Reconciliation Alert', () => {
 
   describe('methods', () => {
     it('sets the cookie on dismis', () => {
-      wrapper.find(GlAlert).vm.$emit('dismiss');
+      findAlert().vm.$emit('dismiss');
 
       expect(Cookie.set).toHaveBeenCalledTimes(1);
       expect(Cookie.set).toHaveBeenCalledWith('key', true, { expires: 4 });
