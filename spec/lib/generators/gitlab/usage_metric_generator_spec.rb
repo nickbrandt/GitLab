@@ -21,48 +21,33 @@ RSpec.describe Gitlab::UsageMetricGenerator do
     FileUtils.rm_rf([ce_temp_dir, ee_temp_dir, spec_ce_temp_dir, spec_ee_temp_dir])
   end
 
+  def expect_generated_file(directory, file_name, content)
+    file_path = File.join(directory, file_name)
+    file = File.read(file_path)
+
+    expect(file).to eq(content)
+  end
+
   describe 'Creating metric instrumentation files' do
     let(:sample_metric_dir) { 'lib/generators/gitlab/usage_metric_generator' }
     let(:sample_metric) { fixture_file(File.join(sample_metric_dir, 'sample_metric.rb')) }
     let(:sample_spec) { fixture_file(File.join(sample_metric_dir, 'sample_metric_test.rb')) }
 
-    it 'creates CE metric instrumentation file using the template' do
+    it 'creates CE metric instrumentation files using the template' do
       described_class.new(args, options).invoke_all
 
-      file_path = File.join(ce_temp_dir, 'count_foo_metric.rb')
-      file = File.read(file_path)
-
-      expect(file).to eq(sample_metric)
-    end
-
-    it 'creates CE metric instrumentation spec file using the template' do
-      described_class.new(args, options).invoke_all
-
-      file_path = File.join(spec_ce_temp_dir, 'count_foo_metric_spec.rb')
-      file = File.read(file_path)
-
-      expect(file).to eq(sample_spec)
+      expect_generated_file(ce_temp_dir, 'count_foo_metric.rb', sample_metric)
+      expect_generated_file(spec_ce_temp_dir, 'count_foo_metric_spec.rb', sample_spec)
     end
 
     context 'with EE flag true' do
       let(:options) { { 'type' => 'redis_hll', 'ee' => true } }
 
-      it 'creates EE metric instrumentation file using the template' do
+      it 'creates EE metric instrumentation files using the template' do
         described_class.new(args, options).invoke_all
 
-        file_path = File.join(ee_temp_dir, 'count_foo_metric.rb')
-        file = File.read(file_path)
-
-        expect(file).to eq(sample_metric)
-      end
-
-      it 'creates EE metric instrumentation spec file using the template' do
-        described_class.new(args, options).invoke_all
-
-        file_path = File.join(spec_ee_temp_dir, 'count_foo_metric_spec.rb')
-        file = File.read(file_path)
-
-        expect(file).to eq(sample_spec)
+        expect_generated_file(ee_temp_dir, 'count_foo_metric.rb', sample_metric)
+        expect_generated_file(spec_ee_temp_dir, 'count_foo_metric_spec.rb', sample_spec)
       end
     end
 
