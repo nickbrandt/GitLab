@@ -130,20 +130,16 @@ module Projects
             access_level: group_access_level)
         end
 
-        if Feature.enabled?(:specialized_project_authorization_workers, default_enabled: :yaml)
-          AuthorizedProjectUpdate::ProjectCreateWorker.perform_async(@project.id)
-          # AuthorizedProjectsWorker uses an exclusive lease per user but
-          # specialized workers might have synchronization issues. Until we
-          # compare the inconsistency rates of both approaches, we still run
-          # AuthorizedProjectsWorker but with some delay and lower urgency as a
-          # safety net.
-          @project.group.refresh_members_authorized_projects(
-            blocking: false,
-            priority: UserProjectAccessChangedService::LOW_PRIORITY
-          )
-        else
-          @project.group.refresh_members_authorized_projects(blocking: false)
-        end
+        AuthorizedProjectUpdate::ProjectCreateWorker.perform_async(@project.id)
+        # AuthorizedProjectsWorker uses an exclusive lease per user but
+        # specialized workers might have synchronization issues. Until we
+        # compare the inconsistency rates of both approaches, we still run
+        # AuthorizedProjectsWorker but with some delay and lower urgency as a
+        # safety net.
+        @project.group.refresh_members_authorized_projects(
+          blocking: false,
+          priority: UserProjectAccessChangedService::LOW_PRIORITY
+        )
       else
         @project.add_maintainer(@project.namespace.owner, current_user: current_user)
       end
