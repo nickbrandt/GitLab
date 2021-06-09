@@ -298,6 +298,9 @@ export default {
   },
 
   fetchItemsForList: ({ state, commit }, { listId, fetchNext = false }) => {
+    if (!fetchNext) {
+      commit(types.RESET_ITEMS_FOR_LIST, listId);
+    }
     commit(types.REQUEST_ITEMS_FOR_LIST, { listId, fetchNext });
 
     const { fullPath, fullBoardId, boardType, filterParams } = state;

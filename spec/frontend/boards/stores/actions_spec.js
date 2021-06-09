@@ -677,6 +677,10 @@ describe('fetchItemsForList', () => {
       state,
       [
         {
+          type: types.RESET_ITEMS_FOR_LIST,
+          payload: listId,
+        },
+        {
           type: types.REQUEST_ITEMS_FOR_LIST,
           payload: { listId, fetchNext: false },
         },
@@ -698,6 +702,10 @@ describe('fetchItemsForList', () => {
       { listId },
       state,
       [
+        {
+          type: types.RESET_ITEMS_FOR_LIST,
+          payload: listId,
+        },
         {
           type: types.REQUEST_ITEMS_FOR_LIST,
           payload: { listId, fetchNext: false },
