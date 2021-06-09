@@ -25,17 +25,21 @@ const transformJiraIssueLabels = (jiraIssue) => {
   }));
 };
 
+const transformJiraIssuePageInfo = (responseHeaders = {}) => {
+  return {
+    __typename: 'JiraIssuesPageInfo',
+    page: parseInt(responseHeaders['x-page'], 10) ?? 1,
+    total: parseInt(responseHeaders['x-total'], 10) ?? 0,
+  };
+};
+
 export const transformJiraIssuesREST = (response) => {
   const { headers, data: jiraIssues } = response;
 
   return {
     __typename: 'JiraIssues',
     errors: [],
-    pageInfo: {
-      __typename: 'JiraIssuesPageInfo',
-      page: parseInt(headers['x-page'], 10),
-      total: parseInt(headers['x-total'], 10),
-    },
+    pageInfo: transformJiraIssuePageInfo(headers),
     nodes: jiraIssues.map((rawIssue, index) => {
       const jiraIssue = convertObjectPropsToCamelCase(rawIssue, { deep: true });
       return {
@@ -75,10 +79,7 @@ export default function jiraIssuesResolver(
       return {
         __typename: 'JiraIssues',
         errors: error?.response?.data?.errors || [__('An error occurred while loading issues')],
-        pageInfo: {
-          total: 0,
-          page: 1,
-        },
+        pageInfo: transformJiraIssuePageInfo(),
         nodes: [],
       };
     });
