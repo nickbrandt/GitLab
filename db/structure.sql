@@ -41,62 +41,6 @@ RETURN NULL;
 END
 $$;
 
-CREATE FUNCTION table_sync_function_29bc99d6db() RETURNS trigger
-    LANGUAGE plpgsql
-    AS $$
-BEGIN
-IF (TG_OP = 'DELETE') THEN
-  DELETE FROM web_hook_logs_archived where id = OLD.id;
-ELSIF (TG_OP = 'UPDATE') THEN
-  UPDATE web_hook_logs_archived
-  SET web_hook_id = NEW.web_hook_id,
-    trigger = NEW.trigger,
-    url = NEW.url,
-    request_headers = NEW.request_headers,
-    request_data = NEW.request_data,
-    response_headers = NEW.response_headers,
-    response_body = NEW.response_body,
-    response_status = NEW.response_status,
-    execution_duration = NEW.execution_duration,
-    internal_error_message = NEW.internal_error_message,
-    created_at = NEW.created_at,
-    updated_at = NEW.updated_at
-  WHERE web_hook_logs_archived.id = NEW.id;
-ELSIF (TG_OP = 'INSERT') THEN
-  INSERT INTO web_hook_logs_archived (id,
-    web_hook_id,
-    trigger,
-    url,
-    request_headers,
-    request_data,
-    response_headers,
-    response_body,
-    response_status,
-    execution_duration,
-    internal_error_message,
-    created_at,
-    updated_at)
-  VALUES (NEW.id,
-    NEW.web_hook_id,
-    NEW.trigger,
-    NEW.url,
-    NEW.request_headers,
-    NEW.request_data,
-    NEW.response_headers,
-    NEW.response_body,
-    NEW.response_status,
-    NEW.execution_duration,
-    NEW.internal_error_message,
-    NEW.created_at,
-    NEW.updated_at);
-END IF;
-RETURN NULL;
-
-END
-$$;
-
-COMMENT ON FUNCTION table_sync_function_29bc99d6db() IS 'Partitioning migration: table sync for web_hook_logs table';
-
 CREATE FUNCTION trigger_07c94931164e() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
@@ -19351,22 +19295,6 @@ CREATE SEQUENCE vulnerability_user_mentions_id_seq
 
 ALTER SEQUENCE vulnerability_user_mentions_id_seq OWNED BY vulnerability_user_mentions.id;
 
-CREATE TABLE web_hook_logs_archived (
-    id integer NOT NULL,
-    web_hook_id integer NOT NULL,
-    trigger character varying,
-    url character varying,
-    request_headers text,
-    request_data text,
-    response_headers text,
-    response_body text,
-    response_status character varying,
-    execution_duration double precision,
-    internal_error_message character varying,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
-);
-
 CREATE SEQUENCE web_hook_logs_id_seq
     START WITH 1
     INCREMENT BY 1
@@ -22128,9 +22056,6 @@ ALTER TABLE ONLY vulnerability_statistics
 
 ALTER TABLE ONLY vulnerability_user_mentions
     ADD CONSTRAINT vulnerability_user_mentions_pkey PRIMARY KEY (id);
-
-ALTER TABLE ONLY web_hook_logs_archived
-    ADD CONSTRAINT web_hook_logs_archived_pkey PRIMARY KEY (id);
 
 ALTER TABLE ONLY web_hook_logs
     ADD CONSTRAINT web_hook_logs_pkey PRIMARY KEY (id, created_at);
@@ -24967,10 +24892,6 @@ CREATE UNIQUE INDEX index_vulns_user_mentions_on_vulnerability_id ON vulnerabili
 
 CREATE UNIQUE INDEX index_vulns_user_mentions_on_vulnerability_id_and_note_id ON vulnerability_user_mentions USING btree (vulnerability_id, note_id);
 
-CREATE INDEX index_web_hook_logs_on_created_at_and_web_hook_id ON web_hook_logs_archived USING btree (created_at, web_hook_id);
-
-CREATE INDEX index_web_hook_logs_on_web_hook_id ON web_hook_logs_archived USING btree (web_hook_id);
-
 CREATE INDEX index_web_hook_logs_part_on_created_at_and_web_hook_id ON ONLY web_hook_logs USING btree (created_at, web_hook_id);
 
 CREATE INDEX index_web_hook_logs_part_on_web_hook_id ON ONLY web_hook_logs USING btree (web_hook_id);
@@ -25352,8 +25273,6 @@ ALTER INDEX product_analytics_events_experimental_pkey ATTACH PARTITION gitlab_p
 ALTER INDEX product_analytics_events_experimental_pkey ATTACH PARTITION gitlab_partitions_static.product_analytics_events_experimental_62_pkey;
 
 ALTER INDEX product_analytics_events_experimental_pkey ATTACH PARTITION gitlab_partitions_static.product_analytics_events_experimental_63_pkey;
-
-CREATE TRIGGER table_sync_trigger_b99eb6998c AFTER INSERT OR DELETE OR UPDATE ON web_hook_logs FOR EACH ROW EXECUTE FUNCTION table_sync_function_29bc99d6db();
 
 CREATE TRIGGER trigger_07c94931164e BEFORE INSERT OR UPDATE ON push_event_payloads FOR EACH ROW EXECUTE FUNCTION trigger_07c94931164e();
 
@@ -26816,9 +26735,6 @@ ALTER TABLE ONLY operations_feature_flags_clients
 
 ALTER TABLE ONLY namespace_admin_notes
     ADD CONSTRAINT fk_rails_666166ea7b FOREIGN KEY (namespace_id) REFERENCES namespaces(id) ON DELETE CASCADE;
-
-ALTER TABLE ONLY web_hook_logs_archived
-    ADD CONSTRAINT fk_rails_666826e111 FOREIGN KEY (web_hook_id) REFERENCES web_hooks(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY analytics_cycle_analytics_project_value_streams
     ADD CONSTRAINT fk_rails_669f4ba293 FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE;
