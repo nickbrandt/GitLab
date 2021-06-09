@@ -49,11 +49,11 @@ module Ci
     end
 
     ##
-    # Add shared runner build tracking entry (used for queuing). This will rase
-    # an exception if a build has not been picked by a shared runner.
+    # Add shared runner build tracking entry (used for queuing).
     #
     def track(build, transition)
       return unless Feature.enabled?(:ci_track_shared_runner_builds, build.project, default_enabled: :yaml)
+      return unless build.shared_runner_build?
 
       raise InvalidQueueTransition unless transition.to == 'running'
 
@@ -69,10 +69,12 @@ module Ci
     end
 
     ##
-    # Remove a runtime build tracking entry (used for queuing).
+    # Remove a runtime build tracking entry for a shared runner build (used for
+    # queuing).
     #
     def untrack(build, transition)
       return unless Feature.enabled?(:ci_untrack_shared_runner_builds, build.project, default_enabled: :yaml)
+      return unless build.shared_runner_build?
 
       raise InvalidQueueTransition unless transition.from == 'running'
 
