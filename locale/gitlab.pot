@@ -38877,6 +38877,9 @@ msgstr ""
 msgid "mrWidget|Merge blocked: all threads must be resolved."
 msgstr ""
 
+msgid "mrWidget|Merge blocked: pipeline must succeed. It's waiting for a manual action to continue."
+msgstr ""
+
 msgid "mrWidget|Merge failed."
 msgstr ""
 
@@ -38911,9 +38914,6 @@ msgid "mrWidget|More information"
 msgstr ""
 
 msgid "mrWidget|Open in Web IDE"
-msgstr ""
-
-msgid "mrWidget|Pipeline blocked. The pipeline for this merge request requires a manual action to proceed"
 msgstr ""
 
 msgid "mrWidget|Plain diff"
