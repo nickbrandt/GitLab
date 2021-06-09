@@ -248,7 +248,7 @@ You can view the most recent actions taken in a group.
 
 1. From the top menu, select **Groups > Your Groups**.
 1. Find the group and select it.
-1. From the left menu, select **Group overview > Activity**.
+1. On the left sidebar, select **Group information > Activity**.
 
 To view the activity feed in Atom format, select the
 **RSS** (**{rss}**) icon.
