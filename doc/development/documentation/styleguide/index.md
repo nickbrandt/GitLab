@@ -1377,10 +1377,10 @@ readability of the text.
 For example, this Markdown adds little to the accompanying text:
 
 ```markdown
-1. Go to **{home}** **Project overview > Details**.
+1. Go to **{home}** **Project information > Details**.
 ```
 
-1. Go to **{home}** **Project overview > Details**.
+1. Go to **{home}** **Project information > Details**.
 
 However, these tables might help the reader connect the text to the user
 interface:
