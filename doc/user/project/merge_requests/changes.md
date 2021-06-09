@@ -135,7 +135,7 @@ To disable it:
 Feature.disable(:local_file_reviews)
 ```
 
-## Merge request conflicts in diff
+## Show merge request conflicts in diff
 
 > - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/232484) in GitLab 13.5.
 > - [Deployed behind a feature flag](../../feature_flags.md), disabled by default.
