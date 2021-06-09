@@ -300,7 +300,7 @@ module Ci
       end
 
       # rubocop:disable CodeReuse/ServiceClass
-      after_transition any: :pending do |build, transition|
+      after_transition any => [:pending] do |build, transition|
         Ci::UpdateBuildQueueService.new.push(build, transition)
 
         build.run_after_commit do
@@ -312,11 +312,11 @@ module Ci
         Ci::UpdateBuildQueueService.new.pop(build, transition)
       end
 
-      after_transition any: :running do |build, transition|
+      after_transition any => [:running] do |build, transition|
         Ci::UpdateBuildQueueService.new.track(build, transition)
       end
 
-      after_transition running: any do |build|
+      after_transition running: any do |build, transition|
         Ci::UpdateBuildQueueService.new.untrack(build, transition)
 
         Ci::BuildRunnerSession.where(build: build).delete_all
@@ -1095,9 +1095,7 @@ module Ci
     end
 
     def shared_runner_build?
-      return false if runner.nil?
-
-      runner.instance_type?
+      runner&.instance_type?
     end
 
     protected
