@@ -104,13 +104,13 @@ module Resolvers
       transformed[:group_id]    = group
       transformed[:iids]      ||= [args[:iid]].compact
 
-      set_relative_param(transformed)
+      transformed.merge(transform_timeframe_parameters(args)).merge(relative_param)
     end
 
-    def set_relative_param(args)
-      args[:parent_id] = parent.id if parent
+    def relative_param
+      return {} unless parent
 
-      args
+      { parent_id: parent.id }
     end
 
     # `resolver_object` refers to the object we're currently querying on, and is usually a `Group`
