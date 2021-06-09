@@ -25502,9 +25502,6 @@ msgstr ""
 msgid "Project path"
 msgstr ""
 
-msgid "Project scanning help page"
-msgstr ""
-
 msgid "Project security status"
 msgstr ""
 
@@ -34840,21 +34837,6 @@ msgid "UnscannedProjects|5 or more days"
 msgstr ""
 
 msgid "UnscannedProjects|60 or more days"
-msgstr ""
-
-msgid "UnscannedProjects|Default branch scanning by project"
-msgstr ""
-
-msgid "UnscannedProjects|Out of date"
-msgstr ""
-
-msgid "UnscannedProjects|Project scanning"
-msgstr ""
-
-msgid "UnscannedProjects|Untested"
-msgstr ""
-
-msgid "UnscannedProjects|Your projects are up do date! Nice job!"
 msgstr ""
 
 msgid "Unschedule job"
