@@ -31650,7 +31650,7 @@ msgstr ""
 msgid "Survey Response"
 msgstr ""
 
-msgid "Switch Branch"
+msgid "Switch branch"
 msgstr ""
 
 msgid "Switch branch/tag"
