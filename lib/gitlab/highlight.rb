@@ -32,7 +32,11 @@ module Gitlab
     def highlight(text, continue: false, plain: false, context: {})
       @context = context
 
+      add_highlight_attempt_metric
+
       plain ||= self.class.too_large?(text.length)
+
+      highlight_timeout.increment(source: Gitlab::Runtime.sidekiq? ? "background" : "foreground")
 
       highlighted_text = highlight_text(text, continue: continue, plain: plain)
       highlighted_text = link_dependencies(text, highlighted_text) if blob_name
@@ -90,10 +94,23 @@ module Gitlab
       Gitlab::DependencyLinker.link(blob_name, text, highlighted_text)
     end
 
+    def add_highlight_attempt_metric
+      return unless Feature.enabled?(:track_highlight_timeouts)
+
+      highlighting_attempt.increment(source: @language || "undefined")
+    end
+
     def add_highlight_timeout_metric
       return unless Feature.enabled?(:track_highlight_timeouts)
 
       highlight_timeout.increment(source: Gitlab::Runtime.sidekiq? ? "background" : "foreground")
+    end
+
+    def highlighting_attempt
+      @highlight_timeout ||= Gitlab::Metrics.counter(
+        :file_highlighting_attempt,
+        'Counts the times highlighting has been attempted on a file'
+      )
     end
 
     def highlight_timeout

@@ -143,6 +143,14 @@ RSpec.describe Gitlab::Highlight do
     end
 
     describe 'highlight timeouts' do
+      context 'when there is an attempt' do
+        let(:result) { described_class.highlight(file_name, content) }
+
+        it "increments the foreground counter if it's in the foreground" do
+          expect { result }.to change { highlight_attempt_total("undefined") }
+        end
+      end
+
       context 'when there is a timeout error while highlighting' do
         let(:result) { described_class.highlight(file_name, content) }
 
@@ -174,6 +182,12 @@ RSpec.describe Gitlab::Highlight do
   def highlight_timeout_total(source)
     Gitlab::Metrics
       .counter(:highlight_timeout, 'Counts the times highlights have timed out')
+      .get(source: source)
+  end
+
+  def highlight_attempt_total(source)
+    Gitlab::Metrics
+      .counter(:file_highlighting_attempt, 'Counts the times highlighting has been attempted on a file')
       .get(source: source)
   end
 
