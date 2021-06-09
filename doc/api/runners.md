@@ -50,7 +50,7 @@ GET /runners?search=gitlab
 | `type`      | string         | no       | The type of runners to show, one of: `instance_type`, `group_type`, `project_type` |
 | `status`    | string         | no       | The status of runners to show, one of: `active`, `paused`, `online`, `offline` |
 | `tag_list`  | string array   | no       | List of the runner's tags |
-| `search`    | string         | no       | The partial token or description text to match |
+| `search`    | string         | no       | The full token or partial description text to match |
 
 ```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/runners"
