@@ -1,8 +1,17 @@
 <script>
 import { GlButton, GlDrawer } from '@gitlab/ui';
 import { getContentWrapperHeight } from '../../utils';
-import { CiliumNetworkPolicyKind } from '../policy_editor/network_policy/lib';
+import {
+  CiliumNetworkPolicyKind,
+  ScanExecutionPolicyKind,
+} from '../policy_editor/network_policy/lib';
 import CiliumNetworkPolicy from './cilium_network_policy.vue';
+import ScanExecutionPolicy from './scan_execution_policy.vue';
+
+const policyComponent = {
+  [CiliumNetworkPolicyKind]: CiliumNetworkPolicy,
+  [ScanExecutionPolicyKind]: ScanExecutionPolicy,
+};
 
 export default {
   components: {
@@ -11,6 +20,7 @@ export default {
     PolicyYamlEditor: () =>
       import(/* webpackChunkName: 'policy_yaml_editor' */ '../policy_yaml_editor.vue'),
     CiliumNetworkPolicy,
+    ScanExecutionPolicy,
   },
   props: {
     policy: {
@@ -25,8 +35,17 @@ export default {
     },
   },
   computed: {
-    isCiliumNetworkPolicy() {
-      return this.policy ? this.policy.manifest.includes(CiliumNetworkPolicyKind) : false;
+    policyKind() {
+      if (this.policy?.manifest?.includes(CiliumNetworkPolicyKind)) {
+        return CiliumNetworkPolicyKind;
+      }
+      if (this.policy?.manifest?.includes(ScanExecutionPolicyKind)) {
+        return ScanExecutionPolicyKind;
+      }
+      return null;
+    },
+    policyComponent() {
+      return policyComponent[this.policyKind] || null;
     },
   },
   methods: {
@@ -62,8 +81,7 @@ export default {
       </div>
     </template>
     <div v-if="policy">
-      <cilium-network-policy v-if="isCiliumNetworkPolicy" :value="policy.manifest" />
-
+      <component :is="policyComponent" v-if="policyComponent" :value="policy.manifest" />
       <div v-else>
         <h5>{{ s__('NetworkPolicies|Policy definition') }}</h5>
         <p>
