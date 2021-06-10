@@ -55,6 +55,7 @@ describe('Pipeline Security Dashboard component', () => {
       localVue,
       store,
       provide: {
+        projectId,
         projectFullPath: 'my-path',
         emptyStateSvgPath,
         dashboardDocumentation,
@@ -64,12 +65,9 @@ describe('Pipeline Security Dashboard component', () => {
           jobsPath,
           sourceBranch,
         },
-        ...provide,
-      },
-      propsData: {
-        projectId,
         vulnerabilitiesEndpoint,
         loadingErrorIllustrations,
+        ...provide,
       },
       stubs,
       data() {
