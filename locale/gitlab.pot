@@ -22006,7 +22006,7 @@ msgstr ""
 msgid "New password"
 msgstr ""
 
-msgid "New pipelines cause older pending pipelines on the same branch to be cancelled."
+msgid "New pipelines cause older pending or running pipelines on the same branch to be cancelled."
 msgstr ""
 
 msgid "New project"
