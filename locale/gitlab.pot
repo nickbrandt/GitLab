@@ -9405,9 +9405,6 @@ msgstr ""
 msgid "Create your group"
 msgstr ""
 
-msgid "Create your own profile to collaborate with your teammates in issues, merge requests, and more."
-msgstr ""
-
 msgid "Create/import your first project"
 msgstr ""
 
@@ -18899,9 +18896,6 @@ msgid "Job|with"
 msgstr ""
 
 msgid "Join Zoom meeting"
-msgstr ""
-
-msgid "Join your team"
 msgstr ""
 
 msgid "Joined %{time_ago}"
