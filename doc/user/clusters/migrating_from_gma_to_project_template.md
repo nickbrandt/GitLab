@@ -91,5 +91,5 @@ The [GitLab Managed Apps](applications.md) are deprecated in GitLab 14.0. To mig
    +++ heritage: Tiller
    ```
 
-   After getting a successful pipeline, go ahead and repeat these steps for the other apps that you have deployed
-   and would like to manage with the Cluster Management Project..
+After getting a successful pipeline, repeat these steps for any other deployed apps
+you want to manage with the Cluster Management Project.
