@@ -117,6 +117,7 @@ RSpec.describe 'gitlab:app namespace rake task', :delete do
 
     context 'when the backup is restored' do
       let!(:included_project) { create(:project, :repository) }
+      let!(:original_checksum) { included_project.repository.checksum }
 
       before do
         expect { run_rake_task('gitlab:backup:create') }.to output.to_stdout_from_any_process
@@ -151,6 +152,7 @@ RSpec.describe 'gitlab:app namespace rake task', :delete do
         raw_repo = included_project.repository.raw
 
         expect(raw_repo.empty?).to be(false)
+        expect(included_project.repository.checksum).to eq(original_checksum)
       end
     end
   end
