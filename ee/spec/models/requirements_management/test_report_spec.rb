@@ -17,7 +17,7 @@ RSpec.describe RequirementsManagement::TestReport do
 
     let(:requirement) { build(:requirement) }
     let(:requirement_issue) { build(:requirement_issue) }
-    let(:requirement_error) { /Must be associated with either a RequirementsManagement::Requirement and an Issue of type `requirement`, but not both/ }
+    let(:requirement_error) { /Must be associated with either a RequirementsManagement::Requirement OR an Issue of type `requirement`, but not both/ }
 
     it { is_expected.to validate_presence_of(:state) }
 

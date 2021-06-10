@@ -12,6 +12,7 @@ module RequirementsManagement
 
     validates :state, presence: true
     validate :only_one_requirement_association
+    validate :only_requirement_type_issue
 
     enum state: { passed: 1, failed: 2 }
 
@@ -69,7 +70,10 @@ module RequirementsManagement
     end
 
     def only_one_requirement_association
-      errors.add(:base, 'Must be associated with either a RequirementsManagement::Requirement and an Issue of type `requirement`, but not both') unless !!requirement ^ !!requirement_issue
+      errors.add(:base, 'Must be associated with either a RequirementsManagement::Requirement OR an Issue of type `requirement`, but not both') unless !!requirement ^ !!requirement_issue
+    end
+
+    def only_requirement_type_issue
       errors.add(:requirement_issue, 'must be an issue of type `Requirement`') if requirement_issue && !requirement_issue.requirement?
     end
   end
