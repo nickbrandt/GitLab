@@ -103,7 +103,7 @@ RSpec.describe 'Admin Dashboard' do
       context 'when qrtly reconciliation is available' do
         before do
           create(:upcoming_reconciliation, :self_managed)
-          visit(admin_license_path)
+          visit(admin_dashboard_stats_path)
         end
 
         it_behaves_like 'a visible alert'
@@ -111,7 +111,7 @@ RSpec.describe 'Admin Dashboard' do
 
       context 'when qrtly reconciliation is not available' do
         before do
-          visit(admin_license_path)
+          visit(admin_dashboard_stats_path)
         end
 
         it_behaves_like 'a hidden alert'
