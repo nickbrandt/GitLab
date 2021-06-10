@@ -5,7 +5,7 @@ import PipelineSecurityDashboard from 'ee/security_dashboard/components/pipeline
 import ScanErrorsAlert from 'ee/security_dashboard/components/pipeline/scan_errors_alert.vue';
 import SecurityDashboard from 'ee/security_dashboard/components/pipeline/security_dashboard_vuex.vue';
 import SecurityReportsSummary from 'ee/security_dashboard/components/pipeline/security_reports_summary.vue';
-import VulnerabilityReport from 'ee/security_dashboard/components/vulnerability_report.vue';
+import VulnerabilityReport from 'ee/security_dashboard/components/shared/vulnerability_report.vue';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
