@@ -13619,9 +13619,6 @@ msgstr ""
 msgid "FeatureFlags|Enable features for specific users and environments by configuring feature flag strategies."
 msgstr ""
 
-msgid "FeatureFlags|Environment Spec"
-msgstr ""
-
 msgid "FeatureFlags|Environment Specs"
 msgstr ""
 
@@ -13667,9 +13664,6 @@ msgstr ""
 msgid "FeatureFlags|Inactive flag for %{scope}"
 msgstr ""
 
-msgid "FeatureFlags|Include additional user IDs"
-msgstr ""
-
 msgid "FeatureFlags|Install a %{docsLinkAnchoredStart}compatible client library%{docsLinkAnchoredEnd} and specify the API URL, application name, and instance ID during the configuration setup. %{docsLinkStart}More Information%{docsLinkEnd}"
 msgstr ""
 
@@ -13709,22 +13703,10 @@ msgstr ""
 msgid "FeatureFlags|Percent rollout"
 msgstr ""
 
-msgid "FeatureFlags|Percent rollout (logged in users)"
-msgstr ""
-
 msgid "FeatureFlags|Percent rollout must be an integer number between 0 and 100"
 msgstr ""
 
-msgid "FeatureFlags|Protected"
-msgstr ""
-
 msgid "FeatureFlags|Remove"
-msgstr ""
-
-msgid "FeatureFlags|Rollout Percentage"
-msgstr ""
-
-msgid "FeatureFlags|Rollout Strategy"
 msgstr ""
 
 msgid "FeatureFlags|Set the Unleash client application name to the name of the environment your application runs in. This value is used to match environment scopes. See the %{linkStart}example client configuration%{linkEnd}."
@@ -13734,9 +13716,6 @@ msgid "FeatureFlags|Status"
 msgstr ""
 
 msgid "FeatureFlags|Strategies"
-msgstr ""
-
-msgid "FeatureFlags|Target environments"
 msgstr ""
 
 msgid "FeatureFlags|There was an error fetching the feature flags."
