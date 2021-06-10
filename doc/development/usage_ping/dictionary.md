@@ -16286,7 +16286,7 @@ Tiers: `premium`, `ultimate`
 
 ### `usage_activity_by_stage.enablement.counts.geo_node_usage.git_push_event_count_weekly`
 
-Number of git push events from Prometheus on the Geo secondary
+Number of Git push events from Prometheus on the Geo secondary
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_7d/20210604110603_git_push_event_count_weekly.yml)
 
