@@ -20,21 +20,15 @@ export default {
     VulnerabilityReport,
   },
   mixins: [glFeatureFlagMixin()],
-  inject: ['projectFullPath', 'pipeline', 'dashboardDocumentation', 'emptyStateSvgPath'],
-  props: {
-    projectId: {
-      type: Number,
-      required: true,
-    },
-    vulnerabilitiesEndpoint: {
-      type: String,
-      required: true,
-    },
-    loadingErrorIllustrations: {
-      type: Object,
-      required: true,
-    },
-  },
+  inject: [
+    'dashboardDocumentation',
+    'emptyStateSvgPath',
+    'loadingErrorIllustrations',
+    'pipeline',
+    'projectFullPath',
+    'projectId',
+    'vulnerabilitiesEndpoint',
+  ],
   data() {
     return {
       securityReportSummary: {},
