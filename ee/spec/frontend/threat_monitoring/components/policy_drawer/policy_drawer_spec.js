@@ -1,15 +1,20 @@
 import CiliumNetworkPolicy from 'ee/threat_monitoring/components/policy_drawer/cilium_network_policy.vue';
-import NetworkPolicyDrawer from 'ee/threat_monitoring/components/policy_drawer/network_policy_drawer.vue';
+import PolicyDrawer from 'ee/threat_monitoring/components/policy_drawer/policy_drawer.vue';
+import ScanExecutionPolicy from 'ee/threat_monitoring/components/policy_drawer/scan_execution_policy.vue';
 import { mountExtended } from 'helpers/vue_test_utils_helper';
-import { mockPoliciesResponse, mockCiliumPolicy } from '../../mocks/mock_data';
+import {
+  mockPoliciesResponse,
+  mockCiliumPolicy,
+  mockScanExecutionPolicy,
+} from '../../mocks/mock_data';
 
 const [mockGenericPolicy] = mockPoliciesResponse;
 
-describe('NetworkPolicyDrawer component', () => {
+describe('PolicyDrawer component', () => {
   let wrapper;
 
   const factory = ({ propsData } = {}) => {
-    wrapper = mountExtended(NetworkPolicyDrawer, {
+    wrapper = mountExtended(PolicyDrawer, {
       propsData: {
         editPolicyPath: '/policies/policy/edit?environment_id=-1',
         open: true,
@@ -23,6 +28,7 @@ describe('NetworkPolicyDrawer component', () => {
   const findEditButton = () => wrapper.findByTestId('edit-button');
   const findPolicyEditor = () => wrapper.findByTestId('policy-yaml-editor');
   const findCiliumNetworkPolicy = () => wrapper.findComponent(CiliumNetworkPolicy);
+  const findScanExecutionPolicy = () => wrapper.findComponent(ScanExecutionPolicy);
 
   // Shared assertions
   const itRendersEditButton = () => {
@@ -66,17 +72,21 @@ describe('NetworkPolicyDrawer component', () => {
     itRendersEditButton();
   });
 
-  describe('given a cilium policy', () => {
+  describe.each`
+    policyKind          | mock                       | finder
+    ${'cilium'}         | ${mockCiliumPolicy}        | ${findCiliumNetworkPolicy}
+    ${'scan execution'} | ${mockScanExecutionPolicy} | ${findScanExecutionPolicy}
+  `('given a $policyKind policy', ({ policyKind, mock, finder }) => {
     beforeEach(() => {
       factory({
         propsData: {
-          policy: mockCiliumPolicy,
+          policy: mock,
         },
       });
     });
 
-    it('renders the network policy component', () => {
-      expect(findCiliumNetworkPolicy().exists()).toBe(true);
+    it(`renders the ${policyKind} component`, () => {
+      expect(finder().exists()).toBe(true);
     });
 
     itRendersEditButton();
