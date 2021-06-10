@@ -3750,9 +3750,6 @@ msgstr ""
 msgid "An error occurred while updating the configuration."
 msgstr ""
 
-msgid "An error occurred while updating the milestone."
-msgstr ""
-
 msgid "An error occurred while updating the notification settings. Please try again."
 msgstr ""
 
@@ -21241,9 +21238,6 @@ msgid "Milestones|Group Milestone"
 msgstr ""
 
 msgid "Milestones|Milestone %{milestoneTitle} was not found"
-msgstr ""
-
-msgid "Milestones|No milestones found"
 msgstr ""
 
 msgid "Milestones|Ongoing Issues (open and assigned)"
