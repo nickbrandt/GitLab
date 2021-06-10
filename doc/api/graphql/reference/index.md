@@ -455,30 +455,6 @@ four standard [pagination arguments](#connection-pagination-arguments):
 | <a id="queryvulnerabilitiescountbydayenddate"></a>`endDate` | [`ISO8601Date!`](#iso8601date) | Last day for which to fetch vulnerability history. |
 | <a id="queryvulnerabilitiescountbydaystartdate"></a>`startDate` | [`ISO8601Date!`](#iso8601date) | First day for which to fetch vulnerability history. |
 
-### `Query.vulnerabilitiesCountByDayAndSeverity`
-
-Number of vulnerabilities per severity level, per day, for the projects on the
-current user's instance security dashboard.
-.
-
-WARNING:
-**Deprecated** in 13.3.
-Use of this is not recommended.
-Use: [`Query.vulnerabilitiesCountByDay`](#queryvulnerabilitiescountbyday).
-
-Returns [`VulnerabilitiesCountByDayAndSeverityConnection`](#vulnerabilitiescountbydayandseverityconnection).
-
-This field returns a [connection](#connections). It accepts the
-four standard [pagination arguments](#connection-pagination-arguments):
-`before: String`, `after: String`, `first: Int`, `last: Int`.
-
-#### Arguments
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| <a id="queryvulnerabilitiescountbydayandseverityenddate"></a>`endDate` | [`ISO8601Date!`](#iso8601date) | Last day for which to fetch vulnerability history. |
-| <a id="queryvulnerabilitiescountbydayandseveritystartdate"></a>`startDate` | [`ISO8601Date!`](#iso8601date) | First day for which to fetch vulnerability history. |
-
 ### `Query.vulnerability`
 
 Find a vulnerability.
@@ -509,30 +485,6 @@ mutation($id: NoteableID!, $body: String!) {
   }
 }
 ```
-
-### `Mutation.addAwardEmoji`
-
-WARNING:
-**Deprecated** in 13.2.
-Use awardEmojiAdd.
-
-Input type: `AddAwardEmojiInput`
-
-#### Arguments
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| <a id="mutationaddawardemojiawardableid"></a>`awardableId` | [`AwardableID!`](#awardableid) | The global ID of the awardable resource. |
-| <a id="mutationaddawardemojiclientmutationid"></a>`clientMutationId` | [`String`](#string) | A unique identifier for the client performing the mutation. |
-| <a id="mutationaddawardemojiname"></a>`name` | [`String!`](#string) | The emoji name. |
-
-#### Fields
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| <a id="mutationaddawardemojiawardemoji"></a>`awardEmoji` | [`AwardEmoji`](#awardemoji) | The award emoji after mutation. |
-| <a id="mutationaddawardemojiclientmutationid"></a>`clientMutationId` | [`String`](#string) | A unique identifier for the client performing the mutation. |
-| <a id="mutationaddawardemojierrors"></a>`errors` | [`[String!]!`](#string) | Errors encountered during execution of the mutation. |
 
 ### `Mutation.addProjectToSecurityDashboard`
 
@@ -1485,7 +1437,6 @@ Input type: `DastScannerProfileCreateInput`
 | ---- | ---- | ----------- |
 | <a id="mutationdastscannerprofilecreateclientmutationid"></a>`clientMutationId` | [`String`](#string) | A unique identifier for the client performing the mutation. |
 | <a id="mutationdastscannerprofilecreateerrors"></a>`errors` | [`[String!]!`](#string) | Errors encountered during execution of the mutation. |
-| <a id="mutationdastscannerprofilecreateglobalid"></a>`globalId` **{warning-solid}** | [`DastScannerProfileID`](#dastscannerprofileid) | **Deprecated:** Use `id`. Deprecated in 13.6. |
 | <a id="mutationdastscannerprofilecreateid"></a>`id` | [`DastScannerProfileID`](#dastscannerprofileid) | ID of the scanner profile. |
 
 ### `Mutation.dastScannerProfileDelete`
@@ -1942,31 +1893,6 @@ Input type: `DiscussionToggleResolveInput`
 | <a id="mutationdiscussiontoggleresolveclientmutationid"></a>`clientMutationId` | [`String`](#string) | A unique identifier for the client performing the mutation. |
 | <a id="mutationdiscussiontoggleresolvediscussion"></a>`discussion` | [`Discussion`](#discussion) | The discussion after mutation. |
 | <a id="mutationdiscussiontoggleresolveerrors"></a>`errors` | [`[String!]!`](#string) | Errors encountered during execution of the mutation. |
-
-### `Mutation.dismissVulnerability`
-
-WARNING:
-**Deprecated** in 13.5.
-Use vulnerabilityDismiss.
-
-Input type: `DismissVulnerabilityInput`
-
-#### Arguments
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| <a id="mutationdismissvulnerabilityclientmutationid"></a>`clientMutationId` | [`String`](#string) | A unique identifier for the client performing the mutation. |
-| <a id="mutationdismissvulnerabilitycomment"></a>`comment` | [`String`](#string) | Comment why vulnerability should be dismissed. |
-| <a id="mutationdismissvulnerabilitydismissalreason"></a>`dismissalReason` | [`VulnerabilityDismissalReason`](#vulnerabilitydismissalreason) | Reason why vulnerability should be dismissed. |
-| <a id="mutationdismissvulnerabilityid"></a>`id` | [`VulnerabilityID!`](#vulnerabilityid) | ID of the vulnerability to be dismissed. |
-
-#### Fields
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| <a id="mutationdismissvulnerabilityclientmutationid"></a>`clientMutationId` | [`String`](#string) | A unique identifier for the client performing the mutation. |
-| <a id="mutationdismissvulnerabilityerrors"></a>`errors` | [`[String!]!`](#string) | Errors encountered during execution of the mutation. |
-| <a id="mutationdismissvulnerabilityvulnerability"></a>`vulnerability` | [`Vulnerability`](#vulnerability) | The vulnerability after dismissal. |
 
 ### `Mutation.enableDevopsAdoptionNamespace`
 
@@ -3513,30 +3439,6 @@ Input type: `ReleaseUpdateInput`
 | <a id="mutationreleaseupdateerrors"></a>`errors` | [`[String!]!`](#string) | Errors encountered during execution of the mutation. |
 | <a id="mutationreleaseupdaterelease"></a>`release` | [`Release`](#release) | The release after mutation. |
 
-### `Mutation.removeAwardEmoji`
-
-WARNING:
-**Deprecated** in 13.2.
-Use awardEmojiRemove.
-
-Input type: `RemoveAwardEmojiInput`
-
-#### Arguments
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| <a id="mutationremoveawardemojiawardableid"></a>`awardableId` | [`AwardableID!`](#awardableid) | The global ID of the awardable resource. |
-| <a id="mutationremoveawardemojiclientmutationid"></a>`clientMutationId` | [`String`](#string) | A unique identifier for the client performing the mutation. |
-| <a id="mutationremoveawardemojiname"></a>`name` | [`String!`](#string) | The emoji name. |
-
-#### Fields
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| <a id="mutationremoveawardemojiawardemoji"></a>`awardEmoji` | [`AwardEmoji`](#awardemoji) | The award emoji after mutation. |
-| <a id="mutationremoveawardemojiclientmutationid"></a>`clientMutationId` | [`String`](#string) | A unique identifier for the client performing the mutation. |
-| <a id="mutationremoveawardemojierrors"></a>`errors` | [`[String!]!`](#string) | Errors encountered during execution of the mutation. |
-
 ### `Mutation.removeProjectFromSecurityDashboard`
 
 Input type: `RemoveProjectFromSecurityDashboardInput`
@@ -3576,55 +3478,6 @@ Input type: `RepositionImageDiffNoteInput`
 | <a id="mutationrepositionimagediffnoteclientmutationid"></a>`clientMutationId` | [`String`](#string) | A unique identifier for the client performing the mutation. |
 | <a id="mutationrepositionimagediffnoteerrors"></a>`errors` | [`[String!]!`](#string) | Errors encountered during execution of the mutation. |
 | <a id="mutationrepositionimagediffnotenote"></a>`note` | [`Note`](#note) | The note after mutation. |
-
-### `Mutation.revertVulnerabilityToDetected`
-
-WARNING:
-**Deprecated** in 13.5.
-Use vulnerabilityRevertToDetected.
-
-Input type: `RevertVulnerabilityToDetectedInput`
-
-#### Arguments
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| <a id="mutationrevertvulnerabilitytodetectedclientmutationid"></a>`clientMutationId` | [`String`](#string) | A unique identifier for the client performing the mutation. |
-| <a id="mutationrevertvulnerabilitytodetectedid"></a>`id` | [`VulnerabilityID!`](#vulnerabilityid) | ID of the vulnerability to be reverted. |
-
-#### Fields
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| <a id="mutationrevertvulnerabilitytodetectedclientmutationid"></a>`clientMutationId` | [`String`](#string) | A unique identifier for the client performing the mutation. |
-| <a id="mutationrevertvulnerabilitytodetectederrors"></a>`errors` | [`[String!]!`](#string) | Errors encountered during execution of the mutation. |
-| <a id="mutationrevertvulnerabilitytodetectedvulnerability"></a>`vulnerability` | [`Vulnerability`](#vulnerability) | The vulnerability after revert. |
-
-### `Mutation.runDastScan`
-
-WARNING:
-**Deprecated** in 13.4.
-Use DastOnDemandScanCreate.
-
-Input type: `RunDASTScanInput`
-
-#### Arguments
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| <a id="mutationrundastscanbranch"></a>`branch` | [`String!`](#string) | The branch to be associated with the scan. |
-| <a id="mutationrundastscanclientmutationid"></a>`clientMutationId` | [`String`](#string) | A unique identifier for the client performing the mutation. |
-| <a id="mutationrundastscanprojectpath"></a>`projectPath` | [`ID!`](#id) | The project the DAST scan belongs to. |
-| <a id="mutationrundastscanscantype"></a>`scanType` | [`DastScanTypeEnum!`](#dastscantypeenum) | The type of scan to be run. |
-| <a id="mutationrundastscantargeturl"></a>`targetUrl` | [`String!`](#string) | The URL of the target to be scanned. |
-
-#### Fields
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| <a id="mutationrundastscanclientmutationid"></a>`clientMutationId` | [`String`](#string) | A unique identifier for the client performing the mutation. |
-| <a id="mutationrundastscanerrors"></a>`errors` | [`[String!]!`](#string) | Errors encountered during execution of the mutation. |
-| <a id="mutationrundastscanpipelineurl"></a>`pipelineUrl` | [`String`](#string) | URL of the pipeline that was created. |
 
 ### `Mutation.runnerDelete`
 
@@ -3803,7 +3656,6 @@ Input type: `TodoRestoreManyInput`
 | <a id="mutationtodorestoremanyclientmutationid"></a>`clientMutationId` | [`String`](#string) | A unique identifier for the client performing the mutation. |
 | <a id="mutationtodorestoremanyerrors"></a>`errors` | [`[String!]!`](#string) | Errors encountered during execution of the mutation. |
 | <a id="mutationtodorestoremanytodos"></a>`todos` | [`[Todo!]!`](#todo) | Updated to-do items. |
-| <a id="mutationtodorestoremanyupdatedids"></a>`updatedIds` **{warning-solid}** | [`[TodoID!]!`](#todoid) | **Deprecated:** Use to-do items. Deprecated in 13.2. |
 
 ### `Mutation.todosMarkAllDone`
 
@@ -3822,32 +3674,6 @@ Input type: `TodosMarkAllDoneInput`
 | <a id="mutationtodosmarkalldoneclientmutationid"></a>`clientMutationId` | [`String`](#string) | A unique identifier for the client performing the mutation. |
 | <a id="mutationtodosmarkalldoneerrors"></a>`errors` | [`[String!]!`](#string) | Errors encountered during execution of the mutation. |
 | <a id="mutationtodosmarkalldonetodos"></a>`todos` | [`[Todo!]!`](#todo) | Updated to-do items. |
-| <a id="mutationtodosmarkalldoneupdatedids"></a>`updatedIds` **{warning-solid}** | [`[TodoID!]!`](#todoid) | **Deprecated:** Use to-do items. Deprecated in 13.2. |
-
-### `Mutation.toggleAwardEmoji`
-
-WARNING:
-**Deprecated** in 13.2.
-Use awardEmojiToggle.
-
-Input type: `ToggleAwardEmojiInput`
-
-#### Arguments
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| <a id="mutationtoggleawardemojiawardableid"></a>`awardableId` | [`AwardableID!`](#awardableid) | The global ID of the awardable resource. |
-| <a id="mutationtoggleawardemojiclientmutationid"></a>`clientMutationId` | [`String`](#string) | A unique identifier for the client performing the mutation. |
-| <a id="mutationtoggleawardemojiname"></a>`name` | [`String!`](#string) | The emoji name. |
-
-#### Fields
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| <a id="mutationtoggleawardemojiawardemoji"></a>`awardEmoji` | [`AwardEmoji`](#awardemoji) | The award emoji after mutation. |
-| <a id="mutationtoggleawardemojiclientmutationid"></a>`clientMutationId` | [`String`](#string) | A unique identifier for the client performing the mutation. |
-| <a id="mutationtoggleawardemojierrors"></a>`errors` | [`[String!]!`](#string) | Errors encountered during execution of the mutation. |
-| <a id="mutationtoggleawardemojitoggledon"></a>`toggledOn` | [`Boolean!`](#boolean) | Indicates the status of the emoji. True if the toggle awarded the emoji, and false if the toggle removed the emoji. |
 
 ### `Mutation.updateAlertStatus`
 
@@ -6875,29 +6701,6 @@ The edge type for [`UserCore`](#usercore).
 | <a id="usercoreedgecursor"></a>`cursor` | [`String!`](#string) | A cursor for use in pagination. |
 | <a id="usercoreedgenode"></a>`node` | [`UserCore`](#usercore) | The item at the end of the edge. |
 
-#### `VulnerabilitiesCountByDayAndSeverityConnection`
-
-The connection type for [`VulnerabilitiesCountByDayAndSeverity`](#vulnerabilitiescountbydayandseverity).
-
-##### Fields
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| <a id="vulnerabilitiescountbydayandseverityconnectionedges"></a>`edges` | [`[VulnerabilitiesCountByDayAndSeverityEdge]`](#vulnerabilitiescountbydayandseverityedge) | A list of edges. |
-| <a id="vulnerabilitiescountbydayandseverityconnectionnodes"></a>`nodes` | [`[VulnerabilitiesCountByDayAndSeverity]`](#vulnerabilitiescountbydayandseverity) | A list of nodes. |
-| <a id="vulnerabilitiescountbydayandseverityconnectionpageinfo"></a>`pageInfo` | [`PageInfo!`](#pageinfo) | Information to aid in pagination. |
-
-#### `VulnerabilitiesCountByDayAndSeverityEdge`
-
-The edge type for [`VulnerabilitiesCountByDayAndSeverity`](#vulnerabilitiescountbydayandseverity).
-
-##### Fields
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| <a id="vulnerabilitiescountbydayandseverityedgecursor"></a>`cursor` | [`String!`](#string) | A cursor for use in pagination. |
-| <a id="vulnerabilitiescountbydayandseverityedgenode"></a>`node` | [`VulnerabilitiesCountByDayAndSeverity`](#vulnerabilitiescountbydayandseverity) | The item at the end of the edge. |
-
 #### `VulnerabilitiesCountByDayConnection`
 
 The connection type for [`VulnerabilitiesCountByDay`](#vulnerabilitiescountbyday).
@@ -8043,7 +7846,6 @@ Represents a DAST scanner profile.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | <a id="dastscannerprofileeditpath"></a>`editPath` | [`String`](#string) | Relative web path to the edit page of a scanner profile. |
-| <a id="dastscannerprofileglobalid"></a>`globalId` **{warning-solid}** | [`DastScannerProfileID!`](#dastscannerprofileid) | **Deprecated** in 13.6. Use `id`. |
 | <a id="dastscannerprofileid"></a>`id` | [`DastScannerProfileID!`](#dastscannerprofileid) | ID of the DAST scanner profile. |
 | <a id="dastscannerprofileprofilename"></a>`profileName` | [`String`](#string) | Name of the DAST scanner profile. |
 | <a id="dastscannerprofilereferencedinsecuritypolicies"></a>`referencedInSecurityPolicies` | [`[String!]`](#string) | List of security policy names that are referencing given project. |
@@ -9557,27 +9359,6 @@ four standard [pagination arguments](#connection-pagination-arguments):
 | ---- | ---- | ----------- |
 | <a id="groupvulnerabilitiescountbydayenddate"></a>`endDate` | [`ISO8601Date!`](#iso8601date) | Last day for which to fetch vulnerability history. |
 | <a id="groupvulnerabilitiescountbydaystartdate"></a>`startDate` | [`ISO8601Date!`](#iso8601date) | First day for which to fetch vulnerability history. |
-
-##### `Group.vulnerabilitiesCountByDayAndSeverity`
-
-Number of vulnerabilities per severity level, per day, for the projects in the group and its subgroups.
-
-WARNING:
-**Deprecated** in 13.3.
-Use `vulnerabilitiesCountByDay`.
-
-Returns [`VulnerabilitiesCountByDayAndSeverityConnection`](#vulnerabilitiescountbydayandseverityconnection).
-
-This field returns a [connection](#connections). It accepts the
-four standard [pagination arguments](#connection-pagination-arguments):
-`before: String`, `after: String`, `first: Int`, `last: Int`.
-
-###### Arguments
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| <a id="groupvulnerabilitiescountbydayandseverityenddate"></a>`endDate` | [`ISO8601Date!`](#iso8601date) | Last day for which to fetch vulnerability history. |
-| <a id="groupvulnerabilitiescountbydayandseveritystartdate"></a>`startDate` | [`ISO8601Date!`](#iso8601date) | First day for which to fetch vulnerability history. |
 
 ##### `Group.vulnerabilityGrades`
 
@@ -12417,18 +12198,6 @@ Counts of requirements by their state.
 | <a id="rootstoragestatisticsuploadssize"></a>`uploadsSize` | [`Float!`](#float) | The uploads size in bytes. |
 | <a id="rootstoragestatisticswikisize"></a>`wikiSize` | [`Float!`](#float) | The wiki size in bytes. |
 
-### `RunDASTScanPayload`
-
-Autogenerated return type of RunDASTScan.
-
-#### Fields
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| <a id="rundastscanpayloadclientmutationid"></a>`clientMutationId` | [`String`](#string) | A unique identifier for the client performing the mutation. |
-| <a id="rundastscanpayloaderrors"></a>`errors` | [`[String!]!`](#string) | Errors encountered during execution of the mutation. |
-| <a id="rundastscanpayloadpipelineurl"></a>`pipelineUrl` | [`String`](#string) | URL of the pipeline that was created. |
-
 ### `RunnerArchitecture`
 
 #### Fields
@@ -12771,7 +12540,6 @@ Represents a snippet entry.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | <a id="snippetauthor"></a>`author` | [`UserCore`](#usercore) | The owner of the snippet. |
-| <a id="snippetblob"></a>`blob` **{warning-solid}** | [`SnippetBlob!`](#snippetblob) | **Deprecated** in 13.3. Use `blobs`. |
 | <a id="snippetcreatedat"></a>`createdAt` | [`Time!`](#time) | Timestamp this snippet was created. |
 | <a id="snippetdescription"></a>`description` | [`String`](#string) | Description of the snippet. |
 | <a id="snippetdescriptionhtml"></a>`descriptionHtml` | [`String`](#string) | The GitLab Flavored Markdown rendering of `description`. |
@@ -13388,18 +13156,6 @@ Represents the count of vulnerabilities by severity on a particular day. This da
 | <a id="vulnerabilitiescountbydaymedium"></a>`medium` | [`Int!`](#int) | Total number of vulnerabilities on a particular day with medium severity. |
 | <a id="vulnerabilitiescountbydaytotal"></a>`total` | [`Int!`](#int) | Total number of vulnerabilities on a particular day. |
 | <a id="vulnerabilitiescountbydayunknown"></a>`unknown` | [`Int!`](#int) | Total number of vulnerabilities on a particular day with unknown severity. |
-
-### `VulnerabilitiesCountByDayAndSeverity`
-
-Represents the number of vulnerabilities for a particular severity on a particular day. This data is retained for 365 days.
-
-#### Fields
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| <a id="vulnerabilitiescountbydayandseveritycount"></a>`count` | [`Int`](#int) | Number of vulnerabilities. |
-| <a id="vulnerabilitiescountbydayandseverityday"></a>`day` | [`ISO8601Date`](#iso8601date) | Date for the count. |
-| <a id="vulnerabilitiescountbydayandseverityseverity"></a>`severity` | [`VulnerabilitySeverity`](#vulnerabilityseverity) | Severity of the counted vulnerabilities. |
 
 ### `Vulnerability`
 
