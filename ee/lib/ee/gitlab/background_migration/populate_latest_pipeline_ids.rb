@@ -40,7 +40,7 @@ module EE
 
           self.table_name = 'namespaces'
 
-          belongs_to :parent, class_name: 'EE::Gitlab::BackgroundMigration::PopulateLatestPipelineIds::Namespace'
+          belongs_to :parent, class_name: '::EE::Gitlab::BackgroundMigration::PopulateLatestPipelineIds::Namespace'
 
           def self.find_sti_class(type_name)
             super("EE::Gitlab::BackgroundMigration::PopulateLatestPipelineIds::#{type_name}")
@@ -118,8 +118,8 @@ module EE
           alias_method :parent, :namespace
 
           has_many :all_pipelines, class_name: '::EE::Gitlab::BackgroundMigration::PopulateLatestPipelineIds::Pipeline'
-          has_one :project_setting, class_name: '::Gitlab::BackgroundMigration::PopulateLatestPipelineIds::ProjectSetting'
-          has_one :route, as: :source, class_name: '::Gitlab::BackgroundMigration::PopulateLatestPipelineIds::Route'
+          has_one :project_setting, class_name: '::EE::Gitlab::BackgroundMigration::PopulateLatestPipelineIds::ProjectSetting'
+          has_one :route, as: :source, class_name: '::EE::Gitlab::BackgroundMigration::PopulateLatestPipelineIds::Route'
 
           def self.polymorphic_name
             'Project'
