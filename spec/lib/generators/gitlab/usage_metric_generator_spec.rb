@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require 'generator_helper'
+require 'spec_helper'
 
-RSpec.describe Gitlab::UsageMetricGenerator do
+RSpec.describe Gitlab::UsageMetricGenerator, :silence_stdout do
   let(:ce_temp_dir) { Dir.mktmpdir }
   let(:ee_temp_dir) { Dir.mktmpdir }
   let(:spec_ce_temp_dir) { Dir.mktmpdir }
