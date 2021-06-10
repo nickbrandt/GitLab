@@ -14,8 +14,10 @@ class ImportExportUpload < ApplicationRecord
   # This causes CarrierWave v1 and v3 (but not v2) to upload the file to
   # object storage *after* the database entry has been committed to the
   # database. This avoids idling in a transaction.
-  skip_callback :save, :after, :store_export_file!
-  set_callback :commit, :after, :store_export_file!
+  if Gitlab::Utils.to_boolean(ENV.fetch('ENABLE_STORE_EXPORT_FILE_AFTER_COMMIT', true))
+    skip_callback :save, :after, :store_export_file!
+    set_callback :commit, :after, :store_export_file!
+  end
 
   scope :updated_before, ->(date) { where('updated_at < ?', date) }
   scope :with_export_file, -> { where.not(export_file: nil) }

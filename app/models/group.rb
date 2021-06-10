@@ -652,6 +652,15 @@ class Group < Namespace
     import_export_upload&.export_file
   end
 
+  # This method returns two values: whether a record of the export file exists in the
+  # database and whether the object is actually stored. The latter requires a HEAD request
+  # if object storage is used.
+  def export_file_exists_and_stored?
+    file = export_file&.file
+
+    [file.present?, !!file&.exists?]
+  end
+
   def adjourned_deletion?
     false
   end

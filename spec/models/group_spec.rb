@@ -2613,4 +2613,28 @@ RSpec.describe Group do
       expect(group.activity_path).to eq(expected_path)
     end
   end
+
+  describe '#export_file_exists_and_stored?' do
+    it 'returns false and false' do
+      expect(group.export_file_exists_and_stored?).to eq([false, false])
+    end
+
+    context 'with export' do
+      let(:group) { create(:group, :with_export) }
+
+      it 'returns true and true' do
+        expect(group.export_file_exists_and_stored?).to eq([true, true])
+      end
+
+      context 'when object file does not exist' do
+        before do
+          group.export_file.file.delete
+        end
+
+        it 'returns true and false' do
+          expect(group.reload.export_file_exists_and_stored?).to eq([true, false])
+        end
+      end
+    end
+  end
 end

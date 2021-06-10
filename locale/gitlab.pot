@@ -32320,6 +32320,9 @@ msgstr ""
 msgid "The errors we encountered were:"
 msgstr ""
 
+msgid "The file containing the export is not available yet; it may still be transferring. Please try again later."
+msgstr ""
+
 msgid "The file has been successfully created."
 msgstr ""
 

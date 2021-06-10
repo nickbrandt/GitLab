@@ -4346,6 +4346,32 @@ RSpec.describe Project, factory_default: :keep do
     end
   end
 
+  describe '#export_file_exists_and_stored?' do
+    let(:project) { create(:project) }
+
+    it 'returns false and false' do
+      expect(project.export_file_exists_and_stored?).to eq([false, false])
+    end
+
+    context 'with export' do
+      let(:project) { create(:project, :with_export) }
+
+      it 'returns true and true' do
+        expect(project.export_file_exists_and_stored?).to eq([true, true])
+      end
+
+      context 'when object file does not exist' do
+        before do
+          project.export_file.file.delete
+        end
+
+        it 'returns true and false' do
+          expect(project.export_file_exists_and_stored?).to eq([true, false])
+        end
+      end
+    end
+  end
+
   describe '#forks_count' do
     it 'returns the number of forks' do
       project = build(:project)
