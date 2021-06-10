@@ -24,7 +24,7 @@ export const getProjectValueStreamStages = (projectPath, valueStreamId) => {
 };
 
 // NOTE: legacy VSA request use a different path
-// the `requestPath` provides a full url for th request
+// the `requestPath` provides a full url for the request
 export const getProjectValueStreamStageData = ({ requestPath, stageId, params }) =>
   axios.get(`${requestPath}/events/${stageId}`, { params });
 

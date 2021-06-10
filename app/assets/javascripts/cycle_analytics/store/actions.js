@@ -20,12 +20,8 @@ export const fetchValueStreamStages = ({ commit, state }) => {
 
   return getProjectValueStreamStages(fullPath, selectedValueStream.id)
     .then(({ data }) => commit(types.RECEIVE_VALUE_STREAM_STAGES_SUCCESS, data))
-    .catch((error) => {
-      const {
-        response: { status },
-      } = error;
+    .catch(({ response: { status } }) => {
       commit(types.RECEIVE_VALUE_STREAM_STAGES_ERROR, status);
-      throw error;
     });
 };
 
@@ -45,12 +41,8 @@ export const fetchValueStreams = ({ commit, dispatch, state }) => {
   return getProjectValueStreams(fullPath)
     .then(({ data }) => dispatch('receiveValueStreamsSuccess', data))
     .then(() => dispatch('setSelectedStage'))
-    .catch((error) => {
-      const {
-        response: { status },
-      } = error;
+    .catch(({ response: { status } }) => {
       commit(types.RECEIVE_VALUE_STREAMS_ERROR, status);
-      throw error;
     });
 };
 
@@ -94,9 +86,10 @@ export const setSelectedStage = ({ dispatch, commit, state: { stages } }, select
 
 const refetchData = (dispatch, commit) => {
   commit(types.SET_LOADING, true);
-  return dispatch('fetchValueStreams')
+  return Promise.resolve()
+    .then(() => dispatch('fetchValueStreams'))
     .then(() => dispatch('fetchCycleAnalyticsData'))
-    .then(() => commit(types.SET_LOADING, false));
+    .finally(() => commit(types.SET_LOADING, false));
 };
 
 export const setDateRange = ({ dispatch, commit }, { startDate = DEFAULT_DAYS_TO_DISPLAY }) => {
