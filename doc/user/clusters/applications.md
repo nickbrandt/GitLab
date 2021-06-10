@@ -6,6 +6,10 @@ info: To determine the technical writer assigned to the Stage/Group associated w
 
 # GitLab Managed Apps (DEPRECATED) **(FREE)**
 
+NOTE:
+The new recommended way to manage cluster applications is to use the [cluster management project template](management_project_template.md).
+If you want to migrate your GitLab managed apps management to this template, reference to [migrating from GitLab managed apps to project template](migrating_from_gma_to_project_template.md).
+
 **GitLab Managed Apps** was created to help you configure applications in your
 cluster directly from GitLab. You could use this feature through two different
 methods: "one-click install" and "CI/CD template". Both methods are **deprecated**:
@@ -24,10 +28,6 @@ learn how to proceed to keep your apps up and running:
 
 - [One-click install method](#install-with-one-click-deprecated)
 - [CI/CD template method](#install-using-gitlab-cicd-deprecated)
-
-NOTE:
-The new recommended way to manage cluster applications is to use the [cluster management project template](management_project_template.md).
-If you want to migrate your GitLab managed apps management to this template, reference to [migrating from GitLab managed apps to project template](migrating_from_gma_to_project_template.md).
 
 ## Install using GitLab CI/CD (DEPRECATED)
 
