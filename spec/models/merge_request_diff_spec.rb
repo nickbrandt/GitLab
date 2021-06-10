@@ -499,6 +499,14 @@ RSpec.describe MergeRequestDiff do
             expect(diffs.pagination_data).to eq(current_page: 1, next_page: 2, total_pages: 2)
           end
 
+          it 'returns an empty MergeRequestBatch with empty pagination data when the batch is empty' do
+            diffs = diff_with_commits.diffs_in_batch(3, 10, diff_options: diff_options)
+
+            expect(diffs).to be_a(Gitlab::Diff::FileCollection::MergeRequestDiffBatch)
+            expect(diffs.diff_files.size).to eq 0
+            expect(diffs.pagination_data).to eq(current_page: nil, next_page: nil, total_pages: nil)
+          end
+
           context 'with gradual load enabled' do
             before do
               stub_feature_flags(diffs_gradual_load: true)
@@ -511,6 +519,14 @@ RSpec.describe MergeRequestDiff do
               expect(diffs).to be_a(Gitlab::Diff::FileCollection::Compare)
               expect(diffs.diff_files.size).to eq 10
               expect(diffs.pagination_data).to eq(current_page: nil, next_page: nil, total_pages: file_count)
+            end
+
+            it 'returns an empty MergeRequestBatch with empty pagination data when the batch is empty' do
+              diffs = diff_with_commits.diffs_in_batch(30, 10, diff_options: diff_options)
+
+              expect(diffs).to be_a(Gitlab::Diff::FileCollection::MergeRequestDiffBatch)
+              expect(diffs.diff_files.size).to eq 0
+              expect(diffs.pagination_data).to eq(current_page: nil, next_page: nil, total_pages: nil)
             end
           end
         end
