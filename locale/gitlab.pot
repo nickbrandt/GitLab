@@ -11261,6 +11261,18 @@ msgstr ""
 msgid "DevopsAdoption|Add a group to get started"
 msgstr ""
 
+msgid "DevopsAdoption|Add group"
+msgstr ""
+
+msgid "DevopsAdoption|Add group to table"
+msgstr ""
+
+msgid "DevopsAdoption|Add sub-group"
+msgstr ""
+
+msgid "DevopsAdoption|Add sub-group to table"
+msgstr ""
+
 msgid "DevopsAdoption|Add/remove groups"
 msgstr ""
 
@@ -11336,6 +11348,9 @@ msgstr ""
 msgid "DevopsAdoption|No filter results."
 msgstr ""
 
+msgid "DevopsAdoption|No results…"
+msgstr ""
+
 msgid "DevopsAdoption|Not adopted"
 msgstr ""
 
@@ -11373,6 +11388,9 @@ msgid "DevopsAdoption|There was an error fetching Group adoption data. Please re
 msgstr ""
 
 msgid "DevopsAdoption|There was an error fetching Groups. Please refresh the page."
+msgstr ""
+
+msgid "DevopsAdoption|This group has no sub-groups"
 msgstr ""
 
 msgid "DevopsAdoption|You cannot remove the group you are currently in."
