@@ -175,6 +175,10 @@ We recommend users do this prior to turning on sync, because while synchronizati
 
 New users and existing users on subsequent visits can access the group through the identify provider's dashboard or by visiting links directly.
 
+GitLab users that were created with a SCIM identity will be displayed with an **Enterprise** badge in the **Members** view.
+
+![Enterprise badge for users created with a SCIM identity](img/member_enterprise_badge_v14_0.png)
+
 For role information, please see the [Group SAML page](index.md#user-access-and-management)
 
 ### Blocking access
