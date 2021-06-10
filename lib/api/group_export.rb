@@ -22,12 +22,12 @@ module API
       get ':id/export/download' do
         check_rate_limit! :group_download_export, [current_user, user_group]
 
-        db_status, object_status = user_group.export_file_exists_and_stored?
-
-        if db_status && object_status
-          present_carrierwave_file!(user_group.export_file)
-        elsif db_status && !object_status
-          render_api_error!('The group export file is not available yet', 404)
+        if user_group.export_file_exists?
+          if user_group.export_archive_exists?
+            present_carrierwave_file!(user_group.export_file)
+          else
+            render_api_error!('The group export file is not available yet', 404)
+          end
         else
           render_api_error!('404 Not found or has expired', 404)
         end

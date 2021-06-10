@@ -225,15 +225,15 @@ class ProjectsController < Projects::ApplicationController
   end
 
   def download_export
-    db_status, object_status = @project.export_file_exists_and_stored?
-
-    if db_status && object_status
-      send_upload(@project.export_file, attachment: @project.export_file.filename)
-    elsif db_status && !object_status
-      redirect_to(
-        edit_project_path(@project, anchor: 'js-export-project'),
-        alert: _("The file containing the export is not available yet; it may still be transferring. Please try again later.")
-      )
+    if @project.export_file_exists?
+      if @project.export_archive_exists?
+        send_upload(@project.export_file, attachment: @project.export_file.filename)
+      else
+        redirect_to(
+          edit_project_path(@project, anchor: 'js-export-project'),
+          alert: _("The file containing the export is not available yet; it may still be transferring. Please try again later.")
+        )
+      end
     else
       redirect_to(
         edit_project_path(@project, anchor: 'js-export-project'),

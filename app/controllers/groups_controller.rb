@@ -181,13 +181,13 @@ class GroupsController < Groups::ApplicationController
   end
 
   def download_export
-    db_status, object_status = @group.export_file_exists_and_stored?
-
-    if db_status && object_status
-      send_upload(@group.export_file, attachment: @group.export_file.filename)
-    elsif db_status && !object_status
-      redirect_to edit_group_path(@group),
-        alert: _('The file containing the export is not available yet; it may still be transferring. Please try again later.')
+    if @group.export_file_exists?
+      if @group.export_archive_exists?
+        send_upload(@group.export_file, attachment: @group.export_file.filename)
+      else
+        redirect_to edit_group_path(@group),
+                    alert: _('The file containing the export is not available yet; it may still be transferring. Please try again later.')
+      end
     else
       redirect_to edit_group_path(@group),
         alert: _('Group export link has expired. Please generate a new export from your group settings.')

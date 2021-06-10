@@ -29,12 +29,12 @@ module API
       get ':id/export/download' do
         check_rate_limit! :project_download_export, [current_user, user_project]
 
-        db_status, object_status = user_project.export_file_exists_and_stored?
-
-        if db_status && object_status
-          present_carrierwave_file!(user_project.export_file)
-        elsif db_status && !object_status
-          render_api_error!('The project export file is not available yet', 404)
+        if user_project.export_file_exists?
+          if user_project.export_archive_exists?
+            present_carrierwave_file!(user_project.export_file)
+          else
+            render_api_error!('The project export file is not available yet', 404)
+          end
         else
           render_api_error!('404 Not found or has expired', 404)
         end

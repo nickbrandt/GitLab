@@ -4346,29 +4346,15 @@ RSpec.describe Project, factory_default: :keep do
     end
   end
 
-  describe '#export_file_exists_and_stored?' do
-    let(:project) { create(:project) }
+  context 'with export' do
+    let(:project) { create(:project, :with_export) }
 
-    it 'returns false and false' do
-      expect(project.export_file_exists_and_stored?).to eq([false, false])
+    it '#export_file_exists? returns true' do
+      expect(project.export_file_exists?).to be true
     end
 
-    context 'with export' do
-      let(:project) { create(:project, :with_export) }
-
-      it 'returns true and true' do
-        expect(project.export_file_exists_and_stored?).to eq([true, true])
-      end
-
-      context 'when object file does not exist' do
-        before do
-          project.export_file.file.delete
-        end
-
-        it 'returns true and false' do
-          expect(project.export_file_exists_and_stored?).to eq([true, false])
-        end
-      end
+    it '#export_archive_exists? returns false' do
+      expect(project.export_archive_exists?).to be true
     end
   end
 
@@ -6634,7 +6620,7 @@ RSpec.describe Project, factory_default: :keep do
     context 'when project export is completed' do
       before do
         finish_job(project_export_job)
-        allow(project).to receive(:export_file).and_return(double(ImportExportUploader, file: 'exists.zip'))
+        allow(project).to receive(:export_file_exists?).and_return(true)
       end
 
       it { expect(project.export_status).to eq :finished }
@@ -6645,7 +6631,7 @@ RSpec.describe Project, factory_default: :keep do
 
       before do
         finish_job(project_export_job)
-        allow(project).to receive(:export_file).and_return(double(ImportExportUploader, file: 'exists.zip'))
+        allow(project).to receive(:export_file_exists?).and_return(true)
       end
 
       it { expect(project.export_status).to eq :regeneration_in_progress }

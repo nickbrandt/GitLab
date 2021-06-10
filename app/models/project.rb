@@ -1993,20 +1993,15 @@ class Project < ApplicationRecord
   end
 
   def export_file_exists?
-    export_file&.file
+    import_export_upload&.export_file_exists?
+  end
+
+  def export_archive_exists?
+    import_export_upload&.export_archive_exists?
   end
 
   def export_file
     import_export_upload&.export_file
-  end
-
-  # This method returns two values: whether a record of the export file exists in the
-  # database and whether the object is actually stored. The latter requires a HEAD request
-  # if object storage is used.
-  def export_file_exists_and_stored?
-    file = export_file&.file
-
-    [file.present?, !!file&.exists?]
   end
 
   def full_path_slug
