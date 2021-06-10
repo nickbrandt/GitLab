@@ -151,7 +151,9 @@ To avoid displaying the changes that are already on target branch in the diff,
 we compare the merge request's source branch with HEAD of the target branch.
 
 When there are conflicts between the source and target branch, we show the
-conflicts on the merge request diff as well.
+conflicts on the merge request diff as well:
+
+![Example of a conflict shown in a merge request diff](img/conflict_ui_v14_0.png)
 
 ### Enable or disable merge request conflicts in diff **(FREE SELF)**
 
