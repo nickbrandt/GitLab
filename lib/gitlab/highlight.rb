@@ -32,8 +32,6 @@ module Gitlab
     def highlight(text, continue: false, plain: false, context: {})
       @context = context
 
-      add_highlight_attempt_metric
-
       plain ||= self.class.too_large?(text.length)
 
       highlighted_text = highlight_text(text, continue: continue, plain: plain)
@@ -72,6 +70,8 @@ module Gitlab
     end
 
     def highlight_rich(text, continue: true)
+      add_highlight_attempt_metric
+
       tag = lexer.tag
       tokens = lexer.lex(text, continue: continue)
       Timeout.timeout(timeout_time) { @formatter.format(tokens, context.merge(tag: tag)).html_safe }
