@@ -16,7 +16,8 @@ export default {
   computed: {
     commitPath() {
       const { projectFullPath, value } = this;
-      // this ensures an absolute path, as `projectFullPath` can be relative in some cases (e.g.: pipeline security tab)
+      // `projectFullPath` comes in two flavors: relative (e.g.: `group/project`) and  absolute (e.g.: `/group/project`)
+      // adding a leading slash to the relative path makes sure we always link to an absolute path
       const absoluteProjectPath = isRootRelative(projectFullPath)
         ? projectFullPath
         : `/${projectFullPath}`;
