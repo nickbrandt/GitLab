@@ -2454,7 +2454,7 @@ Whether or not ModSecurity is set to blocking mode
 
 Group: `group::container security`
 
-Status: `deprecated`
+Status: `removed`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -2466,7 +2466,7 @@ Whether or not ModSecurity is disabled within Ingress
 
 Group: `group::container security`
 
-Status: `deprecated`
+Status: `removed`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -2478,7 +2478,7 @@ Whether or not ModSecurity is set to logging mode
 
 Group: `group::container security`
 
-Status: `deprecated`
+Status: `removed`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -2490,7 +2490,7 @@ Whether or not ModSecurity has not been installed into the cluster
 
 Group: `group::container security`
 
-Status: `deprecated`
+Status: `removed`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -2502,7 +2502,7 @@ Cumulative count of packets identified as anomalous by ModSecurity since Usage P
 
 Group: `group::container security`
 
-Status: `deprecated`
+Status: `removed`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -2514,7 +2514,7 @@ Cumulative count of packets processed by ModSecurity since Usage Ping was last r
 
 Group: `group::container security`
 
-Status: `deprecated`
+Status: `removed`
 
 Tiers: `free`, `premium`, `ultimate`
 
@@ -2526,7 +2526,7 @@ Whether or not ModSecurity statistics are unavailable
 
 Group: `group::container security`
 
-Status: `deprecated`
+Status: `removed`
 
 Tiers: `ultimate`
 
@@ -11216,7 +11216,7 @@ Group: `group::product planning`
 
 Status: `implemented`
 
-Tiers: `ultimate`
+Tiers: `premium`
 
 ### `redis_hll_counters.epics_usage.g_project_management_users_epic_issue_added_from_epic_weekly`
 
@@ -11228,7 +11228,7 @@ Group: `group::product planning`
 
 Status: `implemented`
 
-Tiers: `ultimate`
+Tiers: `premium`
 
 ### `redis_hll_counters.epics_usage.g_project_management_users_removing_epic_emoji_monthly`
 
@@ -16286,7 +16286,7 @@ Tiers: `premium`, `ultimate`
 
 ### `usage_activity_by_stage.enablement.counts.geo_node_usage.git_push_event_count_weekly`
 
-Number of Git push events from Prometheus on the Geo secondary
+Number of git push events from Prometheus on the Geo secondary
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_7d/20210604110603_git_push_event_count_weekly.yml)
 
