@@ -28898,6 +28898,21 @@ msgstr ""
 msgid "SecurityOrchestration|Security policy project"
 msgstr ""
 
+msgid "SecurityPolicies|Description"
+msgstr ""
+
+msgid "SecurityPolicies|Enforcement status"
+msgstr ""
+
+msgid "SecurityPolicies|Latest scan"
+msgstr ""
+
+msgid "SecurityPolicies|Scan execution"
+msgstr ""
+
+msgid "SecurityPolicies|view results"
+msgstr ""
+
 msgid "SecurityReports|%{firstProject} and %{secondProject}"
 msgstr ""
 
