@@ -10,20 +10,62 @@ module Banzai
         self.reference_type = :milestone
         self.object_class   = Milestone
 
+        def parent_records(parent, ids)
+          return Milestone.none unless valid_context?(parent)
+
+          milestones_by_iid  = find_milestones(parent, true)
+          milestones_by_name = find_milestones(parent, false)
+          milestone_iids     = ids.map {|y| y[:milestone_iid]}.compact
+          milestone_names    = ids.map {|y| y[:milestone_name]}.compact
+          iid_relation       = milestones_by_iid.where(iid: milestone_iids)
+          milestone_relation = milestones_by_name.where(title: milestone_names)
+
+          Milestone.from_union([iid_relation, milestone_relation]).includes(:project, :group)
+        end
+
         # Links to project milestones contain the IID, but when we're handling
         # 'regular' references, we need to use the global ID to disambiguate
         # between group and project milestones.
-        def find_object(parent, id)
-          return unless valid_context?(parent)
+        def find_object(parent_object, id)
+          key = reference_cache.records_per_parent[parent_object].keys.find do |k|
+            k[:milestone_iid] == id[:milestone_iid] || k[:milestone_name] == id[:milestone_name]
+          end
 
-          find_milestone_with_finder(parent, id: id)
+          reference_cache.records_per_parent[parent_object][key] if key
         end
 
-        def find_object_from_link(parent, iid)
-          return unless valid_context?(parent)
-
-          find_milestone_with_finder(parent, iid: iid)
+        # Transform a symbol extracted from the text to a meaningful value
+        #
+        # This method has the contract that if a string `ref` refers to a
+        # record `record`, then `parse_symbol(ref) == record_identifier(record)`.
+        #
+        # This contract is slightly broken here, as we only have either the label_id
+        # or the label_name, but not both.  But below, we have both pieces of information.
+        # But it's accounted for in `find_object`
+        def parse_symbol(symbol, match_data)
+          if symbol
+            # when parsing links, there is no `match_data[:milestone_iid]`, but `symbol`
+            # holds the iid
+            { milestone_iid: symbol.to_i, milestone_name: nil }
+          else
+            { milestone_iid: match_data[:milestone_iid]&.to_i, milestone_name: match_data[:milestone_name]&.tr('"', '') }
+          end
         end
+
+        # We assume that most classes are identifying records by ID.
+        #
+        # This method has the contract that if a string `ref` refers to a
+        # record `record`, then `class.parse_symbol(ref) == record_identifier(record)`.
+        # See note in `parse_symbol` above
+        def record_identifier(record)
+          { milestone_iid: record.iid, milestone_name: record.title }
+        end
+
+        # def find_object_from_link(parent, iid)
+        #   return unless valid_context?(parent)
+        #
+        #   find_milestone_with_finder(parent, iid: iid)
+        # end
 
         def valid_context?(parent)
           strong_memoize(:valid_context) do
@@ -50,12 +92,14 @@ module Banzai
           return super(text, pattern) if pattern != Milestone.reference_pattern
 
           milestones = {}
-          unescaped_html = unescape_html_entities(text).gsub(pattern) do |match|
-            milestone = find_milestone($~[:project], $~[:namespace], $~[:milestone_iid], $~[:milestone_name])
 
-            if milestone
-              milestones[milestone.id] = yield match, milestone.id, $~[:project], $~[:namespace], $~
-              "#{REFERENCE_PLACEHOLDER}#{milestone.id}"
+          unescaped_html = unescape_html_entities(text).gsub(pattern).with_index do |match, index|
+            ident = identifier($~)
+            milestone = yield match, ident, $~[:project], $~[:namespace], $~
+
+            if milestone != match
+              milestones[index] = milestone
+              "#{REFERENCE_PLACEHOLDER}#{index}"
             else
               match
             end
@@ -66,31 +110,10 @@ module Banzai
           escape_with_placeholders(unescaped_html, milestones)
         end
 
-        def find_milestone(project_ref, namespace_ref, milestone_id, milestone_name)
-          project_path = reference_cache.full_project_path(namespace_ref, project_ref)
+        def find_milestones(parent, find_by_iid = false)
+          finder_params = milestone_finder_params(parent, find_by_iid)
 
-          # Returns group if project is not found by path
-          parent = parent_from_ref(project_path)
-
-          return unless parent
-
-          milestone_params = milestone_params(milestone_id, milestone_name)
-
-          find_milestone_with_finder(parent, milestone_params)
-        end
-
-        def milestone_params(iid, name)
-          if name
-            { name: name.tr('"', '') }
-          else
-            { iid: iid.to_i }
-          end
-        end
-
-        def find_milestone_with_finder(parent, params)
-          finder_params = milestone_finder_params(parent, params[:iid].present?)
-
-          MilestonesFinder.new(finder_params).find_by(params)
+          MilestonesFinder.new(finder_params).execute
         end
 
         def milestone_finder_params(parent, find_by_iid)
@@ -130,6 +153,14 @@ module Banzai
 
         def object_link_title(object, matches)
           nil
+        end
+
+        def parent
+          project || group
+        end
+
+        def requires_unescaping?
+          true
         end
       end
     end
