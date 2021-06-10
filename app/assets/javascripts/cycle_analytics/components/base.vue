@@ -93,9 +93,6 @@ export default {
     handleDateSelect(startDate) {
       this.setDateRange({ startDate });
     },
-    isActiveStage(stage) {
-      return stage.slug === this.selectedStage.slug;
-    },
     onSelectStage(stage) {
       this.setSelectedStage(stage);
     },
