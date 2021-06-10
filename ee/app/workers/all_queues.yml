@@ -1044,8 +1044,8 @@
   :idempotent: true
   :tags:
   - :exclude_from_kubernetes
-- :name: incident_management_escalations_escalation_check
-  :worker_name: IncidentManagement::Escalations::EscalationCheckWorker
+- :name: incident_management_escalations_alert_escalation_check
+  :worker_name: IncidentManagement::Escalations::AlertEscalationCheckWorker
   :feature_category: :incident_management
   :has_external_dependencies:
   :urgency: :high

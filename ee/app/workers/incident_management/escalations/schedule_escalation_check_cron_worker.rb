@@ -11,8 +11,9 @@ module IncidentManagement
       feature_category :incident_management
 
       def perform
-        IncidentManagement::AlertEscalation.ids.each do |escalation_id| # rubocop: disable CodeReuse/ActiveRecord
-          IncidentManagement::Escalations::EscalationCheckWorker.perform_async('IncidentManagement::AlertEscalation', escalation_id)
+        IncidentManagement::AlertEscalation.select(:id).find_in_batches do |escalation_ids|
+          args = escalation_ids.map { |escalation| [escalation.id] }
+          IncidentManagement::Escalations::AlertEscalationCheckWorker.bulk_perform_async(args) # rubocop:disable Scalability/BulkPerformWithContext
         end
       end
     end

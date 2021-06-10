@@ -2,7 +2,7 @@
 
 module IncidentManagement
   module Escalations
-    class EscalationCheckWorker
+    class AlertEscalationCheckWorker
       include ApplicationWorker
 
       urgency :high
@@ -10,22 +10,19 @@ module IncidentManagement
       idempotent!
       feature_category :incident_management
 
-      def initialize(escalation_class, escalation_id)
-        @escalation_class = escalation_class
+      def initialize(escalation_id)
         @escalation_id = escalation_id
       end
 
       def perform
-        escalation = escalation_class.constantize.find_by_id(escalation_id)
-
-        return unless escalation
+        escalation = IncidentManagement::AlertEscalation.find_by_id(escalation_id)
 
         IncidentManagement::Escalations::ProcessService.new(escalation).execute
       end
 
       private
 
-      attr_reader :escalation_class, :escalation_id
+      attr_reader :escalation_id
     end
   end
 end

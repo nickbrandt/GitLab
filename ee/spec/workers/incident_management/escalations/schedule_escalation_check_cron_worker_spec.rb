@@ -11,9 +11,9 @@ RSpec.describe IncidentManagement::Escalations::ScheduleEscalationCheckCronWorke
   describe '#perform' do
     subject { worker.perform }
 
-    it 'schedules a job for each escalaton' do
-      expect(IncidentManagement::Escalations::EscalationCheckWorker).to receive(:perform_async).with(escalation_1.class.name, escalation_1.id)
-      expect(IncidentManagement::Escalations::EscalationCheckWorker).to receive(:perform_async).with(escalation_2.class.name, escalation_2.id)
+    it 'schedules a job for each escalation' do
+      expect(IncidentManagement::Escalations::AlertEscalationCheckWorker).to receive(:bulk_perform_async)
+        .with( [[escalation_1.id], [escalation_2.id]] )
 
       subject
     end

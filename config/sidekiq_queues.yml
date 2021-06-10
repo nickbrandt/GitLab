@@ -180,7 +180,7 @@
   - 2
 - - incident_management_apply_incident_sla_exceeded_label
   - 1
-- - incident_management_escalations_escalation_check
+- - incident_management_escalations_alert_escalation_check
   - 1
 - - incident_management_oncall_rotations_persist_shifts_job
   - 1
