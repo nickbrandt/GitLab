@@ -20,7 +20,7 @@
       = link_to group_epics_path(group), title: 'List' do
         %span= _('List')
 
-    - if Feature.enabled?(:epic_boards, group)
+    - if Feature.enabled?(:epic_boards, group, default_enabled: :yaml)
       = nav_link(path: ['epic_boards#index', 'epic_boards#show'], html_options: { class: "home" }) do
         = link_to group_epic_boards_path(group), title: 'Boards' do
           %span= _('Boards')
