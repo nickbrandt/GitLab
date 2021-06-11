@@ -16242,7 +16242,8 @@ CREATE TABLE plan_limits (
     helm_max_file_size bigint DEFAULT 5242880 NOT NULL,
     ci_registered_group_runners integer DEFAULT 1000 NOT NULL,
     ci_registered_project_runners integer DEFAULT 1000 NOT NULL,
-    web_hook_calls integer DEFAULT 0 NOT NULL
+    web_hook_calls integer DEFAULT 0 NOT NULL,
+    ci_daily_pipeline_schedule_triggers integer DEFAULT 0 NOT NULL
 );
 
 CREATE SEQUENCE plan_limits_id_seq
