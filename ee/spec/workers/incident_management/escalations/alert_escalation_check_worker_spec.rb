@@ -2,8 +2,8 @@
 
 require 'spec_helper'
 
-RSpec.describe IncidentManagement::Escalations::EscalationCheckWorker do
-  let(:worker) { described_class.new(escalation.class.name, escalation.id) }
+RSpec.describe IncidentManagement::Escalations::AlertEscalationCheckWorker do
+  let(:worker) { described_class.new(escalation.id) }
 
   let_it_be(:escalation) { create(:incident_management_alert_escalation) }
 
