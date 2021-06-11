@@ -5239,4 +5239,20 @@ RSpec.describe Ci::Build do
       end
     end
   end
+
+  describe '.without_coverage' do
+    let!(:build_with_coverage) { create(:ci_build, pipeline: pipeline, coverage: 100.0) }
+
+    it 'returns builds without coverage values' do
+      expect(described_class.without_coverage).to eq([build])
+    end
+  end
+
+  describe '.with_coverage_regex' do
+    let!(:build_with_coverage_regex) { create(:ci_build, pipeline: pipeline, coverage_regex: '\d') }
+
+    it 'returns builds with coverage regex values' do
+      expect(described_class.with_coverage_regex).to eq([build_with_coverage_regex])
+    end
+  end
 end
