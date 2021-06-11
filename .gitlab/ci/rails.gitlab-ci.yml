@@ -177,6 +177,14 @@ update-setup-test-env-cache:
   artifacts:
     paths: []  # This job's purpose is only to update the cache.
 
+update-gitaly-binaries-cache:
+  extends:
+    - setup-test-env
+    - .gitaly-binaries-cache-push
+    - .shared:rules:update-gitaly-binaries-cache
+  artifacts:
+    paths: []  # This job's purpose is only to update the cache.
+
 .coverage-base:
   extends:
     - .default-retry
