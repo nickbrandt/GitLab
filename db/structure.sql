@@ -11156,8 +11156,8 @@ CREATE TABLE ci_running_builds (
     build_id bigint NOT NULL,
     project_id bigint NOT NULL,
     runner_id bigint NOT NULL,
-    runner_type smallint NOT NULL,
-    created_at timestamp with time zone DEFAULT now() NOT NULL
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    runner_type smallint NOT NULL
 );
 
 CREATE SEQUENCE ci_running_builds_id_seq
