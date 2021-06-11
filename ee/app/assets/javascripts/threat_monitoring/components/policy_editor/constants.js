@@ -1,15 +1,15 @@
 import { s__, __ } from '~/locale';
 
-export const EditorModeRule = 'rule';
-export const EditorModeYAML = 'yaml';
+export const EDITOR_MODE_RULE = 'rule';
+export const EDITOR_MODE_YAML = 'yaml';
 
 export const PARSING_ERROR_MESSAGE = s__(
   'NetworkPolicies|Rule mode is unavailable for this policy. In some cases, we cannot parse the YAML file back into the rules editor.',
 );
 
 export const EDITOR_MODES = [
-  { value: EditorModeRule, text: s__('NetworkPolicies|Rule mode') },
-  { value: EditorModeYAML, text: s__('NetworkPolicies|.yaml mode') },
+  { value: EDITOR_MODE_RULE, text: s__('NetworkPolicies|Rule mode') },
+  { value: EDITOR_MODE_YAML, text: s__('NetworkPolicies|.yaml mode') },
 ];
 
 export const POLICY_TYPES = {

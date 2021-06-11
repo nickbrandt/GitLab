@@ -1,11 +1,12 @@
 <script>
+import { removeUnnecessaryDashes } from 'ee/threat_monitoring/utils';
 import { __ } from '~/locale';
-import { EDITOR_MODES, EditorModeYAML } from '../constants';
+import { EDITOR_MODES, EDITOR_MODE_YAML } from '../constants';
 import PolicyEditorLayout from '../policy_editor_layout.vue';
 import { DEFAULT_SCAN_EXECUTION_POLICY, fromYaml } from './lib';
 
 export default {
-  DEFAULT_EDITOR_MODE: EditorModeYAML,
+  DEFAULT_EDITOR_MODE: EDITOR_MODE_YAML,
   EDITOR_MODES: [EDITOR_MODES[1]],
   i18n: {
     createMergeRequest: __('Create merge request'),
@@ -27,28 +28,30 @@ export default {
       : fromYaml(DEFAULT_SCAN_EXECUTION_POLICY);
 
     const yamlEditorValue = this.existingPolicy
-      ? this.existingPolicy.manifest
+      ? removeUnnecessaryDashes(this.existingPolicy.manifest)
       : DEFAULT_SCAN_EXECUTION_POLICY;
 
     return {
-      editorMode: EditorModeYAML,
-      yamlEditorValue,
-      yamlEditorError: policy.error ? true : null,
+      isRemovingPolicy: false,
+      isUpdatingPolicy: false,
       policy,
+      yamlEditorValue,
     };
   },
   computed: {
-    isCreatingMergeRequest() {
-      // TODO track the graphql mutation status after #333163 is closed
-      return false;
-    },
     isEditing() {
       return Boolean(this.existingPolicy);
     },
   },
   methods: {
-    createMergeRequest() {
-      // TODO call graphql mutation and redirect to merge request after #333163 is closed
+    removePolicy() {
+      // TODO call graphql mutation and redirect to merge request after #329422 is closed
+    },
+    savePolicy() {
+      // TODO call graphql mutation and redirect to merge request after #329422 is closed
+    },
+    updateYaml(manifest) {
+      this.yamlEditorValue = manifest;
     },
   },
 };
@@ -56,13 +59,19 @@ export default {
 
 <template>
   <policy-editor-layout
-    :custom-save-button-text="$options.i18n.createMergeRequest"
     :default-editor-mode="$options.DEFAULT_EDITOR_MODE"
     :editor-modes="$options.EDITOR_MODES"
     :is-editing="isEditing"
-    :is-updating-policy="isCreatingMergeRequest"
+    :is-removing-policy="isRemovingPolicy"
+    :is-updating-policy="isUpdatingPolicy"
     :policy-name="policy.name"
     :yaml-editor-value="yamlEditorValue"
-    @save-policy="createMergeRequest"
-  />
+    @remove-policy="removePolicy"
+    @save-policy="savePolicy"
+    @update-yaml="updateYaml"
+  >
+    <template #save-button-text>
+      {{ $options.i18n.createMergeRequest }}
+    </template>
+  </policy-editor-layout>
 </template>

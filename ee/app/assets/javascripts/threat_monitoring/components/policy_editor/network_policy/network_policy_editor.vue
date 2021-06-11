@@ -1,15 +1,15 @@
 <script>
 import { GlFormGroup, GlFormInput, GlFormTextarea, GlToggle, GlButton, GlAlert } from '@gitlab/ui';
 import { mapState, mapActions } from 'vuex';
+import { removeUnnecessaryDashes } from 'ee/threat_monitoring/utils';
 import { redirectTo } from '~/lib/utils/url_utility';
 import { s__ } from '~/locale';
-import { EDITOR_MODES, EditorModeYAML, PARSING_ERROR_MESSAGE } from '../constants';
+import { EDITOR_MODES, EDITOR_MODE_YAML, PARSING_ERROR_MESSAGE } from '../constants';
 import DimDisableContainer from '../dim_disable_container.vue';
 import PolicyActionPicker from '../policy_action_picker.vue';
 import PolicyAlertPicker from '../policy_alert_picker.vue';
 import PolicyEditorLayout from '../policy_editor_layout.vue';
 import PolicyPreview from '../policy_preview.vue';
-import { removeUnnecessaryDashes } from '../utils';
 import {
   DEFAULT_NETWORK_POLICY,
   RuleTypeEndpoint,
@@ -128,14 +128,14 @@ export default {
       }
     },
     changeEditorMode(mode) {
-      if (mode === EditorModeYAML && !this.hasParsingError) {
+      if (mode === EDITOR_MODE_YAML && !this.hasParsingError) {
         this.yamlEditorValue = toYaml(this.policy);
       }
     },
     savePolicy(mode) {
       const saveFn = this.isEditing ? this.updatePolicy : this.createPolicy;
       const policy = {
-        manifest: mode === EditorModeYAML ? this.yamlEditorValue : toYaml(this.policy),
+        manifest: mode === EDITOR_MODE_YAML ? this.yamlEditorValue : toYaml(this.policy),
       };
       if (this.isEditing) {
         policy.name = this.existingPolicy.name;
@@ -159,6 +159,7 @@ export default {
 <template>
   <policy-editor-layout
     :is-editing="isEditing"
+    :is-removing-policy="isRemovingPolicy"
     :is-updating-policy="isUpdatingPolicy"
     :policy-name="policy.name"
     :yaml-editor-value="yamlEditorValue"

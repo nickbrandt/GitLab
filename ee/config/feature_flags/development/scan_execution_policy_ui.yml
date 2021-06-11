@@ -4,5 +4,5 @@ introduced_by_url: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/63585
 rollout_issue_url: https://gitlab.com/gitlab-org/gitlab/-/issues/273791
 milestone: '14.0'
 type: development
-group: group::container_security
+group: group::container security
 default_enabled: false

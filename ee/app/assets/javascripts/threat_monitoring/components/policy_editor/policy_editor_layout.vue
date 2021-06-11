@@ -1,7 +1,7 @@
 <script>
 import { GlButton, GlFormGroup, GlModal, GlModalDirective, GlSegmentedControl } from '@gitlab/ui';
 import { s__, sprintf } from '~/locale';
-import { DELETE_MODAL_CONFIG, EDITOR_MODES, EditorModeRule, EditorModeYAML } from './constants';
+import { DELETE_MODAL_CONFIG, EDITOR_MODES, EDITOR_MODE_RULE, EDITOR_MODE_YAML } from './constants';
 
 export default {
   i18n: {
@@ -18,15 +18,10 @@ export default {
   directives: { GlModal: GlModalDirective },
   inject: ['threatMonitoringPath'],
   props: {
-    customSaveButtonText: {
-      type: String,
-      required: false,
-      default: '',
-    },
     defaultEditorMode: {
       type: String,
       required: false,
-      default: EditorModeRule,
+      default: EDITOR_MODE_RULE,
     },
     editorModes: {
       type: Array,
@@ -34,6 +29,11 @@ export default {
       default: () => EDITOR_MODES,
     },
     isEditing: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    isRemovingPolicy: {
       type: Boolean,
       required: false,
       default: false,
@@ -64,18 +64,15 @@ export default {
       return sprintf(s__('NetworkPolicies|Delete policy: %{policy}'), { policy: this.policyName });
     },
     saveButtonText() {
-      if (this.customSaveButtonText) {
-        return this.customSaveButtonText;
-      }
       return this.isEditing
         ? s__('NetworkPolicies|Save changes')
         : s__('NetworkPolicies|Create policy');
     },
     shouldShowRuleEditor() {
-      return this.selectedEditorMode === EditorModeRule;
+      return this.selectedEditorMode === EDITOR_MODE_RULE;
     },
     shouldShowYamlEditor() {
-      return this.selectedEditorMode === EditorModeYAML;
+      return this.selectedEditorMode === EDITOR_MODE_YAML;
     },
   },
   methods: {
@@ -89,8 +86,8 @@ export default {
       this.selectedEditorMode = mode;
       this.$emit('update-editor-mode', mode);
     },
-    updateYaml() {
-      this.$emit('load-yaml');
+    updateYaml(manifest) {
+      this.$emit('update-yaml', manifest);
     },
   },
 };
@@ -103,7 +100,6 @@ export default {
         class="gl-px-5 gl-py-3 gl-mb-0 gl-bg-gray-10 gl-border-b-solid gl-border-b-gray-100 gl-border-b-1"
       >
         <gl-segmented-control
-          data-testid="editor-mode"
           :options="editorModes"
           :checked="selectedEditorMode"
           @input="updateEditorMode"
@@ -111,7 +107,9 @@ export default {
       </gl-form-group>
       <div class="gl-display-flex gl-sm-flex-direction-column">
         <section class="gl-w-full gl-p-5 gl-flex-fill-4 policy-table-left">
-          <slot v-if="shouldShowRuleEditor" name="rule-editor" data-testid="rule-editor"></slot>
+          <div v-if="shouldShowRuleEditor" data-testid="rule-editor">
+            <slot name="rule-editor"></slot>
+          </div>
           <policy-yaml-editor
             v-if="shouldShowYamlEditor"
             data-testid="policy-yaml-editor"
@@ -123,6 +121,7 @@ export default {
         <section
           v-if="shouldShowRuleEditor"
           class="gl-w-30p gl-p-5 gl-border-l-gray-100 gl-border-l-1 gl-border-l-solid gl-flex-fill-2"
+          data-testid="rule-editor-preview"
         >
           <slot name="rule-editor-preview"></slot>
         </section>
@@ -134,8 +133,11 @@ export default {
       data-testid="save-policy"
       :loading="isUpdatingPolicy"
       @click="savePolicy"
-      >{{ saveButtonText }}</gl-button
     >
+      <slot name="save-button-text">
+        {{ saveButtonText }}
+      </slot>
+    </gl-button>
     <gl-button
       v-if="isEditing"
       v-gl-modal="'delete-modal'"
