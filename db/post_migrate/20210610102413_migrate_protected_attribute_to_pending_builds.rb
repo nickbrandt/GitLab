@@ -6,6 +6,8 @@ class MigrateProtectedAttributeToPendingBuilds < ActiveRecord::Migration[6.1]
   disable_ddl_transaction!
 
   def up
+    return unless Gitlab.dev_or_test_env? || Gitlab.com?
+
     each_batch_range('ci_pending_builds', of: 1000) do |min, max|
       execute <<~SQL
         UPDATE ci_pending_builds
