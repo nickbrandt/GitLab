@@ -3,7 +3,7 @@
 module QA
   module Page
     module Project
-      module Operations
+      module Infrastructure
         module Kubernetes
           class Index < Page::Base
             view 'app/views/clusters/clusters/_empty_state.html.haml' do

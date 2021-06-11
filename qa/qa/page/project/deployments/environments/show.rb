@@ -3,7 +3,7 @@
 module QA
   module Page
     module Project
-      module Operations
+      module Deployments
         module Environments
           class Show < Page::Base
             view 'app/views/projects/environments/_external_url.html.haml' do

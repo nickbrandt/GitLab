@@ -3,7 +3,7 @@
 module QA
   module Page
     module Project
-      module Operations
+      module Infrastructure
         module Kubernetes
           class Show < Page::Base
             view 'app/assets/javascripts/clusters/components/applications.vue' do
@@ -77,7 +77,7 @@ module QA
             end
 
             def save_domain
-              click_element :save_changes_button, Page::Project::Operations::Kubernetes::Show
+              click_element :save_changes_button, Page::Project::Infrastructure::Kubernetes::Show
             end
 
             def wait_for_cluster_health

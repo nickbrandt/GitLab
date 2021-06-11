@@ -3,7 +3,7 @@
 module QA
   module Page
     module Project
-      module Operations
+      module Monitor
         module Incidents
           class Index < Page::Base
             view 'app/assets/javascripts/incidents/components/incidents_list.vue' do
