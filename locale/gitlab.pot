@@ -28273,6 +28273,9 @@ msgstr ""
 msgid "Runners|Name"
 msgstr ""
 
+msgid "Runners|New registration token generated!"
+msgstr ""
+
 msgid "Runners|New runner, has not connected yet"
 msgstr ""
 
