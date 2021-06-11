@@ -298,7 +298,7 @@ RSpec.describe Projects::CreateService, '#execute' do
 
   context 'error handling' do
     it 'handles invalid options' do
-      opts[:default_branch] = 'master'
+      opts[:invalid] = 'option'
       expect(create_project(user, opts)).to eq(nil)
     end
   end
