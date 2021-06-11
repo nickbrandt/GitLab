@@ -1870,7 +1870,7 @@ RSpec.describe Ci::Build do
     end
 
     describe '#retryable?' do
-      subject { build.retryable? }
+      subject { build }
 
       context 'when build is retryable' do
         context 'when build is successful' do
@@ -1878,7 +1878,7 @@ RSpec.describe Ci::Build do
             build.success!
           end
 
-          it { is_expected.to be_truthy }
+          it { is_expected.to be_retryable }
         end
 
         context 'when build is failed' do
@@ -1886,7 +1886,7 @@ RSpec.describe Ci::Build do
             build.drop!
           end
 
-          it { is_expected.to be_truthy }
+          it { is_expected.to be_retryable }
         end
 
         context 'when build is canceled' do
@@ -1894,7 +1894,7 @@ RSpec.describe Ci::Build do
             build.cancel!
           end
 
-          it { is_expected.to be_truthy }
+          it { is_expected.to be_retryable }
         end
       end
 
@@ -1904,7 +1904,7 @@ RSpec.describe Ci::Build do
             build.run!
           end
 
-          it { is_expected.to be_falsey }
+          it { is_expected.not_to be_retryable }
         end
 
         context 'when build is skipped' do
@@ -1912,7 +1912,7 @@ RSpec.describe Ci::Build do
             build.skip!
           end
 
-          it { is_expected.to be_falsey }
+          it { is_expected.not_to be_retryable }
         end
 
         context 'when build is degenerated' do
@@ -1920,7 +1920,7 @@ RSpec.describe Ci::Build do
             build.degenerate!
           end
 
-          it { is_expected.to be_falsey }
+          it { is_expected.not_to be_retryable }
         end
 
         context 'when a canceled build has been retried already' do
@@ -1931,7 +1931,7 @@ RSpec.describe Ci::Build do
           end
 
           context 'when prevent_retry_of_retried_jobs feature flag is enabled' do
-            it { is_expected.to be_falsey }
+            it { is_expected.not_to be_retryable }
           end
 
           context 'when prevent_retry_of_retried_jobs feature flag is disabled' do
@@ -1939,7 +1939,7 @@ RSpec.describe Ci::Build do
               stub_feature_flags(prevent_retry_of_retried_jobs: false)
             end
 
-            it { is_expected.to be_truthy }
+            it { is_expected.to be_retryable }
           end
         end
       end
