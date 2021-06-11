@@ -25061,6 +25061,10 @@ CREATE INDEX tmp_idx_deduplicate_vulnerability_occurrences ON vulnerability_occu
 
 CREATE INDEX tmp_idx_on_namespaces_delayed_project_removal ON namespaces USING btree (id) WHERE (delayed_project_removal = true);
 
+CREATE INDEX tmp_index_namespaces_empty_traversal_ids_with_child_namespaces ON namespaces USING btree (id) WHERE ((parent_id IS NOT NULL) AND (traversal_ids = '{}'::integer[]));
+
+CREATE INDEX tmp_index_namespaces_empty_traversal_ids_with_root_namespaces ON namespaces USING btree (id) WHERE ((parent_id IS NULL) AND (traversal_ids = '{}'::integer[]));
+
 CREATE INDEX tmp_index_on_vulnerabilities_non_dismissed ON vulnerabilities USING btree (id) WHERE (state <> 2);
 
 CREATE UNIQUE INDEX uniq_pkgs_deb_grp_architectures_on_distribution_id_and_name ON packages_debian_group_architectures USING btree (distribution_id, name);
