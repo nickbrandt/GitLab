@@ -339,22 +339,6 @@ module Gitlab
     end
 
     def check_access!
-      # Iterate over all changes to find if user allowed all of them to be applied
-      changes_list.each.with_index do |change, index|
-        skip_lfs_integrity_check = index != 0
-
-        # If user does not have access to make at least one change, cancel all
-        # push by allowing the exception to bubble up
-        Checks::SingleChangeAccess.new(
-          change,
-          user_access: user_access,
-          project: project,
-          skip_lfs_integrity_check: skip_lfs_integrity_check,
-          protocol: protocol,
-          logger: logger
-        ).validate!
-      end
-
       Checks::ChangesAccess.new(
         changes_list.changes,
         user_access: user_access,
