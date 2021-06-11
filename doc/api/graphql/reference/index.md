@@ -3538,7 +3538,8 @@ Input type: `RunnersRegistrationTokenResetInput`
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | <a id="mutationrunnersregistrationtokenresetclientmutationid"></a>`clientMutationId` | [`String`](#string) | A unique identifier for the client performing the mutation. |
-| <a id="mutationrunnersregistrationtokenresetid"></a>`id` | [`ID!`](#id) | ID of the project or group to reset the token for. Omit if resetting instance runner token. |
+| <a id="mutationrunnersregistrationtokenresetid"></a>`id` | [`ID`](#id) | ID of the project or group to reset the token for. Omit if resetting instance runner token. |
+| <a id="mutationrunnersregistrationtokenresettype"></a>`type` | [`CiRunnerType!`](#cirunnertype) | Scope of the object to reset the token for. |
 
 #### Fields
 

@@ -38,7 +38,7 @@ RSpec.describe 'RunnersRegistrationTokenReset' do
     end
   end
 
-  shared_context 'when authorized' do
+  shared_context 'when authorized' do |scope|
     it 'resets runner registration token' do
       expect { subject }.to change { get_token }
       expect(response).to have_gitlab_http_status(:success)
@@ -49,8 +49,8 @@ RSpec.describe 'RunnersRegistrationTokenReset' do
       expect(mutation_response['token']).to eq(get_token)
     end
 
-    context 'when bad arguments are provided' do
-      let(:input) { { id: 'some string' } }
+    context 'when malformed id is provided' do
+      let(:input) { { type: "#{scope.upcase}_TYPE", id: 'some string' } }
 
       it 'returns errors' do
         expect { subject }.not_to change { get_token }
@@ -64,13 +64,13 @@ RSpec.describe 'RunnersRegistrationTokenReset' do
   context 'applied to project' do
     let_it_be(:project) { create_default(:project) }
 
-    let(:input) { { id: project.to_global_id.to_s } }
+    let(:input) { { type: 'PROJECT_TYPE', id: project.to_global_id.to_s } }
 
     include_context 'when unauthorized', 'project' do
       let(:target) { project }
     end
 
-    include_context 'when authorized' do
+    include_context 'when authorized', 'project' do
       let_it_be(:user) { project.owner }
 
       def get_token
@@ -82,13 +82,13 @@ RSpec.describe 'RunnersRegistrationTokenReset' do
   context 'applied to group' do
     let_it_be(:group) { create_default(:group) }
 
-    let(:input) { { id: group.to_global_id.to_s } }
+    let(:input) { { type: 'GROUP_TYPE', id: group.to_global_id.to_s } }
 
     include_context 'when unauthorized', 'group' do
       let(:target) { group }
     end
 
-    include_context 'when authorized' do
+    include_context 'when authorized', 'group' do
       let_it_be(:user) { create_default(:group_member, :maintainer, user: create(:user), group: group ).user }
 
       def get_token
@@ -103,7 +103,7 @@ RSpec.describe 'RunnersRegistrationTokenReset' do
       stub_env('IN_MEMORY_APPLICATION_SETTINGS', 'false')
     end
 
-    let(:input) { {} }
+    let(:input) { { type: 'INSTANCE_TYPE' } }
 
     context 'when unauthorized' do
       let(:user) { create(:user) }
@@ -111,7 +111,7 @@ RSpec.describe 'RunnersRegistrationTokenReset' do
       it_behaves_like 'unauthorized'
     end
 
-    include_context 'when authorized' do
+    include_context 'when authorized', 'instance' do
       let_it_be(:user) { create(:user, :admin) }
 
       def get_token
