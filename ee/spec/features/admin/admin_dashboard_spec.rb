@@ -86,15 +86,6 @@ RSpec.describe 'Admin Dashboard' do
       end
     end
 
-    context 'on dotcom' do
-      before do
-        allow(Gitlab).to receive(:com?).and_return(true)
-        visit(admin_dashboard_stats_path)
-      end
-
-      it_behaves_like 'a hidden alert'
-    end
-
     context 'on self-managed' do
       before do
         allow(Gitlab).to receive(:ee?).and_return(true)
@@ -103,7 +94,7 @@ RSpec.describe 'Admin Dashboard' do
       context 'when qrtly reconciliation is available' do
         before do
           create(:upcoming_reconciliation, :self_managed)
-          visit(admin_dashboard_stats_path)
+          visit(admin_root_path)
         end
 
         it_behaves_like 'a visible alert'
@@ -111,7 +102,7 @@ RSpec.describe 'Admin Dashboard' do
 
       context 'when qrtly reconciliation is not available' do
         before do
-          visit(admin_dashboard_stats_path)
+          visit(admin_root_path)
         end
 
         it_behaves_like 'a hidden alert'
