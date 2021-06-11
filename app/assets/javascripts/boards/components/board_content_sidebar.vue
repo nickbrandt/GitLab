@@ -119,7 +119,6 @@ export default {
       <sidebar-date-widget
         :iid="activeBoardItem.iid"
         :full-path="fullPath"
-        date-type="dueDate"
         :issuable-type="issuableType"
         data-testid="sidebar-due-date"
       />
