@@ -345,7 +345,7 @@ module Gitlab
 
         # If user does not have access to make at least one change, cancel all
         # push by allowing the exception to bubble up
-        Checks::ChangeAccess.new(
+        Checks::SingleChangeAccess.new(
           change,
           user_access: user_access,
           project: project,

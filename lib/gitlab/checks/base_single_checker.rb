@@ -2,11 +2,11 @@
 
 module Gitlab
   module Checks
-    class BaseChecker
+    class BaseSingleChecker
       include Gitlab::Utils::StrongMemoize
 
       attr_reader :change_access
-      delegate(*ChangeAccess::ATTRIBUTES, to: :change_access)
+      delegate(*SingleChangeAccess::ATTRIBUTES, to: :change_access)
 
       def initialize(change_access)
         @change_access = change_access
@@ -57,4 +57,4 @@ module Gitlab
   end
 end
 
-Gitlab::Checks::BaseChecker.prepend_mod_with('Gitlab::Checks::BaseChecker')
+Gitlab::Checks::BaseSingleChecker.prepend_mod_with('Gitlab::Checks::BaseSingleChecker')

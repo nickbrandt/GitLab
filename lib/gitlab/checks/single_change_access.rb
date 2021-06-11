@@ -2,7 +2,7 @@
 
 module Gitlab
   module Checks
-    class ChangeAccess
+    class SingleChangeAccess
       ATTRIBUTES = %i[user_access project skip_authorization
                       skip_lfs_integrity_check protocol oldrev newrev ref
                       branch_name tag_name logger commits].freeze
@@ -54,4 +54,4 @@ module Gitlab
   end
 end
 
-Gitlab::Checks::ChangeAccess.prepend_mod_with('Gitlab::Checks::ChangeAccess')
+Gitlab::Checks::SingleChangeAccess.prepend_mod_with('Gitlab::Checks::SingleChangeAccess')

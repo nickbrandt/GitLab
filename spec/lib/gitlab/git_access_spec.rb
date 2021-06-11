@@ -1009,7 +1009,7 @@ RSpec.describe Gitlab::GitAccess do
       it 'raises TimeoutError when #check_access! raises a timeout error' do
         message = "Push operation timed out\n\nTiming information for debugging purposes:\nRunning checks for ref: wow"
 
-        expect_next_instance_of(Gitlab::Checks::ChangeAccess) do |check|
+        expect_next_instance_of(Gitlab::Checks::SingleChangeAccess) do |check|
           expect(check).to receive(:validate!).and_raise(Gitlab::Checks::TimedLogger::TimeoutError)
         end
 

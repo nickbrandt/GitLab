@@ -3,7 +3,7 @@
 module EE
   module Gitlab
     module Checks
-      module BaseChecker
+      module BaseSingleChecker
         extend ActiveSupport::Concern
         include ::Gitlab::Utils::StrongMemoize
 
