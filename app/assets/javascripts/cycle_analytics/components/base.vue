@@ -102,7 +102,7 @@ export default {
     },
     isUserAllowed(id) {
       const { permissions } = this;
-      return permissions?.[id];
+      return Boolean(permissions?.[id]);
     },
   },
   dayRangeOptions: [7, 30, 90],
