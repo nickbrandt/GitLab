@@ -50,7 +50,7 @@ RSpec.describe 'RunnersRegistrationTokenReset' do
     end
 
     context 'when bad arguments are provided' do
-      let(:input) { { full_path: 'some string' } }
+      let(:input) { { id: 'some string' } }
 
       it 'returns errors' do
         expect { subject }.not_to change { get_token }
@@ -64,7 +64,7 @@ RSpec.describe 'RunnersRegistrationTokenReset' do
   context 'applied to project' do
     let_it_be(:project) { create_default(:project) }
 
-    let(:input) { { full_path: project.to_global_id.to_s } }
+    let(:input) { { id: project.to_global_id.to_s } }
 
     include_context 'when unauthorized', 'project' do
       let(:target) { project }
@@ -82,7 +82,7 @@ RSpec.describe 'RunnersRegistrationTokenReset' do
   context 'applied to group' do
     let_it_be(:group) { create_default(:group) }
 
-    let(:input) { { full_path: group.to_global_id.to_s } }
+    let(:input) { { id: group.to_global_id.to_s } }
 
     include_context 'when unauthorized', 'group' do
       let(:target) { group }
