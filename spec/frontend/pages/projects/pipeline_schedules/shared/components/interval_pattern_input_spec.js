@@ -43,6 +43,11 @@ describe('Interval Pattern Input Component', () => {
 
     wrapper = mount(IntervalPatternInput, {
       propsData: { ...props },
+      provide: {
+        glFeatures: {
+          ciDailyLimitForPipelineSchedules: true,
+        },
+      },
       data() {
         return {
           randomHour: data?.hour || mockHour,
@@ -208,7 +213,7 @@ describe('Interval Pattern Input Component', () => {
 
   describe('Custom cron syntax quota info', () => {
     it('the help text icon is only shown for the custom radio option', () => {
-      createWrapper();
+      createWrapper({ dailyLimit: '144' });
 
       expect(findIcon().exists()).toBe(true);
       expect(findAllIcons().length).toBe(1);
