@@ -9,8 +9,8 @@ export default {
   components: {
     EditorLite,
   },
+  inject: ['ciConfigPath', 'projectPath', 'projectNamespace', 'defaultBranch'],
   mixins: [glFeatureFlagMixin()],
-  inject: ['ciConfigPath', 'projectPath', 'projectNamespace'],
   inheritAttrs: false,
   data() {
     return {
@@ -34,7 +34,7 @@ export default {
         editorInstance.registerCiSchema({
           projectPath: this.projectPath,
           projectNamespace: this.projectNamespace,
-          ref: this.commitSha,
+          ref: this.commitSha || this.defaultBranch,
         });
       }
     },
