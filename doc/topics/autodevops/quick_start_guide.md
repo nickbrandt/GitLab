@@ -106,7 +106,8 @@ status on your [GCP dashboard](https://console.cloud.google.com/kubernetes).
 After your cluster is running, you must install NGINX Ingress Controller as a
 load balancer, to route traffic from the internet to your application. Because
 you've created a Google GKE cluster in this guide, you can install NGINX Ingress Controller
-with Google Cloud Shell:
+through the GitLab [Cluster management project template](../../user/clusters/management_project_template.md),
+or manually with Google Cloud Shell:
 
 1. Go to your cluster's details page, and click the **Advanced Settings** tab.
 1. Click the link to Google Kubernetes Engine to visit the cluster on Google Cloud Console.
@@ -122,12 +123,26 @@ with Google Cloud Shell:
    kubectl get service nginx-ingress-nginx-ingress
    ```
 
-1. A few minutes after you install NGINX, the load balancer obtains an IP address, and you can
-   get the external IP address with this command:
+## Configure your Base Domain
 
-   ```shell
-   kubectl get service nginx-ingress-nginx-ingress -ojson | jq -r '.status.loadBalancer.ingress[].ip'
-   ```
+Follow these steps to configure the Base Domain where your apps will be accessible.
+
+1. A few minutes after you install NGINX, the load balancer obtains an IP address, and you can
+   get the external IP address with the following command:
+
+   - If you installed it manually through the [Cluster management project template](../../user/clusters/management_project_template.md):
+
+      ```shell
+      kubectl get service ingress-nginx-ingress-controller -n gitlab-managed-apps -ojson | jq -r '.status.loadBalancer.ingress[].ip'
+      ```
+
+      Replace `gitlab-managed-apps` if you have overwritten your namespace.
+
+   - If you installed it manually through Google Cloud Shell:
+
+      ```shell
+      kubectl get service nginx-ingress-nginx-ingress -ojson | jq -r '.status.loadBalancer.ingress[].ip'
+      ```
 
    Copy this IP address, as you need it in the next step.
 
