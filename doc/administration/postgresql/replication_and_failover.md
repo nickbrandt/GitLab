@@ -174,8 +174,6 @@ Few notes on the service itself:
 - The service runs as the same system account as the database
   - In the package, this is by default `gitlab-psql`
 - If you use a non-default user account for PgBouncer service (by default `pgbouncer`), you will have to specify this username. We will refer to this requirement with `PGBOUNCER_USERNAME`.
-- The service will have a regular database user account generated for it
-  - This defaults to `patroni`
 - Passwords are stored in the following locations:
   - `/etc/gitlab/gitlab.rb`: hashed, and in plain text
   - `/var/opt/gitlab/pgbouncer/pg_auth`: hashed
