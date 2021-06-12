@@ -135,7 +135,13 @@ export default {
             :edit-path="blobInfo.editBlobPath"
             :web-ide-path="blobInfo.ideEditPath"
           />
-          <blob-replace v-if="isLoggedIn" :name="blobInfo.name" :path="path" />
+          <blob-replace
+            v-if="isLoggedIn"
+            :path="path"
+            :name="blobInfo.name"
+            :replace-path="blobInfo.replacePath"
+            :can-push-code="blobInfo.canModifyBlob"
+          />
         </template>
       </blob-header>
       <blob-content

@@ -2,6 +2,7 @@
 import { GlButton, GlModalDirective } from '@gitlab/ui';
 import { uniqueId } from 'lodash';
 import { sprintf, __ } from '~/locale';
+import getRefMixin from '../mixins/get_ref';
 import UploadBlobModal from './upload_blob_modal.vue';
 
 export default {
@@ -16,18 +17,13 @@ export default {
   directives: {
     GlModal: GlModalDirective,
   },
+  mixins: [getRefMixin],
   inject: {
     targetBranch: {
       default: '',
     },
     originalBranch: {
       default: '',
-    },
-    canPushCode: {
-      default: false,
-    },
-    replacePath: {
-      default: null,
     },
   },
   props: {
@@ -37,6 +33,14 @@ export default {
     },
     path: {
       type: String,
+      required: true,
+    },
+    replacePath: {
+      type: String,
+      required: true,
+    },
+    canPushCode: {
+      type: Boolean,
       required: true,
     },
   },
@@ -60,8 +64,8 @@ export default {
       :modal-id="replaceModalId"
       :modal-title="title"
       :commit-message="title"
-      :target-branch="targetBranch"
-      :original-branch="originalBranch"
+      :target-branch="targetBranch || ref"
+      :original-branch="originalBranch || ref"
       :can-push-code="canPushCode"
       :path="path"
       :replace-path="replacePath"

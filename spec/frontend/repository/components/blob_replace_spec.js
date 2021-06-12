@@ -5,13 +5,13 @@ import UploadBlobModal from '~/repository/components/upload_blob_modal.vue';
 const DEFAULT_PROPS = {
   name: 'some name',
   path: 'some/path',
+  canPushCode: true,
+  replacePath: 'some/replace/path',
 };
 
 const DEFAULT_INJECT = {
   targetBranch: 'master',
   originalBranch: 'master',
-  canPushCode: true,
-  replacePath: 'some/replace/path',
 };
 
 describe('BlobReplace component', () => {
@@ -49,8 +49,8 @@ describe('BlobReplace component', () => {
   it('renders UploadBlobModal', () => {
     createComponent();
 
-    const { targetBranch, originalBranch, canPushCode, replacePath } = DEFAULT_INJECT;
-    const { name, path } = DEFAULT_PROPS;
+    const { targetBranch, originalBranch } = DEFAULT_INJECT;
+    const { name, path, canPushCode, replacePath } = DEFAULT_PROPS;
     const title = `Replace ${name}`;
 
     expect(findUploadBlobModal().props()).toMatchObject({
