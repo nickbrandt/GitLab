@@ -73,6 +73,7 @@ export default {
       @execute="trackToolbarControlExecution"
     />
     <toolbar-link-button
+      data-testid="link"
       :tiptap-editor="contentEditor.tiptapEditor"
       @execute="trackToolbarControlExecution"
     />
