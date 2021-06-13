@@ -72,7 +72,10 @@ export default {
       :tiptap-editor="contentEditor.tiptapEditor"
       @execute="trackToolbarControlExecution"
     />
-    <toolbar-link-button :tiptap-editor="contentEditor.tiptapEditor" />
+    <toolbar-link-button
+      :tiptap-editor="contentEditor.tiptapEditor"
+      @execute="trackToolbarControlExecution"
+    />
     <divider />
     <toolbar-button
       data-testid="blockquote"
