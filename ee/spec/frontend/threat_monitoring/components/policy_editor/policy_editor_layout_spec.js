@@ -58,15 +58,13 @@ describe('PolicyEditorLayout component', () => {
     it('mode changes appropriately when new mode is selected', async () => {
       expect(findRuleModeSection().exists()).toBe(true);
       expect(findYamlModeSection().exists()).toBe(false);
-      findEditorModeToggle().vm.$emit('input', EDITOR_MODE_YAML);
-      await wrapper.vm.$nextTick();
+      await findEditorModeToggle().vm.$emit('input', EDITOR_MODE_YAML);
       expect(findRuleModeSection().exists()).toBe(false);
       expect(findYamlModeSection().exists()).toBe(true);
       expect(wrapper.emitted('update-editor-mode')).toStrictEqual([[EDITOR_MODE_YAML]]);
     });
 
     it('does display custom save button text', () => {
-      // custom save button text works
       const saveButton = findSavePolicyButton();
       expect(saveButton.exists()).toBe(true);
       expect(saveButton.text()).toBe('Create policy');
@@ -118,7 +116,7 @@ describe('PolicyEditorLayout component', () => {
       expect(findComponent().exists()).toBe(state);
     });
 
-    it('emits propertly when yaml is updated', () => {
+    it('emits properly when yaml is updated', () => {
       const newManifest = 'new yaml!';
       findYamlModeSection().vm.$emit('input', newManifest);
       expect(wrapper.emitted('update-yaml')).toStrictEqual([[newManifest]]);

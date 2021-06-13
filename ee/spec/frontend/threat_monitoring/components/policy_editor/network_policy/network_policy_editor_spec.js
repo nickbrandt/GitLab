@@ -63,11 +63,9 @@ describe('NetworkPolicyEditor component', () => {
 
   const modifyPolicyAlert = async ({ isAlertEnabled }) => {
     const policyAlertPicker = findPolicyAlertPicker();
-    policyAlertPicker.vm.$emit('update-alert', isAlertEnabled);
-    await wrapper.vm.$nextTick();
+    await policyAlertPicker.vm.$emit('update-alert', isAlertEnabled);
     expect(policyAlertPicker.props('policyAlert')).toBe(isAlertEnabled);
-    findPolicyEditorLayout().vm.$emit('save-policy');
-    await wrapper.vm.$nextTick();
+    await findPolicyEditorLayout().vm.$emit('save-policy');
   };
 
   beforeEach(() => {
@@ -140,8 +138,7 @@ describe('NetworkPolicyEditor component', () => {
         }),
       });
 
-      findPolicyEditorLayout().vm.$emit('save-policy', EDITOR_MODE_YAML);
-      await wrapper.vm.$nextTick();
+      await findPolicyEditorLayout().vm.$emit('save-policy', EDITOR_MODE_YAML);
       expect(store.dispatch).toHaveBeenCalledWith('networkPolicies/createPolicy', {
         environmentId: -1,
         policy: { manifest: mockL7Manifest },
@@ -152,24 +149,21 @@ describe('NetworkPolicyEditor component', () => {
 
   it('given there is a name change, updates policy yaml preview', async () => {
     const initialValue = findPreview().props('policyYaml');
-    findPolicyName().vm.$emit('input', 'new');
-    await wrapper.vm.$nextTick();
+    await findPolicyName().vm.$emit('input', 'new');
     expect(findPreview().props('policyYaml')).not.toEqual(initialValue);
   });
 
   it('given there is a rule change, updates policy description preview', async () => {
     const initialValue = findPreview().props('policyDescription');
-    findAddRuleButton().vm.$emit('click');
-    await wrapper.vm.$nextTick();
+    await findAddRuleButton().vm.$emit('click');
     expect(findPreview().props('policyDescription')).not.toEqual(initialValue);
   });
 
   it('adds a new rule', async () => {
     expect(wrapper.findAllComponents(PolicyRuleBuilder)).toHaveLength(1);
     const button = findAddRuleButton();
-    button.vm.$emit('click');
-    button.vm.$emit('click');
-    await wrapper.vm.$nextTick();
+    await button.vm.$emit('click');
+    await button.vm.$emit('click');
     const elements = wrapper.findAllComponents(PolicyRuleBuilder);
     expect(elements).toHaveLength(3);
 
@@ -186,20 +180,17 @@ describe('NetworkPolicyEditor component', () => {
   });
 
   it('removes a new rule', async () => {
-    findAddRuleButton().vm.$emit('click');
-    await wrapper.vm.$nextTick();
+    await findAddRuleButton().vm.$emit('click');
     expect(wrapper.findAllComponents(PolicyRuleBuilder)).toHaveLength(2);
 
-    findPolicyRuleBuilder().vm.$emit('remove');
-    await wrapper.vm.$nextTick();
+    await findPolicyRuleBuilder().vm.$emit('remove');
     expect(wrapper.findAllComponents(PolicyRuleBuilder)).toHaveLength(1);
   });
 
   it('updates yaml editor value on switch to yaml editor', async () => {
     const policyEditorLayout = findPolicyEditorLayout();
     findPolicyName().vm.$emit('input', 'test-policy');
-    policyEditorLayout.vm.$emit('update-editor-mode', EDITOR_MODE_YAML);
-    await wrapper.vm.$nextTick();
+    await policyEditorLayout.vm.$emit('update-editor-mode', EDITOR_MODE_YAML);
     expect(fromYaml(policyEditorLayout.attributes('yamleditorvalue'))).toMatchObject({
       name: 'test-policy',
     });
@@ -245,16 +236,13 @@ describe('NetworkPolicyEditor component', () => {
     it('does not update yaml editor value on switch to yaml editor', async () => {
       findPolicyName().vm.$emit('input', 'test-policy');
       const policyEditorLayout = findPolicyEditorLayout();
-      policyEditorLayout.vm.$emit('update-editor-mode', EDITOR_MODE_YAML);
-      await wrapper.vm.$nextTick();
+      await policyEditorLayout.vm.$emit('update-editor-mode', EDITOR_MODE_YAML);
       expect(policyEditorLayout.attributes('yamleditorvalue')).toEqual('');
     });
   });
 
   it('creates policy and redirects to a threat monitoring path', async () => {
-    findPolicyEditorLayout().vm.$emit('save-policy');
-
-    await wrapper.vm.$nextTick();
+    await findPolicyEditorLayout().vm.$emit('save-policy');
     expect(store.dispatch).toHaveBeenCalledWith('networkPolicies/createPolicy', {
       environmentId: -1,
       policy: { manifest: toYaml(wrapper.vm.policy) },
@@ -272,8 +260,7 @@ describe('NetworkPolicyEditor component', () => {
     });
 
     it('it does not redirect', async () => {
-      findPolicyEditorLayout().vm.$emit('save-policy');
-      await wrapper.vm.$nextTick();
+      await findPolicyEditorLayout().vm.$emit('save-policy');
       expect(redirectTo).not.toHaveBeenCalledWith('/threat-monitoring');
     });
   });
@@ -299,8 +286,7 @@ describe('NetworkPolicyEditor component', () => {
     });
 
     it('updates existing policy and redirects to a threat monitoring path', async () => {
-      findPolicyEditorLayout().vm.$emit('save-policy');
-      await wrapper.vm.$nextTick();
+      await findPolicyEditorLayout().vm.$emit('save-policy');
       expect(store.dispatch).toHaveBeenCalledWith('networkPolicies/updatePolicy', {
         environmentId: -1,
         policy: { name: 'policy', manifest: toYaml(wrapper.vm.policy) },
@@ -328,8 +314,7 @@ describe('NetworkPolicyEditor component', () => {
     });
 
     it('removes policy and redirects to a threat monitoring path on secondary modal button click', async () => {
-      findPolicyEditorLayout().vm.$emit('remove-policy');
-      await wrapper.vm.$nextTick();
+      await findPolicyEditorLayout().vm.$emit('remove-policy');
 
       expect(store.dispatch).toHaveBeenCalledWith('networkPolicies/deletePolicy', {
         environmentId: -1,

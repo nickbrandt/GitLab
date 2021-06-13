@@ -21755,6 +21755,9 @@ msgstr ""
 msgid "NetworkPolicies|Save changes"
 msgstr ""
 
+msgid "NetworkPolicies|Scan Execution"
+msgstr ""
+
 msgid "NetworkPolicies|Something went wrong, failed to update policy"
 msgstr ""
 

@@ -32,8 +32,6 @@ export default {
       : DEFAULT_SCAN_EXECUTION_POLICY;
 
     return {
-      isRemovingPolicy: false,
-      isUpdatingPolicy: false,
       policy,
       yamlEditorValue,
     };
@@ -44,12 +42,6 @@ export default {
     },
   },
   methods: {
-    removePolicy() {
-      // TODO call graphql mutation and redirect to merge request after #329422 is closed
-    },
-    savePolicy() {
-      // TODO call graphql mutation and redirect to merge request after #329422 is closed
-    },
     updateYaml(manifest) {
       this.yamlEditorValue = manifest;
     },
@@ -62,12 +54,8 @@ export default {
     :default-editor-mode="$options.DEFAULT_EDITOR_MODE"
     :editor-modes="$options.EDITOR_MODES"
     :is-editing="isEditing"
-    :is-removing-policy="isRemovingPolicy"
-    :is-updating-policy="isUpdatingPolicy"
     :policy-name="policy.name"
     :yaml-editor-value="yamlEditorValue"
-    @remove-policy="removePolicy"
-    @save-policy="savePolicy"
     @update-yaml="updateYaml"
   >
     <template #save-button-text>
