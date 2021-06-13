@@ -31227,6 +31227,9 @@ msgstr ""
 msgid "StorageSize|Unknown"
 msgstr ""
 
+msgid "Strikethrough"
+msgstr ""
+
 msgid "Subgroup information"
 msgstr ""
 
