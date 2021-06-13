@@ -1,5 +1,6 @@
+import { GlAlert } from '@gitlab/ui';
 import { EditorContent } from '@tiptap/vue-2';
-import { shallowMount } from '@vue/test-utils';
+import { shallowMountExtended } from 'helpers/vue_test_utils_helper';
 import ContentEditor from '~/content_editor/components/content_editor.vue';
 import TopToolbar from '~/content_editor/components/top_toolbar.vue';
 import { createContentEditor } from '~/content_editor/services/create_content_editor';
@@ -8,8 +9,10 @@ describe('ContentEditor', () => {
   let wrapper;
   let editor;
 
+  const findEditorElement = () => wrapper.findByTestId('content-editor');
+
   const createWrapper = async (contentEditor) => {
-    wrapper = shallowMount(ContentEditor, {
+    wrapper = shallowMountExtended(ContentEditor, {
       propsData: {
         contentEditor,
       },
@@ -39,6 +42,24 @@ describe('ContentEditor', () => {
     expect(wrapper.findComponent(TopToolbar).props().contentEditor).toBe(editor);
   });
 
+  describe('if an error is emitted by the top toolbar', () => {
+    beforeEach(async () => {
+      createWrapper(editor);
+
+      return wrapper.findComponent(TopToolbar).vm.$emit('error', 'An error occured');
+    });
+
+    it('shows an error alert', () => {
+      expect(wrapper.findComponent(GlAlert).text()).toContain('An error occured');
+    });
+
+    it('hides the error alert on dismiss', async () => {
+      await wrapper.findComponent(GlAlert).vm.$emit('dismiss');
+
+      expect(wrapper.findComponent(GlAlert).exists()).toBe(false);
+    });
+  });
+
   it.each`
     isFocused | classes
     ${true}   | ${['md-area', 'is-focused']}
@@ -49,7 +70,7 @@ describe('ContentEditor', () => {
       editor.tiptapEditor.isFocused = isFocused;
       createWrapper(editor);
 
-      expect(wrapper.classes()).toStrictEqual(classes);
+      expect(findEditorElement().classes()).toStrictEqual(classes);
     },
   );
 
@@ -57,6 +78,6 @@ describe('ContentEditor', () => {
     editor.tiptapEditor.isFocused = true;
     createWrapper(editor);
 
-    expect(wrapper.classes()).toContain('is-focused');
+    expect(findEditorElement().classes()).toContain('is-focused');
   });
 });

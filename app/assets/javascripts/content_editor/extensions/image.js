@@ -1,7 +1,47 @@
+import { nodeInputRule } from '@tiptap/core';
 import { Image } from '@tiptap/extension-image';
-import { defaultMarkdownSerializer } from 'prosemirror-markdown/src/to_markdown';
+import { Plugin, PluginKey } from 'prosemirror-state';
+import { uploadFile } from '../services/upload_file';
 
-const ExtendedImage = Image.extend({
+export const imageSyntaxInputRuleRegExp = /(?:^|\s)!\[(?<alt>[\w|\s|-]+)\]\((?<src>.+?)\)$/gm;
+
+const acceptedMimes = ['image/jpeg', 'image/png', 'image/gif', 'image/jpg'];
+
+const startFileUpload = async ({ file, uploadsPath, renderMarkdown, editor }) => {
+  editor.emit('imageUploadStart');
+
+  try {
+    const data = await uploadFile({ file, uploadsPath, renderMarkdown });
+    const { src, canonicalSrc } = data;
+
+    editor.commands.setImage({ src, canonicalSrc, alt: '' });
+    editor.emit('imageUploadSucceed', data);
+  } catch (e) {
+    editor.emit('imageUploadFailed');
+  }
+};
+
+const handleFileEvent = ({ files, uploadsPath, renderMarkdown, editor }) => {
+  const file = files[0];
+
+  if (acceptedMimes.includes(file?.type)) {
+    startFileUpload({ file, uploadsPath, renderMarkdown, editor });
+
+    return true;
+  }
+
+  return false;
+};
+
+export const ExtendedImage = Image.extend({
+  defaultOptions: {
+    ...Image.options,
+    uploadsPath: null,
+    renderMarkdown: null,
+  },
+  addInputRules() {
+    return [nodeInputRule(imageSyntaxInputRuleRegExp, this.type, ({ groups }) => groups)];
+  },
   addAttributes() {
     return {
       ...this.parent?.(),
@@ -17,7 +57,15 @@ const ExtendedImage = Image.extend({
           const img = element.querySelector('img');
 
           return {
-            src: img.dataset.src || img.getAttribute('src'),
+            src: img.dataset.src,
+          };
+        },
+      },
+      canonicalSrc: {
+        default: null,
+        parseHTML: (element) => {
+          return {
+            canonicalSrc: element.dataset.canonicalSrc,
           };
         },
       },
@@ -44,7 +92,62 @@ const ExtendedImage = Image.extend({
       },
     ];
   },
+  addCommands() {
+    return {
+      ...this.parent(),
+      uploadImage: ({ file }) => () => {
+        const { uploadsPath, renderMarkdown } = this.options;
+
+        startFileUpload({ file, uploadsPath, renderMarkdown, editor: this.editor });
+      },
+    };
+  },
+  addProseMirrorPlugins() {
+    const extension = this;
+
+    return [
+      new Plugin({
+        key: new PluginKey('handleDropAndPasteImages'),
+        props: {
+          handlePaste: (_, event) => {
+            const { uploadsPath, renderMarkdown } = this.options;
+
+            return handleFileEvent({
+              files: event.clipboardData.files,
+              uploadsPath,
+              renderMarkdown,
+              editor: extension.editor,
+            });
+          },
+          handleDrop: (_, event) => {
+            const { uploadsPath, renderMarkdown } = this.options;
+
+            return handleFileEvent({
+              files: event.dataTransfer.files,
+              uploadsPath,
+              renderMarkdown,
+              editor: extension.editor,
+            });
+          },
+        },
+      }),
+    ];
+  },
 }).configure({ inline: true });
 
-export const tiptapExtension = ExtendedImage;
-export const serializer = defaultMarkdownSerializer.nodes.image;
+export const serializer = (state, node) => {
+  const { alt = '', canonicalSrc, src, title } = node.attrs;
+  const quotedTitle = title ? ` ${state.quote(title)}` : '';
+
+  state.write(`![${state.esc(alt)}](${state.esc(canonicalSrc || src)}${quotedTitle})`);
+};
+
+export const configure = (config) => ({
+  tiptapExtension: ExtendedImage.configure({
+    HTMLAttributes: {
+      class: 'gl-w-full gl-h-auto',
+    },
+    ...config,
+  }),
+  serializer,
+});

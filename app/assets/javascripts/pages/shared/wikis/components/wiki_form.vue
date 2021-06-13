@@ -257,6 +257,7 @@ export default {
         this.contentEditor ||
         createContentEditor({
           renderMarkdown: (markdown) => this.getContentHTML(markdown),
+          uploadsPath: this.pageInfo.uploadsPath,
           tiptapOptions: {
             onUpdate: () => this.handleContentChange(),
           },
@@ -469,7 +470,11 @@ export default {
             </gl-sprintf>
           </gl-alert>
           <gl-loading-icon v-if="isContentEditorLoading" class="bordered-box gl-w-full gl-py-6" />
-          <content-editor v-else :content-editor="contentEditor" />
+          <content-editor
+            v-else
+            :content-editor="contentEditor"
+            :uploads-path="pageInfo.uploadsPath"
+          />
           <input id="wiki_content" v-model.trim="content" type="hidden" name="wiki[content]" />
         </div>
 

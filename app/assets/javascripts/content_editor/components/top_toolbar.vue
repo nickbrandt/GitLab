@@ -1,9 +1,11 @@
 <script>
+import { GlLoadingIcon } from '@gitlab/ui';
 import Tracking from '~/tracking';
 import { CONTENT_EDITOR_TRACKING_LABEL, TOOLBAR_CONTROL_TRACKING_ACTION } from '../constants';
 import { ContentEditor } from '../services/content_editor';
 import Divider from './divider.vue';
 import ToolbarButton from './toolbar_button.vue';
+import ToolbarImageButton from './toolbar_image_button.vue';
 import ToolbarLinkButton from './toolbar_link_button.vue';
 import ToolbarTextStyleDropdown from './toolbar_text_style_dropdown.vue';
 
@@ -13,9 +15,11 @@ const trackingMixin = Tracking.mixin({
 
 export default {
   components: {
+    GlLoadingIcon,
     ToolbarButton,
     ToolbarTextStyleDropdown,
     ToolbarLinkButton,
+    ToolbarImageButton,
     Divider,
   },
   mixins: [trackingMixin],
@@ -24,8 +28,24 @@ export default {
       type: ContentEditor,
       required: true,
     },
+    uploadsPath: {
+      type: String,
+      required: false,
+      default: '',
+    },
+  },
+  data() {
+    return {
+      isLoading: false,
+    };
   },
   methods: {
+    setLoadingState(state) {
+      this.isLoading = state;
+    },
+    setError(error) {
+      this.$emit('error', error);
+    },
     trackToolbarControlExecution({ contentType: property, value }) {
       this.track(TOOLBAR_CONTROL_TRACKING_ACTION, {
         property,
@@ -39,6 +59,7 @@ export default {
   <div
     class="gl-display-flex gl-justify-content-end gl-pb-3 gl-pt-0 gl-border-b-solid gl-border-b-1 gl-border-b-gray-200"
   >
+    <gl-loading-icon v-if="isLoading" class="gl-w-full gl-mt-2" />
     <toolbar-text-style-dropdown
       data-testid="text-styles"
       :tiptap-editor="contentEditor.tiptapEditor"
@@ -87,6 +108,14 @@ export default {
       @execute="trackToolbarControlExecution"
     />
     <divider />
+    <toolbar-image-button
+      ref="imageButton"
+      :tiptap-editor="contentEditor.tiptapEditor"
+      :uploads-path="uploadsPath"
+      @execute="trackToolbarControlExecution"
+      @loading="setLoadingState"
+      @error="setError"
+    />
     <toolbar-button
       data-testid="blockquote"
       content-type="blockquote"
@@ -134,3 +163,8 @@ export default {
     />
   </div>
 </template>
+<style>
+.gl-spinner-container {
+  text-align: left;
+}
+</style>
