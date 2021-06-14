@@ -243,7 +243,7 @@ describe('InviteMembersModal', () => {
         });
       });
 
-      describe('when adding an existing user id through the members API command fails', () => {
+      describe('when member is not added successfully', () => {
         beforeEach(() => {
           createInviteMembersToGroupWrapper();
 
@@ -290,7 +290,6 @@ describe('InviteMembersModal', () => {
           await waitForPromises();
 
           expect(membersFormGroupInvalidFeedback()).toBe('Something went wrong');
-          expect(membersFormGroupInvalidFeedback()).not.toBe('Request failed with status code 500');
         });
 
         it('displays the restricted user api message for response with bad request', async () => {
@@ -360,7 +359,7 @@ describe('InviteMembersModal', () => {
         });
       });
 
-      describe('when inviting a new member throught invitaions API fails', () => {
+      describe('when invites are not sent successfully', () => {
         beforeEach(() => {
           createInviteMembersToGroupWrapper();
 
@@ -378,7 +377,7 @@ describe('InviteMembersModal', () => {
           expect(findMembersSelect().props('validationState')).toBe(false);
         });
 
-        it('displays the restricted email error for restricted email invited', async () => {
+        it('displays the restricted email error when restricted email is invited', async () => {
           mockInvitationsApi(httpStatus.CREATED, invitationsApiResponse.RESTRICTED_EMAIL_ERROR);
 
           clickInviteButton();
@@ -389,7 +388,7 @@ describe('InviteMembersModal', () => {
           expect(findMembersSelect().props('validationState')).toBe(false);
         });
 
-        it('displays the successful toastMessage when already invited', async () => {
+        it('displays the successful toast message when email has already been invited', async () => {
           mockInvitationsApi(httpStatus.CREATED, invitationsApiResponse.EMAIL_TAKEN);
           wrapper.vm.$toast = { show: jest.fn() };
           jest.spyOn(wrapper.vm, 'showToastMessageSuccess');
@@ -402,9 +401,8 @@ describe('InviteMembersModal', () => {
           expect(findMembersSelect().props('validationState')).toBe(null);
         });
 
-        it('displays the first error message when multiple in response were restricted', async () => {
+        it('displays the first error message when multiple emails return a restricted error message', async () => {
           mockInvitationsApi(httpStatus.CREATED, invitationsApiResponse.MULTIPLE_RESTRICTED);
-          wrapper.vm.$toast = { show: jest.fn() };
 
           clickInviteButton();
 
@@ -416,7 +414,6 @@ describe('InviteMembersModal', () => {
 
         it('displays the invalid syntax error for bad request', async () => {
           mockInvitationsApi(httpStatus.BAD_REQUEST, invitationsApiResponse.INVALID_EMAIL_SINGLE);
-          wrapper.vm.$toast = { show: jest.fn() };
 
           clickInviteButton();
 
@@ -427,13 +424,12 @@ describe('InviteMembersModal', () => {
         });
       });
 
-      describe('when more than 1 new emails are invited in the same click', () => {
-        it('displays the invalid syntax error when 2 invited and 1 received invalid syntax error', async () => {
+      describe('when multiple emails are invited at the same time', () => {
+        it('displays the invalid syntax error if one of the emails is invalid', async () => {
           createInviteMembersToGroupWrapper();
 
           wrapper.setData({ newUsersToInvite: [user3, user4] });
           mockInvitationsApi(httpStatus.CREATED, invitationsApiResponse.INVALID_EMAIL_SINGLE);
-          wrapper.vm.$toast = { show: jest.fn() };
 
           clickInviteButton();
 

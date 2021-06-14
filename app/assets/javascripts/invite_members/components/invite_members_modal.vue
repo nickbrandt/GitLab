@@ -352,7 +352,7 @@ export default {
           :groups-filter="groupSelectFilter"
           :parent-group-id="groupSelectParentId"
         />
-      </div>
+      </gl-form-group>
 
       <label class="gl-font-weight-bold gl-mt-3">{{ $options.labels.accessLevel }}</label>
       <div class="gl-mt-2 gl-w-half gl-xs-w-full">

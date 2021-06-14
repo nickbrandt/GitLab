@@ -30,7 +30,14 @@ export function responseMessageFromError(response) {
     response: { data },
   } = response;
 
-  return data.error || data.message?.user?.[0] || data.message?.access_level?.[0] || data.message?.error || data.message || '';
+  return (
+    data.error ||
+    data.message?.user?.[0] ||
+    data.message?.access_level?.[0] ||
+    data.message?.error ||
+    data.message ||
+    ''
+  );
 }
 
 export function responseMessageFromSuccess(response) {
