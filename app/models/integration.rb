@@ -45,6 +45,7 @@ class Integration < ApplicationRecord
     campfire confluence custom_issue_tracker
     datadog discord drone_ci
     emails_on_push ewm emails_on_push external_wiki
+    flowdock
   ].to_set.freeze
 
   def self.renamed?(name)
