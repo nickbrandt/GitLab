@@ -16,7 +16,7 @@ is recommended over NFS where possible, due to better performance.
 File system performance can impact overall GitLab performance, especially for
 actions that read or write to Git repositories. For steps you can use to test
 file system performance, see
-[File system Performance Benchmarking](operations/filesystem_benchmarking.md).
+[File System Performance Benchmarking](operations/filesystem_benchmarking.md).
 
 ## Gitaly and NFS deprecation
 
