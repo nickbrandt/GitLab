@@ -46,6 +46,7 @@ class Integration < ApplicationRecord
     datadog discord drone_ci
     emails_on_push ewm emails_on_push external_wiki
     flowdock
+    hangouts_chat
   ].to_set.freeze
 
   def self.renamed?(name)
