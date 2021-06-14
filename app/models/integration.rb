@@ -47,6 +47,7 @@ class Integration < ApplicationRecord
     emails_on_push ewm emails_on_push external_wiki
     flowdock
     hangouts_chat
+    irker
   ].to_set.freeze
 
   def self.renamed?(name)
