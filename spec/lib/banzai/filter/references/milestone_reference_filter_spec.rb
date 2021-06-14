@@ -526,6 +526,14 @@ RSpec.describe Banzai::Filter::References::MilestoneReferenceFilter do
       expect do
         reference_filter(markdown)
       end.not_to exceed_all_query_limit(max_count)
+
+      # Use an iid instead of title reference
+      markdown = "#{project_reference} #{group2_reference} #{project2.full_path}%#{project2_milestone.iid} #{project3.full_path}%test_milestone"
+      max_count += 4
+
+      expect do
+        reference_filter(markdown)
+      end.not_to exceed_all_query_limit(max_count)
     end
   end
 end
