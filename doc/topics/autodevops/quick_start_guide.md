@@ -124,20 +124,20 @@ or manually with Google Cloud Shell:
    kubectl get service ingress-nginx-ingress-controller -n gitlab-managed-apps
    ```
 
-## Configure your Base Domain
+## Configure your base domain
 
 Follow these steps to configure the Base Domain where your apps will be accessible.
 
 1. A few minutes after you install NGINX, the load balancer obtains an IP address, and you can
    get the external IP address with the following command:
    
-  ```shell
-  kubectl get service ingress-nginx-ingress-controller -n gitlab-managed-apps -ojson | jq -r '.status.loadBalancer.ingress[].ip'
-  ```
+   ```shell
+   kubectl get service ingress-nginx-ingress-controller -n gitlab-managed-apps -ojson | jq -r '.status.loadBalancer.ingress[].ip'
+   ```
 
-  Replace `gitlab-managed-apps` if you have overwritten your namespace.
+   Replace `gitlab-managed-apps` if you have overwritten your namespace.
 
-  Copy this IP address, as you need it in the next step.
+   Copy this IP address, as you need it in the next step.
 
 1. Go back to the cluster page on GitLab, and go to the **Details** tab.
    - Add your **Base domain**. For this guide, use the domain `<IP address>.nip.io`.
