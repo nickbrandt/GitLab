@@ -13,14 +13,17 @@ module Banzai
         def parent_records(parent, ids)
           return Milestone.none unless valid_context?(parent)
 
-          milestones_by_iid  = find_milestones(parent, true)
-          milestones_by_name = find_milestones(parent, false)
-          milestone_iids     = ids.map {|y| y[:milestone_iid]}.compact
-          milestone_names    = ids.map {|y| y[:milestone_name]}.compact
-          iid_relation       = milestones_by_iid.where(iid: milestone_iids)
-          milestone_relation = milestones_by_name.where(title: milestone_names)
+          milestone_iids = ids.map {|y| y[:milestone_iid]}.compact
+          unless milestone_iids.empty?
+            iid_relation = find_milestones(parent, true).where(iid: milestone_iids)
+          end
 
-          Milestone.from_union([iid_relation, milestone_relation]).includes(:project, :group)
+          milestone_names = ids.map {|y| y[:milestone_name]}.compact
+          unless milestone_names.empty?
+            milestone_relation = find_milestones(parent, false).where(title: milestone_names)
+          end
+
+          Milestone.from_union([iid_relation, milestone_relation].compact).includes(:project, :group)
         end
 
         # Links to project milestones contain the IID, but when we're handling
