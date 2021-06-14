@@ -146,6 +146,14 @@ class Project < ApplicationRecord
   has_one :last_event, -> {order 'events.created_at DESC'}, class_name: 'Event'
   has_many :boards
 
+  def self.integration_association(name)
+    if ::Integration.renamed?(name)
+      "#{name}_integration"
+    else
+      "#{name}_service"
+    end
+  end
+
   # Project integrations
   has_one :asana_integration, class_name: 'Integrations::Asana'
   has_one :assembla_integration, class_name: 'Integrations::Assembla'

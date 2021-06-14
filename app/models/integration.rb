@@ -46,6 +46,10 @@ class Integration < ApplicationRecord
     datadog discord drone_ci
   ].to_set.freeze
 
+  def self.renamed?(name)
+    RENAMED_TO_INTEGRATION.include?(name)
+  end
+
   serialize :properties, JSON # rubocop:disable Cop/ActiveRecordSerialize
 
   attribute :type, Gitlab::Integrations::StiType.new
