@@ -205,7 +205,7 @@ describe('IDE store project actions', () => {
           { type: 'CREATE_TREE', payload: { treePath: `${TEST_PROJECT_ID}/main` } },
           {
             type: 'TOGGLE_LOADING',
-            payload: { entry: store.state.trees[`${TEST_PROJECT_ID}/maind`], forceValue: false },
+            payload: { entry: store.state.trees[`${TEST_PROJECT_ID}/main`], forceValue: false },
           },
         ],
         expect.any(Object),
