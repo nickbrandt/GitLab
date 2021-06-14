@@ -99,7 +99,7 @@ should be changed.
 We use the following categories to classify the metric.
 
 1. `Operational`: Required data for operational purposes.
-1. `Optional`: Data that is optional to collect. This can be [enabled/disabled](https://docs.gitlab.com/ee/development/usage_ping/#disable-usage-ping) admin settings.
+1. `Optional`: Data that is optional to collect. This can be [enabled/disabled](index#disable-usage-ping) admin settings.
 1. `Subscription`: Data related to licensing.
 1. `Standard`: Standard set of identifiers that are included when collecting data.
 
