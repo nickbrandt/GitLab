@@ -39511,6 +39511,9 @@ msgstr ""
 msgid "view the source"
 msgstr ""
 
+msgid "visibility"
+msgstr ""
+
 msgid "vulnerability"
 msgid_plural "vulnerabilities"
 msgstr[0] ""
