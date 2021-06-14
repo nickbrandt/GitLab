@@ -26,6 +26,8 @@ class GraphqlController < ApplicationController
   before_action :track_vs_code_usage
   before_action :disable_query_limiting
 
+  before_action :disallow_mutations_for_get
+
   # Since we deactivate authentication from the main ApplicationController and
   # defer it to :authorize_access_api!, we need to override the bypass session
   # callback execution order here
@@ -61,6 +63,25 @@ class GraphqlController < ApplicationController
   end
 
   private
+
+  def disallow_mutations_for_get
+    return unless request.get? || request.head?
+    return unless any_mutating_query?
+
+    raise ::Gitlab::Graphql::Errors::ArgumentError, "Mutations are forbidden in #{request.request_method} requests"
+  end
+
+  def any_mutating_query?
+    if multiplex?
+      multiplex_queries.any? { |q| mutation?(q[:query], q[:operation_name]) }
+    else
+      mutation?(query)
+    end
+  end
+
+  def mutation?(query_string, operation_name = params[:operationName])
+    ::GraphQL::Query.new(GitlabSchema, query_string, operation_name: operation_name).mutation?
+  end
 
   # Tests may mark some GraphQL queries as exempt from SQL query limits
   def disable_query_limiting
