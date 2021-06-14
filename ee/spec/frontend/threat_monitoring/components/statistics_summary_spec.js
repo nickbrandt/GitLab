@@ -1,4 +1,3 @@
-import { GlSingleStat } from '@gitlab/ui/dist/charts';
 import { shallowMount } from '@vue/test-utils';
 import StatisticsSummary from 'ee/threat_monitoring/components/statistics_summary.vue';
 
@@ -7,12 +6,13 @@ describe('StatisticsSummary component', () => {
 
   const factory = (options) => {
     wrapper = shallowMount(StatisticsSummary, {
+      stubs: { GlSingleStat: true },
       ...options,
     });
   };
 
-  const findAnomalousStat = () => wrapper.findAll(GlSingleStat).at(0);
-  const findNominalStat = () => wrapper.findAll(GlSingleStat).at(1);
+  const findAnomalousStat = () => wrapper.findAll('glsinglestat-stub').at(0);
+  const findNominalStat = () => wrapper.findAll('glsinglestat-stub').at(1);
 
   beforeEach(() => {
     factory({

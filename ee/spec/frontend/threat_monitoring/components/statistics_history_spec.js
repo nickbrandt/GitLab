@@ -1,4 +1,3 @@
-import { GlAreaChart } from '@gitlab/ui/dist/charts';
 import { createLocalVue, shallowMount } from '@vue/test-utils';
 import { TOTAL_REQUESTS, ANOMALOUS_REQUESTS } from 'ee/threat_monitoring/components/constants';
 import StatisticsHistory from 'ee/threat_monitoring/components/statistics_history.vue';
@@ -25,6 +24,9 @@ localVue.directive('gl-resize-observer-directive', MockResizeObserverDirective);
 
 describe('StatisticsHistory component', () => {
   let wrapper;
+  const mockChartInstance = {
+    resize: jest.fn(),
+  };
 
   const factory = ({ options } = {}) => {
     wrapper = shallowMount(StatisticsHistory, {
@@ -38,6 +40,10 @@ describe('StatisticsHistory component', () => {
         },
         yLegend: 'Requests',
       },
+      stubs: { GlAreaChart: true },
+      data: () => {
+        return { chartInstance: mockChartInstance };
+      },
       ...options,
     });
   };
@@ -46,65 +52,32 @@ describe('StatisticsHistory component', () => {
     wrapper.destroy();
   });
 
-  const findChart = () => wrapper.find(GlAreaChart);
+  const findChart = () => wrapper.find('glareachart-stub');
 
   describe('the data passed to the chart', () => {
     beforeEach(() => {
       factory();
     });
 
-    it('is structured correctly', () => {
-      expect(findChart().props('data')).toMatchObject([
-        { data: mockAnomalousHistory },
-        { data: mockNominalHistory },
-      ]);
-    });
-  });
-
-  describe('the options passed to the chart', () => {
-    beforeEach(() => {
-      factory();
+    it('passes the anomalous values correctly', () => {
+      expect(findChart().props('data').anomalous.values).toMatchObject(mockAnomalousHistory);
     });
 
-    it('sets the xAxis range', () => {
-      expect(findChart().props('option')).toMatchObject({
-        xAxis: {
-          min: 'foo',
-          max: 'bar',
-        },
-      });
+    it('passes the nominal values correctly', () => {
+      expect(findChart().props('data').nominal.values).toMatchObject(mockNominalHistory);
     });
   });
 
   describe('given the component needs to resize', () => {
-    let mockChartInstance;
     beforeEach(() => {
       factory();
-
-      mockChartInstance = {
-        resize: jest.fn(),
-      };
     });
 
-    describe('given the chart has not emitted the created event', () => {
-      beforeEach(() => {
-        MockResizeObserverDirective.simulateResize();
-      });
-
-      it('there is no attempt to resize the chart instance', () => {
-        expect(mockChartInstance.resize).not.toHaveBeenCalled();
-      });
-    });
-
-    describe('given the chart has emitted the created event', () => {
-      beforeEach(() => {
-        findChart().vm.$emit('created', mockChartInstance);
-        MockResizeObserverDirective.simulateResize();
-      });
-
-      it('the chart instance is resized', () => {
-        expect(mockChartInstance.resize).toHaveBeenCalledTimes(1);
-      });
+    it('the chart instance is resized', () => {
+      findChart().vm.$emit('created', mockChartInstance);
+      expect(mockChartInstance.resize).toHaveBeenCalledTimes(0);
+      MockResizeObserverDirective.simulateResize();
+      expect(mockChartInstance.resize).toHaveBeenCalledTimes(1);
     });
   });
 
