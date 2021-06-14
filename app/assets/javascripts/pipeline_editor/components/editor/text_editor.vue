@@ -9,8 +9,8 @@ export default {
   components: {
     EditorLite,
   },
-  inject: ['ciConfigPath', 'projectPath', 'projectNamespace', 'defaultBranch'],
   mixins: [glFeatureFlagMixin()],
+  inject: ['ciConfigPath', 'projectPath', 'projectNamespace', 'defaultBranch'],
   inheritAttrs: false,
   data() {
     return {
