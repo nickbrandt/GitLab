@@ -17,7 +17,7 @@ const apolloProvider = new VueApollo({
 });
 
 export default () => {
-  const el = document.getElementById('js-show-cloud-license-page');
+  const el = document.getElementById('js-show-subscription-page');
 
   if (!el) {
     return null;
