@@ -420,9 +420,9 @@ RSpec.describe GroupMember do
     end
 
     context 'when member does not have a related user (invited member)' do
-      it 'returns `false`' do
-        expect(invited.provisioned_by_this_group?).to eq(false)
-      end
+      let(:member) { invited }
+
+      it { is_expected.to eq(false) }
     end
   end
 
