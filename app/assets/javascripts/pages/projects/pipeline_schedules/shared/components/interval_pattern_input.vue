@@ -99,7 +99,7 @@ export default {
       return getWeekdayNames()[this.randomWeekDayIndex];
     },
     parsedDailyLimit() {
-      return this.dailyLimit === '144' ? '5' : '60';
+      return this.dailyLimit ? (24 * 60) / this.dailyLimit : null;
     },
     scheduleDailyLimitMsg() {
       return sprintf(

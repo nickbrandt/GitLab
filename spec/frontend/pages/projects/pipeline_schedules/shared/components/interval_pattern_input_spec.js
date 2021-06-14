@@ -29,7 +29,6 @@ describe('Interval Pattern Input Component', () => {
   const findSelectedRadio = () =>
     wrapper.findAll('input[type="radio"]').wrappers.find((x) => x.element.checked);
   const findIcon = () => wrapper.findComponent(GlIcon);
-  const findAllIcons = () => wrapper.findAllComponents(GlIcon);
   const findSelectedRadioKey = () => findSelectedRadio()?.attributes('data-testid');
   const selectEveryDayRadio = () => findEveryDayRadio().trigger('click');
   const selectEveryWeekRadio = () => findEveryWeekRadio().trigger('click');
@@ -212,11 +211,22 @@ describe('Interval Pattern Input Component', () => {
   });
 
   describe('Custom cron syntax quota info', () => {
-    it('the help text icon is only shown for the custom radio option', () => {
-      createWrapper({ dailyLimit: '144' });
+    it('the info message includes 5 minutes', () => {
+      createWrapper({ dailyLimit: '288' });
 
-      expect(findIcon().exists()).toBe(true);
-      expect(findAllIcons().length).toBe(1);
+      expect(findIcon().attributes('title')).toContain('5 minutes');
+    });
+
+    it('the info message includes 60 minutes', () => {
+      createWrapper({ dailyLimit: '24' });
+
+      expect(findIcon().attributes('title')).toContain('60 minutes');
+    });
+
+    it('the info message icon is not shown when there is no daily limit', () => {
+      createWrapper();
+
+      expect(findIcon().exists()).toBe(false);
     });
   });
 });
