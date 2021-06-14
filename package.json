@@ -41,6 +41,7 @@
     "markdownlint:no-trailing-spaces:fix": "yarn run markdownlint:no-trailing-spaces --fix",
     "postinstall": "node ./scripts/frontend/postinstall.js",
     "storybook:install": "yarn --cwd ./storybook install",
+    "storybook:build": "yarn --cwd ./storybook build",
     "storybook:start": "yarn --cwd ./storybook start",
     "stylelint-create-utility-map": "node scripts/frontend/stylelint/stylelint-utility-map.js",
     "webpack": "NODE_OPTIONS=\"--max-old-space-size=3584\" webpack --config config/webpack.config.js",

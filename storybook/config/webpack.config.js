@@ -12,6 +12,7 @@ const TRANSPARENT_1X1_PNG =
   'url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==)';
 const SASS_INCLUDE_PATHS = [
   'app/assets/stylesheets',
+  'app/assets/stylesheets/_ee',
   'ee/app/assets/stylesheets',
   'ee/app/assets/stylesheets/_ee',
   'node_modules',
