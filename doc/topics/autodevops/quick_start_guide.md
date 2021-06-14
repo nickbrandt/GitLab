@@ -115,12 +115,13 @@ or manually with Google Cloud Shell:
 1. After the Cloud Shell starts, run these commands to install NGINX Ingress Controller:
 
    ```shell
-   helm repo add nginx-stable https://helm.nginx.com/stable
+   kubectl create ns gitlab-managed-apps
+   helm repo add stable https://charts.helm.sh/stable
    helm repo update
-   helm install nginx-ingress nginx-stable/nginx-ingress
+   helm install ingress stable/nginx-ingress -n gitlab-managed-apps
 
    # Check that the ingress controller is installed successfully
-   kubectl get service nginx-ingress-nginx-ingress
+   kubectl get service ingress-nginx-ingress-controller -n gitlab-managed-apps
    ```
 
 ## Configure your Base Domain
@@ -129,22 +130,14 @@ Follow these steps to configure the Base Domain where your apps will be accessib
 
 1. A few minutes after you install NGINX, the load balancer obtains an IP address, and you can
    get the external IP address with the following command:
+   
+  ```shell
+  kubectl get service ingress-nginx-ingress-controller -n gitlab-managed-apps -ojson | jq -r '.status.loadBalancer.ingress[].ip'
+  ```
 
-   - If you installed it manually through the [Cluster management project template](../../user/clusters/management_project_template.md):
+  Replace `gitlab-managed-apps` if you have overwritten your namespace.
 
-      ```shell
-      kubectl get service ingress-nginx-ingress-controller -n gitlab-managed-apps -ojson | jq -r '.status.loadBalancer.ingress[].ip'
-      ```
-
-      Replace `gitlab-managed-apps` if you have overwritten your namespace.
-
-   - If you installed it manually through Google Cloud Shell:
-
-      ```shell
-      kubectl get service nginx-ingress-nginx-ingress -ojson | jq -r '.status.loadBalancer.ingress[].ip'
-      ```
-
-   Copy this IP address, as you need it in the next step.
+  Copy this IP address, as you need it in the next step.
 
 1. Go back to the cluster page on GitLab, and go to the **Details** tab.
    - Add your **Base domain**. For this guide, use the domain `<IP address>.nip.io`.
