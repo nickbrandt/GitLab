@@ -1,5 +1,5 @@
 <script>
-import { GlTokenSelector, GlAvatar, GlAvatarLabeled, GlSprintf } from '@gitlab/ui';
+import { GlTokenSelector, GlAvatar, GlAvatarLabeled, GlIcon, GlSprintf } from '@gitlab/ui';
 import { debounce } from 'lodash';
 import { __ } from '~/locale';
 import { getUsers } from '~/rest_api';
@@ -10,6 +10,7 @@ export default {
     GlTokenSelector,
     GlAvatar,
     GlAvatarLabeled,
+    GlIcon,
     GlSprintf,
   },
   props: {
@@ -21,6 +22,11 @@ export default {
     ariaLabelledby: {
       type: String,
       required: true,
+    },
+    validationState: {
+      type: Boolean,
+      required: false,
+      default: null,
     },
   },
   data() {
@@ -84,6 +90,13 @@ export default {
 
       this.hasBeenFocused = true;
     },
+    handleTokenRemove() {
+      if (this.selectedTokens.length) {
+        return;
+      }
+
+      this.$emit('clear');
+    },
   },
   queryOptions: { exclude_internal: true, active: true },
   i18n: {
@@ -95,6 +108,7 @@ export default {
 <template>
   <gl-token-selector
     v-model="selectedTokens"
+    :state="validationState"
     :dropdown-items="users"
     :loading="loading"
     :allow-user-defined-tokens="emailIsValid"
@@ -105,9 +119,11 @@ export default {
     @text-input="handleTextInput"
     @input="handleInput"
     @focus="handleFocus"
+    @token-remove="handleTokenRemove"
   >
     <template #token-content="{ token }">
-      <gl-avatar v-if="token.avatar_url" :src="token.avatar_url" :size="16" />
+      <gl-icon v-if="validationState === false" name="error" :size="16" class="gl-mr-2" />
+      <gl-avatar v-else-if="token.avatar_url" :src="token.avatar_url" :size="16" />
       {{ token.name }}
     </template>
 
