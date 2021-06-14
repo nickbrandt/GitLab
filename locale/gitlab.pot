@@ -12382,6 +12382,9 @@ msgstr ""
 msgid "Enter your password to approve"
 msgstr ""
 
+msgid "Enterprise"
+msgstr ""
+
 msgid "Environment"
 msgstr ""
 
