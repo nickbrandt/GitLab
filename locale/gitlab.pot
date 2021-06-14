@@ -6466,6 +6466,9 @@ msgstr ""
 msgid "Choose specific groups or storage shards"
 msgstr ""
 
+msgid "Choose the preferred Runner and populate the AWS CFT."
+msgstr ""
+
 msgid "Choose the top-level group for your repository imports."
 msgstr ""
 
@@ -9028,6 +9031,9 @@ msgid "Copy source branch name"
 msgstr ""
 
 msgid "Copy the code below to implement tracking in your application:"
+msgstr ""
+
+msgid "Copy this registration token."
 msgstr ""
 
 msgid "Copy this value"
@@ -24158,10 +24164,16 @@ msgstr ""
 msgid "Pipelines|Improve code quality with GitLab CI/CD"
 msgstr ""
 
+msgid "Pipelines|Install GitLab Runners"
+msgstr ""
+
 msgid "Pipelines|It is recommended the code is reviewed thoroughly before running this pipeline with the parent project's CI resource."
 msgstr ""
 
 msgid "Pipelines|Last Used"
+msgstr ""
+
+msgid "Pipelines|Learn about Runners"
 msgstr ""
 
 msgid "Pipelines|Lint"
@@ -28090,6 +28102,9 @@ msgstr ""
 msgid "RightSidebar|deleting the"
 msgstr ""
 
+msgid "Rnners|Don't see what you are looking for? See the full list of options, including a fully customizable option, %{linkStart}here%{linkEnd}."
+msgstr ""
+
 msgid "Roadmap"
 msgstr ""
 
@@ -28168,6 +28183,12 @@ msgstr ""
 msgid "Runners|Active"
 msgstr ""
 
+msgid "Runners|Amazon Linux 2 Docker HA with manual scaling and optional scheduling. %{percentage} spot."
+msgstr ""
+
+msgid "Runners|Amazon Linux 2 Docker HA with manual scaling and optional scheduling. Non-spot. Default choice for Linux Docker executor."
+msgstr ""
+
 msgid "Runners|An error has occurred fetching instructions"
 msgstr ""
 
@@ -28186,6 +28207,9 @@ msgstr ""
 msgid "Runners|Copy instructions"
 msgstr ""
 
+msgid "Runners|Deploy GitLab Runner in AWS"
+msgstr ""
+
 msgid "Runners|Description"
 msgstr ""
 
@@ -28198,7 +28222,13 @@ msgstr ""
 msgid "Runners|Enter the number of seconds. This timeout takes precedence over lower timeouts set for the project."
 msgstr ""
 
+msgid "Runners|For each solution, you will choose a capacity. 1 enables warm HA through Auto Scaling group re-spawn. 2 enables hot HA because the service is available even when a node is lost. 3 or more enables hot HA and manual scaling of runner fleet."
+msgstr ""
+
 msgid "Runners|IP Address"
+msgstr ""
+
+msgid "Runners|If you do not select an AWS VPC, the runner will deploy to the Default VPC in the AWS Region you select. Please consult with your AWS administrator to understand if there are any security risks to deploying into the Default VPC in any given region in your AWS account."
 msgstr ""
 
 msgid "Runners|Install a runner"
@@ -28292,6 +28322,12 @@ msgid "Runners|Version"
 msgstr ""
 
 msgid "Runners|View installation instructions"
+msgstr ""
+
+msgid "Runners|Windows 2019 Shell with manual scaling and optional scheduling. %{percentage} spot."
+msgstr ""
+
+msgid "Runners|Windows 2019 Shell with manual scaling and optional scheduling. Non-spot. Default choice for Windows Shell executor."
 msgstr ""
 
 msgid "Runners|You can set up a specific runner to be used by multiple projects but you cannot make this a shared runner."
@@ -35352,7 +35388,13 @@ msgstr ""
 msgid "Use .gitlab-ci.yml"
 msgstr ""
 
+msgid "Use GitLab Runner in AWS"
+msgstr ""
+
 msgid "Use a one-time password authenticator on your mobile device or computer to enable two-factor authentication (2FA)."
+msgstr ""
+
+msgid "Use an AWS CloudFormation Template (CFT) to install and configure GitLab Runner in AWS."
 msgstr ""
 
 msgid "Use cURL"
