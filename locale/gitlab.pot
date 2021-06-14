@@ -7966,6 +7966,9 @@ msgstr ""
 msgid "Collapse approvers"
 msgstr ""
 
+msgid "Collapse diffs larger than this size, and show a 'too large' message instead."
+msgstr ""
+
 msgid "Collapse issues"
 msgstr ""
 
@@ -20214,6 +20217,9 @@ msgid "Maximum concurrency of Elasticsearch bulk requests per indexing operation
 msgstr ""
 
 msgid "Maximum delay (Minutes)"
+msgstr ""
+
+msgid "Maximum diff patch size in bytes"
 msgstr ""
 
 msgid "Maximum duration of a session."
