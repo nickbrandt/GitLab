@@ -1,4 +1,4 @@
-import { GlBanner, GlSprintf } from '@gitlab/ui';
+import { GlBanner } from '@gitlab/ui';
 import { shallowMountExtended } from 'helpers/vue_test_utils_helper';
 import UpgradeBanner from '~/security_configuration/components/upgrade_banner.vue';
 
@@ -18,9 +18,6 @@ describe('UpgradeBanner component', () => {
       propsData,
       listeners: {
         close: closeSpy,
-      },
-      stubs: {
-        GlSprintf,
       },
     });
   };
@@ -46,9 +43,11 @@ describe('UpgradeBanner component', () => {
   it('renders the list of benefits', () => {
     const wrapperText = wrapper.text();
 
-    expect(wrapperText).toContain('Check your application');
-    expect(wrapperText).toContain('Manage and report');
-    expect(wrapperText).toContain('Implement controls');
+    expect(wrapperText).toContain('GitLab Ultimate checks your application');
+    expect(wrapperText).toContain('statistics in the merge request');
+    expect(wrapperText).toContain('statistics across projects');
+    expect(wrapperText).toContain('Runtime security metrics');
+    expect(wrapperText).toContain('risk analysis and remediation');
   });
 
   it(`re-emits GlBanner's close event`, () => {
