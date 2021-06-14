@@ -26345,10 +26345,19 @@ msgstr ""
 msgid "ProtectedBranch|Branch:"
 msgstr ""
 
+msgid "ProtectedBranch|By default, protected branches restrict who can modify the branch."
+msgstr ""
+
 msgid "ProtectedBranch|Code owner approval"
 msgstr ""
 
 msgid "ProtectedBranch|Does not apply to users allowed to push. Optional sections are not enforced."
+msgstr ""
+
+msgid "ProtectedBranch|Keep stable branches secure and force developers to use merge requests."
+msgstr ""
+
+msgid "ProtectedBranch|Learn more."
 msgstr ""
 
 msgid "ProtectedBranch|Protect"
@@ -26358,6 +26367,9 @@ msgid "ProtectedBranch|Protect a branch"
 msgstr ""
 
 msgid "ProtectedBranch|Protected branch (%{protected_branches_count})"
+msgstr ""
+
+msgid "ProtectedBranch|Protected branches"
 msgstr ""
 
 msgid "ProtectedBranch|Reject code pushes that change files listed in the CODEOWNERS file."
@@ -26373,6 +26385,9 @@ msgid "ProtectedBranch|Toggle allowed to force push"
 msgstr ""
 
 msgid "ProtectedBranch|Toggle code owner approval"
+msgstr ""
+
+msgid "ProtectedBranch|What are protected branches?"
 msgstr ""
 
 msgid "ProtectedEnvironment|%{environment_name} will be writable for developers. Are you sure?"
@@ -26418,6 +26433,21 @@ msgid "ProtectedEnvironment|Your environment has been protected."
 msgstr ""
 
 msgid "ProtectedEnvironment|Your environment has been unprotected"
+msgstr ""
+
+msgid "ProtectedTag|By default, protected branches restrict who can modify the tag."
+msgstr ""
+
+msgid "ProtectedTag|Learn more."
+msgstr ""
+
+msgid "ProtectedTag|Limit access to creating and updating tags."
+msgstr ""
+
+msgid "ProtectedTag|Protected tags"
+msgstr ""
+
+msgid "ProtectedTag|What are protected tags?"
 msgstr ""
 
 msgid "Protip: %{linkStart}Auto DevOps%{linkEnd} uses Kubernetes clusters to deploy your code!"
