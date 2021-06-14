@@ -28844,6 +28844,12 @@ msgstr ""
 msgid "SecurityConfiguration|Feature documentation for %{featureName}"
 msgstr ""
 
+msgid "SecurityConfiguration|GitLab Ultimate checks your application for security vulnerabilities that may lead to unauthorized access, data leaks, and denial of service attacks. Its features include:"
+msgstr ""
+
+msgid "SecurityConfiguration|High-level vulnerability statistics across projects and groups."
+msgstr ""
+
 msgid "SecurityConfiguration|Manage"
 msgstr ""
 
@@ -28856,10 +28862,16 @@ msgstr ""
 msgid "SecurityConfiguration|Not enabled"
 msgstr ""
 
+msgid "SecurityConfiguration|Runtime security metrics for application environments."
+msgstr ""
+
 msgid "SecurityConfiguration|SAST Analyzers"
 msgstr ""
 
 msgid "SecurityConfiguration|SAST Configuration"
+msgstr ""
+
+msgid "SecurityConfiguration|Secure your project with Ultimate"
 msgstr ""
 
 msgid "SecurityConfiguration|Security Control"
@@ -28877,10 +28889,19 @@ msgstr ""
 msgid "SecurityConfiguration|The status of the tools only applies to the default branch and is based on the %{linkStart}latest pipeline%{linkEnd}. Once you've enabled a scan for the default branch, any subsequent feature branch you create will include the scan."
 msgstr ""
 
+msgid "SecurityConfiguration|Upgrade or start a free trial"
+msgstr ""
+
 msgid "SecurityConfiguration|Using custom settings. You won't receive automatic updates on this variable. %{anchorStart}Restore to default%{anchorEnd}"
 msgstr ""
 
 msgid "SecurityConfiguration|View history"
+msgstr ""
+
+msgid "SecurityConfiguration|Vulnerability details and statistics in the merge request."
+msgstr ""
+
+msgid "SecurityConfiguration|With the information provided, you can immediately begin risk analysis and remediation within GitLab."
 msgstr ""
 
 msgid "SecurityConfiguration|You can quickly enable all security scanning tools by enabling %{linkStart}Auto DevOps%{linkEnd}."
