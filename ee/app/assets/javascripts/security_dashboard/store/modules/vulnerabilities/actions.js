@@ -243,7 +243,7 @@ export const dismissVulnerability = (
               dispatch('revertDismissVulnerability', { vulnerability })
                 .then(() => dispatch('fetchVulnerabilities', { page }))
                 .catch(() => {});
-              toastObject.goAway(0);
+              toastObject.hide();
             }
           },
         },
