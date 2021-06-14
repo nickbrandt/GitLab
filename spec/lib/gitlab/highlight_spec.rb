@@ -143,11 +143,17 @@ RSpec.describe Gitlab::Highlight do
     end
 
     describe 'highlight timeouts' do
-      let(:result) { described_class.highlight(file_name, content) }
+      let(:result) { described_class.highlight(file_name, content, language: "ruby") }
 
       context 'when there is an attempt' do
-        it "increments the attempt counter" do
-          expect { result }.to change { highlight_attempt_total("undefined") }
+        it "increments the attempt counter with a defined language" do
+          expect { result }.to change { highlight_attempt_total("ruby") }
+        end
+
+        it "increments the attempt counter with an undefined language" do
+          expect do
+            described_class.highlight(file_name, content)
+          end.to change { highlight_attempt_total("undefined") }
         end
       end
 
