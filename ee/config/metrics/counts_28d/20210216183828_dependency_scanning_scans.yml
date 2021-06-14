@@ -1,13 +1,13 @@
 ---
-key_path: usage_activity_by_stage.secure.user_dependency_scanning_jobs
-description: Total number of users running Dependency Scanning jobs
+key_path: usage_activity_by_stage_monthly.secure.dependency_scanning_scans
+description: Monthly number of users running Dependency Scanning Scans
 product_section: sec
 product_stage: secure
 product_group: group::composition analysis
 product_category: dependency_scanning
 value_type: number
 status: data_available
-time_frame: all
+time_frame: 28d
 data_source: database
 distribution:
 - ee

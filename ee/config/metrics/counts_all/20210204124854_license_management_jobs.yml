@@ -1,10 +1,10 @@
 ---
-key_path: usage_activity_by_stage.secure.user_dependency_scanning_jobs
-description: Total number of users running Dependency Scanning jobs
+key_path: counts.license_management_jobs
+description: Count of License Scanning jobs run
 product_section: sec
 product_stage: secure
 product_group: group::composition analysis
-product_category: dependency_scanning
+product_category: license_compliance
 value_type: number
 status: data_available
 time_frame: all
