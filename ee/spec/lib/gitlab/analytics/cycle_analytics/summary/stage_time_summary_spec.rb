@@ -1,16 +1,18 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-RSpec.describe Gitlab::Analytics::CycleAnalytics::Summary::Group::StageTimeSummary do
+RSpec.describe Gitlab::Analytics::CycleAnalytics::Summary::StageTimeSummary do
   let_it_be(:group) { create(:group) }
   let_it_be(:project) { create(:project, :repository, namespace: group) }
   let_it_be(:project_2) { create(:project, :repository, namespace: group) }
   let_it_be(:user) { create(:user) }
+
   let(:from) { 1.day.ago }
   let(:to) { nil }
   let(:options) { { from: from, to: to, current_user: user } }
+  let(:stage) { Analytics::CycleAnalytics::GroupStage.new(group: group) }
 
-  subject { described_class.new(group, options: options).data }
+  subject { described_class.new(stage, options: options).data }
 
   around do |example|
     freeze_time { example.run }
@@ -101,7 +103,7 @@ RSpec.describe Gitlab::Analytics::CycleAnalytics::Summary::Group::StageTimeSumma
           create(:closed_issue, created_at: 3.days.ago, closed_at: Time.zone.now, project: create(:project, namespace: group))
         end
 
-        subject { described_class.new(group, options: { from: from, current_user: user, projects: [project.id, project_2.id] }).data }
+        subject { described_class.new(stage, options: { from: from, current_user: user, projects: [project.id, project_2.id] }).data }
 
         it 'finds the lead time of issues from those projects' do
           # Median of 1, 2, 4, not including new issue
@@ -178,7 +180,7 @@ RSpec.describe Gitlab::Analytics::CycleAnalytics::Summary::Group::StageTimeSumma
           issue_4.metrics.update!(first_mentioned_in_commit_at: 3.days.ago)
         end
 
-        subject { described_class.new(group, options: { from: from, current_user: user, projects: [project.id, project_2.id] }).data }
+        subject { described_class.new(stage, options: { from: from, current_user: user, projects: [project.id, project_2.id] }).data }
 
         it 'finds the cycle time of issues from those projects' do
           # Median of 1, 2, 4, not including new issue
