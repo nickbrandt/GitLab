@@ -29,7 +29,7 @@ RSpec.describe "CI YML Templates" do
     ]
 
     where(:template_name) do
-      all_templates - non_autodevops_templates
+      all_templates - non_autodevops_templates - ["Terraform.gitlab-ci.yml"]
     end
 
     with_them do
