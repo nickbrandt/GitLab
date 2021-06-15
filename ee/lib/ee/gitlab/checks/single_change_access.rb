@@ -3,7 +3,7 @@
 module EE
   module Gitlab
     module Checks
-      module ChangeAccess
+      module SingleChangeAccess
         extend ActiveSupport::Concern
         extend ::Gitlab::Utils::Override
 
