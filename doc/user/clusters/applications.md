@@ -454,7 +454,7 @@ for the available configuration options.
 You can check Cilium's installation status on the cluster management page:
 
 - [Project-level cluster](../project/clusters/index.md): Navigate to your project's
-  **Operations > Kubernetes** page.
+  **Infrastructure > Kubernetes clusters** page.
 - [Group-level cluster](../group/clusters/index.md): Navigate to your group's
   **Kubernetes** page.
 
@@ -1054,8 +1054,8 @@ Logs produced by pods running **GitLab Managed Apps** can be browsed using
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/327803) in GitLab 13.12.
 
 With the removal of the One-click install method in GitLab 14.0,
-the **Applications** tab (under your project's  **Operations > Kubernetes**)
-will no longer be displayed:
+the **Applications** tab (under your project's **Infrastructure > Kubernetes clusters**)
+is no longer displayed:
 
 ![GitLab Managed Apps - Applications tab](img/applications_tab_v13_12.png)
 
