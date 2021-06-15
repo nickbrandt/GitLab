@@ -13,44 +13,52 @@ highlight, we look at how you can create a new file, directory, branch, or
 tag from the file browser. All of these actions are available from a single
 dropdown menu.
 
-## Create a file
-
-From a project's files page, click the '+' button to the right of the branch selector.
-Choose **New file** from the dropdown.
-![New file dropdown menu](img/web_editor_new_file_dropdown.png)
-
-Enter a filename in the **Filename** box. Then, add file content in the editor
-area. Add a descriptive commit message and choose a branch. The branch field
-defaults to the branch you were viewing in the file browser. If you enter
-a new branch name, a checkbox displays, allowing you to start a new merge
-request after you commit the changes.
-
-When you are satisfied with your new file, click **Commit Changes** at the bottom.
-
-![Create file editor](img/web_editor_new_file_editor.png)
-
-### Shortcuts
-
 You can use shortcuts when editing a file through the Web Editor. It uses the same shortcuts
 as the Web IDE. For details, read the documentation for [Command Palette](../web_ide/index.md#command-palette).
 
-### Template dropdowns
+## Create a file
 
-When starting a new project, there are some common files that the new project
-might need. GitLab displays a message to help you:
+You can create new files from the web editor. If your project is empty, you
+can create a new file [directly from the project page](#create-files-in-an-empty-project).
+If your project already contains other files, you can either start from templates
+provided in the UI, or from an empty file:
 
-![First file for your project](img/web_editor_template_dropdown_first_file.png)
+1. Go to your project.
+1. To the right of the branch selector, select **(plus)** (Plus).
+1. Select **New file**.
+1. Enter a **File name**.
+1. (Optional) To create a file from a template:
+   1. Select a template type. GitLab supports these template types:
+      - `.gitignore`
+      - `.gitlab-ci.yml`
+      - `.metrics-dashboard.yml`
+      - `Dockerfile`
+      - `LICENSE`
 
-When clicking on either `LICENSE` or `.gitignore` and so on, a dropdown displays
-to provide you a template that may be suitable for your project:
+   1. In the **Apply a template** select box, select a template to apply:
+      ![MIT license selected](img/web_editor_template_dropdown_mit_license.png)
+1. In the editing area, add your file content:
+   ![Create file editor](img/web_editor_new_file_editor.png)
+1. Scroll to **Commit message**, and add a descriptive commit message.
+1. Select a **Target branch**. This field defaults to the branch you viewed in
+   the file browser.
+1. Select **Start a new merge request with these changes**, if desired.
+1. Select **Commit changes**.
 
-![MIT license selected](img/web_editor_template_dropdown_mit_license.png)
+### Create files in an empty project
 
-The license, changelog, contribution guide, or `.gitlab-ci.yml` file can also
-be added through a button on the project page. In this example, the license
-has already been created, which creates a link to the license itself.
+When you create a new project, GitLab provides templates to help you build some
+known and common file types:
 
-![New file button](img/web_editor_template_dropdown_buttons.png)
+1. Go to your project.
+1. Scroll to **The repository for this project is empty**.
+1. Select the type of file to create. GitLab supports:
+   - README files.
+   - LICENSE files.
+   - CHANGELOG files.
+   - CONTRIBUTING files.
+   - Uploads of files not matching any of these types.
+1. TODO EVERYTHING CHANGES HERE
 
 NOTE:
 The **Set up CI/CD** button does not appear on an empty repository. For the button
