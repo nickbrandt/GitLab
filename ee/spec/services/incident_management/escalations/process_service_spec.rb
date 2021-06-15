@@ -9,8 +9,8 @@ RSpec.describe IncidentManagement::Escalations::ProcessService do
   let_it_be(:schedule_1_users) { schedule_1.participants.map(&:user) }
   let_it_be(:schedule_2_users) { schedule_2.participants.map(&:user) }
 
-  let_it_be(:rules) { [build(:incident_management_escalation_rule, oncall_schedule: schedule_1)] }
-  let_it_be(:escalation_policy) { create(:incident_management_escalation_policy, project: project, rules: rules) }
+  let(:rules) { [build(:incident_management_escalation_rule, oncall_schedule: schedule_1)] }
+  let!(:escalation_policy) { create(:incident_management_escalation_policy, project: project, rules: rules) }
 
   let(:alert) { create(:alert_management_alert, project: project, **alert_params) }
   let(:alert_params) { { status: AlertManagement::Alert::STATUSES[:triggered] } }

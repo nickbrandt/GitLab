@@ -2,7 +2,12 @@
 
 module IncidentManagement
   class AlertEscalation < ApplicationRecord
+    include PartitionedTable
+
+    self.primary_key = :id
     self.table_name = 'incident_management_alert_escalations'
+
+    partitioned_by :created_at, strategy: :monthly
 
     belongs_to :policy, class_name: 'EscalationPolicy', foreign_key: 'policy_id'
     belongs_to :alert, class_name: 'AlertManagement::Alert', foreign_key: 'alert_id'
