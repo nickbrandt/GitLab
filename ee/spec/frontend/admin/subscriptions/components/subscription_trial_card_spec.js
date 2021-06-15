@@ -1,6 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
-import SubscriptionTrialCard from 'ee/pages/admin/cloud_licenses/components/subscription_trial_card.vue';
-import { trialCard } from 'ee/pages/admin/cloud_licenses/constants';
+import SubscriptionTrialCard from 'ee/admin/subscriptions/show/components/subscription_trial_card.vue';
+import { trialCard } from 'ee/admin/subscriptions/show/constants';
 import { extendedWrapper } from 'helpers/vue_test_utils_helper';
 
 describe('SubscriptionTrialCard', () => {

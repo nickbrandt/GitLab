@@ -1,6 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
-import SubscriptionPurchaseCard from 'ee/pages/admin/cloud_licenses/components/subscription_purchase_card.vue';
-import { buySubscriptionCard } from 'ee/pages/admin/cloud_licenses/constants';
+import SubscriptionPurchaseCard from 'ee/admin/subscriptions/show/components/subscription_purchase_card.vue';
+import { buySubscriptionCard } from 'ee/admin/subscriptions/show/constants';
 import { extendedWrapper } from 'helpers/vue_test_utils_helper';
 
 describe('SubscriptionPurchaseCard', () => {

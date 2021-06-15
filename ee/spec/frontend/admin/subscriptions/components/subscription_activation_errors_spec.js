@@ -3,7 +3,7 @@ import { shallowMount } from '@vue/test-utils';
 import SubscriptionActivationErrors, {
   subscriptionActivationHelpLink,
   troubleshootingHelpLink,
-} from 'ee/pages/admin/cloud_licenses/components/subscription_activation_errors.vue';
+} from 'ee/admin/subscriptions/show/components/subscription_activation_errors.vue';
 import {
   CONNECTIVITY_ERROR,
   generalActivationErrorMessage,
@@ -11,7 +11,7 @@ import {
   invalidActivationCode,
   INVALID_CODE_ERROR,
   supportLink,
-} from 'ee/pages/admin/cloud_licenses/constants';
+} from 'ee/admin/subscriptions/show/constants';
 import { extendedWrapper } from 'helpers/vue_test_utils_helper';
 
 describe('SubscriptionActivationErrors', () => {

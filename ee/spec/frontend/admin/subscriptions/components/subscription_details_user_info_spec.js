@@ -3,7 +3,7 @@ import { shallowMount } from '@vue/test-utils';
 import SubscriptionDetailsUserInfo, {
   billableUsersURL,
   trueUpURL,
-} from 'ee/pages/admin/cloud_licenses/components/subscription_details_user_info.vue';
+} from 'ee/admin/subscriptions/show/components/subscription_details_user_info.vue';
 import {
   billableUsersText,
   billableUsersTitle,
@@ -13,7 +13,7 @@ import {
   usersInSubscriptionTitle,
   usersOverSubscriptionText,
   usersOverSubscriptionTitle,
-} from 'ee/pages/admin/cloud_licenses/constants';
+} from 'ee/admin/subscriptions/show/constants';
 import { extendedWrapper } from 'helpers/vue_test_utils_helper';
 import { license } from '../mock_data';
 

@@ -1,7 +1,7 @@
 import { GlSkeletonLoader } from '@gitlab/ui';
 import { mount } from '@vue/test-utils';
-import SubscriptionDetailsTable from 'ee/pages/admin/cloud_licenses/components/subscription_details_table.vue';
-import { detailsLabels } from 'ee/pages/admin/cloud_licenses/constants';
+import SubscriptionDetailsTable from 'ee/admin/subscriptions/show/components/subscription_details_table.vue';
+import { detailsLabels } from 'ee/admin/subscriptions/show/constants';
 import { extendedWrapper } from 'helpers/vue_test_utils_helper';
 import ClipboardButton from '~/vue_shared/components/clipboard_button.vue';
 

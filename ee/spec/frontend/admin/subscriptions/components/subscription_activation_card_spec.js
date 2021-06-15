@@ -2,12 +2,12 @@ import { GlCard, GlSprintf } from '@gitlab/ui';
 import { shallowMount } from '@vue/test-utils';
 import SubscriptionActivationCard, {
   activateSubscriptionUrl,
-} from 'ee/pages/admin/cloud_licenses/components/subscription_activation_card.vue';
-import SubscriptionActivationErrors from 'ee/pages/admin/cloud_licenses/components/subscription_activation_errors.vue';
+} from 'ee/admin/subscriptions/show/components/subscription_activation_card.vue';
+import SubscriptionActivationErrors from 'ee/admin/subscriptions/show/components/subscription_activation_errors.vue';
 import SubscriptionActivationForm, {
   SUBSCRIPTION_ACTIVATION_FAILURE_EVENT,
-} from 'ee/pages/admin/cloud_licenses/components/subscription_activation_form.vue';
-import { CONNECTIVITY_ERROR, uploadLicenseFile } from 'ee/pages/admin/cloud_licenses/constants';
+} from 'ee/admin/subscriptions/show/components/subscription_activation_form.vue';
+import { CONNECTIVITY_ERROR, uploadLicenseFile } from 'ee/admin/subscriptions/show/constants';
 import { extendedWrapper } from 'helpers/vue_test_utils_helper';
 
 describe('CloudLicenseApp', () => {

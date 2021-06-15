@@ -1,4 +1,4 @@
-import { CONNECTIVITY_ERROR, subscriptionTypes } from 'ee/pages/admin/cloud_licenses/constants';
+import { CONNECTIVITY_ERROR, subscriptionTypes } from 'ee/admin/subscriptions/show/constants';
 
 export const license = {
   ULTIMATE: {

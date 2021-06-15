@@ -2,24 +2,24 @@ import { GlCard } from '@gitlab/ui';
 import { shallowMount } from '@vue/test-utils';
 import AxiosMockAdapter from 'axios-mock-adapter';
 import { nextTick } from 'vue';
-import SubscriptionActivationModal from 'ee/pages/admin/cloud_licenses/components/subscription_activation_modal.vue';
+import SubscriptionActivationModal from 'ee/admin/subscriptions/show/components/subscription_activation_modal.vue';
 import SubscriptionBreakdown, {
   licensedToFields,
   modalId,
   subscriptionDetailsFields,
-} from 'ee/pages/admin/cloud_licenses/components/subscription_breakdown.vue';
-import SubscriptionDetailsCard from 'ee/pages/admin/cloud_licenses/components/subscription_details_card.vue';
-import SubscriptionDetailsHistory from 'ee/pages/admin/cloud_licenses/components/subscription_details_history.vue';
-import SubscriptionDetailsUserInfo from 'ee/pages/admin/cloud_licenses/components/subscription_details_user_info.vue';
+} from 'ee/admin/subscriptions/show/components/subscription_breakdown.vue';
+import SubscriptionDetailsCard from 'ee/admin/subscriptions/show/components/subscription_details_card.vue';
+import SubscriptionDetailsHistory from 'ee/admin/subscriptions/show/components/subscription_details_history.vue';
+import SubscriptionDetailsUserInfo from 'ee/admin/subscriptions/show/components/subscription_details_user_info.vue';
 import SubscriptionSyncNotifications, {
   SUCCESS_ALERT_DISMISSED_EVENT,
-} from 'ee/pages/admin/cloud_licenses/components/subscription_sync_notifications.vue';
+} from 'ee/admin/subscriptions/show/components/subscription_sync_notifications.vue';
 import {
   licensedToHeaderText,
   subscriptionSyncStatus,
   subscriptionDetailsHeaderText,
   subscriptionTypes,
-} from 'ee/pages/admin/cloud_licenses/constants';
+} from 'ee/admin/subscriptions/show/constants';
 import { extendedWrapper } from 'helpers/vue_test_utils_helper';
 import waitForPromises from 'helpers/wait_for_promises';
 import axios from '~/lib/utils/axios_utils';
