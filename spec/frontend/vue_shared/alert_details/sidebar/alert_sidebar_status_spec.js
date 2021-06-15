@@ -9,8 +9,8 @@ const mockAlert = mockAlerts[0];
 
 describe('Alert Details Sidebar Status', () => {
   let wrapper;
-  const findStatusDropdown = () => wrapper.find(GlDropdown);
-  const findStatusLoadingIcon = () => wrapper.find(GlLoadingIcon);
+  const findStatusDropdown = () => wrapper.findComponent(GlDropdown);
+  const findStatusLoadingIcon = () => wrapper.findComponent(GlLoadingIcon);
   const findAlertStatus = () => wrapper.findComponent(AlertStatus);
   const findStatus = () => wrapper.findByTestId('status');
   const findSidebarIcon = () => wrapper.findByTestId('status-icon');
@@ -74,7 +74,8 @@ describe('Alert Details Sidebar Status', () => {
           sidebarCollapsed: false,
           loading: false,
         });
-        await findAlertStatus().vm.$emit('handle-updating', true);
+        findAlertStatus().vm.$emit('handle-updating', true);
+        await wrapper.vm.$nextTick();
         expect(findStatusLoadingIcon().exists()).toBe(true);
       });
 
