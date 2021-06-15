@@ -6979,9 +6979,6 @@ msgstr ""
 msgid "ClusterIntegration|All data will be deleted and cannot be restored."
 msgstr ""
 
-msgid "ClusterIntegration|All installed applications and related resources"
-msgstr ""
-
 msgid "ClusterIntegration|Allow GitLab to manage namespace and service accounts for this cluster. %{linkStart}More information%{linkEnd}"
 msgstr ""
 
@@ -7685,9 +7682,6 @@ msgid "ClusterIntegration|Specifying a domain will allow you to use Auto Review 
 msgstr ""
 
 msgid "ClusterIntegration|Subnets"
-msgstr ""
-
-msgid "ClusterIntegration|The %{gitlabNamespace} namespace"
 msgstr ""
 
 msgid "ClusterIntegration|The Amazon Resource Name (ARN) associated with your role. If you do not have a provision role, first create one on  %{startAwsLink}Amazon Web Services %{externalLinkIcon}%{endLink} using the above account and external IDs. %{startMoreInfoLink}More information%{endLink}"
