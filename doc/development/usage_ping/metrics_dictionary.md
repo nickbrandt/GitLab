@@ -94,14 +94,14 @@ Metric name suggestions can contain two types of elements:
 For a metric name to be valid, it must not include any prompt, and no fixed suggestions
 should be changed.
 
-### Data Category
+### Data category
 
-We use the following categories to classify the metric.
+We use the following categories to classify a metric:
 
-1. `Operational`: Required data for operational purposes.
-1. `Optional`: Data that is optional to collect. This can be [enabled/disabled](../usage_ping/index.md#disable-usage-ping) admin settings.
-1. `Subscription`: Data related to licensing.
-1. `Standard`: Standard set of identifiers that are included when collecting data.
+- `Operational`: Required data for operational purposes.
+- `Optional`: Data that is optional to collect. This can be [enabled or disabled](../usage_ping/index.md#disable-usage-ping) in the Admin Area.
+- `Subscription`: Data related to licensing.
+- `Standard`: Standard set of identifiers that are included when collecting data.
 
 ### Metric name suggestion examples
 
