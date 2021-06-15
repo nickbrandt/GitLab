@@ -17818,6 +17818,9 @@ msgstr ""
 msgid "Invalid login or password"
 msgstr ""
 
+msgid "Invalid period"
+msgstr ""
+
 msgid "Invalid pin code"
 msgstr ""
 
