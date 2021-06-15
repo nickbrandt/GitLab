@@ -463,7 +463,10 @@ Installation and removal of the Cilium requires a **manual**
 [restart](https://docs.cilium.io/en/stable/gettingstarted/k8s-install-gke/#restart-unmanaged-pods)
 of all affected pods in all namespaces to ensure that they are
 [managed](https://docs.cilium.io/en/v1.8/operations/troubleshooting/#ensure-managed-pod)
-by the correct networking plugin.
+by the correct networking plugin. Whenever Hubble is enabled, its related pod might require a
+restart depending on whether it started prior to Cilium. For more information, see
+[Failed Deployment](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#failed-deployment)
+in the Kubernetes docs.
 
 NOTE:
 Major upgrades might require additional setup steps. For more information, see
