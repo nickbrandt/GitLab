@@ -172,7 +172,7 @@ class Project < ApplicationRecord
   has_one :flowdock_integration, class_name: 'Integrations::Flowdock'
   has_one :hangouts_chat_integration, class_name: 'Integrations::HangoutsChat'
   has_one :irker_integration, class_name: 'Integrations::Irker'
-  has_one :jenkins_service, class_name: 'Integrations::Jenkins'
+  has_one :jenkins_integration, class_name: 'Integrations::Jenkins'
   has_one :jira_service, class_name: 'Integrations::Jira'
   has_one :mattermost_integration, class_name: 'Integrations::Mattermost'
   has_one :mattermost_slash_commands_integration, class_name: 'Integrations::MattermostSlashCommands'
