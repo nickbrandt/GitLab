@@ -54,17 +54,18 @@ module Gitlab
         def finalize(job_class_name, table_name, column_name, job_arguments)
           migration = BatchedMigration.find_for_configuration(job_class_name, table_name, column_name, job_arguments)
 
-          if migration.nil?
-            configuration = {
-              job_class_name: job_class_name,
-              table_name: table_name,
-              column_name: column_name,
-              job_arguments: job_arguments
-            }
-            Gitlab::AppLogger.warn "Could not find batched background migration for the given configuration: #{configuration}"
-          else
-            return if migration.finished?
+          configuration = {
+            job_class_name: job_class_name,
+            table_name: table_name,
+            column_name: column_name,
+            job_arguments: job_arguments
+          }
 
+          if migration.nil?
+            Gitlab::AppLogger.warn "Could not find batched background migration for the given configuration: #{configuration}"
+          elsif migration.finished?
+            Gitlab::AppLogger.warn "Batched background migration for the given configuration is already finished: #{configuration}"
+          else
             migration.finalizing!
             migration.batched_jobs.pending.each { |job| migration_wrapper.perform(job) }
 

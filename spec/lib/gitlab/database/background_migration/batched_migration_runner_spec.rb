@@ -381,6 +381,16 @@ RSpec.describe Gitlab::Database::BackgroundMigration::BatchedMigrationRunner do
           .with('CopyColumnUsingBackgroundMigrationJob', table_name, column_name, job_arguments)
           .and_return(batched_migration)
 
+        configuration = {
+          job_class_name: batched_migration.job_class_name,
+          table_name: table_name.to_sym,
+          column_name: column_name.to_sym,
+          job_arguments: job_arguments
+        }
+
+        expect(Gitlab::AppLogger).to receive(:warn)
+          .with("Batched background migration for the given configuration is already finished: #{configuration}")
+
         expect(batched_migration).not_to receive(:finalizing!)
 
         runner.finalize(
