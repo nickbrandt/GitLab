@@ -5,7 +5,7 @@ require 'spec_helper'
 RSpec.describe ServiceEventEntity do
   let(:request) { double('request') }
 
-  subject { described_class.new(event, request: request, service: service).as_json }
+  subject { described_class.new(event, request: request, service: integration).as_json }
 
   before do
     allow(request).to receive(:service).and_return(integration)

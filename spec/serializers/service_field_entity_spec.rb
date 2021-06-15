@@ -56,6 +56,7 @@ RSpec.describe ServiceFieldEntity do
 
     context 'EmailsOnPush Service' do
       let(:integration) { create(:emails_on_push_integration, send_from_committer_email: '1') }
+      let(:service) { integration }
 
       context 'field with type checkbox' do
         let(:field) { integration.global_fields.find { |field| field[:name] == 'send_from_committer_email' } }
