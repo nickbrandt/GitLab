@@ -8,15 +8,15 @@ RSpec.describe ServiceFieldEntity do
   subject { described_class.new(field, request: request, service: service).as_json }
 
   before do
-    allow(request).to receive(:service).and_return(service)
+    allow(request).to receive(:service).and_return(integration)
   end
 
   describe '#as_json' do
     context 'Jira Service' do
-      let(:service) { create(:jira_service) }
+      let(:integration) { create(:jira_integration) }
 
       context 'field with type text' do
-        let(:field) { service.global_fields.find { |field| field[:name] == 'username' } }
+        let(:field) { integration.global_fields.find { |field| field[:name] == 'username' } }
 
         it 'exposes correct attributes' do
           expected_hash = {
@@ -35,7 +35,7 @@ RSpec.describe ServiceFieldEntity do
       end
 
       context 'field with type password' do
-        let(:field) { service.global_fields.find { |field| field[:name] == 'password' } }
+        let(:field) { integration.global_fields.find { |field| field[:name] == 'password' } }
 
         it 'exposes correct attributes but hides password' do
           expected_hash = {
