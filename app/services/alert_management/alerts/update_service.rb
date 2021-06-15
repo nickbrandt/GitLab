@@ -37,7 +37,7 @@ module AlertManagement
 
       private
 
-      attr_reader :alert, :current_user, :params, :param_errors, :status, :old_status
+      attr_reader :alert, :current_user, :params, :param_errors, :status
       delegate :resolved?, :open?, to: :alert
 
       def allowed?

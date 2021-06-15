@@ -50,7 +50,7 @@ RSpec.describe AlertManagement::Alerts::UpdateService do
 
         it 'deletes the escalation' do
           expect { execute }.to change { IncidentManagement::AlertEscalation.count }.by(-1)
-          expect {escalation.reload }.to raise_error(ActiveRecord::RecordNotFound)
+          expect { escalation.reload }.to raise_error(ActiveRecord::RecordNotFound)
         end
       end
 

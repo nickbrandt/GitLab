@@ -106,6 +106,16 @@ RSpec.describe Projects::Alerting::NotifyService do
         end
 
         include_examples 'oncall users are correctly notified of recovery alert'
+
+        context 'with existing alert escalation' do
+          let_it_be(:alert) { create(:alert_management_alert, :ignored, fingerprint: gitlab_fingerprint, project: project) }
+          let_it_be(:alert_escalation) { create(:incident_management_alert_escalation, alert: alert) }
+
+          it 'deletes the escalation' do
+            expect { subject }.to change { IncidentManagement::AlertEscalation.count }.by(-1)
+            expect { alert_escalation.reload }.to raise_error(ActiveRecord::RecordNotFound)
+          end
+        end
       end
     end
   end

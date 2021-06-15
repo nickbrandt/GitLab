@@ -14,6 +14,13 @@ module EE
         create_escalation
       end
 
+      override :process_resolved_alert
+      def process_resolved_alert
+        super
+
+        destroy_open_escalations if alert.resolved?
+      end
+
       override :complete_post_processing_tasks
       def complete_post_processing_tasks
         super
@@ -31,6 +38,10 @@ module EE
         strong_memoize(:oncall_notification_recipients) do
           ::IncidentManagement::OncallUsersFinder.new(project).execute
         end
+      end
+
+      def destroy_open_escalations
+        ::IncidentManagement::AlertEscalation.for_alert(alert).delete_all
       end
 
       def create_escalation
