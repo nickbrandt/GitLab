@@ -1897,6 +1897,9 @@ msgstr ""
 msgid "Add a comment to this line or drag for multiple lines"
 msgstr ""
 
+msgid "Add a custom message with details about the instance's shared runners. The message is visible in group and project CI/CD settings, in the Runners section. Markdown is supported."
+msgstr ""
+
 msgid "Add a general comment to this %{noteableDisplayName}."
 msgstr ""
 
@@ -2332,9 +2335,6 @@ msgstr ""
 msgid "AdminSettings|Enable shared runners for new projects"
 msgstr ""
 
-msgid "AdminSettings|Environment variables are protected by default"
-msgstr ""
-
 msgid "AdminSettings|Feed token"
 msgstr ""
 
@@ -2347,7 +2347,13 @@ msgstr ""
 msgid "AdminSettings|Moved to integrations"
 msgstr ""
 
+msgid "AdminSettings|New CI/CD variables in projects and groups default to protected."
+msgstr ""
+
 msgid "AdminSettings|No required pipeline"
+msgstr ""
+
+msgid "AdminSettings|Protect CI/CD variables by default"
 msgstr ""
 
 msgid "AdminSettings|Required pipeline configuration"
@@ -2378,9 +2384,6 @@ msgid "AdminSettings|The latest artifacts for all jobs in the most recent succes
 msgstr ""
 
 msgid "AdminSettings|The template for the required pipeline configuration can be one of the GitLab-provided templates, or a custom template added to an instance template repository. %{link_start}How do I create an instance template repository?%{link_end}"
-msgstr ""
-
-msgid "AdminSettings|When creating a new environment variable it will be protected by default."
 msgstr ""
 
 msgid "AdminSettings|You can't add new templates. To migrate or remove a Service template, create a new integration at %{settings_link_start}Settings &gt; Integrations%{link_end}. Learn more about %{doc_link_start}Project integration management%{link_end}."
@@ -4709,9 +4712,6 @@ msgstr ""
 msgid "Auto DevOps enabled"
 msgstr ""
 
-msgid "Auto DevOps, runners and job artifacts"
-msgstr ""
-
 msgid "Auto stop successfully canceled."
 msgstr ""
 
@@ -5770,10 +5770,10 @@ msgstr ""
 msgid "CICD|Jobs"
 msgstr ""
 
-msgid "CICD|The Auto DevOps pipeline runs if no alternative CI configuration file is found."
+msgid "CICD|The Auto DevOps pipeline runs by default in all projects with no CI/CD configuration file."
 msgstr ""
 
-msgid "CICD|The Auto DevOps pipeline will run if no alternative CI configuration file is found."
+msgid "CICD|The Auto DevOps pipeline runs if no alternative CI configuration file is found."
 msgstr ""
 
 msgid "CICD|group enabled"
@@ -9747,6 +9747,9 @@ msgstr ""
 msgid "Customizable by owners."
 msgstr ""
 
+msgid "Customize CI/CD settings, including Auto DevOps, shared runners, and job artifacts."
+msgstr ""
+
 msgid "Customize colors"
 msgstr ""
 
@@ -10461,7 +10464,7 @@ msgstr ""
 msgid "Default"
 msgstr ""
 
-msgid "Default CI configuration path"
+msgid "Default CI/CD configuration file"
 msgstr ""
 
 msgid "Default Timeout Period"
@@ -29951,6 +29954,9 @@ msgstr ""
 msgid "Shared runners are disabled on group level"
 msgstr ""
 
+msgid "Shared runners details"
+msgstr ""
+
 msgid "Shared runners help link"
 msgstr ""
 
@@ -32389,7 +32395,7 @@ msgstr ""
 msgid "The data source is connected, but there is no data to display. %{documentationLink}"
 msgstr ""
 
-msgid "The default CI configuration path for new projects."
+msgid "The default CI/CD configuration file and path for new projects."
 msgstr ""
 
 msgid "The dependency list details information about the components used within your project."
@@ -36716,6 +36722,9 @@ msgid "What describes you best?"
 msgstr ""
 
 msgid "What does this command do?"
+msgstr ""
+
+msgid "What is Auto DevOps?"
 msgstr ""
 
 msgid "What is repository mirroring?"
