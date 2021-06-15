@@ -27,44 +27,6 @@ RSpec.describe 'Environment' do
       visit_environment(environment)
     end
 
-    it 'shows environment name' do
-      expect(page).to have_content(environment.name)
-    end
-
-    context 'without auto-stop' do
-      it 'does not show auto-stop text' do
-        expect(page).not_to have_content('Auto stops')
-      end
-
-      it 'does not show auto-stop button' do
-        expect(page).not_to have_selector(auto_stop_button_selector)
-      end
-    end
-
-    context 'with auto-stop' do
-      let!(:environment) { create(:environment, :will_auto_stop, name: 'staging', project: project) }
-
-      before do
-        visit_environment(environment)
-      end
-
-      it 'shows auto stop info' do
-        expect(page).to have_content('Auto stops')
-      end
-
-      it 'shows auto stop button' do
-        expect(page).to have_selector(auto_stop_button_selector)
-        expect(page.find(auto_stop_button_selector).find(:xpath, '..')['action']).to have_content(cancel_auto_stop_project_environment_path(environment.project, environment))
-      end
-
-      it 'allows user to cancel auto stop', :js do
-        page.find(auto_stop_button_selector).click
-        wait_for_all_requests
-        expect(page).to have_content('Auto stop successfully canceled.')
-        expect(page).not_to have_selector(auto_stop_button_selector)
-      end
-    end
-
     context 'without deployments' do
       it 'does not show deployments' do
         expect(page).to have_content('You don\'t have any deployments right now.')
@@ -80,7 +42,6 @@ RSpec.describe 'Environment' do
         it 'does show deployment SHA' do
           expect(page).to have_link(deployment.short_sha)
           expect(page).not_to have_link('Re-deploy')
-          expect(page).not_to have_terminal_button
         end
       end
 
@@ -181,16 +142,6 @@ RSpec.describe 'Environment' do
             end
           end
 
-          context 'with external_url' do
-            let(:environment) { create(:environment, project: project, external_url: 'https://git.gitlab.com') }
-            let(:build) { create(:ci_build, pipeline: pipeline) }
-            let(:deployment) { create(:deployment, :success, environment: environment, deployable: build) }
-
-            it 'does show an external link button' do
-              expect(page).to have_link(nil, href: environment.external_url)
-            end
-          end
-
           context 'with terminal' do
             context 'when user configured kubernetes from CI/CD > Clusters' do
               let!(:cluster) do
@@ -199,10 +150,6 @@ RSpec.describe 'Environment' do
 
               context 'for project maintainer' do
                 let(:role) { :maintainer }
-
-                it 'shows the terminal button' do
-                  expect(page).to have_terminal_button
-                end
 
                 context 'web terminal', :js do
                   before do
@@ -224,71 +171,6 @@ RSpec.describe 'Environment' do
                   end
                 end
               end
-
-              context 'for developer' do
-                let(:role) { :developer }
-
-                it 'does not show terminal button' do
-                  expect(page).not_to have_terminal_button
-                end
-              end
-            end
-          end
-
-          context 'when environment is available' do
-            context 'with stop action' do
-              let(:action) do
-                create(:ci_build, :manual, pipeline: pipeline,
-                                           name: 'close_app')
-              end
-
-              let(:deployment) do
-                create(:deployment, :success,
-                                    environment: environment,
-                                    deployable: build,
-                                    on_stop: 'close_app')
-              end
-
-              context 'when user has ability to stop environment' do
-                let(:permissions) do
-                  create(:protected_branch, :developers_can_merge,
-                         name: action.ref, project: project)
-                end
-
-                it 'allows to stop environment', :js do
-                  click_button('Stop')
-                  click_button('Stop environment') # confirm modal
-                  wait_for_all_requests
-                  expect(page).to have_content('close_app')
-                end
-              end
-
-              context 'when user has no ability to stop environment' do
-                let(:permissions) do
-                  create(:protected_branch, :no_one_can_merge,
-                         name: action.ref, project: project)
-                end
-
-                it 'does not allow to stop environment' do
-                  expect(page).not_to have_button('Stop')
-                end
-              end
-
-              context 'for reporter' do
-                let(:role) { :reporter }
-
-                it 'does not show stop button' do
-                  expect(page).not_to have_button('Stop')
-                end
-              end
-            end
-          end
-
-          context 'when environment is stopped' do
-            let(:environment) { create(:environment, project: project, state: :stopped) }
-
-            it 'does not show stop button' do
-              expect(page).not_to have_button('Stop')
             end
           end
         end
@@ -315,73 +197,7 @@ RSpec.describe 'Environment' do
     end
   end
 
-  describe 'auto-close environment when branch is deleted' do
-    let(:project) { create(:project, :repository) }
-
-    let!(:environment) do
-      create(:environment, :with_review_app, project: project,
-                                             ref: 'feature')
-    end
-
-    it 'user visits environment page' do
-      visit_environment(environment)
-
-      expect(page).to have_button('Stop')
-    end
-
-    it 'user deletes the branch with running environment', :js do
-      visit project_branches_filtered_path(project, state: 'all', search: 'feature')
-
-      remove_branch_with_hooks(project, user, 'feature') do
-        page.within('.js-branch-feature') { find('.js-delete-branch-button').click }
-      end
-
-      visit_environment(environment)
-
-      expect(page).not_to have_button('Stop')
-    end
-
-    context 'when the feature flag :delete_branch_confirmation_modals is disabled' do
-      before do
-        stub_feature_flags(delete_branch_confirmation_modals: false)
-      end
-
-      it 'user deletes the branch with running environment' do
-        visit project_branches_filtered_path(project, state: 'all', search: 'feature')
-
-        remove_branch_with_hooks(project, user, 'feature') do
-          within('.js-branch-feature') { click_link(title: 'Delete branch') }
-        end
-
-        visit_environment(environment)
-
-        expect(page).not_to have_button('Stop')
-      end
-    end
-
-    ##
-    # This is a workaround for problem described in #24543
-    #
-    def remove_branch_with_hooks(project, user, branch)
-      params = {
-        change: {
-          oldrev: project.commit(branch).id,
-          newrev: Gitlab::Git::BLANK_SHA,
-          ref: "refs/heads/#{branch}"
-        }
-      }
-
-      yield
-
-      Git::BranchPushService.new(project, user, params).execute
-    end
-  end
-
   def visit_environment(environment)
     visit project_environment_path(environment.project, environment)
-  end
-
-  def have_terminal_button
-    have_link(nil, href: terminal_project_environment_path(project, environment))
   end
 end
