@@ -160,7 +160,8 @@ module Gitlab
 
         # We treat underscored_service as a trusted input because it is included
         # in the Integration.available_services_names allowlist.
-        service = project.public_send(Project.integration_association(underscored_service)) # rubocop:disable GitlabSecurity/PublicSend
+        accessor = Project.integration_association_name(underscored_service)
+        service = project.public_send(accessor) # rubocop:disable GitlabSecurity/PublicSend
 
         return unless service && service.activated? && service.valid_token?(password)
 

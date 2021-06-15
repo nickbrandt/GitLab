@@ -146,7 +146,7 @@ class Project < ApplicationRecord
   has_one :last_event, -> {order 'events.created_at DESC'}, class_name: 'Event'
   has_many :boards
 
-  def self.integration_association(name)
+  def self.integration_association_name(name)
     if ::Integration.renamed?(name)
       "#{name}_integration"
     else
