@@ -406,7 +406,13 @@ describe('MyTracking', () => {
 
 ### Form tracking
 
-Snowplow automatic [form tracking](https://docs.snowplowanalytics.com/docs/collecting-data/collecting-from-own-applications/javascript-trackers/javascript-tracker/javascript-tracker-v2/tracking-specific-events/#form-tracking) can be enabled by calling `Tracking.enableFormTracking` (after the DOM is ready) and providing a `config` object including at least one of: `forms`, `fields`. The `forms` element determines which forms will be tracked, identified by CSS class name; the `fields` element determines which fields inside the tracked forms will be tracked, identified by field `name`. An optional list of contexts can be provided as the second argument, do note that our [`gitlab_standard`](#gitlab_standard) schema is excluded from these events.
+You can enable Snowplow automatic [form tracking](https://docs.snowplowanalytics.com/docs/collecting-data/collecting-from-own-applications/javascript-trackers/javascript-tracker/javascript-tracker-v2/tracking-specific-events/#form-tracking) by calling `Tracking.enableFormTracking` (after the DOM is ready) and providing a `config` object that includes at least one of the following elements:
+
+- `forms`: determines which forms are tracked, and are identified by the CSS class name.
+- `fields`: determines which fields inside the tracked forms are tracked, and are identified by the field `name`.
+
+An optional list of contexts can be provided as the second argument.
+Note that our [`gitlab_standard`](#gitlab_standard) schema is excluded from these events.
 
 ```javascript
 Tracking.enableFormTracking({
