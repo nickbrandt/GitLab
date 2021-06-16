@@ -37938,6 +37938,9 @@ msgstr ""
 msgid "Your projects"
 msgstr ""
 
+msgid "Your projects, groups, and dashboards are now in a simpler, combined menu. We welcome your comments in this %{linkStart}feedback issue%{linkEnd}."
+msgstr ""
+
 msgid "Your public email will be displayed on your public profile."
 msgstr ""
 

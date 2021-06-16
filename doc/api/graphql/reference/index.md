@@ -14923,6 +14923,7 @@ Name of the feature that the callout is for.
 | <a id="usercalloutfeaturenameenumbuy_pipeline_minutes_notification_dot"></a>`BUY_PIPELINE_MINUTES_NOTIFICATION_DOT` | Callout feature name for buy_pipeline_minutes_notification_dot. |
 | <a id="usercalloutfeaturenameenumcanary_deployment"></a>`CANARY_DEPLOYMENT` | Callout feature name for canary_deployment. |
 | <a id="usercalloutfeaturenameenumcluster_security_warning"></a>`CLUSTER_SECURITY_WARNING` | Callout feature name for cluster_security_warning. |
+| <a id="usercalloutfeaturenameenumcombined_menu_top_nav"></a>`COMBINED_MENU_TOP_NAV` | Callout feature name for combined_menu_top_nav. |
 | <a id="usercalloutfeaturenameenumcustomize_homepage"></a>`CUSTOMIZE_HOMEPAGE` | Callout feature name for customize_homepage. |
 | <a id="usercalloutfeaturenameenumeoa_bronze_plan_banner"></a>`EOA_BRONZE_PLAN_BANNER` | Callout feature name for eoa_bronze_plan_banner. |
 | <a id="usercalloutfeaturenameenumfeature_flags_new_version"></a>`FEATURE_FLAGS_NEW_VERSION` | Callout feature name for feature_flags_new_version. |
