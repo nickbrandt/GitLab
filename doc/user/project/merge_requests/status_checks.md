@@ -113,6 +113,32 @@ To complete the deletion of the status check you must select the
 **Remove status check** button. This **permanently** deletes
 the status check and it **will not** be recoverable.
 
+## Status checks widget
+
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/327634) in GitLab 14.1.
+
+![Status checks widget](img/status_checks_widget_passed_v14_0.png)
+
+In each merge request, this widget displays the status of external status checks.
+
+GitLab does not prevent merging of merge requests that fail these checks and they are for
+informational purposes only. However, you could have a policy that disallows merging merge
+requests until the status checks pass. However, GitLab can not enforce such a policy.
+
+NOTE:
+GitLab cannot guarantee that the external status checks are processed by the related external
+service.
+
+### Pending state
+
+![Status checks widget pending](img/status_checks_widget_pending_v14_0.png)
+
+Because GitLab cannot guarantee that external status checks are completed before viewing the
+widget on a merge request, you can see a pending state.
+
+Once GitLab [receives a response](../../../api/status_checks.md#set-approval-status-of-an-external-status-check)
+from the external status check, the widget is updated accordingly.
+
 ## Troubleshooting
 
 ### Duplicate value errors
@@ -148,6 +174,19 @@ Unable to fetch branches list, please close the form and try again
 An unexpected response was received from the branches retrieval API.
 As suggested, you should close the form and reopen again or refresh the page. This error should be temporary, although
 if it persists please check the [GitLab status page](https://status.gitlab.com/) to see if there is a wider outage.
+
+### Failed to load status checks
+
+```plaintext
+Failed to load status checks
+```
+
+An unexpected response was received from the external status checks API.
+You should:
+
+- Refresh the page in case this error is temporary.
+- Check the [GitLab status page](https://status.gitlab.com/) if the problem persists,
+  to see if there is a wider outage.
 
 ## Enable or disable status checks **(ULTIMATE SELF)**
 
