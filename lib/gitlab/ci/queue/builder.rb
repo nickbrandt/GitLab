@@ -4,89 +4,102 @@ module Gitlab
   module Ci
     module Queue
       class Builder < SimpleDelegator
+        attr_reader :runner
+
         def initialize(runner)
-          if ::Feature.enabled?(:ci_pending_builds_queue_source, runner, default_enabled: :yaml)
-            super(PendingBuildsTableStrategy.new(runner))
-          else
-            super(BuildsTableStrategy.new(runner))
+          @runner = runner
+          @strategy = begin
+            if ::Feature.enabled?(:ci_pending_builds_queue_source, runner, default_enabled: :yaml)
+              PendingBuildsTableStrategy.new(runner)
+            else
+              BuildsTableStrategy.new(runner)
+            end
           end
+
+          super(@strategy)
+        end
+
+        ##
+        # This is overridden in EE
+        #
+        def builds_for_shared_runner
+          @strategy.builds_for_shared_runner
         end
 
         # rubocop:disable CodeReuse/ActiveRecord
+        def builds_for_group_runner
+          # Workaround for weird Rails bug, that makes `runner.groups.to_sql` to return `runner_id = NULL`
+          groups = ::Group.joins(:runner_namespaces).merge(runner.runner_namespaces)
+
+          hierarchy_groups = Gitlab::ObjectHierarchy
+            .new(groups, options: { use_distinct: ::Feature.enabled?(:use_distinct_in_register_job_object_hierarchy) })
+            .base_and_descendants
+
+          projects = Project.where(namespace_id: hierarchy_groups)
+            .with_group_runners_enabled
+            .with_builds_enabled
+            .without_deleted
+
+          relation = @strategy.new_builds.where(project: projects)
+
+          @strategy.order(relation)
+        end
+
+        def builds_for_project_runner
+          relation = @strategy.new_builds
+            .where(project: runner.projects.without_deleted.with_builds_enabled)
+
+          @strategy.order(relation)
+        end
+
+        def builds_queued_before(relation, time)
+          relation.queued_before(time)
+        end
 
         class BuildsTableStrategy
-          attr_reader :runner
+          attr_reader :runner, :common
 
           def initialize(runner)
             @runner = runner
-            @relation = new_builds
           end
 
           def builds_for_shared_runner
-            @relation = new_builds
+            relation = new_builds
               # don't run projects which have not enabled shared runners and builds
               .joins('INNER JOIN projects ON ci_builds.project_id = projects.id')
               .where(projects: { shared_runners_enabled: true, pending_delete: false })
               .joins('LEFT JOIN project_features ON ci_builds.project_id = project_features.project_id')
               .where('project_features.builds_access_level IS NULL or project_features.builds_access_level > 0')
 
-            @relation = begin
-              if Feature.enabled?(:ci_queueing_disaster_recovery, runner, type: :ops, default_enabled: :yaml)
-                # if disaster recovery is enabled, we fallback to FIFO scheduling
-                @relation.order('ci_builds.id ASC')
-              else
-                # Implement fair scheduling
-                # this returns builds that are ordered by number of running builds
-                # we prefer projects that don't use shared runners at all
-                relation
-                  .joins("LEFT JOIN (#{running_builds_for_shared_runners.to_sql}) AS project_builds ON ci_builds.project_id=project_builds.project_id")
-                  .order(Arel.sql('COALESCE(project_builds.running_builds, 0) ASC'), 'ci_builds.id ASC')
-              end
+            if Feature.enabled?(:ci_queueing_disaster_recovery, runner, type: :ops, default_enabled: :yaml)
+              # if disaster recovery is enabled, we fallback to FIFO scheduling
+              relation.order('ci_builds.id ASC')
+            else
+              # Implement fair scheduling
+              # this returns builds that are ordered by number of running builds
+              # we prefer projects that don't use shared runners at all
+              relation
+                .joins("LEFT JOIN (#{running_builds_for_shared_runners.to_sql}) AS project_builds ON ci_builds.project_id = project_builds.project_id")
+                .order(Arel.sql('COALESCE(project_builds.running_builds, 0) ASC'), 'ci_builds.id ASC')
             end
           end
 
-          def builds_for_project_runner
-            @relation = new_builds.where(project: runner.projects.without_deleted.with_builds_enabled).order('id ASC')
-          end
-
-          def builds_for_group_runner
-            # Workaround for weird Rails bug, that makes `runner.groups.to_sql` to return `runner_id = NULL`
-            groups = ::Group.joins(:runner_namespaces).merge(runner.runner_namespaces)
-
-            hierarchy_groups = Gitlab::ObjectHierarchy
-              .new(groups, options: { use_distinct: ::Feature.enabled?(:use_distinct_in_register_job_object_hierarchy) })
-              .base_and_descendants
-
-            projects = Project.where(namespace_id: hierarchy_groups)
-              .with_group_runners_enabled
-              .with_builds_enabled
-              .without_deleted
-
-            @relation = new_builds.where(project: projects).order('id ASC')
-          end
-
-          def builds_matching_tag_ids(ids)
+          def builds_matching_tag_ids(relation, ids)
             # pick builds that does not have other tags than runner's one
-            @relation = @relation.matches_tag_ids(ids)
+            relation.matches_tag_ids(ids)
           end
 
-          def builds_with_any_tags
+          def builds_with_any_tags(relation)
             # pick builds that have at least one tag
-            @relation = @relation.with_any_tags
+            relation.with_any_tags
           end
 
-          def builds_queued_before(time)
-            @relation = @relation.queued_before(time)
+          def order(relation)
+            relation.order('id ASC')
           end
 
-          def build_ids
-            @relation.pluck(:id)
-          end
-
-          private
-
-          def all_builds
-            ::Ci::Build.pending.unstarted
+          def build_ids(relation)
+            relation.pluck(:id)
           end
 
           def new_builds
@@ -95,6 +108,12 @@ module Gitlab
             else
               all_builds
             end
+          end
+
+          private
+
+          def all_builds
+            ::Ci::Build.pending.unstarted
           end
 
           def running_builds_for_shared_runners
@@ -110,34 +129,31 @@ module Gitlab
 
           def initialize(runner)
             @runner = runner
-            @relation = new_builds
           end
 
           def builds_for_shared_runner
-            @relation = new_builds
+            relation = new_builds
               # don't run projects which have not enabled shared runners and builds
               .joins('INNER JOIN projects ON ci_pending_builds.project_id = projects.id')
               .where(projects: { shared_runners_enabled: true, pending_delete: false })
               .joins('LEFT JOIN project_features ON ci_pending_builds.project_id = project_features.project_id')
               .where('project_features.builds_access_level IS NULL or project_features.builds_access_level > 0')
 
-            @relation = begin
-              if Feature.enabled?(:ci_queueing_disaster_recovery, runner, type: :ops, default_enabled: :yaml)
-                # if disaster recovery is enabled, we fallback to FIFO scheduling
-                @relation.order('ci_pending_builds.build_id ASC')
-              else
-                # Implement fair scheduling
-                # this returns builds that are ordered by number of running builds
-                # we prefer projects that don't use shared runners at all
-                @relation
-                  .joins("LEFT JOIN (#{running_builds_for_shared_runners.to_sql}) AS project_builds ON ci_pending_builds.project_id=project_builds.project_id")
-                  .order(Arel.sql('COALESCE(project_builds.running_builds, 0) ASC'), 'ci_pending_builds.build_id ASC')
-              end
+            if Feature.enabled?(:ci_queueing_disaster_recovery, runner, type: :ops, default_enabled: :yaml)
+              # if disaster recovery is enabled, we fallback to FIFO scheduling
+              relation.order('ci_pending_builds.build_id ASC')
+            else
+              # Implement fair scheduling
+              # this returns builds that are ordered by number of running builds
+              # we prefer projects that don't use shared runners at all
+              relation
+                .joins("LEFT JOIN (#{running_builds_for_shared_runners.to_sql}) AS project_builds ON ci_pending_builds.project_id=project_builds.project_id")
+                .order(Arel.sql('COALESCE(project_builds.running_builds, 0) ASC'), 'ci_pending_builds.build_id ASC')
             end
           end
 
           def builds_for_project_runner
-            @relation = new_builds
+            new_builds
               .where(project: runner.projects.without_deleted.with_builds_enabled)
               .order('build_id ASC')
           end
@@ -155,29 +171,27 @@ module Gitlab
               .with_builds_enabled
               .without_deleted
 
-            @relation = new_builds.where(project: projects).order('build_id ASC')
+            new_builds.where(project: projects).order('build_id ASC')
           end
 
-          def builds_matching_tag_ids(ids)
-            @relation = @relation.merge(CommitStatus.matches_tag_ids(ids, on: 'ci_pending_builds.build_id'))
+          def builds_matching_tag_ids(relation, ids)
+            relation.merge(CommitStatus.matches_tag_ids(ids, on: 'ci_pending_builds.build_id'))
           end
 
-          def builds_with_any_tags
-            @relation = @relation.merge(CommitStatus.with_any_tags(on: 'ci_pending_builds.build_id'))
+          def builds_with_any_tags(relation)
+            relation.merge(CommitStatus.with_any_tags(on: 'ci_pending_builds.build_id'))
           end
 
-          def builds_queued_before(time)
-            @relation = @relation.queued_before(time)
+          def builds_queued_before(relation, time)
+            relation.queued_before(time)
           end
 
-          def build_ids
-            @relation.pluck(:build_id)
+          def order(relation)
+            relation.order('build_id ASC')
           end
 
-          private
-
-          def all_builds
-            ::Ci::PendingBuild.all
+          def build_ids(relation)
+            relation.pluck(:build_id)
           end
 
           def new_builds
@@ -188,13 +202,18 @@ module Gitlab
             end
           end
 
+          private
+
+          def all_builds
+            ::Ci::PendingBuild.all
+          end
+
           def running_builds_for_shared_runners
             ::Ci::RunningBuild
               .where(runner: ::Ci::Runner.instance_type)
               .group(:project_id)
               .select(:project_id, 'count(*) AS running_builds')
           end
-
           # rubocop:enable CodeReuse/ActiveRecord
         end
       end

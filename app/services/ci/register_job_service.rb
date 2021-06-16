@@ -105,28 +105,30 @@ module Ci
     def each_build(params, &blk)
       queue = ::Gitlab::Ci::Queue::Builder.new(runner)
 
-      if runner.instance_type?
-        queue.builds_for_shared_runner
-      elsif runner.group_type?
-        queue.builds_for_group_runner
-      else
-        queue.builds_for_project_runner
+      builds = begin
+        if runner.instance_type?
+          queue.builds_for_shared_runner
+        elsif runner.group_type?
+          queue.builds_for_group_runner
+        else
+          queue.builds_for_project_runner
+        end
       end
 
       # pick builds that does not have other tags than runner's one
-      queue.builds_matching_tag_ids(runner.tags.ids)
+      builds = queue.builds_matching_tag_ids(builds, runner.tags.ids)
 
       # pick builds that have at least one tag
       unless runner.run_untagged?
-        queue.builds_with_any_tags
+        builds = queue.builds_with_any_tags(builds)
       end
 
       # pick builds that older than specified age
       if params.key?(:job_age)
-        queue.builds_queued_before(params[:job_age].seconds.ago)
+        builds = queue.builds_queued_before(builds, params[:job_age].seconds.ago)
       end
 
-      build_ids = retrieve_queue(-> { queue.build_ids })
+      build_ids = retrieve_queue(-> { queue.build_ids(builds) })
 
       @metrics.observe_queue_size(-> { build_ids.size }, @runner.runner_type)
 
