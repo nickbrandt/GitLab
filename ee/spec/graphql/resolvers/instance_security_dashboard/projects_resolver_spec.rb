@@ -20,7 +20,7 @@ RSpec.describe Resolvers::InstanceSecurityDashboard::ProjectsResolver do
     end
 
     context 'when provided object is InstanceSecurityDashboard' do
-      it { is_expected.to eq([project1, project2]) }
+      it { is_expected.to match_array([project1, project2]) }
     end
 
     context 'when object is not provided' do
