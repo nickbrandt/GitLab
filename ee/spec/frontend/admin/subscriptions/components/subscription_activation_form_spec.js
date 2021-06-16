@@ -4,13 +4,13 @@ import VueApollo from 'vue-apollo';
 import SubscriptionActivationForm, {
   SUBSCRIPTION_ACTIVATION_FAILURE_EVENT,
   SUBSCRIPTION_ACTIVATION_SUCCESS_EVENT,
-} from 'ee/pages/admin/cloud_licenses/components/subscription_activation_form.vue';
+} from 'ee/admin/subscriptions/show/components/subscription_activation_form.vue';
 import {
   CONNECTIVITY_ERROR,
   fieldRequiredMessage,
   INVALID_CODE_ERROR,
   subscriptionQueries,
-} from 'ee/pages/admin/cloud_licenses/constants';
+} from 'ee/admin/subscriptions/show/constants';
 import createMockApollo from 'helpers/mock_apollo_helper';
 import { stubComponent } from 'helpers/stub_component';
 import { extendedWrapper } from 'helpers/vue_test_utils_helper';

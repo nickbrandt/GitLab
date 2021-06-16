@@ -1,7 +1,7 @@
 import { GlBadge } from '@gitlab/ui';
 import { mount } from '@vue/test-utils';
-import SubscriptionDetailsHistory from 'ee/pages/admin/cloud_licenses/components/subscription_details_history.vue';
-import { cloudLicenseText } from 'ee/pages/admin/cloud_licenses/constants';
+import SubscriptionDetailsHistory from 'ee/admin/subscriptions/show/components/subscription_details_history.vue';
+import { cloudLicenseText } from 'ee/admin/subscriptions/show/constants';
 import { extendedWrapper } from 'helpers/vue_test_utils_helper';
 import { license, subscriptionHistory } from '../mock_data';
 

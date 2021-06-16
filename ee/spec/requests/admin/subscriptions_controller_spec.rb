@@ -2,10 +2,10 @@
 
 require 'spec_helper'
 
-RSpec.describe Admin::CloudLicensesController, :cloud_licenses do
+RSpec.describe Admin::SubscriptionsController, :cloud_licenses do
   include AdminModeHelper
 
-  describe 'GET /cloud_licenses' do
+  describe 'GET /subscriptions' do
     context 'when the user is not admin' do
       let_it_be(:user) { create(:user) }
 
@@ -47,13 +47,13 @@ RSpec.describe Admin::CloudLicensesController, :cloud_licenses do
           send_request
 
           expect(response).to render_template(:show)
-          expect(response.body).to include('js-show-cloud-license-page')
+          expect(response.body).to include('js-show-subscription-page')
         end
       end
     end
   end
 
   def send_request
-    get admin_cloud_license_path
+    get admin_subscription_path
   end
 end

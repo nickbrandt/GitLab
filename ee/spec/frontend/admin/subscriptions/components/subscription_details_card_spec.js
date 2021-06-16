@@ -1,8 +1,8 @@
 import { GlCard } from '@gitlab/ui';
 import { shallowMount } from '@vue/test-utils';
-import { subscriptionDetailsFields } from 'ee/pages/admin/cloud_licenses/components/subscription_breakdown.vue';
-import SubscriptionDetailsCard from 'ee/pages/admin/cloud_licenses/components/subscription_details_card.vue';
-import SubscriptionDetailsTable from 'ee/pages/admin/cloud_licenses/components/subscription_details_table.vue';
+import { subscriptionDetailsFields } from 'ee/admin/subscriptions/show/components/subscription_breakdown.vue';
+import SubscriptionDetailsCard from 'ee/admin/subscriptions/show/components/subscription_details_card.vue';
+import SubscriptionDetailsTable from 'ee/admin/subscriptions/show/components/subscription_details_table.vue';
 import { useFakeDate } from 'helpers/fake_date';
 import { extendedWrapper } from 'helpers/vue_test_utils_helper';
 import { license } from '../mock_data';

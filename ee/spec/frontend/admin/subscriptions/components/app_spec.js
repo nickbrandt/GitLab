@@ -1,15 +1,16 @@
 import { createLocalVue, shallowMount } from '@vue/test-utils';
 import VueApollo from 'vue-apollo';
-import SubscriptionManagementApp from 'ee/pages/admin/cloud_licenses/components/app.vue';
-import SubscriptionActivationCard from 'ee/pages/admin/cloud_licenses/components/subscription_activation_card.vue';
-import SubscriptionBreakdown from 'ee/pages/admin/cloud_licenses/components/subscription_breakdown.vue';
+import SubscriptionManagementApp from 'ee/admin/subscriptions/show/components/app.vue';
+import SubscriptionActivationCard from 'ee/admin/subscriptions/show/components/subscription_activation_card.vue';
+import SubscriptionBreakdown from 'ee/admin/subscriptions/show/components/subscription_breakdown.vue';
+
 import {
   noActiveSubscription,
   subscriptionActivationNotificationText,
   subscriptionHistoryQueries,
   subscriptionMainTitle,
   subscriptionQueries,
-} from 'ee/pages/admin/cloud_licenses/constants';
+} from 'ee/admin/subscriptions/show/constants';
 import createMockApollo from 'helpers/mock_apollo_helper';
 import { extendedWrapper } from 'helpers/vue_test_utils_helper';
 import { license, subscriptionHistory } from '../mock_data';

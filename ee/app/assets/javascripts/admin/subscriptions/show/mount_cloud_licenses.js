@@ -3,7 +3,7 @@ import VueApollo from 'vue-apollo';
 import { helpPagePath } from '~/helpers/help_page_helper';
 import createDefaultClient from '~/lib/graphql';
 import { parseBoolean } from '~/lib/utils/common_utils';
-import CloudLicenseShowApp from '../components/app.vue';
+import CloudLicenseShowApp from './components/app.vue';
 
 Vue.use(VueApollo);
 
@@ -17,7 +17,7 @@ const apolloProvider = new VueApollo({
 });
 
 export default () => {
-  const el = document.getElementById('js-show-cloud-license-page');
+  const el = document.getElementById('js-show-subscription-page');
 
   if (!el) {
     return null;

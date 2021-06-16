@@ -2,7 +2,7 @@ import {
   getErrorsAsData,
   getLicenseFromData,
   updateSubscriptionAppCache,
-} from 'ee/pages/admin/cloud_licenses/graphql/utils';
+} from 'ee/admin/subscriptions/show/graphql/utils';
 import { activateLicenseMutationResponse } from '../mock_data';
 
 describe('graphQl utils', () => {
