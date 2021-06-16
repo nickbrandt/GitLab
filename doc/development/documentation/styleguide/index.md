@@ -306,11 +306,11 @@ GitLab documentation should be clear and easy to understand. Avoid unnecessary w
 - Write in US English with US grammar. (Tested in [`British.yml`](https://gitlab.com/gitlab-org/gitlab/-/blob/master/doc/.vale/gitlab/British.yml).)
 - Use [inclusive language](#inclusive-language).
 - Rewrite to avoid wordiness:
-    - there is
-    - there are
-    - enables you to
-    - in order to
-    - because of the fact that
+  - there is
+  - there are
+  - enables you to
+  - in order to
+  - because of the fact that
 
 ### Capitalization
 
