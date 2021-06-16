@@ -547,7 +547,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         end
       end
 
-      scope :usage_ping, controller: :usage_ping do
+      scope :service_ping, controller: :service_ping do
         post :web_ide_clientside_preview # rubocop:todo Cop/PutProjectRoutesUnderScope
         post :web_ide_pipelines_count # rubocop:todo Cop/PutProjectRoutesUnderScope
       end
