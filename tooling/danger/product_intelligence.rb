@@ -14,7 +14,7 @@ module Tooling
         'spec/lib/gitlab/tracking_spec.rb',
         'app/helpers/tracking_helper.rb',
         'spec/helpers/tracking_helper_spec.rb',
-        'app/assets/javascripts/tracking.js',
+        'app/assets/javascripts/tracking/index.js',
         'spec/frontend/tracking_spec.js',
         'generator_templates/usage_metric_definition/metric_definition.yml',
         'lib/generators/gitlab/usage_metric/usage_metric_generator.rb',
