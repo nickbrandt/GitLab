@@ -48,7 +48,7 @@ class Integration < ApplicationRecord
     flowdock
     hangouts_chat
     irker
-    packagist
+    packagist pipelines_email
   ].to_set.freeze
 
   def self.renamed?(name)
