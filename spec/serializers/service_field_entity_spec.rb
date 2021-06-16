@@ -56,7 +56,7 @@ RSpec.describe ServiceFieldEntity do
 
     context 'EmailsOnPush Service' do
       let(:integration) { create(:emails_on_push_integration, send_from_committer_email: '1') }
-      let(:service) { integration }
+      let(:service) { integration } # TODO: remove when https://gitlab.com/gitlab-org/gitlab/-/issues/330300 is complete
 
       context 'field with type checkbox' do
         let(:field) { integration.global_fields.find { |field| field[:name] == 'send_from_committer_email' } }
