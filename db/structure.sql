@@ -190,16 +190,6 @@ CREATE TABLE audit_events (
 )
 PARTITION BY RANGE (created_at);
 
-CREATE TABLE incident_management_alert_escalations (
-    id bigint NOT NULL,
-    policy_id bigint NOT NULL,
-    alert_id bigint NOT NULL,
-    last_notified_at timestamp with time zone,
-    created_at timestamp with time zone NOT NULL,
-    updated_at timestamp with time zone NOT NULL
-)
-PARTITION BY RANGE (created_at);
-
 CREATE TABLE web_hook_logs (
     id bigint NOT NULL,
     web_hook_id integer NOT NULL,
@@ -13788,6 +13778,16 @@ CREATE SEQUENCE in_product_marketing_emails_id_seq
     CACHE 1;
 
 ALTER SEQUENCE in_product_marketing_emails_id_seq OWNED BY in_product_marketing_emails.id;
+
+CREATE TABLE incident_management_alert_escalations (
+    id bigint NOT NULL,
+    policy_id bigint NOT NULL,
+    alert_id bigint NOT NULL,
+    last_notified_at timestamp with time zone,
+    created_at timestamp with time zone NOT NULL,
+    updated_at timestamp with time zone NOT NULL
+)
+PARTITION BY RANGE (created_at);
 
 CREATE SEQUENCE incident_management_alert_escalations_id_seq
     START WITH 1
