@@ -24,6 +24,7 @@ module RuboCop
         ].freeze
         WORKER_METHODS = %i[
           data_consistency
+          deduplicate
         ].freeze
         GRAPHQL_METHODS = %i[
           field
