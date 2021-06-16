@@ -29,9 +29,10 @@ RSpec.describe Integrations::Flowdock do
   describe "Execute" do
     let(:user)    { create(:user) }
     let(:project) { create(:project, :repository) }
-    let(:flowdock_integration) { subject }
     let(:sample_data) { Gitlab::DataBuilder::Push.build_sample(project, user) }
     let(:api_url) { 'https://api.flowdock.com/v1/messages' }
+
+    subject(:flowdock_integration) { described_class.new }
 
     before do
       allow(flowdock_integration).to receive_messages(
@@ -45,6 +46,7 @@ RSpec.describe Integrations::Flowdock do
 
     it "calls FlowDock API" do
       flowdock_integration.execute(sample_data)
+
       sample_data[:commits].each do |commit|
         # One request to Flowdock per new commit
         next if commit[:id] == sample_data[:before]
