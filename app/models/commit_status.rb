@@ -85,6 +85,25 @@ class CommitStatus < ApplicationRecord
     merge(or_conditions)
   end
 
+  scope :matches_tag_ids, ->(tag_ids) do
+    matcher = ::ActsAsTaggableOn::Tagging
+      .where(taggable_type: CommitStatus.name)
+      .where(context: 'tags')
+      .where('taggable_id = ci_builds.id')
+      .where.not(tag_id: tag_ids).select('1')
+
+    where("NOT EXISTS (?)", matcher)
+  end
+
+  scope :with_any_tags, -> do
+    matcher = ::ActsAsTaggableOn::Tagging
+      .where(taggable_type: CommitStatus.name)
+      .where(context: 'tags')
+      .where('taggable_id = ci_builds.id').select('1')
+
+    where("EXISTS (?)", matcher)
+  end
+
   # We use `Enums::Ci::CommitStatus.failure_reasons` here so that EE can more easily
   # extend this `Hash` with new values.
   enum_with_nil failure_reason: Enums::Ci::CommitStatus.failure_reasons

@@ -178,25 +178,6 @@ module Ci
       joins(:metadata).where("ci_builds_metadata.config_options -> 'artifacts' -> 'reports' ?| array[:job_types]", job_types: job_types)
     end
 
-    scope :matches_tag_ids, -> (tag_ids) do
-      matcher = ::ActsAsTaggableOn::Tagging
-        .where(taggable_type: CommitStatus.name)
-        .where(context: 'tags')
-        .where('taggable_id = ci_builds.id')
-        .where.not(tag_id: tag_ids).select('1')
-
-      where("NOT EXISTS (?)", matcher)
-    end
-
-    scope :with_any_tags, -> do
-      matcher = ::ActsAsTaggableOn::Tagging
-        .where(taggable_type: CommitStatus.name)
-        .where(context: 'tags')
-        .where('taggable_id = ci_builds.id').select('1')
-
-      where("EXISTS (?)", matcher)
-    end
-
     scope :queued_before, ->(time) { where(arel_table[:queued_at].lt(time)) }
 
     scope :preload_project_and_pipeline_project, -> do

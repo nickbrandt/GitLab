@@ -21,10 +21,10 @@ module EE
 
       # rubocop: disable CodeReuse/ActiveRecord
       def enforce_minutes_based_on_cost_factors(relation)
-        visibility_relation = ::Ci::Build.where(
+        visibility_relation = ::CommitStatus.where(
           projects: { visibility_level: runner.visibility_levels_without_minutes_quota })
 
-        enforce_limits_relation = ::Ci::Build.where('EXISTS (?)', builds_check_limit)
+        enforce_limits_relation = ::CommitStatus.where('EXISTS (?)', builds_check_limit)
 
         relation.merge(visibility_relation.or(enforce_limits_relation))
       end
