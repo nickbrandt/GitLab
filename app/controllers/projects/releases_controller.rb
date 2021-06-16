@@ -25,9 +25,6 @@ class Projects::ReleasesController < Projects::ApplicationController
     end
   end
 
-  def new
-  end
-
   def downloads
     redirect_to link.url
   end
