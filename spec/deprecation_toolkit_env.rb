@@ -60,6 +60,7 @@ module DeprecationToolkitEnv
       activerecord-6.0.3.7/lib/active_record/relation.rb
       asciidoctor-2.0.12/lib/asciidoctor/extensions.rb
       attr_encrypted-3.1.0/lib/attr_encrypted/adapters/active_record.rb
+      grpc-1.30.2-universal/darwin/src/ruby/lib/grpc/generic/interceptors.rb
     ]
   end
 
