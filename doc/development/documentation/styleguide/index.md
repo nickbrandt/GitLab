@@ -216,15 +216,15 @@ to update.
 
 Put files for a specific product area into the related folder:
 
-| Directory             | What belongs here |
+| Directory             | Contents |
 |:----------------------|:------------------|
-| `doc/user/`           | User related documentation. Anything that can be done in the GitLab user interface goes here, including usage of the `/admin` interface. |
+| `doc/user/`           | Documentation for users. Anything that can be done in the GitLab user interface goes here, including usage of the `/admin` interface. |
 | `doc/administration/` | Documentation that requires the user to have access to the server where GitLab is installed. Administrator settings in the GitLab user interface are under `doc/user/admin_area/`. |
-| `doc/api/`            | API-related documentation. |
+| `doc/api/`            | Documentation for the API. |
 | `doc/development/`    | Documentation related to the development of GitLab, whether contributing code or documentation. Related process and style guides should go here. |
 | `doc/legal/`          | Legal documents about contributing to GitLab. |
-| `doc/install/`        | Contains instructions for installing GitLab. |
-| `doc/update/`         | Contains instructions for updating GitLab. |
+| `doc/install/`        | Instructions for installing GitLab. |
+| `doc/update/`         | Instructions for updating GitLab. |
 | `doc/topics/`         | Indexes per topic (`doc/topics/topic_name/index.md`): all resources for that topic. |
 
 ### Work with directories and files
