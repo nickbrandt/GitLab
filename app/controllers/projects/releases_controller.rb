@@ -26,7 +26,6 @@ class Projects::ReleasesController < Projects::ApplicationController
   end
 
   def new
-    redirect_to(new_project_tag_path(@project))
   end
 
   def downloads
