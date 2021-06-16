@@ -14,9 +14,8 @@ RSpec.describe Integrations::MattermostSlashCommands do
       session = ::Mattermost::Session.new(nil)
       session.base_uri = 'http://mattermost.example.com'
 
-      allow_next_instance_of(::Mattermost::Client) do |client|
-        allow(client).to receive(:with_session).and_yield(session)
-      end
+      allow(session).to receive(:with_session).and_yield(session)
+      allow(::Mattermost::Session).to receive(:new).and_return(session)
     end
 
     describe '#configure' do
