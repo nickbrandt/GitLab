@@ -269,25 +269,27 @@ module Ci
             let!(:unrelated_group_runner) { create(:ci_runner, :group, groups: [unrelated_group]) }
 
             it 'does not consider builds from other group runners' do
-              expect(described_class.new(group_runner).send(:builds_for_group_runner).size).to eq 6
+              queue = ::Gitlab::Ci::Queue::Builder
+
+              expect(queue.new(group_runner).builds_for_group_runner.size).to eq 6
               execute(group_runner)
 
-              expect(described_class.new(group_runner).send(:builds_for_group_runner).size).to eq 5
+              expect(queue.new(group_runner).builds_for_group_runner.size).to eq 5
               execute(group_runner)
 
-              expect(described_class.new(group_runner).send(:builds_for_group_runner).size).to eq 4
+              expect(queue.new(group_runner).builds_for_group_runner.size).to eq 4
               execute(group_runner)
 
-              expect(described_class.new(group_runner).send(:builds_for_group_runner).size).to eq 3
+              expect(queue.new(group_runner).builds_for_group_runner.size).to eq 3
               execute(group_runner)
 
-              expect(described_class.new(group_runner).send(:builds_for_group_runner).size).to eq 2
+              expect(queue.new(group_runner).builds_for_group_runner.size).to eq 2
               execute(group_runner)
 
-              expect(described_class.new(group_runner).send(:builds_for_group_runner).size).to eq 1
+              expect(queue.new(group_runner).builds_for_group_runner.size).to eq 1
               execute(group_runner)
 
-              expect(described_class.new(group_runner).send(:builds_for_group_runner).size).to eq 0
+              expect(queue.new(group_runner).builds_for_group_runner.size).to eq 0
               expect(execute(group_runner)).to be_nil
             end
           end
@@ -299,7 +301,9 @@ module Ci
             end
 
             it 'calls DISTINCT' do
-              expect(described_class.new(group_runner).send(:builds_for_group_runner).to_sql).to include("DISTINCT")
+              queue = ::Gitlab::Ci::Queue::Builder.new(group_runner)
+
+              expect(queue.builds_for_group_runner.to_sql).to include("DISTINCT")
             end
           end
 
@@ -310,7 +314,9 @@ module Ci
             end
 
             it 'does not call DISTINCT' do
-              expect(described_class.new(group_runner).send(:builds_for_group_runner).to_sql).not_to include("DISTINCT")
+              queue = ::Gitlab::Ci::Queue::Builder.new(group_runner)
+
+              expect(queue.builds_for_group_runner.to_sql).not_to include("DISTINCT")
             end
           end
 
@@ -349,8 +355,9 @@ module Ci
             let!(:other_build) { create(:ci_build, :pending, :queued, pipeline: pipeline) }
 
             before do
-              allow_any_instance_of(Ci::RegisterJobService).to receive(:builds_for_project_runner)
-                .and_return(Ci::Build.where(id: [pending_job, other_build]))
+              allow_any_instance_of(::Gitlab::Ci::Queue::Builder)
+                .to receive(:build_ids)
+                .and_return(Ci::Build.where(id: [pending_job, other_build]).pluck(:id))
             end
 
             it "receives second build from the queue" do
@@ -361,8 +368,9 @@ module Ci
 
           context 'when single build is in queue' do
             before do
-              allow_any_instance_of(Ci::RegisterJobService).to receive(:builds_for_project_runner)
-                .and_return(Ci::Build.where(id: pending_job))
+              allow_any_instance_of(::Gitlab::Ci::Queue::Builder)
+                .to receive(:build_ids)
+                .and_return(Ci::Build.where(id: pending_job).pluck(:id))
             end
 
             it "does not receive any valid result" do
@@ -372,8 +380,9 @@ module Ci
 
           context 'when there is no build in queue' do
             before do
-              allow_any_instance_of(Ci::RegisterJobService).to receive(:builds_for_project_runner)
-                .and_return(Ci::Build.none)
+              allow_any_instance_of(::Gitlab::Ci::Queue::Builder)
+                .to receive(:build_ids)
+                .and_return([])
             end
 
             it "does not receive builds but result is valid" do

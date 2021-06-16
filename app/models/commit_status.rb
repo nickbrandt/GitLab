@@ -85,21 +85,25 @@ class CommitStatus < ApplicationRecord
     merge(or_conditions)
   end
 
-  scope :matches_tag_ids, ->(tag_ids) do
+  ##
+  # The temporary `on:` argument has been introduced to make it possible to
+  # reuse these scopes as a subquery for a different table (ci_pending_builds).
+  #
+  scope :matches_tag_ids, ->(tag_ids, on: 'ci_builds.id') do
     matcher = ::ActsAsTaggableOn::Tagging
       .where(taggable_type: CommitStatus.name)
       .where(context: 'tags')
-      .where('taggable_id = ci_builds.id')
+      .where("taggable_id = #{on}")
       .where.not(tag_id: tag_ids).select('1')
 
     where("NOT EXISTS (?)", matcher)
   end
 
-  scope :with_any_tags, -> do
+  scope :with_any_tags, ->(on: 'ci_builds.id') do
     matcher = ::ActsAsTaggableOn::Tagging
       .where(taggable_type: CommitStatus.name)
       .where(context: 'tags')
-      .where('taggable_id = ci_builds.id').select('1')
+      .where("taggable_id = #{on}").select('1')
 
     where("EXISTS (?)", matcher)
   end
