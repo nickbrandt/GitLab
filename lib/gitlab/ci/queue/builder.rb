@@ -8,6 +8,7 @@ module Gitlab
 
         def initialize(runner)
           @runner = runner
+
           @strategy = begin
             if ::Feature.enabled?(:ci_pending_builds_queue_source, runner, default_enabled: :yaml)
               PendingBuildsTableStrategy.new(runner)
@@ -220,3 +221,5 @@ module Gitlab
     end
   end
 end
+
+Gitlab::Ci::Queue::Builder.prepend_mod_with('Gitlab::Ci::Queue::Builder')
