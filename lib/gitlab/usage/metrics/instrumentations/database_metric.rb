@@ -46,7 +46,7 @@ module Gitlab
           end
 
           def value
-            start, finish = get_or_cache_batch_ids if batch_query?
+            start, finish = get_or_cache_batch_ids
 
             method(self.class.metric_operation)
               .call(relation,
@@ -69,10 +69,6 @@ module Gitlab
 
           private
 
-          def batch_query?
-            self.class.metric_start.present? && self.class.metric_finish.present?
-          end
-
           def relation
             self.class.metric_relation.call.where(time_constraints)
           end
@@ -91,11 +87,9 @@ module Gitlab
           end
 
           def get_or_cache_batch_ids
-            key_name = if self.class.cache_key.present?
-                         "metric_instrumentation/#{self.class.cache_key}"
-                       else
-                         "metric_instrumentation/#{relation.table_name}"
-                       end
+            return [self.class.start, self.class.finish] unless self.class.cache_key.present?
+
+            key_name = "metric_instrumentation/#{self.class.cache_key}"
 
             start = Rails.cache.fetch("#{key_name}_minimum_id", expires_in: 1.day) do
               self.class.start

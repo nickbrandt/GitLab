@@ -25,11 +25,11 @@ RSpec.describe Gitlab::Usage::Metrics::Instrumentations::DatabaseMetric do
       expect(subject.value).to eq(3)
     end
 
-    it 'caches the result of start and finish', :use_clean_rails_redis_caching do
+    it 'does not cache the result of start and finish', :use_clean_rails_redis_caching do
       subject.value
 
-      expect(Rails.cache.read('metric_instrumentation/issues_minimum_id')).to eq(314)
-      expect(Rails.cache.read('metric_instrumentation/issues_maximum_id')).to eq(949)
+      expect(Rails.cache.read('metric_instrumentation/issues_minimum_id')).to eq(nil)
+      expect(Rails.cache.read('metric_instrumentation/issues_maximum_id')).to eq(nil)
     end
 
     context 'with start and finish not called' do
