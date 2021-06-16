@@ -300,11 +300,17 @@ Do not include the same information in multiple places.
 
 ## Language
 
-GitLab documentation should be clear and easy to understand.
+GitLab documentation should be clear and easy to understand. Avoid unnecessary words.
 
-- Be clear, concise, and stick to the goal of the documentation.
+- Be clear, concise, and stick to the goal of the topic.
 - Write in US English with US grammar. (Tested in [`British.yml`](https://gitlab.com/gitlab-org/gitlab/-/blob/master/doc/.vale/gitlab/British.yml).)
 - Use [inclusive language](#inclusive-language).
+- Rewrite to avoid wordiness:
+    - there is
+    - there are
+    - enables you to
+    - in order to
+    - because of the fact that
 
 ### Capitalization
 
