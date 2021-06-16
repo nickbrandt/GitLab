@@ -23,7 +23,10 @@ export default {
     showVisualReviewApp: {
       type: Boolean,
       required: false,
-      default: false,
+      // WIP: Test Condition, revert in MR after testing
+      // default: false,
+      default: true,
+      // End Test Condition
     },
     visualReviewAppMeta: {
       type: Object,

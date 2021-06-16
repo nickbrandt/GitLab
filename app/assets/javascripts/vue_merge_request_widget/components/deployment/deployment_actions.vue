@@ -163,8 +163,11 @@ export default {
     >
       <span>{{ $options.actionsConfiguration[constants.DEPLOYING].buttonText }}</span>
     </deployment-action-button>
+    <!-- TEST CASE -->
+    <!-- CURRENT: v-if="canBeManuallyDeployed" -->
+    <!-- ORIGINAL: v-if="canBeManuallyRedeployed" -->
     <deployment-action-button
-      v-if="canBeManuallyRedeployed"
+      v-if="canBeManuallyDeployed"
       :action-in-progress="actionInProgress"
       :actions-configuration="$options.actionsConfiguration[constants.REDEPLOYING]"
       :computed-deployment-status="computedDeploymentStatus"
@@ -174,8 +177,11 @@ export default {
     >
       <span>{{ $options.actionsConfiguration[constants.REDEPLOYING].buttonText }}</span>
     </deployment-action-button>
+    <!-- TEST CASE -->
+    <!-- CURRENT: v-if="canBeManuallyDeployed" -->
+    <!-- ORIGINAL: v-if="hasExternalUrls" -->
     <deployment-view-button
-      v-if="hasExternalUrls"
+      v-if="canBeManuallyDeployed"
       :app-button-text="appButtonText"
       :deployment="deployment"
       :show-visual-review-app="showVisualReviewApp"
