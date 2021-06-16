@@ -3,11 +3,14 @@
 require 'spec_helper'
 
 RSpec.describe 'Account recovery regular check callout' do
+  include Spec::Support::Helpers::Features::TopNavSpecHelpers
+
   context 'when signed in' do
     let(:user) { create(:user, created_at: 4.months.ago ) }
     let(:message) { "Please ensure your account's recovery settings are up to date." }
 
     before do
+      dismiss_top_nav_callout(user)
       allow(Gitlab).to receive(:com?) { true }
       gitlab_sign_in(user)
     end

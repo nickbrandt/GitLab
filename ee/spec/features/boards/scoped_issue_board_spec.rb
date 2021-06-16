@@ -3,6 +3,7 @@
 require 'spec_helper'
 
 RSpec.describe 'Scoped issue boards', :js do
+  include Spec::Support::Helpers::Features::TopNavSpecHelpers
   include FilteredSearchHelpers
   include MobileHelpers
 
@@ -23,6 +24,10 @@ RSpec.describe 'Scoped issue boards', :js do
   let(:edit_board) { find('.btn', text: 'Edit board') }
   let(:view_scope) { find('.btn', text: 'View scope') }
   let(:board_title) { find('.boards-selector-wrapper .dropdown-menu-toggle') }
+
+  before_all do
+    dismiss_top_nav_callout(user)
+  end
 
   before do
     allow_next_instance_of(ApplicationHelper) do |helper|

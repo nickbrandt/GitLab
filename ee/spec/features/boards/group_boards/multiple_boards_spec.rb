@@ -3,6 +3,8 @@
 require 'spec_helper'
 
 RSpec.describe 'Multiple Issue Boards', :js do
+  include Spec::Support::Helpers::Features::TopNavSpecHelpers
+
   let_it_be(:user) { create(:user) }
   let_it_be(:group) { create(:group, :public) }
   let_it_be(:planning) { create(:group_label, group: group, name: 'Planning') }
@@ -10,6 +12,10 @@ RSpec.describe 'Multiple Issue Boards', :js do
 
   let(:parent) { group }
   let(:boards_path) { group_boards_path(group) }
+
+  before_all do
+    dismiss_top_nav_callout(user)
+  end
 
   context 'with multiple group issue boards disabled' do
     before do

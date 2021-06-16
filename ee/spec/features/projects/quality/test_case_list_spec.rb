@@ -3,6 +3,8 @@
 require 'spec_helper'
 
 RSpec.describe 'Test Cases', :js do
+  include Spec::Support::Helpers::Features::TopNavSpecHelpers
+
   let_it_be(:user) { create(:user) }
   let_it_be(:project) { create(:project, :repository) }
   let_it_be(:label) { create(:label, project: project, title: 'bug') }
@@ -10,6 +12,10 @@ RSpec.describe 'Test Cases', :js do
   let_it_be(:test_case2) { create(:quality_test_case, project: project, author: user, created_at: 6.days.ago, updated_at: 2.days.ago) }
   let_it_be(:test_case3) { create(:quality_test_case, project: project, author: user, created_at: 7.days.ago, updated_at: 2.days.ago) }
   let_it_be(:test_case_archived) { create(:quality_test_case, project: project, author: user, created_at: 7.days.ago, updated_at: 2.days.ago, state: :closed) }
+
+  before_all do
+    dismiss_top_nav_callout(user)
+  end
 
   before do
     project.add_developer(user)

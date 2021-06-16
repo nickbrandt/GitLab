@@ -3,11 +3,17 @@
 require 'spec_helper'
 
 RSpec.describe 'epic boards', :js do
+  include Spec::Support::Helpers::Features::TopNavSpecHelpers
+
   let_it_be(:user) { create(:user) }
   let_it_be(:group) { create(:group, :public) }
 
   let_it_be(:epic_board) { create(:epic_board, group: group) }
   let_it_be(:epic_board2) { create(:epic_board, group: group) }
+
+  before_all do
+    dismiss_top_nav_callout(user)
+  end
 
   context 'multiple epic boards' do
     before do

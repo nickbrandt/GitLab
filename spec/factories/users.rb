@@ -13,9 +13,6 @@ FactoryBot.define do
 
     after(:stub) do |user|
       user.notification_email = user.email
-      user.find_or_initialize_callout('combined_menu_top_nav').tap do |callout|
-        callout.update(dismissed_at: Time.current)
-      end
     end
 
     trait :admin do

@@ -3,6 +3,7 @@
 require 'spec_helper'
 
 RSpec.describe 'Merge Requests > Filters generic behavior', :js do
+  include Spec::Support::Helpers::Features::TopNavSpecHelpers
   include FilteredSearchHelpers
 
   let(:project) { create(:project, :public, :repository) }
@@ -17,6 +18,7 @@ RSpec.describe 'Merge Requests > Filters generic behavior', :js do
     merged_mr.labels << bug
     closed_mr.labels << bug
 
+    dismiss_top_nav_callout(user)
     sign_in(user)
     visit project_merge_requests_path(project)
   end

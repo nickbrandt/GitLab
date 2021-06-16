@@ -3,6 +3,7 @@
 require "spec_helper"
 
 RSpec.describe 'Group wikis' do
+  include Spec::Support::Helpers::Features::TopNavSpecHelpers
   include WikiHelpers
 
   let_it_be(:user) { create(:user) }
@@ -10,6 +11,7 @@ RSpec.describe 'Group wikis' do
   let(:wiki) { create(:group_wiki, user: user) }
 
   before do
+    dismiss_top_nav_callout(user)
     stub_group_wikis(true)
     wiki.container.add_owner(user)
   end

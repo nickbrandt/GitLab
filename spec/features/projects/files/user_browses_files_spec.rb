@@ -3,6 +3,7 @@
 require "spec_helper"
 
 RSpec.describe "User browses files" do
+  include Spec::Support::Helpers::Features::TopNavSpecHelpers
   include RepoHelpers
 
   let(:fork_message) do
@@ -16,6 +17,7 @@ RSpec.describe "User browses files" do
   let(:user) { project.owner }
 
   before do
+    dismiss_top_nav_callout(user)
     sign_in(user)
   end
 

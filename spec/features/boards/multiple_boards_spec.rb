@@ -3,6 +3,8 @@
 require 'spec_helper'
 
 RSpec.describe 'Multiple Issue Boards', :js do
+  include Spec::Support::Helpers::Features::TopNavSpecHelpers
+
   let_it_be(:user) { create(:user) }
   let_it_be(:project) { create(:project, :public) }
   let_it_be(:planning) { create(:label, project: project, name: 'Planning') }
@@ -11,6 +13,10 @@ RSpec.describe 'Multiple Issue Boards', :js do
 
   let(:parent) { project }
   let(:boards_path) { project_boards_path(project) }
+
+  before_all do
+    dismiss_top_nav_callout(user)
+  end
 
   it_behaves_like 'multiple issue boards'
 end

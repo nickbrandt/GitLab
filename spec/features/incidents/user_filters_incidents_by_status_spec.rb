@@ -3,10 +3,13 @@
 require 'spec_helper'
 
 RSpec.describe 'User filters Incident Management table by status', :js do
+  include Spec::Support::Helpers::Features::TopNavSpecHelpers
+
   let_it_be(:project) { create(:project) }
   let_it_be(:developer) { create(:user) }
 
   before_all do
+    dismiss_top_nav_callout(user)
     project.add_developer(developer)
 
     create_list(:incident, 2, project: project, state: 'opened')

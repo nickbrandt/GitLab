@@ -7,6 +7,12 @@ module Spec
     module Helpers
       module Features
         module TopNavSpecHelpers
+          def dismiss_top_nav_callout(user)
+            user.find_or_initialize_callout(feature_name: user).tap do |callout|
+              callout.update(dismissed_at: Time.current)
+            end
+          end
+
           def open_top_nav
             return unless Feature.enabled?(:combined_menu, default_enabled: :yaml)
 

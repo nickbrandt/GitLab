@@ -3,6 +3,8 @@
 require 'spec_helper'
 
 RSpec.describe 'Group Boards', :js do
+  include Spec::Support::Helpers::Features::TopNavSpecHelpers
+
   let(:group) { create(:group) }
   let!(:board_ux) { create(:board, group: group, name: 'UX') }
   let!(:board_dev) { create(:board, group: group, name: 'Dev') }
@@ -10,6 +12,7 @@ RSpec.describe 'Group Boards', :js do
 
   before do
     stub_licensed_features(multiple_group_issue_boards: true)
+    dismiss_top_nav_callout(user)
     sign_in(user)
     visit group_boards_path(group)
     wait_for_requests

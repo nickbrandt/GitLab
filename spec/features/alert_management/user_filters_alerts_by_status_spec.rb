@@ -3,6 +3,8 @@
 require 'spec_helper'
 
 RSpec.describe 'User filters Alert Management table by status', :js do
+  include Spec::Support::Helpers::Features::TopNavSpecHelpers
+
   let_it_be(:project) { create(:project) }
   let_it_be(:developer) { create(:user) }
   let_it_be(:alert1, reload: true) { create(:alert_management_alert, :triggered, project: project) }
@@ -10,6 +12,7 @@ RSpec.describe 'User filters Alert Management table by status', :js do
   let_it_be(:alert3, reload: true) { create(:alert_management_alert, :acknowledged, project: project) }
 
   before_all do
+    dismiss_top_nav_callout(developer)
     project.add_developer(developer)
   end
 

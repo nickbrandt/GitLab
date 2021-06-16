@@ -3,6 +3,7 @@
 require 'spec_helper'
 
 RSpec.describe 'Login' do
+  include Spec::Support::Helpers::Features::TopNavSpecHelpers
   include TermsHelper
   include UserLoginHelper
 
@@ -16,6 +17,7 @@ RSpec.describe 'Login' do
         .to increment(:user_authenticated_counter)
 
       user = create(:user)
+      dismiss_top_nav_callout(user)
 
       expect(user.reset_password_token).to be_nil
 
@@ -43,6 +45,7 @@ RSpec.describe 'Login' do
       User.delete_all
 
       user = create(:admin, password_automatically_set: true)
+      dismiss_top_nav_callout(user)
 
       visit root_path
       expect(current_path).to eq edit_user_password_path
@@ -76,6 +79,7 @@ RSpec.describe 'Login' do
         .and increment(:user_session_destroyed_counter).twice
 
       user = create(:user, :blocked)
+      dismiss_top_nav_callout(user)
 
       gitlab_sign_in(user)
 
@@ -89,6 +93,7 @@ RSpec.describe 'Login' do
         .and increment(:user_session_destroyed_counter).twice
 
       user = create(:user, :blocked)
+      dismiss_top_nav_callout(user)
 
       expect { gitlab_sign_in(user) }.not_to change { user.reload.sign_in_count }
     end

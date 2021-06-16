@@ -3,6 +3,7 @@
 require 'spec_helper'
 
 RSpec.describe 'Pipelines', :js do
+  include Spec::Support::Helpers::Features::TopNavSpecHelpers
   include ProjectForksHelper
 
   let(:project) { create(:project) }
@@ -11,6 +12,7 @@ RSpec.describe 'Pipelines', :js do
     let(:user) { create(:user) }
 
     before do
+      dismiss_top_nav_callout(user)
       sign_in(user)
       stub_feature_flags(graphql_pipeline_details: false)
       stub_feature_flags(graphql_pipeline_details_users: false)
