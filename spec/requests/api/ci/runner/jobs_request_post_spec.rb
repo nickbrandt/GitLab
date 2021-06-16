@@ -302,7 +302,7 @@ RSpec.describe API::Ci::Runner, :clean_gitlab_redis_shared_state do
             end
 
             before do
-              job.queuing_entry&.update(created_at: 60.seconds.ago)
+              job.queuing_entry&.update!(created_at: 60.seconds.ago)
             end
 
             context 'job is queued less than job_age parameter' do
