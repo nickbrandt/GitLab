@@ -18,14 +18,18 @@ RSpec.describe Gitlab::Elastic::Client do
       end
 
       it 'does not set request timeout in transport' do
-        expect(client.transport.options).not_to include(:request_timeout)
+        options = client.transport.options.dig(:transport_options, :request)
+
+        expect(options).to include(open_timeout: described_class::OPEN_TIMEOUT, timeout: nil)
       end
 
       context 'with client_request_timeout in config' do
         let(:params) { { url: 'http://dummy-elastic:9200', client_request_timeout: 30 } }
 
-        it 'does not set request timeout in transport' do
-          expect(client.transport.options).to include(request_timeout: 30)
+        it 'sets request timeout in transport' do
+          options = client.transport.options.dig(:transport_options, :request)
+
+          expect(options).to include(open_timeout: described_class::OPEN_TIMEOUT, timeout: 30)
         end
       end
     end
