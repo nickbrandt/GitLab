@@ -378,7 +378,7 @@ project:
 - assembla_integration
 - asana_integration
 - slack_service
-- microsoft_teams_service
+- microsoft_teams_integration
 - mattermost_integration
 - hangouts_chat_integration
 - unify_circuit_service

@@ -49,7 +49,7 @@ class Integration < ApplicationRecord
     hangouts_chat
     irker
     packagist pipelines_email pivotaltracker pushover
-    mattermost
+    mattermost mattermost_slash_commands microsoft_teams
   ].to_set.freeze
 
   def self.renamed?(name)
