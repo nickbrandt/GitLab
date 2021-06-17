@@ -17692,13 +17692,22 @@ msgstr ""
 msgid "Integrations|Failed to unlink namespace. Please try again."
 msgstr ""
 
-msgid "Integrations|GitLab administrators can set up integrations that all projects inherit and use by default. These integrations apply to all projects that don't already use custom settings. You can override custom settings for a group or project if the settings are necessary at that level. Learn more about %{integrations_link_start}project integration management%{link_end}."
+msgid "Integrations|GitLab administrators can set up integrations that all groups and projects inherit and use by default. These integrations apply to all groups and projects that don't already use custom settings. You can override custom settings for a group or project if the settings are necessary at that level. Learn more about %{integrations_link_start}instance-level integration management%{link_end}."
+msgstr ""
+
+msgid "Integrations|GitLab administrators can set up integrations that all projects in a group inherit and use by default. These integrations apply to all projects that don't already use custom settings. You can override custom settings for a project if the settings are necessary at that level. Learn more about %{integrations_link_start}group-level integration management%{link_end}."
+msgstr ""
+
+msgid "Integrations|Group-level integration management"
 msgstr ""
 
 msgid "Integrations|Includes Standard, plus the entire commit message, commit hash, and issue IDs"
 msgstr ""
 
 msgid "Integrations|Includes commit title and branch."
+msgstr ""
+
+msgid "Integrations|Instance-level integration management"
 msgstr ""
 
 msgid "Integrations|Issues created in Jira are shown here once you have created the issues in project setup in Jira."
@@ -17723,9 +17732,6 @@ msgid "Integrations|No linked namespaces"
 msgstr ""
 
 msgid "Integrations|Note: this integration only works with accounts on GitLab.com (SaaS)."
-msgstr ""
-
-msgid "Integrations|Project integration management"
 msgstr ""
 
 msgid "Integrations|Projects using custom settings will not be affected."
