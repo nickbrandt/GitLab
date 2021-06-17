@@ -60,7 +60,7 @@ RSpec.describe MergeRequests::ExternalStatusCheck, type: :model do
     context 'when data target branch matches a protected branch' do
       let_it_be(:check) { create(:external_status_check, project: merge_request.project, protected_branches: [create(:protected_branch, name: 'test')]) }
 
-      it 'does not enqueue the status check' do
+      it 'enqueues the status check' do
         expect(ApprovalRules::ExternalApprovalRulePayloadWorker).to receive(:perform_async).once
 
         subject
