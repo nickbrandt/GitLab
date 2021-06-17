@@ -185,7 +185,7 @@ class Project < ApplicationRecord
   has_one :prometheus_service, class_name: 'Integrations::Prometheus', inverse_of: :project
   has_one :pushover_integration, class_name: 'Integrations::Pushover'
   has_one :redmine_integration, class_name: 'Integrations::Redmine'
-  has_one :slack_service, class_name: 'Integrations::Slack'
+  has_one :slack_integration, class_name: 'Integrations::Slack'
   has_one :slack_slash_commands_service, class_name: 'Integrations::SlackSlashCommands'
   has_one :teamcity_service, class_name: 'Integrations::Teamcity'
   has_one :unify_circuit_service, class_name: 'Integrations::UnifyCircuit'
