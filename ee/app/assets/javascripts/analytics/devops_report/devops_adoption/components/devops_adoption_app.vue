@@ -335,7 +335,7 @@ export default {
 
       <template #tabs-end>
         <span
-          class="nav-item gl-align-self-center gl-flex-fill-1 gl-display-none gl-md-display-block"
+          class="nav-item gl-align-self-center gl-flex-grow-1 gl-display-none gl-md-display-block"
           align="right"
         >
           <devops-adoption-add-dropdown

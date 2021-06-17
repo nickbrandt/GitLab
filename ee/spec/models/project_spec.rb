@@ -2412,6 +2412,61 @@ RSpec.describe Project do
         expect(project.reload.import_url).to eq('http://user:pass@test.com')
       end
     end
+
+    context 'project is inside a fork network' do
+      subject { project }
+
+      let(:project) { create(:project, fork_network: fork_network) }
+      let(:fork_network) { create(:fork_network) }
+
+      before do
+        stub_config_setting(host: 'gitlab.com')
+      end
+
+      context 'feature flag is disabled' do
+        before do
+          stub_feature_flags(block_external_fork_network_mirrors: false)
+          project.import_url = "https://customgitlab.com/foo/bar.git"
+        end
+
+        it { is_expected.to be_valid }
+      end
+
+      context 'the project is the root of the fork network' do
+        before do
+          project.import_url = "https://customgitlab.com/foo/bar.git"
+          expect(fork_network).to receive(:root_project).and_return(project)
+        end
+
+        it { is_expected.to be_valid }
+      end
+
+      context 'the URL is inside the fork network' do
+        before do
+          project.import_url = "https://#{Gitlab.config.gitlab.host}/#{project.fork_network.root_project.full_path}.git"
+        end
+
+        it { is_expected.to be_valid }
+      end
+
+      context 'the URL is external but the project exists' do
+        it 'raises an error' do
+          project.import_url = "https://customgitlab.com/#{project.fork_network.root_project.full_path}.git"
+          project.validate
+
+          expect(project.errors[:url]).to include('must be inside the fork network')
+        end
+      end
+
+      context 'the URL is not inside the fork network' do
+        it 'raises an error' do
+          project.import_url = "https://customgitlab.com/foo/bar.git"
+          project.validate
+
+          expect(project.errors[:url]).to include('must be inside the fork network')
+        end
+      end
+    end
   end
 
   describe '#add_import_job' do
@@ -2860,32 +2915,6 @@ RSpec.describe Project do
 
       it 'returns a list with specific runners' do
         is_expected.to match_array([group_runner, project_runner])
-      end
-    end
-  end
-
-  describe '#shared_runners_enabled_but_unavailable?' do
-    using RSpec::Parameterized::TableSyntax
-
-    let(:project) do
-      build_stubbed(:project, shared_runners_enabled: shared_runners_enabled)
-    end
-
-    before do
-      allow(project).to receive(:ci_minutes_quota)
-        .and_return(double('quota', minutes_used_up?: minutes_used_up))
-    end
-
-    where(:shared_runners_enabled, :minutes_used_up, :result) do
-      true  | true  | true
-      true  | false | false
-      false | false | false
-      false | true  | false
-    end
-
-    with_them do
-      it 'returns the correct value' do
-        expect(project.shared_runners_enabled_but_unavailable?).to eq(result)
       end
     end
   end
