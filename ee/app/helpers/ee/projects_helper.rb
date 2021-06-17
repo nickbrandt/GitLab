@@ -79,7 +79,7 @@ module EE
           'eligible_approvers_docs_path': help_page_path('user/project/merge_requests/merge_request_approvals', anchor: 'eligible-approvers'),
           'security_approvals_help_page_path': help_page_path('user/application_security/index', anchor: 'security-approvals-in-merge-requests'),
           'security_configuration_path': project_security_configuration_path(project),
-          'vulnerability_check_help_page_path': help_page_path('user/application_security/index', anchor: 'enabling-security-approvals-within-a-project'),
+          'vulnerability_check_help_page_path': help_page_path('user/application_security/index', anchor: 'security-approvals-in-merge-requests'),
           'license_check_help_page_path': help_page_path('user/application_security/index', anchor: 'enabling-license-approvals-within-a-project')
         }
       }
