@@ -189,7 +189,7 @@ export const fetchDiffFilesBatch = ({ commit, state, dispatch }) => {
       .catch(() => commit(types.SET_RETRIEVING_BATCHES, false));
 
   return getBatch()
-    .then(() => handleLocationHash())
+    .then(() => !window.gon?.features?.diffsVirtualScrolling && handleLocationHash())
     .then(() => {
       eventHub.$emit(
         'scrollToFileHash',
@@ -532,12 +532,17 @@ export const scrollToFile = ({ state, commit }, path) => {
   if (!state.treeEntries[path]) return;
 
   const { fileHash } = state.treeEntries[path];
-  document.location.hash = fileHash;
 
   commit(types.VIEW_DIFF_FILE, fileHash);
 
   if (window.gon?.features?.diffsVirtualScrolling) {
     eventHub.$emit('scrollToFileHash', fileHash);
+
+    setTimeout(() => {
+      document.location.hash = fileHash;
+    });
+  } else {
+    document.location.hash = fileHash;
   }
 };
 

@@ -572,8 +572,14 @@ export default {
     },
 
     scrollToItem (index) {
+      this.$_scrollDirty = true
       const { viewport, scrollDirection, scrollDistance } = this.scrollToPosition(index)
       viewport[scrollDirection] = scrollDistance
+
+      setTimeout(() => {
+        this.$_scrollDirty = false
+        this.updateVisibleItems(false, true)
+      })
     },
 
     scrollToPosition (index) {
