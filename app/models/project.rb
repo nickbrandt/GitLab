@@ -178,6 +178,7 @@ class Project < ApplicationRecord
   has_one :mattermost_slash_commands_integration, class_name: 'Integrations::MattermostSlashCommands'
   has_one :microsoft_teams_integration, class_name: 'Integrations::MicrosoftTeams'
   has_one :mock_ci_integration, class_name: 'Integrations::MockCi'
+  has_one :mock_monitoring_integration, class_name: 'MockMonitoringService'
   has_one :packagist_integration, class_name: 'Integrations::Packagist'
   has_one :pipelines_email_integration, class_name: 'Integrations::PipelinesEmail'
   has_one :pivotaltracker_integration, class_name: 'Integrations::Pivotaltracker'
@@ -190,7 +191,6 @@ class Project < ApplicationRecord
   has_one :webex_teams_service, class_name: 'Integrations::WebexTeams'
   has_one :youtrack_service, class_name: 'Integrations::Youtrack'
   has_one :prometheus_service, inverse_of: :project
-  has_one :mock_monitoring_service
 
   has_one :root_of_fork_network,
           foreign_key: 'root_project_id',
