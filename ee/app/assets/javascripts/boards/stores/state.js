@@ -8,8 +8,12 @@ export default () => ({
   epicsSwimlanesFetchInProgress: {
     epicLanesFetchInProgress: false,
     listItemsFetchInProgress: false,
+    epicLanesFetchMoreInProgress: false,
   },
+  hasMoreEpics: false,
+  epicsEndCursor: null,
   epics: [],
+  epicsFlags: {},
   milestones: [],
   milestonesLoading: false,
   iterations: [],
