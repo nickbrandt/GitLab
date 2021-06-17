@@ -269,27 +269,27 @@ module Ci
             let!(:unrelated_group_runner) { create(:ci_runner, :group, groups: [unrelated_group]) }
 
             it 'does not consider builds from other group runners' do
-              queue = ::Gitlab::Ci::Queue::Builder
+              queue = ::Gitlab::Ci::Queue::Builder.new(group_runner)
 
-              expect(queue.new(group_runner).builds_for_group_runner.size).to eq 6
+              expect(queue.builds_for_group_runner.size).to eq 6
               execute(group_runner)
 
-              expect(queue.new(group_runner).builds_for_group_runner.size).to eq 5
+              expect(queue.builds_for_group_runner.size).to eq 5
               execute(group_runner)
 
-              expect(queue.new(group_runner).builds_for_group_runner.size).to eq 4
+              expect(queue.builds_for_group_runner.size).to eq 4
               execute(group_runner)
 
-              expect(queue.new(group_runner).builds_for_group_runner.size).to eq 3
+              expect(queue.builds_for_group_runner.size).to eq 3
               execute(group_runner)
 
-              expect(queue.new(group_runner).builds_for_group_runner.size).to eq 2
+              expect(queue.builds_for_group_runner.size).to eq 2
               execute(group_runner)
 
-              expect(queue.new(group_runner).builds_for_group_runner.size).to eq 1
+              expect(queue.builds_for_group_runner.size).to eq 1
               execute(group_runner)
 
-              expect(queue.new(group_runner).builds_for_group_runner.size).to eq 0
+              expect(queue.builds_for_group_runner.size).to eq 0
               expect(execute(group_runner)).to be_nil
             end
           end
