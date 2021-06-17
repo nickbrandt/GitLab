@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import QrtlyReconciliationAlert from './components/qrtly_reconciliation_alert.vue';
+import QrtlyReconciliationAlert from 'ee/billings/qrtly_reconciliation/components/qrtly_reconciliation_alert.vue';
 
 export const initQrtlyReconciliationAlert = (selector = '#js-qrtly-reconciliation-alert') => {
   const el = document.querySelector(selector);
