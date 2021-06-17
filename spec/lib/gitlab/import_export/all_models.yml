@@ -387,7 +387,7 @@ project:
 - teamcity_service
 - pushover_integration
 - jira_integration
-- redmine_service
+- redmine_integration
 - youtrack_service
 - custom_issue_tracker_integration
 - bugzilla_integration
