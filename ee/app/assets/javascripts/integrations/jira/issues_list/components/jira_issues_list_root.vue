@@ -18,6 +18,7 @@ export default {
   IssuableListTabs,
   AvailableSortOptions,
   defaultPageSize: DEFAULT_PAGE_SIZE,
+  jiraLogo,
   components: {
     GlButton,
     GlIcon,
@@ -46,13 +47,12 @@ export default {
   },
   data() {
     return {
-      jiraLogo,
       issues: [],
-      issuesListLoadFailed: false,
       totalIssues: 0,
       currentState: this.initialState,
       filterParams: this.initialFilterParams,
       sortedBy: this.initialSortBy,
+      initialFilterValue: this.getInitialFilterValue(),
       currentPage: this.page,
       issuesCount: {
         [IssuableStates.Opened]: 0,
@@ -112,17 +112,33 @@ export default {
     },
   },
   methods: {
-    getFilteredSearchValue() {
+    getInitialFilterValue() {
       return [
         {
           type: 'filtered-search-term',
           value: {
-            data: this.filterParams.search || '',
+            data: this.initialFilterParams.search || '',
           },
         },
       ];
     },
-    handleFilterIssues(filters = []) {
+    onJiraIssuesQueryError(error) {
+      createFlash({
+        message: error.message,
+        captureError: true,
+        error,
+      });
+    },
+    onIssuableListClickTab(selectedIssueState) {
+      this.currentState = selectedIssueState;
+    },
+    onIssuableListPageChange(selectedPage) {
+      this.currentPage = selectedPage;
+    },
+    onIssuableListSort(selectedSort) {
+      this.sortedBy = selectedSort;
+    },
+    onIssuableListFilter(filters = []) {
       const filterParams = {};
       const plainText = [];
 
@@ -138,13 +154,6 @@ export default {
 
       this.filterParams = filterParams;
     },
-    onJiraIssuesQueryError(error) {
-      createFlash({
-        message: error.message,
-        captureError: true,
-        error,
-      });
-    },
   },
 };
 </script>
@@ -157,8 +166,8 @@ export default {
     :search-input-placeholder="s__('Integrations|Search Jira issues')"
     :search-tokens="[]"
     :sort-options="$options.AvailableSortOptions"
-    :initial-filter-value="getFilteredSearchValue()"
-    :initial-sort-by="sortedBy"
+    :initial-filter-value="initialFilterValue"
+    :initial-sort-by="initialSortBy"
     :issuables="issues"
     :issuables-loading="issuesListLoading"
     :show-pagination-controls="showPaginationControls"
@@ -170,10 +179,10 @@ export default {
     :url-params="urlParams"
     label-filter-param="labels"
     recent-searches-storage-key="jira_issues"
-    @click-tab="currentState = $event"
-    @page-change="currentPage = $event"
-    @sort="sortedBy = $event"
-    @filter="handleFilterIssues"
+    @click-tab="onIssuableListClickTab"
+    @page-change="onIssuableListPageChange"
+    @sort="onIssuableListSort"
+    @filter="onIssuableListFilter"
   >
     <template #nav-actions>
       <gl-button :href="issueCreateUrl" target="_blank" class="gl-my-5">
@@ -182,7 +191,7 @@ export default {
       </gl-button>
     </template>
     <template #reference="{ issuable }">
-      <span v-safe-html="jiraLogo" class="svg-container jira-logo-container"></span>
+      <span v-safe-html="$options.jiraLogo" class="svg-container jira-logo-container"></span>
       <span v-if="issuable">{{ issuable.references.relative }}</span>
     </template>
     <template #author="{ author }">
