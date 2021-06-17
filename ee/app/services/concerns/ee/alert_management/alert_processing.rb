@@ -12,6 +12,15 @@ module EE
         super
 
         notify_oncall if oncall_notification_recipients.present? && notifying_alert?
+        process_escalations
+      end
+
+      def process_escalations
+        if alert.resolved? || alert.ignored?
+          delete_pending_escalations
+        else
+          create_pending_escalations
+        end
       end
 
       def notify_oncall
@@ -24,6 +33,15 @@ module EE
         strong_memoize(:oncall_notification_recipients) do
           ::IncidentManagement::OncallUsersFinder.new(project).execute
         end
+      end
+
+      def delete_pending_escalations
+        # We use :delete_all here to avoid null constraint errors. (the default is :nullify).
+        alert.pending_escalations.delete_all(:delete_all)
+      end
+
+      def create_pending_escalations
+        ::IncidentManagement::PendingEscalations::CreateService.new(alert).execute
       end
     end
   end

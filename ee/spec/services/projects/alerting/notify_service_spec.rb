@@ -16,6 +16,10 @@ RSpec.describe Projects::Alerting::NotifyService do
       }
     end
 
+    before do
+      stub_feature_flags(escalation_policies_mvc: false)
+    end
+
     subject { service.execute(token, integration) }
 
     context 'existing alert with same payload fingerprint' do
@@ -81,6 +85,18 @@ RSpec.describe Projects::Alerting::NotifyService do
 
       include_examples 'oncall users are correctly notified of firing alert'
 
+      context 'with escalation policies ready' do
+        let_it_be(:policy) { create(:incident_management_escalation_policy, project: project) }
+
+        before do
+          stub_licensed_features(oncall_schedules: project, escalation_policies: true)
+          stub_feature_flags(escalation_policies_mvc: project)
+        end
+
+        include_examples 'oncall users are correctly notified of firing alert'
+        include_examples 'creates an escalation', 1
+      end
+
       context 'with resolving payload' do
         let(:payload) do
           {
@@ -90,6 +106,23 @@ RSpec.describe Projects::Alerting::NotifyService do
         end
 
         include_examples 'oncall users are correctly notified of recovery alert'
+
+        context 'with existing alert escalation' do
+          let_it_be(:alert) { create(:alert_management_alert, :ignored, fingerprint: gitlab_fingerprint, project: project) }
+          let_it_be(:pending_escalation) { create(:incident_management_pending_alert_escalation, alert: alert) }
+
+          let(:target) { alert }
+
+          include_examples "deletes the target's escalations"
+
+          context 'with escalation policy feature disabled' do
+            before do
+              stub_feature_flags(escalation_policies_mvc: false)
+            end
+
+            include_examples "deletes the target's escalations"
+          end
+        end
       end
     end
   end
