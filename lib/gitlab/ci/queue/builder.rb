@@ -104,6 +104,8 @@ module Gitlab
           end
 
           def new_builds
+            all_builds = ::Ci::Build.pending.unstarted
+
             if runner.ref_protected?
               all_builds.ref_protected
             else
@@ -112,10 +114,6 @@ module Gitlab
           end
 
           private
-
-          def all_builds
-            ::Ci::Build.pending.unstarted
-          end
 
           def running_builds_for_shared_runners
             ::Ci::Build.running
@@ -153,28 +151,6 @@ module Gitlab
             end
           end
 
-          def builds_for_project_runner
-            new_builds
-              .where(project: runner.projects.without_deleted.with_builds_enabled)
-              .order('build_id ASC')
-          end
-
-          def builds_for_group_runner
-            # Workaround for weird Rails bug, that makes `runner.groups.to_sql` to return `runner_id = NULL`
-            groups = ::Group.joins(:runner_namespaces).merge(runner.runner_namespaces)
-
-            hierarchy_groups = Gitlab::ObjectHierarchy
-              .new(groups, options: { use_distinct: ::Feature.enabled?(:use_distinct_in_register_job_object_hierarchy) })
-              .base_and_descendants
-
-            projects = Project.where(namespace_id: hierarchy_groups)
-              .with_group_runners_enabled
-              .with_builds_enabled
-              .without_deleted
-
-            new_builds.where(project: projects).order('build_id ASC')
-          end
-
           def builds_matching_tag_ids(relation, ids)
             relation.merge(CommitStatus.matches_tag_ids(ids, on: 'ci_pending_builds.build_id'))
           end
@@ -197,17 +173,13 @@ module Gitlab
 
           def new_builds
             if runner.ref_protected?
-              all_builds.ref_protected
+              ::Ci::PendingBuild.ref_protected
             else
-              all_builds
+              ::Ci::PendingBuild.all
             end
           end
 
           private
-
-          def all_builds
-            ::Ci::PendingBuild.all
-          end
 
           def running_builds_for_shared_runners
             ::Ci::RunningBuild
