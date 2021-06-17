@@ -9,17 +9,19 @@ export default {
   watch: {
     index: {
       handler() {
-        if (this.index < 0) return;
+        const { index } = this;
 
-        if (this.vscrollParent.itemsWithSize[this.index].size) {
-          this.scrollToIndex();
+        if (index < 0) return;
+
+        if (this.vscrollParent.itemsWithSize[index].size) {
+          this.scrollToIndex(index);
         } else {
           this.$_itemsWithSizeWatcher = this.$watch('vscrollParent.itemsWithSize', async () => {
             await this.$nextTick();
 
-            if (this.vscrollParent.itemsWithSize[this.index].size) {
+            if (this.vscrollParent.itemsWithSize[index].size) {
               this.$_itemsWithSizeWatcher();
-              this.scrollToIndex();
+              this.scrollToIndex(index);
             }
           });
         }
@@ -31,8 +33,8 @@ export default {
     if (this.$_itemsWithSizeWatcher) this.$_itemsWithSizeWatcher();
   },
   methods: {
-    scrollToIndex() {
-      this.vscrollParent.scrollToItem(this.index);
+    scrollToIndex(index) {
+      this.vscrollParent.scrollToItem(index);
     },
   },
   render(h) {
