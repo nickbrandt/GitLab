@@ -588,7 +588,7 @@ export default {
   >
     <div
       class="table-section section-wrap text-truncate"
-      :class="tableData.name.spacing"
+      :class="[isFolder ? 'section-100' : tableData.name.spacing]"
       role="gridcell"
     >
       <div v-if="!isFolder" class="table-mobile-header" role="rowheader">
@@ -632,6 +632,7 @@ export default {
     </div>
 
     <div
+      v-if="!isFolder"
       class="table-section deployment-column d-none d-md-block"
       :class="tableData.deploy.spacing"
       role="gridcell"
@@ -656,7 +657,12 @@ export default {
       </div>
     </div>
 
-    <div class="table-section d-none d-md-block" :class="tableData.build.spacing" role="gridcell">
+    <div
+      v-if="!isFolder"
+      class="table-section d-none d-md-block"
+      :class="tableData.build.spacing"
+      role="gridcell"
+    >
       <a v-if="shouldRenderBuildName" :href="buildPath" class="build-link cgray">
         <tooltip-on-truncate
           :title="buildName"
