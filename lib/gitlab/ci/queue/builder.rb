@@ -121,7 +121,7 @@ module Gitlab
             ::Ci::Build.running
               .where(runner: ::Ci::Runner.instance_type)
               .group(:project_id)
-              .select(:project_id, 'count(*) AS running_builds')
+              .select(:project_id, 'COUNT(*) AS running_builds')
           end
         end
 
@@ -211,9 +211,9 @@ module Gitlab
 
           def running_builds_for_shared_runners
             ::Ci::RunningBuild
-              .where(runner: ::Ci::Runner.instance_type)
+              .instance_type
               .group(:project_id)
-              .select(:project_id, 'count(*) AS running_builds')
+              .select(:project_id, 'COUNT(*) AS running_builds')
           end
           # rubocop:enable CodeReuse/ActiveRecord
         end
