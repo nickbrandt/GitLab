@@ -105,38 +105,28 @@ RSpec.describe Project do
     end
 
     describe '#jira_issue_association_required_to_merge_enabled?' do
-      where(:jira_integration_licensed, :jira_integration_active, :jira_enforcement_licensed, :feature_flag, :result) do
-        true  | true  | true  | true  | true
-        true  | true  | true  | false | false
-        true  | true  | false | true  | false
-        true  | true  | false | false | false
-        true  | false | true  | true  | false
-        true  | false | true  | false | false
-        true  | false | false | true  | false
-        true  | false | false | false | false
-        false | true  | true  | true  | false
-        false | true  | true  | false | false
-        false | true  | false | true  | false
-        false | true  | false | false | false
-        false | false | true  | true  | false
-        false | false | true  | false | false
-        false | false | false | true  | false
-        false | false | false | false | false
-      end
-
       before do
         stub_licensed_features(
           jira_issues_integration: jira_integration_licensed,
           jira_issue_association_enforcement: jira_enforcement_licensed
         )
 
-        project.build_jira_service(active: jira_integration_active)
+        project.build_jira_integration(active: jira_integration_active)
         stub_feature_flags(jira_issue_association_on_merge_request: feature_flag)
       end
 
+      where(
+        jira_integration_licensed: [true, false],
+        jira_integration_active: [true, false],
+        jira_enforcement_licensed: [true, false],
+        feature_flag: [true, false]
+      )
+
       with_them do
-        it 'returns the correct value' do
-          expect(project.jira_issue_association_required_to_merge_enabled?).to eq(result)
+        it 'is enabled if all values are true' do
+          expect(project.jira_issue_association_required_to_merge_enabled?).to be(
+            jira_integration_licensed && jira_integration_active && jira_enforcement_licensed && feature_flag
+          )
         end
       end
     end
