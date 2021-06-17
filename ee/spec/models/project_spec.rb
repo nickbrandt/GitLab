@@ -2412,6 +2412,61 @@ RSpec.describe Project do
         expect(project.reload.import_url).to eq('http://user:pass@test.com')
       end
     end
+
+    context 'project is inside a fork network' do
+      subject { project }
+
+      let(:project) { create(:project, fork_network: fork_network) }
+      let(:fork_network) { create(:fork_network) }
+
+      before do
+        stub_config_setting(host: 'gitlab.com')
+      end
+
+      context 'feature flag is disabled' do
+        before do
+          stub_feature_flags(block_external_fork_network_mirrors: false)
+          project.import_url = "https://customgitlab.com/foo/bar.git"
+        end
+
+        it { is_expected.to be_valid }
+      end
+
+      context 'the project is the root of the fork network' do
+        before do
+          project.import_url = "https://customgitlab.com/foo/bar.git"
+          expect(fork_network).to receive(:root_project).and_return(project)
+        end
+
+        it { is_expected.to be_valid }
+      end
+
+      context 'the URL is inside the fork network' do
+        before do
+          project.import_url = "https://#{Gitlab.config.gitlab.host}/#{project.fork_network.root_project.full_path}.git"
+        end
+
+        it { is_expected.to be_valid }
+      end
+
+      context 'the URL is external but the project exists' do
+        it 'raises an error' do
+          project.import_url = "https://customgitlab.com/#{project.fork_network.root_project.full_path}.git"
+          project.validate
+
+          expect(project.errors[:url]).to include('must be inside the fork network')
+        end
+      end
+
+      context 'the URL is not inside the fork network' do
+        it 'raises an error' do
+          project.import_url = "https://customgitlab.com/foo/bar.git"
+          project.validate
+
+          expect(project.errors[:url]).to include('must be inside the fork network')
+        end
+      end
+    end
   end
 
   describe '#add_import_job' do

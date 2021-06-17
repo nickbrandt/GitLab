@@ -218,6 +218,7 @@ module EE
                         less_than: ::Gitlab::Pages::MAX_SIZE / 1.megabyte }
 
       validates :approvals_before_merge, numericality: true, allow_blank: true
+      validate :import_url_inside_fork_network, if: :import_url_changed?
 
       with_options if: :mirror? do
         validates :import_url, presence: true
@@ -851,6 +852,20 @@ module EE
 
       pipeline_scope.with_reports(::Ci::JobArtifact.security_reports).first ||
         pipeline_scope.with_legacy_security_reports.first
+    end
+
+    # If the project is inside a fork network, the mirror URL must
+    # also belong to a member of that fork network
+    def import_url_inside_fork_network
+      return unless ::Feature.enabled?(:block_external_fork_network_mirrors, self, default_enabled: :yaml)
+
+      if forked?
+        mirror_project = ::Project.find_by_url(import_url)
+
+        unless mirror_project.present? && fork_network_projects.include?(mirror_project)
+          errors.add(:url, _("must be inside the fork network"))
+        end
+      end
     end
   end
 end
