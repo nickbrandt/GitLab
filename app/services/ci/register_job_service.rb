@@ -115,6 +115,10 @@ module Ci
         end
       end
 
+      if runner.ref_protected?
+        builds = queue.builds_for_protected_runner(builds)
+      end
+
       # pick builds that does not have other tags than runner's one
       builds = queue.builds_matching_tag_ids(builds, runner.tags.ids)
 

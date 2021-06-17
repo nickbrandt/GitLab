@@ -57,6 +57,10 @@ module Gitlab
           relation.queued_before(time)
         end
 
+        def builds_for_protected_runner(relation)
+          relation.ref_protected
+        end
+
         class BuildsTableStrategy
           attr_reader :runner, :common
 
@@ -104,13 +108,7 @@ module Gitlab
           end
 
           def new_builds
-            all_builds = ::Ci::Build.pending.unstarted
-
-            if runner.ref_protected?
-              all_builds.ref_protected
-            else
-              all_builds
-            end
+            ::Ci::Build.pending.unstarted
           end
 
           private
@@ -172,11 +170,7 @@ module Gitlab
           end
 
           def new_builds
-            if runner.ref_protected?
-              ::Ci::PendingBuild.ref_protected
-            else
-              ::Ci::PendingBuild.all
-            end
+            ::Ci::PendingBuild.all
           end
 
           private
