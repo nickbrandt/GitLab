@@ -1105,9 +1105,11 @@ Another example:
 
 An Admin Area example:
 
-`1. On the top bar, select **Menu >** **{admin}** **Admin**.`
+```markdown
+1. On the top bar, select **Menu >** **{admin}** **Admin**.
+```
 
-This text generates this HTML:
+This text renders this output:
 
 1. On the top bar, select **Menu >** **{admin}** **Admin**.
 
