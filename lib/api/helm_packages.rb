@@ -41,16 +41,21 @@ module API
         params do
           requires :channel, type: String, desc: 'Helm channel', regexp: Gitlab::Regex.helm_channel_regex
         end
+        content_type :yaml, 'text/yaml'
+        formatter :yaml, -> (object, _) { object.serializable_hash.stringify_keys.to_yaml }
+
         get ":channel/index.yaml" do
           authorize_read_package!(authorized_user_project)
 
-          generated_index = Packages::Helm::GenerateIndexService.new(authorized_user_project, params[:channel]).execute
-          generated_index['serverInfo'] = {
-            'contextPath' => request.url.delete_suffix("/#{params[:channel]}/index.yaml")
-          }
+          package_files = Packages::Helm::PackageFilesFinder.new(
+            authorized_user_project,
+            params[:channel],
+            order_by: 'created_at',
+            sort: 'desc'
+          ).execute
 
-          content_type 'text/yaml'
-          generated_index.to_yaml
+          present ::Packages::Helm::IndexPresenter.new(authorized_user_project, package_files),
+                      with: ::API::Entities::Helm::Index
         end
 
         desc 'Download a chart' do
