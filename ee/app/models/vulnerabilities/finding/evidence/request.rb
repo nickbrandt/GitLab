@@ -11,7 +11,7 @@ module Vulnerabilities
 
         validates :method, length: { maximum: 32 }
         validates :url, length: { maximum: 2048 }
-        validates :body, length: { maximum: 2048 }
+        validates :body, length: { maximum: 4096 }
       end
     end
   end

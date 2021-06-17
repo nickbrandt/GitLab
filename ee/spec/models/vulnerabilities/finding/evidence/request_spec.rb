@@ -8,5 +8,5 @@ RSpec.describe Vulnerabilities::Finding::Evidence::Request do
 
   it { is_expected.to validate_length_of(:method).is_at_most(32) }
   it { is_expected.to validate_length_of(:url).is_at_most(2048) }
-  it { is_expected.to validate_length_of(:body).is_at_most(2048) }
+  it { is_expected.to validate_length_of(:body).is_at_most(4096) }
 end

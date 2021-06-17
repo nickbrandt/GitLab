@@ -19047,7 +19047,7 @@ CREATE TABLE vulnerability_finding_evidence_requests (
     method text,
     url text,
     body text,
-    CONSTRAINT check_7e37f2d01a CHECK ((char_length(body) <= 2048)),
+    CONSTRAINT check_7e37f2d01a CHECK ((char_length(body) <= 4096)),
     CONSTRAINT check_8152fbb236 CHECK ((char_length(url) <= 2048)),
     CONSTRAINT check_d9d11300f4 CHECK ((char_length(method) <= 32))
 );
@@ -19070,7 +19070,7 @@ CREATE TABLE vulnerability_finding_evidence_responses (
     reason_phrase text,
     body text,
     CONSTRAINT check_58b124ab48 CHECK ((char_length(reason_phrase) <= 2048)),
-    CONSTRAINT check_76bac0c32b CHECK ((char_length(body) <= 2048))
+    CONSTRAINT check_76bac0c32b CHECK ((char_length(body) <= 4096))
 );
 
 CREATE SEQUENCE vulnerability_finding_evidence_responses_id_seq

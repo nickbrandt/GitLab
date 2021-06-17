@@ -10,7 +10,7 @@ module Vulnerabilities
         has_many :headers, class_name: 'Vulnerabilities::Finding::Evidence::Header', inverse_of: :response, foreign_key: 'vulnerability_finding_evidence_response_id'
 
         validates :reason_phrase, length: { maximum: 2048 }
-        validates :body, length: { maximum: 2048 }
+        validates :body, length: { maximum: 4096 }
       end
     end
   end
