@@ -53,19 +53,23 @@ describe('UserNameWithStatus', () => {
     });
 
     it("renders user's name with pronouns", () => {
-      expect(wrapper.text()).toMatchInterpolatedText(`Administrator (${pronouns})`);
+      expect(wrapper.text()).toMatchInterpolatedText(`${name} (${pronouns})`);
     });
   });
 
   describe('when user does not have pronouns set', () => {
-    it.each`
+    describe.each`
       pronouns
       ${undefined}
+      ${null}
       ${''}
-    `("renders the user's name", ({ pronouns }) => {
-      createComponent({ pronouns });
+      ${'   '}
+    `('when `pronouns` prop is $pronouns', ({ pronouns }) => {
+      it("renders only the user's name", () => {
+        createComponent({ pronouns });
 
-      expect(wrapper.text()).toMatchInterpolatedText('Administrator');
+        expect(wrapper.text()).toMatchInterpolatedText(name);
+      });
     });
   });
 });
