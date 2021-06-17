@@ -242,8 +242,14 @@ module EE
       alias_attribute :fallback_approvals_required, :approvals_before_merge
 
       def jira_issue_association_required_to_merge_enabled?
-        ::Feature.enabled?(:jira_issue_association_on_merge_request, self) &&
-          feature_available?(:jira_issue_association_enforcement)
+        strong_memoize(:jira_issue_association_required_to_merge_enabled) do
+          next false unless jira_issues_integration_available?
+          next false unless jira_service&.active?
+          next false unless ::Feature.enabled?(:jira_issue_association_on_merge_request, self, default_enabled: :yaml)
+          next false unless feature_available?(:jira_issue_association_enforcement)
+
+          true
+        end
       end
 
       def jira_vulnerabilities_integration_enabled?
