@@ -4,12 +4,13 @@
     # With .git/hooks/post-checkout in place, Git tries to pull LFS objects, but the image doesn't have Git LFS, and we actually don't care about it for this specific so we just remove the file.
     # Without removing the file, the error is as follows: "This repository is configured for Git LFS but 'git-lfs' was not found on your path. If you no longer wish to use Git LFS, remove this hook by deleting .git/hooks/post-checkout."
     - rm .git/hooks/post-checkout
-    # Use $CI_MERGE_REQUEST_SOURCE_BRANCH_SHA so that GitLab image built in omnibus-gitlab-mirror and QA image are in sync.
-    # This falls back to $CI_COMMIT_SHA (the default checked out commit) for the non-merged result pipelines.
-    # See https://docs.gitlab.com/ee/development/testing_guide/end_to_end/index.html#with-pipeline-for-merged-results.
     - if [ -n "$CI_MERGE_REQUEST_SOURCE_BRANCH_SHA" ]; then
+        echo "Checking out \$CI_MERGE_REQUEST_SOURCE_BRANCH_SHA ($CI_MERGE_REQUEST_SOURCE_BRANCH_SHA) instead of \$CI_COMMIT_SHA (merge result commit $CI_COMMIT_SHA) so that GitLab image built in omnibus-gitlab-mirror and QA image are in sync.";
         git checkout -f ${CI_MERGE_REQUEST_SOURCE_BRANCH_SHA};
-      fi
+      else
+        echo "Building the image from \$CI_COMMIT_SHA ($CI_COMMIT_SHA) for this non-merge result pipeline.";
+      fi;
+    - echo "See https://docs.gitlab.com/ee/development/testing_guide/end_to_end/index.html#with-pipeline-for-merged-results for more details.";
   retry: 2
 
 # This image is used by:
