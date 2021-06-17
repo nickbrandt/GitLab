@@ -13129,6 +13129,9 @@ msgstr ""
 msgid "EscalationPolicies|The escalation policy could not be deleted. Please try again."
 msgstr ""
 
+msgid "EscalationPolicies|The escalation policy could not be updated. Please try again"
+msgstr ""
+
 msgid "EscalationPolicies|mins"
 msgstr ""
 
