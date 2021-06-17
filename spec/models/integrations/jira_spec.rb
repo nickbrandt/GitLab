@@ -1078,4 +1078,50 @@ RSpec.describe Integrations::Jira do
       expect(jira_integration.issue_transition_enabled?).to be(false)
     end
   end
+
+  describe 'valid_connection? and configured?' do
+    before do
+      allow(jira_integration).to receive(:test).with(nil).and_return(test_result)
+    end
+
+    context 'when the test fails' do
+      let(:test_result) { { success: false } }
+
+      it 'is falsey' do
+        expect(jira_integration).not_to be_valid_connection
+      end
+
+      it 'implies that configured? is also falsey' do
+        expect(jira_integration).not_to be_configured
+      end
+    end
+
+    context 'when the test succeeds' do
+      let(:test_result) { { success: true } }
+
+      it 'is truthy' do
+        expect(jira_integration).to be_valid_connection
+      end
+
+      context 'when the integration is active' do
+        before do
+          jira_integration.active = true
+        end
+
+        it 'implies that configured? is also truthy' do
+          expect(jira_integration).to be_configured
+        end
+      end
+
+      context 'when the integration is inactive' do
+        before do
+          jira_integration.active = false
+        end
+
+        it 'implies that configured? is falsey' do
+          expect(jira_integration).not_to be_configured
+        end
+      end
+    end
+  end
 end
