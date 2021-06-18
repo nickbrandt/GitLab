@@ -56,6 +56,7 @@ class Integration < ApplicationRecord
     teamcity
     unify_circuit
     webex_teams
+    youtrack
   ].to_set.freeze
 
   def self.renamed?(name)
