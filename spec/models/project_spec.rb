@@ -80,6 +80,8 @@ RSpec.describe Project, factory_default: :keep do
     it { is_expected.to have_one(:error_tracking_setting).class_name('ErrorTracking::ProjectErrorTrackingSetting') }
     it { is_expected.to have_one(:project_setting) }
     it { is_expected.to have_one(:alerting_setting).class_name('Alerting::ProjectAlertingSetting') }
+    it { is_expected.to have_one(:mock_ci_integration) }
+    it { is_expected.to have_one(:mock_monitoring_integration) }
     it { is_expected.to have_many(:commit_statuses) }
     it { is_expected.to have_many(:ci_pipelines) }
     it { is_expected.to have_many(:ci_refs) }
