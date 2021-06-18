@@ -15388,9 +15388,6 @@ msgstr ""
 msgid "Group description (optional)"
 msgstr ""
 
-msgid "Group details"
-msgstr ""
-
 msgid "Group export could not be started."
 msgstr ""
 
@@ -23058,9 +23055,6 @@ msgid "Operations"
 msgstr ""
 
 msgid "Operations Dashboard"
-msgstr ""
-
-msgid "Operations Settings"
 msgstr ""
 
 msgid "OperationsDashboard|Add a project to the dashboard"

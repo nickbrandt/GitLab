@@ -444,8 +444,7 @@ a {
   border-top: 1px solid #dbdbdb;
 }
 .toggle-sidebar-button .collapse-text,
-.toggle-sidebar-button .icon-chevron-double-lg-left,
-.toggle-sidebar-button .icon-chevron-double-lg-right {
+.toggle-sidebar-button .icon-chevron-double-lg-left {
   color: #666;
 }
 svg {
@@ -1314,10 +1313,8 @@ input {
 }
 .toggle-sidebar-button .collapse-text,
 .toggle-sidebar-button .icon-chevron-double-lg-left,
-.toggle-sidebar-button .icon-chevron-double-lg-right,
 .close-nav-button .collapse-text,
-.close-nav-button .icon-chevron-double-lg-left,
-.close-nav-button .icon-chevron-double-lg-right {
+.close-nav-button .icon-chevron-double-lg-left {
   color: inherit;
 }
 .collapse-text {
@@ -1504,12 +1501,6 @@ svg.s16 {
   height: 32px;
   margin-right: 8px;
 }
-.avatar.s40,
-.avatar-container.s40 {
-  width: 40px;
-  height: 40px;
-  margin-right: 8px;
-}
 .avatar {
   transition-property: none;
   width: 40px;
@@ -1536,10 +1527,6 @@ svg.s16 {
 .identicon.s32 {
   font-size: 14px;
   line-height: 32px;
-}
-.identicon.s40 {
-  font-size: 16px;
-  line-height: 38px;
 }
 .identicon.bg1 {
   background-color: #fcf1ef;
@@ -1580,10 +1567,6 @@ svg.s16 {
   margin: 0;
   align-self: center;
 }
-.avatar-container.s40 {
-  min-width: 40px;
-  min-height: 40px;
-}
 .rect-avatar {
   border-radius: 2px;
 }
@@ -1604,9 +1587,6 @@ svg.s16 {
   a
   .avatar-container.rect-avatar
   .avatar.s32 {
-  border-radius: 4px;
-}
-.rect-avatar.s40 {
   border-radius: 4px;
 }
 
