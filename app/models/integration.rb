@@ -54,6 +54,7 @@ class Integration < ApplicationRecord
     redmine
     slack slack_slash_commands
     teamcity
+    unify_circuit
   ].to_set.freeze
 
   def self.renamed?(name)
