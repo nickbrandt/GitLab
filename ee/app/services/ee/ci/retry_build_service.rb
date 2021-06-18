@@ -37,6 +37,16 @@ module EE
           raise ::Gitlab::Access::AccessDeniedError, 'Credit card required to be on file in order to retry a build'
         end
       end
+
+      override :check_assignable_runners!
+      def check_assignable_runners!(build)
+        return unless ::Feature.enabled?(:ci_quota_check_on_retries, project, default_enabled: :yaml)
+
+        runner_minutes = ::Gitlab::Ci::Minutes::RunnersAvailability.new(project)
+        return if runner_minutes.available?(build.build_matcher)
+
+        build.drop!(:ci_quota_exceeded)
+      end
     end
   end
 end
