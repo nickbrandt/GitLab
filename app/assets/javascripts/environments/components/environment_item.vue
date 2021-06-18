@@ -552,6 +552,9 @@ export default {
         { 'gl-display-none gl-md-display-block': !this.upcomingDeployment },
       ];
     },
+    tableNameSpacingClass() {
+      return this.isFolder ? 'section-100' : this.tableData.name.spacing;
+    },
   },
 
   methods: {
@@ -588,7 +591,7 @@ export default {
   >
     <div
       class="table-section section-wrap text-truncate"
-      :class="[isFolder ? 'section-100' : tableData.name.spacing]"
+      :class="tableNameSpacingClass"
       role="gridcell"
     >
       <div v-if="!isFolder" class="table-mobile-header" role="rowheader">
