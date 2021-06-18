@@ -269,7 +269,7 @@ module Ci
             let!(:unrelated_group_runner) { create(:ci_runner, :group, groups: [unrelated_group]) }
 
             it 'does not consider builds from other group runners' do
-              queue = ::Gitlab::Ci::Queue::Builder.new(group_runner)
+              queue = ::Ci::BuildQueueService.new(group_runner)
 
               expect(queue.builds_for_group_runner.size).to eq 6
               execute(group_runner)
@@ -301,7 +301,7 @@ module Ci
             end
 
             it 'calls DISTINCT' do
-              queue = ::Gitlab::Ci::Queue::Builder.new(group_runner)
+              queue = ::Ci::BuildQueueService.new(group_runner)
 
               expect(queue.builds_for_group_runner.to_sql).to include("DISTINCT")
             end
@@ -314,7 +314,7 @@ module Ci
             end
 
             it 'does not call DISTINCT' do
-              queue = ::Gitlab::Ci::Queue::Builder.new(group_runner)
+              queue = ::Ci::BuildQueueService.new(group_runner)
 
               expect(queue.builds_for_group_runner.to_sql).not_to include("DISTINCT")
             end
@@ -355,8 +355,8 @@ module Ci
             let!(:other_build) { create(:ci_build, :pending, :queued, pipeline: pipeline) }
 
             before do
-              allow_any_instance_of(::Gitlab::Ci::Queue::Builder)
-                .to receive(:build_ids)
+              allow_any_instance_of(::Ci::BuildQueueService)
+                .to receive(:execute)
                 .and_return(Ci::Build.where(id: [pending_job, other_build]).pluck(:id))
             end
 
@@ -368,8 +368,8 @@ module Ci
 
           context 'when single build is in queue' do
             before do
-              allow_any_instance_of(::Gitlab::Ci::Queue::Builder)
-                .to receive(:build_ids)
+              allow_any_instance_of(::Ci::BuildQueueService)
+                .to receive(:execute)
                 .and_return(Ci::Build.where(id: pending_job).pluck(:id))
             end
 
@@ -380,8 +380,8 @@ module Ci
 
           context 'when there is no build in queue' do
             before do
-              allow_any_instance_of(::Gitlab::Ci::Queue::Builder)
-                .to receive(:build_ids)
+              allow_any_instance_of(::Ci::BuildQueueService)
+                .to receive(:execute)
                 .and_return([])
             end
 

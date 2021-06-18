@@ -103,7 +103,7 @@ module Ci
 
     # rubocop: disable CodeReuse/ActiveRecord
     def each_build(params, &blk)
-      queue = ::Gitlab::Ci::Queue::Builder.new(runner)
+      queue = ::Ci::BuildQueueService.new(runner)
 
       builds = begin
         if runner.instance_type?
@@ -132,7 +132,7 @@ module Ci
         builds = queue.builds_queued_before(builds, params[:job_age].seconds.ago)
       end
 
-      build_ids = retrieve_queue(-> { queue.build_ids(builds) })
+      build_ids = retrieve_queue(-> { queue.execute(builds) })
 
       @metrics.observe_queue_size(-> { build_ids.size }, @runner.runner_type)
 
