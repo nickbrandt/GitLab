@@ -54,7 +54,7 @@ module API
             sort: 'desc'
           ).execute
 
-          present ::Packages::Helm::IndexPresenter.new(authorized_user_project, package_files),
+          present ::Packages::Helm::IndexPresenter.new(authorized_user_project, params[:id], package_files),
                       with: ::API::Entities::Helm::Index
         end
 

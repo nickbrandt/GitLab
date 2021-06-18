@@ -6,10 +6,12 @@ module Packages
       include API::Helpers::RelatedResourcesHelpers
 
       API_VERSION = 'v2'
-      INDEX_YAML_SUFFIX = '/index.yaml'
+      CHANNEL = 'channel'
+      INDEX_YAML_SUFFIX = "/#{CHANNEL}/index.yaml"
 
-      def initialize(project, package_files)
+      def initialize(project, project_id_param, package_files)
         @project = project
+        @project_id_param = project_id_param
         @package_files = package_files
       end
 
@@ -39,8 +41,8 @@ module Packages
 
       def server_info
         path = api_v4_projects_packages_helm_index_yaml_path(
-          id: @project.id,
-          channel: 'channel'
+          id: ERB::Util.url_encode(@project_id_param),
+          channel: CHANNEL
         )
         {
           'contextPath' => expose_url(path.delete_suffix(INDEX_YAML_SUFFIX))
