@@ -110,7 +110,9 @@ export const fetchDiffFilesBatch = ({ commit, state, dispatch }) => {
     w: state.showWhitespace ? '0' : '1',
     view: 'inline',
   };
+  const hash = window.location.hash.replace('#', '').split('diff-content-').pop();
   let totalLoaded = 0;
+  let scrolledVirtualScroller = false;
 
   commit(types.SET_BATCH_LOADING, true);
   commit(types.SET_RETRIEVING_BATCHES, true);
@@ -125,10 +127,14 @@ export const fetchDiffFilesBatch = ({ commit, state, dispatch }) => {
         commit(types.SET_DIFF_DATA_BATCH, { diff_files });
         commit(types.SET_BATCH_LOADING, false);
 
-        eventHub.$emit(
-          'scrollToFileHash',
-          window.location.hash.replace('#', '').split('diff-content-').pop(),
-        );
+        if (window.gon?.features?.diffsVirtualScrolling && !scrolledVirtualScroller) {
+          const index = state.diffFiles.findIndex((f) => f.file_hash === hash);
+
+          if (index >= 0) {
+            eventHub.$emit('scrollToIndex', index);
+            scrolledVirtualScroller = true;
+          }
+        }
 
         if (!isNoteLink && !state.currentDiffFileId) {
           commit(types.VIEW_DIFF_FILE, diff_files[0].file_hash);

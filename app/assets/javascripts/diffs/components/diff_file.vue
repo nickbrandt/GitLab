@@ -68,6 +68,11 @@ export default {
       type: Boolean,
       required: true,
     },
+    preRender: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   data() {
     return {
@@ -163,7 +168,7 @@ export default {
       handler: function hashChangeWatch(newHash, oldHash) {
         this.isCollapsed = isCollapsed(this.file);
 
-        if (newHash && oldHash && !this.hasDiff) {
+        if (newHash && oldHash && !this.hasDiff && !this.preRender) {
           this.requestDiff();
         }
       },

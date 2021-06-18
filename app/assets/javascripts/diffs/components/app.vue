@@ -331,6 +331,7 @@ export default {
 
     if (window.gon?.features?.diffsVirtualScrolling) {
       diffsEventHub.$on('scrollToFileHash', this.scrollVirtualScrollerToFileHash);
+      diffsEventHub.$on('scrollToIndex', this.scrollVirtualScrollerToIndex);
     }
 
     if (window.gon?.features?.diffSettingsUsageData) {
@@ -390,6 +391,7 @@ export default {
 
     if (window.gon?.features?.diffsVirtualScrolling) {
       diffsEventHub.$off('scrollToFileHash', this.scrollVirtualScrollerToFileHash);
+      diffsEventHub.$off('scrollToIndex', this.scrollVirtualScrollerToIndex);
     }
   },
   methods: {
@@ -526,12 +528,15 @@ export default {
       const index = this.diffFiles.findIndex((f) => f.file_hash === hash);
 
       if (index !== -1) {
-        this.virtualScrollCurrentIndex = index;
-
-        await this.$nextTick();
-
-        this.virtualScrollCurrentIndex = -1;
+        this.scrollVirtualScrollerToIndex(index);
       }
+    },
+    async scrollVirtualScrollerToIndex(index) {
+      this.virtualScrollCurrentIndex = index;
+
+      await this.$nextTick();
+
+      this.virtualScrollCurrentIndex = -1;
     },
   },
   minTreeWidth: MIN_TREE_WIDTH,
@@ -629,6 +634,7 @@ export default {
                         :help-page-path="helpPagePath"
                         :can-current-user-fork="canCurrentUserFork"
                         :view-diffs-file-by-file="viewDiffsFileByFile"
+                        pre-render
                       />
                     </dynamic-scroller-item>
                   </template>

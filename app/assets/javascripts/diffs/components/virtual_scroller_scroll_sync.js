@@ -1,3 +1,5 @@
+import { handleLocationHash } from '~/lib/utils/common_utils';
+
 export default {
   inject: ['vscrollParent'],
   props: {
@@ -22,6 +24,10 @@ export default {
             if (this.vscrollParent.itemsWithSize[index].size) {
               this.$_itemsWithSizeWatcher();
               this.scrollToIndex(index);
+
+              await this.$nextTick();
+
+              handleLocationHash();
             }
           });
         }
