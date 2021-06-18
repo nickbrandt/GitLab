@@ -593,6 +593,7 @@ export default {
       class="table-section section-wrap text-truncate"
       :class="tableNameSpacingClass"
       role="gridcell"
+      data-testid="environment-name-cell"
     >
       <div v-if="!isFolder" class="table-mobile-header" role="rowheader">
         {{ getMobileViewTitleForField('name') }}
@@ -639,6 +640,7 @@ export default {
       class="table-section deployment-column d-none d-md-block"
       :class="tableData.deploy.spacing"
       role="gridcell"
+      data-testid="enviornment-deployment-id-cell"
     >
       <span v-if="shouldRenderDeploymentID" class="text-break-word">
         {{ deploymentInternalId }}
@@ -665,6 +667,7 @@ export default {
       class="table-section d-none d-md-block"
       :class="tableData.build.spacing"
       role="gridcell"
+      data-testid="environment-build-cell"
     >
       <a v-if="shouldRenderBuildName" :href="buildPath" class="build-link cgray">
         <tooltip-on-truncate
