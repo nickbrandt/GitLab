@@ -1,7 +1,6 @@
 - page_title _('License')
 
-- if display_upcoming_reconciliation_alert?
-  #js-qrtly-reconciliation-alert{ data: upcoming_reconciliation_hash }
+= render_if_exists 'shared/qrtly_reconciliation_alert'
 
 %h3.page-title
   = _('Your License')
