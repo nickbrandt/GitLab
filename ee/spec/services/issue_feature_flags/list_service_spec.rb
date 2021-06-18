@@ -21,7 +21,7 @@ RSpec.describe IssueFeatureFlags::ListService do
       create(:feature_flag_issue, feature_flag: feature_flag, issue: issue)
     end
 
-    context 'user can see feature flags' do
+    context 'when user can see feature flags' do
       before do
         project.add_developer(user)
       end
@@ -32,7 +32,7 @@ RSpec.describe IssueFeatureFlags::ListService do
         expect { described_class.new(issue, user).execute }.not_to exceed_query_limit(control_count)
       end
 
-      it 'returns related issues' do
+      it 'returns related feature flags' do
         expect(subject.size).to eq(4)
 
         expect(subject).to include(include(id: feature_flag.id,
@@ -50,8 +50,8 @@ RSpec.describe IssueFeatureFlags::ListService do
       end
     end
 
-    context 'user can not see feature flags' do
-      it 'returns related issues' do
+    context 'when user can not see feature flags' do
+      it 'returns nothing' do
         expect(subject.size).to eq(0)
       end
     end

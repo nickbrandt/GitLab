@@ -83,7 +83,7 @@ RSpec.describe Projects::IssueFeatureFlagsController do
         stub_licensed_features(feature_flags_related_issues: false)
       end
 
-      it 'does not return linked issues' do
+      it 'returns not found' do
         feature_flag, _, _ = setup
         sign_in(developer)
 

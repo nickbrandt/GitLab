@@ -362,7 +362,7 @@ RSpec.describe Ability do
         cross_project.add_developer(user)
       end
 
-      it 'returns projects visible to the user' do
+      it 'returns feature flags visible to the user' do
         expect(readable_feature_flags).to contain_exactly(feature_flag, cross_project_feature_flag)
       end
 
