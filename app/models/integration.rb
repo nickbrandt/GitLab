@@ -55,6 +55,7 @@ class Integration < ApplicationRecord
     slack slack_slash_commands
     teamcity
     unify_circuit
+    webex_teams
   ].to_set.freeze
 
   def self.renamed?(name)
