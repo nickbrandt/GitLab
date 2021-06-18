@@ -669,11 +669,8 @@ RSpec.describe Integration do
   end
 
   describe '.integration_name_to_model' do
-    it 'returns the model for the given service name', :aggregate_failures do
+    it 'returns the model for the given service name' do
       expect(described_class.integration_name_to_model('asana')).to eq(Integrations::Asana)
-      # TODO We can remove this test when all models have been namespaced:
-      # https://gitlab.com/gitlab-org/gitlab/-/merge_requests/60968#note_570994955
-      expect(described_class.integration_name_to_model('prometheus')).to eq(PrometheusService)
     end
 
     it 'raises an error if service name is invalid' do
