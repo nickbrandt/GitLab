@@ -123,6 +123,10 @@ Do not use. Options are **primary** or **main**. ([Vale](../testing.md#vale) rul
 
 Do not use first-person singular. Use **you**, **we**, or **us** instead. ([Vale](../testing.md#vale) rule: [`FirstPerson.yml`](https://gitlab.com/gitlab-org/gitlab/-/blob/master/doc/.vale/gitlab/FirstPerson.yml))
 
+## merge requests
+
+Lowercase. If you use **MR** as the acronym, spell it out on first use.
+
 ## Owner
 
 When writing about the Owner role, use a capital "O." Do not use the phrase, "if you are an owner"
