@@ -7839,9 +7839,6 @@ msgstr ""
 msgid "CodeQuality|Code quality"
 msgstr ""
 
-msgid "CodeQuality|Code quality: %{severity} - %{description}"
-msgstr ""
-
 msgid "CodeQuality|New code quality degradations in this file"
 msgstr ""
 
