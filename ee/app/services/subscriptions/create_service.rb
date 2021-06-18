@@ -2,6 +2,8 @@
 
 module Subscriptions
   class CreateService
+    include Gitlab::Utils::StrongMemoize
+
     attr_reader :current_user, :customer_params, :subscription_params
 
     CUSTOMERS_OAUTH_APP_ID_CACHE_KEY = 'customers_oauth_app_id'
@@ -103,13 +105,13 @@ module Subscriptions
     end
 
     def oauth_token
-      @oauth_token ||= begin
-        return unless customers_oauth_app_id
+      strong_memoize(:oauth_token) do
+        next unless customers_oauth_app_id
 
         application = Doorkeeper::Application.find_by_uid(customers_oauth_app_id)
         existing_token = Doorkeeper::AccessToken.matching_token_for(application, current_user.id, application.scopes)
 
-        return existing_token if existing_token
+        next existing_token if existing_token
 
         Doorkeeper::AccessToken.new(
           application_id: customers_oauth_app_id,
