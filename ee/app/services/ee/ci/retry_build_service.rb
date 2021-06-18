@@ -11,7 +11,12 @@ module EE
 
         override :clone_accessors
         def clone_accessors
-          (super + %i[secrets]).freeze
+          (super + extra_accessors).freeze
+        end
+
+        override :extra_accessors
+        def extra_accessors
+          %i[dast_site_profile dast_scanner_profile secrets].freeze
         end
       end
 

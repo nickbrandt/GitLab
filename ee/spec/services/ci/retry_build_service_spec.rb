@@ -28,6 +28,20 @@ RSpec.describe Ci::RetryBuildService do
         project.add_developer(user)
       end
 
+      context 'dast' do
+        let(:dast_site_profile) { create(:dast_site_profile, project: project) }
+        let(:dast_scanner_profile) { create(:dast_scanner_profile, project: project) }
+
+        before do
+          build.update!(dast_site_profile: dast_site_profile, dast_scanner_profile: dast_scanner_profile)
+        end
+
+        it 'clones the profile associations', :aggregate_failures do
+          expect(new_build.dast_site_profile).to eq(dast_site_profile)
+          expect(new_build.dast_scanner_profile).to eq(dast_scanner_profile)
+        end
+      end
+
       context 'when build has secrets' do
         let(:secrets) do
           {
