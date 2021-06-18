@@ -161,6 +161,8 @@ export default {
   watch: {
     'file.id': {
       handler: function fileIdHandler() {
+        if (this.preRender) return;
+
         this.manageViewedEffects();
       },
     },
@@ -192,10 +194,14 @@ export default {
     },
   },
   created() {
+    if (this.preRender) return;
+
     notesEventHub.$on(`loadCollapsedDiff/${this.file.file_hash}`, this.requestDiff);
     eventHub.$on(EVT_EXPAND_ALL_FILES, this.expandAllListener);
   },
   mounted() {
+    if (this.preRender) return;
+
     if (this.hasDiff) {
       this.postRender();
     }
@@ -203,6 +209,8 @@ export default {
     this.manageViewedEffects();
   },
   beforeDestroy() {
+    if (this.preRender) return;
+
     eventHub.$off(EVT_EXPAND_ALL_FILES, this.expandAllListener);
   },
   methods: {

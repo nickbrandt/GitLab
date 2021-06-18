@@ -25,7 +25,9 @@ export default {
 
       if (nextItem) {
         this.startedRender = true;
-        this.nextItem = nextItem;
+        requestIdleCallback(() => {
+          this.nextItem = nextItem;
+        });
       } else if (this.startedRender) {
         this.nextItem = null;
 
