@@ -9,7 +9,6 @@ pages:
     - karma
     - compile-production-assets
     - compile-storybook
-    - compile-storybook as-if-foss
   script:
     - mv public/ .public/
     - mkdir public/
