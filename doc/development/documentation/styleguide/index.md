@@ -1437,25 +1437,6 @@ It renders on the GitLab documentation site as:
 
 To maintain consistency through GitLab documentation, use these styles and terms.
 
-### Merge requests (MRs)
-
-Merge requests allow you to exchange changes you made to source code and
-collaborate with other people on the same project.
-
-- Use lowercase _merge requests_ regardless of whether referring to the feature
-  or individual merge requests.
-
-As noted in the GitLab [Writing Style Guidelines](https://about.gitlab.com/handbook/communication/#writing-style-guidelines),
-if you use the _MR_ acronym, expand it at least once per document page.
-Typically, the first use would be phrased as _merge request (MR)_ with subsequent
-instances being _MR_.
-
-Examples:
-
-- "We prefer GitLab merge requests".
-- "Open a merge request to fix a broken link".
-- "After you open a merge request (MR), submit your MR for review and approval".
-
 ### Describe UI elements
 
 Follow these styles when you're describing user interface elements in an
