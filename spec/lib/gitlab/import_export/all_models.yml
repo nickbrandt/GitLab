@@ -386,7 +386,7 @@ project:
 - bamboo_integration
 - teamcity_service
 - pushover_integration
-- jira_service
+- jira_integration
 - redmine_service
 - youtrack_service
 - custom_issue_tracker_integration
@@ -485,7 +485,7 @@ project:
 - protected_environments
 - mirror_user
 - push_rule
-- jenkins_service
+- jenkins_integration
 - index_status
 - feature_usage
 - approval_rules

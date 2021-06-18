@@ -244,7 +244,7 @@ module EE
       def jira_issue_association_required_to_merge_enabled?
         strong_memoize(:jira_issue_association_required_to_merge_enabled) do
           next false unless jira_issues_integration_available?
-          next false unless jira_service&.active?
+          next false unless jira_integration&.active?
           next false unless ::Feature.enabled?(:jira_issue_association_on_merge_request, self, default_enabled: :yaml)
           next false unless feature_available?(:jira_issue_association_enforcement)
 
@@ -253,11 +253,11 @@ module EE
       end
 
       def jira_vulnerabilities_integration_enabled?
-        !!jira_service&.jira_vulnerabilities_integration_enabled?
+        !!jira_integration&.jira_vulnerabilities_integration_enabled?
       end
 
       def configured_to_create_issues_from_vulnerabilities?
-        !!jira_service&.configured_to_create_issues_from_vulnerabilities?
+        !!jira_integration&.configured_to_create_issues_from_vulnerabilities?
       end
     end
 
