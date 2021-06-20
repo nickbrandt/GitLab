@@ -137,6 +137,15 @@ RSpec.describe Epics::IssuePromoteService, :aggregate_failures do
             expect { subject.execute(issue) }.not_to raise_error
           end
 
+          it 'creates a close state event for promoted issue' do
+            # promote issue to epic also copies over existing issue state resource events to the epic
+            # so in this case we have an existing resource event defined above and one that we create
+            # for issue close event, which we are not copying over
+            expect { subject.execute(issue) }.to change(ResourceStateEvent, :count).by(2).and(
+              change(ResourceStateEvent.where(issue_id: issue), :count).by(1)
+            )
+          end
+
           it 'promotes issue successfully' do
             epic = subject.execute(issue)
 
