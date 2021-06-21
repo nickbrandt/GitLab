@@ -31437,9 +31437,6 @@ msgstr ""
 msgid "SuperSonics|Cloud license"
 msgstr ""
 
-msgid "SuperSonics|Enter activation code"
-msgstr ""
-
 msgid "SuperSonics|Expires on"
 msgstr ""
 
