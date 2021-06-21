@@ -39,8 +39,8 @@ RSpec.describe Project, factory_default: :keep do
     it { is_expected.to have_one(:microsoft_teams_integration) }
     it { is_expected.to have_one(:mattermost_integration) }
     it { is_expected.to have_one(:hangouts_chat_integration) }
-    it { is_expected.to have_one(:unify_circuit_service) }
-    it { is_expected.to have_one(:webex_teams_service) }
+    it { is_expected.to have_one(:unify_circuit_integration) }
+    it { is_expected.to have_one(:webex_teams_integration) }
     it { is_expected.to have_one(:packagist_integration) }
     it { is_expected.to have_one(:pushover_integration) }
     it { is_expected.to have_one(:asana_integration) }
@@ -62,7 +62,7 @@ RSpec.describe Project, factory_default: :keep do
     it { is_expected.to have_one(:teamcity_integration) }
     it { is_expected.to have_one(:jira_integration) }
     it { is_expected.to have_one(:redmine_integration) }
-    it { is_expected.to have_one(:youtrack_service) }
+    it { is_expected.to have_one(:youtrack_integration) }
     it { is_expected.to have_one(:custom_issue_tracker_integration) }
     it { is_expected.to have_one(:bugzilla_integration) }
     it { is_expected.to have_one(:ewm_integration) }
