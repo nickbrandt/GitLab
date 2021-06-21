@@ -17,7 +17,7 @@ module TaggableQueries
       matcher = ::ActsAsTaggableOn::Tagging
         .where(taggable_type: CommitStatus.name)
         .where(context: 'tags')
-        .where("taggable_id = #{table}.#{column}")
+        .where("taggable_id = #{connection.quote_table_name(table)}.#{connection.quote_column_name(column)}") # rubocop:disable GitlabSecurity/SqlInjection
         .where.not(tag_id: tag_ids)
         .select('1')
 
@@ -28,7 +28,7 @@ module TaggableQueries
       matcher = ::ActsAsTaggableOn::Tagging
         .where(taggable_type: CommitStatus.name)
         .where(context: 'tags')
-        .where("taggable_id = #{table}.#{column}")
+        .where("taggable_id = #{connection.quote_table_name(table)}.#{connection.quote_column_name(column)}") # rubocop:disable GitlabSecurity/SqlInjection
         .select('1')
 
       where("EXISTS (?)", matcher)
