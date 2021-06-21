@@ -16,7 +16,7 @@ RSpec.describe IssueEntity do
     create(:issue_link, source: blocking_issue, target: blocked_issue, link_type: IssueLink::TYPE_BLOCKS)
   end
 
-  subject { described_class.new(resource, request: request).as_json }
+  subject(:rendered) { described_class.new(resource, request: request).as_json }
 
   context 'when with_blocking_issues option is not present' do
     it 'exposes blocking issues' do
@@ -37,6 +37,34 @@ RSpec.describe IssueEntity do
       response = described_class.new(blocked_issue, request: request, with_blocking_issues: true).as_json
 
       expect(response[:blocked_by_issues].first.keys).to match_array([:iid, :web_url])
+    end
+  end
+
+  context 'when issue belongs to an iteration' do
+    let_it_be(:iteration) { create(:iteration, group: project.group) }
+
+    before do
+      resource.update!(iteration: iteration)
+    end
+
+    context 'when iterations feature is available' do
+      before do
+        stub_licensed_features(iterations: true)
+      end
+
+      it 'exposes iteration' do
+        expect(rendered[:iteration]).to include('id' => iteration.id)
+      end
+    end
+
+    context 'when iterations feature is not available' do
+      before do
+        stub_licensed_features(iterations: false)
+      end
+
+      it 'does not expose iteration' do
+        expect(rendered[:iteration]).to be_nil
+      end
     end
   end
 end

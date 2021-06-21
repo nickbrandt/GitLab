@@ -26,7 +26,7 @@ RSpec.describe Projects::IssuesController do
 
     context 'licensed' do
       before do
-        stub_licensed_features(issue_weights: true, epics: true, security_dashboard: true)
+        stub_licensed_features(issue_weights: true, epics: true, security_dashboard: true, iterations: true)
       end
 
       describe '#index' do
@@ -47,6 +47,23 @@ RSpec.describe Projects::IssuesController do
 
           expect(response).to have_gitlab_http_status(:ok)
           expect(assigns(:issues)).to eq([issue2])
+        end
+
+        context 'when issues belong to an iteration' do
+          before do
+            issue.update_columns(sprint_id: create(:iteration, group: project.group).id)
+            issue2
+          end
+
+          it 'avoids N+1 queries' do
+            control = ActiveRecord::QueryRecorder.new { perform :get, :index }
+            expect(assigns(:issues)).to contain_exactly(issue, issue2)
+
+            another_issue = create(:issue, project: project, iteration: create(:iteration, group: project.group))
+
+            expect { perform :get, :index }.not_to exceed_query_limit(control)
+            expect(assigns(:issues)).to contain_exactly(issue, issue2, another_issue)
+          end
         end
       end
 
