@@ -118,7 +118,7 @@ module EE
           alias_method :parent, :namespace
 
           has_many :all_pipelines, class_name: '::EE::Gitlab::BackgroundMigration::PopulateLatestPipelineIds::Pipeline'
-          has_one :project_setting, class_name: '::EE::Gitlab::BackgroundMigration::PopulateLatestPipelineIds::ProjectSetting'
+          has_one :project_setting, class_name: '::Gitlab::BackgroundMigration::PopulateLatestPipelineIds::ProjectSetting'
           has_one :route, as: :source, class_name: '::EE::Gitlab::BackgroundMigration::PopulateLatestPipelineIds::Route'
 
           def self.polymorphic_name
