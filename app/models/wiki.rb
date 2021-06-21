@@ -88,6 +88,7 @@ class Wiki
 
   def create_wiki_repository
     repository.create_if_not_exists
+    change_head_to_default_branch
 
     raise CouldNotCreateWikiError unless repository_exists?
   rescue StandardError => err
@@ -248,7 +249,7 @@ class Wiki
 
   override :default_branch
   def default_branch
-    wiki.class.default_ref
+    super || Gitlab::DefaultBranch.value(object: container)
   end
 
   def wiki_base_path
@@ -319,6 +320,28 @@ class Wiki
     Gitlab::ErrorTracking.log_exception(error, action: action, wiki_id: id)
 
     false
+  end
+
+  def change_head_to_default_branch
+    # This call avoids a possible race condition. At the moment, the status methods
+    # (:exists?, :empty?, ...) are update in the PostReceive worker.
+    #
+    # It can happen that the first commit triggers the worker, and it gets delayed.
+    # Then, another user updates the instance default branch and tries to push a new commit.
+    # Since the worker hasn't updated the status methods, method `empty?` will return
+    # `true` while it has content already.
+    #
+    # The result of this operation would be that the default branch in HEAD will be
+    # changed to the new one, and the commit will go as well to that branch.
+    repository.expire_status_cache
+
+    return unless repository.exists?
+    return unless repository.empty?
+
+    repository.before_change_head
+    repository.raw_repository.write_ref('HEAD', "refs/heads/#{default_branch}")
+    repository.copy_gitattributes(default_branch)
+    repository.after_change_head
   end
 end
 
