@@ -3,14 +3,14 @@
 module EE
   module API
     module Helpers
-      module ServicesHelpers
+      module IntegrationsHelpers
         extend ActiveSupport::Concern
 
         class_methods do
           extend ::Gitlab::Utils::Override
 
-          override :services
-          def services
+          override :integrations
+          def integrations
             super.merge(
               'github' => [
                 {
@@ -35,8 +35,8 @@ module EE
             )
           end
 
-          override :service_classes
-          def service_classes
+          override :integration_classes
+          def integration_classes
             [
               ::Integrations::Github,
               *super
