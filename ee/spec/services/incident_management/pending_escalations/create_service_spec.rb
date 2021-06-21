@@ -53,13 +53,11 @@ RSpec.describe IncidentManagement::PendingEscalations::CreateService do
       end
     end
 
-    it 'processes the escalation' do
-      expect(IncidentManagement::PendingEscalations::ProcessService)
-        .to receive(:new)
-        .with(having_attributes(rule_id: first_escalation_rule.id))
-        .and_return(process_service_spy)
+    it 'creates the escalations and queues the escalation process check' do
+      expect(IncidentManagement::Escalations::PendingAlertEscalationCheckWorker)
+        .to receive(:bulk_perform_async)
+        .with([[a_kind_of(Integer)], [a_kind_of(Integer)]])
 
-      expect(process_service_spy).to receive(:execute)
       expect { execute }.to change { IncidentManagement::PendingEscalations::Alert.count }.by(rule_count)
     end
 

@@ -4,10 +4,14 @@ module IncidentManagement
   module PendingEscalations
     class Alert < ApplicationRecord
       include PartitionedTable
+      include EachBatch
+
       alias_attribute :target, :alert
 
       self.primary_key = :id
       self.table_name = 'incident_management_pending_alert_escalations'
+
+      ESCALATION_BUFFER = 1.month.freeze
 
       partitioned_by :process_at, strategy: :monthly
 

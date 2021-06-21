@@ -28,10 +28,12 @@ module IncidentManagement
       end
 
       def create_escalations(rules)
-        rules.each do |rule|
+        escalation_ids = rules.map do |rule|
           escalaton = create_escalation(rule)
-          process_escalation(escalaton) if rule.elapsed_time_seconds == 0
+          escalaton.id
         end
+
+        process_escalations(escalation_ids)
 
       rescue StandardError => e
         Gitlab::ErrorTracking.track_exception(e, target_type: target.class.to_s, target_id: target.id)
@@ -47,8 +49,10 @@ module IncidentManagement
         )
       end
 
-      def process_escalation(escalation)
-        ::IncidentManagement::PendingEscalations::ProcessService.new(escalation).execute
+      def process_escalations(escalation_ids)
+        args = escalation_ids.map { |id| [id] }
+
+        ::IncidentManagement::Escalations::PendingAlertEscalationCheckWorker.bulk_perform_async(args) # rubocop:disable Scalability/BulkPerformWithContext
       end
     end
   end

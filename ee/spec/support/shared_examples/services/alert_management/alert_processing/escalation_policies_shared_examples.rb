@@ -8,6 +8,13 @@ RSpec.shared_examples 'creates an escalation' do |count|
       .exactly(count).times
       .and_call_original
 
+    expected_args = []
+    count.times { expected_args << [a_kind_of(Integer)]}
+
+    expect(IncidentManagement::Escalations::PendingAlertEscalationCheckWorker)
+      .to receive(:bulk_perform_async)
+      .with(expected_args)
+
     subject
   end
 end
