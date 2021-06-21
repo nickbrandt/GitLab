@@ -39,8 +39,8 @@ export default {
 </script>
 <template>
   <step :step-id="$options.stepId" :title="$options.i18n.stepTitle" :is-valid="isValid">
-    <template #body="props">
-      <zuora :active="props.active" />
+    <template #body="{ active }">
+      <zuora :active="active" />
     </template>
     <template #summary>
       <div class="js-summary-line-1">
