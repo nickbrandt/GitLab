@@ -140,10 +140,10 @@ RSpec.describe Integration do
   end
 
   describe "Test Button" do
-    let(:service) { build(:service, project: project) }
+    let(:integration) { build(:service, project: project) }
 
     describe '#can_test?' do
-      subject { service.can_test? }
+      subject { integration.can_test? }
 
       context 'when repository is not empty' do
         let(:project) { build(:project, :repository) }
@@ -158,9 +158,9 @@ RSpec.describe Integration do
       end
 
       context 'when instance-level service' do
-        Integration.available_services_types.each do |service_type|
-          let(:service) do
-            described_class.send(:integration_type_to_model, service_type).new(instance: true)
+        Integration.available_integration_types.each do |type|
+          let(:integration) do
+            described_class.send(:integration_type_to_model, type).new(instance: true)
           end
 
           it { is_expected.to be_falsey }
@@ -168,9 +168,9 @@ RSpec.describe Integration do
       end
 
       context 'when group-level service' do
-        Integration.available_services_types.each do |service_type|
-          let(:service) do
-            described_class.send(:integration_type_to_model, service_type).new(group_id: group.id)
+        Integration.available_integration_types.each do |type|
+          let(:integration) do
+            described_class.send(:integration_type_to_model, type).new(group_id: group.id)
           end
 
           it { is_expected.to be_falsey }
@@ -266,7 +266,7 @@ RSpec.describe Integration do
     context 'with all existing instances' do
       before do
         Integration.insert_all(
-          Integration.available_services_types(include_project_specific: false).map { |type| { instance: true, type: type } }
+          Integration.available_integration_types(include_project_specific: false).map { |type| { instance: true, type: type } }
         )
       end
 
@@ -294,7 +294,7 @@ RSpec.describe Integration do
   describe 'template' do
     shared_examples 'retrieves service templates' do
       it 'returns the available service templates' do
-        expect(Integration.find_or_create_templates.pluck(:type)).to match_array(Integration.available_services_types(include_project_specific: false))
+        expect(Integration.find_or_create_templates.pluck(:type)).to match_array(Integration.available_integration_types(include_project_specific: false))
       end
     end
 
@@ -310,7 +310,7 @@ RSpec.describe Integration do
       context 'with all existing templates' do
         before do
           Integration.insert_all(
-            Integration.available_services_types(include_project_specific: false).map { |type| { template: true, type: type } }
+            Integration.available_integration_types(include_project_specific: false).map { |type| { template: true, type: type } }
           )
         end
 
