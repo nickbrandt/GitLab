@@ -116,6 +116,7 @@ the status check and it **will not** be recoverable.
 ## Status checks widget
 
 > - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/327634) in GitLab 14.1.
+> - Follows the [external status checks](#external-status-checks) features status
 
 ![Status checks widget](img/status_checks_widget_passed_v14_0.png)
 
