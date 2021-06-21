@@ -1,7 +1,7 @@
 <script>
 import { GlSprintf } from '@gitlab/ui';
 import { STEPS } from 'ee/subscriptions/constants';
-import STATE_QUERY from 'ee/subscriptions/graphql/queries/state.query.graphql';
+import stateQuery from 'ee/subscriptions/graphql/queries/state.query.graphql';
 import Step from 'ee/vue_shared/purchase_flow/components/step.vue';
 import { sprintf, s__ } from '~/locale';
 import Zuora from './zuora.vue';
@@ -14,7 +14,7 @@ export default {
   },
   apollo: {
     paymentMethod: {
-      query: STATE_QUERY,
+      query: stateQuery,
       update: (data) => data.paymentMethod,
     },
   },
