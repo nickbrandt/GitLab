@@ -100,7 +100,7 @@ module API
         status.assign_attributes(attributes_for_keys(updatable_optional_attributes))
 
         if status.valid?
-          status.update_older_statuses_retried! if Feature.enabled?(:ci_fix_commit_status_retried, user_project, default_enabled: :yaml)
+          ::Ci::PipelineCreation::AddJobService.new(pipeline).execute(status, save: false)
         else
           render_validation_error!(status)
         end

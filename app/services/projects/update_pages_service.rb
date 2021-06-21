@@ -31,8 +31,9 @@ module Projects
       register_attempt
 
       # Create status notifying the deployment of pages
-      @status = create_status
-      @status.update_older_statuses_retried! if Feature.enabled?(:ci_fix_commit_status_retried, project, default_enabled: :yaml)
+      @status = build_commit_status
+      ::Ci::PipelineCreation::AddJobService.new(@build.pipeline).execute(@status)
+
       @status.enqueue!
       @status.run!
 
@@ -70,12 +71,9 @@ module Projects
       super
     end
 
-    def create_status
+    def build_commit_status
       GenericCommitStatus.new(
-        project: project,
-        pipeline: build.pipeline,
         user: build.user,
-        ref: build.ref,
         stage: 'deploy',
         name: 'pages:deploy'
       )
