@@ -37,12 +37,6 @@ export default {
       return this.active && this.zuoraLoaded && !this.isLoading;
     },
   },
-  watch: {
-    // The Zuora script has loaded and the parameters for rendering the iframe have been fetched.
-    paymentFormParams() {
-      this.renderZuoraIframe();
-    },
-  },
   mounted() {
     this.loadZuoraScript();
   },
