@@ -110,7 +110,7 @@ module API
         destroy_conditionally!(integration) do
           attrs = service_attributes(integration).index_with { nil }.merge(active: false)
 
-          render_api_error!('400 Bad Request', 400) unless service.update(attrs)
+          render_api_error!('400 Bad Request', 400) unless integration.update(attrs)
         end
       end
 

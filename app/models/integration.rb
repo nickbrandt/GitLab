@@ -246,11 +246,11 @@ class Integration < ApplicationRecord
   # Example: ["asana", ...]
   # @deprecated
   def self.available_integration_names(include_project_specific: true, include_dev: true)
-    service_names = integration_names
-    service_names += project_specific_integration_names if include_project_specific
-    service_names += dev_integration_names if include_dev
+    names = integration_names
+    names += project_specific_integration_names if include_project_specific
+    names += dev_integration_names if include_dev
 
-    service_names.sort_by(&:downcase)
+    names.sort_by(&:downcase)
   end
 
   def self.integration_names

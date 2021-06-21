@@ -185,9 +185,9 @@ RSpec.describe Integration do
         let(:project) { build(:project, :repository) }
 
         it 'test runs execute' do
-          expect(service).to receive(:execute).with(data)
+          expect(integration).to receive(:execute).with(data)
 
-          service.test(data)
+          integration.test(data)
         end
       end
 
@@ -195,9 +195,9 @@ RSpec.describe Integration do
         let(:project) { build(:project) }
 
         it 'test runs execute' do
-          expect(service).to receive(:execute).with(data)
+          expect(integration).to receive(:execute).with(data)
 
-          service.test(data)
+          integration.test(data)
         end
       end
     end

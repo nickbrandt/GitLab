@@ -66,7 +66,7 @@ Integration.available_integration_names.each do |service|
       return unless licensed_feature
 
       stub_licensed_features(licensed_feature => true)
-      project.clear_memoization(:disabled_services)
+      project.clear_memoization(:disabled_integrations)
     end
   end
 end
