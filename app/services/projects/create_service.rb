@@ -3,7 +3,6 @@
 module Projects
   class CreateService < BaseService
     include ValidatesClassificationLabel
-    TEMPLATE_PATH = Rails.root.join('app', 'services', 'projects', 'create_service', 'templates')
 
     def initialize(user, params)
       @current_user = user
@@ -152,19 +151,10 @@ module Projects
         branch_name: @default_branch.presence || @project.default_branch_or_main,
         commit_message: 'Initial commit',
         file_path: 'README.md',
-        file_content: experiment(:new_project_readme_content, namespace: @project.namespace) do |e|
-          e.control { template('readme_basic.md') }
-          e.try(:advanced) { template('readme_advanced.md') }
-          e.record!
-          e.run
-        end
+        file_content: experiment(:new_project_readme_content, namespace: @project.namespace).run_with(@project)
       }
 
       Files::CreateService.new(@project, current_user, commit_attrs).execute
-    end
-
-    def template(name)
-      ERB.new(File.read(TEMPLATE_PATH.join("#{name}.tt")), trim_mode: '<>').result(binding)
     end
 
     def skip_wiki?
