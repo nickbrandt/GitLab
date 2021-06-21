@@ -18,7 +18,7 @@ general best practices for code reviews, refer to our [code review guide](../cod
 
 ## Review process
 
-We recommend a Product Intelligence review when an MR involve changes in
+We recommend a Product Intelligence review when a merge request (MR) involves changes in
 events or touches Snowplow related files.
 
 ### Roles and process
