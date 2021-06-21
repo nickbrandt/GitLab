@@ -83,7 +83,8 @@ module Gitlab
               description: message_including_template,
               confidential: true,
               external_author: from_address
-            }
+            },
+            spam_params: nil
           ).execute
 
           raise InvalidIssueError unless @issue.persisted?
