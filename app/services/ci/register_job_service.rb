@@ -103,7 +103,7 @@ module Ci
 
     # rubocop: disable CodeReuse/ActiveRecord
     def each_build(params, &blk)
-      queue = ::Ci::BuildQueueService.new(runner)
+      queue = ::Ci::Queue::BuildQueueService.new(runner)
 
       builds = begin
         if runner.instance_type?
