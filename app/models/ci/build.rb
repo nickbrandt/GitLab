@@ -11,7 +11,6 @@ module Ci
     include Importable
     include Ci::HasRef
     include IgnorableColumns
-    include TaggableQueries
 
     BuildArchivedError = Class.new(StandardError)
 
