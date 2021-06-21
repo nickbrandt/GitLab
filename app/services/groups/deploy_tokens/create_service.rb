@@ -2,7 +2,7 @@
 
 module Groups
   module DeployTokens
-    class CreateService < BaseService
+    class CreateService < Groups::BaseService
       include DeployTokenMethods
 
       def execute

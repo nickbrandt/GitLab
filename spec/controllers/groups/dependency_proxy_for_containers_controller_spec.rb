@@ -201,7 +201,7 @@ RSpec.describe Groups::DependencyProxyForContainersController do
       it_behaves_like 'a successful manifest pull'
 
       context 'a valid deploy token' do
-        let_it_be(:user) { create(:deploy_token, :revoked) }
+        let_it_be(:user) { create(:deploy_token) }
         let_it_be(:group_deploy_token) { create(:group_deploy_token, deploy_token: user, group: group) }
 
         it_behaves_like 'a successful manifest pull'
@@ -273,7 +273,7 @@ RSpec.describe Groups::DependencyProxyForContainersController do
       it_behaves_like 'a successful blob pull'
 
       context 'a valid deploy token' do
-        let_it_be(:user) { create(:deploy_token, :revoked) }
+        let_it_be(:user) { create(:deploy_token) }
         let_it_be(:group_deploy_token) { create(:group_deploy_token, deploy_token: user, group: group) }
 
         it_behaves_like 'a successful blob pull'

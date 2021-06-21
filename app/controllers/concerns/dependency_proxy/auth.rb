@@ -7,6 +7,15 @@ module DependencyProxy
     included do
       # We disable `authenticate_user!` since the `DependencyProxy::Auth` performs auth using JWT token
       skip_before_action :authenticate_user!, raise: false
+      skip_before_action :check_two_factor_requirement, raise: false
+      skip_before_action :check_password_expiration, raise: false
+      skip_around_action :set_current_context
+      skip_before_action :add_gon_variables
+      skip_before_action :require_email
+      skip_before_action :active_user_check
+      skip_before_action :required_signup_info
+      skip_before_action :set_confirm_warning
+
       prepend_before_action :authenticate_user_from_jwt_token!
     end
 

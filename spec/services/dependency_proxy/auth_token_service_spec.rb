@@ -23,7 +23,7 @@ RSpec.describe DependencyProxy::AuthTokenService do
       it 'returns the user' do
         result = subject
 
-        expect(result['deploy_token']).to eq(deploy_token.token)
+        expect(result['deploy_token']).to eq(user.token)
         expect(result['user_id']).to be_nil
       end
     end
