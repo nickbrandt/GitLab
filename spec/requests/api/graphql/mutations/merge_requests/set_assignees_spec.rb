@@ -96,7 +96,7 @@ RSpec.describe 'Setting assignees of a merge request' do
   end
 
   context 'when passing an empty list of assignees' do
-    let(:db_query_limit) { 32 }
+    let(:db_query_limit) { 33 }
     let(:input) { { assignee_usernames: [] } }
 
     before do
@@ -135,7 +135,7 @@ RSpec.describe 'Setting assignees of a merge request' do
   end
 
   context 'when passing remove as true' do
-    let(:db_query_limit) { 32 }
+    let(:db_query_limit) { 33 }
     let(:mode) { Types::MutationOperationModeEnum.enum[:remove] }
     let(:input) { { assignee_usernames: [assignee.username], operation_mode: mode } }
     let(:expected_result) { [] }
