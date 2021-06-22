@@ -11,8 +11,9 @@ RSpec.describe MilestonesFinder do
   context 'without filters' do
     let_it_be(:milestone_1) { create(:milestone, group: group, title: 'one test', start_date: now - 1.day, due_date: now) }
     let_it_be(:milestone_2) { create(:milestone, group: group, start_date: now + 1.day, due_date: now + 2.days) }
-    let_it_be(:milestone_3) { create(:milestone, project: project_1, state: 'active', start_date: now + 2.days, due_date: now + 3.days) }
+    let_it_be(:milestone_3) { create(:milestone, project: project_1, state: 'active', start_date: now + 2.days) }
     let_it_be(:milestone_4) { create(:milestone, project: project_2, state: 'active', start_date: now + 4.days, due_date: now + 5.days) }
+    let_it_be(:milestone_5) { create(:milestone, group: group, due_date: now - 2.days) }
 
     it 'returns milestones for projects' do
       result = described_class.new(project_ids: [project_1.id, project_2.id], state: 'all').execute
@@ -23,24 +24,33 @@ RSpec.describe MilestonesFinder do
     it 'returns milestones for groups' do
       result = described_class.new(group_ids: group.id,  state: 'all').execute
 
-      expect(result).to contain_exactly(milestone_1, milestone_2)
+      expect(result).to contain_exactly(milestone_5, milestone_1, milestone_2)
     end
 
     context 'milestones for groups and project' do
+      let(:extra_params) {{}}
       let(:result) do
-        described_class.new(project_ids: [project_1.id, project_2.id], group_ids: group.id, state: 'all').execute
+        described_class.new({ project_ids: [project_1.id, project_2.id], group_ids: group.id, state: 'all' }.merge(extra_params)).execute
       end
 
       it 'returns milestones for groups and projects' do
-        expect(result).to contain_exactly(milestone_1, milestone_2, milestone_3, milestone_4)
+        expect(result).to contain_exactly(milestone_5, milestone_1, milestone_2, milestone_3, milestone_4)
       end
 
       it 'orders milestones by due date' do
-        milestone = create(:milestone, group: group, due_date: now - 2.days)
+        aggregate_failures do
+          expect(result.first).to eq(milestone_5)
+          expect(result.second).to eq(milestone_1)
+          expect(result.third).to eq(milestone_2)
+        end
+      end
 
-        expect(result.first).to eq(milestone)
-        expect(result.second).to eq(milestone_1)
-        expect(result.third).to eq(milestone_2)
+      context 'when expired_last param is used' do
+        let(:extra_params) { { expired_last: true } }
+
+        it 'current milestones are returned first, then milestones without due date followed by expired milestones, sorted by due date in ascending order' do
+          expect(result).to eq([milestone_2, milestone_4, milestone_3, milestone_5, milestone_1])
+        end
       end
     end
 
