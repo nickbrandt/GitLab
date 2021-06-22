@@ -107,6 +107,15 @@ module EE
 
       expose :blocking_merge_requests, if: -> (mr, _) { mr&.target_project&.feature_available?(:blocking_merge_requests) }
 
+      expose :failures_project_pipeline_path do |merge_request|
+        pipeline = merge_request.actual_head_pipeline
+        project = merge_request.target_project
+
+        next unless pipeline && project
+
+        failures_project_pipeline_path(project, pipeline)
+      end
+
       private
 
       def blocking_merge_requests

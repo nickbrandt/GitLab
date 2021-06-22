@@ -216,6 +216,8 @@ export default {
       </div>
     </div>
 
+    <slot name="alerts"></slot>
+
     <div v-if="hasIssues" v-show="isExpanded" class="js-report-section-container">
       <slot name="body">
         <issues-list

@@ -1,0 +1,21 @@
+query securityJobsStatus(
+  $fullPath: ID!
+  $mrIid: String!
+  $securityReportTypes: [SecurityReportTypeEnum!]
+) {
+  project(fullPath: $fullPath) {
+    id
+    mergeRequest(iid: $mrIid) {
+      id
+      headPipeline {
+        id
+        jobs(securityReportTypes: $securityReportTypes) {
+          nodes {
+            id
+            status
+          }
+        }
+      }
+    }
+  }
+}

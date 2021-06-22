@@ -1,5 +1,6 @@
 <script>
 import {
+  GlAlert,
   GlButton,
   GlSprintf,
   GlLink,
@@ -22,6 +23,7 @@ import DastModal from './components/dast_modal.vue';
 import IssueModal from './components/modal.vue';
 import { securityReportTypeEnumToReportType } from './constants';
 import securityReportSummaryQuery from './graphql/mr_security_report_summary.graphql';
+import securityJobsStatusQuery from './graphql/security_jobs_status.query.graphql';
 import securityReportsMixin from './mixins/security_report_mixin';
 import { vulnerabilityModalMixin } from './mixins/vulnerability_modal_mixin';
 import createStore from './store';
@@ -45,6 +47,7 @@ export default {
     SummaryRow,
     SecuritySummary,
     IssueModal,
+    GlAlert,
     GlSprintf,
     GlLink,
     DastModal,
@@ -68,6 +71,21 @@ export default {
       update(data) {
         const dast = data?.project?.pipeline?.securityReportSummary?.dast;
         return dast && Object.keys(dast).length ? dast : null;
+      },
+    },
+    hasFailedSecurityJobs: {
+      query: securityJobsStatusQuery,
+      variables() {
+        return {
+          fullPath: this.projectFullPath,
+          mrIid: String(this.mrIid),
+          securityReportTypes: Object.keys(securityReportTypeEnumToReportType),
+        };
+      },
+      update(data) {
+        const jobs = data.project?.mergeRequest?.headPipeline?.jobs?.nodes ?? [];
+
+        return jobs.some((job) => job.status === 'FAILED');
       },
     },
   },
@@ -239,10 +257,20 @@ export default {
       type: String,
       required: true,
     },
+    pipelineFailuresPath: {
+      type: String,
+      required: false,
+      default: '',
+    },
     mrIid: {
       type: Number,
       required: true,
     },
+  data() {
+    return {
+      hasFailedSecurityJobs: false,
+    };
+  },
   },
   componentNames,
   computed: {
@@ -515,6 +543,22 @@ export default {
           </template>
         </gl-sprintf>
       </div>
+    </template>
+
+    <template #alerts>
+      <gl-alert v-if="hasFailedSecurityJobs" variant="warning" :dismissible="false">
+        <gl-sprintf
+          :message="
+            __(
+              'One or more security jobs failed to complete. Address the %{linkStart}failed security job(s)%{linkEnd} to generate an accurate security report.',
+            )
+          "
+        >
+          <template #link="{ content }">
+            <gl-link :href="pipelineFailuresPath">{{ content }}</gl-link>
+          </template>
+        </gl-sprintf>
+      </gl-alert>
     </template>
 
     <template #body>

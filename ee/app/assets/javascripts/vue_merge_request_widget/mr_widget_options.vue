@@ -391,6 +391,7 @@ export default {
         :sast-comparison-path="mr.sastComparisonPath"
         :secret-scanning-comparison-path="mr.secretScanningComparisonPath"
         :target-project-full-path="mr.targetProjectFullPath"
+        :pipeline-failures-path="mr.failuresProjectPipelinePath"
         :mr-iid="mr.iid"
         class="js-security-widget"
       />
