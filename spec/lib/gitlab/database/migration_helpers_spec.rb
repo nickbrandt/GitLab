@@ -2157,6 +2157,31 @@ RSpec.describe Gitlab::Database::MigrationHelpers do
       buffer.rewind
       expect(buffer.read).to include("\"class\":\"#{model.class}\"")
     end
+
+    using RSpec::Parameterized::TableSyntax
+
+    where(:safe, :raise_on_exhaustion) do
+      true       | true
+      false      | false
+    end
+
+    with_them do
+      it 'sets raise_on_exhaustion as  requested' do
+        with_lock_retries = double
+        expect(Gitlab::Database::WithLockRetries).to receive(:new).and_return(with_lock_retries)
+        expect(with_lock_retries).to receive(:run).with(raise_on_exhaustion: raise_on_exhaustion)
+
+        model.with_lock_retries(env: env, logger: in_memory_logger, safe: safe) { }
+      end
+    end
+
+    it 'does not raise on exhaustion by default' do
+      with_lock_retries = double
+      expect(Gitlab::Database::WithLockRetries).to receive(:new).and_return(with_lock_retries)
+      expect(with_lock_retries).to receive(:run).with(raise_on_exhaustion: false)
+
+      model.with_lock_retries(env: env, logger: in_memory_logger) { }
+    end
   end
 
   describe '#backfill_iids' do
