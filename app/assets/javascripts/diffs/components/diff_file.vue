@@ -68,6 +68,11 @@ export default {
       type: Boolean,
       required: true,
     },
+    active: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
     preRender: {
       type: Boolean,
       required: false,
@@ -300,7 +305,7 @@ export default {
 
 <template>
   <div
-    :id="file.file_hash"
+    :id="!preRender && active && file.file_hash"
     :class="{
       'is-active': currentDiffFileId === file.file_hash,
       'comments-disabled': Boolean(file.brokenSymlink),
@@ -343,7 +348,7 @@ export default {
     </div>
     <template v-else>
       <div
-        :id="`diff-content-${file.file_hash}`"
+        :id="!preRender && active && `diff-content-${file.file_hash}`"
         :class="hasBodyClasses.contentByHash"
         data-testid="content-area"
       >

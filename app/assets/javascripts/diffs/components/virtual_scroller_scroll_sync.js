@@ -26,8 +26,6 @@ export default {
               this.scrollToIndex(index);
 
               await this.$nextTick();
-
-              handleLocationHash();
             }
           });
         }
@@ -41,6 +39,10 @@ export default {
   methods: {
     scrollToIndex(index) {
       this.vscrollParent.scrollToItem(index);
+
+      setTimeout(() => {
+        handleLocationHash();
+      });
     },
   },
   render(h) {

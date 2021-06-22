@@ -619,6 +619,7 @@ export default {
                     :help-page-path="helpPagePath"
                     :can-current-user-fork="canCurrentUserFork"
                     :view-diffs-file-by-file="viewDiffsFileByFile"
+                    :active="active"
                   />
                 </dynamic-scroller-item>
               </template>

@@ -544,7 +544,7 @@ export const scrollToFile = ({ state, commit }, path) => {
     eventHub.$emit('scrollToFileHash', fileHash);
 
     setTimeout(() => {
-      document.location.hash = fileHash;
+      window.history.replaceState(null, null, `#${fileHash}`);
     });
   } else {
     document.location.hash = fileHash;

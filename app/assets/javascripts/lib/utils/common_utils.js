@@ -98,7 +98,7 @@ export const handleLocationHash = () => {
   let adjustment = 0;
   if (fixedNav) adjustment -= fixedNav.offsetHeight;
 
-  if (target && target.scrollIntoView && !target.classList.contains('is-virtual-scrolling')) {
+  if (target && target.scrollIntoView) {
     target.scrollIntoView(true);
   }
 

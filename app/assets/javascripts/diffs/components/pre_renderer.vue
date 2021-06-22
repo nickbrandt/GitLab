@@ -29,11 +29,7 @@ export default {
           this.nextItem = nextItem;
         });
       } else if (this.startedRender) {
-        this.nextItem = null;
-
-        if (this.maxLength === this.vscrollParent.itemsWithSize.length) {
-          this.$_itemsWithSizeWatcher();
-        }
+        this.clearRendering();
       }
     });
   },
@@ -41,6 +37,13 @@ export default {
     this.$_itemsWithSizeWatcher();
   },
   methods: {
+    clearRendering() {
+      this.nextItem = null;
+
+      if (this.maxLength === this.vscrollParent.itemsWithSize.length) {
+        this.$_itemsWithSizeWatcher();
+      }
+    },
     findNextToRender() {
       return this.vscrollParent.itemsWithSize.find(({ size }, index) => {
         const isNext = size === 0;
