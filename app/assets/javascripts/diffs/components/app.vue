@@ -610,7 +610,7 @@ export default {
               page-mode
             >
               <template #default="{ item, index, active }">
-                <dynamic-scroller-item :item="item" :active="active">
+                <dynamic-scroller-item :item="item" :active="active" :class="{ active }">
                   <diff-file
                     :file="item"
                     :reviewed="fileReviews[item.id]"
