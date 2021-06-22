@@ -2642,6 +2642,42 @@ class Project < ApplicationRecord
   end
   alias_method :container_registry_enabled?, :container_registry_enabled
 
+  def ci_forward_deployment_enabled?
+    return false unless ci_cd_settings
+
+    ci_cd_settings.forward_deployment_enabled?
+  end
+
+  def ci_job_token_scope_enabled?
+    return false unless ci_cd_settings
+
+    ci_cd_settings.job_token_scope_enabled?
+  end
+
+  def restrict_user_defined_variables?
+    return false unless ci_cd_settings
+
+    ci_cd_settings.restrict_user_defined_variables?
+  end
+
+  def keep_latest_artifacts_available?
+    return false unless ci_cd_settings
+
+    ci_cd_settings.keep_latest_artifacts_available?
+  end
+
+  def keep_latest_artifact?
+    return false unless ci_cd_settings
+
+    ci_cd_settings.keep_latest_artifact?
+  end
+
+  def group_runners_enabled?
+    return false unless ci_cd_settings
+
+    ci_cd_settings.group_runners_enabled?
+  end
+
   private
 
   def set_container_registry_access_level
@@ -2829,42 +2865,6 @@ class Project < ApplicationRecord
 
   def online_runners_with_tags
     @online_runners_with_tags ||= active_runners_with_tags.online
-  end
-
-  def ci_forward_deployment_enabled?
-    return false unless ci_cd_settings
-
-    ci_cd_settings.forward_deployment_enabled?
-  end
-
-  def ci_job_token_scope_enabled?
-    return false unless ci_cd_settings
-
-    ci_cd_settings.job_token_scope_enabled?
-  end
-
-  def restrict_user_defined_variables?
-    return false unless ci_cd_settings
-
-    ci_cd_settings.restrict_user_defined_variables?
-  end
-
-  def keep_latest_artifacts_available?
-    return false unless ci_cd_settings
-
-    ci_cd_settings.keep_latest_artifacts_available?
-  end
-
-  def keep_latest_artifact?
-    return false unless ci_cd_settings
-
-    ci_cd_settings.keep_latest_artifact?
-  end
-
-  def group_runners_enabled?
-    return false unless ci_cd_settings
-
-    ci_cd_settings.group_runners_enabled?
   end
 end
 
