@@ -93,13 +93,13 @@ RSpec.describe 'Groups > Members > Manage members' do
     visit group_group_members_path(group)
 
     click_on 'Invite members'
-    fill_in 'Select members or type email addresses', with: '@gitlab.com'
+    fill_in '', with: '@gitlab.com'
 
     wait_for_requests
 
     expect(page).to have_content('No matches found')
 
-    fill_in 'Select members or type email addresses', with: 'undisclosed_email@gitlab.com'
+    fill_in '', with: 'undisclosed_email@gitlab.com'
     wait_for_requests
 
     expect(page).to have_content("Jane 'invisible' Doe")

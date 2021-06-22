@@ -92,12 +92,6 @@ export default {
     validationState() {
       return this.invalidFeedbackMessage === '' ? null : false;
     },
-    errorFieldDescription() {
-      if (this.invalidFeedbackMessage === '') {
-        return '';
-      }
-      return this.$options.labels[this.inviteeType].placeHolder;
-    },
     isInviteGroup() {
       return this.inviteeType === 'group';
     },
@@ -331,7 +325,7 @@ export default {
         class="gl-mt-2"
         :invalid-feedback="invalidFeedbackMessage"
         :state="validationState"
-        :description="errorFieldDescription"
+        :description="$options.labels[inviteeType].placeHolder"
         data-testid="members-form-group"
       >
         <label :id="$options.membersTokenSelectLabelId" class="col-form-label">{{
@@ -342,7 +336,6 @@ export default {
           v-model="newUsersToInvite"
           :validation-state="validationState"
           :aria-labelledby="$options.membersTokenSelectLabelId"
-          :placeholder="$options.labels[inviteeType].placeHolder"
           @clear="handleMembersTokenSelectClear"
         />
         <group-select
