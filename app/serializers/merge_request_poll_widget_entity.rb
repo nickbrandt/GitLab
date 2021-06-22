@@ -147,6 +147,8 @@ class MergeRequestPollWidgetEntity < Grape::Entity
     presenter(merge_request).approvals_widget_type
   end
 
+  expose :security_reports_up_to_date?, as: :security_reports_up_to_date
+
   private
 
   delegate :current_user, to: :request

@@ -96,11 +96,16 @@ export default {
       return !this.mr.canReadVulnerabilities && this.shouldRenderSecurityReport;
     },
     shouldRenderExtendedSecurityReport() {
-      const { enabledReports } = this.mr;
+      const { enabledReports = {} } = this.mr;
+      const sourceBranchHasSecurityReports = Object.values(enabledReports).some(
+        (enabled) => enabled,
+      );
+
       return (
         this.mr.canReadVulnerabilities &&
-        enabledReports &&
-        this.$options.securityReportTypes.some((reportType) => enabledReports[reportType])
+        (sourceBranchHasSecurityReports ||
+          // FIXME: will need to write a good comment for this
+          this.mr.securityReportsUpToDate)
       );
     },
     shouldRenderStatusReport() {
@@ -242,17 +247,6 @@ export default {
       };
     },
   },
-  // TODO: Use the snake_case report types rather than the camelCased versions
-  // of them. See https://gitlab.com/gitlab-org/gitlab/-/issues/282430
-  securityReportTypes: [
-    'dast',
-    'sast',
-    'dependencyScanning',
-    'containerScanning',
-    'coverageFuzzing',
-    'apiFuzzing',
-    'secretDetection',
-  ],
 };
 </script>
 <template>
@@ -393,6 +387,7 @@ export default {
         :target-project-full-path="mr.targetProjectFullPath"
         :pipeline-failures-path="mr.failuresProjectPipelinePath"
         :mr-iid="mr.iid"
+        :security-reports-up-to-date="mr.securityReportsUpToDate"
         class="js-security-widget"
       />
       <mr-widget-licenses

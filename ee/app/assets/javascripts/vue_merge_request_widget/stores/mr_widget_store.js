@@ -48,6 +48,8 @@ export default class MergeRequestStore extends CEMergeRequestStore {
     this.policyViolation = data.policy_violation;
     this.jiraAssociation = data.jira_associations || {};
 
+    this.securityReportsUpToDate = data.security_reports_up_to_date;
+
     super.setData(data, isRebased);
   }
 

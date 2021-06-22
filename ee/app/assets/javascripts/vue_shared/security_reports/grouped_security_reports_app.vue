@@ -266,11 +266,15 @@ export default {
       type: Number,
       required: true,
     },
+    securityReportsUpToDate: {
+      type: Boolean,
+      required: true,
+    },
+  },
   data() {
     return {
       hasFailedSecurityJobs: false,
     };
-  },
   },
   componentNames,
   computed: {
