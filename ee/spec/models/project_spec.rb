@@ -64,6 +64,30 @@ RSpec.describe Project do
 
     include_examples 'ci_cd_settings delegation'
 
+    describe '#merge_pipelines_enabled?' do
+      it_behaves_like 'a ci_cd_settings predicate method' do
+        let(:delegated_method) { :merge_pipelines_enabled? }
+      end
+    end
+
+    describe '#merge_pipelines_were_disabled?' do
+      it_behaves_like 'a ci_cd_settings predicate method' do
+        let(:delegated_method) { :merge_pipelines_were_disabled? }
+      end
+    end
+
+    describe '#merge_trains_enabled?' do
+      it_behaves_like 'a ci_cd_settings predicate method' do
+        let(:delegated_method) { :merge_trains_enabled? }
+      end
+    end
+
+    describe '#auto_rollback_enabled?' do
+      it_behaves_like 'a ci_cd_settings predicate method' do
+        let(:delegated_method) { :auto_rollback_enabled? }
+      end
+    end
+
     describe '#jira_vulnerabilities_integration_enabled?' do
       context 'when project lacks a jira_integration relation' do
         it 'returns false' do

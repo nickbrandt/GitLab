@@ -660,6 +660,42 @@ RSpec.describe Project, factory_default: :keep do
 
     include_examples 'ci_cd_settings delegation'
 
+    describe '#ci_forward_deployment_enabled?' do
+      it_behaves_like 'a ci_cd_settings predicate method', prefix: 'ci_' do
+        let(:delegated_method) { :forward_deployment_enabled? }
+      end
+    end
+
+    describe '#ci_job_token_scope_enabled?' do
+      it_behaves_like 'a ci_cd_settings predicate method', prefix: 'ci_' do
+        let(:delegated_method) { :job_token_scope_enabled? }
+      end
+    end
+
+    describe '#restrict_user_defined_variables?' do
+      it_behaves_like 'a ci_cd_settings predicate method' do
+        let(:delegated_method) { :restrict_user_defined_variables? }
+      end
+    end
+
+    describe '#keep_latest_artifacts_available?' do
+      it_behaves_like 'a ci_cd_settings predicate method' do
+        let(:delegated_method) { :keep_latest_artifacts_available? }
+      end
+    end
+
+    describe '#keep_latest_artifact?' do
+      it_behaves_like 'a ci_cd_settings predicate method' do
+        let(:delegated_method) { :keep_latest_artifact? }
+      end
+    end
+
+    describe '#group_runners_enabled?' do
+      it_behaves_like 'a ci_cd_settings predicate method' do
+        let(:delegated_method) { :group_runners_enabled? }
+      end
+    end
+
     context 'when read_container_registry_access_level is disabled' do
       before do
         stub_feature_flags(read_container_registry_access_level: false)

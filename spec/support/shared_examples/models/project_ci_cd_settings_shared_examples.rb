@@ -14,3 +14,39 @@ RSpec.shared_examples 'ci_cd_settings delegation' do
     end
   end
 end
+
+RSpec.shared_examples 'a ci_cd_settings predicate method' do |prefix: ''|
+  using RSpec::Parameterized::TableSyntax
+
+  let_it_be(:project) { create(:project) }
+
+  context 'when ci_cd_settings is nil' do
+    before do
+      allow(project).to receive(:ci_cd_settings).and_return(nil)
+    end
+
+    it 'returns false' do
+      expect(project.send("#{prefix}#{delegated_method}")).to be(false)
+    end
+  end
+
+  context 'when ci_cd_settings is not nil' do
+    where(:delegated_method_return, :subject_return) do
+      true  | true
+      false | false
+    end
+
+    with_them do
+      let(:ci_cd_settings_double) { double('ProjectCiCdSetting') }
+
+      before do
+        allow(project).to receive(:ci_cd_settings).and_return(ci_cd_settings_double)
+        allow(ci_cd_settings_double).to receive(delegated_method).and_return(delegated_method_return)
+      end
+
+      it 'returns the expected boolean value' do
+        expect(project.send("#{prefix}#{delegated_method}")).to be(subject_return)
+      end
+    end
+  end
+end
