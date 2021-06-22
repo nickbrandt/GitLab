@@ -253,9 +253,10 @@ module EE
       Settings.gitlab.seat_link_enabled
     end
 
-    def seat_link_enabled?
+    def seat_link_enabled
       seat_link_available? && seat_link_can_be_configured? && super
     end
+    alias_method :seat_link_enabled?, :seat_link_enabled
 
     def should_check_namespace_plan?
       check_namespace_plan? && (Rails.env.test? || ::Gitlab.dev_env_org_or_com?)
