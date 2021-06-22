@@ -89,7 +89,12 @@ export default {
       name="application_setting[required_instance_ci_template]"
       :value="selectedGitlabCiYmlValue"
     />
-    <gl-dropdown :text="dropdownText" :header-text="$options.i18n.defaultDropdownHeaderText" block>
+    <gl-dropdown
+      :text="dropdownText"
+      :header-text="$options.i18n.defaultDropdownHeaderText"
+      no-flip
+      class="gl-display-block gl-m-0"
+    >
       <template #header>
         <gl-search-box-by-type v-model.trim="searchTerm" :debounce="$options.TYPING_DELAY" />
       </template>
