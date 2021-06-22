@@ -18,6 +18,8 @@ RSpec.describe 'Project navbar' do
     stub_config(registry: { enabled: false })
     insert_package_nav(_('Infrastructure'))
     insert_infrastructure_registry_nav
+
+    stub_feature_flags(runner_list_project_view_vue_ui: false)
   end
 
   it_behaves_like 'verified navigation bar' do

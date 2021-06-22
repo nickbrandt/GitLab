@@ -28132,6 +28132,9 @@ msgstr ""
 msgid "Runners|Runner registration"
 msgstr ""
 
+msgid "Runners|Runners"
+msgstr ""
+
 msgid "Runners|Shared runners are available to every project in a GitLab instance. If you want a runner to build only specific projects, restrict the project in the table below. After you restrict a runner to a project, you cannot change it back to a shared runner."
 msgstr ""
 

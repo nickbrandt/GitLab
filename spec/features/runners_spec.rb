@@ -7,6 +7,8 @@ RSpec.describe 'Runners' do
 
   before do
     sign_in(user)
+
+    stub_feature_flags(runner_list_project_view_vue_ui: false)
   end
 
   context 'when user opens runners page' do

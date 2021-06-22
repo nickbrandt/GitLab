@@ -16,6 +16,8 @@ RSpec.describe 'Project navbar' do
 
     insert_package_nav(_('Infrastructure'))
     insert_infrastructure_registry_nav
+
+    stub_feature_flags(runner_list_project_view_vue_ui: false)
   end
 
   context 'when issue analytics is available' do
