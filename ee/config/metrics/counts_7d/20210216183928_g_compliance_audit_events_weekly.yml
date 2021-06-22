@@ -13,4 +13,3 @@ data_source: redis_hll
 distribution:
 - ee
 tier: []
-skip_validation: true
