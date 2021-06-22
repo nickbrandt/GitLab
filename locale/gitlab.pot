@@ -29807,9 +29807,6 @@ msgstr ""
 msgid "Show all issues."
 msgstr ""
 
-msgid "Show all members"
-msgstr ""
-
 msgid "Show all test cases."
 msgstr ""
 
@@ -29868,12 +29865,6 @@ msgid "Show me the basics"
 msgstr ""
 
 msgid "Show one file at a time"
-msgstr ""
-
-msgid "Show only direct members"
-msgstr ""
-
-msgid "Show only inherited members"
 msgstr ""
 
 msgid "Show parent pages"
@@ -30426,12 +30417,6 @@ msgstr ""
 msgid "Sort direction: Descending"
 msgstr ""
 
-msgid "SortOptions|Access level, ascending"
-msgstr ""
-
-msgid "SortOptions|Access level, descending"
-msgstr ""
-
 msgid "SortOptions|Blocking"
 msgstr ""
 
@@ -30463,9 +30448,6 @@ msgid "SortOptions|Last Contact"
 msgstr ""
 
 msgid "SortOptions|Last created"
-msgstr ""
-
-msgid "SortOptions|Last joined"
 msgstr ""
 
 msgid "SortOptions|Last updated"
@@ -30508,9 +30490,6 @@ msgid "SortOptions|Name, descending"
 msgstr ""
 
 msgid "SortOptions|Oldest created"
-msgstr ""
-
-msgid "SortOptions|Oldest joined"
 msgstr ""
 
 msgid "SortOptions|Oldest last activity"
