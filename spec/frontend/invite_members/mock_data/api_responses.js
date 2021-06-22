@@ -1,12 +1,12 @@
-const INVITATIONS_API_INVALID_EMAIL_ADDRESS = {
+const INVITATIONS_API_EMAIL_INVALID = {
   message: { error: 'email contains an invalid email address' },
 };
 
-const INVITATIONS_API_INVALID_EMAIL_SINGLE = {
+const INVITATIONS_API_ERROR_EMAIL_INVALID = {
   error: 'email contains an invalid email address',
 };
 
-const INVITATIONS_API_RESTRICTED_EMAIL_ERROR = {
+const INVITATIONS_API_EMAIL_RESTRICTED = {
   message: {
     'email@example.com':
       "Invite email 'email@example.com' does not match the allowed domains: example1.org",
@@ -14,7 +14,7 @@ const INVITATIONS_API_RESTRICTED_EMAIL_ERROR = {
   status: 'error',
 };
 
-const INVITATIONS_API_MULTIPLE_RESTRICTED = {
+const INVITATIONS_API_MULTIPLE_EMAIL_RESTRICTED = {
   message: {
     'email@example.com':
       "Invite email email 'email@example.com' does not match the allowed domains: example1.org",
@@ -66,9 +66,9 @@ export const membersApiResponse = {
 };
 
 export const invitationsApiResponse = {
-  INVALID_EMAIL_ADDRESS: INVITATIONS_API_INVALID_EMAIL_ADDRESS,
-  INVALID_EMAIL_SINGLE: INVITATIONS_API_INVALID_EMAIL_SINGLE,
-  RESTRICTED_EMAIL_ERROR: INVITATIONS_API_RESTRICTED_EMAIL_ERROR,
-  MULTIPLE_RESTRICTED: INVITATIONS_API_MULTIPLE_RESTRICTED,
+  EMAIL_INVALID: INVITATIONS_API_EMAIL_INVALID,
+  ERROR_EMAIL_INVALID: INVITATIONS_API_ERROR_EMAIL_INVALID,
+  EMAIL_RESTRICTED: INVITATIONS_API_EMAIL_RESTRICTED,
+  MULTIPLE_EMAIL_RESTRICTED: INVITATIONS_API_MULTIPLE_EMAIL_RESTRICTED,
   EMAIL_TAKEN: INVITATIONS_API_EMAIL_TAKEN,
 };

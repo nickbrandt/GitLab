@@ -339,7 +339,6 @@ export default {
         }}</label>
         <members-token-select
           v-if="!isInviteGroup"
-          id="members-select-input"
           v-model="newUsersToInvite"
           :validation-state="validationState"
           :aria-labelledby="$options.membersTokenSelectLabelId"

@@ -219,7 +219,7 @@ describe('InviteMembersModal', () => {
         format: 'json',
       };
 
-      describe('when invites are sent successfully', () => {
+      describe('when member is added successully', () => {
         beforeEach(() => {
           createComponent({ newUsersToInvite: [user1, user2] });
 
@@ -367,7 +367,7 @@ describe('InviteMembersModal', () => {
         });
 
         it('displays the api error for invalid email syntax', async () => {
-          mockInvitationsApi(httpStatus.BAD_REQUEST, invitationsApiResponse.INVALID_EMAIL_ADDRESS);
+          mockInvitationsApi(httpStatus.BAD_REQUEST, invitationsApiResponse.EMAIL_INVALID);
 
           clickInviteButton();
 
@@ -378,7 +378,7 @@ describe('InviteMembersModal', () => {
         });
 
         it('displays the restricted email error when restricted email is invited', async () => {
-          mockInvitationsApi(httpStatus.CREATED, invitationsApiResponse.RESTRICTED_EMAIL_ERROR);
+          mockInvitationsApi(httpStatus.CREATED, invitationsApiResponse.EMAIL_RESTRICTED);
 
           clickInviteButton();
 
@@ -402,7 +402,7 @@ describe('InviteMembersModal', () => {
         });
 
         it('displays the first error message when multiple emails return a restricted error message', async () => {
-          mockInvitationsApi(httpStatus.CREATED, invitationsApiResponse.MULTIPLE_RESTRICTED);
+          mockInvitationsApi(httpStatus.CREATED, invitationsApiResponse.MULTIPLE_EMAIL_RESTRICTED);
 
           clickInviteButton();
 
@@ -413,7 +413,7 @@ describe('InviteMembersModal', () => {
         });
 
         it('displays the invalid syntax error for bad request', async () => {
-          mockInvitationsApi(httpStatus.BAD_REQUEST, invitationsApiResponse.INVALID_EMAIL_SINGLE);
+          mockInvitationsApi(httpStatus.BAD_REQUEST, invitationsApiResponse.ERROR_EMAIL_INVALID);
 
           clickInviteButton();
 
@@ -429,7 +429,7 @@ describe('InviteMembersModal', () => {
           createInviteMembersToGroupWrapper();
 
           wrapper.setData({ newUsersToInvite: [user3, user4] });
-          mockInvitationsApi(httpStatus.CREATED, invitationsApiResponse.INVALID_EMAIL_SINGLE);
+          mockInvitationsApi(httpStatus.CREATED, invitationsApiResponse.ERROR_EMAIL_INVALID);
 
           clickInviteButton();
 
@@ -503,7 +503,7 @@ describe('InviteMembersModal', () => {
 
           wrapper.setData({ newUsersToInvite: [user1, user3] });
 
-          mockInvitationsApi(httpStatus.BAD_REQUEST, invitationsApiResponse.INVALID_EMAIL_ADDRESS);
+          mockInvitationsApi(httpStatus.BAD_REQUEST, invitationsApiResponse.EMAIL_INVALID);
           mockMembersApi(httpStatus.OK, '200 OK');
 
           clickInviteButton();
