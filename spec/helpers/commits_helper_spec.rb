@@ -321,4 +321,14 @@ RSpec.describe CommitsHelper do
       it { is_expected.to include(pipeline.cache_key) }
     end
   end
+
+  describe "#commit_path_template" do
+    let(:project) { create(:project, :repository) }
+
+    it "returns the correct path" do
+      expect(helper.commit_path_template(project))
+        .to eq("/#{project.namespace.full_path}/#{project.name}/-/commit/$COMMIT_SHA")
+    end
+  end
+
 end
