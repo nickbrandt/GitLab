@@ -15727,13 +15727,7 @@ msgstr ""
 msgid "GroupSettings|Prevent sharing a project within %{group} with other groups"
 msgstr ""
 
-msgid "GroupSettings|Projects will be permanently deleted after a %{waiting_period}-day delay."
-msgstr ""
-
 msgid "GroupSettings|Projects will be permanently deleted after a %{waiting_period}-day delay. Inherited by subgroups."
-msgstr ""
-
-msgid "GroupSettings|Projects will be permanently deleted after a %{waiting_period}-day delay. This delay can be %{link_start}customized by an admin%{link_end} in instance settings."
 msgstr ""
 
 msgid "GroupSettings|Projects will be permanently deleted after a %{waiting_period}-day delay. This delay can be %{link_start}customized by an admin%{link_end} in instance settings. Inherited by subgroups."
