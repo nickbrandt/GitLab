@@ -5579,6 +5579,9 @@ msgstr ""
 msgid "Browse files"
 msgstr ""
 
+msgid "Browse templates"
+msgstr ""
+
 msgid "BuildArtifacts|An error occurred while fetching the artifacts"
 msgstr ""
 
