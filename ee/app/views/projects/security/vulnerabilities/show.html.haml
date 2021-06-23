@@ -6,4 +6,4 @@
 - add_page_specific_style 'page_bundles/security_dashboard'
 
 #js-vulnerability-main{ data: { vulnerability: vulnerability_details_json(@vulnerability, @pipeline),
-                                commit_base_path: "#{project_path(@vulnerability.project)}/-/commit" } }
+                                commit_path_template: commit_path_template(@project)  } }

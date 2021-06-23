@@ -5,7 +5,7 @@ export default {
   components: {
     GlLink,
   },
-  inject: ['commitBasePath'],
+  inject: ['commitPathTemplate'],
   props: {
     value: {
       type: String,
@@ -14,7 +14,11 @@ export default {
   },
   computed: {
     commitPath() {
-      return `${this.commitBasePath}/${this.value}`;
+      // search for all occurences of "$COMMIT_SHA" within the given template, eg.: "/base/project/path/-/commit/$COMMIT_SHA"
+      const allCommitShaPlaceHolders = /\$COMMIT_SHA/g;
+      // Replace it with the actual commit hash
+      // NOTE: This can be swapped to using `replaceAll` once it's more widely supported
+      return this.commitPathTemplate.replace(allCommitShaPlaceHolders, this.value);
     },
   },
 };
