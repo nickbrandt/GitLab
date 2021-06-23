@@ -658,7 +658,16 @@ RSpec.describe Project, factory_default: :keep do
     it { is_expected.to delegate_method(:container_registry_enabled?).to(:project_feature) }
     it { is_expected.to delegate_method(:container_registry_access_level).to(:project_feature) }
 
-    include_examples 'ci_cd_settings delegation'
+    include_examples 'ci_cd_settings delegation' do
+      # Skip attributes defined in EE code
+      let(:exclude_attributes) do
+        %w(
+          merge_pipelines_enabled
+          merge_trains_enabled
+          auto_rollback_enabled
+        )
+      end
+    end
 
     describe '#ci_forward_deployment_enabled?' do
       it_behaves_like 'a ci_cd_settings predicate method', prefix: 'ci_' do
