@@ -71,7 +71,7 @@ module HasRepository
   end
 
   def default_branch
-    @default_branch ||= repository.root_ref || default_branch_from_preferences
+    @default_branch ||= repository._uncached_root_ref || default_branch_from_preferences
   end
 
   def default_branch_from_preferences
