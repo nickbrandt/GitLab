@@ -30,12 +30,8 @@ Documentation-related MRs should be reviewed by a Technical Writer for a non-blo
   - [ ] Ensure docs metadata is present and up-to-date.
   - [ ] Ensure the appropriate [labels](https://about.gitlab.com/handbook/engineering/ux/technical-writing/workflow/#labels) are added to this MR.
   - If relevant to this MR, ensure [content topic type](https://docs.gitlab.com/ee/development/documentation/structure.html) principles are in use, including:
-    - [ ] The headings should be something you'd do a Google search for.
-          - Instead of: Default behavior
-          - Say something like: Default behavior when you close an issue
-    - [ ] The headings (other than the page title) should be active.
-          - Instead of: Configuring GDK
-          - Say something like: Configure GDK
+    - [ ] The headings should be something you'd do a Google search for. Instead of `Default behavior`, say something like `Default behavior when you close an issue`.
+    - [ ] The headings (other than the page title) should be active. Instead of `Configuring GDK`, say something like `Configure GDK`.
     - [ ] Any task steps should be written as a numbered list.
 - [ ] Review by assigned maintainer, who can always request/require the above reviews. Maintainer's review can occur before or after a technical writer review.
 - [ ] Ensure a release milestone is set.
