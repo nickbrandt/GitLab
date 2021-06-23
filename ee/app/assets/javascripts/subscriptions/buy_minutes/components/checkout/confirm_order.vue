@@ -16,7 +16,7 @@ export default {
   },
   data() {
     return {
-      isActive: {},
+      isActive: false,
       isLoading: false,
     };
   },

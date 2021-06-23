@@ -38,7 +38,7 @@ describe('Confirm Order', () => {
 
   describe('Active', () => {
     describe('when receiving proper step data', () => {
-      beforeEach(async () => {
+      beforeEach(() => {
         const mockApolloProvider = createMockApolloProvider(STEPS, 3);
         wrapper = createComponent({ apolloProvider: mockApolloProvider });
       });
@@ -79,7 +79,7 @@ describe('Confirm Order', () => {
     });
 
     describe('when failing to receive step data', () => {
-      beforeEach(async () => {
+      beforeEach(() => {
         const mockApolloProvider = createMockApolloProvider([]);
         mockApolloProvider.clients.defaultClient.clearStore();
         wrapper = createComponent({ apolloProvider: mockApolloProvider });
@@ -100,7 +100,7 @@ describe('Confirm Order', () => {
   });
 
   describe('Inactive', () => {
-    beforeEach(async () => {
+    beforeEach(() => {
       const mockApolloProvider = createMockApolloProvider(STEPS, 1);
       wrapper = createComponent({ apolloProvider: mockApolloProvider });
     });
