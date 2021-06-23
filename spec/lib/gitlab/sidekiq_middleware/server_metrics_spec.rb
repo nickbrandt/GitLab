@@ -58,6 +58,28 @@ RSpec.describe Gitlab::SidekiqMiddleware::ServerMetrics do
 
           described_class.initialize_process_metrics
         end
+
+        context 'when the sidekiq_job_completion_metric_initialize feature flag is disabled' do
+          before do
+            stub_feature_flags(sidekiq_job_completion_metric_initialize: false)
+          end
+
+          it 'sets the concurrency metric' do
+            expect(concurrency_metric).to receive(:set).with({}, Sidekiq.options[:concurrency].to_i)
+
+            described_class.initialize_process_metrics
+          end
+
+          it 'does not initialize sidekiq_jobs_completion_seconds' do
+            allow(Gitlab::SidekiqConfig)
+              .to receive(:current_worker_queue_mappings)
+                    .and_return('MergeWorker' => 'merge', 'BuildFinishedWorker' => 'default')
+
+            expect(completion_seconds_metric).not_to receive(:get)
+
+            described_class.initialize_process_metrics
+          end
+        end
       end
 
       describe '#call' do
