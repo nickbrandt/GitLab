@@ -634,13 +634,13 @@ module EE
     end
     alias_method :merge_requests_ff_only_enabled?, :merge_requests_ff_only_enabled
 
-    override :disabled_services
-    def disabled_services
-      strong_memoize(:disabled_services) do
-        super.tap do |services|
-          services.push('github') unless feature_available?(:github_project_service_integration)
-          ::Gitlab::CurrentSettings.slack_app_enabled ? services.push('slack_slash_commands') : services.push('gitlab_slack_application')
-        end
+    override :disabled_integrations
+    def disabled_integrations
+      strong_memoize(:disabled_integrations) do
+        gh = github_integration_enabled? ? [] : %w[github]
+        slack = ::Gitlab::CurrentSettings.slack_app_enabled ? %w[slack_slash_commands] : %w[gitlab_slack_application]
+
+        super + gh + slack
       end
     end
 
@@ -801,6 +801,10 @@ module EE
     end
 
     private
+
+    def github_integration_enabled?
+      feature_available?(:github_project_service_integration)
+    end
 
     def group_hooks
       GroupHook.where(group_id: group.self_and_ancestors)

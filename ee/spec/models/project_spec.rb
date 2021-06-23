@@ -1463,13 +1463,13 @@ RSpec.describe Project do
     end
   end
 
-  describe '#disabled_services' do
+  describe '#disabled_integrations' do
     let(:project) { build(:project) }
 
-    subject { project.disabled_services }
+    subject { project.disabled_integrations }
 
-    where(:license_feature, :disabled_services) do
-      :github_project_service_integration | %w(github)
+    where(:license_feature, :disabled_integrations) do
+      :github_project_service_integration | %w[github]
     end
 
     with_them do
@@ -1478,7 +1478,7 @@ RSpec.describe Project do
           stub_licensed_features(license_feature => true)
         end
 
-        it { is_expected.not_to include(*disabled_services) }
+        it { is_expected.not_to include(*disabled_integrations) }
       end
 
       context 'when feature is unavailable' do
@@ -1486,7 +1486,7 @@ RSpec.describe Project do
           stub_licensed_features(license_feature => false)
         end
 
-        it { is_expected.to include(*disabled_services) }
+        it { is_expected.to include(*disabled_integrations) }
       end
     end
   end
