@@ -120,7 +120,7 @@ export default {
         </section>
         <section
           v-if="shouldShowRuleEditor"
-          class="gl-s-w-half gl-s-max-w-30p gl-p-5 gl-border-l-gray-100 gl-border-l-1 gl-md-border-l-solid"
+          class="gl-md-w-50p gl-md-max-w-30p gl-p-5 gl-border-l-gray-100 gl-border-l-1 gl-md-border-l-solid"
           data-testid="rule-editor-preview"
         >
           <slot name="rule-editor-preview"></slot>
