@@ -116,6 +116,7 @@ export default {
     :placeholder="placeholderText"
     :aria-labelledby="ariaLabelledby"
     :text-input-attrs="{ 'data-testid': 'members-token-select-input' }"
+    data-qa-selector="members_token_select_input"
     @blur="handleBlur"
     @text-input="handleTextInput"
     @input="handleInput"

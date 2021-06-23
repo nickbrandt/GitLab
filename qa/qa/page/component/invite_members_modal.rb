@@ -15,6 +15,10 @@ module QA
             element :invite_members_modal_content
           end
 
+          base.view 'app/assets/javascripts/invite_members/components/members_token_select.vue' do
+            element :members_token_select_input
+          end
+
           base.view 'app/assets/javascripts/invite_members/components/group_select.vue' do
             element :group_select_dropdown_search_field
           end
@@ -42,7 +46,7 @@ module QA
           within_element(:invite_members_modal_content) do
             fill_element :access_level_dropdown, with: access_level
 
-            fill_in 'Select members or type email addresses', with: username
+            fill_element :members_token_select_input, username
 
             Support::WaitForRequests.wait_for_requests
 
