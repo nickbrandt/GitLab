@@ -6,7 +6,7 @@ class AddTimestampToSchemaMigration < ActiveRecord::Migration[6.1]
     add_column :schema_migrations, :finished_at, :timestamptz
 
     # Change default to NOW() for new records
-    change_column :schema_migrations, :finished_at, :timestamptz, default: -> { 'NOW()' }
+    change_column_default :schema_migrations, :finished_at, -> { 'NOW()' }
   end
 
   def down
