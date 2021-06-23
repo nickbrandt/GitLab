@@ -2,10 +2,10 @@
 require 'erb'
 
 module QA
-  RSpec.describe 'Configure' do
+  RSpec.describe 'Configure', only: { subdomain: :staging } do
     include Service::Shellout
 
-    describe 'Kubernetes Agent', :orchestrated, :kubernetes, :requires_admin, quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/-/issues/294177', type: :waiting_on } do
+    describe 'Kubernetes Agent' do
       let!(:cluster) { Service::KubernetesCluster.new(provider_class: Service::ClusterProvider::K3s).create! }
 
       let(:agent_token) do

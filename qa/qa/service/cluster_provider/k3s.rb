@@ -5,7 +5,7 @@ module QA
     module ClusterProvider
       class K3s < Base
         def validate_dependencies
-          Runtime::ApplicationSettings.set_application_settings(allow_local_requests_from_web_hooks_and_services: true)
+          # Runtime::ApplicationSettings.set_application_settings(allow_local_requests_from_web_hooks_and_services: true)
         end
 
         def setup
@@ -33,7 +33,7 @@ module QA
         end
 
         def teardown
-          Runtime::ApplicationSettings.set_application_settings(allow_local_requests_from_web_hooks_and_services: false)
+          # Runtime::ApplicationSettings.set_application_settings(allow_local_requests_from_web_hooks_and_services: false)
 
           @k3s&.remove!
         end
