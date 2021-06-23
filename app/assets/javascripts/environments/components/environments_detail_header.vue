@@ -129,6 +129,7 @@ export default {
         :title="$options.i18n.externalButtonTitle"
         :href="environment.externalUrl"
         icon="external-link"
+        target="_blank"
         >{{ $options.i18n.externalButtonText }}</gl-button
       >
       <gl-button
