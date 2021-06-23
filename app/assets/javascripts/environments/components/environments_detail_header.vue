@@ -99,7 +99,7 @@ export default {
       <h3 class="page-title">
         {{ environment.name }}
       </h3>
-      <p v-if="environment.autoStopAt" class="gl-mb-0 gl-ml-3" data-testid="auto-stops-at">
+      <p v-if="shouldShowCancelAutoStopButton" class="gl-mb-0 gl-ml-3" data-testid="auto-stops-at">
         <gl-sprintf :message="$options.i18n.autoStopAtText">
           <template #autoStopAt>
             <time-ago :time="environment.autoStopAt" />

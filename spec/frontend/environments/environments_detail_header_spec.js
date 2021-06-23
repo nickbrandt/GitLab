@@ -95,14 +95,14 @@ describe('Environments detail header component', () => {
     });
   });
 
-  describe('when auto stops at is enabled', () => {
+  describe('when auto stops at is enabled and environment is available', () => {
     beforeEach(() => {
       const now = new Date();
       const tomorrow = new Date();
       tomorrow.setDate(now.getDate() + 1);
       createWrapper({
         props: {
-          environment: createEnvironment({ autoStopAt: tomorrow.toISOString(), isAvailable: true }),
+          environment: createEnvironment({ autoStopAt: tomorrow.toISOString() }),
           cancelAutoStopPath,
         },
       });
@@ -114,6 +114,31 @@ describe('Environments detail header component', () => {
 
     it('displays a cancel auto stops at button with correct path', () => {
       expect(findCancelAutoStopAtButton().attributes('href')).toBe(cancelAutoStopPath);
+    });
+  });
+
+  describe('when auto stops at is enabled and environment is unavailable (already stopped)', () => {
+    beforeEach(() => {
+      const now = new Date();
+      const tomorrow = new Date();
+      tomorrow.setDate(now.getDate() + 1);
+      createWrapper({
+        props: {
+          environment: createEnvironment({
+            autoStopAt: tomorrow.toISOString(),
+            isAvailable: false,
+          }),
+          cancelAutoStopPath,
+        },
+      });
+    });
+
+    it('does not display a text that describes when the environment is going to be stopped', () => {
+      expect(findAutoStopsAt().exists()).toBe(false);
+    });
+
+    it('displays a cancel auto stops at button with correct path', () => {
+      expect(findCancelAutoStopAtButton().exists()).toBe(false);
     });
   });
 
