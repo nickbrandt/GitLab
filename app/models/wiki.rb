@@ -249,8 +249,7 @@ class Wiki
 
   override :default_branch
   def default_branch
-    super || Gitlab::DefaultBranch.value(object: container)
-  end
+    super || Gitlab::DefaultBranch.value(object: container)  end
 
   def wiki_base_path
     web_url(only_path: true).sub(%r{/#{Wiki::HOMEPAGE}\z}, '')
@@ -340,7 +339,6 @@ class Wiki
 
     repository.before_change_head
     repository.raw_repository.write_ref('HEAD', "refs/heads/#{default_branch}")
-    repository.copy_gitattributes(default_branch)
     repository.after_change_head
   end
 end

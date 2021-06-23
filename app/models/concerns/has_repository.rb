@@ -71,7 +71,9 @@ module HasRepository
   end
 
   def default_branch
-    @default_branch ||= repository._uncached_root_ref || default_branch_from_preferences
+    strong_memoize(:default_branch) do
+      repository.root_ref || default_branch_from_preferences
+    end
   end
 
   def default_branch_from_preferences
@@ -88,7 +90,7 @@ module HasRepository
   end
 
   def reload_default_branch
-    @default_branch = nil # rubocop:disable Gitlab/ModuleWithInstanceVariables
+    clear_memoization(:default_branch)
 
     default_branch
   end
