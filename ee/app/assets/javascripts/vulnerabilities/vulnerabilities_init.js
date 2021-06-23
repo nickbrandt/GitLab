@@ -8,9 +8,7 @@ export default (el) => {
     return null;
   }
 
-  const { vulnerability: rawVulnerability, projectCommitPath } = el.dataset;
-
-  const vulnerability = convertObjectPropsToCamelCase(JSON.parse(rawVulnerability), {
+  const vulnerability = convertObjectPropsToCamelCase(JSON.parse(el.dataset.vulnerability), {
     deep: true,
   });
 
@@ -20,7 +18,7 @@ export default (el) => {
     provide: {
       reportType: vulnerability.reportType,
       newIssueUrl: vulnerability.newIssueUrl,
-      projectCommitPath,
+      commitBasePath: el.dataset.commitBasePath,
       projectFingerprint: vulnerability.projectFingerprint,
       projectFullPath: vulnerability.project?.fullPath,
       vulnerabilityId: vulnerability.id,

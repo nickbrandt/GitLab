@@ -14,7 +14,7 @@ describe('ee/vulnerabilities/components/generic_report/types/commit.vue', () => 
     return shallowMount(Commit, {
       propsData: TEST_DATA,
       provide: {
-        projectCommitPath: TEST_PROJECT_COMMIT_PATH,
+        commitBasePath: TEST_PROJECT_COMMIT_PATH,
       },
     });
   };

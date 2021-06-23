@@ -5,7 +5,7 @@ export default {
   components: {
     GlLink,
   },
-  inject: ['projectCommitPath'],
+  inject: ['commitBasePath'],
   props: {
     value: {
       type: String,
@@ -13,13 +13,13 @@ export default {
     },
   },
   computed: {
-    linkToCommit() {
-      return `${this.projectCommitPath}/${this.value}`;
+    commitPath() {
+      return `${this.commitBasePath}/${this.value}`;
     },
   },
 };
 </script>
 
 <template>
-  <gl-link :href="linkToCommit">{{ value }}</gl-link>
+  <gl-link :href="commitPath">{{ value }}</gl-link>
 </template>
