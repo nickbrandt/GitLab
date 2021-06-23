@@ -27,6 +27,7 @@ describe('Environments detail header component', () => {
   const findHeader = () => wrapper.find('h3');
   const findAutoStopsAt = () => wrapper.findByTestId('auto-stops-at');
   const findCancelAutoStopAtButton = () => wrapper.findByTestId('cancel-auto-stop-button');
+  const findCancelAutoStopAtForm = () => wrapper.findByTestId('cancel-auto-stop-form');
   const findTerminalButton = () => wrapper.findByTestId('terminal-button');
   const findExternalUrlButton = () => wrapper.findByTestId('external-url-button');
   const findMetricsButton = () => wrapper.findByTestId('metrics-button');
@@ -112,8 +113,17 @@ describe('Environments detail header component', () => {
       expect(findAutoStopsAt().text()).toBe('Auto stops in 1 day');
     });
 
-    it('displays a cancel auto stops at button with correct path', () => {
-      expect(findCancelAutoStopAtButton().attributes('href')).toBe(cancelAutoStopPath);
+    it('displays a cancel auto stops at button with a form to make a post request', () => {
+      const button = findCancelAutoStopAtButton();
+      const form = findCancelAutoStopAtForm();
+      expect(form.attributes('action')).toBe(cancelAutoStopPath);
+      expect(button.props('icon')).toBe('thumbtack');
+      expect(button.attributes('type')).toBe('submit');
+    });
+
+    it('includes a csrf token', () => {
+      const input = findCancelAutoStopAtForm().find('input');
+      expect(input.attributes('name')).toBe('authenticity_token');
     });
   });
 

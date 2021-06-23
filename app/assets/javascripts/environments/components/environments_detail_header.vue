@@ -1,5 +1,6 @@
 <script>
 import { GlButton, GlModalDirective, GlTooltipDirective as GlTooltip, GlSprintf } from '@gitlab/ui';
+import csrf from '~/lib/utils/csrf';
 import { __, s__ } from '~/locale';
 import TimeAgo from '~/vue_shared/components/time_ago_tooltip.vue';
 import timeagoMixin from '~/vue_shared/mixins/timeago';
@@ -8,6 +9,7 @@ import StopEnvironmentModal from './stop_environment_modal.vue';
 
 export default {
   name: 'EnvironmentsDetailHeader',
+  csrf,
   components: {
     GlButton,
     GlSprintf,
@@ -108,14 +110,17 @@ export default {
       </p>
     </div>
     <div class="nav-controls gl-my-1">
-      <gl-button
-        v-if="shouldShowCancelAutoStopButton"
-        v-gl-tooltip.hover
-        data-testid="cancel-auto-stop-button"
-        :href="cancelAutoStopPath"
-        :title="$options.i18n.cancelAutoStopButtonTitle"
-        icon="thumbtack"
-      />
+      <form method="POST" :action="cancelAutoStopPath" data-testid="cancel-auto-stop-form">
+        <input :value="$options.csrf.token" type="hidden" name="authenticity_token" />
+        <gl-button
+          v-if="shouldShowCancelAutoStopButton"
+          v-gl-tooltip.hover
+          data-testid="cancel-auto-stop-button"
+          :title="$options.i18n.cancelAutoStopButtonTitle"
+          type="submit"
+          icon="thumbtack"
+        />
+      </form>
       <gl-button
         v-if="shouldShowTerminalButton"
         data-testid="terminal-button"
