@@ -130,6 +130,7 @@ These variables are available when:
 
 | Variable                               | GitLab | Runner | Description |
 |----------------------------------------|--------|--------|-------------|
+| `CI_MERGE_REQUEST_APPROVED`            | 14.1   | all    | Approval status of the merge request. `true` when [merge request approvals](../../user/project/merge_requests/approvals/index.md) is available and the merge request has been approved. |
 | `CI_MERGE_REQUEST_ASSIGNEES`           | 11.9   | all    | Comma-separated list of usernames of assignees for the merge request. |
 | `CI_MERGE_REQUEST_ID`                  | 11.6   | all    | The instance-level ID of the merge request. This is a unique ID across all projects on GitLab. |
 | `CI_MERGE_REQUEST_IID`                 | 11.6   | all    | The project-level IID (internal ID) of the merge request. This ID is unique for the current project. |
