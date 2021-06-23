@@ -323,12 +323,11 @@ RSpec.describe CommitsHelper do
   end
 
   describe "#commit_path_template" do
-    let(:project) { create(:project, :repository) }
+    let(:project) { build(:project) }
+    let(:expected_path) { "/#{project.full_path}/-/commit/$COMMIT_SHA" }
 
-    it "returns the correct path" do
-      expect(helper.commit_path_template(project))
-        .to eq("/#{project.namespace.full_path}/#{project.name}/-/commit/$COMMIT_SHA")
-    end
+    subject { helper.commit_path_template(project) }
+
+    it { is_expected.to eq(expected_path) }
   end
-
 end

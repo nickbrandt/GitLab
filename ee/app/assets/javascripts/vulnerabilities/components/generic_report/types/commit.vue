@@ -14,10 +14,9 @@ export default {
   },
   computed: {
     commitPath() {
-      // search for all occurences of "$COMMIT_SHA" within the given template, eg.: "/base/project/path/-/commit/$COMMIT_SHA"
+      // Search for all occurences of "$COMMIT_SHA" within the given template, eg.: "/base/project/path/-/commit/$COMMIT_SHA"
+      // NOTE: This should be swapped to using `String.prototype.replaceAll` and a raw string, once browser supported is wider (https://caniuse.com/?search=replaceAll)
       const allCommitShaPlaceHolders = /\$COMMIT_SHA/g;
-      // Replace it with the actual commit hash
-      // NOTE: This can be swapped to using `String.prototype.replaceAll` once it's more widely supported (https://caniuse.com/?search=replaceAll)
       return this.commitPathTemplate.replace(allCommitShaPlaceHolders, this.value);
     },
   },
