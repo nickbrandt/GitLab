@@ -116,29 +116,28 @@ the status check and it **will not** be recoverable.
 ## Status checks widget
 
 > - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/327634) in GitLab 14.1.
-> - Follows the [external status checks](#external-status-checks) features status
+> - The [external status checks](#external-status-checks) feature must be [enabled](#enable-or-disable-status-checks) to see the status checks widget.
+
+The status checks widget displays in merge requests and shows the status of external
+status checks:
 
 ![Status checks widget](img/status_checks_widget_passed_v14_0.png)
 
-In each merge request, this widget displays the status of external status checks.
+An organization might have a policy that does not allow merging merge requests if
+external status checks do not pass. However, the details in the widget are for informational
+purposes only. GitLab does not prevent merging of merge requests that fail status checks.
 
-GitLab does not prevent merging of merge requests that fail these checks and they are for
-informational purposes only. However, you could have a policy that disallows merging merge
-requests until the status checks pass. However, GitLab can not enforce such a policy.
-
-NOTE:
-GitLab cannot guarantee that the external status checks are processed by the related external
-service.
-
-### Pending state
+While GitLab waits for a response from the external status check, the widget shows
+the status checks as `pending`:
 
 ![Status checks widget pending](img/status_checks_widget_pending_v14_0.png)
 
-Because GitLab cannot guarantee that external status checks are completed before viewing the
-widget on a merge request, you can see a pending state.
+After GitLab [receives a response](../../../api/status_checks.md#set-approval-status-of-an-external-status-check)
+from the external status check, the widget updates accordingly.
 
-Once GitLab [receives a response](../../../api/status_checks.md#set-approval-status-of-an-external-status-check)
-from the external status check, the widget is updated accordingly.
+NOTE:
+GitLab cannot guarantee that the external status checks are properly processed by
+the related external service.
 
 ## Troubleshooting
 
