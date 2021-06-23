@@ -45,7 +45,6 @@ describe('Subscription Breakdown', () => {
   const findLicenseRemoveAction = () => wrapper.findByTestId('license-remove-action');
   const findActivateSubscriptionAction = () =>
     wrapper.findByTestId('subscription-activate-subscription-action');
-  const findEnterCodeAction = () => wrapper.findByTestId('subscription-enter-code-action');
   const findSubscriptionMangeAction = () => wrapper.findByTestId('subscription-manage-action');
   const findSubscriptionSyncAction = () => wrapper.findByTestId('subscription-sync-action');
   const findSubscriptionActivationModal = () => wrapper.findComponent(SubscriptionActivationModal);
@@ -258,21 +257,6 @@ describe('Subscription Breakdown', () => {
           expect(findActivateSubscriptionAction().exists()).toBe(shouldShow);
         },
       );
-
-      it.each`
-        type                              | shouldShow
-        ${subscriptionTypes.LICENSE_FILE} | ${false}
-        ${subscriptionTypes.CLOUD}        | ${true}
-      `(
-        'with url is $url and type is $type the enter activation code button is shown: $shouldShow',
-        ({ type, shouldShow }) => {
-          const props = { subscription: { ...license.ULTIMATE, type } };
-          const stubs = { GlCard, SubscriptionDetailsCard };
-          createComponent({ props, stubs });
-
-          expect(findEnterCodeAction().exists()).toBe(shouldShow);
-        },
-      );
     });
 
     describe('with a license file', () => {
@@ -399,15 +383,6 @@ describe('Subscription Breakdown', () => {
         currentSubscriptionId: license.ULTIMATE.id,
         subscriptionList: [license.ULTIMATE],
       });
-    });
-  });
-
-  describe('activating a new subscription', () => {
-    it('shows a modal', () => {
-      createComponent({ stubs: { GlCard, SubscriptionDetailsCard } });
-      findEnterCodeAction().vm.$emit('click');
-
-      expect(glModalDirective).toHaveBeenCalledWith(modalId);
     });
   });
 });
