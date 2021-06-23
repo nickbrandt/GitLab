@@ -103,7 +103,7 @@ RSpec.describe Ci::BuildTraceChunks::Fog do
   end
 
   describe '#append_data' do
-    let(:initial_data) { (+'😺').force_encoding('ASCII-8BIT') }
+    let(:initial_data) { (+'😺').force_encoding(Encoding::ASCII_8BIT) }
     let(:model) { create(:ci_build_trace_chunk, :fog_with_data, initial_data: initial_data) }
     let(:data) { data_store.data(model) }
 
@@ -111,15 +111,15 @@ RSpec.describe Ci::BuildTraceChunks::Fog do
       it 'appends ASCII data' do
         data_store.append_data(model, +'hello world', 4)
 
-        expect(data.encoding).to eq(Encoding.find('ASCII-8BIT'))
-        expect(data.force_encoding('UTF-8')).to eq('😺hello world')
+        expect(data.encoding).to eq(Encoding::ASCII_8BIT)
+        expect(data.force_encoding(Encoding::UTF_8)).to eq('😺hello world')
       end
 
       it 'appends UTF-8 data' do
         data_store.append_data(model, +'Résumé', 4)
 
-        expect(data.encoding).to eq(Encoding.find('ASCII-8BIT'))
-        expect(data.force_encoding('UTF-8')).to eq("😺Résumé")
+        expect(data.encoding).to eq(Encoding::ASCII_8BIT)
+        expect(data.force_encoding(Encoding::UTF_8)).to eq("😺Résumé")
       end
 
       context 'when initial data is UTF-8' do
@@ -128,8 +128,8 @@ RSpec.describe Ci::BuildTraceChunks::Fog do
         it 'appends ASCII data' do
           data_store.append_data(model, +'hello world', 4)
 
-          expect(data.encoding).to eq(Encoding.find('ASCII-8BIT'))
-          expect(data.force_encoding('UTF-8')).to eq('😺hello world')
+          expect(data.encoding).to eq(Encoding::ASCII_8BIT)
+          expect(data.force_encoding(Encoding::UTF_8)).to eq('😺hello world')
         end
       end
     end
@@ -142,8 +142,8 @@ RSpec.describe Ci::BuildTraceChunks::Fog do
       it 'appends ASCII data' do
         data_store.append_data(model, +'hello world', 4)
 
-        expect(data.encoding).to eq(Encoding.find('ASCII-8BIT'))
-        expect(data.force_encoding('UTF-8')).to eq('😺hello world')
+        expect(data.encoding).to eq(Encoding::ASCII_8BIT)
+        expect(data.force_encoding(Encoding::UTF_8)).to eq('😺hello world')
       end
 
       it 'throws an exception when appending UTF-8 data' do
