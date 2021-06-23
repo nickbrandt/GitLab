@@ -111,6 +111,7 @@ export default {
       </p>
     </div>
     <div class="flex-column">
+      <!-- TODO: replace default-selected-labels-ids + selected-labels-ids with full label objects-->
       <labels-selector
         data-testid="type-of-work-filters-label"
         :initial-data="defaultGroupLabels"

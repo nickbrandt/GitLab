@@ -10,4 +10,8 @@ class GroupLabel < Label
   def subject_foreign_key
     'group_id'
   end
+
+  def self.for_group(group)
+    where(group: group).where(project_id: nil)
+  end
 end

@@ -31,11 +31,6 @@ export default {
       required: false,
       default: () => [],
     },
-    defaultSelectedLabelIds: {
-      type: Array,
-      required: false,
-      default: () => [],
-    },
     maxLabels: {
       type: Number,
       required: false,
@@ -51,7 +46,7 @@ export default {
       required: false,
       default: false,
     },
-    selectedLabelId: {
+    selectedLabelIds: {
       type: Array,
       required: false,
       default: () => [],
@@ -72,20 +67,26 @@ export default {
       loading: false,
       searchTerm: '',
       labels: [],
-      selectedLabelIds: this.defaultSelectedLabelIds || [],
     };
   },
   computed: {
     selectedLabel() {
-      const { selectedLabelId, labels = [] } = this;
-      if (!selectedLabelId.length || !labels.length) return null;
-      return labels.find(({ id }) => selectedLabelId.includes(id));
+      const { selectedLabelIds, labels = [] } = this;
+      if (!selectedLabelIds.length || !labels.length) return null;
+      return labels.find(({ id }) => selectedLabelIds.includes(id));
     },
     maxLabelsSelected() {
       return this.selectedLabelIds.length >= this.maxLabels;
     },
     noMatchingLabels() {
       return Boolean(this.searchTerm.length && !this.labels.length);
+    },
+    // initialGroupLabels() {
+    //   const selectedLabels = [this.stage.startEventLabel, this.stage.endEventLabel];
+    //   return [...this.defaultGroupLabels];
+    // },
+    availableLabelIds() {
+      return this.labels.map((id) => id);
     },
   },
   watch: {
@@ -94,6 +95,13 @@ export default {
     },
   },
   mounted() {
+    console.log('defaultGroupLabels', this.defaultGroupLabels);
+    console.log('selectedLabelIds', this.selectedLabelIds);
+    console.log('availableLabelIds', this.availableLabelIds);
+    console.log('initialData', this.initialData);
+    this.initialData.forEach((l) => {
+      console.log('l', l);
+    });
     if (!this.initialData.length) {
       this.fetchData();
     } else {
@@ -130,7 +138,7 @@ export default {
       return label?.name || label.title;
     },
     isSelectedLabel(id) {
-      return Boolean(this.selectedLabelId?.includes(id));
+      return Boolean(this.selectedLabelIds?.includes(id));
     },
     isDisabledLabel(id) {
       return Boolean(this.maxLabelsSelected && !this.isSelectedLabel(id));

@@ -74,6 +74,13 @@ export default {
     selectedEndEventName() {
       return this.eventName(this.stage.endEventIdentifier, 'SELECT_END_EVENT');
     },
+    initialGroupLabels() {
+      return [
+        ...this.defaultGroupLabels,
+        this.stage.startEventLabelId ? this.stage.startEventLabel : null,
+        this.stage.endEventLabelId ? this.stage.endEventLabel : null,
+      ].filter((l) => Boolean(l));
+    },
   },
   methods: {
     hasFieldErrors(key) {
@@ -155,8 +162,8 @@ export default {
             :invalid-feedback="fieldErrorMessage('startEventLabelId')"
           >
             <labels-selector
-              :initial-data="defaultGroupLabels"
-              :selected-label-id="[stage.startEventLabelId]"
+              :initial-data="initialGroupLabels"
+              :selected-label-ids="[stage.startEventLabelId]"
               :name="`custom-stage-start-label-${index}`"
               @select-label="$emit('input', { field: 'startEventLabelId', value: $event })"
             />
@@ -199,8 +206,8 @@ export default {
             :invalid-feedback="fieldErrorMessage('endEventLabelId')"
           >
             <labels-selector
-              :initial-data="defaultGroupLabels"
-              :selected-label-id="[stage.endEventLabelId]"
+              :initial-data="initialGroupLabels"
+              :selected-label-ids="[stage.endEventLabelId]"
               :name="`custom-stage-end-label-${index}`"
               @select-label="$emit('input', { field: 'endEventLabelId', value: $event })"
             />

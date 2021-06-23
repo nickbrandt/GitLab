@@ -2,6 +2,7 @@
 
 class Groups::Analytics::CycleAnalyticsController < Groups::Analytics::ApplicationController
   include Analytics::UniqueVisitsHelper
+  include Analytics::CycleAnalyticsHelper
   include CycleAnalyticsParams
   extend ::Gitlab::Utils::Override
 
