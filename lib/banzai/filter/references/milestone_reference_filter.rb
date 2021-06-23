@@ -20,10 +20,14 @@ module Banzai
 
           milestone_names = ids.map {|y| y[:milestone_name]}.compact
           unless milestone_names.empty?
-            milestone_relation = find_milestones(parent, false).where(title: milestone_names)
+            milestone_relation = find_milestones(parent, false).where(name: milestone_names)
           end
 
-          Milestone.from_union([iid_relation, milestone_relation].compact).includes(:project, :group)
+          if (relation = [iid_relation, milestone_relation].compact).empty?
+            Milestone.none
+          else
+            Milestone.from_union(relation).includes(:project, :group)
+          end
         end
 
         # Links to project milestones contain the IID, but when we're handling
@@ -42,8 +46,8 @@ module Banzai
         # This method has the contract that if a string `ref` refers to a
         # record `record`, then `parse_symbol(ref) == record_identifier(record)`.
         #
-        # This contract is slightly broken here, as we only have either the label_id
-        # or the label_name, but not both.  But below, we have both pieces of information.
+        # This contract is slightly broken here, as we only have either the milestone_id
+        # or the milestone_name, but not both.  But below, we have both pieces of information.
         # But it's accounted for in `find_object`
         def parse_symbol(symbol, match_data)
           if symbol
@@ -61,7 +65,7 @@ module Banzai
         # record `record`, then `class.parse_symbol(ref) == record_identifier(record)`.
         # See note in `parse_symbol` above
         def record_identifier(record)
-          { milestone_iid: record.iid, milestone_name: record.title }
+          { milestone_iid: record.iid, milestone_name: record.name }
         end
 
         # def find_object_from_link(parent, iid)
