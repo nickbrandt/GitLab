@@ -18238,6 +18238,12 @@ msgstr ""
 msgid "Iterations|Create cadence"
 msgstr ""
 
+msgid "Iterations|Delete cadence"
+msgstr ""
+
+msgid "Iterations|Delete iteration cadence?"
+msgstr ""
+
 msgid "Iterations|Duration"
 msgstr ""
 
@@ -18293,6 +18299,9 @@ msgid "Iterations|The duration for each iteration (in weeks)"
 msgstr ""
 
 msgid "Iterations|The start date of your first iteration"
+msgstr ""
+
+msgid "Iterations|This will delete the cadence as well as all of the iterations within it."
 msgstr ""
 
 msgid "Iterations|Title"
