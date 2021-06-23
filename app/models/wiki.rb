@@ -249,7 +249,8 @@ class Wiki
 
   override :default_branch
   def default_branch
-    super || Gitlab::DefaultBranch.value(object: container)  end
+    super || Gitlab::DefaultBranch.value(object: container)
+  end
 
   def wiki_base_path
     web_url(only_path: true).sub(%r{/#{Wiki::HOMEPAGE}\z}, '')
