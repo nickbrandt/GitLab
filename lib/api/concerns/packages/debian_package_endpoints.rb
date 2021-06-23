@@ -6,20 +6,17 @@ module API
       module DebianPackageEndpoints
         extend ActiveSupport::Concern
 
-        DISTRIBUTION_REGEX = %r{[a-z0-9][a-z0-9.-]*}i.freeze
-        COMPONENT_REGEX = %r{[a-z0-9][a-z0-9.-]*}i.freeze
-        ARCHITECTURE_REGEX = %r{[a-z0-9][-a-z0-9]*}.freeze
         LETTER_REGEX = %r{(lib)?[a-z0-9]}.freeze
         PACKAGE_REGEX = API::NO_SLASH_URL_PART_REGEX
         DISTRIBUTION_REQUIREMENTS = {
-          distribution: DISTRIBUTION_REGEX
+          distribution: ::Packages::Debian::DISTRIBUTION_REGEX
         }.freeze
         COMPONENT_ARCHITECTURE_REQUIREMENTS = {
-          component: COMPONENT_REGEX,
-          architecture: ARCHITECTURE_REGEX
+          component: ::Packages::Debian::COMPONENT_REGEX,
+          architecture: ::Packages::Debian::ARCHITECTURE_REGEX
         }.freeze
         COMPONENT_LETTER_SOURCE_PACKAGE_REQUIREMENTS = {
-          component: COMPONENT_REGEX,
+          component: ::Packages::Debian::COMPONENT_REGEX,
           letter: LETTER_REGEX,
           source_package: PACKAGE_REGEX
         }.freeze
