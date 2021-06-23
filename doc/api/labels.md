@@ -6,7 +6,7 @@ info: To determine the technical writer assigned to the Stage/Group associated w
 
 # Labels API **(FREE)**
 
-Insteract with [labels](../user/project/labels.md) using the REST API.
+Interact with [labels](../user/project/labels.md) using the REST API.
 
 NOTE:
 The `description_html` - was added to response JSON in [GitLab 12.7](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/21413).

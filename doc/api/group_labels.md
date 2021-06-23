@@ -9,7 +9,7 @@ info: To determine the technical writer assigned to the Stage/Group associated w
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/21368) in GitLab 11.8.
 
 This API supports managing [group labels](../user/project/labels.md#project-labels-and-group-labels).
-It allows to list, create, update, and delete group labels. Furthermore, users can subscribe to and
+It allows users to list, create, update, and delete group labels. Furthermore, users can subscribe to and
 unsubscribe from group labels.
 
 NOTE:
