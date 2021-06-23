@@ -219,7 +219,7 @@ describe('InviteMembersModal', () => {
         format: 'json',
       };
 
-      describe('when member is added successully', () => {
+      describe('when member is added successfully', () => {
         beforeEach(() => {
           createComponent({ newUsersToInvite: [user1, user2] });
 

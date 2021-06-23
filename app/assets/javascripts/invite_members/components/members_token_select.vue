@@ -115,6 +115,7 @@ export default {
     :hide-dropdown-with-no-items="hideDropdownWithNoItems"
     :placeholder="placeholderText"
     :aria-labelledby="ariaLabelledby"
+    :text-input-attrs="{ 'data-testid': 'members-token-select-input' }"
     @blur="handleBlur"
     @text-input="handleTextInput"
     @input="handleInput"
