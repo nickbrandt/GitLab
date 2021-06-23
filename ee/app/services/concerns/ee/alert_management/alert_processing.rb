@@ -11,7 +11,7 @@ module EE
       def complete_post_processing_tasks
         super
 
-        notify_oncall if oncall_notification_recipients.present? && notifying_alert?
+        notify_oncall if !escalation_policies_available? && oncall_notification_recipients.present? && notifying_alert?
         process_escalations
       end
 
@@ -33,6 +33,10 @@ module EE
         strong_memoize(:oncall_notification_recipients) do
           ::IncidentManagement::OncallUsersFinder.new(project).execute
         end
+      end
+
+      def escalation_policies_available?
+        ::Gitlab::IncidentManagement.escalation_policies_available?(project)
       end
 
       def delete_pending_escalations

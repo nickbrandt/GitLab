@@ -55,7 +55,7 @@ RSpec.describe AlertManagement::ProcessPrometheusAlertService do
             stub_feature_flags(escalation_policies_mvc: project)
           end
 
-          include_examples 'oncall users are correctly notified of firing alert'
+          it_behaves_like 'does not send on-call notification'
           include_examples 'creates an escalation', 1
 
           context 'existing alert is now resolved' do
