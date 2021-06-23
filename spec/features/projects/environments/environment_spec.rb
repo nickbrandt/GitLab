@@ -197,6 +197,68 @@ RSpec.describe 'Environment' do
     end
   end
 
+  describe 'auto-close environment when branch is deleted' do
+    let(:project) { create(:project, :repository) }
+
+    let!(:environment) do
+      create(:environment, :with_review_app, project: project,
+                                             ref: 'feature')
+    end
+
+    it 'user visits environment page', :js do
+      visit_environment(environment)
+
+      expect(page).to have_button('Stop')
+    end
+
+    it 'user deletes the branch with running environment', :js do
+      visit project_branches_filtered_path(project, state: 'all', search: 'feature')
+
+      remove_branch_with_hooks(project, user, 'feature') do
+        page.within('.js-branch-feature') { find('.js-delete-branch-button').click }
+      end
+
+      visit_environment(environment)
+
+      expect(page).not_to have_button('Stop')
+    end
+
+    context 'when the feature flag :delete_branch_confirmation_modals is disabled' do
+      before do
+        stub_feature_flags(delete_branch_confirmation_modals: false)
+      end
+
+      it 'user deletes the branch with running environment' do
+        visit project_branches_filtered_path(project, state: 'all', search: 'feature')
+
+        remove_branch_with_hooks(project, user, 'feature') do
+          within('.js-branch-feature') { click_link(title: 'Delete branch') }
+        end
+
+        visit_environment(environment)
+
+        expect(page).not_to have_button('Stop')
+      end
+    end
+
+    ##
+    # This is a workaround for problem described in #24543
+    #
+    def remove_branch_with_hooks(project, user, branch)
+      params = {
+        change: {
+          oldrev: project.commit(branch).id,
+          newrev: Gitlab::Git::BLANK_SHA,
+          ref: "refs/heads/#{branch}"
+        }
+      }
+
+      yield
+
+      Git::BranchPushService.new(project, user, params).execute
+    end
+  end
+
   def visit_environment(environment)
     visit project_environment_path(environment.project, environment)
   end
