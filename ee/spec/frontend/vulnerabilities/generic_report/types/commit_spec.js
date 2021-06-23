@@ -9,7 +9,7 @@ const TEST_COMMIT_PATH_BASE = `/foo/bar`;
 const TEST_COMMIT_PATH_PARAMETERS = '?baz=quz';
 const TEST_COMMIT_PATH_TEMPLATE = `${TEST_COMMIT_PATH_BASE}/$COMMIT_SHA/${TEST_COMMIT_PATH_PARAMETERS}`;
 
-describe.only('ee/vulnerabilities/components/generic_report/types/commit.vue', () => {
+describe('ee/vulnerabilities/components/generic_report/types/commit.vue', () => {
   let wrapper;
 
   const createWrapper = () => {
