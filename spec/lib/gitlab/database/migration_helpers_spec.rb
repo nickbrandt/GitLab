@@ -2980,4 +2980,42 @@ RSpec.describe Gitlab::Database::MigrationHelpers do
       end
     end
   end
+
+  describe '#swap_column_names' do
+    let(:table) { :_test_table }
+    let(:ar_model) do
+      Class.new(ActiveRecord::Base) do
+        self.table_name = :_test_table
+      end
+    end
+
+    before do
+      model.drop_table table, if_exists: true
+      model.create_table table, id: false do |t|
+        t.integer :column_1
+        t.bigint  :column_2
+      end
+    end
+
+    after do
+      model.drop_table table, if_exists: true
+    end
+
+    it 'swaps column names as requested' do
+      model.swap_column_names(table, :column_1, :column_2)
+
+      column_1 = ar_model.column_for_attribute(:column_1)
+      column_2 = ar_model.column_for_attribute(:column_2)
+
+      expect(column_1.sql_type).to eq('bigint')
+      expect(column_2.sql_type).to eq('integer')
+    end
+
+    it 'raises an error when not in transaction' do
+      expect(model).to receive(:transaction_open?).and_return(false)
+
+      expect { model.swap_column_names(table, :column_1, :column_2) }
+        .to raise_error 'Cannot call swap_column_names without a transaction open or outside of a transaction block.'
+    end
+  end
 end

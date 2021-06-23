@@ -1616,6 +1616,17 @@ into similar problems in the future (e.g. when new tables are created).
         raise
       end
 
+      def swap_column_names(table_name, column_1, column_2)
+        unless transaction_open?
+          raise 'Cannot call swap_column_names without a transaction open or outside of a transaction block.'
+        end
+
+        temp_name = "#{column_1}_tmp"
+        rename_column(table_name, column_1, temp_name)
+        rename_column(table_name, column_2, column_1)
+        rename_column(table_name, temp_name, column_2)
+      end
+
       private
 
       def validate_check_constraint_name!(constraint_name)

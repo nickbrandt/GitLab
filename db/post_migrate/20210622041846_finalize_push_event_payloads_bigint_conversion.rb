@@ -32,10 +32,7 @@ class FinalizePushEventPayloadsBigintConversion < ActiveRecord::Migration[6.1]
     add_concurrent_foreign_key TABLE_NAME, :events, column: :event_id_convert_to_bigint, on_delete: :cascade
 
     with_lock_retries(safe: true) do
-      # Swap column names
-      rename_column TABLE_NAME, :event_id, :event_id_convert_to_bigint_tmp
-      rename_column TABLE_NAME, :event_id_convert_to_bigint, :event_id
-      rename_column TABLE_NAME, :event_id_convert_to_bigint_tmp, :event_id_convert_to_bigint
+      swap_column_names TABLE_NAME, :event_id, :event_id_convert_to_bigint # rubocop:disable Migration/WithLockRetriesDisallowedMethod
 
       # Swap defaults
       change_column_default TABLE_NAME, :event_id, nil
