@@ -1,6 +1,7 @@
 <script>
-import { GlButton, GlModalDirective, GlTooltipDirective as GlTooltip } from '@gitlab/ui';
-import { __, s__, sprintf } from '~/locale';
+import { GlButton, GlModalDirective, GlTooltipDirective as GlTooltip, GlSprintf } from '@gitlab/ui';
+import { __, s__ } from '~/locale';
+import TimeAgo from '~/vue_shared/components/time_ago_tooltip.vue';
 import timeagoMixin from '~/vue_shared/mixins/timeago';
 import DeleteEnvironmentModal from './delete_environment_modal.vue';
 import StopEnvironmentModal from './stop_environment_modal.vue';
@@ -9,6 +10,8 @@ export default {
   name: 'EnvironmentsDetailHeader',
   components: {
     GlButton,
+    GlSprintf,
+    TimeAgo,
     DeleteEnvironmentModal,
     StopEnvironmentModal,
   },
@@ -64,6 +67,7 @@ export default {
     },
   },
   i18n: {
+    autoStopAtText: s__('Environments|Auto stops %{autoStopAt}'),
     metricsButtonTitle: __('See metrics'),
     metricsButtonText: __('Monitoring'),
     editButtonText: __('Edit'),
@@ -74,11 +78,6 @@ export default {
     cancelAutoStopButtonTitle: __('Prevent environment from auto-stopping'),
   },
   computed: {
-    autoStopAt() {
-      return sprintf(s__('Environments|Auto stops %{autoStopAt}'), {
-        autoStopAt: this.timeFormatted(this.environment.autoStopAt),
-      });
-    },
     shouldShowCancelAutoStopButton() {
       return this.environment.isAvailable && Boolean(this.environment.autoStopAt);
     },
@@ -101,7 +100,11 @@ export default {
         {{ environment.name }}
       </h3>
       <p v-if="environment.autoStopAt" class="gl-mb-0 gl-ml-3" data-testid="auto-stops-at">
-        {{ autoStopAt }}
+        <gl-sprintf :message="$options.i18n.autoStopAtText">
+          <template #autoStopAt>
+            <time-ago :time="environment.autoStopAt" />
+          </template>
+        </gl-sprintf>
       </p>
     </div>
     <div class="nav-controls gl-my-1">

@@ -1,8 +1,10 @@
+import { GlSprintf } from '@gitlab/ui';
 import { shallowMount } from '@vue/test-utils';
 import { extendedWrapper } from 'helpers/vue_test_utils_helper';
 import DeleteEnvironmentModal from '~/environments/components/delete_environment_modal.vue';
 import EnvironmentsDetailHeader from '~/environments/components/environments_detail_header.vue';
 import StopEnvironmentModal from '~/environments/components/stop_environment_modal.vue';
+import TimeAgo from '~/vue_shared/components/time_ago_tooltip.vue';
 
 describe('Environments detail header component', () => {
   const cancelAutoStopPath = '/my-environment/cancel/path';
@@ -47,6 +49,10 @@ describe('Environments detail header component', () => {
   const createWrapper = ({ props }) => {
     wrapper = extendedWrapper(
       shallowMount(EnvironmentsDetailHeader, {
+        stubs: {
+          GlSprintf,
+          TimeAgo,
+        },
         propsData: {
           canReadEnvironment: false,
           canAdminEnvironment: false,
@@ -102,7 +108,7 @@ describe('Environments detail header component', () => {
       });
     });
 
-    it('displays a text that describes when the', () => {
+    it('displays a text that describes when the environment is going to be stopped', () => {
       expect(findAutoStopsAt().text()).toBe('Auto stops in 1 day');
     });
 

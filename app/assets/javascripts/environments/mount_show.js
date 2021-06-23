@@ -18,7 +18,7 @@ export const initHeader = () => {
         externalUrl: dataset.externalUrl,
         isAvailable: parseBoolean(dataset.isEnvironmentAvailable),
         hasTerminals: parseBoolean(dataset.hasTerminals),
-        autoStopAt: dataset.autoStopAt,
+        autoStopAt: dataset.autoStopAt ? new Date(dataset.autoStopAt).toISOString() : null,
         onSingleEnvironmentPage: true,
         // TODO: These two props are snake_case because the environments_mixin file uses
         // them and the mixin is imported in several files. It would be nice to conver them to camelCase.
