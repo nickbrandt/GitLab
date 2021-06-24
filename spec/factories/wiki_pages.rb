@@ -11,7 +11,7 @@ FactoryBot.define do
       message { nil }
       project { association(:project) }
       container { project }
-      wiki { association(:wiki, container: container) }
+      wiki { container.wiki }
       page { OpenStruct.new(url_path: title) }
     end
 
@@ -29,6 +29,10 @@ FactoryBot.define do
     # Clear our default @page, except when using build_stubbed
     after(:build) do |page|
       page.instance_variable_set('@page', nil)
+    end
+
+    after(:create) do |page|
+      page.wiki.repository.expire_status_cache
     end
 
     to_create do |page, evaluator|
