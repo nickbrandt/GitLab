@@ -23,7 +23,9 @@ module Banzai
             label_relation = labels.where(title: label_names)
           end
 
-          Label.from_union([id_relation, label_relation].compact)
+          return Label.none if (relation = [id_relation, label_relation].compact).empty?
+
+          Label.from_union(relation)
         end
 
         def find_object(parent_object, id)

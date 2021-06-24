@@ -23,16 +23,11 @@ module Banzai
             milestone_relation = find_milestones(parent, false).where(name: milestone_names)
           end
 
-          if (relation = [iid_relation, milestone_relation].compact).empty?
-            Milestone.none
-          else
-            Milestone.from_union(relation).includes(:project, :group)
-          end
+          return Milestone.none if (relation = [iid_relation, milestone_relation].compact).empty?
+
+          Milestone.from_union(relation).includes(:project, :group)
         end
 
-        # Links to project milestones contain the IID, but when we're handling
-        # 'regular' references, we need to use the global ID to disambiguate
-        # between group and project milestones.
         def find_object(parent_object, id)
           key = reference_cache.records_per_parent[parent_object].keys.find do |k|
             k[:milestone_iid] == id[:milestone_iid] || k[:milestone_name] == id[:milestone_name]
@@ -46,7 +41,7 @@ module Banzai
         # This method has the contract that if a string `ref` refers to a
         # record `record`, then `parse_symbol(ref) == record_identifier(record)`.
         #
-        # This contract is slightly broken here, as we only have either the milestone_id
+        # This contract is slightly broken here, as we only have either the milestone_iid
         # or the milestone_name, but not both.  But below, we have both pieces of information.
         # But it's accounted for in `find_object`
         def parse_symbol(symbol, match_data)
@@ -59,20 +54,12 @@ module Banzai
           end
         end
 
-        # We assume that most classes are identifying records by ID.
-        #
         # This method has the contract that if a string `ref` refers to a
         # record `record`, then `class.parse_symbol(ref) == record_identifier(record)`.
         # See note in `parse_symbol` above
         def record_identifier(record)
           { milestone_iid: record.iid, milestone_name: record.name }
         end
-
-        # def find_object_from_link(parent, iid)
-        #   return unless valid_context?(parent)
-        #
-        #   find_milestone_with_finder(parent, iid: iid)
-        # end
 
         def valid_context?(parent)
           strong_memoize(:valid_context) do
