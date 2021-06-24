@@ -5,8 +5,6 @@ module Gitlab
     module Reindexing
       # This is a >= PG12 reindexing strategy based on `REINDEX CONCURRENTLY`
       class ReindexConcurrently
-        include Gitlab::Utils::StrongMemoize
-
         ReindexError = Class.new(StandardError)
 
         TEMPORARY_INDEX_PATTERN = '\_ccnew[0-9]*'
@@ -45,7 +43,6 @@ module Gitlab
               execute("REINDEX INDEX CONCURRENTLY #{quote_table_name(index.schema)}.#{quote_table_name(index.name)}")
             end
           end
-
         ensure
           cleanup_dangling_indexes
         end

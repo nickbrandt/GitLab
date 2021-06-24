@@ -70,7 +70,7 @@ RSpec.describe Gitlab::Database::Reindexing::ReindexConcurrently, '#perform' do
     subject
   end
 
-  context 'with dangling indexes  matching TEMPORARY_INDEX_PATTERN, i.e. /some\_index\_ccnew(\d)*/' do
+  context 'with dangling indexes matching TEMPORARY_INDEX_PATTERN, i.e. /some\_index\_ccnew(\d)*/' do
     before do
       # dangling indexes
       connection.execute("CREATE INDEX #{index_name}_ccnew ON #{table_name} (#{column_name})")
@@ -108,33 +108,5 @@ RSpec.describe Gitlab::Database::Reindexing::ReindexConcurrently, '#perform' do
         method.call(sql.sub(/CONCURRENTLY/, ''))
       end
     end
-  end
-
-  def expect_index_rename(from, to)
-    expect(connection).to receive(:execute).with(<<~SQL).ordered
-      ALTER INDEX "public"."#{from}"
-      RENAME TO "#{to}"
-    SQL
-  end
-
-  def expect_index_drop(drop_index)
-    expect_next_instance_of(::Gitlab::Database::WithLockRetries) do |instance|
-      expect(instance).to receive(:run).with(raise_on_exhaustion: false).and_yield
-    end
-
-    expect_to_execute_concurrently_in_order(drop_index)
-  end
-
-  def find_index_create_statement
-    ActiveRecord::Base.connection.select_value(<<~SQL)
-      SELECT indexdef
-      FROM pg_indexes
-      WHERE schemaname = 'public'
-      AND indexname = #{ActiveRecord::Base.connection.quote(index.name)}
-    SQL
-  end
-
-  def check_index_exists
-    expect(find_index_create_statement).to eq(original_index)
   end
 end
