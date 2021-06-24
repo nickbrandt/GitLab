@@ -197,6 +197,16 @@ describe('Tracking', () => {
         expectedError,
       );
     });
+
+    it('does not add empty form whitelist rules', () => {
+      Tracking.enableFormTracking({ fields: { allow: ['input-class1'] } });
+
+      expect(snowplowSpy).toHaveBeenCalledWith(
+        'enableFormTracking',
+        { fields: { whitelist: ['input-class1'] } },
+        [],
+      );
+    });
   });
 
   describe('.flushPendingEvents', () => {
