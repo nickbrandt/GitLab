@@ -8,7 +8,7 @@ RSpec.describe Gitlab::Database::Reindexing::ReindexConcurrently, '#perform' do
   let(:table_name) { '_test_reindex_table' }
   let(:column_name) { '_test_column' }
   let(:index_name) { '_test_reindex_index' }
-  let(:index) { instance_double(Gitlab::Database::PostgresIndex, indexrelid: 42, name: index_name, schema: 'public', tablename: table_name, partitioned?: false, unique?: false, exclusion?: false, expression?: false, definition: 'CREATE INDEX _test_reindex_index ON public._test_reindex_table USING btree (_test_column)') }
+  let(:index) { Gitlab::Database::PostgresIndex.by_identifier("public.#{index_name}") }
   let(:logger) { double('logger', debug: nil, info: nil, error: nil ) }
   let(:connection) { ActiveRecord::Base.connection }
 
@@ -18,7 +18,7 @@ RSpec.describe Gitlab::Database::Reindexing::ReindexConcurrently, '#perform' do
         id serial NOT NULL PRIMARY KEY,
         #{column_name} integer NOT NULL);
 
-      CREATE INDEX #{index.name} ON #{table_name} (#{column_name});
+      CREATE INDEX #{index_name} ON #{table_name} (#{column_name});
     SQL
   end
 

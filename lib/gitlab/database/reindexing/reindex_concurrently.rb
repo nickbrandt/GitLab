@@ -3,6 +3,7 @@
 module Gitlab
   module Database
     module Reindexing
+      # This is a >= PG12 reindexing strategy based on `REINDEX CONCURRENTLY`
       class ReindexConcurrently
         include Gitlab::Utils::StrongMemoize
 
@@ -39,16 +40,46 @@ module Gitlab
           # While this has been backpatched, we continue to disable expression indexes until further review.
           raise ReindexError, 'expression indexes are currently not supported' if index.expression?
 
-          logger.info "Starting reindex of #{index}"
-
-          set_statement_timeout do
-            execute("REINDEX INDEX CONCURRENTLY #{quote_table_name(index.schema)}.#{quote_table_name(index.name)}")
+          with_logging do
+            set_statement_timeout do
+              execute("REINDEX INDEX CONCURRENTLY #{quote_table_name(index.schema)}.#{quote_table_name(index.name)}")
+            end
           end
+
         ensure
           cleanup_dangling_indexes
         end
 
         private
+
+        def with_logging
+          bloat_size = index.bloat_size
+          ondisk_size_before = index.ondisk_size_bytes
+
+          logger.info(
+            message: "Starting reindex of #{index}",
+            index: index.identifier,
+            table: index.tablename,
+            estimated_bloat_bytes: bloat_size,
+            index_size_before_bytes: ondisk_size_before
+          )
+
+          duration = Benchmark.realtime do
+            yield
+          end
+
+          index.reset
+
+          logger.info(
+            message: "Finished reindex of #{index}",
+            index: index.identifier,
+            table: index.tablename,
+            estimated_bloat_bytes: bloat_size,
+            index_size_before_bytes: ondisk_size_before,
+            index_size_after_bytes: index.ondisk_size_bytes,
+            duration_s: duration.round(2)
+          )
+        end
 
         def cleanup_dangling_indexes
           Gitlab::Database::PostgresIndex.match("#{Regexp.escape(index.name)}#{TEMPORARY_INDEX_PATTERN}").each do |lingering_index|
