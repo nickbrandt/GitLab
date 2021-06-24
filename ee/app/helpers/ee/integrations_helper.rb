@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module EE
-  module ServicesHelper
+  module IntegrationsHelper
     extend ::Gitlab::Utils::Override
 
     override :project_jira_issues_integration?
