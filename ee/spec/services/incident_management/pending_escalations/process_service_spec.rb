@@ -5,9 +5,7 @@ require 'spec_helper'
 RSpec.describe IncidentManagement::PendingEscalations::ProcessService do
   let_it_be(:project) { create(:project) }
   let_it_be(:schedule_1) { create(:incident_management_oncall_schedule, :with_rotation, project: project) }
-  let_it_be(:schedule_2) { create(:incident_management_oncall_schedule, :with_rotation, project: project) }
   let_it_be(:schedule_1_users) { schedule_1.participants.map(&:user) }
-  let_it_be(:schedule_2_users) { schedule_2.participants.map(&:user) }
 
   let(:escalation_rule) { build(:incident_management_escalation_rule, oncall_schedule: schedule_1 ) }
   let!(:escalation_policy) { create(:incident_management_escalation_policy, project: project, rules: [escalation_rule]) }

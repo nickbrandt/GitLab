@@ -18,7 +18,7 @@ module EE
       def process_escalations
         if alert.resolved? || alert.ignored?
           delete_pending_escalations
-        else
+        elsif alert.previously_new_record?
           create_pending_escalations
         end
       end

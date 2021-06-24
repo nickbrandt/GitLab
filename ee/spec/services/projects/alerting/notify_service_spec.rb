@@ -85,6 +85,17 @@ RSpec.describe Projects::Alerting::NotifyService do
 
       include_examples 'oncall users are correctly notified of firing alert'
 
+      context 'with resolving payload' do
+        let(:payload) do
+          {
+            'fingerprint' => fingerprint,
+            'end_time' => Time.current.iso8601
+          }
+        end
+
+        include_examples 'oncall users are correctly notified of recovery alert'
+      end
+
       context 'with escalation policies ready' do
         let_it_be(:policy) { create(:incident_management_escalation_policy, project: project) }
 
@@ -95,32 +106,38 @@ RSpec.describe Projects::Alerting::NotifyService do
 
         it_behaves_like 'does not send on-call notification'
         include_examples 'creates an escalation', 1
-      end
 
-      context 'with resolving payload' do
-        let(:payload) do
-          {
-            'fingerprint' => fingerprint,
-            'end_time' => Time.current.iso8601
-          }
-        end
-
-        include_examples 'oncall users are correctly notified of recovery alert'
-
-        context 'with existing alert escalation' do
-          let_it_be(:alert) { create(:alert_management_alert, :ignored, fingerprint: gitlab_fingerprint, project: project) }
+        context 'existing alert with same payload fingerprint' do
+          let_it_be(:alert) { create(:alert_management_alert, fingerprint: gitlab_fingerprint, project: project) }
           let_it_be(:pending_escalation) { create(:incident_management_pending_alert_escalation, alert: alert) }
 
-          let(:target) { alert }
+          it 'does not create an escalation' do
+            expect { subject }.not_to change { alert.pending_escalations.count }
+          end
 
-          include_examples "deletes the target's escalations"
-
-          context 'with escalation policy feature disabled' do
-            before do
-              stub_feature_flags(escalation_policies_mvc: false)
+          context 'with resolving payload' do
+            let(:payload) do
+              {
+                'fingerprint' => fingerprint,
+                'end_time' => Time.current.iso8601
+              }
             end
 
-            include_examples "deletes the target's escalations"
+            context 'with existing alert escalation' do
+              let_it_be(:pending_escalation) { create(:incident_management_pending_alert_escalation, alert: alert) }
+
+              let(:target) { alert }
+
+              include_examples "deletes the target's escalations"
+
+              context 'with escalation policy feature disabled' do
+                before do
+                  stub_feature_flags(escalation_policies_mvc: false)
+                end
+
+                include_examples "deletes the target's escalations"
+              end
+            end
           end
         end
       end
