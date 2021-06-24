@@ -7,6 +7,7 @@ import {
   GlSearchBoxByType,
 } from '@gitlab/ui';
 import { s__ } from '~/locale';
+import { filterGitlabCiYmls } from './helpers';
 
 export default {
   name: 'CiTemplateDropdown',
@@ -37,19 +38,7 @@ export default {
         return this.gitlabCiYmls;
       }
 
-      return Object.keys(this.gitlabCiYmls).reduce((filteredYmls, category) => {
-        const categoryYmls = this.gitlabCiYmls[category].filter((yml) =>
-          yml.name.toLowerCase().startsWith(this.searchTerm),
-        );
-
-        if (categoryYmls.length > 0) {
-          Object.assign(filteredYmls, {
-            [category]: categoryYmls,
-          });
-        }
-
-        return filteredYmls;
-      }, {});
+      return filterGitlabCiYmls(this.gitlabCiYmls, this.searchTerm);
     },
     filteredTemplateCategories() {
       return Object.keys(this.filteredYmls);
