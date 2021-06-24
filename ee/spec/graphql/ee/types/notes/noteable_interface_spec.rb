@@ -2,8 +2,8 @@
 
 require 'spec_helper'
 
-RSpec.describe EE::Types::Notes::NoteableType do
-  let(:extended_class) { Types::Notes::NoteableType }
+RSpec.describe EE::Types::Notes::NoteableInterface do
+  let(:extended_class) { Types::Notes::NoteableInterface }
 
   describe ".resolve_type" do
     it 'knows the correct type for objects' do

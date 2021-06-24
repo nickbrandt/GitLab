@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 module Types
-  class NoteableUnion < BaseUnion
-    graphql_name 'NoteableUnion'
+  class NoteableType < BaseUnion
+    graphql_name 'NoteableType'
     description 'Represents an object that supports notes.'
 
     possible_types Types::IssueType, Types::DesignManagement::DesignType, Types::MergeRequestType
