@@ -100,7 +100,7 @@ module API
         status.assign_attributes(attributes_for_keys(updatable_optional_attributes))
 
         if status.valid?
-          ::Ci::Pipelines::AddJobService.new(pipeline).execute(status, save: false)
+          ::Ci::Pipelines::AddJobService.new(pipeline).execute!(status, save: false)
         else
           render_validation_error!(status)
         end

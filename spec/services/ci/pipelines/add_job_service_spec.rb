@@ -19,20 +19,20 @@ RSpec.describe Ci::Pipelines::AddJobService do
 
   it 'assigns pipeline attributes to the job' do
     expect do
-      service.execute(job)
+      service.execute!(job)
     end.to change { job.slice(:pipeline, :project, :ref) }.to(
       pipeline: pipeline, project: pipeline.project, ref: pipeline.ref
     )
   end
 
   it 'returns the job itself' do
-    expect(service.execute(job)).to eq(job)
+    expect(service.execute!(job)).to eq(job)
   end
 
   it 'calls update_older_statuses_retried!' do
     expect(job).to receive(:update_older_statuses_retried!)
 
-    service.execute(job)
+    service.execute!(job)
   end
 
   context 'when the FF ci_fix_commit_status_retried is disabled' do
@@ -43,7 +43,7 @@ RSpec.describe Ci::Pipelines::AddJobService do
     it 'does not call update_older_statuses_retried!' do
       expect(job).not_to receive(:update_older_statuses_retried!)
 
-      service.execute(job)
+      service.execute!(job)
     end
   end
 end

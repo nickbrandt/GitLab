@@ -35,7 +35,7 @@ module Ci
       check_access!(build)
 
       new_build = clone_build(build)
-      ::Ci::Pipelines::AddJobService.new(build.pipeline).execute(new_build)
+      ::Ci::Pipelines::AddJobService.new(build.pipeline).execute!(new_build)
       build.reset # refresh the data to get new values of `retried` and `processed`.
 
       new_build

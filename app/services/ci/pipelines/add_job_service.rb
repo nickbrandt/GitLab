@@ -8,10 +8,10 @@ module Ci
       def initialize(pipeline)
         @pipeline = pipeline
 
-        raise "Pipeline must be persisted for this service to be used" unless @pipeline.persisted?
+        raise ArgumentError, "Pipeline must be persisted for this service to be used" unless @pipeline.persisted?
       end
 
-      def execute(job, save: true)
+      def execute!(job, save: true)
         assign_pipeline_attributes(job)
 
         Ci::Pipeline.transaction do

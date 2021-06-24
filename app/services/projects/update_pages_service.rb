@@ -32,7 +32,7 @@ module Projects
 
       # Create status notifying the deployment of pages
       @status = build_commit_status
-      ::Ci::Pipelines::AddJobService.new(@build.pipeline).execute(@status)
+      ::Ci::Pipelines::AddJobService.new(@build.pipeline).execute!(@status)
 
       @status.enqueue!
       @status.run!
