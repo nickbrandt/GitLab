@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Ci
-  module PipelineCreation
+  module Pipelines
     class AddJobService
       attr_reader :pipeline
 

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe Ci::PipelineCreation::AddJobService do
+RSpec.describe Ci::Pipelines::AddJobService do
   let_it_be(:pipeline) { create(:ci_pipeline) }
 
   let(:job) { build(:ci_build) }
