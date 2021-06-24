@@ -23,36 +23,14 @@ export default {
     GlSprintf,
   },
   mixins: [trackingMixin],
-  props: {
-    containerId: {
-      type: [String, null],
-      required: false,
-      default: null,
-    },
-    groupName: {
-      type: String,
-      required: true,
-    },
-    planName: {
-      type: String,
-      required: true,
-    },
-    plansHref: {
-      type: String,
-      required: true,
-    },
-    purchaseHref: {
-      type: String,
-      required: true,
-    },
-    targetId: {
-      type: String,
-      required: true,
-    },
-    trialEndDate: {
-      type: Date,
-      required: true,
-    },
+  inject: {
+    containerId: { default: null },
+    groupName: {},
+    planName: {},
+    plansHref: {},
+    purchaseHref: {},
+    targetId: {},
+    trialEndDate: {},
   },
   data() {
     return {
