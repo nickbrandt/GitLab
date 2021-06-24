@@ -1,10 +1,11 @@
 # frozen_string_literal: true
 
-class Groups::DependencyProxyForContainersController < Groups::ApplicationController
+class Groups::DependencyProxyForContainersController < ApplicationController
   include DependencyProxy::Auth
   include DependencyProxy::GroupAccess
   include SendFileUpload
 
+  before_action :ensure_group
   before_action :ensure_token_granted!
   before_action :ensure_feature_enabled!
 
@@ -46,6 +47,10 @@ class Groups::DependencyProxyForContainersController < Groups::ApplicationContro
 
   private
 
+  def group
+    @group ||= Group.find_by_full_path(params[:group_id], follow_redirects: request.get?)
+  end
+
   def image
     params[:image]
   end
@@ -57,6 +62,10 @@ class Groups::DependencyProxyForContainersController < Groups::ApplicationContro
   def dependency_proxy
     @dependency_proxy ||=
       group.dependency_proxy_setting || group.create_dependency_proxy_setting
+  end
+
+  def ensure_group
+    render_404 unless group
   end
 
   def ensure_feature_enabled!

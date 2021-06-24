@@ -5,16 +5,16 @@ module DependencyProxy
     extend ActiveSupport::Concern
 
     included do
+      attr_reader :authentication_result, :redirected_path
+
+      delegate :actor, :authentication_abilities, to: :authentication_result, allow_nil: true
+      delegate :type, to: :authentication_result, allow_nil: true, prefix: :auth_result
+
+      alias_method :user, :actor
+      alias_method :authenticated_user, :actor
+
       # We disable `authenticate_user!` since the `DependencyProxy::Auth` performs auth using JWT token
       skip_before_action :authenticate_user!, raise: false
-      skip_before_action :check_two_factor_requirement, raise: false
-      skip_before_action :check_password_expiration, raise: false
-      skip_around_action :set_current_context
-      skip_before_action :add_gon_variables
-      skip_before_action :require_email
-      skip_before_action :active_user_check
-      skip_before_action :required_signup_info
-      skip_before_action :set_confirm_warning
 
       prepend_before_action :authenticate_user_from_jwt_token!
     end
@@ -23,12 +23,13 @@ module DependencyProxy
       return unless dependency_proxy_for_private_groups?
 
       authenticate_with_http_token do |token, _|
+        @authentication_result = Gitlab::Auth::Result.new # rubocop:disable Gitlab/ModuleWithInstanceVariables
+
         user = user_from_token(token)
         sign_in(user) if user.is_a?(User)
-        @current_user = user if user.is_a?(DeployToken)
       end
 
-      request_bearer_token! unless current_user
+      request_bearer_token! unless authenticated_user
     end
 
     private
@@ -45,8 +46,16 @@ module DependencyProxy
 
     def user_from_token(token)
       token_payload = DependencyProxy::AuthTokenService.decoded_token_payload(token)
-      return User.find(token_payload['user_id']) if token_payload['user_id']
-      return DeployToken.active.find_by_token(token_payload['deploy_token']) if token_payload['deploy_token']
+
+      if token_payload['user_id']
+        user = User.find(token_payload['user_id'])
+        @authentication_result = Gitlab::Auth::Result.new(token, nil, :user, []) # rubocop:disable Gitlab/ModuleWithInstanceVariables
+        return user
+      elsif token_payload['deploy_token']
+        token = DeployToken.active.find_by_token(token_payload['deploy_token'])
+        @authentication_result = Gitlab::Auth::Result.new(token, nil, :deploy_token, []) # rubocop:disable Gitlab/ModuleWithInstanceVariables
+        return token
+      end
 
       nil
     rescue JWT::DecodeError, JWT::ExpiredSignature, JWT::ImmatureSignature
