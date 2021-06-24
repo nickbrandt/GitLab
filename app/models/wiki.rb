@@ -174,6 +174,7 @@ class Wiki
     commit = commit_details(:created, message, title)
 
     wiki.write_page(title, format.to_sym, content, commit)
+    repository.expire_status_cache
     after_wiki_activity
 
     true
