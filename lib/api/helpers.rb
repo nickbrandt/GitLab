@@ -461,6 +461,35 @@ module API
       render_api_error!('202 Accepted', 202)
     end
 
+    def render_members_admin_validation_error!(model, source_type)
+      messages = model_error_messages(model)
+
+      if messages.to_s.include?('does not match the allowed domain')
+        message = _('The domain for \'%{email}\' is not allowed for this %{source_type}. ' % { email: model.user.email, source_type: source_type, strongStart: '%{strongStart}', strongEnd: '%{strongEnd}' }).html_safe
+
+        case source_type
+        when 'group'
+          admin_msg = _('Check the permissions on the group\'s Settings > General page, or check the Sign-up restrictions in the Admin area.' % { strongStart: '<strong>', strongEnd: '</strong>' }).html_safe
+        when 'project'
+          admin_msg = _('Go to the Admin area, and check the Sign-up restrictions.' % { strongStart: '<strong>', strongEnd: '</strong>' }).html_safe
+        end
+
+        render_api_error!((message + admin_msg) || '400 Bad Request', 400)
+      else
+        render_api_error!(messages || '400 Bad Request', 400)
+      end
+    end
+
+    def render_members_non_admin_validation_error!(model, source_type)
+      messages = model_error_messages(model)
+
+      if messages.to_s.include?('does not match the allowed domain')
+        render_api_error!('XXX non_admin ' || '400 Bad Request', 400)
+      else
+        render_api_error!('YYY non_admin ' || '400 Bad Request', 400)
+      end
+    end
+
     def render_validation_error!(model)
       if model.errors.any?
         render_api_error!(model_error_messages(model) || '400 Bad Request', 400)

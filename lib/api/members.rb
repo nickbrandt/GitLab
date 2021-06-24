@@ -121,7 +121,11 @@ module API
               present_members(member)
               Gitlab::Tracking.event(::Members::CreateService.name, 'create_member', label: params[:invite_source], property: 'existing_user', user: current_user)
             else
-              render_validation_error!(member)
+              if current_user.can_admin_all_resources?
+                render_members_admin_validation_error!(member, source_type)
+              else
+                render_members_non_admin_validation_error!(member, source_type)
+              end
             end
           end
         end

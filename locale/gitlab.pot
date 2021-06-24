@@ -6268,6 +6268,9 @@ msgstr ""
 msgid "Check the elasticsearch.log file to debug why the migration was halted and make any changes before retrying the migration. When you fix the cause of the failure, click \"Retry migration\", and the migration will be scheduled to be retried in the background."
 msgstr ""
 
+msgid "Check the permissions on the group's Settings > General page, or check the Sign-up restrictions in the Admin area."
+msgstr ""
+
 msgid "Check your Docker images for known vulnerabilities."
 msgstr ""
 
@@ -15148,6 +15151,9 @@ msgstr ""
 msgid "Go to snippets"
 msgstr ""
 
+msgid "Go to the Admin area, and check the Sign-up restrictions."
+msgstr ""
+
 msgid "Go to the activity feed"
 msgstr ""
 
@@ -17722,6 +17728,9 @@ msgstr ""
 msgid "Invite a group"
 msgstr ""
 
+msgid "Invite email has already been taken"
+msgstr ""
+
 msgid "Invite group"
 msgstr ""
 
@@ -17773,7 +17782,7 @@ msgstr ""
 msgid "InviteMembersBanner|We noticed that you haven't invited anyone to this group. Invite your colleagues so you can discuss issues, collaborate on merge requests, and share your knowledge."
 msgstr ""
 
-msgid "InviteMembersModal|%{linkStart}Learn more%{linkEnd} about roles."
+msgid "InviteMembersModal|%{linkStart}Read more%{linkEnd} about role permissions"
 msgstr ""
 
 msgid "InviteMembersModal|Access expiration date (optional)"
@@ -17786,6 +17795,9 @@ msgid "InviteMembersModal|Close invite team members"
 msgstr ""
 
 msgid "InviteMembersModal|GitLab member or email address"
+msgstr ""
+
+msgid "InviteMembersModal|Go to the group’s Settings &gt; General page, and check the permissions."
 msgstr ""
 
 msgid "InviteMembersModal|Invite"
@@ -17812,7 +17824,13 @@ msgstr ""
 msgid "InviteMembersModal|Select members or type email addresses"
 msgstr ""
 
-msgid "InviteMembersModal|Some of the members could not be added"
+msgid "InviteMembersModal|Something went wrong"
+msgstr ""
+
+msgid "InviteMembersModal|The domain for %{email} is not allowed for this group."
+msgstr ""
+
+msgid "InviteMembersModal|The domain for %{email} is not allowed for this project."
 msgstr ""
 
 msgid "InviteMembersModal|You're inviting a group to the %{strongStart}%{name}%{strongEnd} group."
@@ -32254,6 +32272,9 @@ msgstr ""
 msgid "The directory has been successfully created."
 msgstr ""
 
+msgid "The domain for '%{email}' is not allowed for this %{source_type}. "
+msgstr ""
+
 msgid "The domain you entered is misformatted."
 msgstr ""
 
@@ -38567,9 +38588,6 @@ msgid "is not a valid X509 certificate."
 msgstr ""
 
 msgid "is not allowed since the group is not top-level group."
-msgstr ""
-
-msgid "is not allowed. Try again with a different email address, or contact your GitLab admin."
 msgstr ""
 
 msgid "is not allowed. We do not currently support project-level iterations"

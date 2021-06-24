@@ -1,5 +1,5 @@
 <script>
-import { GlTokenSelector, GlAvatar, GlAvatarLabeled, GlSprintf } from '@gitlab/ui';
+import { GlTokenSelector, GlAvatar, GlAvatarLabeled, GlIcon, GlSprintf } from '@gitlab/ui';
 import { debounce } from 'lodash';
 import { __ } from '~/locale';
 import { getUsers } from '~/rest_api';
@@ -10,6 +10,7 @@ export default {
     GlTokenSelector,
     GlAvatar,
     GlAvatarLabeled,
+    GlIcon,
     GlSprintf,
   },
   props: {
@@ -22,6 +23,11 @@ export default {
       type: String,
       required: true,
     },
+    validationState: {
+      type: Boolean,
+      required: false,
+      default: null,
+    },
   },
   data() {
     return {
@@ -31,9 +37,16 @@ export default {
       selectedTokens: [],
       hasBeenFocused: false,
       hideDropdownWithNoItems: true,
+      isInvalid: false,
     };
   },
   computed: {
+    fieldIsValid() {
+      if (this.state) {
+        return true;
+      }
+      return false;
+    },
     emailIsValid() {
       const regex = /.+@/;
 
@@ -44,6 +57,12 @@ export default {
         return this.placeholder;
       }
       return '';
+    },
+    errorState() {
+      if (!this.isInvalid || this.selectedTokens.length !== 1) {
+        return false;
+      }
+      return !this.state;
     },
   },
   methods: {
@@ -61,6 +80,7 @@ export default {
             name: token.name,
             username: token.username,
             avatar_url: token.avatar_url,
+            class: '',
           }));
           this.loading = false;
         })
@@ -70,6 +90,9 @@ export default {
     }, SEARCH_DELAY),
     handleInput() {
       this.$emit('input', this.selectedTokens);
+      if (this.selectedTokens.length === 0) {
+        this.isInvalid = false;
+      }
     },
     handleBlur() {
       this.hideDropdownWithNoItems = false;
@@ -84,6 +107,13 @@ export default {
 
       this.hasBeenFocused = true;
     },
+    handleTokenRemove() {
+      if (this.selectedTokens.length) {
+        return;
+      }
+
+      this.$emit('clear');
+    },
   },
   queryOptions: { exclude_internal: true, active: true },
   i18n: {
@@ -95,19 +125,24 @@ export default {
 <template>
   <gl-token-selector
     v-model="selectedTokens"
+    :state="validationState"
     :dropdown-items="users"
     :loading="loading"
     :allow-user-defined-tokens="emailIsValid"
     :hide-dropdown-with-no-items="hideDropdownWithNoItems"
     :placeholder="placeholderText"
     :aria-labelledby="ariaLabelledby"
+    :text-input-attrs="{ 'data-testid': 'members-token-select-input' }"
+    data-qa-selector="members_token_select_input"
     @blur="handleBlur"
     @text-input="handleTextInput"
     @input="handleInput"
     @focus="handleFocus"
+    @token-remove="handleTokenRemove"
   >
     <template #token-content="{ token }">
-      <gl-avatar v-if="token.avatar_url" :src="token.avatar_url" :size="16" />
+      <gl-icon v-if="validationState === false" name="error" :size="16" class="gl-mr-2" />
+      <gl-avatar v-else-if="token.avatar_url" :src="token.avatar_url" :size="16" />
       {{ token.name }}
     </template>
 
