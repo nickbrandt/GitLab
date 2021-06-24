@@ -26,7 +26,7 @@ describe('TrialStatusPopover component', () => {
 
   const createComponent = (mountFn = shallowMount) => {
     return mountFn(TrialStatusPopover, {
-      propsData: {
+      provide: {
         groupName: 'Some Test Group',
         planName: 'Ultimate',
         plansHref: 'billing/path-for/group',
