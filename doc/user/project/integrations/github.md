@@ -8,8 +8,9 @@ info: To determine the technical writer assigned to the Stage/Group associated w
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/3836) in GitLab Premium 10.6.
 
-GitLab provides an integration for updating the pipeline statuses on GitHub.
-This is especially useful if using GitLab for CI/CD only.
+GitLab provides an integration for updating the pipeline statuses on GitHub, and
+is helpful if you use GitLab only for CI/CD. While this integration updates the
+statuses, it does not perform a full synchronization.
 
 This project integration is separate from the [instance wide GitHub integration](../import/github.md#mirroring-and-pipeline-status-sharing)
 and is automatically configured on [GitHub import](../../../integration/github.md).
