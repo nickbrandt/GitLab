@@ -1,3 +1,8 @@
+# Please contribute improvements to this template via the CI/CD templates development guide:
+# https://docs.gitlab.com/ee/development/cicd/templates.html
+# This specific templates file can be found here:
+# https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Grails.gitlab-ci.yml
+
 # This template uses the java:8 docker image because there isn't any
 # official Grails image at this moment
 #
@@ -7,11 +12,6 @@
 # Feel free to change GRAILS_VERSION version with your project version (3.0.1, 3.1.1,...)
 # Feel free to change GRADLE_VERSION version with your gradle project version (2.13, 2.14,...)
 # If you use Angular profile, this yml it's prepared to work with it
-
-# Please contribute improvements to this template via the CI/CD templates development guide:
-# https://docs.gitlab.com/ee/development/cicd/templates.html
-# This specific templates file can be found here:
-# https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Grails.gitlab-ci.yml
 
 image: java:8
 
