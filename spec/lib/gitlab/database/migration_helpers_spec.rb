@@ -2166,7 +2166,7 @@ RSpec.describe Gitlab::Database::MigrationHelpers do
     end
 
     with_them do
-      it 'sets raise_on_exhaustion as  requested' do
+      it 'sets raise_on_exhaustion as requested' do
         with_lock_retries = double
         expect(Gitlab::Database::WithLockRetries).to receive(:new).and_return(with_lock_retries)
         expect(with_lock_retries).to receive(:run).with(raise_on_exhaustion: raise_on_exhaustion)
@@ -3025,6 +3025,14 @@ RSpec.describe Gitlab::Database::MigrationHelpers do
 
       expect { model.swap_column_names(table, :column_1, :column_2) }
         .to raise_error 'Cannot call swap_column_names without a transaction open or outside of a transaction block.'
+    end
+  end
+
+  describe '#rename_constraint' do
+    it "executes the statement to rename constraint" do
+      expect(model).to receive(:execute).with /ALTER TABLE "test_table"\nRENAME CONSTRAINT "fk_old_name" TO "fk_new_name"/
+
+      model.rename_constraint(:test_table, :fk_old_name, :fk_new_name)
     end
   end
 end

@@ -1627,6 +1627,13 @@ into similar problems in the future (e.g. when new tables are created).
         execute "ALTER TABLE #{quote_table_name(table_name)} RENAME COLUMN #{quote_column_name(temp_name)} TO #{quote_column_name(column_2)}"
       end
 
+      def rename_constraint(table_name, old_name, new_name)
+        execute <<~SQL
+          ALTER TABLE #{quote_table_name(table_name)}
+          RENAME CONSTRAINT #{quote_column_name(old_name)} TO #{quote_column_name(new_name)}
+        SQL
+      end
+
       private
 
       def validate_check_constraint_name!(constraint_name)

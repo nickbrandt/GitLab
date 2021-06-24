@@ -46,11 +46,11 @@ class FinalizePushEventPayloadsBigintConversion < ActiveRecord::Migration[6.1]
       # Drop FK fk_36c74129da
       remove_foreign_key TABLE_NAME, name: concurrent_foreign_key_name(TABLE_NAME, :event_id)
       # Change the name of the FK for event_id_convert_to_bigint to the FK name for event_id
-      execute <<~SQL
-          ALTER TABLE #{TABLE_NAME}
-          RENAME CONSTRAINT #{concurrent_foreign_key_name(TABLE_NAME, :event_id_convert_to_bigint)}
-          TO #{concurrent_foreign_key_name(TABLE_NAME, :event_id)}
-      SQL
+      rename_constraint(
+        TABLE_NAME,
+        concurrent_foreign_key_name(TABLE_NAME, :event_id_convert_to_bigint),
+        concurrent_foreign_key_name(TABLE_NAME, :event_id)
+      )
     end
   end
 end
