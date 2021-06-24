@@ -19,6 +19,7 @@ module Gitlab
           .where('NOT expression')
           .not_match("^#{ConcurrentReindex::TEMPORARY_INDEX_PREFIX}")
           .not_match("^#{ConcurrentReindex::REPLACED_INDEX_PREFIX}")
+          .not_match("#{ReindexConcurrently::TEMPORARY_INDEX_PATTERN}$")
       end
     end
   end
