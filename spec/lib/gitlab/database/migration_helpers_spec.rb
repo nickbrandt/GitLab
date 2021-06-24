@@ -2995,6 +2995,8 @@ RSpec.describe Gitlab::Database::MigrationHelpers do
         t.integer :column_1
         t.bigint  :column_2
       end
+
+      model.add_index(table, :column_2)
     end
 
     after do
@@ -3009,6 +3011,13 @@ RSpec.describe Gitlab::Database::MigrationHelpers do
 
       expect(column_1.sql_type).to eq('bigint')
       expect(column_2.sql_type).to eq('integer')
+    end
+
+    it 'does not rename indexes' do
+      model.swap_column_names(table, :column_1, :column_2)
+
+      index = model.indexes_for(table, :column_1).first
+      expect(index.name).to eq("index_#{table}_on_column_2")
     end
 
     it 'raises an error when not in transaction' do

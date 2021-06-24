@@ -40,7 +40,7 @@ class FinalizePushEventPayloadsBigintConversion < ActiveRecord::Migration[6.1]
 
       # Swap PK constraint
       execute "ALTER TABLE #{TABLE_NAME} DROP CONSTRAINT push_event_payloads_pkey"
-      rename_index TABLE_NAME, index_name(TABLE_NAME, column: :event_id), 'push_event_payloads_pkey'
+      rename_index TABLE_NAME, INDEX_NAME, 'push_event_payloads_pkey'
       execute "ALTER TABLE #{TABLE_NAME} ADD CONSTRAINT push_event_payloads_pkey PRIMARY KEY USING INDEX push_event_payloads_pkey"
 
       # Drop FK fk_36c74129da

@@ -1622,9 +1622,9 @@ into similar problems in the future (e.g. when new tables are created).
         end
 
         temp_name = "#{column_1}_tmp"
-        rename_column(table_name, column_1, temp_name)
-        rename_column(table_name, column_2, column_1)
-        rename_column(table_name, temp_name, column_2)
+        execute "ALTER TABLE #{quote_table_name(table_name)} RENAME COLUMN #{quote_column_name(column_1)} TO #{quote_column_name(temp_name)}"
+        execute "ALTER TABLE #{quote_table_name(table_name)} RENAME COLUMN #{quote_column_name(column_2)} TO #{quote_column_name(column_1)}"
+        execute "ALTER TABLE #{quote_table_name(table_name)} RENAME COLUMN #{quote_column_name(temp_name)} TO #{quote_column_name(column_2)}"
       end
 
       private
