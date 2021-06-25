@@ -29,13 +29,12 @@ RSpec.describe MarkupHelper do
 
     context 'when file is Markdown' do
       context 'when content has labels' do
-        let(:wiki_page) { create(:wiki_page, format: :markdown, container: container, title: 'merge', content: '~Bug') }
-        let(:wiki) { wiki_page.wiki }
+        let(:wiki_page) { create(:wiki_page, format: :markdown, wiki: wiki, title: 'merge', content: '~Bug') }
 
         before do
           allow(helper).to receive(:current_user).and_return(nil)
 
-          helper.instance_variable_set(:@wiki, wiki)
+          helper.instance_variable_set(:@wiki, wiki_page.wiki)
         end
 
         shared_examples 'renders label' do
@@ -48,10 +47,11 @@ RSpec.describe MarkupHelper do
         end
 
         context 'when wiki is a group wiki' do
+          let_it_be(:user) { create(:user) }
           let_it_be(:group) { create(:group) }
           let_it_be(:label) { create(:group_label, group: group, title: 'Bug') }
 
-          let(:container) { group }
+          let(:wiki) { create(:group_wiki, group: group, user: user) }
 
           it_behaves_like 'renders label'
         end
@@ -59,7 +59,7 @@ RSpec.describe MarkupHelper do
         context 'when wiki is a project wiki' do
           let_it_be(:label) { create(:label, title: 'Bug', project: project) }
 
-          let(:container) { project }
+          let(:wiki) { create(:project_wiki, project: project) }
 
           it_behaves_like 'renders label'
         end

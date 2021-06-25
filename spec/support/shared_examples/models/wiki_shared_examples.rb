@@ -541,16 +541,15 @@ RSpec.shared_examples 'wiki model' do
   describe '#create_wiki_repository' do
     subject { wiki.create_wiki_repository }
 
-    context 'when repository is empty' do
+    context 'when repository is not created' do
+      let(:wiki_container) { wiki_container_without_repo }
       let(:head_path) { Rails.root.join(TestEnv.repos_path, "#{wiki.disk_path}.git", 'HEAD') }
-      let(:default_branch) { 'main' }
+      let(:default_branch) { 'foo' }
 
       it 'changes the HEAD reference to the default branch' do
         expect(wiki.empty?).to eq true
 
         allow(Gitlab::CurrentSettings).to receive(:default_branch_name).and_return(default_branch)
-
-        expect(File.read(head_path).squish).to eq 'ref: refs/heads/master'
 
         subject
 
@@ -558,12 +557,23 @@ RSpec.shared_examples 'wiki model' do
       end
     end
 
+    context 'when repository is empty' do
+      let(:wiki_container) { wiki_container_without_repo }
+
+      it 'does nothing' do
+        wiki.repository.create_if_not_exists
+
+        expect(wiki).not_to receive(:change_head_to_default_branch)
+
+        subject
+      end
+    end
+
     context 'when repository is not empty' do
       it 'does nothing' do
         wiki.create_page('index', 'test content')
 
-        expect(wiki.empty?).to eq false
-        expect(wiki.repository.raw_repository).not_to receive(:write_ref)
+        expect(wiki).not_to receive(:change_head_to_default_branch)
 
         subject
       end
