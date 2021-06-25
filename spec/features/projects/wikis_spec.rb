@@ -5,8 +5,8 @@ require "spec_helper"
 RSpec.describe 'Project wikis' do
   let_it_be(:user) { create(:user) }
 
-  let(:wiki) { create(:project_wiki, user: user, project: project) }
-  let(:project) { create(:project, namespace: user.namespace, creator: user) }
+  let(:project) { create(:project, :wiki_repo, namespace: user.namespace, creator: user) }
+  let(:wiki) { project.wiki }
 
   it_behaves_like 'User creates wiki page'
   it_behaves_like 'User deletes wiki page'
