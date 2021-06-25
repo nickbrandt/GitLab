@@ -54,6 +54,10 @@ module Gitlab
 
       attr_reader :repository
 
+      def self.default_ref(container = nil)
+        Gitlab::DefaultBranch.value(object: container)
+      end
+
       # Initialize with a Gitlab::Git::Repository instance
       def initialize(repository)
         @repository = repository
