@@ -5,9 +5,9 @@ module DependencyProxy
     extend ActiveSupport::Concern
 
     included do
-      attr_reader :authentication_result, :redirected_path
+      attr_reader :authentication_result
 
-      delegate :actor, :authentication_abilities, to: :authentication_result, allow_nil: true
+      delegate :actor, to: :authentication_result, allow_nil: true
       delegate :type, to: :authentication_result, allow_nil: true, prefix: :auth_result
 
       alias_method :user, :actor
@@ -23,10 +23,10 @@ module DependencyProxy
       return unless dependency_proxy_for_private_groups?
 
       authenticate_with_http_token do |token, _|
-        @authentication_result = Gitlab::Auth::Result.new # rubocop:disable Gitlab/ModuleWithInstanceVariables
+        @authentication_result = Gitlab::Auth::Result.new(nil, nil, nil, nil) # rubocop:disable Gitlab/ModuleWithInstanceVariables
 
-        user = user_from_token(token)
-        sign_in(user) if user.is_a?(User)
+        found_user = user_from_token(token)
+        sign_in(found_user) if found_user.is_a?(User)
       end
 
       request_bearer_token! unless authenticated_user
@@ -48,13 +48,13 @@ module DependencyProxy
       token_payload = DependencyProxy::AuthTokenService.decoded_token_payload(token)
 
       if token_payload['user_id']
-        user = User.find(token_payload['user_id'])
-        @authentication_result = Gitlab::Auth::Result.new(token, nil, :user, []) # rubocop:disable Gitlab/ModuleWithInstanceVariables
-        return user
+        token_user = User.find(token_payload['user_id'])
+        @authentication_result = Gitlab::Auth::Result.new(token_user, nil, :user, []) # rubocop:disable Gitlab/ModuleWithInstanceVariables
+        return token_user
       elsif token_payload['deploy_token']
-        token = DeployToken.active.find_by_token(token_payload['deploy_token'])
-        @authentication_result = Gitlab::Auth::Result.new(token, nil, :deploy_token, []) # rubocop:disable Gitlab/ModuleWithInstanceVariables
-        return token
+        deploy_token = DeployToken.active.find_by_token(token_payload['deploy_token'])
+        @authentication_result = Gitlab::Auth::Result.new(deploy_token, nil, :deploy_token, []) # rubocop:disable Gitlab/ModuleWithInstanceVariables
+        return deploy_token
       end
 
       nil

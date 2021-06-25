@@ -16,11 +16,11 @@ module DependencyProxy
     end
 
     def authorize_read_dependency_proxy!
-      access_denied! unless can?(user, :read_dependency_proxy, group)
+      access_denied! unless can?(current_user || try(:authenticated_user), :read_dependency_proxy, group)
     end
 
     def authorize_admin_dependency_proxy!
-      access_denied! unless can?(user, :admin_dependency_proxy, group)
+      access_denied! unless can?(current_user || try(:authenticated_user), :admin_dependency_proxy, group)
     end
   end
 end

@@ -18,12 +18,13 @@ RSpec.describe DependencyProxy::AuthTokenService do
     end
 
     context 'with a deploy token' do
-      let_it_be(:user) { create(:deploy_token) }
+      let_it_be(:deploy_token) { create(:deploy_token) }
+      let_it_be(:token) { build_jwt(deploy_token) }
 
-      it 'returns the user' do
+      it 'returns the deploy token' do
         result = subject
 
-        expect(result['deploy_token']).to eq(user.token)
+        expect(result['deploy_token']).to eq(deploy_token.token)
         expect(result['user_id']).to be_nil
       end
     end

@@ -66,7 +66,7 @@ RSpec.describe Groups::DependencyProxyAuthController do
           request.headers['HTTP_AUTHORIZATION'] = token_header
         end
 
-        it { is_expected.to have_gitlab_http_status(:not_found) }
+        it { is_expected.to have_gitlab_http_status(:unauthorized) }
       end
 
       context 'token with no user id' do
@@ -76,7 +76,7 @@ RSpec.describe Groups::DependencyProxyAuthController do
           request.headers['HTTP_AUTHORIZATION'] = token_header
         end
 
-        it { is_expected.to have_gitlab_http_status(:not_found) }
+        it { is_expected.to have_gitlab_http_status(:unauthorized) }
       end
 
       context 'expired token' do
