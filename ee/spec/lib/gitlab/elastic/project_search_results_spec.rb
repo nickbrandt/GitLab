@@ -69,118 +69,118 @@ RSpec.describe Gitlab::Elastic::ProjectSearchResults, :elastic, :clean_gitlab_re
       end
     end
 
-    # context 'filtering' do
-    #   let!(:project) { create(:project, :public) }
-    #   let(:query) { 'foo' }
+    context 'filtering' do
+      let!(:project) { create(:project, :public) }
+      let(:query) { 'foo' }
 
-    #   context 'issues' do
-    #     let!(:closed_result) { create(:issue, :closed, project: project, title: 'foo closed') }
-    #     let!(:opened_result) { create(:issue, :opened, project: project, title: 'foo opened') }
-    #     let!(:confidential_result) { create(:issue, :confidential, project: project, title: 'foo confidential') }
-    #     let(:scope) { 'issues' }
+      context 'issues' do
+        let!(:closed_result) { create(:issue, :closed, project: project, title: 'foo closed') }
+        let!(:opened_result) { create(:issue, :opened, project: project, title: 'foo opened') }
+        let!(:confidential_result) { create(:issue, :confidential, project: project, title: 'foo confidential') }
+        let(:scope) { 'issues' }
 
-    #     before do
-    #       project.add_developer(user)
+        before do
+          project.add_developer(user)
 
-    #       ensure_elasticsearch_index!
-    #     end
+          ensure_elasticsearch_index!
+        end
 
-    #     include_examples 'search results filtered by state'
-    #     include_examples 'search results filtered by confidential'
-    #   end
+        include_examples 'search results filtered by state'
+        include_examples 'search results filtered by confidential'
+      end
 
-    #   context 'merge_requests' do
-    #     let!(:opened_result) { create(:merge_request, :opened, source_project: project, title: 'foo opened') }
-    #     let!(:closed_result) { create(:merge_request, :closed, source_project: project, title: 'foo closed') }
-    #     let(:scope) { 'merge_requests' }
+      context 'merge_requests' do
+        let!(:opened_result) { create(:merge_request, :opened, source_project: project, title: 'foo opened') }
+        let!(:closed_result) { create(:merge_request, :closed, source_project: project, title: 'foo closed') }
+        let(:scope) { 'merge_requests' }
 
-    #     before do
-    #       ensure_elasticsearch_index!
-    #     end
+        before do
+          ensure_elasticsearch_index!
+        end
 
-    #     include_examples 'search results filtered by state'
-    #   end
-    # end
+        include_examples 'search results filtered by state'
+      end
+    end
   end
 
-  # describe "search for commits in non-default branch" do
-  #   let(:project) { create(:project, :public, :repository, visibility) }
-  #   let(:visibility) { :repository_enabled }
-  #   let(:query) { 'initial' }
-  #   let(:repository_ref) { 'test' }
+  describe "search for commits in non-default branch" do
+    let(:project) { create(:project, :public, :repository, visibility) }
+    let(:visibility) { :repository_enabled }
+    let(:query) { 'initial' }
+    let(:repository_ref) { 'test' }
 
-  #   subject(:commits) { results.objects('commits') }
+    subject(:commits) { results.objects('commits') }
 
-  #   it 'finds needed commit' do
-  #     expect(results.commits_count).to eq(1)
-  #   end
+    it 'finds needed commit' do
+      expect(results.commits_count).to eq(1)
+    end
 
-  #   it 'responds to total_pages method' do
-  #     expect(commits.total_pages).to eq(1)
-  #   end
+    it 'responds to total_pages method' do
+      expect(commits.total_pages).to eq(1)
+    end
 
-  #   context 'disabled repository' do
-  #     let(:visibility) { :repository_disabled }
+    context 'disabled repository' do
+      let(:visibility) { :repository_disabled }
 
-  #     it 'hides commits from members' do
-  #       project.add_reporter(user)
+      it 'hides commits from members' do
+        project.add_reporter(user)
 
-  #       is_expected.to be_empty
-  #     end
+        is_expected.to be_empty
+      end
 
-  #     it 'hides commits from non-members' do
-  #       is_expected.to be_empty
-  #     end
-  #   end
+      it 'hides commits from non-members' do
+        is_expected.to be_empty
+      end
+    end
 
-  #   context 'private repository' do
-  #     let(:visibility) { :repository_private }
+    context 'private repository' do
+      let(:visibility) { :repository_private }
 
-  #     it 'shows commits to members' do
-  #       project.add_reporter(user)
+      it 'shows commits to members' do
+        project.add_reporter(user)
 
-  #       is_expected.not_to be_empty
-  #     end
+        is_expected.not_to be_empty
+      end
 
-  #     it 'hides commits from non-members' do
-  #       is_expected.to be_empty
-  #     end
-  #   end
-  # end
+      it 'hides commits from non-members' do
+        is_expected.to be_empty
+      end
+    end
+  end
 
-  # describe 'search for blobs in non-default branch' do
-  #   let(:project) { create(:project, :public, :repository, :repository_private) }
-  #   let(:query) { 'initial' }
-  #   let(:repository_ref) { 'test' }
+  describe 'search for blobs in non-default branch' do
+    let(:project) { create(:project, :public, :repository, :repository_private) }
+    let(:query) { 'initial' }
+    let(:repository_ref) { 'test' }
 
-  #   subject(:blobs) { results.objects('blobs') }
+    subject(:blobs) { results.objects('blobs') }
 
-  #   it 'always returns zero results' do
-  #     expect_any_instance_of(Gitlab::FileFinder).to receive(:find).never
+    it 'always returns zero results' do
+      expect_any_instance_of(Gitlab::FileFinder).to receive(:find).never
 
-  #     expect(blobs).to be_empty
-  #   end
-  # end
+      expect(blobs).to be_empty
+    end
+  end
 
-  # describe 'confidential issues', :sidekiq_might_not_need_inline do
-  #   include_examples 'access restricted confidential issues' do
-  #     before do
-  #       ensure_elasticsearch_index!
-  #     end
-  #   end
-  # end
+  describe 'confidential issues', :sidekiq_might_not_need_inline do
+    include_examples 'access restricted confidential issues' do
+      before do
+        ensure_elasticsearch_index!
+      end
+    end
+  end
 
-  # context 'query performance' do
-  #   let(:project) { create(:project, :public, :repository, :wiki_repo) }
-  #   let(:query) { '*' }
+  context 'query performance' do
+    let(:project) { create(:project, :public, :repository, :wiki_repo) }
+    let(:query) { '*' }
 
-  #   before do
-  #     # wiki_blobs method checks to see if there is a wiki page before doing
-  #     # the search
-  #     create(:wiki_page, wiki: project.wiki)
-  #   end
+    before do
+      # wiki_blobs method checks to see if there is a wiki page before doing
+      # the search
+      create(:wiki_page, wiki: project.wiki)
+    end
 
-  #   include_examples 'does not hit Elasticsearch twice for objects and counts', %w[notes blobs wiki_blobs commits issues merge_requests milestones]
-  #   include_examples 'does not load results for count only queries', %w[notes blobs wiki_blobs commits issues merge_requests milestones]
-  # end
+    include_examples 'does not hit Elasticsearch twice for objects and counts', %w[notes blobs wiki_blobs commits issues merge_requests milestones]
+    include_examples 'does not load results for count only queries', %w[notes blobs wiki_blobs commits issues merge_requests milestones]
+  end
 end
