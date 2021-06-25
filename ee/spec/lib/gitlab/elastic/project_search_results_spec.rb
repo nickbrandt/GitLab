@@ -48,7 +48,6 @@ RSpec.describe Gitlab::Elastic::ProjectSearchResults, :elastic, :clean_gitlab_re
     end
 
     it "returns correct amounts" do
-      binding.pry
       result = described_class.new(user, 'term', project: project)
       expect(result.notes_count).to eq(1)
       expect(result.wiki_blobs_count).to eq(1)
