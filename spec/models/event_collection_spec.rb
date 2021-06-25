@@ -11,6 +11,7 @@ RSpec.describe EventCollection do
     let_it_be(:projects) { Project.where(id: project.id) }
     let_it_be(:user) { create(:user) }
     let_it_be(:merge_request) { create(:merge_request) }
+    let_it_be(:wiki) { create(:project_wiki, project: project) }
 
     before do
       enable_design_management
@@ -26,7 +27,7 @@ RSpec.describe EventCollection do
 
       let_it_be(:merge_request_events) { create_list(:event, 10, :commented, project: project, target: merge_request) }
       let_it_be(:closed_issue_event) { create(:closed_issue_event, project: project, author: user) }
-      let_it_be(:wiki_page_event) { create(:wiki_page_event, project: project) }
+      let_it_be(:wiki_page_event) { create(:wiki_page_event, project: project, wiki_page: create(:wiki_page, wiki: wiki)) }
       let_it_be(:design_event) { create(:design_event, project: project) }
       let(:push_events) { push_event_payloads.map(&:event) }
 

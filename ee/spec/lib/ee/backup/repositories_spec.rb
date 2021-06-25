@@ -11,10 +11,13 @@ RSpec.describe Backup::Repositories do
   describe '#dump' do
     context 'hashed storage' do
       let_it_be(:project) { create(:project, :repository) }
-      let_it_be(:group) { create(:group, :wiki_repo) }
+      let_it_be(:user) { create(:user) }
+      let_it_be(:group_wiki) { create(:group_wiki, user: user) }
+
+      let(:group) { group_wiki.group }
 
       it 'calls enqueue for each repository type', :aggregate_failures do
-        create(:wiki_page, container: group)
+        create(:wiki_page, wiki: group_wiki)
 
         subject.dump(max_concurrency: 1, max_storage_concurrency: 1)
 

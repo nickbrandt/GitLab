@@ -54,10 +54,6 @@ module Gitlab
 
       attr_reader :repository
 
-      def self.default_ref
-        'master'
-      end
-
       # Initialize with a Gitlab::Git::Repository instance
       def initialize(repository)
         @repository = repository
