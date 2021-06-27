@@ -28,8 +28,8 @@ RSpec.describe Gitlab::Database::PostgresqlDatabaseTasks::LoadSchemaVersionsMixi
   end
 
   context 'when database is primary' do
-    it 'loads version files' do
-      expect(Gitlab::Database::SchemaVersionFiles).to receive(:load_all)
+    it 'loads version files for primary database' do
+      expect(Gitlab::Database::SchemaVersionFiles).to receive(:load_all).with(db_name)
       expect(instance).to receive(:original_structure_load)
 
       instance.structure_load
@@ -39,8 +39,8 @@ RSpec.describe Gitlab::Database::PostgresqlDatabaseTasks::LoadSchemaVersionsMixi
   context 'when the database is ci' do
     let(:db_name) { 'ci' }
 
-    it 'does not load version files' do
-      expect(Gitlab::Database::SchemaVersionFiles).not_to receive(:load_all)
+    it 'loads version files for ci database' do
+      expect(Gitlab::Database::SchemaVersionFiles).to receive(:load_all).with(db_name)
       expect(instance).to receive(:original_structure_load)
 
       instance.structure_load
