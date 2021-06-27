@@ -28,6 +28,13 @@ export default {
     GlLink,
     AccountVerificationModal,
   },
+  props: {
+    customMessage: {
+      type: String,
+      default: null,
+      required: false,
+    },
+  },
   data() {
     return {
       shouldRenderSuccess: false,
@@ -73,7 +80,10 @@ export default {
       :primary-button-text="$options.i18n.dangerAlert.primaryButtonText"
       @primaryAction="showModal"
     >
-      <gl-sprintf :message="$options.i18n.dangerAlert.text">
+      <template v-if="customMessage" class="gl-m-0">
+        {{ customMessage }}
+      </template>
+      <gl-sprintf v-else :message="$options.i18n.dangerAlert.text">
         <template #strong="{ content }">
           <strong>{{ content }}</strong>
         </template>

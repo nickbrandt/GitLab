@@ -31,7 +31,7 @@ describe('projects/settings/components/shared_runners', () => {
   const findErrorAlert = () => wrapper.find(GlAlert);
   const findSharedRunnersToggle = () => wrapper.find(GlToggle);
   const findToggleTooltip = () => wrapper.find(GlTooltip);
-  const findCcValidationRequiredAlert = () => wrapper.find(CcValidationRequiredAlert);
+  const findCcValidationRequiredAlert = () => wrapper.findComponent(CcValidationRequiredAlert);
   const getToggleValue = () => findSharedRunnersToggle().props('value');
   const isToggleLoading = () => findSharedRunnersToggle().props('isLoading');
   const isToggleDisabled = () => findSharedRunnersToggle().props('disabled');
@@ -178,6 +178,9 @@ describe('projects/settings/components/shared_runners', () => {
 
     it('credit card validation component should exist', () => {
       expect(findCcValidationRequiredAlert().exists()).toBe(true);
+      expect(findCcValidationRequiredAlert().text()).toBe(
+        SharedRunnersToggleComponent.i18n.REQUIRES_VALIDATION_TEXT,
+      );
     });
 
     describe('when credit card is validated', () => {
