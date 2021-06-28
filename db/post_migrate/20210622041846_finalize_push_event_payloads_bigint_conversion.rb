@@ -11,7 +11,7 @@ class FinalizePushEventPayloadsBigintConversion < ActiveRecord::Migration[6.1]
   def up
     ensure_batched_background_migration_is_finished(
       job_class_name: 'CopyColumnUsingBackgroundMigrationJob',
-      table_name: 'push_event_payloads',
+      table_name: TABLE_NAME,
       column_name: 'event_id',
       job_arguments: [["event_id"], ["event_id_convert_to_bigint"]]
     )
@@ -28,7 +28,7 @@ class FinalizePushEventPayloadsBigintConversion < ActiveRecord::Migration[6.1]
   def swap_columns
     add_concurrent_index TABLE_NAME, :event_id_convert_to_bigint, unique: true, name: INDEX_NAME
 
-    # Duplicate fk_36c74129da FK
+    # Add a foreign key on `event_id_convert_to_bigint` before we swap the columns and drop the old FK (fk_36c74129da)
     add_concurrent_foreign_key TABLE_NAME, :events, column: :event_id_convert_to_bigint, on_delete: :cascade
 
     with_lock_retries(raise_on_exhaustion: true) do
@@ -43,9 +43,10 @@ class FinalizePushEventPayloadsBigintConversion < ActiveRecord::Migration[6.1]
       rename_index TABLE_NAME, INDEX_NAME, 'push_event_payloads_pkey'
       execute "ALTER TABLE #{TABLE_NAME} ADD CONSTRAINT push_event_payloads_pkey PRIMARY KEY USING INDEX push_event_payloads_pkey"
 
-      # Drop FK fk_36c74129da
+      # Drop original FK on the old int4 `event_id` (fk_36c74129da)
       remove_foreign_key TABLE_NAME, name: concurrent_foreign_key_name(TABLE_NAME, :event_id)
-      # Change the name of the FK for event_id_convert_to_bigint to the FK name for event_id
+      # We swapped the columns but the FK for event_id is still using the old name for the event_id_convert_to_bigint column
+      # So we have to also swap the FK name now that we dropped the other one with the same
       rename_constraint(
         TABLE_NAME,
         concurrent_foreign_key_name(TABLE_NAME, :event_id_convert_to_bigint),
