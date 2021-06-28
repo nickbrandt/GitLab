@@ -69,7 +69,7 @@ module Ci
       {
         is_enabled: "#{project.shared_runners_enabled?}",
         is_disabled_and_unoverridable: "#{project.group&.shared_runners_setting == 'disabled_and_unoverridable'}",
-        update_path: toggle_shared_runners_project_runners_path(project)
+        update_path: toggle_shared_runners_project_settings_runners_path(project)
       }
     end
   end

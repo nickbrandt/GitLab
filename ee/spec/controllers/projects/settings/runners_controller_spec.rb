@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe Projects::RunnersController do
+RSpec.describe Projects::Settings::RunnersController do
   let_it_be(:user) { create(:user) }
   let_it_be(:namespace) { create(:namespace) }
 

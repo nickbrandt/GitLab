@@ -105,7 +105,7 @@ RSpec.describe Ci::RunnersHelper do
     context 'for all projects' do
       it 'returns the update path for toggling the shared runners setting' do
         data = toggle_shared_runners_settings_data(project_with_runners)
-        expect(data[:update_path]).to eq(toggle_shared_runners_project_runners_path(project_with_runners))
+        expect(data[:update_path]).to eq(toggle_shared_runners_project_settings_runners_path(project_with_runners))
       end
 
       it 'returns false for is_disabled_and_unoverridable when project has no group' do

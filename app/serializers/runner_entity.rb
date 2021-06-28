@@ -6,7 +6,7 @@ class RunnerEntity < Grape::Entity
   expose :id, :description, :short_sha
 
   expose :edit_path, if: -> (*) { can_edit_runner? } do |runner|
-    edit_project_runner_path(project, runner)
+    edit_project_settings_runner_path(project, runner)
   end
 
   private

@@ -7,4 +7,4 @@
 - else
   %h4.underlined-title #{_('Available shared runners:')} #{@shared_runners_count}
   %ul.bordered-list.available-shared-runners
-    = render partial: 'projects/runners/runner', collection: @shared_runners, as: :runner
+    = render partial: 'projects/settings/runners/runner', collection: @shared_runners, as: :runner

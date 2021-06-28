@@ -13,10 +13,10 @@
     %br
     %br
     - if @project.group_runners_enabled?
-      = link_to toggle_group_runners_project_runners_path(@project), class: 'btn gl-button btn-default', method: :post do
+      = link_to toggle_group_runners_project_settings_runners_path(@project), class: 'btn gl-button btn-default', method: :post do
         = _('Disable group runners')
     - else
-      = link_to toggle_group_runners_project_runners_path(@project), class: 'btn gl-button btn-confirm-secondary', method: :post do
+      = link_to toggle_group_runners_project_settings_runners_path(@project), class: 'btn gl-button btn-confirm-secondary', method: :post do
         = _('Enable group runners')
     &nbsp;
     = _('for this project')
@@ -37,4 +37,4 @@
   %h4.underlined-title
     = _('Available group runners: %{runners}').html_safe % { runners: @group_runners.count }
   %ul.bordered-list
-    = render partial: 'projects/runners/runner', collection: @group_runners, as: :runner
+    = render partial: 'projects/settings/runners/runner', collection: @group_runners, as: :runner

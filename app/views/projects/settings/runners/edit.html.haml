@@ -1,7 +1,7 @@
 - breadcrumb_title _('Edit')
 - page_title _('Edit'), "##{@runner.id} (#{@runner.short_sha})"
 - add_to_breadcrumbs _('CI/CD Settings'), project_settings_ci_cd_path(@project)
-- add_to_breadcrumbs "#{@runner.short_sha}", project_runner_path(@project, @runner)
+- add_to_breadcrumbs "#{@runner.short_sha}", project_settings_runner_path(@project, @runner)
 
 %h2.page-title
   = s_('Runners|Runner #%{runner_id}' % { runner_id: @runner.id })
@@ -9,4 +9,4 @@
 
 = render 'shared/runners/runner_type_alert', runner: @runner
 
-= render 'shared/runners/form', runner: @runner, runner_form_url: project_runner_path(@project, @runner)
+= render 'shared/runners/form', runner: @runner, runner_form_url: project_settings_runner_path(@project, @runner)

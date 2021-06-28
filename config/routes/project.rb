@@ -131,6 +131,18 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           end
 
           resource :packages_and_registries, only: [:show]
+
+          resources :runners, only: [:index, :edit, :update, :destroy, :show] do
+            member do
+              post :resume
+              post :pause
+            end
+
+            collection do
+              post :toggle_shared_runners
+              post :toggle_group_runners
+            end
+          end
         end
 
         resources :autocomplete_sources, only: [] do
@@ -520,18 +532,6 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         collection do
           get ":secret/:filename", action: :show, as: :show, constraints: { filename: %r{[^/]+} }, format: false, defaults: { format: nil } # rubocop:todo Cop/PutProjectRoutesUnderScope
           post :authorize # rubocop:todo Cop/PutProjectRoutesUnderScope
-        end
-      end
-
-      resources :runners, only: [:index, :edit, :update, :destroy, :show] do # rubocop: disable Cop/PutProjectRoutesUnderScope
-        member do
-          post :resume # rubocop:todo Cop/PutProjectRoutesUnderScope
-          post :pause # rubocop:todo Cop/PutProjectRoutesUnderScope
-        end
-
-        collection do
-          post :toggle_shared_runners # rubocop:todo Cop/PutProjectRoutesUnderScope
-          post :toggle_group_runners # rubocop:todo Cop/PutProjectRoutesUnderScope
         end
       end
 

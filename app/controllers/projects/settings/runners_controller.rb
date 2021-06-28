@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Projects::RunnersController < Projects::ApplicationController
+class Projects::Settings::RunnersController < Projects::ApplicationController
   before_action :authorize_admin_build!
   before_action :runner, only: [:edit, :update, :destroy, :pause, :resume, :show]
 
@@ -17,7 +17,7 @@ class Projects::RunnersController < Projects::ApplicationController
 
   def update
     if Ci::UpdateRunnerService.new(@runner).update(runner_params)
-      redirect_to project_runner_path(@project, @runner), notice: _('Runner was successfully updated.')
+      redirect_to project_settings_runner_path(@project, @runner), notice: _('Runner was successfully updated.')
     else
       render 'edit'
     end
@@ -28,22 +28,22 @@ class Projects::RunnersController < Projects::ApplicationController
       @runner.destroy
     end
 
-    redirect_to project_runners_path(@project), status: :found
+    redirect_to project_settings_runners_path(@project), status: :found
   end
 
   def resume
     if Ci::UpdateRunnerService.new(@runner).update(active: true)
-      redirect_to project_runners_path(@project), notice: _('Runner was successfully updated.')
+      redirect_to project_settings_runners_path(@project), notice: _('Runner was successfully updated.')
     else
-      redirect_to project_runners_path(@project), alert: _('Runner was not updated.')
+      redirect_to project_settings_runners_path(@project), alert: _('Runner was not updated.')
     end
   end
 
   def pause
     if Ci::UpdateRunnerService.new(@runner).update(active: false)
-      redirect_to project_runners_path(@project), notice: _('Runner was successfully updated.')
+      redirect_to project_settings_runners_path(@project), notice: _('Runner was successfully updated.')
     else
-      redirect_to project_runners_path(@project), alert: _('Runner was not updated.')
+      redirect_to project_settings_runners_path(@project), alert: _('Runner was not updated.')
     end
   end
 
