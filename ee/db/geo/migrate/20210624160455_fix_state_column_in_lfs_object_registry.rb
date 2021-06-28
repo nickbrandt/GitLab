@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class FixStateColumnInLfsObjectRegistry < ActiveRecord::Migration[6.1]
+class FixStateColumnInLfsObjectRegistry < ActiveRecord::Migration[6.0]
   include Gitlab::Database::MigrationHelpers
 
   disable_ddl_transaction!
