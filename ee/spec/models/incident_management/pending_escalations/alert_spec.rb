@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 RSpec.describe IncidentManagement::PendingEscalations::Alert do
-  subject { build(:incident_management_pending_alert_escalation) }
+  subject { create(:incident_management_pending_alert_escalation) }
 
   it { is_expected.to be_valid }
 
@@ -11,6 +11,7 @@ RSpec.describe IncidentManagement::PendingEscalations::Alert do
     it { is_expected.to validate_presence_of(:process_at) }
     it { is_expected.to validate_presence_of(:status) }
     it { is_expected.to delegate_method(:project).to(:alert) }
+    it { is_expected.to validate_uniqueness_of(:rule_id).scoped_to([:alert_id]) }
   end
 
   describe 'associations' do

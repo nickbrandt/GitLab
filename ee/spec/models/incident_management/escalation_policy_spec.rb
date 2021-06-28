@@ -21,5 +21,12 @@ RSpec.describe IncidentManagement::EscalationPolicy do
     it { is_expected.to validate_uniqueness_of(:name).scoped_to(:project_id) }
     it { is_expected.to validate_length_of(:name).is_at_most(72) }
     it { is_expected.to validate_length_of(:description).is_at_most(160) }
+
+    it 'validates the number of rules' do
+      policy = build(:incident_management_escalation_policy, rule_count: 11)
+
+      expect(policy).not_to be_valid
+      expect(policy.errors).to contain_exactly("cannot have more than #{described_class::MAX_RULE_COUNT} rules")
+    end
   end
 end

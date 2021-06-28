@@ -25,6 +25,7 @@ module IncidentManagement
 
       validates :process_at, presence: true
       validates :status, presence: true
+      validates :rule_id, presence: true, uniqueness: { scope: [:alert_id] }
 
       delegate :project, to: :alert
     end

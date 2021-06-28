@@ -12,10 +12,10 @@ class CreateIncidentManagementPendingAlertEscalations < ActiveRecord::Migration[
           rule_id bigint,
           alert_id bigint NOT NULL,
           schedule_id bigint NOT NULL,
-          status smallint NOT NULL,
           process_at timestamp with time zone NOT NULL,
           created_at timestamp with time zone NOT NULL,
           updated_at timestamp with time zone NOT NULL,
+          status smallint NOT NULL,
           PRIMARY KEY (id, process_at)
         ) PARTITION BY RANGE (process_at);
 
@@ -28,8 +28,8 @@ class CreateIncidentManagementPendingAlertEscalations < ActiveRecord::Migration[
         CREATE INDEX index_incident_management_pending_alert_escalations_on_schedule_id
           ON incident_management_pending_alert_escalations USING btree (schedule_id);
 
-        CREATE INDEX index_incident_management_pending_alert_escalations_on_process_at
-          ON incident_management_pending_alert_escalations USING btree (process_at);
+        CREATE INDEX index_incident_management_pending_alert_escalations_on_process_at_id
+          ON incident_management_pending_alert_escalations USING btree (process_at, id);
 
         ALTER TABLE incident_management_pending_alert_escalations ADD CONSTRAINT fk_rails_fcbfd9338b
           FOREIGN KEY (schedule_id) REFERENCES incident_management_oncall_schedules(id) ON DELETE CASCADE;
