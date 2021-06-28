@@ -2,13 +2,13 @@
 
 require 'spec_helper'
 
-RSpec.describe IncidentManagement::Escalations::PendingAlertEscalationCheckWorker do
-  let(:worker) { described_class.new(escalation.id) }
+RSpec.describe IncidentManagement::PendingEscalations::AlertCheckWorker do
+  let(:worker) { described_class.new }
 
   let_it_be(:escalation) { create(:incident_management_pending_alert_escalation) }
 
   describe '#perform' do
-    subject { worker.perform }
+    subject { worker.perform(escalation.id) }
 
     it 'processes the escalation' do
       process_service = spy(IncidentManagement::PendingEscalations::ProcessService)
