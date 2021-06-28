@@ -1,5 +1,6 @@
+import '~/commons';
 import { shallowMount } from '@vue/test-utils';
-import ExperimentTracking from '~/experimentation/experiment_tracking';
+import { mockTracking } from 'helpers/tracking_helper';
 import PipelinesCiTemplate from '~/pipelines/components/pipelines_list/pipelines_ci_templates.vue';
 
 const addCiYmlPath = "/-/new/main?commit_message='Add%20.gitlab-ci.yml'";
@@ -9,21 +10,15 @@ const suggestedCiTemplates = [
   { name: 'C++', logo: '/assets/illustrations/logos/c_plus_plus.svg' },
 ];
 
-jest.mock('~/experimentation/experiment_tracking');
-
 describe('Pipelines CI Templates', () => {
   let wrapper;
-
-  const GlEmoji = { template: '<img/>' };
+  let trackingSpy;
 
   const createWrapper = () => {
     return shallowMount(PipelinesCiTemplate, {
       provide: {
         addCiYmlPath,
         suggestedCiTemplates,
-      },
-      stubs: {
-        GlEmoji,
       },
     });
   };
@@ -88,24 +83,25 @@ describe('Pipelines CI Templates', () => {
   describe('tracking', () => {
     beforeEach(() => {
       wrapper = createWrapper();
+      trackingSpy = mockTracking(undefined, wrapper.element, jest.spyOn);
     });
 
     it('sends an event when template is clicked', () => {
       findTemplateLinks().at(0).vm.$emit('click');
 
-      expect(ExperimentTracking).toHaveBeenCalledWith('pipeline_empty_state_templates', {
+      expect(trackingSpy).toHaveBeenCalledTimes(1);
+      expect(trackingSpy).toHaveBeenCalledWith(undefined, 'template_clicked', {
         label: 'Android',
       });
-      expect(ExperimentTracking.prototype.event).toHaveBeenCalledWith('template_clicked');
     });
 
     it('sends an event when Hello-World template is clicked', () => {
       findTestTemplateLinks().at(0).vm.$emit('click');
 
-      expect(ExperimentTracking).toHaveBeenCalledWith('pipeline_empty_state_templates', {
+      expect(trackingSpy).toHaveBeenCalledTimes(1);
+      expect(trackingSpy).toHaveBeenCalledWith(undefined, 'template_clicked', {
         label: 'Hello-World',
       });
-      expect(ExperimentTracking.prototype.event).toHaveBeenCalledWith('template_clicked');
     });
   });
 });

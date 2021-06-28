@@ -1,8 +1,8 @@
 <script>
 import { GlAvatar, GlButton, GlCard, GlSprintf } from '@gitlab/ui';
-import ExperimentTracking from '~/experimentation/experiment_tracking';
 import { mergeUrlParams } from '~/lib/utils/url_utility';
 import { s__, sprintf } from '~/locale';
+import Tracking from '~/tracking';
 import { HELLO_WORLD_TEMPLATE_KEY } from '../../constants';
 
 export default {
@@ -12,6 +12,7 @@ export default {
     GlCard,
     GlSprintf,
   },
+  mixins: [Tracking.mixin()],
   HELLO_WORLD_TEMPLATE_KEY,
   i18n: {
     cta: s__('Pipelines|Use template'),
@@ -56,10 +57,9 @@ export default {
   },
   methods: {
     trackEvent(template) {
-      const tracking = new ExperimentTracking('pipeline_empty_state_templates', {
+      this.track('template_clicked', {
         label: template,
       });
-      tracking.event('template_clicked');
     },
   },
 };
