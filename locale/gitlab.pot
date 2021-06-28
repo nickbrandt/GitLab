@@ -31554,6 +31554,9 @@ msgstr ""
 msgid "Symbolic link"
 msgstr ""
 
+msgid "Sync LDAP"
+msgstr ""
+
 msgid "Sync now"
 msgstr ""
 
@@ -31561,6 +31564,9 @@ msgid "Synced"
 msgstr ""
 
 msgid "Synchronization settings"
+msgstr ""
+
+msgid "Synchronize LDAP"
 msgstr ""
 
 msgid "Syncing…"
@@ -36215,6 +36221,9 @@ msgid "Warning:"
 msgstr ""
 
 msgid "Warning: Displaying this diagram might cause performance issues on this page."
+msgstr ""
+
+msgid "Warning: Synchronizing LDAP removes direct members' access."
 msgstr ""
 
 msgid "We are currently unable to fetch data for the pipeline header."
