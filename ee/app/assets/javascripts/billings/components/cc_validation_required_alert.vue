@@ -80,7 +80,7 @@ export default {
       :primary-button-text="$options.i18n.dangerAlert.primaryButtonText"
       @primaryAction="showModal"
     >
-      <template v-if="customMessage" class="gl-m-0">
+      <template v-if="customMessage">
         {{ customMessage }}
       </template>
       <gl-sprintf v-else :message="$options.i18n.dangerAlert.text">
