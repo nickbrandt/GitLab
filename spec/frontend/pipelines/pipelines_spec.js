@@ -84,7 +84,7 @@ describe('Pipelines', () => {
     wrapper = extendedWrapper(
       mount(PipelinesComponent, {
         provide: {
-          addCiYmlPath: '',
+          pipelineEditorPath: '',
           suggestedCiTemplates: [],
         },
         propsData: {

@@ -13,7 +13,7 @@ describe('Pipelines Empty State', () => {
   const createWrapper = (props = {}) => {
     wrapper = mount(EmptyState, {
       provide: {
-        addCiYmlPath: '',
+        pipelineEditorPath: '',
         suggestedCiTemplates: [],
       },
       propsData: {

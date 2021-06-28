@@ -3,7 +3,7 @@ import { shallowMount } from '@vue/test-utils';
 import { mockTracking } from 'helpers/tracking_helper';
 import PipelinesCiTemplate from '~/pipelines/components/pipelines_list/pipelines_ci_templates.vue';
 
-const addCiYmlPath = "/-/new/main?commit_message='Add%20.gitlab-ci.yml'";
+const pipelineEditorPath = '/-/ci/editor';
 const suggestedCiTemplates = [
   { name: 'Android', logo: '/assets/illustrations/logos/android.svg' },
   { name: 'Bash', logo: '/assets/illustrations/logos/bash.svg' },
@@ -17,7 +17,7 @@ describe('Pipelines CI Templates', () => {
   const createWrapper = () => {
     return shallowMount(PipelinesCiTemplate, {
       provide: {
-        addCiYmlPath,
+        pipelineEditorPath,
         suggestedCiTemplates,
       },
     });
@@ -39,9 +39,9 @@ describe('Pipelines CI Templates', () => {
       wrapper = createWrapper();
     });
 
-    it('links to the hello world template', () => {
+    it('links to the getting started template', () => {
       expect(findTestTemplateLinks().at(0).attributes('href')).toBe(
-        addCiYmlPath.concat('&template=Hello-World'),
+        pipelineEditorPath.concat('?template=Getting-Started'),
       );
     });
   });
@@ -63,7 +63,7 @@ describe('Pipelines CI Templates', () => {
 
     it('links to the correct template', () => {
       expect(findTemplateLinks().at(0).attributes('href')).toBe(
-        addCiYmlPath.concat('&template=Android'),
+        pipelineEditorPath.concat('?template=Android'),
       );
     });
 
@@ -95,12 +95,12 @@ describe('Pipelines CI Templates', () => {
       });
     });
 
-    it('sends an event when Hello-World template is clicked', () => {
+    it('sends an event when Getting-Started template is clicked', () => {
       findTestTemplateLinks().at(0).vm.$emit('click');
 
       expect(trackingSpy).toHaveBeenCalledTimes(1);
       expect(trackingSpy).toHaveBeenCalledWith(undefined, 'template_clicked', {
-        label: 'Hello-World',
+        label: 'Getting-Started',
       });
     });
   });
