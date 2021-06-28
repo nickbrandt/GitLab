@@ -12880,6 +12880,7 @@ Represents the snippet blob.
 | <a id="snippetblobpath"></a>`path` | [`String`](#string) | Blob path. |
 | <a id="snippetblobplaindata"></a>`plainData` | [`String`](#string) | Blob plain highlighted data. |
 | <a id="snippetblobrawpath"></a>`rawPath` | [`String!`](#string) | Blob raw content endpoint path. |
+| <a id="snippetblobrawplaindata"></a>`rawPlainData` | [`String`](#string) | The raw content of the blob, if the blob is text data. |
 | <a id="snippetblobrenderedastext"></a>`renderedAsText` | [`Boolean!`](#boolean) | Shows whether the blob is rendered as text. |
 | <a id="snippetblobrichdata"></a>`richData` | [`String`](#string) | Blob highlighted data. |
 | <a id="snippetblobrichviewer"></a>`richViewer` | [`SnippetBlobViewer`](#snippetblobviewer) | Blob content rich viewer. |
