@@ -957,6 +957,7 @@ Alternatively, you can use the CI/CD variable `SECURE_ANALYZERS_PREFIX` to overr
 > - The saved scans feature was [introduced](https://gitlab.com/groups/gitlab-org/-/epics/5100) in GitLab 13.9.
 > - The option to select a branch was [introduced](https://gitlab.com/groups/gitlab-org/-/epics/4847) in GitLab 13.10.
 > - DAST branch selection [feature flag removed](https://gitlab.com/gitlab-org/gitlab/-/issues/322672) in GitLab 13.11.
+> - Auditing for DAST profile management was [introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/217872) in GitLab 14.1.
 
 An on-demand DAST scan runs outside the DevOps life cycle. Changes in your repository don't trigger
 the scan. You must start it manually.
@@ -1279,6 +1280,13 @@ To delete a scanner profile:
 If a scanner profile is linked to a security policy, a user cannot delete the profile from this
 page. See [Scan Policies](../policies/index.md)
 for more information.
+
+### Auditing
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/217872) in GitLab 14.1.
+
+The creation, updating, and deletion of DAST profiles, DAST scanner profiles,
+and DAST site profiles are included in the [audit log](../../../administration/audit_events.md).
 
 ## Reports
 
