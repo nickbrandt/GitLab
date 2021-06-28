@@ -3,10 +3,9 @@
 require 'spec_helper'
 
 RSpec.describe Milestone do
-  let(:user) { create(:user) }
-  let(:issue) { create(:issue, project: project) }
-  let(:milestone) { create(:milestone, project: project) }
-  let(:project) { create(:project, :public) }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:project) { create(:project, :public) }
+  let_it_be(:issue) { create(:issue, project: project) }
 
   it_behaves_like 'a timebox', :milestone do
     describe "#uniqueness_of_title" do
@@ -92,6 +91,8 @@ RSpec.describe Milestone do
   end
 
   describe '.predefined_id?' do
+    let_it_be(:milestone) { create(:milestone, project: project) }
+
     it 'returns true for a predefined Milestone ID' do
       expect(Milestone.predefined_id?(described_class::Upcoming.id)).to be true
     end
@@ -129,6 +130,8 @@ RSpec.describe Milestone do
   end
 
   describe "#percent_complete" do
+    let(:milestone) { create(:milestone, project: project) }
+
     it "does not count open issues" do
       milestone.issues << issue
       expect(milestone.percent_complete).to eq(0)
@@ -146,13 +149,15 @@ RSpec.describe Milestone do
   end
 
   describe '#expired?' do
+    let_it_be(:milestone) { build(:milestone, project: project) }
+
     context "expired" do
       before do
         allow(milestone).to receive(:due_date).and_return(Date.today.prev_year)
       end
 
       it 'returns true when due_date is in the past' do
-        expect(milestone.expired?).to be_truthy
+          expect(milestone.expired?).to be_truthy
       end
     end
 
@@ -162,7 +167,7 @@ RSpec.describe Milestone do
       end
 
       it 'returns false when due_date is in the future' do
-        expect(milestone.expired?).to be_falsey
+          expect(milestone.expired?).to be_falsey
       end
     end
   end
@@ -180,10 +185,14 @@ RSpec.describe Milestone do
   end
 
   describe '#can_be_closed?' do
+    let_it_be(:milestone) { build(:milestone, project: project) }
+
     it { expect(milestone.can_be_closed?).to be_truthy }
   end
 
   describe '#can_be_closed?' do
+    let_it_be(:milestone) { build(:milestone, project: project) }
+
     before do
       milestone = create :milestone, project: project
       create :closed_issue, milestone: milestone, project: project
@@ -335,10 +344,10 @@ RSpec.describe Milestone do
   it_behaves_like '#for_projects_and_groups'
 
   describe '.upcoming_ids' do
-    let(:group_1) { create(:group) }
-    let(:group_2) { create(:group) }
-    let(:group_3) { create(:group) }
-    let(:groups) { [group_1, group_2, group_3] }
+    let_it_be(:group_1) { create(:group) }
+    let_it_be(:group_2) { create(:group) }
+    let_it_be(:group_3) { create(:group) }
+    let_it_be(:groups) { [group_1, group_2, group_3] }
 
     let!(:past_milestone_group_1) { create(:milestone, group: group_1, due_date: Time.current - 1.day) }
     let!(:current_milestone_group_1) { create(:milestone, group: group_1, due_date: Time.current + 1.day) }
@@ -350,10 +359,10 @@ RSpec.describe Milestone do
 
     let!(:past_milestone_group_3) { create(:milestone, group: group_3, due_date: Time.current - 1.day) }
 
-    let(:project_1) { create(:project) }
-    let(:project_2) { create(:project) }
-    let(:project_3) { create(:project) }
-    let(:projects) { [project_1, project_2, project_3] }
+    let_it_be(:project_1) { create(:project) }
+    let_it_be(:project_2) { create(:project) }
+    let_it_be(:project_3) { create(:project) }
+    let_it_be(:projects) { [project_1, project_2, project_3] }
 
     let!(:past_milestone_project_1) { create(:milestone, project: project_1, due_date: Time.current - 1.day) }
     let!(:current_milestone_project_1) { create(:milestone, project: project_1, due_date: Time.current + 1.day) }
