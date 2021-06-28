@@ -1,7 +1,7 @@
 ---
 data_category: Optional
 key_path: compliance_unique_visits.compliance_unique_visits_for_any_target_monthly
-description: ''
+description: 'Number of unique visits to any compliance page over a given month'
 product_section: 'dev'
 product_stage: 'manage'
 product_group: 'group::compliance'
@@ -9,7 +9,7 @@ product_category: 'compliance_management'
 value_type: number
 status: data_available
 time_frame: 28d
-data_source: database
+data_source: redis
 distribution:
 - ee
 tier:
