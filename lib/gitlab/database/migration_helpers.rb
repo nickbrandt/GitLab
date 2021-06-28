@@ -1616,17 +1616,6 @@ into similar problems in the future (e.g. when new tables are created).
         raise
       end
 
-      def swap_column_names(table_name, column_1, column_2)
-        unless transaction_open?
-          raise 'Cannot call swap_column_names without a transaction open or outside of a transaction block.'
-        end
-
-        temp_name = "#{column_1}_tmp"
-        execute "ALTER TABLE #{quote_table_name(table_name)} RENAME COLUMN #{quote_column_name(column_1)} TO #{quote_column_name(temp_name)}"
-        execute "ALTER TABLE #{quote_table_name(table_name)} RENAME COLUMN #{quote_column_name(column_2)} TO #{quote_column_name(column_1)}"
-        execute "ALTER TABLE #{quote_table_name(table_name)} RENAME COLUMN #{quote_column_name(temp_name)} TO #{quote_column_name(column_2)}"
-      end
-
       def rename_constraint(table_name, old_name, new_name)
         execute <<~SQL
           ALTER TABLE #{quote_table_name(table_name)}

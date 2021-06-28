@@ -2978,53 +2978,6 @@ RSpec.describe Gitlab::Database::MigrationHelpers do
     end
   end
 
-  describe '#swap_column_names' do
-    let(:table) { :_test_table }
-    let(:ar_model) do
-      Class.new(ActiveRecord::Base) do
-        self.table_name = :_test_table
-      end
-    end
-
-    before do
-      model.drop_table table, if_exists: true
-      model.create_table table, id: false do |t|
-        t.integer :column_1
-        t.bigint  :column_2
-      end
-
-      model.add_index(table, :column_2)
-    end
-
-    after do
-      model.drop_table table, if_exists: true
-    end
-
-    it 'swaps column names as requested' do
-      model.swap_column_names(table, :column_1, :column_2)
-
-      column_1 = ar_model.column_for_attribute(:column_1)
-      column_2 = ar_model.column_for_attribute(:column_2)
-
-      expect(column_1.sql_type).to eq('bigint')
-      expect(column_2.sql_type).to eq('integer')
-    end
-
-    it 'does not rename indexes' do
-      model.swap_column_names(table, :column_1, :column_2)
-
-      index = model.indexes_for(table, :column_1).first
-      expect(index.name).to eq("index_#{table}_on_column_2")
-    end
-
-    it 'raises an error when not in transaction' do
-      expect(model).to receive(:transaction_open?).and_return(false)
-
-      expect { model.swap_column_names(table, :column_1, :column_2) }
-        .to raise_error 'Cannot call swap_column_names without a transaction open or outside of a transaction block.'
-    end
-  end
-
   describe '#rename_constraint' do
     it "executes the statement to rename constraint" do
       expect(model).to receive(:execute).with /ALTER TABLE "test_table"\nRENAME CONSTRAINT "fk_old_name" TO "fk_new_name"/
