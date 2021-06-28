@@ -467,6 +467,7 @@ RSpec.describe API::Releases do
         get api("/projects/#{project.id}/releases/non_exist_tag", maintainer)
 
         expect(response).to have_gitlab_http_status(:not_found)
+        expect(json_response['message']).to eq('404 Not Found')
       end
 
       it 'returns project not found for no user' do
@@ -476,10 +477,10 @@ RSpec.describe API::Releases do
         expect(json_response['message']).to eq('404 Project Not Found')
       end
 
-      it 'returns 404 for guest' do
-        get api("/projects/#{project.id}/releases/non_exist_tag", guest)
+      it 'returns forbidden for guest' do
+        get api("/projects/#{project.id}/releases/non_existing_tag", guest)
 
-        expect(response).to have_gitlab_http_status(:not_found)
+        expect(response).to have_gitlab_http_status(:forbidden)
       end
     end
 
