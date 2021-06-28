@@ -81,6 +81,7 @@ module EE
         mount_mutation ::Mutations::IncidentManagement::EscalationPolicy::Destroy
         mount_mutation ::Mutations::AppSec::Fuzzing::API::CiConfiguration::Create
         mount_mutation ::Mutations::SecurityPolicy::CommitScanExecutionPolicy
+        mount_mutation ::Mutations::SecurityPolicy::AssignSecurityPolicyProject
 
         prepend(Types::DeprecatedMutations)
       end
