@@ -71,6 +71,26 @@ RSpec.describe Resolvers::ProjectMilestonesResolver do
       end
     end
 
+    context 'by sort' do
+      it 'calls MilestonesFinder with correct parameters' do
+        expect(MilestonesFinder).to receive(:new)
+          .with(args(project_ids: project.id, state: 'all', sort: :due_date_desc))
+          .and_call_original
+
+        resolve_project_milestones(sort: :due_date_desc)
+      end
+    end
+
+    context 'when expired_last is set' do
+      it 'calls MilestonesFinder with correct parameters' do
+        expect(MilestonesFinder).to receive(:new)
+          .with(args(project_ids: project.id, state: 'all', expired_last: true))
+          .and_call_original
+
+        resolve_project_milestones(expired_last: true)
+      end
+    end
+
     context 'by timeframe' do
       context 'when start_date and end_date are present' do
         it 'calls MilestonesFinder with correct parameters' do

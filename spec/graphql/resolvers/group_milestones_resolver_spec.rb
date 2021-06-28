@@ -79,6 +79,32 @@ RSpec.describe Resolvers::GroupMilestonesResolver do
       end
     end
 
+    context 'by sort' do
+      it 'calls MilestonesFinder with correct parameters' do
+        expect(MilestonesFinder).to receive(:new)
+          .with(args(group_ids: group.id, state: 'all', sort: :due_date_desc))
+          .and_call_original
+
+        resolve_group_milestones(sort: :due_date_desc)
+      end
+    end
+
+    context 'when expired_last is set' do
+      it 'calls MilestonesFinder with correct parameters' do
+        expect(MilestonesFinder).to receive(:new)
+          .with(args(group_ids: group.id, state: 'all', expired_last: true))
+          .and_call_original
+
+        resolve_group_milestones(expired_last: true)
+      end
+
+      it 'uses offset-pagination' do
+        resolved = resolve_group_milestones(expired_last: true)
+
+        expect(resolved).to be_a(::Gitlab::Graphql::Pagination::OffsetActiveRecordRelationConnection)
+      end
+    end
+
     context 'by timeframe' do
       context 'when start_date and end_date are present' do
         context 'when start date is after end_date' do

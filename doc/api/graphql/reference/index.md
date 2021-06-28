@@ -9564,10 +9564,12 @@ four standard [pagination arguments](#connection-pagination-arguments):
 | ---- | ---- | ----------- |
 | <a id="groupmilestonescontainingdate"></a>`containingDate` | [`Time`](#time) | A date that the milestone contains. |
 | <a id="groupmilestonesenddate"></a>`endDate` **{warning-solid}** | [`Time`](#time) | **Deprecated** in 13.5. Use timeframe.end. |
+| <a id="groupmilestonesexpiredlast"></a>`expiredLast` | [`Boolean`](#boolean) | Display non-expired milestones first when sorting milestones. In any sort the displayed order would be: non-expired milestones with due dates, non-expired milestones without due dates and expired milestones. Sort order other than due date is ignored. |
 | <a id="groupmilestonesids"></a>`ids` | [`[ID!]`](#id) | Array of global milestone IDs, e.g., `"gid://gitlab/Milestone/1"`. |
 | <a id="groupmilestonesincludeancestors"></a>`includeAncestors` | [`Boolean`](#boolean) | Include milestones from all parent groups. |
 | <a id="groupmilestonesincludedescendants"></a>`includeDescendants` | [`Boolean`](#boolean) | Include milestones from all subgroups and subprojects. |
 | <a id="groupmilestonessearchtitle"></a>`searchTitle` | [`String`](#string) | A search string for the title. |
+| <a id="groupmilestonessort"></a>`sort` | [`MilestoneSort`](#milestonesort) | Sort milestones by this criteria. |
 | <a id="groupmilestonesstartdate"></a>`startDate` **{warning-solid}** | [`Time`](#time) | **Deprecated** in 13.5. Use timeframe.start. |
 | <a id="groupmilestonesstate"></a>`state` | [`MilestoneStateEnum`](#milestonestateenum) | Filter milestones by state. |
 | <a id="groupmilestonestimeframe"></a>`timeframe` | [`Timeframe`](#timeframe) | List items overlapping the given timeframe. |
@@ -10812,6 +10814,7 @@ Represents a milestone.
 | <a id="milestonecreatedat"></a>`createdAt` | [`Time!`](#time) | Timestamp of milestone creation. |
 | <a id="milestonedescription"></a>`description` | [`String`](#string) | Description of the milestone. |
 | <a id="milestoneduedate"></a>`dueDate` | [`Time`](#time) | Timestamp of the milestone due date. |
+| <a id="milestoneexpired"></a>`expired` | [`Boolean!`](#boolean) | Expired state of the milestone (a milestone is expired when the due date is past the current date). |
 | <a id="milestonegroupmilestone"></a>`groupMilestone` | [`Boolean!`](#boolean) | Indicates if milestone is at group level. |
 | <a id="milestoneid"></a>`id` | [`ID!`](#id) | ID of the milestone. |
 | <a id="milestoneiid"></a>`iid` | [`ID!`](#id) | Internal ID of the milestone. |
@@ -11889,9 +11892,11 @@ four standard [pagination arguments](#connection-pagination-arguments):
 | ---- | ---- | ----------- |
 | <a id="projectmilestonescontainingdate"></a>`containingDate` | [`Time`](#time) | A date that the milestone contains. |
 | <a id="projectmilestonesenddate"></a>`endDate` **{warning-solid}** | [`Time`](#time) | **Deprecated** in 13.5. Use timeframe.end. |
+| <a id="projectmilestonesexpiredlast"></a>`expiredLast` | [`Boolean`](#boolean) | Display non-expired milestones first when sorting milestones. In any sort the displayed order would be: non-expired milestones with due dates, non-expired milestones without due dates and expired milestones. Sort order other than due date is ignored. |
 | <a id="projectmilestonesids"></a>`ids` | [`[ID!]`](#id) | Array of global milestone IDs, e.g., `"gid://gitlab/Milestone/1"`. |
 | <a id="projectmilestonesincludeancestors"></a>`includeAncestors` | [`Boolean`](#boolean) | Also return milestones in the project's parent group and its ancestors. |
 | <a id="projectmilestonessearchtitle"></a>`searchTitle` | [`String`](#string) | A search string for the title. |
+| <a id="projectmilestonessort"></a>`sort` | [`MilestoneSort`](#milestonesort) | Sort milestones by this criteria. |
 | <a id="projectmilestonesstartdate"></a>`startDate` **{warning-solid}** | [`Time`](#time) | **Deprecated** in 13.5. Use timeframe.start. |
 | <a id="projectmilestonesstate"></a>`state` | [`MilestoneStateEnum`](#milestonestateenum) | Filter milestones by state. |
 | <a id="projectmilestonestimeframe"></a>`timeframe` | [`Timeframe`](#timeframe) | List items overlapping the given timeframe. |
@@ -14734,6 +14739,23 @@ Representation of whether a GitLab merge request can be merged.
 | <a id="mergestrategyenumadd_to_merge_train_when_pipeline_succeeds"></a>`ADD_TO_MERGE_TRAIN_WHEN_PIPELINE_SUCCEEDS` | Use the add_to_merge_train_when_pipeline_succeeds merge strategy. |
 | <a id="mergestrategyenummerge_train"></a>`MERGE_TRAIN` | Use the merge_train merge strategy. |
 | <a id="mergestrategyenummerge_when_pipeline_succeeds"></a>`MERGE_WHEN_PIPELINE_SUCCEEDS` | Use the merge_when_pipeline_succeeds merge strategy. |
+
+### `MilestoneSort`
+
+Values for sorting milestones.
+
+| Value | Description |
+| ----- | ----------- |
+| <a id="milestonesortcreated_asc"></a>`CREATED_ASC` | Created at ascending order. |
+| <a id="milestonesortcreated_desc"></a>`CREATED_DESC` | Created at descending order. |
+| <a id="milestonesortdue_date_asc"></a>`DUE_DATE_ASC` | Milestone due date by ascending order. |
+| <a id="milestonesortdue_date_desc"></a>`DUE_DATE_DESC` | Milestone due date by descending order. |
+| <a id="milestonesortupdated_asc"></a>`UPDATED_ASC` | Updated at ascending order. |
+| <a id="milestonesortupdated_desc"></a>`UPDATED_DESC` | Updated at descending order. |
+| <a id="milestonesortcreated_asc"></a>`created_asc` **{warning-solid}** | **Deprecated** in 13.5. This was renamed. Use: `CREATED_ASC`. |
+| <a id="milestonesortcreated_desc"></a>`created_desc` **{warning-solid}** | **Deprecated** in 13.5. This was renamed. Use: `CREATED_DESC`. |
+| <a id="milestonesortupdated_asc"></a>`updated_asc` **{warning-solid}** | **Deprecated** in 13.5. This was renamed. Use: `UPDATED_ASC`. |
+| <a id="milestonesortupdated_desc"></a>`updated_desc` **{warning-solid}** | **Deprecated** in 13.5. This was renamed. Use: `UPDATED_DESC`. |
 
 ### `MilestoneStateEnum`
 
