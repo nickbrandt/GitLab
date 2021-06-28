@@ -31,7 +31,7 @@ class FinalizePushEventPayloadsBigintConversion < ActiveRecord::Migration[6.1]
     # Duplicate fk_36c74129da FK
     add_concurrent_foreign_key TABLE_NAME, :events, column: :event_id_convert_to_bigint, on_delete: :cascade
 
-    with_lock_retries(safe: true) do
+    with_lock_retries(raise_on_exhaustion: true) do
       swap_column_names TABLE_NAME, :event_id, :event_id_convert_to_bigint # rubocop:disable Migration/WithLockRetriesDisallowedMethod
 
       # Swap defaults

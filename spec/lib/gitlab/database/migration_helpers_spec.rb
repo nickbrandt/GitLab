@@ -2160,10 +2160,7 @@ RSpec.describe Gitlab::Database::MigrationHelpers do
 
     using RSpec::Parameterized::TableSyntax
 
-    where(:safe, :raise_on_exhaustion) do
-      true       | true
-      false      | false
-    end
+    where(raise_on_exhaustion: [true, false])
 
     with_them do
       it 'sets raise_on_exhaustion as requested' do
@@ -2171,7 +2168,7 @@ RSpec.describe Gitlab::Database::MigrationHelpers do
         expect(Gitlab::Database::WithLockRetries).to receive(:new).and_return(with_lock_retries)
         expect(with_lock_retries).to receive(:run).with(raise_on_exhaustion: raise_on_exhaustion)
 
-        model.with_lock_retries(env: env, logger: in_memory_logger, safe: safe) { }
+        model.with_lock_retries(env: env, logger: in_memory_logger, raise_on_exhaustion: raise_on_exhaustion) { }
       end
     end
 

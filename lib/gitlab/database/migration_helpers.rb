@@ -389,7 +389,7 @@ module Gitlab
       # * +logger+ - [Gitlab::JsonLogger]
       # * +env+ - [Hash] custom environment hash, see the example with `DISABLE_LOCK_RETRIES`
       def with_lock_retries(*args, **kwargs, &block)
-        raise_on_exhaustion = !!kwargs.delete(:safe)
+        raise_on_exhaustion = !!kwargs.delete(:raise_on_exhaustion)
         merged_args = {
           klass: self.class,
           logger: Gitlab::BackgroundMigration::Logger
