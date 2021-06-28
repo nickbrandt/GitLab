@@ -1,6 +1,7 @@
 <script>
 /* eslint-disable vue/no-v-html */
 import { memoize } from 'lodash';
+import { isLoggedIn } from '~/lib/utils/common_utils';
 import {
   PARALLEL_DIFF_VIEW_TYPE,
   CONFLICT_MARKER_THEIR,
@@ -15,8 +16,6 @@ import {
 } from '../utils/interoperability';
 import DiffGutterAvatars from './diff_gutter_avatars.vue';
 import * as utils from './diff_row_utils';
-
-const isLoggedIn = () => Boolean(window.gon?.current_user_id);
 
 export default {
   DiffGutterAvatars,
