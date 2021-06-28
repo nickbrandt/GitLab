@@ -1,7 +1,7 @@
 ---
 data_category: Optional
 key_path: compliance_unique_visits.compliance_unique_visits_for_any_target
-description: ''
+description: 'Number of unique visits to any compliance page'
 product_section: 'dev'
 product_stage: 'manage'
 product_group: 'group::compliance'
@@ -9,8 +9,9 @@ product_category: 'compliance_management'
 value_type: number
 status: data_available
 time_frame: all
-data_source: database
+data_source: redis
 distribution:
-- ce
+- ee
 tier:
-- free
+- premium
+- ultimate
