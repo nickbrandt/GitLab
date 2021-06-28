@@ -36,11 +36,14 @@ export default {
   computed: {
     ...mapState(['boardLists', 'error', 'addColumnForm']),
     ...mapGetters(['isSwimlanesOn', 'isEpicBoard']),
+    useNewBoardColumnComponent() {
+      return this.glFeatures.graphqlBoardLists || this.isSwimlanesOn || this.isEpicBoard;
+    },
     addColumnFormVisible() {
       return this.addColumnForm?.visible;
     },
     boardListsToUse() {
-      return this.glFeatures.graphqlBoardLists || this.isSwimlanesOn || this.isEpicBoard
+      return this.useNewBoardColumnComponent
         ? sortBy([...Object.values(this.boardLists)], 'position')
         : this.lists;
     },
@@ -64,9 +67,7 @@ export default {
       return this.canDragColumns ? options : {};
     },
     boardColumnComponent() {
-      return this.glFeatures.graphqlBoardLists || this.isSwimlanesOn || this.isEpicBoard
-        ? BoardColumn
-        : BoardColumnDeprecated;
+      return this.useNewBoardColumnComponent ? BoardColumn : BoardColumnDeprecated;
     },
   },
   methods: {
