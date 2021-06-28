@@ -6,7 +6,7 @@ module IntegrationsActions
   included do
     include Integrations::Params
 
-    before_action :integration, only: [:edit, :update, :test]
+    before_action :integration, only: [:edit, :update, :test, :overrides]
   end
 
   def edit
@@ -32,6 +32,16 @@ module IntegrationsActions
         render json: serialize_as_json, status: status
       end
     end
+  end
+
+  # rubocop: disable CodeReuse/ActiveRecord
+  def custom_overrides
+    render json: Project.all.page(params[:page]).per(20).to_json
+  end
+  # rubocop: enable CodeReuse/ActiveRecord
+
+  def overrides
+    render 'shared/integrations/overrides'
   end
 
   def test
