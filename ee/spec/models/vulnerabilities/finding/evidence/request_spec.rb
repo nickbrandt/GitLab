@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
+require_relative './body_shared_examples'
 
 RSpec.describe Vulnerabilities::Finding::Evidence::Request do
   it { is_expected.to belong_to(:evidence).class_name('Vulnerabilities::Finding::Evidence').inverse_of(:request).required }
@@ -8,5 +9,6 @@ RSpec.describe Vulnerabilities::Finding::Evidence::Request do
 
   it { is_expected.to validate_length_of(:method).is_at_most(32) }
   it { is_expected.to validate_length_of(:url).is_at_most(2048) }
-  it { is_expected.to validate_length_of(:body).is_at_most(2048) }
+
+  it_behaves_like 'body shared examples', :vulnerabilties_finding_evidence_request
 end
