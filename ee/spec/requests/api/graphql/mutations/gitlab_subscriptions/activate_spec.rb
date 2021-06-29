@@ -7,6 +7,7 @@ RSpec.describe 'Activate a subscription' do
 
   let_it_be(:current_user) { create(:admin) }
   let_it_be(:license_key) { build(:gitlab_license).export }
+
   let(:activation_code) { 'activation_code' }
   let(:mutation) do
     graphql_mutation(:gitlab_subscription_activate, { activation_code: activation_code })
