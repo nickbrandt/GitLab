@@ -16,4 +16,10 @@ export default () => ({
   iterationsLoading: false,
   assignees: [],
   assigneesLoading: false,
+  subGroups: [],
+  subGroupsFlags: {
+    isLoading: false,
+    isLoadingMore: false,
+    pageInfo: {},
+  },
 });
