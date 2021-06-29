@@ -3,8 +3,8 @@
 require 'spec_helper'
 
 RSpec.describe 'issuable list', :js do
-  let(:project) { create(:project) }
-  let(:user)    { create(:user) }
+  let_it_be(:project) { create(:project) }
+  let_it_be(:user)    { create(:user) }
 
   issuable_types = [:issue, :merge_request]
 
@@ -48,19 +48,44 @@ RSpec.describe 'issuable list', :js do
     end
   end
 
-  it 'displays a warning if counting the number of issues times out' do
-    allow_any_instance_of(IssuesFinder).to receive(:count_by_state).and_raise(ActiveRecord::QueryCanceled)
-
-    visit_issuable_list(:issue)
-
-    expect(page).to have_text('Open Closed All')
-  end
-
   it "counts merge requests closing issues icons for each issue" do
     visit_issuable_list(:issue)
 
     expect(page).to have_selector('[data-testid="merge-requests"]', count: 1)
     expect(first('[data-testid="merge-requests"]').find(:xpath, '..')).to have_content(1)
+  end
+
+  context 'when cached issuables state count is enabled' do
+    before do
+      stub_feature_flags(cached_issuables_state_count: true)
+    end
+
+    it 'displays a warning if counting the number of issues times out' do
+      allow_any_instance_of(IssuesFinder).to receive(:count_by_state).and_raise(ActiveRecord::QueryCanceled)
+      allow(Rails.cache).to receive(:fetch).and_call_original
+      allow(Rails.cache).to receive(:fetch).with(
+        ['project', project.id, 'IssuesFinder', 'total'],
+        { expires_in: Gitlab::IssuablesCountForState::CACHE_EXPIRES_IN }
+      ).and_return({ opened: 1, closed: 1, all: 2 })
+
+      visit_issuable_list(:issue)
+
+      expect(page).to have_text('Open 1 Closed 1 All 2')
+    end
+  end
+
+  context 'when cached issuables state count is disabled' do
+    before do
+      stub_feature_flags(cached_issuables_state_count: false)
+    end
+
+    it 'displays a warning if counting the number of issues times out' do
+      allow_any_instance_of(IssuesFinder).to receive(:count_by_state).and_raise(ActiveRecord::QueryCanceled)
+
+      visit_issuable_list(:issue)
+
+      expect(page).to have_text('Open Closed All')
+    end
   end
 
   def visit_issuable_list(issuable_type)

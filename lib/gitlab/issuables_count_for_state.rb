@@ -3,13 +3,16 @@
 module Gitlab
   # Class for counting and caching the number of issuables per state.
   class IssuablesCountForState
+    include Gitlab::Utils::StrongMemoize
     # The name of the Gitlab::SafeRequestStore cache key.
     CACHE_KEY = :issuables_count_for_state
+    # The expiration time for the Rails cache.
+    CACHE_EXPIRES_IN = 10.minutes
 
     # The state values that can be safely casted to a Symbol.
     STATES = %w[opened closed merged all].freeze
 
-    attr_reader :project
+    attr_reader :finder, :project
 
     def self.declarative_policy_class
       'IssuablePolicy'
@@ -18,11 +21,13 @@ module Gitlab
     # finder - The finder class to use for retrieving the issuables.
     # fast_fail - restrict counting to a shorter period, degrading gracefully on
     # failure
-    def initialize(finder, project = nil, fast_fail: false)
+    # store_in_redis_cache - Attempt to cache values
+    def initialize(finder, project = nil, fast_fail: false, store_in_redis_cache: false)
       @finder = finder
       @project = project
       @fast_fail = fast_fail
-      @cache = Gitlab::SafeRequestStore[CACHE_KEY] ||= initialize_cache
+      @store_in_redis_cache = store_in_redis_cache
+      @request_store_cache = Gitlab::SafeRequestStore[CACHE_KEY] ||= initialize_cache
     end
 
     def for_state_or_opened(state = nil)
@@ -52,7 +57,11 @@ module Gitlab
     private
 
     def cache_for_finder
-      @cache[@finder]
+      if @store_in_redis_cache && parent.present? && !params_include_filters?
+        redis_store_cache
+      else
+        @request_store_cache[finder]
+      end
     end
 
     def cast_state_to_symbol?(state)
@@ -107,6 +116,52 @@ module Gitlab
         :gitlab_issuable_fast_count_by_state_failures_total,
         "Count of failed calls to IssuableFinder#count_by_state with fast failure"
       ).increment
+    end
+
+    def redis_store_cache
+      Rails.cache.fetch(redis_cache_key, cache_options) do
+        counts = perform_count(finder)
+        break counts if counts.empty?
+
+        counts
+      end
+    end
+
+    def parent
+      finder.params.project || finder.params.group
+    end
+
+    def redis_cache_key
+      parent_type = parent.is_a?(Group) ? 'group' : 'project'
+      key = [parent_type, parent.id, finder.class.name]
+      return key if skip_confidentiality_check?
+
+      visibility = user_is_at_least_reporter? ? 'total' : 'public'
+      key.push(visibility)
+    end
+
+    def cache_options
+      { expires_in: CACHE_EXPIRES_IN }
+    end
+
+    def user_is_at_least_reporter?
+      parent_team = parent.is_a?(Project) ? parent.team : parent
+
+      strong_memoize(:user_is_at_least_reporter) do
+        finder.current_user && parent_team&.member?(finder.current_user, Gitlab::Access::REPORTER)
+      end
+    end
+
+    def skip_confidentiality_check?
+      return true if finder.instance_of?(MergeRequestsFinder)
+
+      false
+    end
+
+    def params_include_filters?
+      filters = finder.class.valid_params.collect { |item| item.is_a?(Hash) ? item.keys : item }
+        .flatten.push(:confidential)
+      finder.params.compact.slice(*filters).any?
     end
   end
 end

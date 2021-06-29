@@ -283,7 +283,9 @@ module IssuablesHelper
   end
 
   def issuables_count_for_state(issuable_type, state)
-    Gitlab::IssuablesCountForState.new(finder)[state]
+    cached = Feature.enabled?(:cached_issuables_state_count, parent, default_enabled: :yaml)
+
+    Gitlab::IssuablesCountForState.new(finder, store_in_redis_cache: cached)[state]
   end
 
   def close_issuable_path(issuable)
