@@ -8736,7 +8736,7 @@ msgstr ""
 msgid "Control emails linked to your account"
 msgstr ""
 
-msgid "Control the display of third party offers."
+msgid "Control whether to display third-party offers in GitLab."
 msgstr ""
 
 msgid "Cookie domain"
@@ -11431,7 +11431,7 @@ msgstr ""
 msgid "Display source"
 msgstr ""
 
-msgid "Do not display offers from third parties within GitLab"
+msgid "Do not display offers from third parties"
 msgstr ""
 
 msgid "Do you want to remove this deploy key?"
@@ -32937,7 +32937,7 @@ msgstr ""
 msgid "Third Party Advisory Link"
 msgstr ""
 
-msgid "Third party offers"
+msgid "Third-party offers"
 msgstr ""
 
 msgid "This %{issuableDisplayName} is locked. Only project members can comment."
