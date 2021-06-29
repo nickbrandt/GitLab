@@ -1,31 +1,41 @@
 import { nodeInputRule } from '@tiptap/core';
 import { Image } from '@tiptap/extension-image';
+import { VueNodeViewRenderer } from '@tiptap/vue-2';
 import { Plugin, PluginKey } from 'prosemirror-state';
+import ImageWrapper from '../components/wrappers/image.vue';
 import { uploadFile } from '../services/upload_file';
+import { readFileAsDataURL } from '../services/utils';
 
 export const imageSyntaxInputRuleRegExp = /(?:^|\s)!\[(?<alt>[\w|\s|-]+)\]\((?<src>.+?)\)$/gm;
 
 const acceptedMimes = ['image/jpeg', 'image/png', 'image/gif', 'image/jpg'];
 
-const startFileUpload = async ({ file, uploadsPath, renderMarkdown, editor }) => {
-  editor.emit('imageUploadStart');
+const startFileUpload = async ({ editor, file, uploadsPath, renderMarkdown }) => {
+  const encodedSrc = await readFileAsDataURL(file);
+  const { view } = editor;
 
-  try {
-    const data = await uploadFile({ file, uploadsPath, renderMarkdown });
-    const { src, canonicalSrc } = data;
+  editor.commands.setImage({ uploading: true, encodedSrc });
 
-    editor.commands.setImage({ src, canonicalSrc, alt: '' });
-    editor.emit('imageUploadSucceed', data);
-  } catch (e) {
-    editor.emit('imageUploadFailed');
-  }
+  const { state } = view;
+  const position = state.selection.from - 1;
+  const { tr } = state;
+  const { src, canonicalSrc } = await uploadFile({ file, uploadsPath, renderMarkdown });
+
+  view.dispatch(
+    tr.setNodeMarkup(position, undefined, {
+      uploading: false,
+      encodedSrc,
+      src,
+      canonicalSrc,
+    }),
+  );
 };
 
-const handleFileEvent = ({ files, uploadsPath, renderMarkdown, editor }) => {
+const handleFileEvent = ({ editor, files, uploadsPath, renderMarkdown }) => {
   const file = files[0];
 
   if (acceptedMimes.includes(file?.type)) {
-    startFileUpload({ file, uploadsPath, renderMarkdown, editor });
+    startFileUpload({ editor, file, uploadsPath, renderMarkdown });
 
     return true;
   }
@@ -45,6 +55,12 @@ export const ExtendedImage = Image.extend({
   addAttributes() {
     return {
       ...this.parent?.(),
+      uploading: {
+        default: false,
+      },
+      encodedSrc: {
+        default: null,
+      },
       src: {
         default: null,
         /*
@@ -103,7 +119,7 @@ export const ExtendedImage = Image.extend({
     };
   },
   addProseMirrorPlugins() {
-    const extension = this;
+    const { editor } = this;
 
     return [
       new Plugin({
@@ -113,25 +129,28 @@ export const ExtendedImage = Image.extend({
             const { uploadsPath, renderMarkdown } = this.options;
 
             return handleFileEvent({
+              editor,
               files: event.clipboardData.files,
               uploadsPath,
               renderMarkdown,
-              editor: extension.editor,
             });
           },
           handleDrop: (_, event) => {
             const { uploadsPath, renderMarkdown } = this.options;
 
             return handleFileEvent({
+              editor,
               files: event.dataTransfer.files,
               uploadsPath,
               renderMarkdown,
-              editor: extension.editor,
             });
           },
         },
       }),
     ];
+  },
+  addNodeView() {
+    return VueNodeViewRenderer(ImageWrapper);
   },
 }).configure({ inline: true });
 
@@ -144,9 +163,6 @@ export const serializer = (state, node) => {
 
 export const configure = (config) => ({
   tiptapExtension: ExtendedImage.configure({
-    HTMLAttributes: {
-      class: 'gl-w-full gl-h-auto',
-    },
     ...config,
   }),
   serializer,
