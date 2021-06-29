@@ -121,6 +121,10 @@ describe('PolicyList component', () => {
       });
     });
 
+    it("sets table's loading state", () => {
+      expect(findPoliciesTable().attributes('busy')).toBe('true');
+    });
+
     it('fetches network policies on environment change', async () => {
       store.dispatch.mockReset();
       await store.commit('threatMonitoring/SET_CURRENT_ENVIRONMENT_ID', 2);
@@ -129,10 +133,6 @@ describe('PolicyList component', () => {
         fullPath: 'project/path',
         environmentId: environments[0].global_id,
       });
-    });
-
-    it("sets table's loading state", () => {
-      expect(findPoliciesTable().attributes('busy')).toBe('true');
     });
   });
 
