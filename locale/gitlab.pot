@@ -26906,6 +26906,9 @@ msgstr ""
 msgid "References"
 msgstr ""
 
+msgid "Refine your search criteria (select a %{strong_open}group%{strong_close} and %{strong_open}project%{strong_close}  when possible)"
+msgstr ""
+
 msgid "Refresh"
 msgstr ""
 
@@ -34147,6 +34150,9 @@ msgstr ""
 msgid "To receive alerts from manually configured Prometheus services, add the following URL and Authorization key to your Prometheus webhook config file. Learn more about %{linkStart}configuring Prometheus%{linkEnd} to send alerts to GitLab."
 msgstr ""
 
+msgid "To resolve this, try to:"
+msgstr ""
+
 msgid "To run CI/CD pipelines with JetBrains TeamCity, input the GitLab project details in the TeamCity project Version Control Settings."
 msgstr ""
 
@@ -35401,6 +35407,9 @@ msgid "Use cURL"
 msgstr ""
 
 msgid "Use custom color #FF0000"
+msgstr ""
+
+msgid "Use double quotes for multiple keywords, such as %{code_open}\"your search\"%{code_close}"
 msgstr ""
 
 msgid "Use hashed storage"
@@ -37969,6 +37978,9 @@ msgid "Your search didn't match any commits."
 msgstr ""
 
 msgid "Your search didn't match any commits. Try a different query."
+msgstr ""
+
+msgid "Your search timed out"
 msgstr ""
 
 msgid "Your sign-in page is %{url}."
