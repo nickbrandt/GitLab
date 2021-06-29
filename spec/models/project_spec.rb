@@ -5371,7 +5371,7 @@ RSpec.describe Project, factory_default: :keep do
     end
   end
 
-  describe '#execute_services' do
+  describe '#execute_integrations' do
     let(:integration) { create(:integrations_slack, push_events: true, merge_requests_events: false, active: true) }
 
     it 'executes integrations with the specified scope' do
@@ -5381,7 +5381,7 @@ RSpec.describe Project, factory_default: :keep do
         expect(instance).to receive(:async_execute).with(data).once
       end
 
-      integration.project.execute_services(data, :push_hooks)
+      integration.project.execute_integrations(data, :push_hooks)
     end
 
     it 'does not execute integration that don\'t match the specified scope' do
@@ -5391,7 +5391,7 @@ RSpec.describe Project, factory_default: :keep do
         end
       end
 
-      integration.project.execute_services(anything, :merge_request_hooks)
+      integration.project.execute_integrations(anything, :merge_request_hooks)
     end
   end
 
@@ -5422,16 +5422,16 @@ RSpec.describe Project, factory_default: :keep do
     end
   end
 
-  describe '#has_active_services?' do
+  describe '#has_active_integrations?' do
     let_it_be(:project) { create(:project) }
 
-    it { expect(project.has_active_services?).to be_falsey }
+    it { expect(project.has_active_integrations?).to be_falsey }
 
     it 'returns true when a matching service exists' do
       create(:custom_issue_tracker_integration, push_events: true, merge_requests_events: false, project: project)
 
-      expect(project.has_active_services?(:merge_request_hooks)).to be_falsey
-      expect(project.has_active_services?).to be_truthy
+      expect(project.has_active_integrations?(:merge_request_hooks)).to be_falsey
+      expect(project.has_active_integrations?).to be_truthy
     end
   end
 
@@ -5864,7 +5864,7 @@ RSpec.describe Project, factory_default: :keep do
         allow(subject).to receive(:disabled_integrations).and_return(%w[prometheus])
       end
 
-      it 'returns only enabled services sorted' do
+      it 'returns only enabled integrations sorted' do
         expect(subject.find_or_initialize_integrations).to match [
           have_attributes(title: 'JetBrains TeamCity'),
           have_attributes(title: 'Pushover')
@@ -5908,7 +5908,7 @@ RSpec.describe Project, factory_default: :keep do
         create(:prometheus_integration, :template, api_url: 'https://prometheus.template.com/')
       end
 
-      it 'builds the service from the instance integration' do
+      it 'builds the integration from the instance integration' do
         expect(subject.find_or_initialize_integration('prometheus').api_url).to eq('https://prometheus.instance.com/')
       end
     end
@@ -5918,13 +5918,13 @@ RSpec.describe Project, factory_default: :keep do
         create(:prometheus_integration, :template, api_url: 'https://prometheus.template.com/')
       end
 
-      it 'builds the service from the template' do
+      it 'builds the integration from the template' do
         expect(subject.find_or_initialize_integration('prometheus').api_url).to eq('https://prometheus.template.com/')
       end
     end
 
     context 'without an exisiting integration, or instance-level or template' do
-      it 'builds the service' do
+      it 'builds the integration' do
         expect(subject.find_or_initialize_integration('prometheus')).to be_a(::Integrations::Prometheus)
         expect(subject.find_or_initialize_integration('prometheus').api_url).to be_nil
       end
@@ -6615,16 +6615,16 @@ RSpec.describe Project, factory_default: :keep do
       create(:prometheus_integration, project: project, manual_configuration: manual_configuration)
     end
 
-    context 'when project has an activated prometheus service' do
+    context 'when project has an activated prometheus integration' do
       let(:manual_configuration) { true }
 
       it { is_expected.to be_truthy }
     end
 
-    context 'when project has an inactive prometheus service' do
+    context 'when project has an inactive prometheus integration' do
       let(:manual_configuration) { false }
 
-      it 'the service is marked as inactive' do
+      it 'the integration is marked as inactive' do
         expect(subject).to be_falsey
       end
     end
