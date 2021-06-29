@@ -1,14 +1,14 @@
 import { GlTable, GlDrawer } from '@gitlab/ui';
 import { createLocalVue } from '@vue/test-utils';
-import { merge, cloneDeep } from 'lodash';
+import { merge } from 'lodash';
 import VueApollo from 'vue-apollo';
 import PolicyList from 'ee/threat_monitoring/components/policy_list.vue';
 import networkPoliciesQuery from 'ee/threat_monitoring/graphql/queries/network_policies.query.graphql';
 import scanExecutionPoliciesQuery from 'ee/threat_monitoring/graphql/queries/scan_execution_policies.query.graphql';
 import createStore from 'ee/threat_monitoring/store';
 import createMockApolloProvider from 'helpers/mock_apollo_helper';
-import { stubComponent } from 'helpers/stub_component';
 import { mountExtended, shallowMountExtended } from 'helpers/vue_test_utils_helper';
+import waitForPromises from 'helpers/wait_for_promises';
 import { networkPolicies, scanExecutionPolicies } from '../mocks/mock_apollo';
 import { mockNetworkPoliciesResponse, mockScanExecutionPoliciesResponse } from '../mocks/mock_data';
 
@@ -137,33 +137,26 @@ describe('PolicyList component', () => {
   });
 
   describe('given policies have been fetched', () => {
-    beforeEach(() => {
-      mountShallowWrapper({
-        stubs: {
-          GlTable: stubComponent(GlTable, {
-            template: '<table data-testid="table" />',
-            props: ['items'],
-          }),
-        },
-      });
+    let rows;
+
+    beforeEach(async () => {
+      mountWrapper();
+      await waitForPromises();
+      rows = wrapper.findAll('tr');
     });
 
-    it('passes all policies to the table', () => {
-      expect(cloneDeep(wrapper.findByTestId('table').props('items'))).toEqual([
-        expect.objectContaining({
-          name: mockNetworkPoliciesResponse[0].name,
-        }),
-        expect.objectContaining({
-          name: 'drop-outbound',
-        }),
-        expect.objectContaining({
-          name: 'allow-inbound-http',
-        }),
-        expect.objectContaining({
-          name: mockScanExecutionPoliciesResponse[0].name,
-        }),
-      ]);
-    });
+    it.each`
+      rowIndex | expectedPolicyName
+      ${1}     | ${mockNetworkPoliciesResponse[0].name}
+      ${2}     | ${'drop-outbound'}
+      ${3}     | ${'allow-inbound-http'}
+      ${4}     | ${mockScanExecutionPoliciesResponse[0].name}
+    `(
+      'renders "$expectedPolicyName" policy in row #$rowIndex',
+      ({ expectedPolicyName, rowIndex }) => {
+        expect(rows.at(rowIndex).text()).toContain(expectedPolicyName);
+      },
+    );
   });
 
   describe('with allEnvironments enabled', () => {
