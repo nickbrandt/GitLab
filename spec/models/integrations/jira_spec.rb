@@ -146,15 +146,13 @@ RSpec.describe Integrations::Jira do
       }
     end
 
-    subject { described_class.create!(params) }
+    subject(:integration) { described_class.create!(params) }
 
     it 'does not store data into properties' do
-      expect(subject.properties).to be_nil
+      expect(integration.properties).to be_nil
     end
 
     it 'stores data in data_fields correctly' do
-      integration = subject
-
       expect(integration.jira_tracker_data.url).to eq(url)
       expect(integration.jira_tracker_data.api_url).to eq(api_url)
       expect(integration.jira_tracker_data.username).to eq(username)
@@ -164,21 +162,19 @@ RSpec.describe Integrations::Jira do
     end
 
     context 'when loading serverInfo' do
-      let(:jira_integration) { subject }
-
-      context 'from a Cloud instance' do
+      context 'with a Cloud instance' do
         let(:server_info_results) { { 'deploymentType' => 'Cloud' } }
 
         it 'is detected' do
-          expect(jira_integration.jira_tracker_data.deployment_cloud?).to be_truthy
+          expect(integration.jira_tracker_data).to be_deployment_cloud
         end
       end
 
-      context 'from a Server instance' do
+      context 'with a Server instance' do
         let(:server_info_results) { { 'deploymentType' => 'Server' } }
 
         it 'is detected' do
-          expect(jira_integration.jira_tracker_data.deployment_server?).to be_truthy
+          expect(integration.jira_tracker_data).to be_deployment_server
         end
       end
 
@@ -189,7 +185,7 @@ RSpec.describe Integrations::Jira do
           let(:api_url) { 'http://example-api.atlassian.net' }
 
           it 'deployment_type is set to cloud' do
-            expect(jira_integration.jira_tracker_data.deployment_cloud?).to be_truthy
+            expect(integration.jira_tracker_data).to be_deployment_cloud
           end
         end
 
@@ -197,7 +193,7 @@ RSpec.describe Integrations::Jira do
           let(:api_url) { 'http://my-jira-api.someserver.com' }
 
           it 'deployment_type is set to server' do
-            expect(jira_integration.jira_tracker_data.deployment_server?).to be_truthy
+            expect(integration.jira_tracker_data).to be_deployment_server
           end
         end
       end
@@ -210,7 +206,7 @@ RSpec.describe Integrations::Jira do
 
           it 'deployment_type is set to cloud' do
             expect(Gitlab::AppLogger).to receive(:warn).with(message: "Jira API returned no ServerInfo, setting deployment_type from URL", server_info: server_info_results, url: api_url)
-            expect(jira_integration.jira_tracker_data.deployment_cloud?).to be_truthy
+            expect(integration.jira_tracker_data).to be_deployment_cloud
           end
         end
 
@@ -219,7 +215,7 @@ RSpec.describe Integrations::Jira do
 
           it 'deployment_type is set to server' do
             expect(Gitlab::AppLogger).to receive(:warn).with(message: "Jira API returned no ServerInfo, setting deployment_type from URL", server_info: server_info_results, url: api_url)
-            expect(jira_integration.jira_tracker_data.deployment_server?).to be_truthy
+            expect(integration.jira_tracker_data).to be_deployment_server
           end
         end
       end
