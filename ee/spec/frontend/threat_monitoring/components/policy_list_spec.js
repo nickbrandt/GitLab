@@ -10,7 +10,7 @@ import createMockApolloProvider from 'helpers/mock_apollo_helper';
 import { stubComponent } from 'helpers/stub_component';
 import { mountExtended, shallowMountExtended } from 'helpers/vue_test_utils_helper';
 import { networkPolicies, scanExecutionPolicies } from '../mocks/mock_apollo';
-import { mockPoliciesResponse, mockScanExecutionPolicy } from '../mocks/mock_data';
+import { mockNetworkPoliciesResponse, mockScanExecutionPoliciesResponse } from '../mocks/mock_data';
 
 const localVue = createLocalVue();
 localVue.use(VueApollo);
@@ -23,8 +23,8 @@ const environments = [
   },
 ];
 const defaultRequestHandlers = {
-  networkPolicies: networkPolicies(mockPoliciesResponse),
-  scanExecutionPolicies: scanExecutionPolicies([mockScanExecutionPolicy]),
+  networkPolicies: networkPolicies(mockNetworkPoliciesResponse),
+  scanExecutionPolicies: scanExecutionPolicies(mockScanExecutionPoliciesResponse),
 };
 const pendingHandler = jest.fn(() => new Promise(() => {}));
 
@@ -152,7 +152,7 @@ describe('PolicyList component', () => {
     it('passes all policies to the table', () => {
       expect(cloneDeep(wrapper.findByTestId('table').props('items'))).toEqual([
         expect.objectContaining({
-          name: mockPoliciesResponse[0].name,
+          name: mockNetworkPoliciesResponse[0].name,
         }),
         expect.objectContaining({
           name: 'drop-outbound',
@@ -161,7 +161,7 @@ describe('PolicyList component', () => {
           name: 'allow-inbound-http',
         }),
         expect.objectContaining({
-          name: mockScanExecutionPolicy.name,
+          name: mockScanExecutionPoliciesResponse[0].name,
         }),
       ]);
     });
@@ -182,7 +182,7 @@ describe('PolicyList component', () => {
   describe('given there is a selected policy', () => {
     beforeEach(() => {
       mountShallowWrapper();
-      findPoliciesTable().vm.$emit('row-selected', [mockPoliciesResponse[0]]);
+      findPoliciesTable().vm.$emit('row-selected', [mockNetworkPoliciesResponse[0]]);
     });
 
     it('renders opened editor drawer', () => {
@@ -195,7 +195,7 @@ describe('PolicyList component', () => {
   describe('given an autodevops policy', () => {
     beforeEach(() => {
       const autoDevOpsPolicy = {
-        ...mockPoliciesResponse[0],
+        ...mockNetworkPoliciesResponse[0],
         name: 'auto-devops',
         fromAutoDevops: true,
       };

@@ -15,7 +15,7 @@ export const mockEnvironmentsResponse = {
   stopped_count: 5,
 };
 
-export const mockPoliciesResponse = [
+export const mockNetworkPoliciesResponse = [
   {
     name: 'policy',
     yaml: `---
@@ -70,6 +70,8 @@ actions:
 `,
   enabled: true,
 };
+
+export const mockScanExecutionPoliciesResponse = [mockScanExecutionPolicy];
 
 export const mockNominalHistory = [
   ['2019-12-04T00:00:00.000Z', 56],
