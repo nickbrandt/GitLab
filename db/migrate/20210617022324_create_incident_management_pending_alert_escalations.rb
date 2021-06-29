@@ -28,9 +28,6 @@ class CreateIncidentManagementPendingAlertEscalations < ActiveRecord::Migration[
         CREATE INDEX index_incident_management_pending_alert_escalations_on_schedule_id
           ON incident_management_pending_alert_escalations USING btree (schedule_id);
 
-        CREATE INDEX index_incident_management_pending_alert_escalations_on_process_at_id
-          ON incident_management_pending_alert_escalations USING btree (process_at, id);
-
         ALTER TABLE incident_management_pending_alert_escalations ADD CONSTRAINT fk_rails_fcbfd9338b
           FOREIGN KEY (schedule_id) REFERENCES incident_management_oncall_schedules(id) ON DELETE CASCADE;
 

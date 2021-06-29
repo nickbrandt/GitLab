@@ -23636,8 +23636,6 @@ CREATE INDEX index_incident_management_oncall_shifts_on_participant_id ON incide
 
 CREATE INDEX index_incident_management_pending_alert_escalations_on_alert_id ON ONLY incident_management_pending_alert_escalations USING btree (alert_id);
 
-CREATE INDEX index_incident_management_pending_alert_escalations_on_process_ ON ONLY incident_management_pending_alert_escalations USING btree (process_at, id);
-
 CREATE INDEX index_incident_management_pending_alert_escalations_on_rule_id ON ONLY incident_management_pending_alert_escalations USING btree (rule_id);
 
 CREATE INDEX index_incident_management_pending_alert_escalations_on_schedule ON ONLY incident_management_pending_alert_escalations USING btree (schedule_id);
