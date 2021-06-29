@@ -35,7 +35,11 @@ module Ci
       check_access!(build)
 
       new_build = clone_build(build)
-      ::Ci::Pipelines::AddJobService.new(build.pipeline).execute!(new_build)
+      ::Ci::Pipelines::AddJobService.new(build.pipeline).execute!(new_build) do |job|
+        BulkInsertableAssociations.with_bulk_insert do
+          job.save!
+        end
+      end
       build.reset # refresh the data to get new values of `retried` and `processed`.
 
       new_build

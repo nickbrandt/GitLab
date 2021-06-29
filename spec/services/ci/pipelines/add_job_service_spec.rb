@@ -17,33 +17,56 @@ RSpec.describe Ci::Pipelines::AddJobService do
     end
   end
 
-  it 'assigns pipeline attributes to the job' do
-    expect do
-      service.execute!(job)
-    end.to change { job.slice(:pipeline, :project, :ref) }.to(
-      pipeline: pipeline, project: pipeline.project, ref: pipeline.ref
-    )
-  end
-
-  it 'returns the job itself' do
-    expect(service.execute!(job)).to eq(job)
-  end
-
-  it 'calls update_older_statuses_retried!' do
-    expect(job).to receive(:update_older_statuses_retried!)
-
-    service.execute!(job)
-  end
-
-  context 'when the FF ci_fix_commit_status_retried is disabled' do
-    before do
-      stub_feature_flags(ci_fix_commit_status_retried: false)
+  describe '#execute!' do
+    subject(:execute) do
+      service.execute!(job) do |job|
+        job.save!
+      end
     end
 
-    it 'does not call update_older_statuses_retried!' do
-      expect(job).not_to receive(:update_older_statuses_retried!)
+    it 'assigns pipeline attributes to the job' do
+      expect do
+        execute
+      end.to change { job.slice(:pipeline, :project, :ref) }.to(
+        pipeline: pipeline, project: pipeline.project, ref: pipeline.ref
+      )
+    end
 
-      service.execute!(job)
+    it 'returns a service response with the job as payload' do
+      expect(execute).to be_success
+      expect(execute.payload[:job]).to eq(job)
+    end
+
+    it 'calls update_older_statuses_retried!' do
+      expect(job).to receive(:update_older_statuses_retried!)
+
+      execute
+    end
+
+    context 'when the block raises an error' do
+      subject(:execute) do
+        service.execute!(job) do |job|
+          raise "this is an error"
+        end
+      end
+
+      it 'returns a service response with the error and the job as payload' do
+        expect(execute).to be_error
+        expect(execute.payload[:job]).to eq(job)
+        expect(execute.message).to eq('this is an error')
+      end
+    end
+
+    context 'when the FF ci_fix_commit_status_retried is disabled' do
+      before do
+        stub_feature_flags(ci_fix_commit_status_retried: false)
+      end
+
+      it 'does not call update_older_statuses_retried!' do
+        expect(job).not_to receive(:update_older_statuses_retried!)
+
+        execute
+      end
     end
   end
 end
