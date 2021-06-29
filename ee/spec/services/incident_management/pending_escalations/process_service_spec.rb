@@ -14,7 +14,8 @@ RSpec.describe IncidentManagement::PendingEscalations::ProcessService do
   let(:alert_params) { { status: AlertManagement::Alert::STATUSES[:triggered] } }
 
   let(:target) { alert }
-  let(:escalation) { create(:incident_management_pending_alert_escalation, rule: escalation_rule, oncall_schedule: schedule_1, target: target, status: IncidentManagement::EscalationRule.statuses[:acknowledged]) }
+  let(:process_at) { 5.minutes.ago }
+  let(:escalation) { create(:incident_management_pending_alert_escalation, rule: escalation_rule, oncall_schedule: schedule_1, target: target, status: IncidentManagement::EscalationRule.statuses[:acknowledged], process_at: process_at) }
 
   let(:service) { described_class.new(escalation) }
 
@@ -67,6 +68,12 @@ RSpec.describe IncidentManagement::PendingEscalations::ProcessService do
 
     context 'target status is not above threshold' do
       let(:target) { create(:alert_management_alert, :acknowledged, project: project) }
+
+      it_behaves_like 'it does not escalate'
+    end
+
+    context 'escalation is not ready to be processed' do
+      let(:process_at) { 5.minutes.from_now }
 
       it_behaves_like 'it does not escalate'
     end

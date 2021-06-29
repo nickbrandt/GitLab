@@ -33,10 +33,7 @@ RSpec.describe AlertManagement::Alerts::UpdateService do
 
         let(:new_status) { :triggered }
 
-        it 'creates an escalation' do
-          expect { execute }.to change { IncidentManagement::PendingEscalations::Alert.count }.by(1)
-          expect(IncidentManagement::PendingEscalations::Alert.last.alert).to eq(alert)
-        end
+        it_behaves_like 'creates an escalation'
       end
 
       context 'moving from an open status to closed status' do

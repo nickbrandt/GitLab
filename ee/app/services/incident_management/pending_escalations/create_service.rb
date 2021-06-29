@@ -34,9 +34,6 @@ module IncidentManagement
         end
 
         process_escalations(escalation_ids)
-
-      rescue StandardError => e
-        Gitlab::ErrorTracking.track_exception(e, target_type: target.class.to_s, target_id: target.id)
       end
 
       def create_escalation(rule)

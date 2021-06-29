@@ -105,7 +105,7 @@ RSpec.describe Projects::Alerting::NotifyService do
         end
 
         it_behaves_like 'does not send on-call notification'
-        include_examples 'creates an escalation', 1
+        include_examples 'creates an escalation'
 
         context 'existing alert with same payload fingerprint' do
           let_it_be(:alert) { create(:alert_management_alert, fingerprint: gitlab_fingerprint, project: project) }

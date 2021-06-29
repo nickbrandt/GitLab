@@ -12,6 +12,7 @@ module IncidentManagement
 
       def execute
         return unless ::Gitlab::IncidentManagement.escalation_policies_available?(project)
+        return if too_early_to_process?
         return if target_already_resolved?
         return if target_status_exceeded_rule?
 
@@ -31,6 +32,10 @@ module IncidentManagement
 
       def target_status_exceeded_rule?
         target.status >= escalation.status_before_type_cast
+      end
+
+      def too_early_to_process?
+        Time.current < escalation.process_at
       end
 
       def notify_recipients

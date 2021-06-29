@@ -45,7 +45,7 @@ module EE
       end
 
       def create_pending_escalations
-        ::IncidentManagement::PendingEscalations::CreateService.new(alert).execute
+        ::IncidentManagement::PendingEscalations::AlertCreateWorker.perform_async(alert.id)
       end
     end
   end
