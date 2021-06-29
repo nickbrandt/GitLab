@@ -7,8 +7,19 @@ import { getTimeago } from '~/lib/utils/datetime_utility';
 import { setUrlFragment, mergeUrlParams } from '~/lib/utils/url_utility';
 import { s__ } from '~/locale';
 import networkPoliciesQuery from '../graphql/queries/network_policies.query.graphql';
+import scanExecutionPoliciesQuery from '../graphql/queries/scan_execution_policies.query.graphql';
 import EnvironmentPicker from './environment_picker.vue';
 import PolicyDrawer from './policy_drawer/policy_drawer.vue';
+
+const createPolicyFetchError = ({ gqlError, networkError }) => {
+  const error =
+    gqlError?.message ||
+    networkError?.message ||
+    s__('NetworkPolicies|Something went wrong, unable to fetch policies');
+  createFlash({
+    message: error,
+  });
+};
 
 export default {
   components: {
@@ -48,22 +59,32 @@ export default {
         );
         return [...policies, ...predefined];
       },
-      error({ gqlError, networkError }) {
-        const error =
-          gqlError?.message ||
-          networkError?.message ||
-          s__('NetworkPolicies|Something went wrong, unable to fetch policies');
-        createFlash({
-          message: error,
-        });
-      },
+      error: createPolicyFetchError,
       skip() {
         return this.isLoadingEnvironments;
       },
     },
+    scanExecutionPolicies: {
+      query: scanExecutionPoliciesQuery,
+      variables() {
+        return {
+          fullPath: this.projectPath,
+        };
+      },
+      update(data) {
+        return data?.project?.scanExecutionPolicies?.nodes ?? [];
+      },
+      error: createPolicyFetchError,
+    },
   },
   data() {
-    return { selectedPolicyName: null, initialManifest: null, initialEnforcementStatus: null };
+    return {
+      selectedPolicyName: null,
+      initialManifest: null,
+      initialEnforcementStatus: null,
+      networkPolicies: [],
+      scanExecutionPolicies: [],
+    };
   },
   computed: {
     ...mapState('threatMonitoring', [
@@ -75,8 +96,15 @@ export default {
     documentationFullPath() {
       return setUrlFragment(this.documentationPath, 'container-network-policy');
     },
+    policies() {
+      return [...this.networkPolicies, ...this.scanExecutionPolicies];
+    },
     isLoadingPolicies() {
-      return this.isLoadingEnvironments || this.$apollo.queries.networkPolicies.loading;
+      return (
+        this.isLoadingEnvironments ||
+        this.$apollo.queries.networkPolicies.loading ||
+        this.$apollo.queries.scanExecutionPolicies.loading
+      );
     },
     hasSelectedPolicy() {
       return Boolean(this.selectedPolicyName);
@@ -188,7 +216,7 @@ export default {
     <gl-table
       ref="policiesTable"
       :busy="isLoadingPolicies"
-      :items="networkPolicies"
+      :items="policies"
       :fields="fields"
       head-variant="white"
       stacked="md"
