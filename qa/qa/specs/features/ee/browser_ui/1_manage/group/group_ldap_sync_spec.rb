@@ -15,7 +15,7 @@ module QA
         @original_personal_access_token = Runtime::Env.personal_access_token
 
         # We need to nil out any existing personal token generated for the non-admin LDAP user and also set
-        # Runtime::Env.ldap_username=nil so that a new admin token is created for use to enable the feature flag.
+        # Runtime::Env.ldap_username=nil so that it is not used to create the api client.
         Runtime::Env.personal_access_token = nil
         ldap_username = Runtime::Env.ldap_username
         Runtime::Env.ldap_username = nil
