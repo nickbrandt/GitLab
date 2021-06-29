@@ -98,7 +98,7 @@ describe('PolicyList component', () => {
     });
 
     it('renders the new policy button', () => {
-      const button = wrapper.find('[data-testid="new-policy"]');
+      const button = wrapper.findByTestId('new-policy');
       expect(button.exists()).toBe(true);
     });
 
