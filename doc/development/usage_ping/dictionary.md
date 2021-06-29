@@ -300,7 +300,7 @@ Tiers: `premium`, `ultimate`
 
 ### `compliance_unique_visits.compliance_unique_visits_for_any_target`
 
-Missing description
+Number of unique visits to any compliance page
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_all/20210216183914_compliance_unique_visits_for_any_target.yml)
 
@@ -308,11 +308,11 @@ Group: `group::compliance`
 
 Status: `data_available`
 
-Tiers: `free`
+Tiers: `premium`, `ultimate`
 
 ### `compliance_unique_visits.compliance_unique_visits_for_any_target_monthly`
 
-Missing description
+Number of unique visits to any compliance page over a given month
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_28d/20210216183916_compliance_unique_visits_for_any_target_monthly.yml)
 
@@ -9960,7 +9960,7 @@ Tiers: `premium`, `ultimate`
 
 ### `redis_hll_counters.compliance.compliance_total_unique_counts_monthly`
 
-Missing description
+Unique count of compliance actions in a given month
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_28d/20210216183946_compliance_total_unique_counts_monthly.yml)
 
@@ -9972,7 +9972,7 @@ Tiers: `premium`, `ultimate`
 
 ### `redis_hll_counters.compliance.compliance_total_unique_counts_weekly`
 
-Missing description
+Unique count of compliance actions in a given week
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_7d/20210216183944_compliance_total_unique_counts_weekly.yml)
 
@@ -9996,7 +9996,7 @@ Tiers: `premium`, `ultimate`
 
 ### `redis_hll_counters.compliance.g_compliance_audit_events_weekly`
 
-Missing description
+Number of unique visitors to group-level audit events screen in a given week
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_7d/20210216183928_g_compliance_audit_events_weekly.yml)
 
@@ -10004,7 +10004,7 @@ Group: `group::compliance`
 
 Status: `data_available`
 
-Tiers:
+Tiers: `premium`, `ultimate`
 
 ### `redis_hll_counters.compliance.g_compliance_dashboard_monthly`
 
@@ -10068,7 +10068,7 @@ Tiers: `ultimate`
 
 ### `redis_hll_counters.compliance.i_compliance_credential_inventory_weekly`
 
-Missing description
+Unique visitors to the credential inventory screen in a given week
 
 [YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/ee/config/metrics/counts_7d/20210216183936_i_compliance_credential_inventory_weekly.yml)
 
@@ -10076,7 +10076,7 @@ Group: `group::compliance`
 
 Status: `data_available`
 
-Tiers:
+Tiers: `ultimate`
 
 ### `redis_hll_counters.deploy_token_packages.deploy_token_packages_total_unique_counts_monthly`
 
