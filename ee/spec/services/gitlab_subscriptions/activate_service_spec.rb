@@ -11,6 +11,7 @@ RSpec.describe GitlabSubscriptions::ActivateService do
   end
 
   let_it_be(:license_key) { build(:gitlab_license).export }
+
   let(:cloud_license_enabled) { true }
   let(:activation_code) { 'activation_code' }
 
