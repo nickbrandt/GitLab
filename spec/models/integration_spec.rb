@@ -146,13 +146,13 @@ RSpec.describe Integration do
       subject { integration.can_test? }
 
       context 'when repository is not empty' do
-        let(:project) { build(:project, :repository) }
+        let(:project) { create(:project, :repository) }
 
         it { is_expected.to be true }
       end
 
       context 'when repository is empty' do
-        let(:project) { build(:project) }
+        let(:project) { create(:project) }
 
         it { is_expected.to be true }
       end
