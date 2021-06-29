@@ -23927,10 +23927,10 @@ msgstr ""
 msgid "Pipelines|Editor"
 msgstr ""
 
-msgid "Pipelines|Get familiar with GitLab CI/CD syntax by starting with a simple pipeline that runs a “Hello world” script."
+msgid "Pipelines|Get familiar with GitLab CI/CD syntax by starting with a basic 3 stage CI/CD pipeline."
 msgstr ""
 
-msgid "Pipelines|Get started with CI/CD"
+msgid "Pipelines|Get started with GitLab CI/CD"
 msgstr ""
 
 msgid "Pipelines|GitLab CI/CD can automatically build, test, and deploy your code. Let GitLab take care of time consuming tasks, so you can spend more time creating."
@@ -24069,9 +24069,6 @@ msgid "Pipelines|invalid"
 msgstr ""
 
 msgid "Pipelines|parent"
-msgstr ""
-
-msgid "Pipelines|“Hello world” with GitLab CI/CD"
 msgstr ""
 
 msgid "Pipeline|Actions"
@@ -32116,7 +32113,7 @@ msgstr ""
 msgid "The Advanced Search in GitLab is a powerful search service that saves you time. Instead of creating duplicate code and wasting time, you can now search for code within other teams that can help your own project."
 msgstr ""
 
-msgid "The Compliance Dashboard gives you the ability to see a group's merge request activity by providing a high-level view for all projects in the group."
+msgid "The Compliance Report captures merged changes that violate compliance best practices."
 msgstr ""
 
 msgid "The GitLab subscription service (customers.gitlab.com) is currently experiencing an outage. You can monitor the status and get updates at %{linkStart}status.gitlab.com%{linkEnd}."
