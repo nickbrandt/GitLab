@@ -19,6 +19,7 @@ class Projects::CycleAnalyticsController < Projects::ApplicationController
 
   def show
     @cycle_analytics = Analytics::CycleAnalytics::ProjectLevel.new(project: @project, options: options(cycle_analytics_project_params))
+    @group = @project.group
 
     respond_to do |format|
       format.html do

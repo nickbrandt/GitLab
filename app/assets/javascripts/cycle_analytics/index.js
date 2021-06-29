@@ -14,17 +14,25 @@ export default () => {
     requestPath,
     fullPath,
     projectId,
+    parentPath,
     groupPath,
+    groupId,
+    labelsPath,
+    milestonesPath,
   } = el.dataset;
 
   store.dispatch('initializeVsa', {
     projectId: parseInt(projectId, 10),
-    groupPath,
-    requestPath,
-    fullPath,
+    currentGroup: { id: parseInt(groupId, 10), path: groupPath || parentPath },
+    endpoints: {
+      requestPath,
+      labelsPath,
+      milestonesPath,
+      fullPath,
+    },
     features: {
       cycleAnalyticsForGroups:
-        (groupPath && gon?.licensed_features?.cycleAnalyticsForGroups) || false,
+        (parentPath && gon?.licensed_features?.cycleAnalyticsForGroups) || false,
     },
   });
 

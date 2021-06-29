@@ -1,3 +1,5 @@
+import dateFormat from 'dateformat';
+import { dateFormats } from 'ee/analytics/shared/constants';
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 import { DEFAULT_DAYS_TO_DISPLAY } from '../constants';
 import {
@@ -8,12 +10,21 @@ import {
 } from '../utils';
 import * as types from './mutation_types';
 
+const today = new Date();
+
+const calculateFormattedDayInPast = (daysInPast) => {
+  return {
+    now: dateFormat(today, dateFormats.isoDate),
+    past: dateFormat(getDateInPast(today, daysInPast), dateFormats.isoDate),
+  };
+};
+
 export default {
-  [types.INITIALIZE_VSA](state, { requestPath, fullPath, groupPath, projectId, features }) {
-    state.requestPath = requestPath;
-    state.fullPath = fullPath;
-    state.groupPath = groupPath;
+  [types.INITIALIZE_VSA](state, { projectId, endpoints, currentGroup, projectId, features }) {
     state.id = projectId;
+    state.endpoints = endpoints;
+    state.currentGroup = currentGroup;
+
     const { now, past } = calculateFormattedDayInPast(DEFAULT_DAYS_TO_DISPLAY);
     state.createdBefore = now;
     state.createdAfter = past;
@@ -78,7 +89,7 @@ export default {
     state.selectedStageEvents = [];
     state.hasError = false;
   },
-  [types.RECEIVE_STAGE_DATA_SUCCESS](state, { events = [] }) {
+  [types.RECEIVE_STAGE_DATA_SUCCESS](state, events = []) {
     const { selectedStage } = state;
     state.isLoadingStage = false;
     state.isEmptyStage = !events.length;

@@ -3,8 +3,7 @@ import { DEFAULT_DAYS_TO_DISPLAY } from '../constants';
 export default () => ({
   features: {},
   id: null,
-  requestPath: '',
-  fullPath: '',
+  endpoints: {},
   startDate: DEFAULT_DAYS_TO_DISPLAY,
   createdAfter: null,
   createdBefore: null,
@@ -14,6 +13,7 @@ export default () => ({
   stats: [],
   valueStreams: [],
   selectedValueStream: {},
+  currentGroup: {},
   selectedStage: {},
   selectedStageEvents: [],
   selectedStageError: '',
