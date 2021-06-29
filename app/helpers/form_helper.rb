@@ -48,7 +48,7 @@ module FormHelper
         default_label: 'Unassigned',
         'max-select': 1,
         'dropdown-header': 'Assignee',
-        multi_select: true,
+        multi_select: false,
         'input-meta': 'name',
         'always-show-selectbox': true,
         current_user_info: UserSerializer.new.represent(current_user)
@@ -81,7 +81,7 @@ module FormHelper
         default_label: 'Unassigned',
         'max-select': 1,
         'dropdown-header': 'Reviewer',
-        multi_select: true,
+        multi_select: false,
         'input-meta': 'name',
         'always-show-selectbox': true,
         current_user_info: UserSerializer.new.represent(current_user)
@@ -126,6 +126,7 @@ module FormHelper
     new_options[:title] = 'Select assignee(s)'
     new_options[:data][:'dropdown-header'] = 'Assignee(s)'
     new_options[:data].delete(:'max-select')
+    new_options[:data][:'multi-select'] = true
 
     new_options
   end
@@ -136,6 +137,7 @@ module FormHelper
     new_options[:title] = _('Select reviewer(s)')
     new_options[:data][:'dropdown-header'] = _('Reviewer(s)')
     new_options[:data].delete(:'max-select')
+    new_options[:data][:'multi-select'] = true
 
     new_options
   end
