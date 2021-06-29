@@ -82,7 +82,6 @@ describe('PolicyList component', () => {
 
   afterEach(() => {
     wrapper.destroy();
-    wrapper = null;
   });
 
   describe('initial state', () => {
