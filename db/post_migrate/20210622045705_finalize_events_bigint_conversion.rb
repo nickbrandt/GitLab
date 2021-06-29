@@ -57,7 +57,7 @@ class FinalizeEventsBigintConversion < ActiveRecord::Migration[6.1]
       # regenerate the execution plan for it. This is to avoid type mismatch errors like
       # "type of parameter 15 (bigint) does not match that when preparing the plan (integer)"
       function_name = Gitlab::Database::UnidirectionalCopyTrigger.on_table(TABLE_NAME).name(:id, :id_convert_to_bigint)
-      execute "ALTER FUNCTION #{function_name} RESET ALL"
+      execute "ALTER FUNCTION #{quote_table_name(function_name)} RESET ALL"
 
       # Swap defaults
       execute "ALTER SEQUENCE events_id_seq OWNED BY #{TABLE_NAME}.id"
@@ -69,7 +69,7 @@ class FinalizeEventsBigintConversion < ActiveRecord::Migration[6.1]
       rename_index TABLE_NAME, 'index_events_on_id_convert_to_bigint', 'events_pkey'
       execute "ALTER TABLE #{TABLE_NAME} ADD CONSTRAINT events_pkey PRIMARY KEY USING INDEX events_pkey"
 
-      # Rename the rest of the indexes
+      # Rename the rest of the indexes (we already hold an exclusive lock, so no need to use DROP INDEX CONCURRENTLY here
       execute 'DROP INDEX index_events_on_project_id_and_id'
       rename_index TABLE_NAME, 'index_events_on_project_id_and_id_convert_to_bigint', 'index_events_on_project_id_and_id'
       execute 'DROP INDEX index_events_on_project_id_and_id_desc_on_merged_action'
