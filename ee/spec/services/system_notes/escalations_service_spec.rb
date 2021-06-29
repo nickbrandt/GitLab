@@ -8,10 +8,11 @@ RSpec.describe SystemNotes::EscalationsService do
   let_it_be(:user_2) { create(:user) }
   let_it_be(:author) { User.alert_bot }
 
-  describe '#alert_via_escalation' do
-    subject { described_class.new(noteable: noteable, project: project).alert_via_escalation([user, user_2], escalation_policy) }
+  describe '#notify_via_escalation' do
+    subject { described_class.new(noteable: noteable, project: project).notify_via_escalation([user, user_2], escalation_policy, oncall_schedule) }
 
     let_it_be(:escalation_policy) { create(:incident_management_escalation_policy, project: project) }
+    let_it_be(:oncall_schedule) { create(:incident_management_oncall_schedule, project: project) }
     let_it_be(:noteable) { create(:alert_management_alert, project: project) }
 
     it_behaves_like 'a system note' do
@@ -20,6 +21,14 @@ RSpec.describe SystemNotes::EscalationsService do
 
     it 'posts the correct text to the system note' do
       expect(subject.note).to match("notified #{user.to_reference} and #{user_2.to_reference} of this alert via escalation policy **#{escalation_policy.name}**")
+    end
+
+    context 'when policy is missing' do
+      let_it_be(:escalation_policy) { nil }
+
+      it 'posts the correct text to the system note' do
+        expect(subject.note).to match("notified #{user.to_reference} and #{user_2.to_reference} of this alert via schedule **#{oncall_schedule.name}**, per an escalation rule which no longer exists")
+      end
     end
   end
 end

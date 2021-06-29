@@ -112,8 +112,8 @@ module EE
       issuables_service(noteable, project, author).publish_issue_to_status_page
     end
 
-    def alert_via_escalation(noteable, project, recipients, escalation_policy)
-      escalations_service(noteable, project).alert_via_escalation(recipients, escalation_policy)
+    def notify_via_escalation(noteable, project, recipients, escalation_policy, oncall_schedule)
+      escalations_service(noteable, project).notify_via_escalation(recipients, escalation_policy, oncall_schedule)
     end
 
     private

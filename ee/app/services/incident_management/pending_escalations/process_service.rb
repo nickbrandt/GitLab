@@ -49,7 +49,7 @@ module IncidentManagement
       end
 
       def create_system_notes
-        SystemNoteService.alert_via_escalation(target, project, oncall_notification_recipients, escalation.policy)
+        SystemNoteService.notify_via_escalation(target, project, oncall_notification_recipients, escalation.policy, oncall_schedule)
       end
 
       def oncall_notification_recipients

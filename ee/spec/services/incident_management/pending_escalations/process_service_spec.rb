@@ -51,7 +51,7 @@ RSpec.describe IncidentManagement::PendingEscalations::ProcessService do
 
       it 'creates a system note' do
         expect(SystemNoteService)
-          .to receive(:alert_via_escalation).with(alert, project, [a_kind_of(User)], escalation_policy)
+          .to receive(:notify_via_escalation).with(alert, project, [a_kind_of(User)], escalation_policy, schedule_1)
           .and_call_original
 
         expect { execute }.to change(Note, :count).by(1)

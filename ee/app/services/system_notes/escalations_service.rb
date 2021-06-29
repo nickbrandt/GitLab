@@ -8,8 +8,12 @@ module SystemNotes
       @author = User.alert_bot
     end
 
-    def alert_via_escalation(recipients, escalation_policy)
-      body = "notified #{recipients.map(&:to_reference).to_sentence} of this alert via escalation policy **#{escalation_policy.name}**"
+    def notify_via_escalation(recipients, escalation_policy, oncall_schedule)
+      body = if escalation_policy
+               "notified #{recipients.map(&:to_reference).to_sentence} of this alert via escalation policy **#{escalation_policy.name}**"
+             else
+               "notified #{recipients.map(&:to_reference).to_sentence} of this alert via schedule **#{oncall_schedule.name}**, per an escalation rule which no longer exists"
+             end
 
       create_note(NoteSummary.new(noteable, project, author, body, action: 'new_alert_added'))
     end

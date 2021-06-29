@@ -28,7 +28,7 @@ module IncidentManagement
       validates :rule_id, presence: true, uniqueness: { scope: [:alert_id] }
 
       delegate :project, to: :alert
-      delegate :policy, to: :rule
+      delegate :policy, to: :rule, allow_nil: true
     end
   end
 end
