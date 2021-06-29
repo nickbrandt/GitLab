@@ -78,7 +78,13 @@ export default {
     },
   },
   data() {
-    return { selectedPolicyName: null, initialManifest: null, initialEnforcementStatus: null };
+    return {
+      selectedPolicyName: null,
+      initialManifest: null,
+      initialEnforcementStatus: null,
+      networkPolicies: [],
+      scanExecutionPolicies: [],
+    };
   },
   computed: {
     ...mapState('threatMonitoring', [
@@ -91,7 +97,7 @@ export default {
       return setUrlFragment(this.documentationPath, 'container-network-policy');
     },
     policies() {
-      return [...(this.networkPolicies || []), ...(this.scanExecutionPolicies || [])];
+      return [...this.networkPolicies, ...this.scanExecutionPolicies];
     },
     isLoadingPolicies() {
       return (
