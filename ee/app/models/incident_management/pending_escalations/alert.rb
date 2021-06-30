@@ -21,7 +21,7 @@ module IncidentManagement
 
       scope :processable, -> { where(process_at: ESCALATION_BUFFER.ago..Time.current) }
 
-      enum status: AlertManagement::Alert::STATUSES.slice(:acknowledged, :resolved)
+      enum status: ::IncidentManagement::EscalationRule.statuses
 
       validates :process_at, presence: true
       validates :status, presence: true

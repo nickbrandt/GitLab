@@ -13,20 +13,7 @@ module AlertManagement
     include Presentable
     include Gitlab::Utils::StrongMemoize
     include Referable
-
-    STATUSES = {
-      triggered: 0,
-      acknowledged: 1,
-      resolved: 2,
-      ignored: 3
-    }.freeze
-
-    STATUS_DESCRIPTIONS = {
-      triggered: 'Investigation has not started',
-      acknowledged: 'Someone is actively investigating the problem',
-      resolved: 'No further work is required',
-      ignored: 'No action will be taken on the alert'
-    }.freeze
+    include ::IncidentManagement::Escalatable
 
     belongs_to :project
     belongs_to :issue, optional: true
@@ -43,6 +30,8 @@ module AlertManagement
     has_internal_id :iid, scope: :project
 
     sha_attribute :fingerprint
+
+    alias_attribute :resolved_at, :ended_at
 
     TITLE_MAX_LENGTH = 200
     DESCRIPTION_MAX_LENGTH = 1_000
@@ -80,47 +69,6 @@ module AlertManagement
       threat_monitoring: 1
     }
 
-    state_machine :status, initial: :triggered do
-      state :triggered, value: STATUSES[:triggered]
-
-      state :acknowledged, value: STATUSES[:acknowledged]
-
-      state :resolved, value: STATUSES[:resolved] do
-        validates :ended_at, presence: true
-      end
-
-      state :ignored, value: STATUSES[:ignored]
-
-      state :triggered, :acknowledged, :ignored do
-        validates :ended_at, absence: true
-      end
-
-      event :trigger do
-        transition any => :triggered
-      end
-
-      event :acknowledge do
-        transition any => :acknowledged
-      end
-
-      event :resolve do
-        transition any => :resolved
-      end
-
-      event :ignore do
-        transition any => :ignored
-      end
-
-      before_transition to: [:triggered, :acknowledged, :ignored] do |alert, _transition|
-        alert.ended_at = nil
-      end
-
-      before_transition to: :resolved do |alert, transition|
-        ended_at = transition.args.first
-        alert.ended_at = ended_at || Time.current
-      end
-    end
-
     delegate :iid, to: :issue, prefix: true, allow_nil: true
     delegate :details_url, to: :present
 
@@ -155,25 +103,8 @@ module AlertManagement
 
     alias_method :state, :status_name
 
-    def self.state_machine_statuses
-      @state_machine_statuses ||= state_machines[:status].states.to_h { |s| [s.name, s.value] }
-    end
-    private_class_method :state_machine_statuses
-
-    def self.status_value(name)
-      state_machine_statuses[name]
-    end
-
-    def self.status_name(raw_status)
-      state_machine_statuses.key(raw_status)
-    end
-
     def self.counts_by_status
       group(:status).count.transform_keys { |k| status_name(k) }
-    end
-
-    def self.status_names
-      @status_names ||= state_machine_statuses.keys
     end
 
     def self.sort_by_attribute(method)
@@ -227,15 +158,6 @@ module AlertManagement
 
     def open?
       self.class.open_status?(status_name)
-    end
-
-    def status_event_for(status)
-      self.class.state_machines[:status].events.transitions_for(self, to: status.to_s.to_sym).first&.event
-    end
-
-    def change_status_to(new_status)
-      event = status_event_for(new_status)
-      event && fire_status_event(event)
     end
 
     def prometheus?
