@@ -364,28 +364,28 @@ RSpec.describe ProjectsFinder do
       end
 
       describe 'sorting' do
+        let_it_be(:more_projects) do
+          [
+            create(:project, :internal, group: group, name: 'projA', path: 'projA'),
+            create(:project, :internal, group: group, name: 'projABC', path: 'projABC'),
+            create(:project, :internal, group: group, name: 'projAB', path: 'projAB')
+          ]
+        end
+
         context 'when sorting by a field' do
           let(:params) { { sort: 'name_asc' } }
 
-          it { is_expected.to eq([internal_project, public_project]) }
+          it { is_expected.to eq(([internal_project, public_project] + more_projects).sort_by { |p| p[:name] }) }
         end
 
         context 'when sorting by similarity' do
           let(:params) { { sort: 'similarity', search: 'pro' } }
 
-          let_it_be(:internal_project2) do
-            create(:project, :internal, group: group, name: 'projA', path: 'projA')
-          end
+          it { is_expected.to eq([more_projects[0], more_projects[2], more_projects[1]]) }
+        end
 
-          let_it_be(:internal_project3) do
-            create(:project, :internal, group: group, name: 'projABC', path: 'projABC')
-          end
-
-          let_it_be(:internal_project4) do
-            create(:project, :internal, group: group, name: 'projAB', path: 'projAB')
-          end
-
-          it { is_expected.to eq([internal_project2, internal_project4, internal_project3]) }
+        context 'when no sort is provided' do
+          it { is_expected.to eq(([internal_project, public_project] + more_projects).sort_by { |p| p[:id] }.reverse) }
         end
       end
 
