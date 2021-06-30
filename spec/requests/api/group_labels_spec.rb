@@ -48,7 +48,7 @@ RSpec.describe API::GroupLabels do
             group_label1.unsubscribe(user)
           end
 
-          it 'returns true' do
+          it 'returns false' do
             get api("/groups/#{group.id}/labels?search=#{group_label1.name}", user)
 
             expect(response).to have_gitlab_http_status(:ok)

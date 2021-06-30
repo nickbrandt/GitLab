@@ -220,7 +220,7 @@ RSpec.describe API::Labels do
           priority_label.unsubscribe(user)
         end
 
-        it 'returns subscribed true' do
+        it 'returns subscribed false' do
           get api("/projects/#{project.id}/labels?search=#{priority_label.name}", user)
 
           expect(response).to have_gitlab_http_status(:ok)
