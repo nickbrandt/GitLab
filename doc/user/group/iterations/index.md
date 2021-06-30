@@ -191,13 +191,13 @@ can enable it.
 To enable it:
 
 ```ruby
-Feature.enable(:iterations_cadences)
+Feature.enable(:iteration_cadences)
 ```
 
 To disable it:
 
 ```ruby
-Feature.disable(:iterations_cadences)
+Feature.disable(:iteration_cadences)
 ```
 
 <!-- ## Troubleshooting
