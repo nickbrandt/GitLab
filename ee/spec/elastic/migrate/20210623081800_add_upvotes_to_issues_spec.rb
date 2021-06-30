@@ -78,7 +78,7 @@ RSpec.describe AddUpvotesToIssues, :elastic, :sidekiq_inline do
   describe '.completed?' do
     subject { migration.completed? }
 
-    context 'when documents are missing visibility_level' do
+    context 'when documents are missing upvotes' do
       before do
         remove_upvotes_from_issues(issues)
       end
@@ -86,7 +86,7 @@ RSpec.describe AddUpvotesToIssues, :elastic, :sidekiq_inline do
       it { is_expected.to be_falsey }
     end
 
-    context 'when no documents are missing visibility_level' do
+    context 'when no documents are missing upvotes' do
       it { is_expected.to be_truthy }
     end
   end
