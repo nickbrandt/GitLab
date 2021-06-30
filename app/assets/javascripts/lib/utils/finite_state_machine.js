@@ -50,9 +50,8 @@ export function transition(definition, current, event) {
   return definition?.states?.[current]?.on[event] || current;
 }
 
-function startMachine(definition) {
-  const { states } = definition;
-  let current = definition.initial;
+function startMachine({ states, initial } = {}) {
+  let current = initial;
 
   return {
     /**
