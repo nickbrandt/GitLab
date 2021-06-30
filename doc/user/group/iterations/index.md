@@ -94,7 +94,7 @@ To create an iteration:
 
 1. On the top bar, select **Menu > Groups** and find your group.
 1. On the left sidebar, select **Issues > Iterations**.
-1. Select **Add iteration**.
+1. Select **New iteration**.
 1. Enter the title, a description (optional), a start date, and a due date.
 1. Select **Create iteration**. The iteration details page opens.
 
