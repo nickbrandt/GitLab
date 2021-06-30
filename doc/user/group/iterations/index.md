@@ -87,7 +87,6 @@ From there you can create a new iteration or select an iteration to get a more d
 Prerequisites:
 
 - You must have at least the [Developer role](../../permissions.md) for a group.
-- You must first [create an iteration cadence](#create-an-iteration-cadence).
 
 For manually scheduled iteration cadences, you create and add iterations yourself.
 
@@ -95,8 +94,7 @@ To create an iteration:
 
 1. On the top bar, select **Menu > Groups** and find your group.
 1. On the left sidebar, select **Issues > Iterations**.
-1. Next to the iteration cadence to which you want to add a new iteration, select the three-dot
-   menu (**{ellipsis_v}**) > **Add iteration**.
+1. Select **Add iteration**.
 1. Enter the title, a description (optional), a start date, and a due date.
 1. Select **Create iteration**. The iteration details page opens.
 
