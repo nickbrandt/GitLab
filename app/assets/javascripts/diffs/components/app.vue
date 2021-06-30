@@ -14,7 +14,7 @@ import {
 } from '~/behaviors/shortcuts/keybindings';
 import createFlash from '~/flash';
 import { isSingleViewStyle } from '~/helpers/diffs_helper';
-import { getParameterByName, parseBoolean } from '~/lib/utils/common_utils';
+import { parseBoolean } from '~/lib/utils/common_utils';
 import { updateHistory } from '~/lib/utils/url_utility';
 import { __ } from '~/locale';
 import PanelResizer from '~/vue_shared/components/panel_resizer.vue';
@@ -186,6 +186,7 @@ export default {
       'showTreeList',
       'isLoading',
       'startVersion',
+      'latestDiff',
       'currentDiffFileId',
       'isTreeLoaded',
       'conflictResolutionPath',
@@ -228,8 +229,8 @@ export default {
     isLimitedContainer() {
       return !this.renderFileTree && !this.isParallelView && !this.isFluidLayout;
     },
-    isDiffHead() {
-      return parseBoolean(getParameterByName('diff_head'));
+    isFullChangeset() {
+      return this.startVersion === null && this.latestDiff;
     },
     showFileByFileNavigation() {
       return this.diffFiles.length > 1 && this.viewDiffsFileByFile;
@@ -252,7 +253,7 @@ export default {
 
       if (this.renderOverflowWarning) {
         visible = this.$options.alerts.ALERT_OVERFLOW_HIDDEN;
-      } else if (this.isDiffHead && this.hasConflicts) {
+      } else if (this.isFullChangeset && this.hasConflicts) {
         visible = this.$options.alerts.ALERT_MERGE_CONFLICT;
       } else if (this.whichCollapsedTypes.automatic && !this.viewDiffsFileByFile) {
         visible = this.$options.alerts.ALERT_COLLAPSED_FILES;
