@@ -87,7 +87,7 @@ From there you can create a new iteration or select an iteration to get a more d
 Prerequisites:
 
 - You must have at least the [Developer role](../../permissions.md) for a group.
-- You must first [create an iteration cadence](#create-an-iteration-cadence)
+- You must first [create an iteration cadence](#create-an-iteration-cadence).
 
 For manually scheduled iteration cadences, you create and add iterations yourself.
 
