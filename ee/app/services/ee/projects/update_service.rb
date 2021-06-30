@@ -90,7 +90,7 @@ module EE
         if can?(current_user, :admin_compliance_framework, project)
           framework_identifier = settings.delete(:framework)
           if framework_identifier.blank?
-            settings.merge!(_destroy: true)
+            settings[:_destroy] = true
           else
             settings[:compliance_management_framework] = project.namespace.root_ancestor.compliance_management_frameworks.find(framework_identifier)
           end

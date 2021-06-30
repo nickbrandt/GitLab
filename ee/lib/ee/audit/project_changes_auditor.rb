@@ -14,10 +14,24 @@ module EE
         audit_changes(:merge_requests_author_approval, as: 'prevent merge request approval from authors', model: model)
         audit_changes(:merge_requests_disable_committers_approval, as: 'prevent merge request approval from reviewers', model: model)
 
+        audit_compliance_framework_changes
         audit_project_feature_changes
       end
 
       private
+
+      def audit_compliance_framework_changes
+        message = (@model.compliance_management_framework.blank? ? 'removed' : "changed to #{@model&.compliance_management_framework&.name}")
+
+        audit_context = {
+          author: @current_user,
+          scope: @model,
+          target: @model,
+          message: "Compliance framework #{message}"
+        }
+
+        ::Gitlab::Audit::Auditor.audit(audit_context)
+      end
 
       def audit_project_feature_changes
         ::EE::Audit::ProjectFeatureChangesAuditor.new(@current_user, model.project_feature, model).execute
