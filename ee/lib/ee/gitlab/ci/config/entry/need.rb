@@ -31,6 +31,7 @@ module EE
               end
             end
 
+            # Deprecated. Will be removed: https://gitlab.com/gitlab-org/gitlab/-/issues/335081
             class BridgeHash < ::Gitlab::Config::Entry::Node
               include ::Gitlab::Config::Entry::Validatable
               include ::Gitlab::Config::Entry::Attributable

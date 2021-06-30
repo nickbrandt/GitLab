@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require 'spec_helper'
+require 'fast_spec_helper'
 
-RSpec.describe Gitlab::Ci::Config::Entry::Bridge do
+RSpec.describe ::Gitlab::Ci::Config::Entry::Bridge do
   subject { described_class.new(config, name: :my_bridge) }
 
   describe '.matching?' do
@@ -99,7 +99,7 @@ RSpec.describe Gitlab::Ci::Config::Entry::Bridge do
 
       describe '#errors' do
         it 'is returns an error about empty trigger config' do
-          expect(subject.errors.first).to eq('bridge config should contain either a trigger or a needs:pipeline')
+          expect(subject.errors.first).to eq('bridge config should contain either a trigger or a status mirror / needs:pipeline')
         end
       end
     end
@@ -113,7 +113,7 @@ RSpec.describe Gitlab::Ci::Config::Entry::Bridge do
 
       describe '#errors' do
         it 'is returns an error about empty upstream config' do
-          expect(subject.errors.first).to eq('bridge config should contain either a trigger or a needs:pipeline')
+          expect(subject.errors.first).to eq('bridge config should contain either a trigger or a status mirror / needs:pipeline')
         end
       end
     end
@@ -173,6 +173,42 @@ RSpec.describe Gitlab::Ci::Config::Entry::Bridge do
       describe '#errors' do
         it 'returns an error about too many bridge needs' do
           expect(subject.errors).to contain_exactly('bridge config should contain at most one bridge need')
+        end
+      end
+    end
+
+    describe 'status:' do
+      let(:config) { { status: 'some/project' } }
+
+      describe '#valid?' do
+        it { is_expected.to be_valid }
+      end
+
+      describe '#value' do
+        it 'returns a bridge job configuration' do
+          expect(subject.value).to eq(name: :my_bridge,
+                                      needs: { bridge: [{ pipeline: 'some/project' }] },
+                                      ignore: false,
+                                      stage: 'test',
+                                      only: { refs: %w[branches tags] },
+                                      variables: {},
+                                      job_variables: {},
+                                      root_variables_inheritance: true,
+                                      scheduling_type: :stage)
+        end
+      end
+
+      context 'when status and needs:pipeline are defined at the same time' do
+        let(:config) { { status: 'some/project', needs: { pipeline: 'some/project' } } }
+
+        describe '#valid?' do
+          it { is_expected.not_to be_valid }
+        end
+
+        describe '#errors' do
+          it 'returns an error about config' do
+            expect(subject.errors.first).to eq('bridge config should not contain both needs and status mirror')
+          end
         end
       end
     end

@@ -12,7 +12,7 @@ module Gitlab
           include ::Gitlab::Ci::Config::Entry::Processable
 
           ALLOWED_WHEN = %w[on_success on_failure always manual].freeze
-          ALLOWED_KEYS = %i[trigger parallel].freeze
+          ALLOWED_KEYS = %i[trigger parallel status].freeze
 
           validations do
             validates :config, allowed_keys: ALLOWED_KEYS + PROCESSABLE_ALLOWED_KEYS
@@ -26,14 +26,14 @@ module Gitlab
             end
 
             validate on: :composed do
-              unless trigger_defined? || bridge_needs.present?
-                errors.add(:config, 'should contain either a trigger or a needs:pipeline')
+              unless trigger_defined? || mirror_status_config.present?
+                errors.add(:config, 'should contain either a trigger or a status mirror / needs:pipeline')
               end
             end
 
             validate on: :composed do
-              next unless bridge_needs.present?
-              next if bridge_needs.one?
+              next unless mirror_status_config.present?
+              next if mirror_status_config.one?
 
               errors.add(:config, 'should contain at most one bridge need')
             end
@@ -58,33 +58,47 @@ module Gitlab
           def self.matching?(name, config)
             !name.to_s.start_with?('.') &&
               config.is_a?(Hash) &&
-              (config.key?(:trigger) || config.key?(:needs))
+              (trigger?(config) || status_mirror?(config))
           end
 
           def self.visible?
             true
           end
 
+          def self.trigger?(config)
+            config.key?(:trigger)
+          end
+
+          def self.status_mirror?(config)
+            # Deprecated. Will be removed: https://gitlab.com/gitlab-org/gitlab/-/issues/335081
+            config.key?(:needs)
+          end
+
           def value
             super.merge(
               trigger: (trigger_value if trigger_defined?),
-              needs: (needs_value if needs_defined?),
+              needs: needs_defined? ? needs_value : mirror_status_value,
               ignore: ignored?,
               when: self.when,
-              scheduling_type: needs_defined? && !bridge_needs ? :dag : :stage,
+              scheduling_type: trigger_defined? && needs_defined? ? :dag : :stage,
               parallel: has_parallel? ? parallel_value : nil
             ).compact
           end
 
-          def bridge_needs
-            needs_value[:bridge] if needs_value
-          end
-
           def ignored?
             allow_failure.nil? ? manual_action? : allow_failure
+          end
+
+          # Overridden in EE
+          def mirror_status_value; end
+
+          def mirror_status_config
+            needs_value[:bridge] if needs_value
           end
         end
       end
     end
   end
 end
+
+::Gitlab::Ci::Config::Entry::Bridge.prepend_mod_with('Gitlab::Ci::Config::Entry::Bridge')
