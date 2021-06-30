@@ -282,7 +282,7 @@ class License < ApplicationRecord
     end
 
     def features_with_usage_ping
-      return FEATURES_WITH_USAGE_PING if Gitlab::CurrentSettings.usage_ping_enabled?
+      return FEATURES_WITH_USAGE_PING if Gitlab::CurrentSettings.usage_ping_features_enabled?
 
       []
     end
