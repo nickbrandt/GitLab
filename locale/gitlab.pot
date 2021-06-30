@@ -31422,6 +31422,12 @@ msgstr ""
 msgid "SuperSonics|Cloud license"
 msgstr ""
 
+msgid "SuperSonics|Cloud licensing"
+msgstr ""
+
+msgid "SuperSonics|Cloud licensing is now available. It's an easier way to activate instances and manage subscriptions. Read more about it in our %{blogPostLinkStart}blog post%{blogPostLinkEnd}. Activation codes are available in the %{portalLinkStart}Customers Portal%{portalLinkEnd}."
+msgstr ""
+
 msgid "SuperSonics|Expires on"
 msgstr ""
 
