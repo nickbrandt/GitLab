@@ -1,9 +1,11 @@
 <script>
 import { GlDrawer } from '@gitlab/ui';
+import Project from './drawer_sections/project.vue';
 
 export default {
   components: {
     GlDrawer,
+    Project,
   },
   props: {
     mergeRequest: {
@@ -41,6 +43,14 @@ export default {
   >
     <template #header>
       <h4 data-testid="dashboard-drawer-title">{{ mergeRequest.title }}</h4>
+    </template>
+    <template v-if="showDrawer" #default>
+      <project
+        :avatar-url="mergeRequest.project.avatar_url"
+        :compliance-framework="mergeRequest.compliance_management_framework"
+        :name="mergeRequest.project.name"
+        :url="mergeRequest.project.web_url"
+      />
     </template>
   </gl-drawer>
 </template>
