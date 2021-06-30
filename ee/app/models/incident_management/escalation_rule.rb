@@ -9,7 +9,7 @@ module IncidentManagement
     belongs_to :policy, class_name: 'EscalationPolicy', inverse_of: 'rules', foreign_key: 'policy_id'
     belongs_to :oncall_schedule, class_name: 'OncallSchedule', inverse_of: 'rotations', foreign_key: 'oncall_schedule_id'
 
-    enum status: AlertManagement::Alert::STATUSES.slice(:acknowledged, :resolved)
+    enum status: ::IncidentManagement::Escalatable::STATUSES.slice(:acknowledged, :resolved)
 
     validates :status, presence: true
     validates :oncall_schedule, presence: true
