@@ -50,6 +50,8 @@ class AddUpvotesToIssues < Elastic::Migration
   end
 
   def completed?
+    helper.refresh_index(index_name: index_name)
+
     query = {
       size: 0,
       aggs: {
