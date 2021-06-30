@@ -7,12 +7,12 @@ RSpec.describe MilestonesFinder do
   let_it_be(:group) { create(:group) }
   let_it_be(:project_1) { create(:project, namespace: group) }
   let_it_be(:project_2) { create(:project, namespace: group) }
+  let_it_be(:milestone_2) { create(:milestone, group: group, start_date: now + 1.day, due_date: now + 2.days) }
+  let_it_be(:milestone_4) { create(:milestone, project: project_2, state: 'active', start_date: now + 4.days, due_date: now + 5.days) }
 
   context 'without filters' do
     let_it_be(:milestone_1) { create(:milestone, group: group, title: 'one test', start_date: now - 1.day, due_date: now) }
-    let_it_be(:milestone_2) { create(:milestone, group: group, start_date: now + 1.day, due_date: now + 2.days) }
     let_it_be(:milestone_3) { create(:milestone, project: project_1, state: 'active', start_date: now + 2.days) }
-    let_it_be(:milestone_4) { create(:milestone, project: project_2, state: 'active', start_date: now + 4.days, due_date: now + 5.days) }
     let_it_be(:milestone_5) { create(:milestone, group: group, due_date: now - 2.days) }
 
     it 'returns milestones for projects' do
@@ -37,12 +37,10 @@ RSpec.describe MilestonesFinder do
         expect(result).to contain_exactly(milestone_5, milestone_1, milestone_2, milestone_3, milestone_4)
       end
 
-      it 'orders milestones by due date' do
-        aggregate_failures do
-          expect(result.first).to eq(milestone_5)
-          expect(result.second).to eq(milestone_1)
-          expect(result.third).to eq(milestone_2)
-        end
+      it 'orders milestones by due date', :aggregate_failures do
+        expect(result.first).to eq(milestone_5)
+        expect(result.second).to eq(milestone_1)
+        expect(result.third).to eq(milestone_2)
       end
 
       context 'when expired_last param is used' do
@@ -65,9 +63,7 @@ RSpec.describe MilestonesFinder do
 
   context 'with filters' do
     let_it_be(:milestone_1) { create(:milestone, group: group, state: 'closed', title: 'one test', start_date: now - 1.day, due_date: now) }
-    let_it_be(:milestone_2) { create(:milestone, group: group, start_date: now + 1.day, due_date: now + 2.days) }
     let_it_be(:milestone_3) { create(:milestone, project: project_1, state: 'closed', start_date: now + 2.days, due_date: now + 3.days) }
-    let_it_be(:milestone_4) { create(:milestone, project: project_2, state: 'active', start_date: now + 4.days, due_date: now + 5.days) }
 
     let(:params) do
       {

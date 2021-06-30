@@ -149,31 +149,21 @@ RSpec.describe Milestone do
   end
 
   describe '#expired? and #expired' do
-    let_it_be(:milestone) { build(:milestone, project: project) }
-
     context "expired" do
-      before do
-        allow(milestone).to receive(:due_date).and_return(Date.today.prev_year)
-      end
+      let(:milestone) { build(:milestone, project: project, due_date: Date.today.prev_year) }
 
-      it 'returns true when due_date is in the past' do
-        aggregate_failures do
-          expect(milestone.expired?).to be_truthy
-          expect(milestone.expired).to eq true
-        end
+      it 'returns true when due_date is in the past', :aggregate_failures do
+        expect(milestone.expired?).to be_truthy
+        expect(milestone.expired).to eq true
       end
     end
 
     context "not expired" do
-      before do
-        allow(milestone).to receive(:due_date).and_return(Date.today.next_year)
-      end
+      let(:milestone) { build(:milestone, project: project, due_date: Date.today.next_year) }
 
-      it 'returns false when due_date is in the future' do
-        aggregate_failures do
-          expect(milestone.expired?).to be_falsey
-          expect(milestone.expired).to eq false
-        end
+      it 'returns false when due_date is in the future', :aggregate_failures do
+        expect(milestone.expired?).to be_falsey
+        expect(milestone.expired).to eq false
       end
     end
   end
@@ -188,12 +178,6 @@ RSpec.describe Milestone do
       milestone = build(:milestone, start_date: Date.today.prev_year)
       expect(milestone.upcoming?).to be_falsey
     end
-  end
-
-  describe '#can_be_closed?' do
-    let_it_be(:milestone) { build(:milestone, project: project) }
-
-    it { expect(milestone.can_be_closed?).to be_truthy }
   end
 
   describe '#can_be_closed?' do
@@ -475,12 +459,10 @@ RSpec.describe Milestone do
     let_it_be(:milestone_6) { create(:milestone, title: 'Without due date2') }
 
     context 'ordering by due_date ascending' do
-      it 'sorts by due date in ascending order (ties broken by id in desc order)' do
-        aggregate_failures do
-          expect(milestone_3.id).to be < (milestone_6.id)
-          expect(described_class.sort_with_expired_last('due_date_asc'))
-            .to eq([milestone_1, milestone_2, milestone_6, milestone_3, milestone_4, milestone_5])
-        end
+      it 'sorts by due date in ascending order (ties broken by id in desc order)', :aggregate_failures do
+        expect(milestone_3.id).to be < (milestone_6.id)
+        expect(described_class.sort_with_expired_last('due_date_asc'))
+          .to eq([milestone_1, milestone_2, milestone_6, milestone_3, milestone_4, milestone_5])
       end
 
       context 'unsupported sort_by param is presented' do
@@ -492,12 +474,10 @@ RSpec.describe Milestone do
     end
 
     context 'ordering by due_date descending' do
-      it 'sorts by due date in descending order (ties broken by id in desc order)' do
-        aggregate_failures do
-          expect(milestone_3.id).to be < (milestone_6.id)
-          expect(described_class.sort_with_expired_last('due_date_desc'))
-            .to eq([milestone_2, milestone_1, milestone_6, milestone_3, milestone_5, milestone_4])
-        end
+      it 'sorts by due date in descending order (ties broken by id in desc order)', :aggregate_failures do
+        expect(milestone_3.id).to be < (milestone_6.id)
+        expect(described_class.sort_with_expired_last('due_date_desc'))
+          .to eq([milestone_2, milestone_1, milestone_6, milestone_3, milestone_5, milestone_4])
       end
     end
   end
