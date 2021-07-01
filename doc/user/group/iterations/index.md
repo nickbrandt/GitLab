@@ -48,6 +48,10 @@ Iteration cadences automate some common iteration tasks. They can be used to
 automatically create iterations every 1, 2, 3, 4, or 6 weeks. They can also
 be configured to automatically roll over incomplete issues to the next iteration.
 
+With iteration cadences enabled, you must first
+[create an iteration cadence](#create-an-iteration-cadence) before you can
+[create an iteration](#create-an-iteration).
+
 ### Create an iteration cadence
 
 Prerequisites:
