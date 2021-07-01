@@ -43,8 +43,8 @@ RSpec.describe MilestonesFinder do
         expect(result.third).to eq(milestone_2)
       end
 
-      context 'when expired_last param is used' do
-        let(:extra_params) { { expired_last: true } }
+      context 'when grouping and sorting by expired_last' do
+        let(:extra_params) { { sort: :expired_last_due_date_asc } }
 
         it 'current milestones are returned first, then milestones without due date followed by expired milestones, sorted by due date in ascending order' do
           expect(result).to eq([milestone_2, milestone_4, milestone_3, milestone_5, milestone_1])

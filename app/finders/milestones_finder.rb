@@ -7,10 +7,6 @@
 #   project_ids: Array of project ids or single project id or ActiveRecord relation.
 #   group_ids: Array of group ids or single group id or ActiveRecord relation.
 #   order - Orders by field default due date asc.
-#   expired_last - Custom orders milestones by first listing milestones with due dates
-#                  then those without due dates followed by expired milestones.
-#                  Milestones are ordered by due date.
-#                  'order' param is ignored when it isn't either due_date_asc or due_date_desc
 #   title - filter by title.
 #   state - filters by state.
 #   start_date & end_date - filters by timeframe (see TimeFrameFilter)
@@ -21,6 +17,8 @@ class MilestonesFinder
   include TimeFrameFilter
 
   attr_reader :params
+
+  EXPIRED_LAST_SORTS = %i[expired_last_due_date_asc expired_last_due_date_desc].freeze
 
   def initialize(params = {})
     @params = params
@@ -74,12 +72,16 @@ class MilestonesFinder
   end
 
   def order(items)
-    sort_by = params[:sort].presence || 'due_date_asc'
+    sort_by = params[:sort].presence || :due_date_asc
 
-    if params[:expired_last]
+    if sort_by_expired_last?(sort_by)
       items.sort_with_expired_last(sort_by)
     else
       items.sort_by_attribute(sort_by)
     end
+  end
+
+  def sort_by_expired_last?(sort_by)
+    EXPIRED_LAST_SORTS.include?(sort_by)
   end
 end

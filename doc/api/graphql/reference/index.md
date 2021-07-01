@@ -9564,7 +9564,6 @@ four standard [pagination arguments](#connection-pagination-arguments):
 | ---- | ---- | ----------- |
 | <a id="groupmilestonescontainingdate"></a>`containingDate` | [`Time`](#time) | A date that the milestone contains. |
 | <a id="groupmilestonesenddate"></a>`endDate` **{warning-solid}** | [`Time`](#time) | **Deprecated** in 13.5. Use timeframe.end. |
-| <a id="groupmilestonesexpiredlast"></a>`expiredLast` | [`Boolean`](#boolean) | Display non-expired milestones first when sorting milestones. In any sort the displayed order would be: non-expired milestones with due dates, non-expired milestones without due dates and expired milestones. Sort order other than due date is ignored. |
 | <a id="groupmilestonesids"></a>`ids` | [`[ID!]`](#id) | Array of global milestone IDs, e.g., `"gid://gitlab/Milestone/1"`. |
 | <a id="groupmilestonesincludeancestors"></a>`includeAncestors` | [`Boolean`](#boolean) | Include milestones from all parent groups. |
 | <a id="groupmilestonesincludedescendants"></a>`includeDescendants` | [`Boolean`](#boolean) | Include milestones from all subgroups and subprojects. |
@@ -11892,7 +11891,6 @@ four standard [pagination arguments](#connection-pagination-arguments):
 | ---- | ---- | ----------- |
 | <a id="projectmilestonescontainingdate"></a>`containingDate` | [`Time`](#time) | A date that the milestone contains. |
 | <a id="projectmilestonesenddate"></a>`endDate` **{warning-solid}** | [`Time`](#time) | **Deprecated** in 13.5. Use timeframe.end. |
-| <a id="projectmilestonesexpiredlast"></a>`expiredLast` | [`Boolean`](#boolean) | Display non-expired milestones first when sorting milestones. In any sort the displayed order would be: non-expired milestones with due dates, non-expired milestones without due dates and expired milestones. Sort order other than due date is ignored. |
 | <a id="projectmilestonesids"></a>`ids` | [`[ID!]`](#id) | Array of global milestone IDs, e.g., `"gid://gitlab/Milestone/1"`. |
 | <a id="projectmilestonesincludeancestors"></a>`includeAncestors` | [`Boolean`](#boolean) | Also return milestones in the project's parent group and its ancestors. |
 | <a id="projectmilestonessearchtitle"></a>`searchTitle` | [`String`](#string) | A search string for the title. |
@@ -14750,6 +14748,8 @@ Values for sorting milestones.
 | <a id="milestonesortcreated_desc"></a>`CREATED_DESC` | Created at descending order. |
 | <a id="milestonesortdue_date_asc"></a>`DUE_DATE_ASC` | Milestone due date by ascending order. |
 | <a id="milestonesortdue_date_desc"></a>`DUE_DATE_DESC` | Milestone due date by descending order. |
+| <a id="milestonesortexpired_last_due_date_asc"></a>`EXPIRED_LAST_DUE_DATE_ASC` | Group milestones in this order: non-expired milestones with due dates, non-expired milestones without due dates and expired milestones then sort by due date in ascending order. |
+| <a id="milestonesortexpired_last_due_date_desc"></a>`EXPIRED_LAST_DUE_DATE_DESC` | Group milestones in this order: non-expired milestones with due dates, non-expired milestones without due dates and expired milestones then sort by due date in descending order. |
 | <a id="milestonesortupdated_asc"></a>`UPDATED_ASC` | Updated at ascending order. |
 | <a id="milestonesortupdated_desc"></a>`UPDATED_DESC` | Updated at descending order. |
 | <a id="milestonesortcreated_asc"></a>`created_asc` **{warning-solid}** | **Deprecated** in 13.5. This was renamed. Use: `CREATED_ASC`. |

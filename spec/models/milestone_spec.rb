@@ -461,22 +461,15 @@ RSpec.describe Milestone do
     context 'ordering by due_date ascending' do
       it 'sorts by due date in ascending order (ties broken by id in desc order)', :aggregate_failures do
         expect(milestone_3.id).to be < (milestone_6.id)
-        expect(described_class.sort_with_expired_last('due_date_asc'))
+        expect(described_class.sort_with_expired_last(:expired_last_due_date_asc))
           .to eq([milestone_1, milestone_2, milestone_6, milestone_3, milestone_4, milestone_5])
-      end
-
-      context 'unsupported sort_by param is presented' do
-        it 'sorts by due date in ascending order by default' do
-          expect(described_class.sort_with_expired_last('name_asc'))
-            .to eq([milestone_1, milestone_2, milestone_6, milestone_3, milestone_4, milestone_5])
-        end
       end
     end
 
     context 'ordering by due_date descending' do
       it 'sorts by due date in descending order (ties broken by id in desc order)', :aggregate_failures do
         expect(milestone_3.id).to be < (milestone_6.id)
-        expect(described_class.sort_with_expired_last('due_date_desc'))
+        expect(described_class.sort_with_expired_last(:expired_last_due_date_desc))
           .to eq([milestone_2, milestone_1, milestone_6, milestone_3, milestone_5, milestone_4])
       end
     end

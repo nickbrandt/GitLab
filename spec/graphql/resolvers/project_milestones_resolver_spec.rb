@@ -79,15 +79,13 @@ RSpec.describe Resolvers::ProjectMilestonesResolver do
 
         resolve_project_milestones(sort: :due_date_desc)
       end
-    end
 
-    context 'when expired_last is set' do
-      it 'calls MilestonesFinder with correct parameters' do
-        expect(MilestonesFinder).to receive(:new)
-          .with(args(project_ids: project.id, state: 'all', expired_last: true))
-          .and_call_original
+      %i[expired_last_due_date_asc expired_last_due_date_desc].each do |sort_by|
+        it "uses offset-pagination when sorting by #{sort_by}" do
+          resolved = resolve_project_milestones(sort: sort_by)
 
-        resolve_project_milestones(expired_last: true)
+          expect(resolved).to be_a(::Gitlab::Graphql::Pagination::OffsetActiveRecordRelationConnection)
+        end
       end
     end
 
