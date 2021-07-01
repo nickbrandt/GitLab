@@ -1340,7 +1340,7 @@ X-Gitlab-Event: Job Hook
   },
   "runner": {
     "active": true,
-    "runner_type": "project_type", 
+    "runner_type": "project_type",
     "is_shared": false,
     "id": 380987,
     "description": "shared-runners-manager-6.gitlab.com",
@@ -1760,6 +1760,10 @@ If you need more information about execution, you can click `View details` link.
 On this page, you can see data that GitLab sends (request headers and body) and data that it received (response headers and body).
 
 From this page, you can repeat delivery with the same data by clicking `Resend Request` button.
+
+NOTE:
+This history is unavailable for Group-level webhooks. For more information, read
+[issue #325642](https://gitlab.com/gitlab-org/gitlab/-/issues/325642).
 
 NOTE:
 If URL or secret token of the webhook were updated, data is delivered to the new address.
