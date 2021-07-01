@@ -23,7 +23,7 @@ module Resolvers
 
     argument :interval, Types::DoraMetricBucketingIntervalEnum,
              required: false,
-             description: 'How the metric should be aggregrated. Defaults to `DAILY`. In the case of ALL, the `date` field in the response will be `null`.'
+             description: 'How the metric should be aggregrated. Defaults to `DAILY`. In the case of `ALL`, the `date` field in the response will be `null`.'
 
     argument :environment_tier, Types::DeploymentTierEnum,
              required: false,

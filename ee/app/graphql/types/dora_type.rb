@@ -4,7 +4,7 @@ module Types
   # rubocop: disable Graphql/AuthorizeTypes
   class DoraType < BaseObject
     graphql_name 'Dora'
-    description 'A container for all information related to DORA metrics.'
+    description 'All information related to DORA metrics.'
 
     field :metrics, [::Types::DoraMetricType], null: true,
           resolver: ::Resolvers::DoraMetricsResolver,

@@ -8565,7 +8565,7 @@ Aggregated summary of changes.
 
 ### `Dora`
 
-A container for all information related to DORA metrics.
+All information related to DORA metrics.
 
 #### Fields with arguments
 
@@ -8581,7 +8581,7 @@ Returns [`[DoraMetric!]`](#dorametric).
 | ---- | ---- | ----------- |
 | <a id="dorametricsenddate"></a>`endDate` | [`Date`](#date) | Date range to end at. Default is the current date. |
 | <a id="dorametricsenvironmenttier"></a>`environmentTier` | [`DeploymentTier`](#deploymenttier) | The deployment tier of the environments to return. Defaults to `PRODUCTION`. |
-| <a id="dorametricsinterval"></a>`interval` | [`DoraMetricBucketingInterval`](#dorametricbucketinginterval) | How the metric should be aggregrated. Defaults to `DAILY`. In the case of ALL, the `date` field in the response will be `null`. |
+| <a id="dorametricsinterval"></a>`interval` | [`DoraMetricBucketingInterval`](#dorametricbucketinginterval) | How the metric should be aggregrated. Defaults to `DAILY`. In the case of `ALL`, the `date` field in the response will be `null`. |
 | <a id="dorametricsmetric"></a>`metric` | [`DoraMetricType!`](#dorametrictype) | The type of metric to return. |
 | <a id="dorametricsstartdate"></a>`startDate` | [`Date`](#date) | Date range to start from. Default is 3 months ago. |
 
