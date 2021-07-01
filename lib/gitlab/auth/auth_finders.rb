@@ -272,7 +272,7 @@ module Gitlab
         when :api
           api_request?
         when :archive
-          archive_request?
+          archive_request? if Feature.enabled?(:allow_archive_as_web_access_format, default_enabled: :yaml)
         end
       end
 
