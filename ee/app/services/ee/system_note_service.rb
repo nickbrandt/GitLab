@@ -113,7 +113,7 @@ module EE
     end
 
     def notify_via_escalation(noteable, project, recipients, escalation_policy, oncall_schedule)
-      escalations_service(noteable, project).notify_via_escalation(recipients, escalation_policy, oncall_schedule)
+      escalations_service(noteable, project).notify_via_escalation(recipients, escalation_policy: escalation_policy, oncall_schedule: oncall_schedule)
     end
 
     private

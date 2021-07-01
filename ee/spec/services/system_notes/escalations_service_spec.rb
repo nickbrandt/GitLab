@@ -9,7 +9,7 @@ RSpec.describe SystemNotes::EscalationsService do
   let_it_be(:author) { User.alert_bot }
 
   describe '#notify_via_escalation' do
-    subject { described_class.new(noteable: noteable, project: project).notify_via_escalation([user, user_2], escalation_policy, oncall_schedule) }
+    subject { described_class.new(noteable: noteable, project: project).notify_via_escalation([user, user_2], escalation_policy: escalation_policy, oncall_schedule: oncall_schedule) }
 
     let_it_be(:escalation_policy) { create(:incident_management_escalation_policy, project: project) }
     let_it_be(:oncall_schedule) { create(:incident_management_oncall_schedule, project: project) }
