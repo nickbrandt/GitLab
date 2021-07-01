@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require_relative './body_shared_examples'
 
 RSpec.describe Vulnerabilities::Finding::Evidence::Response do
   it { is_expected.to belong_to(:evidence).class_name('Vulnerabilities::Finding::Evidence').inverse_of(:response).required }
