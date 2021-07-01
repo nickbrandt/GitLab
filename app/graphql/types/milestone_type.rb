@@ -27,7 +27,7 @@ module Types
           description: 'State of the milestone.'
 
     field :expired, GraphQL::BOOLEAN_TYPE, null: false,
-          description: 'Expired state of the milestone (a milestone is expired when the due date is past the current date).'
+          description: 'Expired state of the milestone (a milestone is expired when the due date is past the current date). Defaults to `false` when due date has not been set.'
 
     field :web_path, GraphQL::STRING_TYPE, null: false, method: :milestone_path,
           description: 'Web path of the milestone.'

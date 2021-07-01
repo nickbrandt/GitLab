@@ -10813,7 +10813,7 @@ Represents a milestone.
 | <a id="milestonecreatedat"></a>`createdAt` | [`Time!`](#time) | Timestamp of milestone creation. |
 | <a id="milestonedescription"></a>`description` | [`String`](#string) | Description of the milestone. |
 | <a id="milestoneduedate"></a>`dueDate` | [`Time`](#time) | Timestamp of the milestone due date. |
-| <a id="milestoneexpired"></a>`expired` | [`Boolean!`](#boolean) | Expired state of the milestone (a milestone is expired when the due date is past the current date). |
+| <a id="milestoneexpired"></a>`expired` | [`Boolean!`](#boolean) | Expired state of the milestone (a milestone is expired when the due date is past the current date). Defaults to `false` when due date has not been set. |
 | <a id="milestonegroupmilestone"></a>`groupMilestone` | [`Boolean!`](#boolean) | Indicates if milestone is at group level. |
 | <a id="milestoneid"></a>`id` | [`ID!`](#id) | ID of the milestone. |
 | <a id="milestoneiid"></a>`iid` | [`ID!`](#id) | Internal ID of the milestone. |
