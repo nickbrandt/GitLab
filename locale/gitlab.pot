@@ -38925,7 +38925,7 @@ msgstr ""
 msgid "mrWidget|The source branch has been deleted"
 msgstr ""
 
-msgid "mrWidget|The source branch is %{commitsBehindLinkStart}%{commitsBehind}%{commitsBehindLinkEnd} the target branch"
+msgid "mrWidget|The source branch is %{link} the target branch"
 msgstr ""
 
 msgid "mrWidget|The source branch is being deleted"
