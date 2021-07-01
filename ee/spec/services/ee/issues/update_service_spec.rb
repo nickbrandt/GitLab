@@ -7,11 +7,12 @@ RSpec.describe Issues::UpdateService do
 
   let(:project) { create(:project, group: group) }
   let(:issue) { create(:issue, project: project) }
-  let(:user) { issue.author }
+  let(:author) { issue.author }
+  let(:user) { author }
 
   describe 'execute' do
     before do
-      project.add_reporter(user)
+      project.add_reporter(author)
     end
 
     def update_issue(opts)
@@ -166,6 +167,43 @@ RSpec.describe Issues::UpdateService do
         let(:iteration) { create(:iteration, :skip_project_validation, project: project) }
 
         it_behaves_like 'creates iteration resource event'
+      end
+    end
+
+    context 'changing issue_type' do
+      before do
+        stub_licensed_features(quality_management: true)
+      end
+
+      context 'from issue to incident' do
+        it 'changes issue type' do
+          update_issue(issue_type: 'incident')
+
+          expect(issue.reload).to be_incident
+        end
+      end
+
+      context 'from issue to restricted issue types' do
+        context 'with permissions' do
+          it 'changes the type' do
+            expect { update_issue(issue_type: 'test_case') }
+              .to change { issue.reload.issue_type }
+              .from('issue')
+              .to('test_case')
+          end
+        end
+
+        context 'without sufficient permissions' do
+          let(:user) { create(:user) }
+
+          before do
+            project.add_guest(user)
+          end
+
+          it 'excludes the issue type param' do
+            expect { update_issue(issue_type: 'test_case') }.not_to change { issue.reload.issue_type }
+          end
+        end
       end
     end
 
