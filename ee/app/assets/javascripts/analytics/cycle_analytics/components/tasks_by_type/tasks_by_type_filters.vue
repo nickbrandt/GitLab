@@ -111,14 +111,12 @@ export default {
       </p>
     </div>
     <div class="flex-column">
-      <!-- TODO: replace default-selected-labels-ids + selected-labels-ids with full label objects-->
       <labels-selector
         data-testid="type-of-work-filters-label"
         :initial-data="defaultGroupLabels"
-        :default-selected-labels-ids="selectedLabelIds"
         :max-labels="maxLabels"
         :aria-label="__('CycleAnalytics|Display chart filters')"
-        :selected-label-id="selectedLabelIds"
+        :selected-label-ids="selectedLabelIds"
         aria-expanded="false"
         multiselect
         right

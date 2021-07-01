@@ -5,6 +5,7 @@ import { s__, sprintf, __ } from '~/locale';
 import ChartSkeletonLoader from '~/vue_shared/components/resizable_chart/skeleton_loader.vue';
 import { formattedDate } from '../../shared/utils';
 import { TASKS_BY_TYPE_SUBJECT_ISSUE } from '../constants';
+import { uniqById } from '../utils';
 import TasksByTypeChart from './tasks_by_type/tasks_by_type_chart.vue';
 import TasksByTypeFilters from './tasks_by_type/tasks_by_type_filters.vue';
 
@@ -17,6 +18,7 @@ export default {
       'isLoadingTasksByTypeChart',
       'isLoadingTasksByTypeChartTopLabels',
       'errorMessage',
+      'topRankedLabels',
     ]),
     ...mapGetters('typeOfWork', ['selectedTasksByTypeFilters', 'tasksByTypeChartData']),
     hasData() {
@@ -63,6 +65,9 @@ export default {
         ? this.errorMessage
         : __('There is no data available. Please change your selection.');
     },
+    initialGroupLabels() {
+      return uniqById([...this.defaultGroupLabels, ...this.topRankedLabels]);
+    },
   },
   methods: {
     ...mapActions('typeOfWork', ['setTasksByTypeFilters']),
@@ -79,7 +84,7 @@ export default {
       <h3>{{ s__('CycleAnalytics|Type of work') }}</h3>
       <p>{{ summaryDescription }}</p>
       <tasks-by-type-filters
-        :default-group-labels="defaultGroupLabels"
+        :default-group-labels="initialGroupLabels"
         :has-data="hasData"
         :selected-label-ids="selectedLabelIdsFilter"
         :subject-filter="selectedSubjectFilter"

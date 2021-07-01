@@ -400,7 +400,6 @@ export const formatMedianValuesWithOverview = (medians = []) => {
  * @param {Object} popoverContent - Key value pair of data to display in the popover
  * @returns {TransformedMetricData[]} An array of metrics ready to render in the metric_card
  */
-
 export const prepareTimeMetricsData = (data = [], popoverContent = {}) =>
   data.map(({ title: label, ...rest }) => {
     const key = slugify(label);
@@ -411,3 +410,12 @@ export const prepareTimeMetricsData = (data = [], popoverContent = {}) =>
       description: popoverContent[key]?.description || '',
     };
   });
+
+/**
+ * Takes an array of objects with potential duplicates and returns the deduplicated array
+ *
+ * @param {Array} arr - The array of objects with potential duplicates
+ * @returns {Array} The unique objects from the original array
+ */
+export const uniqById = (arr = []) =>
+  Object.values(arr.reduce((acc, curr) => ({ ...acc, [curr.id]: curr }), {}));

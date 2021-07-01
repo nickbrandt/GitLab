@@ -1,6 +1,6 @@
 <script>
 import { GlFormGroup, GlFormInput, GlDropdown, GlDropdownItem } from '@gitlab/ui';
-import { isLabelEvent, getLabelEventsIdentifiers } from '../../utils';
+import { isLabelEvent, getLabelEventsIdentifiers, uniqById } from '../../utils';
 import LabelsSelector from '../labels_selector.vue';
 import { i18n } from './constants';
 import StageFieldActions from './stage_field_actions.vue';
@@ -75,11 +75,13 @@ export default {
       return this.eventName(this.stage.endEventIdentifier, 'SELECT_END_EVENT');
     },
     initialGroupLabels() {
-      return [
-        ...this.defaultGroupLabels,
-        this.stage.startEventLabelId ? this.stage.startEventLabel : null,
-        this.stage.endEventLabelId ? this.stage.endEventLabel : null,
-      ].filter((l) => Boolean(l));
+      return uniqById(
+        [
+          ...this.defaultGroupLabels,
+          this.stage.startEventLabelId ? this.stage.startEventLabel : null,
+          this.stage.endEventLabelId ? this.stage.endEventLabel : null,
+        ].filter((l) => Boolean(l)),
+      );
     },
   },
   methods: {

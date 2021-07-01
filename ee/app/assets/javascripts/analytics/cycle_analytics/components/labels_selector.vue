@@ -81,13 +81,6 @@ export default {
     noMatchingLabels() {
       return Boolean(this.searchTerm.length && !this.labels.length);
     },
-    // initialGroupLabels() {
-    //   const selectedLabels = [this.stage.startEventLabel, this.stage.endEventLabel];
-    //   return [...this.defaultGroupLabels];
-    // },
-    availableLabelIds() {
-      return this.labels.map((id) => id);
-    },
   },
   watch: {
     searchTerm() {
@@ -95,13 +88,6 @@ export default {
     },
   },
   mounted() {
-    console.log('defaultGroupLabels', this.defaultGroupLabels);
-    console.log('selectedLabelIds', this.selectedLabelIds);
-    console.log('availableLabelIds', this.availableLabelIds);
-    console.log('initialData', this.initialData);
-    this.initialData.forEach((l) => {
-      console.log('l', l);
-    });
     if (!this.initialData.length) {
       this.fetchData();
     } else {
