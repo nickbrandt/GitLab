@@ -27,7 +27,7 @@ const mockGroupLabelsRequest = (status = 200) =>
 describe('Value Stream Analytics LabelsSelector', () => {
   let store = null;
 
-  function createComponent({ props = { selectedLabelId: [] }, shallow = true } = {}) {
+  function createComponent({ props = { selectedLabelIds: [] }, shallow = true } = {}) {
     store = createStore();
     const func = shallow ? shallowMount : mount;
     return func(LabelsSelector, {
@@ -117,10 +117,10 @@ describe('Value Stream Analytics LabelsSelector', () => {
     });
   });
 
-  describe('with selectedLabelId set', () => {
+  describe('with selectedLabelIds set', () => {
     beforeEach(() => {
       mock = mockGroupLabelsRequest();
-      wrapper = createComponent({ props: { selectedLabelId: [selectedLabel.id] } });
+      wrapper = createComponent({ props: { selectedLabelIds: [selectedLabel.id] } });
       return waitForPromises();
     });
 
