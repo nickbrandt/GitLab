@@ -1,15 +1,15 @@
 ---
 data_category: Optional
-key_path: redis_hll_counters.compliance.compliance_total_unique_counts_weekly
-description: 'Unique count of compliance actions in a given week'
+key_path: compliance_unique_visits.g_compliance_dashboard
+description: 'Number of unique visitors to the compliance dashboard.'
 product_section: 'dev'
 product_stage: 'manage'
 product_group: 'group::compliance'
 product_category: 'compliance_management'
 value_type: number
 status: data_available
-time_frame: 7d
-data_source: redis_hll
+time_frame: all
+data_source: database
 distribution:
 - ee
 tier:
