@@ -74,7 +74,7 @@ class ProjectPolicy < BasePolicy
     user.is_a?(DeployKey) && user.has_access_to?(project)
   end
 
-  desc "Deploy token with write access"
+  desc "Deploy key with write access"
   condition(:push_code_deploy_key) do
     user.is_a?(DeployKey) && user.can_push_to?(project)
   end
