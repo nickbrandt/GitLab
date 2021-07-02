@@ -18,11 +18,9 @@ module API
       end
 
       expose :subscribed do |label, options|
-        if label.subscribed?(options[:current_user]) || label.subscribed?(options[:current_user], options[:parent])
-          true
-        else
-          false
-        end
+        label.subscribed?(options[:current_user]) || (
+          options[:parent].is_a?(::Project) && label.subscribed?(options[:current_user], options[:parent])
+        )
       end
     end
   end
