@@ -27467,9 +27467,6 @@ msgstr ""
 msgid "RepositoriesAnalytics|No test coverage to display"
 msgstr ""
 
-msgid "RepositoriesAnalytics|Overall activity"
-msgstr ""
-
 msgid "RepositoriesAnalytics|Please select a project or multiple projects to display their most recent test coverage data."
 msgstr ""
 
