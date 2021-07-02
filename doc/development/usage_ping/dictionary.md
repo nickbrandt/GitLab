@@ -18316,6 +18316,22 @@ Status: `data_available`
 
 Tiers: `free`, `premium`, `ultimate`
 
+### `settings.collected_data_categories`
+
+List of collected data categories corresponding to instance settings
+
+[Object JSON schema](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/objects_schemas/collected_data_categories_schema.json)
+
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/settings/20210702140138_collected_data_categories.yml)
+
+Group: `group::product intelligence`
+
+Data Category: `Standard`
+
+Status: `implemented`
+
+Tiers: `free`, `premium`, `ultimate`
+
 ### `settings.gitaly_apdex`
 
 Gitaly application performance
