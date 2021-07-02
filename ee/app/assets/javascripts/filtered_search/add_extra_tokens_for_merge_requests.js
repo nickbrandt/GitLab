@@ -36,6 +36,7 @@ const approvers = {
     symbol: '@',
     icon: 'approval',
     tag: '@approver',
+    hideNotEqual: true,
   },
   tokenAlternative: {
     formattedKey: __('Approver'),
