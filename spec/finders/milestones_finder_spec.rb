@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 RSpec.describe MilestonesFinder do
-  let_it_be(:now) { Time.now }
+  let_it_be(:now) { Date.current }
   let_it_be(:group) { create(:group) }
   let_it_be(:project_1) { create(:project, namespace: group) }
   let_it_be(:project_2) { create(:project, namespace: group) }
@@ -11,7 +11,7 @@ RSpec.describe MilestonesFinder do
   let_it_be(:milestone_4) { create(:milestone, project: project_2, state: 'active', start_date: now + 4.days, due_date: now + 5.days) }
 
   context 'without filters' do
-    let_it_be(:milestone_1) { create(:milestone, group: group, title: 'one test', start_date: now - 1.day, due_date: now) }
+    let_it_be(:milestone_1) { create(:milestone, group: group, start_date: now - 1.day, due_date: now) }
     let_it_be(:milestone_3) { create(:milestone, project: project_1, state: 'active', start_date: now + 2.days) }
     let_it_be(:milestone_5) { create(:milestone, group: group, due_date: now - 2.days) }
 
@@ -47,7 +47,7 @@ RSpec.describe MilestonesFinder do
         let(:extra_params) { { sort: :expired_last_due_date_asc } }
 
         it 'current milestones are returned first, then milestones without due date followed by expired milestones, sorted by due date in ascending order' do
-          expect(result).to eq([milestone_2, milestone_4, milestone_3, milestone_5, milestone_1])
+          expect(result).to eq([milestone_1, milestone_2, milestone_4, milestone_3, milestone_5])
         end
       end
     end

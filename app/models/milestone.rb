@@ -123,7 +123,7 @@ class Milestone < ApplicationRecord
   def self.sort_with_expired_last(method)
     # NOTE: this is a custom ordering of milestones
     # to prioritize displaying non-expired milestones and milestones without due dates
-    sorted = reorder(Arel.sql('(CASE WHEN due_date IS NULL THEN 1 WHEN due_date > now() THEN 0 ELSE 2 END) ASC'))
+    sorted = reorder(Arel.sql("(CASE WHEN due_date IS NULL THEN 1 WHEN due_date >= '#{Date.current}' THEN 0 ELSE 2 END) ASC"))
     sorted = if method.to_s == 'expired_last_due_date_desc'
                sorted.order(due_date: :desc)
              else
