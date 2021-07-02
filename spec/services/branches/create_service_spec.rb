@@ -38,11 +38,11 @@ RSpec.describe Branches::CreateService do
       end
 
       it 'returns an error with a reference name' do
-        error_message = 'Failed to create branch \'new-feature\': invalid reference name unknown'
+        err_msg = 'Failed to create branch \'new-feature\': invalid reference name \'unknown\''
         result = service.execute('new-feature', 'unknown')
 
         expect(result[:status]).to eq(:error)
-        expect(result[:message]).to eq('Invalid reference name: unknown')
+        expect(result[:message]).to eq(err_msg)
       end
     end
 
