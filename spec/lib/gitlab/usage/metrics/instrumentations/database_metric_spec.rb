@@ -26,7 +26,10 @@ RSpec.describe Gitlab::Usage::Metrics::Instrumentations::DatabaseMetric do
       expect(subject.value).to eq(3)
     end
 
-    it 'does not cache the result of start and finish', :use_clean_rails_redis_caching do
+    it 'does not cache the result of start and finish', :request_store, :use_clean_rails_redis_caching do
+      expect(Gitlab::Cache).not_to receive(:fetch_once)
+      expect(subject).to receive(:count).with(any_args, hash_including(start: issues.min_by(&:id).id, finish: issues.max_by(&:id).id)).and_call_original
+
       subject.value
 
       expect(Rails.cache.read('metric_instrumentation/special_issue_count_minimum_id')).to eq(nil)
@@ -57,7 +60,11 @@ RSpec.describe Gitlab::Usage::Metrics::Instrumentations::DatabaseMetric do
         end.new(time_frame: 'all')
       end
 
-      it 'caches using the key name passed', :use_clean_rails_redis_caching do
+      it 'caches using the key name passed', :request_store, :use_clean_rails_redis_caching do
+        expect(Gitlab::Cache).to receive(:fetch_once).with('metric_instrumentation/special_issue_count_minimum_id', any_args).and_call_original
+        expect(Gitlab::Cache).to receive(:fetch_once).with('metric_instrumentation/special_issue_count_maximum_id', any_args).and_call_original
+        expect(subject).to receive(:count).with(any_args, hash_including(start: issues.min_by(&:id).id, finish: issues.max_by(&:id).id)).and_call_original
+
         subject.value
 
         expect(Rails.cache.read('metric_instrumentation/special_issue_count_minimum_id')).to eq(issues.min_by(&:id).id)

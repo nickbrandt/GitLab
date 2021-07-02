@@ -91,11 +91,11 @@ module Gitlab
 
             key_name = "metric_instrumentation/#{self.class.cache_key}"
 
-            start = Rails.cache.fetch("#{key_name}_minimum_id", expires_in: 1.day) do
+            start = Gitlab::Cache.fetch_once("#{key_name}_minimum_id", expires_in: 1.day) do
               self.class.start
             end
 
-            finish = Rails.cache.fetch("#{key_name}_maximum_id", expires_in: 1.day) do
+            finish = Gitlab::Cache.fetch_once("#{key_name}_maximum_id", expires_in: 1.day) do
               self.class.finish
             end
 
