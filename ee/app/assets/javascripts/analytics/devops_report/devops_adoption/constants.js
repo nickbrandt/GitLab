@@ -123,7 +123,7 @@ export const DEVOPS_ADOPTION_TABLE_CONFIGURATION = [
       {
         key: 'mergeRequestApproved',
         label: s__('DevopsAdoption|Approvals'),
-        tooltip: s__('DevopsAdoption|At least one approval on an MR'),
+        tooltip: s__('DevopsAdoption|At least one approval on a merge request'),
         testId: 'approvalsCol',
       },
       {
@@ -141,7 +141,7 @@ export const DEVOPS_ADOPTION_TABLE_CONFIGURATION = [
       {
         key: 'mergeRequestOpened',
         label: s__('DevopsAdoption|MRs'),
-        tooltip: s__('DevopsAdoption|At least one MR opened'),
+        tooltip: s__('DevopsAdoption|At least one merge request opened'),
         testId: 'mrsCol',
       },
     ],
@@ -152,6 +152,18 @@ export const DEVOPS_ADOPTION_TABLE_CONFIGURATION = [
     icon: 'shield',
     variant: 'info',
     cols: [
+      {
+        key: 'dastEnabledCount',
+        label: s__('DevopsAdoption|DAST'),
+        tooltip: s__('DevopsAdoption|DAST enabled for at least one project'),
+        testId: 'dastCol',
+      },
+      {
+        key: 'sastEnabledCount',
+        label: s__('DevopsAdoption|SAST'),
+        tooltip: s__('DevopsAdoption|SAST enabled for at least one project'),
+        testId: 'sastCol',
+      },
       {
         key: 'securityScanSucceeded',
         label: s__('DevopsAdoption|Scanning'),

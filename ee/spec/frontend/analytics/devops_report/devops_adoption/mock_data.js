@@ -46,6 +46,8 @@ export const devopsAdoptionNamespaceData = {
         deploySucceeded: false,
         securityScanSucceeded: false,
         codeOwnersUsedCount: 0,
+        sastEnabledCount: 0,
+        dastEnabledCount: 0,
         recordedAt: '2020-10-31T23:59:59Z',
         __typename: 'latestSnapshot',
       },
@@ -78,7 +80,7 @@ export const devopsAdoptionTableHeaders = [
   {
     index: 1,
     label: 'Approvals',
-    tooltip: 'At least one approval on an MR',
+    tooltip: 'At least one approval on a merge request',
   },
   {
     index: 2,
@@ -93,7 +95,7 @@ export const devopsAdoptionTableHeaders = [
   {
     index: 4,
     label: 'MRs',
-    tooltip: 'At least one MR opened',
+    tooltip: 'At least one merge request opened',
   },
   {
     index: 5,
@@ -129,6 +131,14 @@ export const overallAdoptionData = {
     {
       adopted: true,
       title: 'MRs',
+    },
+    {
+      adopted: false,
+      title: 'DAST',
+    },
+    {
+      adopted: false,
+      title: 'SAST',
     },
     {
       adopted: false,

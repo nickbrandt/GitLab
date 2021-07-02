@@ -4,6 +4,10 @@ import DevopsAdoptionTableCellFlag from 'ee/analytics/devops_report/devops_adopt
 import { shallowMountExtended } from 'helpers/vue_test_utils_helper';
 import { overallAdoptionData } from '../mock_data';
 
+const metrics = `${overallAdoptionData.featureMeta.filter(({ adopted }) => adopted).length}/${
+  overallAdoptionData.featureMeta.length
+}`;
+
 describe('DevopsAdoptionOverview', () => {
   let wrapper;
 
@@ -46,7 +50,7 @@ describe('DevopsAdoptionOverview', () => {
       const text = wrapper.findByTestId('card-description');
 
       expect(text.exists()).toBe(true);
-      expect(text.text()).toBe('3/8 Overall adoption features adopted');
+      expect(text.text()).toBe(`${metrics} Overall adoption features adopted`);
     });
 
     describe('meta', () => {
@@ -83,7 +87,7 @@ describe('DevopsAdoptionOverview', () => {
       const text = wrapper.findByTestId('card-description');
 
       expect(text.exists()).toBe(true);
-      expect(text.text()).toBe('3/8  features adopted');
+      expect(text.text()).toBe(`${metrics}  features adopted`);
     });
 
     it('does not display the meta', () => {
