@@ -2,7 +2,6 @@ import { GlFormCheckbox, GlFormInput } from '@gitlab/ui';
 import { mountExtended } from 'helpers/vue_test_utils_helper';
 
 import JiraIssuesFields from '~/integrations/edit/components/jira_issues_fields.vue';
-import JiraUpgradeCta from '~/integrations/edit/components/jira_upgrade_cta.vue';
 import eventHub from '~/integrations/edit/event_hub';
 import { createStore } from '~/integrations/edit/store';
 
@@ -14,6 +13,7 @@ describe('JiraIssuesFields', () => {
     editProjectPath: '/edit',
     showJiraIssuesIntegration: true,
     showJiraVulnerabilitiesIntegration: true,
+    upgradePlanPath: 'https://gitlab.com',
   };
 
   const createComponent = ({ isInheriting = false, props, ...options } = {}) => {
@@ -37,42 +37,25 @@ describe('JiraIssuesFields', () => {
   const findEnableCheckboxDisabled = () =>
     findEnableCheckbox().find('[type=checkbox]').attributes('disabled');
   const findProjectKey = () => wrapper.findComponent(GlFormInput);
-  const findJiraUpgradeCta = () => wrapper.findComponent(JiraUpgradeCta);
+  const findPremiumUpgradeCTA = () => wrapper.findByTestId('premium-upgrade-cta');
+  const findUltimateUpgradeCTA = () => wrapper.findByTestId('ultimate-upgrade-cta');
   const findJiraForVulnerabilities = () => wrapper.findByTestId('jira-for-vulnerabilities');
   const setEnableCheckbox = async (isEnabled = true) =>
     findEnableCheckbox().vm.$emit('input', isEnabled);
 
-  describe('jira issues call to action', () => {
-    it('shows the premium message', () => {
-      createComponent({
-        props: { showJiraIssuesIntegration: false },
-      });
-
-      expect(findJiraUpgradeCta().props()).toMatchObject({
-        showPremiumMessage: true,
-        showUltimateMessage: false,
-      });
-    });
-
-    it('shows the ultimate message', () => {
-      createComponent({
-        props: {
-          showJiraIssuesIntegration: true,
-          showJiraVulnerabilitiesIntegration: false,
-        },
-      });
-
-      expect(findJiraUpgradeCta().props()).toMatchObject({
-        showPremiumMessage: false,
-        showUltimateMessage: true,
-      });
-    });
-  });
-
   describe('template', () => {
-    describe('upgrade banner for non-Premium user', () => {
+    describe('when `showJiraIssuesIntegration` is false', () => {
       beforeEach(() => {
-        createComponent({ props: { initialProjectKey: '', showJiraIssuesIntegration: false } });
+        createComponent({
+          props: { showJiraIssuesIntegration: false },
+        });
+      });
+
+      it('shows the premium CTA', () => {
+        const premiumUpgradeCTA = findPremiumUpgradeCTA();
+
+        expect(premiumUpgradeCTA.exists()).toBe(true);
+        expect(premiumUpgradeCTA.props('upgradePlanPath')).toBe(defaultProps.upgradePlanPath);
       });
 
       it('does not show checkbox and input field', () => {
@@ -81,14 +64,50 @@ describe('JiraIssuesFields', () => {
       });
     });
 
+    describe('when `showJiraIssuesIntegration` is true and `showJiraVulnerabilitiesIntegration` is false', () => {
+      beforeEach(() => {
+        createComponent({
+          props: { showJiraIssuesIntegration: true, showJiraVulnerabilitiesIntegration: false },
+        });
+      });
+
+      it('renders "Enable Jira Issues" checkbox', () => {
+        expect(findEnableCheckbox().exists()).toBe(true);
+        expect(findEnableCheckboxDisabled()).toBeUndefined();
+      });
+
+      it.each`
+        scenario                                                                        | enableJiraIssues
+        ${'when "Enable Jira Issues" is checked, shows ultimate upgrade CTA'}           | ${true}
+        ${'when "Enable Jira Issues" is unchecked, does not show ultimate upgrade CTA'} | ${false}
+      `('$scenario', async ({ enableJiraIssues }) => {
+        createComponent({
+          props: { showJiraIssuesIntegration: true, showJiraVulnerabilitiesIntegration: false },
+        });
+
+        if (enableJiraIssues) {
+          await setEnableCheckbox();
+        }
+
+        expect(findPremiumUpgradeCTA().exists()).toBe(false);
+        expect(findUltimateUpgradeCTA().exists()).toBe(enableJiraIssues);
+      });
+    });
+
+    describe('when `showJiraIssuesIntegration` is true and `showJiraVulnerabilitiesIntegration` is true', () => {
+      it('does not show any upgrade CTA', () => {
+        createComponent({
+          props: { showJiraIssuesIntegration: true, showJiraVulnerabilitiesIntegration: true },
+        });
+
+        expect(findPremiumUpgradeCTA().exists()).toBe(false);
+        expect(findUltimateUpgradeCTA().exists()).toBe(false);
+      });
+    });
+
     describe('Enable Jira issues checkbox', () => {
       beforeEach(() => {
         createComponent({ props: { initialProjectKey: '' } });
-      });
-
-      it('renders enabled checkbox', () => {
-        expect(findEnableCheckbox().exists()).toBe(true);
-        expect(findEnableCheckboxDisabled()).toBeUndefined();
       });
 
       it('renders disabled project_key input', () => {
@@ -97,10 +116,6 @@ describe('JiraIssuesFields', () => {
         expect(projectKey.exists()).toBe(true);
         expect(projectKey.attributes('disabled')).toBe('disabled');
         expect(projectKey.attributes('required')).toBeUndefined();
-      });
-
-      it('does not show upgrade banner', () => {
-        expect(findJiraUpgradeCta().exists()).toBe(false);
       });
 
       // As per https://vuejs.org/v2/guide/forms.html#Checkbox-1,
