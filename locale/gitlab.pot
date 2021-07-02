@@ -10278,9 +10278,6 @@ msgstr ""
 msgid "Default CI/CD configuration file"
 msgstr ""
 
-msgid "Default Timeout Period"
-msgstr ""
-
 msgid "Default artifacts expiration"
 msgstr ""
 
@@ -10315,6 +10312,9 @@ msgid "Default project deletion protection"
 msgstr ""
 
 msgid "Default projects limit"
+msgstr ""
+
+msgid "Default timeout"
 msgstr ""
 
 msgid "Default: Map a FogBugz account ID to a full name"
@@ -13527,7 +13527,7 @@ msgstr ""
 msgid "False positive"
 msgstr ""
 
-msgid "Fast Timeout Period"
+msgid "Fast timeout"
 msgstr ""
 
 msgid "Fast-forward merge is not possible. Rebase the source branch onto %{targetBranch} to allow this merge request to be merged."
@@ -14989,9 +14989,6 @@ msgstr ""
 msgid "GitLabPages|Your pages are served under:"
 msgstr ""
 
-msgid "Gitaly"
-msgstr ""
-
 msgid "Gitaly Servers"
 msgstr ""
 
@@ -14999,6 +14996,9 @@ msgid "Gitaly relative path:"
 msgstr ""
 
 msgid "Gitaly storage name:"
+msgstr ""
+
+msgid "Gitaly timeouts"
 msgstr ""
 
 msgid "Gitaly|Address"
@@ -20165,7 +20165,7 @@ msgstr ""
 msgid "Measured in bytes of code. Excludes generated and vendored code."
 msgstr ""
 
-msgid "Medium Timeout Period"
+msgid "Medium timeout"
 msgstr ""
 
 msgid "Medium vulnerabilities present"
@@ -33856,6 +33856,15 @@ msgid "Timeout"
 msgstr ""
 
 msgid "Timeout connecting to the Google API. Please try again."
+msgstr ""
+
+msgid "Timeout for moderately fast Gitaly operations (in seconds). Provide a value between Default timeout and Fast timeout."
+msgstr ""
+
+msgid "Timeout for most Gitaly operations (in seconds)."
+msgstr ""
+
+msgid "Timeout for the fastest Gitaly operations (in seconds)."
 msgstr ""
 
 msgid "Timezone"
