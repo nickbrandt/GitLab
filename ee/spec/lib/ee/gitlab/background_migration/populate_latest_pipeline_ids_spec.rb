@@ -31,7 +31,7 @@ RSpec.describe Gitlab::BackgroundMigration::PopulateLatestPipelineIds do
   let!(:project_2) { projects.create!(namespace_id: namespace.id, name: 'Foo 2') }
   let!(:project_3) { projects.create!(namespace_id: namespace.id, name: 'Foo 3') }
   let!(:project_4) { projects.create!(namespace_id: namespace.id, name: 'Foo 4') }
-  let!(:project_5) { projects.create!(namespace_id: namespace.id, name: 'Foo 5') }
+  let!(:project_5) { projects.create!(namespace_id: namespace.id, name: 'Foo 5', path: 'unknown-path-to-repository') }
   let!(:project_6) { projects.create!(namespace_id: namespace.id, name: 'Foo 6') }
 
   let!(:project_1_pipeline) { pipelines.create!(project_id: project_1.id, ref: 'master', sha: 'adf43c3a', status: 'success') }
@@ -72,32 +72,12 @@ RSpec.describe Gitlab::BackgroundMigration::PopulateLatestPipelineIds do
     before do
       allow(Gitlab::ErrorTracking).to receive(:track_and_raise_for_dev_exception)
 
-      # Raise an error while retreiving the `root_ref` for the `project_5`
-      mock_raw_repository = instance_double(::Gitlab::Git::Repository)
-      allow(mock_raw_repository).to receive(:root_ref).and_raise(::Gitlab::Git::Repository::NoRepository.new)
-
-      raw_repository_call_count = 0
-
-      allow_next_instance_of(described_class::Repository) do |repository_instance|
-        original_raw_repository = repository_instance.method(:raw_repository)
-
-        allow(repository_instance).to receive(:raw_repository) do
-          raw_repository_call_count += 1
-
-          raw_repository_call_count == 3 ? mock_raw_repository : original_raw_repository.call
-        end
-      end
-
       # Raise a RuntimeError while retreiving the `pipeline_with_reports` for the `project_6`
-      pipeline_with_reports_call_count = 0
-
       allow_next_found_instance_of(described_class::Project) do |project_instance|
         original_pipeline_with_reports = project_instance.method(:pipeline_with_reports)
 
         allow(project_instance).to receive(:pipeline_with_reports) do
-          pipeline_with_reports_call_count += 1
-
-          pipeline_with_reports_call_count == 4 ? raise("Foo") : original_pipeline_with_reports.call
+          project_instance.id == project_6.id ? raise("Foo") : original_pipeline_with_reports.call
         end
       end
     end
