@@ -6310,16 +6310,28 @@ msgstr ""
 msgid "Checkout|%{name}'s GitLab subscription"
 msgstr ""
 
+msgid "Checkout|%{quantity} CI minute packs"
+msgstr ""
+
 msgid "Checkout|%{selectedPlanText} plan"
 msgstr ""
 
 msgid "Checkout|%{startDate} - %{endDate}"
 msgstr ""
 
+msgid "Checkout|%{totalCiMinutes} CI minutes"
+msgstr ""
+
 msgid "Checkout|(x%{numberOfUsers})"
 msgstr ""
 
 msgid "Checkout|Billing address"
+msgstr ""
+
+msgid "Checkout|CI minute packs"
+msgstr ""
+
+msgid "Checkout|CI minute packs are only used after you've used your subscription's monthly quota. The additional minutes will roll over month to month and are valid for one year."
 msgstr ""
 
 msgid "Checkout|Checkout"
@@ -6403,6 +6415,9 @@ msgstr ""
 msgid "Checkout|Please select a state"
 msgstr ""
 
+msgid "Checkout|Purchase details"
+msgstr ""
+
 msgid "Checkout|Select"
 msgstr ""
 
@@ -6427,6 +6442,9 @@ msgstr ""
 msgid "Checkout|Total"
 msgstr ""
 
+msgid "Checkout|Total minutes: %{quantity}"
+msgstr ""
+
 msgid "Checkout|Users"
 msgstr ""
 
@@ -6443,6 +6461,9 @@ msgid "Checkout|Zip code"
 msgstr ""
 
 msgid "Checkout|company or team"
+msgstr ""
+
+msgid "Checkout|x 1,000 minutes per pack = %{strong}"
 msgstr ""
 
 msgid "Cherry-pick this commit"
