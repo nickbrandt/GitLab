@@ -37149,7 +37149,7 @@ msgstr ""
 msgid "You can easily contribute to them by requesting to join these groups."
 msgstr ""
 
-msgid "You can enable Registration Features because Service Ping is enabled. To continue using Registration Features in future, you will also need to register with GitLab via a new cloud licensing service."
+msgid "You can enable Registration Features because Service Ping is enabled. To continue using Registration Features in the future, you will also need to register with GitLab via a new cloud licensing service."
 msgstr ""
 
 msgid "You can enable project access token creation in %{link_start}group settings%{link_end}."
