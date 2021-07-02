@@ -2551,6 +2551,12 @@ msgstr ""
 msgid "AdminUsers|Blocking user has the following effects:"
 msgstr ""
 
+msgid "AdminUsers|Can't access Git repositories."
+msgstr ""
+
+msgid "AdminUsers|Can't log in."
+msgstr ""
+
 msgid "AdminUsers|Cannot sign in or access instance information"
 msgstr ""
 
@@ -2710,6 +2716,9 @@ msgstr ""
 msgid "AdminUsers|Unban user"
 msgstr ""
 
+msgid "AdminUsers|Unban user %{username}?"
+msgstr ""
+
 msgid "AdminUsers|Unblock"
 msgstr ""
 
@@ -2755,6 +2764,9 @@ msgstr ""
 msgid "AdminUsers|What does this mean?"
 msgstr ""
 
+msgid "AdminUsers|When banned, users:"
+msgstr ""
+
 msgid "AdminUsers|When the user logs back in, their account will reactivate as a fully active account"
 msgstr ""
 
@@ -2783,6 +2795,9 @@ msgid "AdminUsers|You can always re-activate their account, their data will rema
 msgstr ""
 
 msgid "AdminUsers|You can always unblock their account, their data will remain intact."
+msgstr ""
+
+msgid "AdminUsers|You can ban their account in the future if necessary."
 msgstr ""
 
 msgid "AdminUsers|You can unban their account in the future. Their data remains intact."
