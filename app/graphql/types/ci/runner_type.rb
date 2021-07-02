@@ -53,14 +53,16 @@ module Types
 
       # rubocop: disable CodeReuse/ActiveRecord
       def project_count
-        BatchLoader::GraphQL.for(runner).batch(key: :runner_project_count) do |runners, loader, args|
-          counts = ::Ci::RunnerProject.select(:runner_id, 'COUNT(*) as count')
-            .where(runner_id: runners.map(&:id))
-            .group(:runner_id)
-            .index_by(&:runner_id)
+        BatchLoader::GraphQL.for(runner.id).batch(key: :runner_project_count) do |ids, loader, args|
+          counts = ::Ci::Runner.project_type
+            .select(:id, 'COUNT(ci_runner_projects.id) as count')
+            .left_outer_joins(:runner_projects)
+            .where(id: ids)
+            .group(:id)
+            .index_by(&:id)
 
-          runners.each do |runner|
-            loader.call(runner, counts[runner.id]&.count || (runner.project_type? ? 0 : nil))
+          ids.each do |id|
+            loader.call(id, counts[id]&.count)
           end
         end
       end
