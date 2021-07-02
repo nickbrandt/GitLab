@@ -28174,6 +28174,9 @@ msgstr ""
 msgid "Runners|Show Runner installation instructions"
 msgstr ""
 
+msgid "Runners|Something went wrong while fetching runner data."
+msgstr ""
+
 msgid "Runners|Something went wrong while fetching the tags suggestions"
 msgstr ""
 
