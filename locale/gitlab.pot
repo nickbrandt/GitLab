@@ -11150,16 +11150,16 @@ msgstr ""
 msgid "DevopsAdoption|Are you sure that you would like to remove %{name} from the table?"
 msgstr ""
 
-msgid "DevopsAdoption|At least one MR opened"
-msgstr ""
-
-msgid "DevopsAdoption|At least one approval on an MR"
+msgid "DevopsAdoption|At least one approval on a merge request"
 msgstr ""
 
 msgid "DevopsAdoption|At least one deploy"
 msgstr ""
 
 msgid "DevopsAdoption|At least one issue opened"
+msgstr ""
+
+msgid "DevopsAdoption|At least one merge request opened"
 msgstr ""
 
 msgid "DevopsAdoption|At least one pipeline successfully run"
@@ -11175,6 +11175,12 @@ msgid "DevopsAdoption|Code owners enabled for at least one project"
 msgstr ""
 
 msgid "DevopsAdoption|Confirm remove Group"
+msgstr ""
+
+msgid "DevopsAdoption|DAST"
+msgstr ""
+
+msgid "DevopsAdoption|DAST enabled for at least one project"
 msgstr ""
 
 msgid "DevopsAdoption|Deploys"
@@ -11229,6 +11235,12 @@ msgid "DevopsAdoption|Runner configured for project/group"
 msgstr ""
 
 msgid "DevopsAdoption|Runners"
+msgstr ""
+
+msgid "DevopsAdoption|SAST"
+msgstr ""
+
+msgid "DevopsAdoption|SAST enabled for at least one project"
 msgstr ""
 
 msgid "DevopsAdoption|Save changes"
