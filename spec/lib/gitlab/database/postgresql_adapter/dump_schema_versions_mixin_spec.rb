@@ -3,16 +3,6 @@
 require 'spec_helper'
 
 RSpec.describe Gitlab::Database::PostgresqlAdapter::DumpSchemaVersionsMixin do
-  let(:schema_migration) { double('schema_migration', all_versions: versions) }
-  let(:migration_context) { double('migration_context', migrations: versions.map {|v| migration_struct.new(v) }) }
-
-  let(:db_name) { 'primary' }
-  let(:versions) { %w(5 2 1000 200 4 93 2) }
-
-  let(:migration_struct) do
-    Struct.new(:version)
-  end
-
   let(:instance_class) do
     klass = Class.new do
       def dump_schema_information
@@ -30,44 +20,10 @@ RSpec.describe Gitlab::Database::PostgresqlAdapter::DumpSchemaVersionsMixin do
 
   let(:instance) { instance_class.new }
 
-  before do
-    allow(instance).to receive(:schema_migration).and_return(schema_migration)
-    allow(instance).to receive(:migration_context).and_return(migration_context)
+  it 'calls SchemaMigrations touch_all and skips original implementation' do
+    expect(Gitlab::Database::SchemaMigrations).to receive(:touch_all).with(instance)
+    expect(instance).not_to receive(:original_dump_schema_information)
 
-    # pool is from ActiveRecord::ConnectionAdapters::PostgreSQLAdapter
-    allow(instance).to receive_message_chain(:pool, :db_config, :name).and_return(db_name)
-  end
-
-  context 'when database name is primary' do
-    context 'when version files exist' do
-      it 'touches version files' do
-        expect(Gitlab::Database::SchemaVersionFiles).to receive(:touch_all).with(db_name, versions, versions)
-        expect(instance).not_to receive(:original_dump_schema_information)
-
-        instance.dump_schema_information
-      end
-    end
-
-    context 'when version files do not exist' do
-      let(:versions) { [] }
-
-      it 'does not touch version files' do
-        expect(Gitlab::Database::SchemaVersionFiles).not_to receive(:touch_all)
-        expect(instance).not_to receive(:original_dump_schema_information)
-
-        instance.dump_schema_information
-      end
-    end
-  end
-
-  context 'when database name is ci' do
-    let(:db_name) { 'ci' }
-
-    it 'touches version files' do
-      expect(Gitlab::Database::SchemaVersionFiles).to receive(:touch_all).with(db_name, versions, versions)
-      expect(instance).not_to receive(:original_dump_schema_information)
-
-      instance.dump_schema_information
-    end
+    instance.dump_schema_information
   end
 end

@@ -9,7 +9,7 @@ module Gitlab
         def structure_load(...)
           super(...)
 
-          Gitlab::Database::SchemaVersionFiles.load_all(connection.pool.db_config.name)
+          Gitlab::Database::SchemaMigrations.load_all(connection)
         end
       end
     end
