@@ -1,5 +1,6 @@
 import dateFormat from 'dateformat';
 import { dateFormats } from '~/analytics/shared/constants';
+import { filterToQueryObject } from '~/vue_shared/components/filtered_search_bar/filtered_search_utils';
 import { transformStagesForPathNavigation, filterStagesByHiddenStatus } from '../utils';
 
 export const pathNavigationData = ({ stages, medians, stageCounts, selectedStage }) => {
@@ -31,9 +32,27 @@ export const legacyFilterParams = ({ startDate }) => {
   };
 };
 
-export const filterParams = ({ id, ...rest }) => {
+export const filterParams = (state) => {
+  const {
+    id,
+    filters: {
+      authors: { selected: selectedAuthor },
+      milestones: { selected: selectedMilestone },
+      assignees: { selectedList: selectedAssigneeList },
+      labels: { selectedList: selectedLabelList },
+    },
+  } = state;
+
+  const filterBarQuery = filterToQueryObject({
+    milestone_title: selectedMilestone,
+    author_username: selectedAuthor,
+    label_name: selectedLabelList,
+    assignee_username: selectedAssigneeList,
+  });
+
   return {
     project_ids: [id],
-    ...dateRangeParams(rest),
+    ...dateRangeParams(state),
+    ...filterBarQuery,
   };
 };

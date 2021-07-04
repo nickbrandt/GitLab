@@ -1,5 +1,5 @@
 import dateFormat from 'dateformat';
-import { dateFormats } from 'ee/analytics/shared/constants';
+import { dateFormats } from '~/analytics/shared/constants';
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 import { DEFAULT_DAYS_TO_DISPLAY } from '../constants';
 import {

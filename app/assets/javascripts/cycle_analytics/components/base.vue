@@ -2,7 +2,6 @@
 import { GlIcon, GlEmptyState, GlLoadingIcon, GlSprintf } from '@gitlab/ui';
 import Cookies from 'js-cookie';
 import { mapActions, mapState, mapGetters } from 'vuex';
-import ValueStreamFilters from 'ee/analytics/cycle_analytics/components/value_stream_filters.vue';
 import PathNavigation from '~/cycle_analytics/components/path_navigation.vue';
 import { __ } from '~/locale';
 import banner from './banner.vue';
@@ -12,11 +11,9 @@ import stageNavItem from './stage_nav_item.vue';
 import stageReviewComponent from './stage_review_component.vue';
 import stageStagingComponent from './stage_staging_component.vue';
 import stageTestComponent from './stage_test_component.vue';
+import ValueStreamFilters from './value_stream_filters.vue';
 
 const OVERVIEW_DIALOG_COOKIE = 'cycle_analytics_help_dismissed';
-
-// dateFormat(createdAfter, dateFormats.isoDate)
-// const today = new Date();
 
 export default {
   name: 'CycleAnalytics',
@@ -74,13 +71,10 @@ export default {
       return selectedStageEvents.length && !isLoadingStage && !isEmptyStage;
     },
     displayNotEnoughData() {
-      return this.selectedStageReady && this.isEmptyStage;
+      return !this.isLoadingStage && this.isEmptyStage;
     },
     displayNoAccess() {
-      return this.selectedStageReady && !this.isUserAllowed(this.selectedStage.id);
-    },
-    selectedStageReady() {
-      return !this.isLoadingStage && this.selectedStage;
+      return !this.isLoadingStage && !this.isUserAllowed(this.selectedStage.id);
     },
     emptyStageTitle() {
       return this.selectedStageError
@@ -130,9 +124,8 @@ export default {
       Related issue: https://gitlab.com/gitlab-org/gitlab/-/issues/326705
     -->
     <path-navigation
-      v-if="selectedStageReady"
       class="js-path-navigation gl-w-full gl-pb-2"
-      :loading="isLoading"
+      :loading="isLoading || isLoadingStage"
       :stages="pathNavigationData"
       :selected-stage="selectedStage"
       :with-stage-counts="false"

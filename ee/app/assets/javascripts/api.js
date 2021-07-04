@@ -163,11 +163,11 @@ export default {
     return axios.get(url, { params });
   },
 
-  cycleAnalyticsStageEvents({ groupId, valueStreamId, stageId, params = {} }) {
-    const stageBase = this.cycleAnalyticsStageUrl({ groupId, valueStreamId, stageId });
-    const url = `${stageBase}/records`;
-    return axios.get(url, { params });
-  },
+  // cycleAnalyticsStageEvents({ groupId, valueStreamId, stageId, params = {} }) {
+  //   const stageBase = this.cycleAnalyticsStageUrl({ groupId, valueStreamId, stageId });
+  //   const url = `${stageBase}/records`;
+  //   return axios.get(url, { params });
+  // },
 
   cycleAnalyticsStageCount({ groupId, valueStreamId, stageId, params = {} }) {
     const stageBase = this.cycleAnalyticsStageUrl({ groupId, valueStreamId, stageId });

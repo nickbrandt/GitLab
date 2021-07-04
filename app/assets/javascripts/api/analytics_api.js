@@ -49,3 +49,8 @@ export const getValueStreamStageMedian = ({ groupId, valueStreamId, stageId }, p
   const stageBase = buildGroupValueStreamPath({ groupId, valueStreamId, stageId });
   return axios.get(`${stageBase}/median`, { params });
 };
+
+export const getValueStreamStagesAndEvents = ({ groupId, valueStreamId, stageId, params = {} }) => {
+  const stageBase = buildGroupValueStreamPath({ groupId, valueStreamId, stageId });
+  return axios.get(`${stageBase}/records`, { params });
+};

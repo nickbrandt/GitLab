@@ -1,9 +1,9 @@
-import Api from 'ee/api';
 import {
   getProjectValueStreamStages,
   getProjectValueStreams,
   getProjectValueStreamMetrics,
   getValueStreamStageMedian,
+  getValueStreamStagesAndEvents,
 } from '~/api/analytics_api';
 import createFlash from '~/flash';
 import { __ } from '~/locale';
@@ -12,8 +12,7 @@ import * as types from './mutation_types';
 
 export const setSelectedValueStream = ({ commit, dispatch }, valueStream) => {
   commit(types.SET_SELECTED_VALUE_STREAM, valueStream);
-  console.log('setSelectedValueStream::valueStream', valueStream);
-  return dispatch('fetchValueStreamStages');
+  return Promise.all([dispatch('fetchValueStreamStages'), dispatch('fetchCycleAnalyticsData')]);
 };
 
 export const fetchValueStreamStages = ({ commit, state }) => {
@@ -58,7 +57,6 @@ export const fetchValueStreams = ({ commit, dispatch, state }) => {
       commit(types.RECEIVE_VALUE_STREAMS_ERROR, status);
     });
 };
-
 export const fetchCycleAnalyticsData = ({
   state: {
     endpoints: { requestPath },
@@ -81,7 +79,7 @@ export const fetchCycleAnalyticsData = ({
 export const fetchStageData = ({ getters: { requestParams, filterParams }, commit }) => {
   commit(types.REQUEST_STAGE_DATA);
 
-  return Api.cycleAnalyticsStageEvents({ ...requestParams, params: filterParams })
+  return getValueStreamStagesAndEvents({ ...requestParams, params: filterParams })
     .then(({ data }) => {
       // when there's a query timeout, the request succeeds but the error is encoded in the response data
       if (data?.error) {
@@ -130,19 +128,20 @@ export const setSelectedStage = ({ dispatch, commit, state: { stages } }, select
   return dispatch('fetchStageData');
 };
 
-const refetchData = (dispatch, commit) => {
-  commit(types.SET_LOADING, true);
+export const setLoading = ({ commit }, value) => commit(types.SET_LOADING, value);
+
+const refetchStageData = (dispatch) => {
   return Promise.resolve()
-    .then(() => dispatch('fetchValueStreams'))
-    .then(() => dispatch('fetchCycleAnalyticsData'))
-    .finally(() => commit(types.SET_LOADING, false));
+    .then(() => dispatch('setLoading', true))
+    .then(() => Promise.all([dispatch('fetchCycleAnalyticsData'), dispatch('fetchStageData')]))
+    .finally(() => dispatch('setLoading', false));
 };
 
-export const setFilters = ({ dispatch, commit }) => refetchData(dispatch, commit);
+export const setFilters = ({ dispatch }) => refetchStageData(dispatch);
 
 export const setDateRange = ({ dispatch, commit }, daysInPast) => {
   commit(types.SET_DATE_RANGE, daysInPast);
-  return refetchData(dispatch, commit);
+  return refetchStageData(dispatch);
 };
 
 export const initializeVsa = ({ commit, dispatch }, initialData = {}) => {
@@ -151,5 +150,8 @@ export const initializeVsa = ({ commit, dispatch }, initialData = {}) => {
   const { endpoints } = initialData;
   dispatch('setPaths', endpoints);
 
-  return refetchData(dispatch, commit);
+  return Promise.resolve()
+    .then(() => dispatch('setLoading', true))
+    .then(() => dispatch('fetchValueStreams'))
+    .finally(() => dispatch('setLoading', false));
 };
