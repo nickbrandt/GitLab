@@ -42,7 +42,7 @@ The number of active users existing in the instance. This is named the instance_
 
 Group: `group::product intelligence`
 
-Data Category: `Optional`
+Data Category: `Subscription`
 
 Status: `data_available`
 
@@ -3836,7 +3836,7 @@ Count of License Scanning jobs run
 
 Group: `group::composition analysis`
 
-Data Category: `Optional`
+Data Category: `Subscription`
 
 Status: `data_available`
 
@@ -8288,7 +8288,7 @@ The peak active user count. Active is defined in UsersStatistics model.
 
 Group: `group::license`
 
-Data Category: `Optional`
+Data Category: `Subscription`
 
 Status: `data_available`
 
@@ -8386,7 +8386,7 @@ The date the license ends
 
 Group: `group::license`
 
-Data Category: `Optional`
+Data Category: `Subscription`
 
 Status: `data_available`
 
@@ -8400,7 +8400,7 @@ The ID of the license
 
 Group: `group::license`
 
-Data Category: `Optional`
+Data Category: `Subscription`
 
 Status: `data_available`
 
@@ -8428,7 +8428,7 @@ The plan of the GitLab license
 
 Group: `group::license`
 
-Data Category: `Optional`
+Data Category: `Subscription`
 
 Status: `data_available`
 
@@ -8442,7 +8442,7 @@ The date the license starts
 
 Group: `group::license`
 
-Data Category: `Optional`
+Data Category: `Subscription`
 
 Status: `data_available`
 
@@ -8470,7 +8470,7 @@ Whether this is a trial license or not
 
 Group: `group::license`
 
-Data Category: `Optional`
+Data Category: `Subscription`
 
 Status: `data_available`
 
@@ -8484,7 +8484,7 @@ Date the trial license ends on
 
 Group: `group::license`
 
-Data Category: `Optional`
+Data Category: `Subscription`
 
 Status: `data_available`
 
@@ -8498,7 +8498,7 @@ The number of seats included in the license
 
 Group: `group::license`
 
-Data Category: `Optional`
+Data Category: `Subscription`
 
 Status: `data_available`
 
@@ -8512,7 +8512,7 @@ Company on the GitLab license
 
 Group: `group::license`
 
-Data Category: `Optional`
+Data Category: `Subscription`
 
 Status: `data_available`
 
@@ -8526,7 +8526,7 @@ Email on the GitLab license
 
 Group: `group::license`
 
-Data Category: `Optional`
+Data Category: `Subscription`
 
 Status: `data_available`
 
@@ -8540,7 +8540,7 @@ Name on the GitLab license
 
 Group: `group::license`
 
-Data Category: `Optional`
+Data Category: `Subscription`
 
 Status: `data_available`
 
@@ -9002,7 +9002,7 @@ When the EE-specific features were computed
 
 Group: `group::product intelligence`
 
-Data Category: `Optional`
+Data Category: `Subscription`
 
 Status: `data_available`
 
