@@ -11,9 +11,6 @@ RSpec.describe 'Dropdown milestone', :js do
   let_it_be(:uppercase_milestone) { create(:milestone, title: 'CAP_MILESTONE', project: project) }
   let_it_be(:issue) { create(:issue, project: project) }
 
-  let(:filtered_search) { find('.filtered-search') }
-  let(:filter_dropdown) { find('#js-dropdown-milestone .filter-dropdown') }
-
   before do
     project.add_maintainer(user)
     sign_in(user)
@@ -22,12 +19,10 @@ RSpec.describe 'Dropdown milestone', :js do
   end
 
   describe 'behavior' do
-    before do
-      filtered_search.set('milestone:=')
-    end
-
     it 'loads all the milestones when opened' do
-      expect_filtered_search_dropdown_results(filter_dropdown, 2)
+      select_tokens 'Milestone', '=', submit: false
+
+      expect_filtered_search_suggestion_count 2
     end
   end
 end

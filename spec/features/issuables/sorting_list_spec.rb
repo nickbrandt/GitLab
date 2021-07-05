@@ -206,6 +206,11 @@ RSpec.describe 'Sort Issuable List' do
 
         wait_for_requests
 
+        # The below `expect`s do not seem to wait for the issues list to update, so we force a wait
+        Timeout.timeout(Capybara.default_max_wait_time) do
+          loop until first_issue.include? first_updated_issuable.title
+        end
+
         expect(first_issue).to include(first_updated_issuable.title)
         expect(last_issue).to include(last_updated_issuable.title)
       end

@@ -247,3 +247,6 @@ export function setTokenValueToRecentlyUsed(recentSuggestionsStorageKey, tokenVa
     );
   }
 }
+
+export const filterEmptySearchTerm = (filterTokens) =>
+  filterTokens?.filter((token) => token.type === FILTERED_SEARCH_TERM && token.value.data);

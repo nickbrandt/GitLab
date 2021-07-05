@@ -53,10 +53,18 @@ RSpec.describe 'Labels Hierarchy', :js do
     end
   end
 
-  shared_examples 'filtering by ancestor labels for projects' do |board = false|
+  shared_examples 'filtering by ancestor labels for projects' do |board = false, issue = false|
     it 'filters by ancestor labels' do
       [grandparent_group_label, parent_group_label, project_label_1].each do |label|
-        select_label_on_dropdown(label.title)
+        if issue
+          find('.gl-filtered-search-last-item').click
+          click_on 'Label'
+          click_on '= is'
+          click_on label.title
+          send_keys :enter
+        else
+          select_label_on_dropdown(label.title)
+        end
 
         wait_for_requests
 
@@ -72,11 +80,15 @@ RSpec.describe 'Labels Hierarchy', :js do
     end
 
     it 'does not filter by descendant group labels' do
-      filtered_search.set("label=")
+      if issue
+        select_tokens 'Label', '=', submit: false
+      else
+        filtered_search.set("label=")
+      end
 
       wait_for_requests
 
-      expect(page).not_to have_selector('.btn-link', text: child_group_label.title)
+      expect(page).not_to have_link child_group_label.title
     end
   end
 
@@ -226,14 +238,14 @@ RSpec.describe 'Labels Hierarchy', :js do
         visit project_issues_path(project_1)
       end
 
-      it_behaves_like 'filtering by ancestor labels for projects'
+      it_behaves_like 'filtering by ancestor labels for projects', false, true
 
       it 'does not filter by descendant group labels' do
-        filtered_search.set("label=")
+        select_tokens 'Label', '=', submit: false
 
         wait_for_requests
 
-        expect(page).not_to have_selector('.btn-link', text: child_group_label.title)
+        expect(page).not_to have_link child_group_label.title
       end
     end
 

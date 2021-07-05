@@ -12,16 +12,6 @@ RSpec.describe 'Filter issues weight', :js do
   let_it_be(:issue1) { create(:issue, project: project, weight: 1) }
   let_it_be(:issue2) { create(:issue, project: project, weight: 2, title: 'Bug report 1', milestone: milestone, author: user, assignees: [user], labels: [label]) }
 
-  let(:js_dropdown_weight) { '#js-dropdown-weight' }
-
-  shared_examples 'filters by negated weight' do
-    it 'excludes issues with specified weight' do
-      input_filtered_search(search)
-
-      expect_issues_list_count(1)
-    end
-  end
-
   def expect_issues_list_count(open_count, closed_count = 0)
     all_count = open_count + closed_count
 
@@ -40,65 +30,59 @@ RSpec.describe 'Filter issues weight', :js do
 
   describe 'only weight' do
     it 'filter issues by searched weight' do
-      input_filtered_search('weight:=1')
+      select_tokens 'Weight', '=', '1'
 
       expect_issues_list_count(1)
     end
   end
 
   describe 'negated weight only' do
-    let(:search) { 'weight:!=2' }
+    it 'excludes issues with specified weight' do
+      select_tokens 'Weight', '!=', '2'
 
-    it_behaves_like 'filters by negated weight'
-
-    context 'when vue_issuables_list is disabled' do
-      before do
-        stub_feature_flags(vue_issuables_list: false)
-      end
-
-      it_behaves_like 'filters by negated weight'
+      expect_issues_list_count(1)
     end
   end
 
   describe 'weight with other filters' do
     it 'filters issues by searched weight and text' do
-      search = "weight:=2 bug"
-      input_filtered_search(search)
+      select_tokens 'Weight', '=', issue2.weight, submit: false
+      send_keys('bug', :enter)
 
       expect_issues_list_count(1)
-      expect_filtered_search_input('bug')
+      expect_search_term('bug')
     end
 
     it 'filters issues by searched weight, author and text' do
-      search = "weight:=2 author:=@root bug"
-      input_filtered_search(search)
+      select_tokens 'Weight', '=', '2', 'Author', user.username, submit: false
+      send_keys('bug', :enter)
 
       expect_issues_list_count(1)
-      expect_filtered_search_input('bug')
+      expect_search_term('bug')
     end
 
     it 'filters issues by searched weight, author, assignee and text' do
-      search = "weight:=2 author:=@root assignee:=@root bug"
-      input_filtered_search(search)
+      select_tokens 'Weight', '=', '2', 'Author', user.username, 'Assignee', '=', user.username, submit: false
+      send_keys('bug', :enter)
 
       expect_issues_list_count(1)
-      expect_filtered_search_input('bug')
+      expect_search_term('bug')
     end
 
     it 'filters issues by searched weight, author, assignee, label and text' do
-      search = "weight:=2 author:=@root assignee:=@root label:=~urgent bug"
-      input_filtered_search(search)
+      select_tokens 'Weight', '=', '2', 'Author', user.username, 'Assignee', '=', user.username, 'Label', '=', label.title, submit: false
+      send_keys('bug', :enter)
 
       expect_issues_list_count(1)
-      expect_filtered_search_input('bug')
+      expect_search_term('bug')
     end
 
     it 'filters issues by searched weight, milestone and text' do
-      search = "weight:=2 milestone:=%version1 bug"
-      input_filtered_search(search)
+      select_tokens 'Weight', '=', '2', 'Milestone', '=', milestone.title, submit: false
+      send_keys('bug', :enter)
 
       expect_issues_list_count(1)
-      expect_filtered_search_input('bug')
+      expect_search_term('bug')
     end
   end
 end

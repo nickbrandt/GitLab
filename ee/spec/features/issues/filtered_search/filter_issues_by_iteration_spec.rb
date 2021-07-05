@@ -24,9 +24,9 @@ RSpec.describe 'Filter issues by iteration', :js do
       end
 
       it 'does not show the iteration filter option' do
-        find('.filtered-search').set('iter')
+        click_empty_filtered_search_bar
 
-        expect(find('#js-dropdown-hint')).not_to have_selector('.filter-dropdown .filter-dropdown-item', text: 'Iteration')
+        expect_no_suggestion('Iteration')
       end
     end
 
@@ -63,7 +63,7 @@ RSpec.describe 'Filter issues by iteration', :js do
 
       context 'when passing specific iteration by title' do
         before do
-          input_filtered_search("iteration:=\"#{iteration_1.title}\"")
+          select_tokens 'Iteration', '=', iteration_1.title
         end
 
         it_behaves_like 'filters issues by iteration'
@@ -71,7 +71,7 @@ RSpec.describe 'Filter issues by iteration', :js do
 
       context 'when passing Current iteration' do
         before do
-          input_filtered_search("iteration:=Current", extra_space: false)
+          select_tokens 'Iteration', '=', 'Current'
         end
 
         it_behaves_like 'filters issues by iteration'
@@ -81,15 +81,7 @@ RSpec.describe 'Filter issues by iteration', :js do
         before do
           visit page_path
 
-          page.within('.filtered-search-wrapper') do
-            find('.filtered-search').set('iter')
-            click_button('Iteration')
-
-            find('.btn-helptext', text: 'is not').click
-            click_button(iteration_title)
-
-            find('.filtered-search').send_keys(:enter)
-          end
+          select_tokens 'Iteration', '!=', iteration_title
         end
 
         context 'with specific iteration' do

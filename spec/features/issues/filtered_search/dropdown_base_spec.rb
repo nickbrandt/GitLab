@@ -9,14 +9,6 @@ RSpec.describe 'Dropdown base', :js do
   let_it_be(:user) { create(:user, name: 'administrator', username: 'root') }
   let_it_be(:issue) { create(:issue, project: project) }
 
-  let(:filtered_search) { find('.filtered-search') }
-  let(:js_dropdown_assignee) { '#js-dropdown-assignee' }
-  let(:filter_dropdown) { find("#{js_dropdown_assignee} .filter-dropdown") }
-
-  def dropdown_assignee_size
-    filter_dropdown.all('.filter-dropdown-item').size
-  end
-
   before do
     project.add_maintainer(user)
     sign_in(user)
@@ -27,33 +19,33 @@ RSpec.describe 'Dropdown base', :js do
   describe 'behavior' do
     it 'shows loading indicator when opened' do
       slow_requests do
-        # We aren't using `input_filtered_search` because we want to see the loading indicator
-        filtered_search.set('assignee:=')
+        select_tokens 'Assignee', '=', submit: false
 
-        expect(page).to have_css("#{js_dropdown_assignee} .filter-dropdown-loading", visible: true)
+        expect(page).to have_css '[data-testid="filtered-search"] .gl-spinner'
       end
     end
 
     it 'hides loading indicator when loaded' do
-      input_filtered_search('assignee:=', submit: false, extra_space: false)
+      select_tokens 'Assignee', '=', submit: false
 
-      expect(find(js_dropdown_assignee)).not_to have_css('.filter-dropdown-loading')
+      expect(page).not_to have_css '[data-testid="filtered-search"] .gl-spinner'
     end
   end
 
   describe 'caching requests' do
     it 'caches requests after the first load' do
-      input_filtered_search('assignee:=', submit: false, extra_space: false)
-      initial_size = dropdown_assignee_size
+      select_tokens 'Assignee', '=', submit: false
+      initial_size = filtered_search_suggestion_size
 
       expect(initial_size).to be > 0
 
       new_user = create(:user)
       project.add_maintainer(new_user)
-      find('.filtered-search-box .clear-search').click
-      input_filtered_search('assignee:=', submit: false, extra_space: false)
+      click_button 'Clear'
 
-      expect(dropdown_assignee_size).to eq(initial_size)
+      select_tokens 'Assignee', '=', submit: false
+
+      expect(filtered_search_suggestion_size).to eq(initial_size)
     end
   end
 end

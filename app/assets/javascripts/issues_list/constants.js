@@ -250,6 +250,7 @@ export const filters = {
       [OPERATOR_IS]: {
         [NORMAL_FILTER]: 'label_name[]',
         [SPECIAL_FILTER]: 'label_name[]',
+        [ALTERNATIVE_FILTER]: 'label_name',
       },
       [OPERATOR_IS_NOT]: {
         [NORMAL_FILTER]: 'not[label_name][]',

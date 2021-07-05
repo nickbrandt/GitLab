@@ -29,7 +29,7 @@ export default {
 </script>
 
 <template>
-  <span v-if="showWeight" v-gl-tooltip class="issuable-weight" :title="__('Weight')">
+  <span v-if="showWeight" v-gl-tooltip :title="__('Weight')">
     <gl-icon name="weight" />
     {{ weight }}
   </span>

@@ -166,4 +166,101 @@ module FilteredSearchHelpers
       toggle.click if toggle.visible?
     end
   end
+
+  def select_tokens(*args, submit: true)
+    click_empty_filtered_search_bar
+
+    within '[data-testid="filtered-search"]' do
+      args.each do |token|
+        if token == '='
+          click_on '= is'
+        else
+          click_on token
+        end
+      end
+    end
+
+    if submit
+      send_keys :enter
+    end
+  end
+
+  def click_empty_filtered_search_bar
+    find_field('Search or filter results...').click
+  end
+
+  def click_token_segment(value)
+    find('.gl-filtered-search-token-segment', text: value).click
+  end
+
+  def submit_search_term(value)
+    click_empty_filtered_search_bar
+    send_keys(value, :enter)
+  end
+
+  def filtered_search_suggestion_size
+    all('.gl-filtered-search-suggestion').size
+  end
+
+  def expect_token_segment(value)
+    expect(page).to have_css '.gl-filtered-search-token-segment', text: value
+  end
+
+  def expect_visible_suggestions_list
+    expect(page).to have_css('.gl-filtered-search-suggestion-list')
+  end
+
+  def expect_hidden_suggestions_list
+    expect(page).not_to have_css('.gl-filtered-search-suggestion-list')
+  end
+
+  def expect_suggestion(value)
+    expect(page).to have_css('.gl-filtered-search-suggestion-list', text: value)
+  end
+
+  def expect_no_suggestion(value)
+    expect(page).not_to have_css('.gl-filtered-search-suggestion-list', text: value)
+  end
+
+  def expect_filtered_search_suggestion_count(count)
+    expect(page).to have_css('.gl-filtered-search-suggestion', count: count)
+  end
+
+  def expect_assignee_token(value)
+    expect(page).to have_css '.gl-filtered-search-token', text: "Assignee = #{value}"
+  end
+
+  def expect_author_token(value)
+    expect(page).to have_css '.gl-filtered-search-token', text: "Author = #{value}"
+  end
+
+  def expect_label_token(value)
+    expect(page).to have_css '.gl-filtered-search-token', text: "Label = ~#{value}"
+  end
+
+  def expect_negated_label_token(value)
+    expect(page).to have_css '.gl-filtered-search-token', text: "Label != ~#{value}"
+  end
+
+  def expect_milestone_token(value)
+    expect(page).to have_css '.gl-filtered-search-token', text: "Milestone = %#{value}"
+  end
+
+  def expect_negated_milestone_token(value)
+    expect(page).to have_css '.gl-filtered-search-token', text: "Milestone != %#{value}"
+  end
+
+  def expect_weight_token(value)
+    expect(page).to have_css '.gl-filtered-search-token', text: "Weight = %#{value}"
+  end
+
+  def expect_search_term(value)
+    value.split(' ').each do |term|
+      expect(page).to have_css '.gl-filtered-search-term', text: term
+    end
+  end
+
+  def expect_empty_search_term
+    expect(page).to have_css '.gl-filtered-search-term', text: ''
+  end
 end

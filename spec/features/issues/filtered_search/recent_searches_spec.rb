@@ -25,34 +25,46 @@ RSpec.describe 'Recent searches', :js do
     Capybara.ignore_hidden_elements = true
   end
 
+  def submit_search(search)
+    click_empty_filtered_search_bar
+    send_keys(search, :enter)
+    click_button 'Clear'
+  end
+
   it 'searching adds to recent searches' do
     visit project_issues_path(project_1)
 
-    input_filtered_search('foo', submit: true)
-    input_filtered_search('bar', submit: true)
+    submit_search 'search1'
+    submit_search 'search2'
 
-    items = all('.filtered-search-history-dropdown-item', visible: false, count: 2)
+    click_button 'Toggle history'
 
-    expect(items[0].text).to eq('bar')
-    expect(items[1].text).to eq('foo')
+    items = all('.gl-search-box-by-click-history-item', count: 2)
+
+    expect(items[0].text).to eq('search2')
+    expect(items[1].text).to eq('search1')
   end
 
   it 'visiting URL with search params adds to recent searches' do
     visit project_issues_path(project_1, label_name: 'foo', search: 'bar')
     visit project_issues_path(project_1, label_name: 'qux', search: 'garply')
 
-    items = all('.filtered-search-history-dropdown-item', visible: false, count: 2)
+    click_button 'Toggle history'
 
-    expect(items[0].text).to eq('label: = ~qux garply')
-    expect(items[1].text).to eq('label: = ~foo bar')
+    items = all('.gl-search-box-by-click-history-item', count: 2)
+
+    expect(items[0].text).to eq('Label := qux garply')
+    expect(items[1].text).to eq('Label := foo bar')
   end
 
   it 'saved recent searches are restored last on the list' do
-    set_recent_searches(project_1_local_storage_key, '["saved1", "saved2"]')
+    set_recent_searches(project_1_local_storage_key, '[[{"type":"filtered-search-term","value":{"data":"saved1"}}],[{"type":"filtered-search-term","value":{"data":"saved2"}}]]')
 
     visit project_issues_path(project_1, search: 'foo')
 
-    items = all('.filtered-search-history-dropdown-item', visible: false, count: 3)
+    click_button 'Toggle history'
+
+    items = all('.gl-search-box-by-click-history-item', count: 3)
 
     expect(items[0].text).to eq('foo')
     expect(items[1].text).to eq('saved1')
@@ -62,42 +74,45 @@ RSpec.describe 'Recent searches', :js do
   it 'searches are scoped to projects' do
     visit project_issues_path(project_1)
 
-    input_filtered_search('foo', submit: true)
-    input_filtered_search('bar', submit: true)
+    submit_search 'foo'
+    submit_search 'bar'
 
     visit project_issues_path(project_2)
 
-    input_filtered_search('more', submit: true)
-    input_filtered_search('things', submit: true)
+    submit_search 'more'
+    submit_search 'things'
 
-    items = all('.filtered-search-history-dropdown-item', visible: false, count: 2)
+    click_button 'Toggle history'
+
+    items = all('.gl-search-box-by-click-history-item', count: 2)
 
     expect(items[0].text).to eq('things')
     expect(items[1].text).to eq('more')
   end
 
   it 'clicking item fills search input' do
-    set_recent_searches(project_1_local_storage_key, '["foo", "bar"]')
+    set_recent_searches(project_1_local_storage_key, '[[{"type":"filtered-search-term","value":{"data":"foo"}}],[{"type":"filtered-search-term","value":{"data":"bar"}}]]')
     visit project_issues_path(project_1)
 
-    find('.filtered-search-history-dropdown-toggle-button').click
-    all('.filtered-search-history-dropdown-item', count: 2)[0].click
-    wait_for_filtered_search('foo')
+    click_button 'Toggle history'
+    click_button 'foo'
 
-    expect(find('.filtered-search').value.strip).to eq('foo')
+    expect_search_term('foo')
   end
 
   it 'clear recent searches button, clears recent searches' do
-    set_recent_searches(project_1_local_storage_key, '["foo"]')
+    set_recent_searches(project_1_local_storage_key, '[[{"type":"filtered-search-term","value":{"data":"foo"}}]]')
     visit project_issues_path(project_1)
 
-    find('.filtered-search-history-dropdown-toggle-button').click
-    all('.filtered-search-history-dropdown-item', count: 1)
+    click_button 'Toggle history'
 
-    find('.filtered-search-history-clear-button').click
-    items_after = all('.filtered-search-history-dropdown-item', count: 0)
+    expect(page).to have_css '.gl-search-box-by-click-history-item', count: 1
 
-    expect(items_after.count).to eq(0)
+    click_button 'Clear recent searches'
+    click_button 'Toggle history'
+
+    expect(page).to have_text "You don't have any recent searches"
+    expect(page).not_to have_css '.gl-search-box-by-click-history-item'
   end
 
   it 'shows flash error when failed to parse saved history' do
@@ -105,25 +120,5 @@ RSpec.describe 'Recent searches', :js do
     visit project_issues_path(project_1)
 
     expect(find('.flash-alert')).to have_text('An error occurred while parsing recent searches')
-  end
-
-  context 'on tablet/mobile screen' do
-    it 'shows only the history icon in the dropdown' do
-      resize_screen_sm
-      visit project_issues_path(project_1)
-
-      expect(find('.filtered-search-history-dropdown-wrapper')).to have_selector('svg', visible: true)
-      expect(find('.filtered-search-history-dropdown-wrapper')).to have_selector('span', text: 'Recent searches', visible: false)
-    end
-  end
-
-  context 'on PC screen' do
-    it 'shows only the Recent searches text in the dropdown' do
-      restore_window_size
-      visit project_issues_path(project_1)
-
-      expect(find('.filtered-search-history-dropdown-wrapper')).to have_selector('svg', visible: false)
-      expect(find('.filtered-search-history-dropdown-wrapper')).to have_selector('span', text: 'Recent searches', visible: true)
-    end
   end
 end

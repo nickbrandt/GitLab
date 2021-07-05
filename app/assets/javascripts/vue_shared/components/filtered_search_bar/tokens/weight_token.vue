@@ -2,8 +2,32 @@
 import { GlDropdownDivider, GlFilteredSearchSuggestion, GlFilteredSearchToken } from '@gitlab/ui';
 import { DEFAULT_NONE_ANY } from '../constants';
 
+const baseWeights = [
+  '0',
+  '1',
+  '2',
+  '3',
+  '4',
+  '5',
+  '6',
+  '7',
+  '8',
+  '9',
+  '10',
+  '11',
+  '12',
+  '13',
+  '14',
+  '15',
+  '16',
+  '17',
+  '18',
+  '19',
+  '20',
+];
+
 export default {
-  baseWeights: ['0', '1', '2', '3', '4', '5'],
+  baseWeights,
   components: {
     GlDropdownDivider,
     GlFilteredSearchSuggestion,

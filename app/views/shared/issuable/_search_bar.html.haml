@@ -28,7 +28,7 @@
         - elsif Feature.enabled?(:issue_boards_filtered_search, board&.resource_parent) && board
           #js-issue-board-filtered-search
         - else
-          .issues-other-filters.filtered-search-wrapper.d-flex.flex-column.flex-md-row
+          .issues-other-filters.filtered-search-wrapper.d-flex.flex-column.flex-md-row{ data: { testid: 'filtered-search' } }
             .filtered-search-box
               - if type != :boards
                 - text = tag.span(sprite_icon('history'), class: "d-md-none") + tag.span(_('Recent searches'), class: "d-none d-md-inline")
