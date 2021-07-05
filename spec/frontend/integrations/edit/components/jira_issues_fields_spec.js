@@ -44,66 +44,66 @@ describe('JiraIssuesFields', () => {
     findEnableCheckbox().vm.$emit('input', isEnabled);
 
   describe('template', () => {
-    describe('when `showJiraIssuesIntegration` is false', () => {
-      beforeEach(() => {
-        createComponent({
-          props: { showJiraIssuesIntegration: false },
-        });
-      });
-
-      it('shows the premium CTA', () => {
-        const premiumUpgradeCTA = findPremiumUpgradeCTA();
-
-        expect(premiumUpgradeCTA.exists()).toBe(true);
-        expect(premiumUpgradeCTA.props('upgradePlanPath')).toBe(defaultProps.upgradePlanPath);
-      });
-
-      it('does not show checkbox and input field', () => {
-        expect(findEnableCheckbox().exists()).toBe(false);
-        expect(findProjectKey().exists()).toBe(false);
-      });
-    });
-
-    describe('when `showJiraIssuesIntegration` is true and `showJiraVulnerabilitiesIntegration` is false', () => {
-      beforeEach(() => {
-        createComponent({
-          props: { showJiraIssuesIntegration: true, showJiraVulnerabilitiesIntegration: false },
-        });
-      });
-
-      it('renders "Enable Jira Issues" checkbox', () => {
-        expect(findEnableCheckbox().exists()).toBe(true);
-        expect(findEnableCheckboxDisabled()).toBeUndefined();
-      });
-
-      it.each`
-        scenario                                                                        | enableJiraIssues
-        ${'when "Enable Jira Issues" is checked, shows ultimate upgrade CTA'}           | ${true}
-        ${'when "Enable Jira Issues" is unchecked, does not show ultimate upgrade CTA'} | ${false}
-      `('$scenario', async ({ enableJiraIssues }) => {
-        createComponent({
-          props: { showJiraIssuesIntegration: true, showJiraVulnerabilitiesIntegration: false },
+    describe.each`
+      showJiraIssuesIntegration | showJiraVulnerabilitiesIntegration
+      ${false}                  | ${false}
+      ${false}                  | ${true}
+      ${true}                   | ${false}
+      ${true}                   | ${true}
+    `(
+      'when `showJiraIssuesIntegration` is $jiraIssues and `showJiraVulnerabilitiesIntegration` is $jiraVulnerabilities',
+      ({ showJiraIssuesIntegration, showJiraVulnerabilitiesIntegration }) => {
+        beforeEach(() => {
+          createComponent({
+            props: {
+              showJiraIssuesIntegration,
+              showJiraVulnerabilitiesIntegration,
+            },
+          });
         });
 
-        if (enableJiraIssues) {
-          await setEnableCheckbox();
+        if (showJiraIssuesIntegration) {
+          it('renders checkbox and input field', () => {
+            expect(findEnableCheckbox().exists()).toBe(true);
+            expect(findEnableCheckboxDisabled()).toBeUndefined();
+            expect(findProjectKey().exists()).toBe(true);
+          });
+
+          it('does not render the Premium CTA', () => {
+            expect(findPremiumUpgradeCTA().exists()).toBe(false);
+          });
+
+          if (!showJiraVulnerabilitiesIntegration) {
+            it.each`
+              scenario                                                                          | enableJiraIssues
+              ${'when "Enable Jira issues" is checked, renders Ultimate upgrade CTA'}           | ${true}
+              ${'when "Enable Jira issues" is unchecked, does not render Ultimate upgrade CTA'} | ${false}
+            `('$scenario', async ({ enableJiraIssues }) => {
+              if (enableJiraIssues) {
+                await setEnableCheckbox();
+              }
+              expect(findUltimateUpgradeCTA().exists()).toBe(enableJiraIssues);
+            });
+          }
+        } else {
+          it('does not render checkbox and input field', () => {
+            expect(findEnableCheckbox().exists()).toBe(false);
+            expect(findProjectKey().exists()).toBe(false);
+          });
+
+          it('renders the Premium CTA', () => {
+            const premiumUpgradeCTA = findPremiumUpgradeCTA();
+
+            expect(premiumUpgradeCTA.exists()).toBe(true);
+            expect(premiumUpgradeCTA.props('upgradePlanPath')).toBe(defaultProps.upgradePlanPath);
+          });
         }
 
-        expect(findPremiumUpgradeCTA().exists()).toBe(false);
-        expect(findUltimateUpgradeCTA().exists()).toBe(enableJiraIssues);
-      });
-    });
-
-    describe('when `showJiraIssuesIntegration` is true and `showJiraVulnerabilitiesIntegration` is true', () => {
-      it('does not show any upgrade CTA', () => {
-        createComponent({
-          props: { showJiraIssuesIntegration: true, showJiraVulnerabilitiesIntegration: true },
+        it('does not render the Ultimate CTA', () => {
+          expect(findUltimateUpgradeCTA().exists()).toBe(false);
         });
-
-        expect(findPremiumUpgradeCTA().exists()).toBe(false);
-        expect(findUltimateUpgradeCTA().exists()).toBe(false);
-      });
-    });
+      },
+    );
 
     describe('Enable Jira issues checkbox', () => {
       beforeEach(() => {
