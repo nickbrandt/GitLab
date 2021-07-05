@@ -273,6 +273,7 @@ export default {
         <li v-if="showCount" class="board-list-count gl-text-center" data-issue-id="-1">
           <gl-loading-icon
             v-if="loadingMore"
+            size="sm"
             :label="$options.i18n.loadingMoreboardItems"
             data-testid="count-loading-icon"
           />

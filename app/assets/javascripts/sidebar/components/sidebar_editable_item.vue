@@ -125,6 +125,7 @@ export default {
       />
       <gl-loading-icon
         v-if="loading && isClassicSidebar"
+        size="sm"
         inline
         class="gl-mx-auto gl-my-0 hide-expanded"
       />

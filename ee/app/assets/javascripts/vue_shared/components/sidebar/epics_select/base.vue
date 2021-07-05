@@ -223,7 +223,7 @@ export default {
       >
         <span>
           {{ __('Epic')
-          }}<gl-loading-icon v-if="epicSelectInProgress" class="gl-ml-2" :inline="true"
+          }}<gl-loading-icon v-if="epicSelectInProgress" size="sm" class="gl-ml-2" :inline="true"
         /></span>
 
         <gl-link
