@@ -91,6 +91,10 @@ export default {
     toggleSidebar() {
       this.sidebarToggleEl.dispatchEvent(new Event('click'));
     },
+    afterSidebarTransitioned(callback) {
+      // Wait for sidebar expand animation to complete
+      this.sidebarEl.addEventListener('transitionend', callback, { once: true });
+    },
     expandSidebarAndOpenDropdown(dropdownRef = null) {
       // Expand the sidebar if not already expanded.
       if (!this.sidebarExpanded) {
@@ -98,15 +102,9 @@ export default {
       }
 
       if (dropdownRef) {
-        // Wait for sidebar expand animation to complete
-        // before revealing the dropdown.
-        this.sidebarEl.addEventListener(
-          'transitionend',
-          () => {
-            dropdownRef.expand();
-          },
-          { once: true },
-        );
+        this.afterSidebarTransitioned(() => {
+          dropdownRef.expand();
+        });
       }
     },
     onIssueLabelsClose() {
@@ -114,13 +112,9 @@ export default {
     },
     onIssueLabelsToggle() {
       this.expandSidebarAndOpenDropdown();
-      this.sidebarEl.addEventListener(
-        'transitionend',
-        () => {
-          this.isEditingLabels = true;
-        },
-        { once: true },
-      );
+      this.afterSidebarTransitioned(() => {
+        this.isEditingLabels = true;
+      });
     },
     onIssueLabelsUpdated(labels) {
       this.$emit('issue-labels-updated', labels);

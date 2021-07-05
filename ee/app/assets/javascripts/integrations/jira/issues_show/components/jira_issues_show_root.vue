@@ -89,7 +89,7 @@ export default {
       this.isUpdatingLabels = true;
       updateIssue(this.issue, { labels })
         .then((response) => {
-          this.issue = response;
+          this.issue.labels = response.labels;
         })
         .catch(() => {
           createFlash({
@@ -123,7 +123,7 @@ export default {
       this.isUpdatingStatus = true;
       updateIssue(this.issue, { status })
         .then((response) => {
-          this.issue = response;
+          this.issue.status = response.status;
         })
         .catch(() => {
           createFlash({
