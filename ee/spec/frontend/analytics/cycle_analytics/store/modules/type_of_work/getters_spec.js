@@ -1,10 +1,6 @@
 import { tasksByTypeChartData } from 'ee/analytics/cycle_analytics/store/modules/type_of_work/getters';
-import {
-  rawTasksByTypeData,
-  transformedTasksByTypeData,
-  createdAfter,
-  createdBefore,
-} from '../../../mock_data';
+import { createdAfter, createdBefore } from 'jest/cycle_analytics/mock_data';
+import { rawTasksByTypeData, transformedTasksByTypeData } from '../../../mock_data';
 
 describe('Type of work getters', () => {
   describe('tasksByTypeChartData', () => {

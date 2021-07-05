@@ -5,13 +5,11 @@ import * as actions from 'ee/analytics/cycle_analytics/store/actions';
 import * as getters from 'ee/analytics/cycle_analytics/store/getters';
 import * as types from 'ee/analytics/cycle_analytics/store/mutation_types';
 import testAction from 'helpers/vuex_action_helper';
+import { createdAfter, createdBefore, currentGroup } from 'jest/cycle_analytics/mock_data';
 import createFlash from '~/flash';
 import httpStatusCodes from '~/lib/utils/http_status';
 import {
-  currentGroup,
   allowedStages as stages,
-  createdAfter,
-  createdBefore,
   customizableStagesAndEvents,
   endpoints,
   valueStreams,
