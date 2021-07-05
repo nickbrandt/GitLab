@@ -11,7 +11,8 @@ import BlobHeader from '~/blob/components/blob_header.vue';
 import BlobButtonGroup from '~/repository/components/blob_button_group.vue';
 import BlobContentViewer from '~/repository/components/blob_content_viewer.vue';
 import BlobEdit from '~/repository/components/blob_edit.vue';
-import { loadViewer } from '~/repository/components/blob_viewers';
+import { loadViewer, viewerProps } from '~/repository/components/blob_viewers';
+import TextViewer from '~/repository/components/blob_viewers/text_viewer.vue';
 import blobInfoQuery from '~/repository/queries/blob_info.query.graphql';
 
 jest.mock('~/repository/components/blob_viewers');
@@ -113,6 +114,7 @@ describe('Blob content viewer component', () => {
   const findBlobEdit = () => wrapper.findComponent(BlobEdit);
   const findBlobContent = () => wrapper.findComponent(BlobContent);
   const findBlobButtonGroup = () => wrapper.findComponent(BlobButtonGroup);
+  const findTextViewer = () => wrapper.findComponent(TextViewer);
 
   afterEach(() => {
     wrapper.destroy();
@@ -221,6 +223,15 @@ describe('Blob content viewer component', () => {
       factory({ mockData: { blobInfo: richMockData } });
 
       expect(findBlobContent().exists()).toBe(false);
+    });
+
+    it('renders a TextViewer for text files', () => {
+      loadViewer.mockReturnValueOnce(TextViewer);
+      viewerProps.mockReturnValueOnce({ content: 'test', fileName: 'test.js', readOnly: true });
+
+      factory({ mockData: { blobInfo: simpleMockData } });
+
+      expect(findTextViewer().exists()).toBe(true);
     });
   });
 
