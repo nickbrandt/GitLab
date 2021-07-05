@@ -34,7 +34,7 @@ module Resolvers
         .new(container: container, current_user: current_user, params: params)
         .execute
 
-      raise result[:message] unless result[:status] == :success
+      raise Gitlab::Graphql::Errors::ArgumentError, result[:message] unless result[:status] == :success
 
       data = result[:data]
 
