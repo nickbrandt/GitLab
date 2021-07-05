@@ -3,7 +3,7 @@
 module EE
   module Types
     module Notes
-      module NoteableType
+      module NoteableInterface
         module ClassMethods
           def resolve_type(object, *)
             return ::Types::VulnerabilityType if ::Vulnerability === object
