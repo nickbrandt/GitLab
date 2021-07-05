@@ -2,6 +2,7 @@
 import { GlEmptyState } from '@gitlab/ui';
 import { mapActions, mapState, mapGetters } from 'vuex';
 import PathNavigation from '~/cycle_analytics/components/path_navigation.vue';
+import ValueStreamFilters from '~/cycle_analytics/components/value_stream_filters.vue';
 import { OVERVIEW_STAGE_ID } from '~/cycle_analytics/constants';
 import UrlSync from '~/vue_shared/components/url_sync.vue';
 import { toYmd } from '../../shared/utils';
@@ -9,7 +10,6 @@ import DurationChart from './duration_chart.vue';
 import Metrics from './metrics.vue';
 import StageTable from './stage_table.vue';
 import TypeOfWorkCharts from './type_of_work_charts.vue';
-import ValueStreamFilters from './value_stream_filters.vue';
 import ValueStreamSelect from './value_stream_select.vue';
 
 export default {

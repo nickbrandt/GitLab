@@ -1,6 +1,5 @@
 import { uniq } from 'lodash';
 import {
-  DEFAULT_DAYS_IN_PAST,
   TASKS_BY_TYPE_SUBJECT_ISSUE,
   OVERVIEW_STAGE_CONFIG,
   PAGINATION_TYPE,
@@ -15,11 +14,16 @@ import {
 } from 'ee/analytics/cycle_analytics/utils';
 import { toYmd } from 'ee/analytics/shared/utils';
 import { getJSONFixture } from 'helpers/fixtures';
-import { TEST_HOST } from 'helpers/test_constants';
-import { getStageByTitle, defaultStages, rawStageMedians } from 'jest/cycle_analytics/mock_data';
+import {
+  getStageByTitle,
+  defaultStages,
+  rawStageMedians,
+  createdBefore,
+  createdAfter,
+} from 'jest/cycle_analytics/mock_data';
 import { transformStagesForPathNavigation } from '~/cycle_analytics/utils';
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
-import { getDateInPast, getDatesInRange } from '~/lib/utils/datetime_utility';
+import { getDatesInRange } from '~/lib/utils/datetime_utility';
 
 const fixtureEndpoints = {
   customizableCycleAnalyticsStagesAndEvents: 'analytics/value_stream_analytics/stages.json', // customizable stages and events endpoint
@@ -53,16 +57,6 @@ export const valueStreams = [
 export const groupLabels = getJSONFixture(fixtureEndpoints.groupLabels).map(
   convertObjectPropsToCamelCase,
 );
-
-export const group = {
-  id: 1,
-  name: 'foo',
-  path: 'foo',
-  full_path: 'foo',
-  avatar_url: `${TEST_HOST}/images/home/nasa.svg`,
-};
-
-export const currentGroup = convertObjectPropsToCamelCase(group, { deep: true });
 
 export const recentActivityData = getJSONFixture(fixtureEndpoints.recentActivityData);
 export const timeMetricsData = getJSONFixture(fixtureEndpoints.timeMetricsData);
@@ -157,9 +151,6 @@ export const stageCounts = rawStageMedians.reduce((acc, { id, value }) => {
   const { id: stageId } = getStageByTitle(dummyState.stages, id);
   return { ...acc, [stageId]: value };
 }, {});
-
-export const createdBefore = new Date(2019, 0, 14);
-export const createdAfter = getDateInPast(createdBefore, DEFAULT_DAYS_IN_PAST);
 
 export const issueEvents = deepCamelCase(stageFixtures.issue);
 export const planEvents = deepCamelCase(stageFixtures.plan);
@@ -296,21 +287,6 @@ export const rawDurationMedianData = [
   {
     average_duration_in_seconds: 4321000,
     date: '2018-12-02T00:00:00.000Z',
-  },
-];
-
-export const selectedProjects = [
-  {
-    id: 'gid://gitlab/Project/1',
-    name: 'cool project',
-    pathWithNamespace: 'group/cool-project',
-    avatarUrl: null,
-  },
-  {
-    id: 'gid://gitlab/Project/2',
-    name: 'another cool project',
-    pathWithNamespace: 'group/another-cool-project',
-    avatarUrl: null,
   },
 ];
 

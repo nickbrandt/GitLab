@@ -5,13 +5,11 @@ import * as actions from 'ee/analytics/cycle_analytics/store/modules/duration_ch
 import * as getters from 'ee/analytics/cycle_analytics/store/modules/duration_chart/getters';
 import * as types from 'ee/analytics/cycle_analytics/store/modules/duration_chart/mutation_types';
 import testAction from 'helpers/vuex_action_helper';
+import { createdAfter, createdBefore, group } from 'jest/cycle_analytics/mock_data';
 import createFlash from '~/flash';
 import httpStatusCodes from '~/lib/utils/http_status';
 import {
-  group,
   allowedStages as stages,
-  createdAfter,
-  createdBefore,
   rawDurationData,
   transformedDurationData,
   endpoints,
