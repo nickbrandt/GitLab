@@ -4,16 +4,13 @@ import {
 } from 'ee/analytics/cycle_analytics/constants';
 import * as types from 'ee/analytics/cycle_analytics/store/mutation_types';
 import mutations from 'ee/analytics/cycle_analytics/store/mutations';
-
+import { createdAfter, createdBefore, selectedProjects } from 'jest/cycle_analytics/mock_data';
 import {
   issueStage,
   planStage,
   codeStage,
   stagingStage,
   reviewStage,
-  createdAfter,
-  createdBefore,
-  selectedProjects,
   customizableStagesAndEvents,
   valueStreams,
   rawCustomStageEvents,
