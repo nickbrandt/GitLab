@@ -57,9 +57,7 @@ To add previously merged commits to a merge request for more context:
 
    ![Add previously merged commits button](img/add_previously_merged_commits_button_v14_1.png)
 
-1. Select the commits that you want to add:
-
-   ![Add previously merged commits modal](img/add_previously_merged_commits_modal_v14_1.png)
+1. Select the commits that you want to add.
 1. Select **Save changes**.
 
 To view the changes done on those previously merged commits:
