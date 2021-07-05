@@ -57,8 +57,7 @@ module EE
         end
 
         def traversal_ids_enabled?
-          ::Feature.enabled?(:sync_traversal_ids, default_enabled: :yaml) &&
-            ::Feature.enabled?(:traversal_ids_for_quota_calculation, type: :development, default_enabled: :yaml)
+          ::Feature.enabled?(:traversal_ids_for_quota_calculation, type: :development, default_enabled: :yaml)
         end
       end
     end

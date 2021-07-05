@@ -41,9 +41,9 @@ module Namespaces
       UnboundedSearch = Class.new(StandardError)
 
       included do
-        before_update :lock_both_roots, if: -> { sync_traversal_ids? && parent_id_changed? }
-        after_create :sync_traversal_ids, if: -> { sync_traversal_ids? }
-        after_update :sync_traversal_ids, if: -> { sync_traversal_ids? && saved_change_to_parent_id? }
+        before_update :lock_both_roots, if: -> { parent_id_changed? }
+        after_create :sync_traversal_ids
+        after_update :sync_traversal_ids, if: -> { saved_change_to_parent_id? }
 
         scope :traversal_ids_contains, ->(ids) { where("traversal_ids @> (?)", ids) }
         # When filtering namespaces by the traversal_ids column to compile a
@@ -52,10 +52,6 @@ module Namespaces
         # WARNING This scope must be used behind a linear query feature flag
         # such as `use_traversal_ids`.
         scope :as_ids, -> { select('traversal_ids[array_length(traversal_ids, 1)] AS id') }
-      end
-
-      def sync_traversal_ids?
-        Feature.enabled?(:sync_traversal_ids, root_ancestor, default_enabled: :yaml)
       end
 
       def use_traversal_ids?

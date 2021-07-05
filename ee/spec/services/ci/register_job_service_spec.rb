@@ -21,7 +21,6 @@ RSpec.describe Ci::RegisterJobService, '#execute' do
 
         context 'with traversal_ids enabled' do
           before do
-            stub_feature_flags(sync_traversal_ids: true)
             stub_feature_flags(traversal_ids_for_quota_calculation: true)
           end
 
@@ -51,7 +50,6 @@ RSpec.describe Ci::RegisterJobService, '#execute' do
 
         context 'with traversal_ids enabled' do
           before do
-            stub_feature_flags(sync_traversal_ids: true)
             stub_feature_flags(traversal_ids_for_quota_calculation: true)
           end
 
