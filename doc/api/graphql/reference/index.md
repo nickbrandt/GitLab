@@ -8885,6 +8885,7 @@ Relationship between an epic and an issue.
 | <a id="epicissueblocked"></a>`blocked` | [`Boolean!`](#boolean) | Indicates the issue is blocked. |
 | <a id="epicissueblockedbycount"></a>`blockedByCount` | [`Int`](#int) | Count of issues blocking this issue. |
 | <a id="epicissueblockedbyissues"></a>`blockedByIssues` | [`IssueConnection`](#issueconnection) | Issues blocking this issue. (see [Connections](#connections)) |
+| <a id="epicissueblockingcount"></a>`blockingCount` | [`Int!`](#int) | Count of issues this issue is blocking. |
 | <a id="epicissueclosedat"></a>`closedAt` | [`Time`](#time) | Timestamp of when the issue was closed. |
 | <a id="epicissueconfidential"></a>`confidential` | [`Boolean!`](#boolean) | Indicates the issue is confidential. |
 | <a id="epicissuecreatenoteemail"></a>`createNoteEmail` | [`String`](#string) | User specific email address for the issue. |
@@ -9939,6 +9940,7 @@ Returns [`VulnerabilitySeveritiesCount`](#vulnerabilityseveritiescount).
 | <a id="issueblocked"></a>`blocked` | [`Boolean!`](#boolean) | Indicates the issue is blocked. |
 | <a id="issueblockedbycount"></a>`blockedByCount` | [`Int`](#int) | Count of issues blocking this issue. |
 | <a id="issueblockedbyissues"></a>`blockedByIssues` | [`IssueConnection`](#issueconnection) | Issues blocking this issue. (see [Connections](#connections)) |
+| <a id="issueblockingcount"></a>`blockingCount` | [`Int!`](#int) | Count of issues this issue is blocking. |
 | <a id="issueclosedat"></a>`closedAt` | [`Time`](#time) | Timestamp of when the issue was closed. |
 | <a id="issueconfidential"></a>`confidential` | [`Boolean!`](#boolean) | Indicates the issue is confidential. |
 | <a id="issuecreatenoteemail"></a>`createNoteEmail` | [`String`](#string) | User specific email address for the issue. |
@@ -14595,6 +14597,8 @@ Values for sorting issues.
 
 | Value | Description |
 | ----- | ----------- |
+| <a id="issuesortblocking_issues_asc"></a>`BLOCKING_ISSUES_ASC` | Blocking issues count by ascending order. |
+| <a id="issuesortblocking_issues_desc"></a>`BLOCKING_ISSUES_DESC` | Blocking issues count by descending order. |
 | <a id="issuesortcreated_asc"></a>`CREATED_ASC` | Created at ascending order. |
 | <a id="issuesortcreated_desc"></a>`CREATED_DESC` | Created at descending order. |
 | <a id="issuesortdue_date_asc"></a>`DUE_DATE_ASC` | Due date by ascending order. |

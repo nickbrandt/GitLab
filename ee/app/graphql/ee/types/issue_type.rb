@@ -18,6 +18,9 @@ module EE
         field :blocked, GraphQL::BOOLEAN_TYPE, null: false,
               description: 'Indicates the issue is blocked.'
 
+        field :blocking_count, GraphQL::INT_TYPE, null: false,
+              description: 'Count of issues this issue is blocking.'
+
         field :blocked_by_count, GraphQL::INT_TYPE, null: true,
               description: 'Count of issues blocking this issue.'
 
@@ -43,6 +46,10 @@ module EE
 
         def weight
           object.weight_available? ? object.weight : nil
+        end
+
+        def blocking_count
+          object.blocking_issues_count
         end
 
         def blocked
