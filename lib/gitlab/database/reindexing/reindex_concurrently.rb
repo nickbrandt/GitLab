@@ -9,6 +9,7 @@ module Gitlab
 
         TEMPORARY_INDEX_PATTERN = '\_ccnew[0-9]*'
         STATEMENT_TIMEOUT = 9.hours
+        PG_MAX_INDEX_NAME_LENGTH = 63
 
         # When dropping an index, we acquire a SHARE UPDATE EXCLUSIVE lock,
         # which only conflicts with DDL and vacuum. We therefore execute this with a rather
@@ -38,13 +39,15 @@ module Gitlab
           # While this has been backpatched, we continue to disable expression indexes until further review.
           raise ReindexError, 'expression indexes are currently not supported' if index.expression?
 
-          with_logging do
-            set_statement_timeout do
-              execute("REINDEX INDEX CONCURRENTLY #{quote_table_name(index.schema)}.#{quote_table_name(index.name)}")
+          begin
+            with_logging do
+              set_statement_timeout do
+                execute("REINDEX INDEX CONCURRENTLY #{quote_table_name(index.schema)}.#{quote_table_name(index.name)}")
+              end
             end
+          ensure
+            cleanup_dangling_indexes
           end
-        ensure
-          cleanup_dangling_indexes
         end
 
         private
@@ -79,8 +82,21 @@ module Gitlab
         end
 
         def cleanup_dangling_indexes
-          Gitlab::Database::PostgresIndex.match("#{Regexp.escape(index.name)}#{TEMPORARY_INDEX_PATTERN}").each do |lingering_index|
-            remove_index(lingering_index)
+          Gitlab::Database::PostgresIndex.match("#{TEMPORARY_INDEX_PATTERN}$").each do |lingering_index|
+            # Example lingering index name: some_index_ccnew1
+
+            # Example prefix: 'some_index'
+            prefix = lingering_index.name.gsub(/#{TEMPORARY_INDEX_PATTERN}/, '')
+
+            # Example suffix: '_ccnew1'
+            suffix = lingering_index.name.match(/#{TEMPORARY_INDEX_PATTERN}/)[0]
+
+            # Only remove if the lingering index name could have been chosen
+            # as a result of a REINDEX operation (considering that PostgreSQL
+            # truncates index names to 63 chars and adds a suffix).
+            if index.name[0...PG_MAX_INDEX_NAME_LENGTH - suffix.length] == prefix
+              remove_index(lingering_index)
+            end
           end
         end
 

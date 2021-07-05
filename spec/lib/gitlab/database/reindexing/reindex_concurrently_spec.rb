@@ -8,7 +8,7 @@ RSpec.describe Gitlab::Database::Reindexing::ReindexConcurrently, '#perform' do
   let(:table_name) { '_test_reindex_table' }
   let(:column_name) { '_test_column' }
   let(:index_name) { '_test_reindex_index' }
-  let(:index) { Gitlab::Database::PostgresIndex.by_identifier("public.#{index_name}") }
+  let(:index) { Gitlab::Database::PostgresIndex.by_identifier("public.#{iname(index_name)}") }
   let(:logger) { double('logger', debug: nil, info: nil, error: nil ) }
   let(:connection) { ActiveRecord::Base.connection }
 
@@ -73,31 +73,53 @@ RSpec.describe Gitlab::Database::Reindexing::ReindexConcurrently, '#perform' do
   context 'with dangling indexes matching TEMPORARY_INDEX_PATTERN, i.e. /some\_index\_ccnew(\d)*/' do
     before do
       # dangling indexes
-      connection.execute("CREATE INDEX #{index_name}_ccnew ON #{table_name} (#{column_name})")
-      connection.execute("CREATE INDEX #{index_name}_ccnew2 ON #{table_name} (#{column_name})")
+      connection.execute("CREATE INDEX #{iname(index_name, '_ccnew')} ON #{table_name} (#{column_name})")
+      connection.execute("CREATE INDEX #{iname(index_name, '_ccnew2')} ON #{table_name} (#{column_name})")
 
       # Unrelated index - don't drop
       connection.execute("CREATE INDEX some_other_index_ccnew ON #{table_name} (#{column_name})")
     end
 
-    it 'drops the dangling indexes while controlling lock_timeout' do
-      expect_to_execute_in_order(
-        # Regular index rebuild
-        "SET statement_timeout TO '32400s'",
-        "REINDEX INDEX CONCURRENTLY \"public\".\"#{index.name}\"",
-        "RESET statement_timeout",
-        # Drop _ccnew index
-        "SET lock_timeout TO '60000ms'",
-        "DROP INDEX CONCURRENTLY IF EXISTS \"public\".\"#{index.name}_ccnew\"",
-        "RESET idle_in_transaction_session_timeout; RESET lock_timeout",
-        # Drop _ccnew2 index
-        "SET lock_timeout TO '60000ms'",
-        "DROP INDEX CONCURRENTLY IF EXISTS \"public\".\"#{index.name}_ccnew2\"",
-        "RESET idle_in_transaction_session_timeout; RESET lock_timeout"
-      )
+    shared_examples_for 'dropping the dangling index' do
+      it 'drops the dangling indexes while controlling lock_timeout' do
+        expect_to_execute_in_order(
+          # Regular index rebuild
+          "SET statement_timeout TO '32400s'",
+          "REINDEX INDEX CONCURRENTLY \"public\".\"#{index_name}\"",
+          "RESET statement_timeout",
+          # Drop _ccnew index
+          "SET lock_timeout TO '60000ms'",
+          "DROP INDEX CONCURRENTLY IF EXISTS \"public\".\"#{iname(index_name, '_ccnew')}\"",
+          "RESET idle_in_transaction_session_timeout; RESET lock_timeout",
+          # Drop _ccnew2 index
+          "SET lock_timeout TO '60000ms'",
+          "DROP INDEX CONCURRENTLY IF EXISTS \"public\".\"#{iname(index_name, '_ccnew2')}\"",
+          "RESET idle_in_transaction_session_timeout; RESET lock_timeout"
+        )
 
-      subject
+        subject
+      end
     end
+
+    context 'with normal index names' do
+      it_behaves_like 'dropping the dangling index'
+    end
+
+    context 'with index name at 63 character limit' do
+      let(:index_name) { 'a' * 63 }
+
+      before do
+        # Another unrelated index - don't drop
+        extra_index = index_name[0...55]
+        connection.execute("CREATE INDEX #{extra_index}_ccnew ON #{table_name} (#{column_name})")
+      end
+
+      it_behaves_like 'dropping the dangling index'
+    end
+  end
+
+  def iname(name, suffix = '')
+    "#{name[0...63 - suffix.size]}#{suffix}"
   end
 
   def expect_to_execute_in_order(*queries)
