@@ -20,7 +20,12 @@ module Gitlab
       # A 'regular' index is a non-unique index,
       # that does not serve an exclusion constraint and
       # is defined on a table that is not partitioned.
-      scope :regular, -> { where(unique: false, partitioned: false, exclusion: false)}
+      #
+      # Deprecated: Switch to scope .reindexing_support
+      scope :regular, -> { where(unique: false, partitioned: false, exclusion: false, expression: false)}
+
+      # Indexes for reindexing with PG12
+      scope :reindexing_support, -> { where(partitioned: false, exclusion: false, expression: false) }
 
       scope :not_match, ->(regex) { where("name !~ ?", regex)}
 
