@@ -1,5 +1,5 @@
 import dateFormat from 'dateformat';
-import { isNumber } from 'lodash';
+import { isNumber, uniqBy } from 'lodash';
 import { OVERVIEW_STAGE_ID } from '~/cycle_analytics/constants';
 import { medianTimeToParsedSeconds } from '~/cycle_analytics/utils';
 import createFlash, { hideFlash } from '~/flash';
@@ -417,5 +417,4 @@ export const prepareTimeMetricsData = (data = [], popoverContent = {}) =>
  * @param {Array} arr - The array of objects with potential duplicates
  * @returns {Array} The unique objects from the original array
  */
-export const uniqById = (arr = []) =>
-  Object.values(arr.reduce((acc, curr) => ({ ...acc, [curr.id]: curr }), {}));
+export const uniqById = (arr = []) => uniqBy(arr, ({ id }) => id);

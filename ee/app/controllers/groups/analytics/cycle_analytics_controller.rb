@@ -12,6 +12,7 @@ class Groups::Analytics::CycleAnalyticsController < Groups::Analytics::Applicati
   before_action :load_project, only: :show
   before_action :load_value_stream, only: :show
   before_action :request_params, only: :show
+  before_action :load_initial_labels_for_group, only: :show
 
   before_action do
     push_frontend_feature_flag(:cycle_analytics_scatterplot_enabled, default_enabled: true)
@@ -39,5 +40,9 @@ class Groups::Analytics::CycleAnalyticsController < Groups::Analytics::Applicati
                     else
                       @group.value_streams.find(params[:value_stream_id])
                     end
+  end
+
+  def load_initial_labels_for_group
+    @labels ||= GroupLabel.for_group(@group.root_ancestor).limit(20)
   end
 end

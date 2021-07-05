@@ -8,8 +8,7 @@ module Analytics
       end
     end
 
-    def cycle_analytics_default_group_labels(group)
-      labels = GroupLabel.for_group(group.root_ancestor).limit(20)
+    def cycle_analytics_default_group_labels(labels)
       LabelSerializer.new.represent_appearance(labels)
     end
   end
