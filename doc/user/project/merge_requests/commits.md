@@ -27,7 +27,7 @@ To seamlessly navigate among commits in a merge request:
 
 ![Merge requests commit navigation](img/commit_nav_v13_11.png)
 
-## Merge requests context commits
+## View merge request commits in context
 
 > - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/29274) in GitLab 13.12.
 > - [Deployed behind a feature flag](../../feature_flags.md), enabled by default.
@@ -37,9 +37,9 @@ To seamlessly navigate among commits in a merge request:
 
 WARNING:
 This feature is in [beta](https://about.gitlab.com/handbook/product/gitlab-the-product/#beta)
-and is [**not** complete](https://gitlab.com/groups/gitlab-org/-/epics/1192).
-Previously merged commits can be added but they can't be removed due to [this
-bug](https://gitlab.com/gitlab-org/gitlab/-/issues/325538).
+and is [incomplete](https://gitlab.com/groups/gitlab-org/-/epics/1192).
+Previously merged commits can be added, but they can't be removed due to
+[this bug](https://gitlab.com/gitlab-org/gitlab/-/issues/325538).
 
 This in-development feature might not be available for your use. There can be
 [risks when enabling features still in development](../../feature_flags.md#risks-when-enabling-features-still-in-development).
@@ -51,25 +51,27 @@ that have already merged that the change is built on.
 
 To add previously merged commits to a merge request for more context:
 
+1. Go to your merge request.
 1. Select the **Commits** tab.
-1. Click **Add previously merged commits**.
+1. Scroll to the end of the list of commits, and select **Add previously merged commits**:
 
    ![Add previously merged commits button](img/add_previously_merged_commits_button_v14_1.png)
 
-1. Check the commits that you want to add and click **Save changes**.
+1. Select the commits that you want to add:
 
    ![Add previously merged commits modal](img/add_previously_merged_commits_modal_v14_1.png)
+1. Select **Save changes**.
 
 To view the changes done on those previously merged commits:
 
-1. Select the **Changes** tab.
-1. Compare with **previously merged commits**.
+1. On your merge request, select the **Changes** tab.
+1. Scroll to **(file-tree)** **Compare** and select **previously merged commits**:
 
-![Previously merged commits](img/previously_merged_commits_v14_1.png)
+   ![Previously merged commits](img/previously_merged_commits_v14_1.png)
 
-### Enable or disable merge request context commits **(FREE SELF)**
+### Enable or disable viewing merge request commits in context **(FREE SELF)**
 
-Merge request context commits is under development and not ready for production use. It is
+Viewing merge request commits in context is under development and not ready for production use. It is
 deployed behind a feature flag that is **disabled by default**.
 [GitLab administrators with access to the GitLab Rails console](../../../administration/feature_flags.md)
 can enable it.
