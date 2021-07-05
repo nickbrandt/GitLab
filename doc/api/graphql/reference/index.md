@@ -14607,6 +14607,8 @@ Values for sorting issues.
 | <a id="issuesortlabel_priority_desc"></a>`LABEL_PRIORITY_DESC` | Label priority by descending order. |
 | <a id="issuesortmilestone_due_asc"></a>`MILESTONE_DUE_ASC` | Milestone due date by ascending order. |
 | <a id="issuesortmilestone_due_desc"></a>`MILESTONE_DUE_DESC` | Milestone due date by descending order. |
+| <a id="issuesortpopularity_asc"></a>`POPULARITY_ASC` | Number of upvotes (awarded "thumbs up" emoji) by ascending order. |
+| <a id="issuesortpopularity_desc"></a>`POPULARITY_DESC` | Number of upvotes (awarded "thumbs up" emoji) by descending order. |
 | <a id="issuesortpriority_asc"></a>`PRIORITY_ASC` | Priority by ascending order. |
 | <a id="issuesortpriority_desc"></a>`PRIORITY_DESC` | Priority by descending order. |
 | <a id="issuesortpublished_asc"></a>`PUBLISHED_ASC` | Published issues shown last. |
