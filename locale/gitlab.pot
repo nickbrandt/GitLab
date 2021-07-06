@@ -23087,7 +23087,7 @@ msgstr ""
 msgid "Only Project Members"
 msgstr ""
 
-msgid "Only active this projects shows up in the search and on the dashboard."
+msgid "Only active projects show up in the search and on the dashboard."
 msgstr ""
 
 msgid "Only admins can delete project"
@@ -23931,6 +23931,9 @@ msgid "PerformanceBar|Total duration"
 msgstr ""
 
 msgid "PerformanceBar|Trace"
+msgstr ""
+
+msgid "Permanently delete project"
 msgstr ""
 
 msgid "Permissions"

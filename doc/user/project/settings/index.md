@@ -385,6 +385,16 @@ WARNING:
 The default behavior of [delayed project deletion](https://gitlab.com/gitlab-org/gitlab/-/issues/32935) in GitLab 12.6 was changed to
 [Immediate deletion](https://gitlab.com/gitlab-org/gitlab/-/issues/220382) in GitLab 13.2.
 
+#### Delete a project immediately **(PREMIUM)**
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/65522) in GitLab 14.1.
+
+To immediately delete a project marked for deletion:
+
+1. Navigate to your project, and select **Settings > General > Advanced**.
+1. In the "Permanently delete project" section, click the **Delete project** button.
+1. Confirm the action when asked to.
+
 #### Restore a project **(PREMIUM)**
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/32935) in GitLab 12.6.
