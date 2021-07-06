@@ -42,6 +42,4 @@ ALTER TABLE ONLY ci_instance_variables
 ALTER TABLE ONLY schema_migrations
     ADD CONSTRAINT schema_migrations_pkey PRIMARY KEY (version);
 
-CREATE UNIQUE INDEX index_ci_instance_variables_on_key ON ci_instance_variables USING btree (key);-- schema_migrations.version information is no longer stored in this file,
--- but instead tracked in the db/schema_migrations directory
--- see https://gitlab.com/gitlab-org/gitlab/-/issues/218590 for details
+CREATE UNIQUE INDEX index_ci_instance_variables_on_key ON ci_instance_variables USING btree (key);
