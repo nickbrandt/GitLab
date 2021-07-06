@@ -412,6 +412,10 @@ A table of contents is an unordered list that links to subheadings in the docume
 To add a table of contents to a Markdown file, wiki page, issue request, or merge request
 description, add the `[[_TOC_]]` tag on its own line.
 
+NOTE:
+You can add a table of contents to issues and merge requests, but you can't add one
+to notes or comments.
+
 ```markdown
 This is an intro sentence to my Wiki page.
 
