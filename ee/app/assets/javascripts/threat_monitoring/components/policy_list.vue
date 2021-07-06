@@ -98,9 +98,7 @@ export default {
   },
   data() {
     return {
-      selectedPolicyName: null,
-      initialManifest: null,
-      initialEnforcementStatus: null,
+      selectedPolicy: null,
       networkPolicies: [],
       scanExecutionPolicies: [],
     };
@@ -129,11 +127,7 @@ export default {
       );
     },
     hasSelectedPolicy() {
-      return Boolean(this.selectedPolicyName);
-    },
-    selectedPolicy() {
-      if (!this.hasSelectedPolicy) return null;
-      return this.networkPolicies.find((policy) => policy.name === this.selectedPolicyName);
+      return Boolean(this.selectedPolicy);
     },
     hasAutoDevopsPolicy() {
       return Boolean(this.networkPolicies?.some((policy) => policy.fromAutoDevops));
@@ -141,8 +135,10 @@ export default {
     editPolicyPath() {
       return this.hasSelectedPolicy
         ? mergeUrlParams(
-            { environment_id: this.currentEnvironmentId },
-            this.newPolicyPath.replace('new', `${this.selectedPolicyName}/edit`),
+            !this.selectedPolicy.kind
+              ? { environment_id: this.currentEnvironmentId }
+              : { environment_id: this.currentEnvironmentId, kind: this.selectedPolicy.kind },
+            this.newPolicyPath.replace('new', `${this.selectedPolicy.name}/edit`),
           )
         : '';
     },
@@ -191,12 +187,10 @@ export default {
       if (rows.length === 0) return;
 
       const [selectedPolicy] = rows;
-      this.selectedPolicyName = selectedPolicy?.name;
-      this.initialManifest = selectedPolicy?.yaml;
-      this.initialEnforcementStatus = selectedPolicy?.enabled;
+      this.selectedPolicy = selectedPolicy;
     },
     deselectPolicy() {
-      this.selectedPolicyName = null;
+      this.selectedPolicy = null;
 
       const bTable = this.$refs.policiesTable.$children[0];
       bTable.clearSelected();
