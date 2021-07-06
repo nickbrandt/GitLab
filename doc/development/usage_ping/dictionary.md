@@ -8974,7 +8974,7 @@ When the Usage Ping computation was started
 
 Group: `group::product intelligence`
 
-Data Category: `Optional`
+Data Category: `Standard`
 
 Status: `data_available`
 
@@ -8988,7 +8988,7 @@ When the core features were computed
 
 Group: `group::product intelligence`
 
-Data Category: `Optional`
+Data Category: `Standard`
 
 Status: `data_available`
 
@@ -9002,7 +9002,7 @@ When the EE-specific features were computed
 
 Group: `group::product intelligence`
 
-Data Category: `Subscription`
+Data Category: `Standard`
 
 Status: `data_available`
 
