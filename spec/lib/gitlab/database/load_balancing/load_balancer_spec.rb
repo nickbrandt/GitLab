@@ -312,30 +312,6 @@ RSpec.describe Gitlab::Database::LoadBalancing::LoadBalancer, :request_store do
 
       expect(lb.all_caught_up?('foo')).to eq(true)
     end
-
-    context 'when :load_balancing_improved_caught_up_hosts_check FF is disabled' do
-      before do
-        stub_feature_flags(load_balancing_improved_caught_up_hosts_check: false)
-      end
-
-      it 'returns true if all hosts caught up to the write location' do
-        expect(lb.host_list.hosts).to all(receive(:caught_up?).with('foo').and_return(true))
-
-        expect(lb.all_caught_up?('foo')).to eq(true)
-      end
-
-      it 'returns false if a host has not yet caught up' do
-        expect(lb.host_list.hosts[0]).to receive(:caught_up?)
-          .with('foo')
-          .and_return(true)
-
-        expect(lb.host_list.hosts[1]).to receive(:caught_up?)
-          .with('foo')
-          .and_return(false)
-
-        expect(lb.all_caught_up?('foo')).to eq(false)
-      end
-    end
   end
 
   describe '#retry_with_backoff' do
