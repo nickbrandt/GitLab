@@ -10715,9 +10715,9 @@ CREATE SEQUENCE ci_instance_variables_id_seq
 ALTER SEQUENCE ci_instance_variables_id_seq OWNED BY ci_instance_variables.id;
 
 CREATE TABLE ci_job_artifacts (
-    id integer NOT NULL,
+    id_convert_to_bigint integer DEFAULT 0 NOT NULL,
     project_id integer NOT NULL,
-    job_id integer NOT NULL,
+    job_id_convert_to_bigint integer NOT NULL,
     file_type integer NOT NULL,
     size bigint,
     created_at timestamp with time zone NOT NULL,
@@ -10728,8 +10728,8 @@ CREATE TABLE ci_job_artifacts (
     file_sha256 bytea,
     file_format smallint,
     file_location smallint,
-    id_convert_to_bigint bigint DEFAULT 0 NOT NULL,
-    job_id_convert_to_bigint bigint DEFAULT 0 NOT NULL,
+    id bigint NOT NULL,
+    job_id bigint DEFAULT 0 NOT NULL,
     CONSTRAINT check_27f0f6dbab CHECK ((file_store IS NOT NULL))
 );
 
@@ -22937,7 +22937,7 @@ CREATE INDEX index_ci_job_artifacts_on_expire_at_and_job_id ON ci_job_artifacts 
 
 CREATE INDEX index_ci_job_artifacts_on_file_store ON ci_job_artifacts USING btree (file_store);
 
-CREATE UNIQUE INDEX index_ci_job_artifacts_on_job_id_and_file_type ON ci_job_artifacts USING btree (job_id, file_type);
+CREATE INDEX index_ci_job_artifacts_on_job_id_and_file_type ON ci_job_artifacts USING btree (job_id, file_type);
 
 CREATE INDEX index_ci_job_artifacts_on_project_id ON ci_job_artifacts USING btree (project_id);
 
@@ -27584,7 +27584,7 @@ ALTER TABLE ONLY boards_epic_board_recent_visits
     ADD CONSTRAINT fk_rails_c4dcba4a3e FOREIGN KEY (group_id) REFERENCES namespaces(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY ci_job_artifacts
-    ADD CONSTRAINT fk_rails_c5137cb2c1 FOREIGN KEY (job_id) REFERENCES ci_builds(id) ON DELETE CASCADE;
+    ADD CONSTRAINT fk_rails_c5137cb2c1 FOREIGN KEY (job_id_convert_to_bigint) REFERENCES ci_builds(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY packages_events
     ADD CONSTRAINT fk_rails_c6c20d0094 FOREIGN KEY (package_id) REFERENCES packages_packages(id) ON DELETE SET NULL;
