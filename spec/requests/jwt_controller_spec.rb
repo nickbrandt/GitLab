@@ -271,14 +271,8 @@ RSpec.describe JwtController do
       let(:credential_user) { project_deploy_token.username }
       let(:credential_password) { project_deploy_token.token }
 
+      # We do not know anything about the project or group at the time of the token request
       it_behaves_like 'with valid credentials'
-
-      context 'with project deploy token in different group' do
-        let(:other_project) { create(:project) }
-        let(:project_deploy_token) { create(:deploy_token, :project, projects: [other_project]) }
-
-        it_behaves_like 'returning response status', :forbidden
-      end
     end
 
     context 'with invalid credentials' do

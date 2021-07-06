@@ -8,7 +8,7 @@ module Auth
 
     def execute(authentication_abilities:)
       return error('dependency proxy not enabled', 404) unless ::Gitlab.config.dependency_proxy.enabled
-      return error('access forbidden', 403) unless current_user.is_a?(User) || current_user.is_a?(DeployToken)
+      return error('access forbidden', 403) unless valid_user_actor?
 
       { token: authorized_token.encoded }
     end
@@ -32,6 +32,10 @@ module Auth
     end
 
     private
+
+    def valid_user_actor?
+      current_user.is_a?(User) || current_user.is_a?(DeployToken)
+    end
 
     def authorized_token
       JSONWebToken::HMACToken.new(self.class.secret).tap do |token|
