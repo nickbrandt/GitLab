@@ -32817,7 +32817,7 @@ msgstr ""
 msgid "There are no variables yet."
 msgstr ""
 
-msgid "There are pending advanced search migrations. Indexing must remain paused until the migrations are completed."
+msgid "There are pending advanced search migrations which require indexing to be paused. Indexing must remain paused until the migrations are completed."
 msgstr ""
 
 msgid "There are running deployments on the environment. Please retry later."
