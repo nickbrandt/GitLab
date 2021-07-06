@@ -3,6 +3,8 @@
 require 'spec_helper'
 
 RSpec.describe Gitlab::Ci::YamlProcessor do
+  subject(:result) { described_class.new(YAML.dump(config)).execute }
+
   describe 'Bridge Needs' do
     let(:config) do
       {
@@ -10,8 +12,6 @@ RSpec.describe Gitlab::Ci::YamlProcessor do
         bridge: { stage: 'test', needs: needs }
       }
     end
-
-    subject { described_class.new(YAML.dump(config)).execute }
 
     context 'needs upstream pipeline' do
       let(:needs) { { pipeline: 'some/project' } }
@@ -282,8 +282,6 @@ RSpec.describe Gitlab::Ci::YamlProcessor do
 
     let(:config) { { deploy_to_production: { stage: 'deploy', script: ['echo'], secrets: secrets } } }
 
-    subject(:result) { described_class.new(YAML.dump(config)).execute }
-
     it "returns secrets info" do
       secrets = result.stage_builds_attributes('deploy').first.fetch(:secrets)
 
@@ -296,6 +294,51 @@ RSpec.describe Gitlab::Ci::YamlProcessor do
           }
         }
       })
+    end
+  end
+
+  describe 'Bridge status mirror' do
+    let(:config) do
+      {
+        build: { stage: 'build', script: 'test' },
+        bridge: { stage: 'test', status: status }
+      }
+    end
+
+    let(:status) { 'some/project' }
+
+    it 'creates jobs with valid specification' do
+      expect(subject.builds.size).to eq(2)
+      expect(subject.builds[0]).to eq(
+        stage: "build",
+        stage_idx: 1,
+        name: "build",
+        only: { refs: %w[branches tags] },
+        options: {
+          script: ["test"]
+        },
+        when: "on_success",
+        allow_failure: false,
+        yaml_variables: [],
+        job_variables: [],
+        root_variables_inheritance: true,
+        scheduling_type: :stage
+      )
+      expect(subject.builds[1]).to eq(
+        stage: "test",
+        stage_idx: 2,
+        name: "bridge",
+        only: { refs: %w[branches tags] },
+        options: {
+          bridge_needs: { pipeline: 'some/project' }
+        },
+        when: "on_success",
+        allow_failure: false,
+        yaml_variables: [],
+        job_variables: [],
+        root_variables_inheritance: true,
+        scheduling_type: :stage
+      )
     end
   end
 end
