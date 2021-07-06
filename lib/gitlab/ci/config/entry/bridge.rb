@@ -27,7 +27,7 @@ module Gitlab
 
             validate on: :composed do
               unless trigger_defined? || mirror_status_config.present?
-                errors.add(:config, 'should contain either a trigger or a status mirror / needs:pipeline')
+                errors.add(:config, 'should contain one of the keywords; trigger, status or needs:pipeline')
               end
             end
 

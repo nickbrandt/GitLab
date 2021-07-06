@@ -29,7 +29,7 @@ RSpec.describe EE::Gitlab::Ci::Config::Entry::Status do
     it { is_expected.not_to be_valid }
 
     it 'returns an error' do
-      expect(subject.errors.first).to eq('unknown strategy has to be a string')
+      expect(subject.errors.first).to eq('status config should be a string')
     end
   end
 end

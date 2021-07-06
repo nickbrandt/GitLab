@@ -99,7 +99,7 @@ RSpec.describe ::Gitlab::Ci::Config::Entry::Bridge do
 
       describe '#errors' do
         it 'is returns an error about empty trigger config' do
-          expect(subject.errors.first).to eq('bridge config should contain either a trigger or a status mirror / needs:pipeline')
+          expect(subject.errors.first).to eq('bridge config should contain one of the keywords; trigger, status or needs:pipeline')
         end
       end
     end
@@ -113,7 +113,7 @@ RSpec.describe ::Gitlab::Ci::Config::Entry::Bridge do
 
       describe '#errors' do
         it 'is returns an error about empty upstream config' do
-          expect(subject.errors.first).to eq('bridge config should contain either a trigger or a status mirror / needs:pipeline')
+          expect(subject.errors.first).to eq('bridge config should contain one of the keywords; trigger, status or needs:pipeline')
         end
       end
     end
@@ -207,7 +207,7 @@ RSpec.describe ::Gitlab::Ci::Config::Entry::Bridge do
 
         describe '#errors' do
           it 'returns an error about config' do
-            expect(subject.errors.first).to eq('bridge config should not contain both needs and status mirror')
+            expect(subject.errors.first).to eq('bridge config should not contain both needs and status keywords')
           end
         end
       end
