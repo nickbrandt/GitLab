@@ -494,9 +494,9 @@ This in-development feature might not be available for your use. There can be
 [risks when enabling features still in development](../user/feature_flags.md#risks-when-enabling-features-still-in-development).
 Refer to this feature's version history for more details.
 
-The job log file is limited to a `100 megabytes`. Any job that exceeds this value is dropped.
+The job log file size limit is 100 megabytes by default. Any job that exceeds this value is dropped.
 
-To update these limits, run the following in the
+To change the limit, run the following in the
 [GitLab Rails console](operations/rails_console.md#starting-a-rails-console-session):
 
 ```ruby
