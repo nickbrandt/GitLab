@@ -14547,6 +14547,7 @@ Iteration ID wildcard values.
 | <a id="jobartifactfiletypearchive"></a>`ARCHIVE` | ARCHIVE job artifact file type. |
 | <a id="jobartifactfiletypebrowser_performance"></a>`BROWSER_PERFORMANCE` | BROWSER PERFORMANCE job artifact file type. |
 | <a id="jobartifactfiletypecluster_applications"></a>`CLUSTER_APPLICATIONS` | CLUSTER APPLICATIONS job artifact file type. |
+| <a id="jobartifactfiletypecluster_image_scanning"></a>`CLUSTER_IMAGE_SCANNING` | CLUSTER IMAGE SCANNING job artifact file type. |
 | <a id="jobartifactfiletypecobertura"></a>`COBERTURA` | COBERTURA job artifact file type. |
 | <a id="jobartifactfiletypecodequality"></a>`CODEQUALITY` | CODE QUALITY job artifact file type. |
 | <a id="jobartifactfiletypecontainer_scanning"></a>`CONTAINER_SCANNING` | CONTAINER SCANNING job artifact file type. |
