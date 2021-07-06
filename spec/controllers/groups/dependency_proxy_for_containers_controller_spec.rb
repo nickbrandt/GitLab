@@ -34,13 +34,12 @@ RSpec.describe Groups::DependencyProxyForContainersController do
       stub_feature_flags(dependency_proxy_for_private_groups: false)
     end
 
-    it 'redirects', :aggregate_failures do
+    it 'returns not found' do
       group.update!(visibility_level: Gitlab::VisibilityLevel::PRIVATE)
 
       subject
 
-      expect(response).to have_gitlab_http_status(:redirect)
-      expect(response.location).to end_with(new_user_session_path)
+      expect(response).to have_gitlab_http_status(:not_found)
     end
   end
 
@@ -52,15 +51,13 @@ RSpec.describe Groups::DependencyProxyForContainersController do
         request.headers['HTTP_AUTHORIZATION'] = token_header
       end
 
-      it { is_expected.to have_gitlab_http_status(:not_found) }
+      it { is_expected.to have_gitlab_http_status(:unauthorized) }
     end
 
     context 'with valid user that does not have access' do
-      let(:group) { create(:group, :private) }
+      let(:group) { create(:group) }
 
       before do
-        user = double('bad_user', id: 999)
-        token_header = "Bearer #{build_jwt(user).encoded}"
         request.headers['HTTP_AUTHORIZATION'] = token_header
       end
 
@@ -78,14 +75,14 @@ RSpec.describe Groups::DependencyProxyForContainersController do
         let_it_be(:user) { create(:deploy_token, :revoked) }
         let_it_be(:group_deploy_token) { create(:group_deploy_token, deploy_token: user, group: group) }
 
-        it { is_expected.to have_gitlab_http_status(:not_found) }
+        it { is_expected.to have_gitlab_http_status(:unauthorized) }
       end
 
       context 'with expired deploy token' do
         let_it_be(:user) { create(:deploy_token, :expired) }
         let_it_be(:group_deploy_token) { create(:group_deploy_token, deploy_token: user, group: group) }
 
-        it { is_expected.to have_gitlab_http_status(:not_found) }
+        it { is_expected.to have_gitlab_http_status(:unauthorized) }
       end
     end
 
@@ -173,6 +170,10 @@ RSpec.describe Groups::DependencyProxyForContainersController do
           }
         end
 
+        before do
+          group.add_guest(user)
+        end
+
         it 'proxies status from the remote token request', :aggregate_failures do
           subject
 
@@ -190,6 +191,10 @@ RSpec.describe Groups::DependencyProxyForContainersController do
           }
         end
 
+        before do
+          group.add_guest(user)
+        end
+
         it 'proxies status from the remote manifest request', :aggregate_failures do
           subject
 
@@ -198,7 +203,14 @@ RSpec.describe Groups::DependencyProxyForContainersController do
         end
       end
 
-      it_behaves_like 'a successful manifest pull'
+      context 'a valid user' do
+        before do
+          group.add_guest(user)
+        end
+
+        it_behaves_like 'a successful manifest pull'
+      end
+
 
       context 'a valid deploy token' do
         let_it_be(:user) { create(:deploy_token) }
@@ -262,6 +274,10 @@ RSpec.describe Groups::DependencyProxyForContainersController do
           }
         end
 
+        before do
+          group.add_guest(user)
+        end
+
         it 'proxies status from the remote blob request', :aggregate_failures do
           subject
 
@@ -270,7 +286,13 @@ RSpec.describe Groups::DependencyProxyForContainersController do
         end
       end
 
-      it_behaves_like 'a successful blob pull'
+      context 'a valid user' do
+        before do
+          group.add_guest(user)
+        end
+
+        it_behaves_like 'a successful blob pull'
+      end
 
       context 'a valid deploy token' do
         let_it_be(:user) { create(:deploy_token) }

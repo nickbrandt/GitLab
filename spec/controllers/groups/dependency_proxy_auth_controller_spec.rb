@@ -91,6 +91,19 @@ RSpec.describe Groups::DependencyProxyAuthController do
 
         it { is_expected.to have_gitlab_http_status(:unauthorized) }
       end
+
+      context 'expired deploy token' do
+        let_it_be(:user) { create(:deploy_token, :expired) }
+
+        let(:jwt) { build_jwt(user) }
+        let(:token_header) { "Bearer #{jwt.encoded}" }
+
+        before do
+          request.headers['HTTP_AUTHORIZATION'] = token_header
+        end
+
+        it { is_expected.to have_gitlab_http_status(:unauthorized) }
+      end
     end
   end
 end
