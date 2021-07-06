@@ -496,8 +496,8 @@ Refer to this feature's version history for more details.
 
 The job log file size limit is 100 megabytes by default. Any job that exceeds this value is dropped.
 
-To change the limit, run the following in the
-[GitLab Rails console](operations/rails_console.md#starting-a-rails-console-session):
+You can change the limit in the [GitLab Rails console](operations/rails_console.md#starting-a-rails-console-session).
+Update `ci_jobs_trace_size_limit` with the new value in megabytes:
 
 ```ruby
 Plan.default.actual_limits.update!(ci_jobs_trace_size_limit: 125)
