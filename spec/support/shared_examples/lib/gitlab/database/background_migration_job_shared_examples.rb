@@ -21,3 +21,37 @@ RSpec.shared_examples 'marks background migration job records' do
     expect(jobs_updated).to eq(1)
   end
 end
+
+RSpec.shared_examples 'finalized background migration' do
+  it 'processed the scheduled sidekiq queue' do
+    queued = Sidekiq::ScheduledSet.
+      new.
+      select do |scheduled|
+        scheduled.klass == 'BackgroundMigrationWorker' &&
+        scheduled.args.first == job_class_name
+      end
+    expect(queued.size).to eq(0)
+  end
+
+  it 'processed the async sidekiq queue' do
+    queued = Sidekiq::Queue.new('BackgroundMigrationWorker').
+      select do |scheduled|
+        scheduled.klass == job_class_name
+      end
+    expect(queued.size).to eq(0)
+  end
+
+  it 'processed pending tracked jobs' do
+    jobs = Gitlab::Database::BackgroundMigrationJob.for_migration_class(job_class_name).pending
+    expect(jobs).to be_empty
+  end
+end
+
+RSpec.shared_examples 'finalized tracked background migration' do
+  include_examples 'finalized background migration'
+
+  it 'removes successful tracked jobs' do
+    jobs = Gitlab::Database::BackgroundMigrationJob.for_migration_class(job_class_name).succeeded
+    expect(jobs).to be_empty
+  end
+end
