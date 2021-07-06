@@ -12,10 +12,10 @@ module Gitlab
           include ::Gitlab::Ci::Config::Entry::Processable
 
           ALLOWED_WHEN = %w[on_success on_failure always manual].freeze
-          ALLOWED_KEYS = %i[trigger parallel status].freeze
+          ALLOWED_KEYS = %i[trigger parallel].freeze
 
           validations do
-            validates :config, allowed_keys: ALLOWED_KEYS + PROCESSABLE_ALLOWED_KEYS
+            validates :config, allowed_keys: Bridge.allowed_keys
 
             with_options allow_nil: true do
               validates :when, inclusion: {
@@ -72,6 +72,10 @@ module Gitlab
           def self.status_mirror?(config)
             # Deprecated. Will be removed: https://gitlab.com/gitlab-org/gitlab/-/issues/335081
             config.key?(:needs)
+          end
+
+          def self.allowed_keys
+            ALLOWED_KEYS + PROCESSABLE_ALLOWED_KEYS
           end
 
           def value

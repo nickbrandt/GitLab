@@ -10,6 +10,8 @@ module EE
             extend ::Gitlab::Utils::Override
 
             prepended do
+              EE_ALLOWED_KEYS = %i[status].freeze
+
               validations do
                 validate on: :composed do
                   if needs_defined? && status_defined?
@@ -25,9 +27,18 @@ module EE
               attributes :status
             end
 
-            override :status_mirror?
-            def self.status_mirror?(config)
-              super || config.key?(:status)
+            class_methods do
+              extend ::Gitlab::Utils::Override
+
+              override :allowed_keys
+              def allowed_keys
+                super + EE_ALLOWED_KEYS
+              end
+
+              override :status_mirror?
+              def status_mirror?(config)
+                super || config.key?(:status)
+              end
             end
 
             override :mirror_status_value
