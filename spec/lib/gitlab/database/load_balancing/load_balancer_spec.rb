@@ -306,14 +306,6 @@ RSpec.describe Gitlab::Database::LoadBalancing::LoadBalancer, :request_store do
     end
   end
 
-  describe '#all_caught_up?' do
-    it 'delegates execution to #select_up_to_date_host' do
-      expect(lb).to receive(:select_up_to_date_host).with('foo').and_return(true)
-
-      expect(lb.all_caught_up?('foo')).to eq(true)
-    end
-  end
-
   describe '#retry_with_backoff' do
     it 'returns the value returned by the block' do
       value = lb.retry_with_backoff { 10 }

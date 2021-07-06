@@ -147,11 +147,6 @@ module Gitlab
           raise 'Failed to determine the write location of the primary database'
         end
 
-        # Returns true if there was at least one host that has caught up with the given transaction and sets it.
-        def all_caught_up?(location)
-          select_up_to_date_host(location)
-        end
-
         # Returns true if there was at least one host that has caught up with the given transaction.
         #
         # In case of a retry, this method also stores the set of hosts that have caught up.
