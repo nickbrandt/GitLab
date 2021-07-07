@@ -226,7 +226,7 @@ Gitaly Cluster consists of multiple components:
 - [Load balancer](praefect.md#load-balancer) for distributing requests and providing fault-tolerant access to
   Praefect nodes.
 - [Praefect](praefect.md#praefect) nodes for managing the cluster and routing requests to Gitaly nodes.
-- [PostgreSQL database](praefect.md#postgresql) for persisting cluster metadata and [PgBouncer](praefect.md#pgbouncer),
+- [PostgreSQL database](praefect.md#postgresql) for persisting cluster metadata and [PgBouncer](praefect.md#use-pgbouncer),
   recommended for pooling Praefect's database connections.
 - Gitaly nodes to provide repository storage and Git access.
 
