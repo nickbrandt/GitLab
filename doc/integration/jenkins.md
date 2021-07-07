@@ -220,7 +220,7 @@ If you don't find the errors above, but do find *duplicate* entries like below (
 2019-10-25_04:22:41.25630 2019-10-25T04:22:41.256Z 1584 TID-ovowh4tek WebHookWorker JID-941fb7f40b69dff3d833c99b INFO: start
 ```
 
-### Enabling job logs in Jenkins
+### Enable job logs in Jenkins
 
 When troubleshooting an integration issue, it is useful to enable job logs in Jenkins in order to see more details about what is happening under the hood. To do that in Jenkins, you'll need to:
 
