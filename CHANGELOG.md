@@ -1369,6 +1369,12 @@ entry.
 - Change wording for design management upload. !61782
 
 
+## 13.11.7 (2021-07-07)
+
+### Security (1 change)
+
+- [Disable file and network premailer strategies](gitlab-org/security/gitlab@511ed3746b48a26e95c851f76ac6fdcd44c28fd8) ([merge request](gitlab-org/security/gitlab!1546))
+
 ## 13.11.6 (2021-07-01)
 
 ### Added (1 change)
