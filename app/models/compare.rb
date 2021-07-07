@@ -26,7 +26,7 @@ class Compare
   end
 
   def cache_key
-    [@project, :compare, start_commit_sha, base_commit_sha, head_commit_sha, @straight]
+    [@project, :compare, diff_refs.hash]
   end
 
   def commits

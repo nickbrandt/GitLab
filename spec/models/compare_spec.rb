@@ -19,9 +19,8 @@ RSpec.describe Compare do
     subject { compare.cache_key }
 
     it { is_expected.to include(project) }
-    it { is_expected.to include(start_commit.id) }
-    it { is_expected.to include(head_commit.id) }
-    it { is_expected.to include(compare.base_commit_sha) }
+    it { is_expected.to include(:compare) }
+    it { is_expected.to include(compare.diff_refs.hash) }
   end
 
   describe '#start_commit' do
