@@ -137,7 +137,7 @@ Set up the Jenkins project you intend to run your build on.
       }
       ```
 
-      For more Jenkins Pipeline script examples, please visit the [oficial GitLab plugin repository on GitHub](https://github.com/jenkinsci/gitlab-plugin#scripted-pipeline-jobs).
+      For more Jenkins Pipeline script examples, go to the [Jenkins GitLab plugin repository on GitHub](https://github.com/jenkinsci/gitlab-plugin#scripted-pipeline-jobs).
 
 ## Configure the GitLab project
 
