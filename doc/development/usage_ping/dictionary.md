@@ -4346,6 +4346,18 @@ Status: `implemented`
 
 Tiers: `free`, `premium`, `ultimate`
 
+### `counts.package_events_i_package_helm_push_package`
+
+The total count of Helm packages that have been published.
+
+[YAML definition](https://gitlab.com/gitlab-org/gitlab/-/blob/master/config/metrics/counts_all/20210625095025_package_events_i_package_helm_push_package.yml)
+
+Group: `group::package`
+
+Status: `implemented`
+
+Tiers: `free`, `premium`, `ultimate`
+
 ### `counts.package_events_i_package_maven_delete_package`
 
 A count of Maven packages that have been deleted
