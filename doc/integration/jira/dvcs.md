@@ -90,7 +90,7 @@ your integration.
 
 ## Configure Jira for DVCS
 
-If you use Jira Cloud and GitLab.com, use the [GitLab for Jira app](connect-app.md)
+If you use Jira Cloud, use the [GitLab for Jira app](connect-app.md)
 unless you specifically need the DVCS Connector.
 
 Configure this connection when you want to import all GitLab commits and branches,
