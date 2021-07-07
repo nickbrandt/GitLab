@@ -12970,6 +12970,9 @@ msgstr ""
 msgid "Escalation policies"
 msgstr ""
 
+msgid "Escalation policies may not have more than %{rule_count} rules"
+msgstr ""
+
 msgid "Escalation policies must have at least one rule"
 msgstr ""
 
