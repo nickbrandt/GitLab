@@ -1,17 +1,16 @@
-mutation projectIssueMilestoneMutation($fullPath: ID!, $iid: String!, $attributeId: ID) {
-  issuableSetAttribute: updateIssue(
+mutation mergeRequestSetMilestone($fullPath: ID!, $iid: String!, $attributeId: ID) {
+  issuableSetAttribute: mergeRequestSetMilestone(
     input: { projectPath: $fullPath, iid: $iid, milestoneId: $attributeId }
   ) {
     __typename
     errors
-    issuable: issue {
+    issuable: mergeRequest {
       __typename
       id
       attribute: milestone {
         title
         id
         state
-        expired
       }
     }
   }
