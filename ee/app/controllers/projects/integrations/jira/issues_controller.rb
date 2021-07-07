@@ -46,6 +46,7 @@ module Projects
         end
 
         def labels
+          # This implementation is just to mock the endpoint, to be implemented https://gitlab.com/gitlab-org/gitlab/-/issues/330778
           render json: issue_json[:labels]
         end
 
