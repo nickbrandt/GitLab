@@ -7,7 +7,7 @@ module QA
     class ProjectImportedFromGithub < Resource::Project
       attribute :github_repo_id do
         github_repository_path.split('/').yield_self do |path|
-          github_repos.get(user: path[0], repo: path[1]).id
+          github_client.repos.get(user: path[0], repo: path[1]).id
         end
       end
 
@@ -54,11 +54,11 @@ module QA
 
       private
 
-      # Github repos client
+      # Github client
       #
-      # @return [Github::Client::Repos]
-      def github_repos
-        @github_repo ||= Github::Client::Repos.new(oauth_token: github_personal_access_token)
+      # @return [Github::Client]
+      def github_client
+        @github_client ||= Github.new(oauth_token: github_personal_access_token)
       end
     end
   end
