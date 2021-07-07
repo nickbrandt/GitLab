@@ -225,10 +225,10 @@ If you don't find the errors above, but do find *duplicate* entries like below (
 When troubleshooting an integration issue, it is useful to enable job logs in Jenkins to see more details about what is happening under the hood.
 To enable job logs in Jenkins:
 
-- Navigate to `Dashboard -> Manage Jenkins -> System Log`
-- Click on `Add new log recorder`
-- Give the new log recorder a name
-- On the next screen click on `Add` and type `org.jenkinsci.plugins.workflow.job` in the text field.
-- Make sure that the Log Level is `All` and click `Save`
+1. Go to **Dashboard > Manage Jenkins > System Log**.
+1. Select **Add new log recorder**.
+1. Enter a name for the log recorder.
+1. On the next screen, select **Add** and enter `org.jenkinsci.plugins.workflow.job` in the text field.
+1. Make sure that the Log Level is **All** and select **Save**.
 
 Now after running a build you can go to the loggers page (`Dashboard -> Manage Jenkins -> System Log`), click on your logger and check the logs.
