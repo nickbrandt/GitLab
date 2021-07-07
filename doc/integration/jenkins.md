@@ -222,7 +222,8 @@ If you don't find the errors above, but do find *duplicate* entries like below (
 
 ### Enable job logs in Jenkins
 
-When troubleshooting an integration issue, it is useful to enable job logs in Jenkins in order to see more details about what is happening under the hood. To do that in Jenkins, you'll need to:
+When troubleshooting an integration issue, it is useful to enable job logs in Jenkins to see more details about what is happening under the hood.
+To enable job logs in Jenkins:
 
 - Navigate to `Dashboard -> Manage Jenkins -> System Log`
 - Click on `Add new log recorder`
