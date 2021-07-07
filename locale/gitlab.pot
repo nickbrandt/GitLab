@@ -708,9 +708,6 @@ msgstr ""
 msgid "%{message} showing first %{warnings_displayed}"
 msgstr ""
 
-msgid "%{milestone_name} (Past due)"
-msgstr ""
-
 msgid "%{milestone} (expired)"
 msgstr ""
 
@@ -1095,6 +1092,9 @@ msgid "(check progress)"
 msgstr ""
 
 msgid "(deleted)"
+msgstr ""
+
+msgid "(expired)"
 msgstr ""
 
 msgid "(leave blank if you don't want to change it)"
