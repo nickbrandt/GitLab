@@ -9,7 +9,7 @@ module Ci
 
       pipeline.cancel_running if pipeline.cancelable? && ::Feature.enabled?(:cancel_pipelines_prior_to_destroy, default_enabled: :yaml)
 
-      pipeline.destroy!
+      pipeline.reset.destroy!
 
       ServiceResponse.success(message: 'Pipeline not found')
     rescue ActiveRecord::RecordNotFound
