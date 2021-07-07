@@ -231,4 +231,4 @@ To enable job logs in Jenkins:
 1. On the next screen, select **Add** and enter `org.jenkinsci.plugins.workflow.job` in the text field.
 1. Make sure that the Log Level is **All** and select **Save**.
 
-Now after running a build you can go to the loggers page (`Dashboard -> Manage Jenkins -> System Log`), click on your logger and check the logs.
+Now, after you run a build, you can go to the loggers page (**Dashboard > Manage Jenkins > System Log**), select your logger, and check the logs.
