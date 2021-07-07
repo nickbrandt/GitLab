@@ -28311,6 +28311,12 @@ msgstr ""
 msgid "Runners|group"
 msgstr ""
 
+msgid "Runners|instance"
+msgstr ""
+
+msgid "Runners|project"
+msgstr ""
+
 msgid "Runners|shared"
 msgstr ""
 
