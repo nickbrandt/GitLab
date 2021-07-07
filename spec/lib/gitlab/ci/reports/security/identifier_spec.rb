@@ -6,8 +6,7 @@ RSpec.describe Gitlab::Ci::Reports::Security::Identifier do
   using RSpec::Parameterized::TableSyntax
 
   describe '#initialize' do
-    # wrote the class explicitly because described_class kept returning Gitlab::identifier<module>
-    subject { Gitlab::Ci::Reports::Security::Identifier.new(**params) }
+    subject { described_class.new(**params) }
 
     let(:params) do
       {
