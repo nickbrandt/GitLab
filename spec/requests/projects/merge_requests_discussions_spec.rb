@@ -147,6 +147,17 @@ RSpec.describe 'merge requests discussions' do
         end
       end
 
+      context 'when cached markdown version gets bump' do
+        before do
+          settings = Gitlab::CurrentSettings.current_application_settings
+          settings.update!(local_markdown_version: settings.local_markdown_version + 1)
+        end
+
+        it_behaves_like 'cache miss' do
+          let(:changed_notes) { [first_note, second_note] }
+        end
+      end
+
       context 'when merge_request_discussion_cache is disabled' do
         before do
           stub_feature_flags(merge_request_discussion_cache: false)
