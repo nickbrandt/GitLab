@@ -3,9 +3,6 @@
 module QA
   RSpec.describe 'Manage', :github, :requires_admin do
     describe 'Project import' do
-      let!(:github_user) { 'gitlab-qa-github' }
-      let!(:github_repo) { 'test-project' }
-
       let!(:api_client) { Runtime::API::Client.as_admin }
       let!(:group) { Resource::Group.fabricate_via_api! { |resource| resource.api_client = api_client } }
       let!(:user) do
@@ -20,7 +17,7 @@ module QA
           project.name = 'imported-project'
           project.group = group
           project.github_personal_access_token = Runtime::Env.github_access_token
-          project.github_repository_path = "#{github_user}/#{github_repo}"
+          project.github_repository_path = 'gitlab-qa-github/test-project'
           project.api_client = api_client
         end
       end
@@ -33,7 +30,7 @@ module QA
         user.remove_via_api!
       end
 
-      it 'imports Github repo via api' do
+      it 'imports Github repo via api', testcase: 'https://gitlab.com/gitlab-org/quality/testcases/-/issues/1858' do
         imported_project # import the project
 
         expect { imported_project.reload!.import_status }.to eventually_eq('finished').within(duration: 90)
