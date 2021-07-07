@@ -22972,6 +22972,9 @@ msgstr ""
 msgid "Only include features new to your current subscription tier."
 msgstr ""
 
+msgid "Only owners can update Security Policy Project"
+msgstr ""
+
 msgid "Only policy:"
 msgstr ""
 
