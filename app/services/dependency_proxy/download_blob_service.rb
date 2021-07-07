@@ -29,6 +29,33 @@ module DependencyProxy
       error(exception.message, 599)
     end
 
+    def execute_with_blob
+      raise ArgumentError, 'Block must be provided' unless block_given?
+
+      file = Tempfile.new('dependency_proxy_blob:')
+      file.unlink
+      begin
+        Gitlab::HTTP.get(blob_url, headers: auth_headers, stream_body: true) do |fragment|
+          if [301, 302, 307].include?(fragment.code)
+            # do nothing
+          elsif fragment.code == 200
+            file.write(fragment)
+          else
+            raise DownloadError.new('Non-success response code on downloading blob fragment', fragment.code)
+          end
+        end
+
+        file.flush
+        yield(success(file: file))
+      ensure
+        file.close
+      end
+    rescue DownloadError => exception
+      error(exception.message, exception.http_status)
+    rescue Timeout::Error => exception
+      error(exception.message, 599)
+    end
+
     private
 
     def blob_url
