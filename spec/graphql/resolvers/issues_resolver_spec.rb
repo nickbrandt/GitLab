@@ -305,13 +305,11 @@ RSpec.describe Resolvers::IssuesResolver do
             create(:award_emoji, :upvote, awardable: issue4)
           end
 
-          it 'sorts issues ascending (ties broken by id in desc order)', :aggregate_failures do
-            expect(issue1.id).to be < (issue4.id)
+          it 'sorts issues ascending (ties broken by id in desc order)' do
             expect(resolve_issues(sort: :popularity_asc).to_a).to eq([issue3, issue4, issue1, issue2])
           end
 
-          it 'sorts issues descending (ties broken by id in desc order)', :aggregate_failures do
-            expect(issue1.id).to be < (issue4.id)
+          it 'sorts issues descending (ties broken by id in desc order)' do
             expect(resolve_issues(sort: :popularity_desc).to_a).to eq([issue2, issue4, issue1, issue3])
           end
         end

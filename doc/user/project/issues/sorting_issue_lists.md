@@ -8,7 +8,7 @@ info: To determine the technical writer assigned to the Stage/Group associated w
 
 You can sort a list of issues several ways, including by:
 
-- Blocking (descending sort only) **(PREMIUM)**
+- Blocking **(PREMIUM)**
 - Created date
 - Due date
 - Label priority

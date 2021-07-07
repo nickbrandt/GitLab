@@ -66,13 +66,11 @@ RSpec.describe Resolvers::IssuesResolver do
         end
 
         context 'when sorting by blocking issues count (ties broken by id in desc order)' do
-          it 'sorts issues ascending', :aggregate_failures do
-            expect(issue1.id).to be < (issue2.id)
+          it 'sorts issues ascending' do
             expect(resolve_issues(sort: :blocking_issues_asc).to_a).to eq [issue4, issue2, issue1, issue3]
           end
 
-          it 'sorts issues descending', :aggregate_failures do
-            expect(issue1.id).to be < (issue2.id)
+          it 'sorts issues descending' do
             expect(resolve_issues(sort: :blocking_issues_desc).to_a).to eq [issue3, issue2, issue1, issue4]
           end
         end
