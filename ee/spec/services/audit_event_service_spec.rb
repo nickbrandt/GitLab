@@ -292,6 +292,16 @@ RSpec.describe AuditEventService do
         expect(event.details).not_to have_key(:ip_address)
       end
     end
+
+    context 'on a read-only instance' do
+      before do
+        allow(Gitlab::Database).to receive(:read_only?).and_return(true)
+      end
+
+      it 'does not create an event record in the database' do
+        expect { service.for_failed_login.unauth_security_event }.not_to change(AuditEvent, :count)
+      end
+    end
   end
 
   describe '#for_project_group_link' do
