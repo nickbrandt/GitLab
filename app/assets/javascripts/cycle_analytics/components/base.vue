@@ -74,7 +74,12 @@ export default {
       return !this.isLoadingStage && this.isEmptyStage;
     },
     displayNoAccess() {
-      return !this.isLoadingStage && !this.isUserAllowed(this.selectedStage.id);
+      return (
+        !this.isLoadingStage && this.selectedStage?.id && !this.isUserAllowed(this.selectedStage.id)
+      );
+    },
+    displayPathNavigation() {
+      return this.isLoading || (this.selectedStage && this.pathNavigationData.length);
     },
     emptyStageTitle() {
       return this.selectedStageError
@@ -82,7 +87,7 @@ export default {
         : __("We don't have enough data to show this stage.");
     },
     emptyStageText() {
-      return !this.selectedStageError ? this.selectedStage.emptyStageText : '';
+      return (!this.selectedStageError && this.selectedStage?.emptyStageText) || '';
     },
   },
   methods: {
@@ -124,6 +129,7 @@ export default {
       Related issue: https://gitlab.com/gitlab-org/gitlab/-/issues/326705
     -->
     <path-navigation
+      v-if="displayPathNavigation"
       class="js-path-navigation gl-w-full gl-pb-2"
       :loading="isLoading || isLoadingStage"
       :stages="pathNavigationData"
