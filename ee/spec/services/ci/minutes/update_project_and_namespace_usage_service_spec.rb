@@ -2,16 +2,16 @@
 
 require 'spec_helper'
 
-RSpec.describe Ci::Minutes::UpdateMinutesByConsumptionService do
+RSpec.describe Ci::Minutes::UpdateProjectAndNamespaceUsageService do
+  let_it_be(:namespace) { create(:namespace, shared_runners_minutes_limit: 100) }
+  let_it_be(:project) { create(:project, :private, namespace: namespace) }
+
+  let(:consumption_minutes) { 120 }
+  let(:consumption_seconds) { consumption_minutes * 60 }
+  let(:namespace_amount_used) { Ci::Minutes::NamespaceMonthlyUsage.find_or_create_current(namespace).amount_used }
+  let(:project_amount_used) { Ci::Minutes::ProjectMonthlyUsage.find_or_create_current(project).amount_used }
+
   describe '#execute' do
-    let_it_be(:namespace) { create(:namespace, shared_runners_minutes_limit: 100) }
-    let_it_be(:project) { create(:project, :private, namespace: namespace) }
-
-    let(:consumption_minutes) { 120 }
-    let(:consumption_seconds) { 120 * 60 }
-    let(:namespace_amount_used) { Ci::Minutes::NamespaceMonthlyUsage.find_or_create_current(namespace).amount_used }
-    let(:project_amount_used) { Ci::Minutes::ProjectMonthlyUsage.find_or_create_current(project).amount_used }
-
     subject { described_class.new(project, namespace).execute(consumption_minutes) }
 
     context 'with shared runner' do
@@ -43,6 +43,32 @@ RSpec.describe Ci::Minutes::UpdateMinutesByConsumptionService do
 
             expect(namespace_amount_used).to eq(0)
             expect(project_amount_used).to eq(0)
+          end
+        end
+
+        context 'when on .com' do
+          before do
+            allow(Gitlab).to receive(:com?).and_return(true)
+          end
+
+          it 'sends a minute notification email' do
+            expect_next_instance_of(Ci::Minutes::EmailNotificationService) do |service|
+              expect(service).to receive(:execute)
+            end
+
+            subject
+          end
+        end
+
+        context 'when not on .com' do
+          before do
+            allow(Gitlab).to receive(:com?).and_return(false)
+          end
+
+          it 'does not send a minute notification email' do
+            expect(Ci::Minutes::EmailNotificationService).not_to receive(:new)
+
+            subject
           end
         end
       end

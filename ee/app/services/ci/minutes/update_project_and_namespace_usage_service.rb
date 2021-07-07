@@ -2,26 +2,24 @@
 
 module Ci
   module Minutes
-    class UpdateMinutesByConsumptionService
+    class UpdateProjectAndNamespaceUsageService
       def initialize(project, namespace)
         @project = project
         @namespace = namespace
       end
 
-      # Updates the project and namespace minutes based on the passed consumption amount
+      # Updates the project and namespace usage based on the passed consumption amount
       def execute(consumption)
-        return unless consumption > 0
-
         consumption_in_seconds = consumption.minutes.to_i
         legacy_track_usage_of_monthly_minutes(consumption_in_seconds)
 
         track_usage_of_monthly_minutes(consumption)
-        send_email_notification
+        send_minutes_email_notification
       end
 
       private
 
-      def send_email_notification
+      def send_minutes_email_notification
         # `perform reset` on `project` because `Namespace#namespace_statistics` will otherwise return stale data.
         ::Ci::Minutes::EmailNotificationService.new(@project.reset).execute if ::Gitlab.com?
       end
@@ -40,7 +38,7 @@ module Ci
         namespace_usage = ::Ci::Minutes::NamespaceMonthlyUsage.find_or_create_current(@namespace)
         project_usage = ::Ci::Minutes::ProjectMonthlyUsage.find_or_create_current(@project)
 
-        ActiveRecord::Base.transaction do
+        ApplicationRecord.transaction do
           ::Ci::Minutes::NamespaceMonthlyUsage.increase_usage(namespace_usage, consumption)
           ::Ci::Minutes::ProjectMonthlyUsage.increase_usage(project_usage, consumption)
         end
