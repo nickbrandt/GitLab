@@ -30491,6 +30491,9 @@ msgstr ""
 msgid "Something went wrong while setting %{issuableType} to-do item."
 msgstr ""
 
+msgid "Something went wrong while setting %{issuableType} weight."
+msgstr ""
+
 msgid "Something went wrong while stopping this environment. Please try again."
 msgstr ""
 
