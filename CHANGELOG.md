@@ -690,6 +690,12 @@ entry.
 - [Add missing metrics information](gitlab-org/gitlab@89cd7fe3b95323e635b2d73e08549b2e6153dc4d) ([merge request](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/61772/edit))
 - [Track usage of the resolve UI](gitlab-org/gitlab@35c8e30fce288cecefcf2f7c0077d4608e696519) ([merge request](gitlab-org/gitlab!61654))
 
+## 13.12.8 (2021-07-07)
+
+### Security (1 change)
+
+- [Disable file and network premailer strategies](gitlab-org/security/gitlab@ee69d6d6950bb116cb31523ca805e78af431c25c) ([merge request](gitlab-org/security/gitlab!1545))
+
 ## 13.12.7 (2021-07-05)
 
 ### Fixed (2 changes)
