@@ -15,7 +15,7 @@ module EE
               validations do
                 validate on: :composed do
                   if needs_defined? && status_defined?
-                    errors.add(:config, 'should not contain both needs and status keywords')
+                    errors.add(:config, 'should not contain both "needs" and "status" keywords')
                   end
                 end
               end

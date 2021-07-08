@@ -207,7 +207,7 @@ RSpec.describe ::Gitlab::Ci::Config::Entry::Bridge do
 
         describe '#errors' do
           it 'returns an error about config' do
-            expect(subject.errors.first).to eq('bridge config should not contain both needs and status keywords')
+            expect(subject.errors.first).to eq('bridge config should not contain both "needs" and "status" keywords')
           end
         end
       end
