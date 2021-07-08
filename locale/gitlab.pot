@@ -6330,6 +6330,9 @@ msgstr ""
 msgid "Check your Docker images for known vulnerabilities."
 msgstr ""
 
+msgid "Check your Kubernetes cluster images for known vulnerabilities."
+msgstr ""
+
 msgid "Check your source instance permissions."
 msgstr ""
 
@@ -38303,6 +38306,9 @@ msgid "ciReport|Browser performance test metrics: No changes"
 msgstr ""
 
 msgid "ciReport|Checks"
+msgstr ""
+
+msgid "ciReport|Cluster Image Scanning"
 msgstr ""
 
 msgid "ciReport|Code quality"
