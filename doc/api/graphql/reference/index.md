@@ -10957,6 +10957,7 @@ Represents the network policy.
 | <a id="networkpolicyenabled"></a>`enabled` | [`Boolean!`](#boolean) | Indicates whether this policy is enabled. |
 | <a id="networkpolicyenvironments"></a>`environments` | [`EnvironmentConnection`](#environmentconnection) | Environments where this policy is applied. (see [Connections](#connections)) |
 | <a id="networkpolicyfromautodevops"></a>`fromAutoDevops` | [`Boolean!`](#boolean) | Indicates whether this policy is created from AutoDevops. |
+| <a id="networkpolicykind"></a>`kind` | [`NetworkPolicyKind!`](#networkpolicykind) | Kind of the policy. |
 | <a id="networkpolicyname"></a>`name` | [`String!`](#string) | Name of the policy. |
 | <a id="networkpolicynamespace"></a>`namespace` | [`String!`](#string) | Namespace of the policy. |
 | <a id="networkpolicyupdatedat"></a>`updatedAt` | [`Time!`](#time) | Timestamp of when the policy YAML was last updated. |
@@ -14885,6 +14886,15 @@ Negated Iteration ID wildcard values.
 | Value | Description |
 | ----- | ----------- |
 | <a id="negatediterationwildcardidcurrent"></a>`CURRENT` | Current iteration. |
+
+### `NetworkPolicyKind`
+
+Kind of the network policy.
+
+| Value | Description |
+| ----- | ----------- |
+| <a id="networkpolicykindciliumnetworkpolicy"></a>`CiliumNetworkPolicy` | The policy kind of Cilium Network Policy. |
+| <a id="networkpolicykindnetworkpolicy"></a>`NetworkPolicy` | The policy kind of Network Policy. |
 
 ### `OncallRotationUnitEnum`
 
