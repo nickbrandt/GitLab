@@ -46,7 +46,7 @@ and can show your instance's usage statistics to your users.
 We use the following terminology to describe the Service Ping components:
 
 - **Service Ping**: the process that collects and generates a JSON payload.
-- **Service data**: the contents of the Service Ping JSON payload. This includes metrics.
+- **Service Data**: the contents of the Service Ping JSON payload. This includes metrics.
 - **Metrics**: primarily made up of row counts for different tables in an instance's database. Each
   metric has a corresponding [metric definition](metrics_dictionary.md#metrics-definition-and-validation)
   in a YAML file.
