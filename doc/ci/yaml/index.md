@@ -1796,17 +1796,17 @@ rspec:
       optional: true
 ```
 
-##### Mirroring the status of another project pipeline **(PREMIUM)**
+##### Mirror the status of another project's pipeline with `needs:pipeline` **(PREMIUM)**
 
 > - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/12334) in GitLab 12.2.
 > - [Deprecated](https://gitlab.com/gitlab-org/gitlab/-/issues/280853) in GitLab 14.1.
 > - [Will be removed](https://gitlab.com/gitlab-org/gitlab/-/issues/335081) in GitLab 15.0.
 
 WARNING:
-`needs:pipeline` is deprecated, and could be removed in one of the future releases.
-Use [`status`](#status) instead.
+`needs:pipeline` is deprecated and scheduled for removal.
+Use [`status`](#status) instead. See version history for more details.
 
-To mirror the status from an upstream pipeline:
+You can mirror the status of an upstream pipeline with `needs: pipeline`:
 
 ```yaml
 upstream_bridge:
@@ -3652,11 +3652,10 @@ trigger_job:
     strategy: depend
 ```
 
-To mirror the status from an upstream pipeline:
+To mirror the status of an upstream pipeline, you can use:
 
-You can use [`status`](#status).
-
-Old usage: [`needs:pipeline`](#mirroring-the-status-of-another-project-pipeline).
+- [`status`](#status).
+- [`needs:pipeline`](#mirror-the-status-of-another-project-s-pipeline-with-needs-pipeline) (deprecated).
 
 #### `trigger` syntax for child pipeline
 
@@ -3755,14 +3754,16 @@ The trigger token is different than the [`trigger`](#trigger) keyword.
 
 ### `status`
 
-Use `status` to add a job that reflects the status of another project's pipeline.
+- [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/280853) in GitLab 14.1.
+
+Use `status` to add a job that reflects the status of another project's pipeline:
 
 ```yaml
 upstream-status:
   status: root/my-project
 ```
 
-In this case, the `upstream-status` job will reflect **the latest pipeline** in **the main branch** of the `root/my-project` project.
+In this case, the `upstream-status` job will reflect **the latest pipeline** in **the default branch** of the `root/my-project` project.
 
 ### `interruptible`
 
