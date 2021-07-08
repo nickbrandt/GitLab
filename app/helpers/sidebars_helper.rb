@@ -14,7 +14,7 @@ module SidebarsHelper
     end
   end
 
-  def sidebar_qa_sidebar_element(object)
+  def sidebar_qa_selector(object)
     case object
     when Project
       'qa-project-sidebar'
