@@ -5,7 +5,12 @@ require 'spec_helper'
 RSpec.describe Dast::ProfileSchedule, type: :model do
   subject { create(:dast_profile_schedule) }
 
+  it_behaves_like 'includes Limitable concern' do
+    subject { build(:dast_profile_schedule, project: create(:project), dast_profile: create(:dast_profile), owner: create(:user)) }
+  end
+
   describe 'associations' do
+    it { is_expected.to belong_to(:project) }
     it { is_expected.to belong_to(:dast_profile).class_name('Dast::Profile').required.inverse_of(:dast_profile_schedules) }
     it { is_expected.to belong_to(:owner).class_name('User').with_foreign_key(:user_id) }
   end

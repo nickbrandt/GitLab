@@ -29,7 +29,7 @@ module AppSec
       private
 
       def dast_runnable_schedules
-        ::Dast::ProfileSchedule.with_profile_project.with_owner.runnable_schedules
+        ::Dast::ProfileSchedule.with_project.with_profile.with_owner.runnable_schedules
       end
 
       def service(schedule)

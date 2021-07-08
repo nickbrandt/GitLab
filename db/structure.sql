@@ -12007,6 +12007,7 @@ CREATE TABLE dast_profile_schedules (
     id bigint NOT NULL,
     dast_profile_id bigint NOT NULL,
     user_id bigint NOT NULL,
+    project_id bigint NOT NULL,
     active boolean DEFAULT true,
     next_run_at timestamp with time zone NOT NULL,
     created_at timestamp with time zone NOT NULL,
@@ -23353,6 +23354,8 @@ CREATE INDEX index_dast_profile_schedules_active_next_run_at ON dast_profile_sch
 
 CREATE INDEX index_dast_profile_schedules_on_dast_profile_id ON dast_profile_schedules USING btree (dast_profile_id);
 
+CREATE INDEX index_dast_profile_schedules_on_project_id ON dast_profile_schedules USING btree (project_id);
+
 CREATE INDEX index_dast_profile_schedules_on_user_id ON dast_profile_schedules USING btree (user_id);
 
 CREATE INDEX index_dast_profiles_on_dast_scanner_profile_id ON dast_profiles USING btree (dast_scanner_profile_id);
@@ -25985,6 +25988,9 @@ ALTER TABLE ONLY merge_requests
 
 ALTER TABLE ONLY geo_event_log
     ADD CONSTRAINT fk_6ada82d42a FOREIGN KEY (container_repository_updated_event_id) REFERENCES geo_container_repository_updated_events(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY dast_profile_schedules
+    ADD CONSTRAINT fk_6cca0d8800 FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY projects
     ADD CONSTRAINT fk_6e5c14658a FOREIGN KEY (pool_repository_id) REFERENCES pool_repositories(id) ON DELETE SET NULL;
