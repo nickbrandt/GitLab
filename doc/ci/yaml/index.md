@@ -3655,7 +3655,7 @@ trigger_job:
 To mirror the status of an upstream pipeline, you can use:
 
 - [`status`](#status).
-- [`needs:pipeline`](#mirror-the-status-of-another-project-s-pipeline-with-needs-pipeline) (deprecated).
+- [`needs:pipeline`](#mirror-the-status-of-another-projects-pipeline-with-needspipeline) (deprecated).
 
 #### `trigger` syntax for child pipeline
 
