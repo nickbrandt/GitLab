@@ -3,13 +3,6 @@
 module Security
   module CiConfiguration
     class DependencyScanningCreateService < ::Security::CiConfiguration::BaseCreateService
-      attr_reader :params
-
-      def initialize(project, current_user, params)
-        super(project, current_user)
-        @params = params
-      end
-
       private
 
       def action

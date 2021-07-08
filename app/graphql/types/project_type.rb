@@ -20,10 +20,6 @@ module Types
       calls_gitaly: true,
       description: 'SAST CI configuration for the project.'
 
-    field :dependency_scanning_ci_configuration, Types::CiConfiguration::DependencyScanning::Type, null: true,
-      calls_gitaly: true,
-      description: 'Dependency Scanning CI configuration for the project.'
-
     field :name_with_namespace, GraphQL::STRING_TYPE, null: false,
           description: 'Full name of the project with its namespace.'
     field :name, GraphQL::STRING_TYPE, null: false,
@@ -393,12 +389,6 @@ module Types
       return unless Ability.allowed?(current_user, :download_code, object)
 
       ::Security::CiConfiguration::SastParserService.new(object).configuration
-    end
-
-    def dependency_scanning_ci_configuration
-      return unless Ability.allowed?(current_user, :download_code, object)
-
-      ::Security::CiConfiguration::DependencyScanningParserService.new(object).configuration
     end
 
     def tag_list

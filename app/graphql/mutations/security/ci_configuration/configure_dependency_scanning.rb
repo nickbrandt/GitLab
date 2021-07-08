@@ -17,10 +17,6 @@ module Mutations
           required: true,
           description: 'Full path of the project.'
 
-        argument :configuration, ::Types::CiConfiguration::DependencyScanning::InputType,
-          required: true,
-          description: 'Dependency Scanning CI configuration for the project.'
-
         field :success_path, GraphQL::STRING_TYPE, null: true,
           description: 'Redirect path to use when the response is successful.'
 
