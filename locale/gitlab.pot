@@ -23386,6 +23386,9 @@ msgstr ""
 msgid "PackageRegistry|Gradle Kotlin DSL install command"
 msgstr ""
 
+msgid "PackageRegistry|Helm"
+msgstr ""
+
 msgid "PackageRegistry|If you haven't already done so, you will need to add the below to your %{codeStart}.pypirc%{codeEnd} file."
 msgstr ""
 
