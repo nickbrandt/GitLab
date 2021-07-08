@@ -146,15 +146,15 @@ describe('EpicsSwimlanes', () => {
     });
 
     it('displays IssueLaneList component when toggling unassigned issues lane', async () => {
-      wrapper.vm.toggleUnassignedLane();
+      wrapper.findByTestId('unassigned-lane-toggle').vm.$emit('click');
 
       await wrapper.vm.$nextTick();
       expect(wrapper.findComponent(IssueLaneList).exists()).toBe(true);
     });
 
     it('displays issues icon and count for unassigned issue', () => {
-      expect(wrapper.findComponent(GlIcon).props('name')).toEqual('issues');
-      expect(wrapper.findByTestId('issues-lane-issue-count').text()).toEqual('2');
+      expect(wrapper.findComponent(GlIcon).props('name')).toBe('issues');
+      expect(wrapper.findByTestId('issues-lane-issue-count').text()).toBe('2');
     });
 
     it('makes non preset lists draggable', () => {

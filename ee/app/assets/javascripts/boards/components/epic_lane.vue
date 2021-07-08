@@ -87,11 +87,14 @@ export default {
     shouldDisplay() {
       return this.issuesCount > 0 || this.isLoading;
     },
+    showUnassignedLane() {
+      return !this.isCollapsed && this.issuesCount > 0;
+    },
   },
   watch: {
-    filterParams: {
-      handler() {
-        if (!this.filterParams.epicId || this.filterParams.epicId === this.epic.id) {
+    'filterParams.epicId': {
+      handler(epicId) {
+        if (!epicId || epicId === this.epic.id) {
           this.fetchIssuesForEpic(this.epic.id);
         }
       },
@@ -134,7 +137,6 @@ export default {
           class="gl-mr-2 gl-cursor-pointer"
           category="tertiary"
           size="small"
-          data-testid="epic-lane-chevron"
           @click="toggleCollapsed"
         />
         <h4
@@ -165,7 +167,7 @@ export default {
       </div>
     </div>
     <div
-      v-if="!isCollapsed && issuesCount > 0"
+      v-if="showUnassignedLane"
       class="gl-display-flex gl-pb-5 board-epic-lane-issues"
       data-testid="board-epic-lane-issues"
     >

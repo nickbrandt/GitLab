@@ -92,6 +92,7 @@ export default {
       ...state.epicsSwimlanesFetchInProgress,
       listItemsFetchInProgress: false,
     });
+    state.error = undefined;
   },
 
   [mutationTypes.RECEIVE_BOARD_LISTS_SUCCESS]: (state, boardLists) => {

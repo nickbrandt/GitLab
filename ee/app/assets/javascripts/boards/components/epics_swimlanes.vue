@@ -123,11 +123,7 @@ export default {
   watch: {
     filterParams: {
       handler() {
-        Promise.all(
-          this.epics.map((epic) => {
-            return this.fetchIssuesForEpic(epic.id);
-          }),
-        )
+        Promise.all(this.epics.map((epic) => this.fetchIssuesForEpic(epic.id)))
           .then(() => this.doneLoadingSwimlanesItems())
           .catch(() => {});
       },

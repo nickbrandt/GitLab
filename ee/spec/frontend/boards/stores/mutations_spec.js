@@ -140,17 +140,19 @@ describe('SET_EPICS_SWIMLANES', () => {
 });
 
 describe('DONE_LOADING_SWIMLANES_ITEMS', () => {
-  it('set listItemsFetchInProgress to false', () => {
+  it('set listItemsFetchInProgress to false ans resets error', () => {
     state = {
       ...state,
       epicsSwimlanesFetchInProgress: {
         listItemsFetchInProgress: true,
       },
+      error: 'Houston, we have a problem.',
     };
 
     mutations.DONE_LOADING_SWIMLANES_ITEMS(state);
 
     expect(state.epicsSwimlanesFetchInProgress.listItemsFetchInProgress).toBe(false);
+    expect(state.error).toBe(undefined);
   });
 });
 
