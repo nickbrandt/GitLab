@@ -144,6 +144,18 @@ export const setDateRange = ({ dispatch, commit }, daysInPast) => {
   return refetchStageData(dispatch);
 };
 
+const appendExtension = (path) => (path.indexOf('.') > -1 ? path : `${path}.json`);
+
+export const setPaths = ({ dispatch }, options) => {
+  const { groupPath, milestonesPath = '', labelsPath = '' } = options;
+
+  return dispatch('filters/setEndpoints', {
+    labelsEndpoint: appendExtension(labelsPath),
+    milestonesEndpoint: appendExtension(milestonesPath),
+    groupEndpoint: groupPath,
+  });
+};
+
 export const initializeVsa = ({ commit, dispatch }, initialData = {}) => {
   commit(types.INITIALIZE_VSA, initialData);
 

@@ -7,8 +7,6 @@
 
 import Vue from 'vue';
 import Vuex from 'vuex';
-// TODO: this wont work in FOSS
-import { setPaths } from 'ee/analytics/cycle_analytics/store/actions';
 import filters from '~/vue_shared/components/filtered_search_bar/store/modules/filters';
 import * as actions from './actions';
 import * as getters from './getters';
@@ -19,10 +17,7 @@ Vue.use(Vuex);
 
 export default () =>
   new Vuex.Store({
-    actions: {
-      ...actions,
-      setPaths,
-    },
+    actions,
     getters,
     mutations,
     state,
