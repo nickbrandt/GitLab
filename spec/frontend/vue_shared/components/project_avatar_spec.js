@@ -11,8 +11,8 @@ describe('ProjectAvatar', () => {
 
   const findGlAvatar = () => wrapper.findComponent(GlAvatar);
 
-  const createComponent = ({ props } = {}) => {
-    wrapper = shallowMount(ProjectAvatar, { propsData: { ...defaultProps, ...props } });
+  const createComponent = ({ props, attrs } = {}) => {
+    wrapper = shallowMount(ProjectAvatar, { propsData: { ...defaultProps, ...props }, attrs });
   };
 
   afterEach(() => {
@@ -49,6 +49,19 @@ describe('ProjectAvatar', () => {
 
       const avatar = findGlAvatar();
       expect(avatar.props('src')).toBe(mockProjectAvatarUrl);
+    });
+  });
+
+  describe.each`
+    alt
+    ${''}
+    ${'custom-alt'}
+  `('when `alt` prop is "$alt"', ({ alt }) => {
+    it('renders GlAvatar with specified `alt` attribute', () => {
+      createComponent({ props: { alt } });
+
+      const avatar = findGlAvatar();
+      expect(avatar.props('alt')).toBe(alt);
     });
   });
 });

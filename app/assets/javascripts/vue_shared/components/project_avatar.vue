@@ -13,12 +13,22 @@ export default {
     projectAvatarUrl: {
       type: String,
       required: false,
-      default: undefined,
+      default: '',
     },
     size: {
       type: Number,
       default: 32,
       required: false,
+    },
+    alt: {
+      type: String,
+      required: false,
+      default: undefined,
+    },
+  },
+  computed: {
+    avatarAlt() {
+      return this.alt ?? this.projectName;
     },
   },
 };
@@ -29,7 +39,7 @@ export default {
     shape="rect"
     :entity-name="projectName"
     :src="projectAvatarUrl"
-    :alt="projectName"
+    :alt="avatarAlt"
     :size="size"
   />
 </template>

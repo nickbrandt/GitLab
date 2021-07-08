@@ -8,7 +8,7 @@ export default {
 const Template = (args, { argTypes }) => ({
   components: { ProjectAvatar },
   props: Object.keys(argTypes),
-  template: '<project-avatar v-bind="$props" v-on="$props" />',
+  template: '<project-avatar v-bind="$props" />',
 });
 
 export const Default = Template.bind({});
@@ -21,4 +21,10 @@ Default.args = {
 export const FallbackAvatar = Template.bind({});
 FallbackAvatar.args = {
   projectName: 'GitLab',
+};
+
+export const EmptyAltTag = Template.bind({});
+EmptyAltTag.args = {
+  ...Default.args,
+  alt: '',
 };
