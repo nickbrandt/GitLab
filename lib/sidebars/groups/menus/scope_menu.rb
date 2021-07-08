@@ -19,13 +19,6 @@ module Sidebars
           { path: %w[groups#show groups#details] }
         end
 
-        override :extra_container_html_options
-        def extra_container_html_options
-          {
-            data: { qa_selector: 'group_scope_link' }
-          }
-        end
-
         override :extra_nav_link_html_options
         def extra_nav_link_html_options
           { class: 'context-header' }
