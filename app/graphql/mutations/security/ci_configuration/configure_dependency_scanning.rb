@@ -25,10 +25,10 @@ module Mutations
 
         authorize :push_code
 
-        def resolve(project_path:, configuration:)
+        def resolve(project_path:)
           project = authorized_find!(project_path)
 
-          result = ::Security::CiConfiguration::DependencyScanningCreateService.new(project, current_user, configuration).execute
+          result = ::Security::CiConfiguration::DependencyScanningCreateService.new(project, current_user).execute
           prepare_response(result)
         end
 
