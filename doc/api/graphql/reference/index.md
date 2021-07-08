@@ -863,6 +863,31 @@ Input type: `CommitCreateInput`
 | <a id="mutationcommitcreatecontent"></a>`content` | [`[String!]`](#string) | Contents of the commit. |
 | <a id="mutationcommitcreateerrors"></a>`errors` | [`[String!]!`](#string) | Errors encountered during execution of the mutation. |
 
+### `Mutation.configureDependencyScanning`
+
+Configure Dependency Scanning for a project by enabling Dependency Scanning in a new or modified
+`.gitlab-ci.yml` file in a new branch. The new branch and a URL to
+create a Merge Request are a part of the response.
+
+Input type: `ConfigureDependencyScanningInput`
+
+#### Arguments
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| <a id="mutationconfiguredependencyscanningclientmutationid"></a>`clientMutationId` | [`String`](#string) | A unique identifier for the client performing the mutation. |
+| <a id="mutationconfiguredependencyscanningconfiguration"></a>`configuration` | [`DependencyScanningCiConfigurationInput!`](#dependencyscanningciconfigurationinput) | Dependency Scanning CI configuration for the project. |
+| <a id="mutationconfiguredependencyscanningprojectpath"></a>`projectPath` | [`ID!`](#id) | Full path of the project. |
+
+#### Fields
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| <a id="mutationconfiguredependencyscanningbranch"></a>`branch` | [`String`](#string) | Branch that has the new/modified `.gitlab-ci.yml` file. |
+| <a id="mutationconfiguredependencyscanningclientmutationid"></a>`clientMutationId` | [`String`](#string) | A unique identifier for the client performing the mutation. |
+| <a id="mutationconfiguredependencyscanningerrors"></a>`errors` | [`[String!]!`](#string) | Errors encountered during execution of the mutation. |
+| <a id="mutationconfiguredependencyscanningsuccesspath"></a>`successPath` | [`String`](#string) | Redirect path to use when the response is successful. |
+
 ### `Mutation.configureSast`
 
 Configure SAST for a project by enabling SAST in a new or modified
@@ -5087,6 +5112,75 @@ The edge type for [`DastSiteValidation`](#dastsitevalidation).
 | <a id="dastsitevalidationedgecursor"></a>`cursor` | [`String!`](#string) | A cursor for use in pagination. |
 | <a id="dastsitevalidationedgenode"></a>`node` | [`DastSiteValidation`](#dastsitevalidation) | The item at the end of the edge. |
 
+#### `DependencyScanningCiConfigurationAnalyzersEntityConnection`
+
+The connection type for [`DependencyScanningCiConfigurationAnalyzersEntity`](#dependencyscanningciconfigurationanalyzersentity).
+
+##### Fields
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| <a id="dependencyscanningciconfigurationanalyzersentityconnectionedges"></a>`edges` | [`[DependencyScanningCiConfigurationAnalyzersEntityEdge]`](#dependencyscanningciconfigurationanalyzersentityedge) | A list of edges. |
+| <a id="dependencyscanningciconfigurationanalyzersentityconnectionnodes"></a>`nodes` | [`[DependencyScanningCiConfigurationAnalyzersEntity]`](#dependencyscanningciconfigurationanalyzersentity) | A list of nodes. |
+| <a id="dependencyscanningciconfigurationanalyzersentityconnectionpageinfo"></a>`pageInfo` | [`PageInfo!`](#pageinfo) | Information to aid in pagination. |
+
+#### `DependencyScanningCiConfigurationAnalyzersEntityEdge`
+
+The edge type for [`DependencyScanningCiConfigurationAnalyzersEntity`](#dependencyscanningciconfigurationanalyzersentity).
+
+##### Fields
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| <a id="dependencyscanningciconfigurationanalyzersentityedgecursor"></a>`cursor` | [`String!`](#string) | A cursor for use in pagination. |
+| <a id="dependencyscanningciconfigurationanalyzersentityedgenode"></a>`node` | [`DependencyScanningCiConfigurationAnalyzersEntity`](#dependencyscanningciconfigurationanalyzersentity) | The item at the end of the edge. |
+
+#### `DependencyScanningCiConfigurationEntityConnection`
+
+The connection type for [`DependencyScanningCiConfigurationEntity`](#dependencyscanningciconfigurationentity).
+
+##### Fields
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| <a id="dependencyscanningciconfigurationentityconnectionedges"></a>`edges` | [`[DependencyScanningCiConfigurationEntityEdge]`](#dependencyscanningciconfigurationentityedge) | A list of edges. |
+| <a id="dependencyscanningciconfigurationentityconnectionnodes"></a>`nodes` | [`[DependencyScanningCiConfigurationEntity]`](#dependencyscanningciconfigurationentity) | A list of nodes. |
+| <a id="dependencyscanningciconfigurationentityconnectionpageinfo"></a>`pageInfo` | [`PageInfo!`](#pageinfo) | Information to aid in pagination. |
+
+#### `DependencyScanningCiConfigurationEntityEdge`
+
+The edge type for [`DependencyScanningCiConfigurationEntity`](#dependencyscanningciconfigurationentity).
+
+##### Fields
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| <a id="dependencyscanningciconfigurationentityedgecursor"></a>`cursor` | [`String!`](#string) | A cursor for use in pagination. |
+| <a id="dependencyscanningciconfigurationentityedgenode"></a>`node` | [`DependencyScanningCiConfigurationEntity`](#dependencyscanningciconfigurationentity) | The item at the end of the edge. |
+
+#### `DependencyScanningCiConfigurationOptionsEntityConnection`
+
+The connection type for [`DependencyScanningCiConfigurationOptionsEntity`](#dependencyscanningciconfigurationoptionsentity).
+
+##### Fields
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| <a id="dependencyscanningciconfigurationoptionsentityconnectionedges"></a>`edges` | [`[DependencyScanningCiConfigurationOptionsEntityEdge]`](#dependencyscanningciconfigurationoptionsentityedge) | A list of edges. |
+| <a id="dependencyscanningciconfigurationoptionsentityconnectionnodes"></a>`nodes` | [`[DependencyScanningCiConfigurationOptionsEntity]`](#dependencyscanningciconfigurationoptionsentity) | A list of nodes. |
+| <a id="dependencyscanningciconfigurationoptionsentityconnectionpageinfo"></a>`pageInfo` | [`PageInfo!`](#pageinfo) | Information to aid in pagination. |
+
+#### `DependencyScanningCiConfigurationOptionsEntityEdge`
+
+The edge type for [`DependencyScanningCiConfigurationOptionsEntity`](#dependencyscanningciconfigurationoptionsentity).
+
+##### Fields
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| <a id="dependencyscanningciconfigurationoptionsentityedgecursor"></a>`cursor` | [`String!`](#string) | A cursor for use in pagination. |
+| <a id="dependencyscanningciconfigurationoptionsentityedgenode"></a>`node` | [`DependencyScanningCiConfigurationOptionsEntity`](#dependencyscanningciconfigurationoptionsentity) | The item at the end of the edge. |
+
 #### `DesignAtVersionConnection`
 
 The connection type for [`DesignAtVersion`](#designatversion).
@@ -8138,6 +8232,60 @@ The response from the AdminSidekiqQueuesDeleteJobs mutation.
 | <a id="deletejobsresponsecompleted"></a>`completed` | [`Boolean`](#boolean) | Whether or not the entire queue was processed in time; if not, retrying the same request is safe. |
 | <a id="deletejobsresponsedeletedjobs"></a>`deletedJobs` | [`Int`](#int) | The number of matching jobs deleted. |
 | <a id="deletejobsresponsequeuesize"></a>`queueSize` | [`Int`](#int) | The queue size after processing. |
+
+### `DependencyScanningCiConfiguration`
+
+Represents a CI configuration of Dependency Scanning.
+
+#### Fields
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| <a id="dependencyscanningciconfigurationanalyzers"></a>`analyzers` | [`DependencyScanningCiConfigurationAnalyzersEntityConnection`](#dependencyscanningciconfigurationanalyzersentityconnection) | List of analyzers entities attached to Dependency Scanning configuration. (see [Connections](#connections)) |
+| <a id="dependencyscanningciconfigurationglobal"></a>`global` | [`DependencyScanningCiConfigurationEntityConnection`](#dependencyscanningciconfigurationentityconnection) | List of global entities related to Dependency Scanning configuration. (see [Connections](#connections)) |
+| <a id="dependencyscanningciconfigurationpipeline"></a>`pipeline` | [`DependencyScanningCiConfigurationEntityConnection`](#dependencyscanningciconfigurationentityconnection) | List of pipeline entities related to Dependency Scanning configuration. (see [Connections](#connections)) |
+
+### `DependencyScanningCiConfigurationAnalyzersEntity`
+
+Represents an analyzer entity in Dependency Scanning CI configuration.
+
+#### Fields
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| <a id="dependencyscanningciconfigurationanalyzersentitydescription"></a>`description` | [`String`](#string) | Analyzer description that is displayed on the form. |
+| <a id="dependencyscanningciconfigurationanalyzersentityenabled"></a>`enabled` | [`Boolean`](#boolean) | Indicates whether an analyzer is enabled. |
+| <a id="dependencyscanningciconfigurationanalyzersentitylabel"></a>`label` | [`String`](#string) | Analyzer label used in the config UI. |
+| <a id="dependencyscanningciconfigurationanalyzersentityname"></a>`name` | [`String`](#string) | Name of the analyzer. |
+| <a id="dependencyscanningciconfigurationanalyzersentityvariables"></a>`variables` | [`DependencyScanningCiConfigurationEntityConnection`](#dependencyscanningciconfigurationentityconnection) | List of supported variables. (see [Connections](#connections)) |
+
+### `DependencyScanningCiConfigurationEntity`
+
+Represents an entity in Dependency Scanning CI configuration.
+
+#### Fields
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| <a id="dependencyscanningciconfigurationentitydefaultvalue"></a>`defaultValue` | [`String`](#string) | Default value that is used if value is empty. |
+| <a id="dependencyscanningciconfigurationentitydescription"></a>`description` | [`String`](#string) | Entity description that is displayed on the form. |
+| <a id="dependencyscanningciconfigurationentityfield"></a>`field` | [`String`](#string) | CI keyword of entity. |
+| <a id="dependencyscanningciconfigurationentitylabel"></a>`label` | [`String`](#string) | Label for entity used in the form. |
+| <a id="dependencyscanningciconfigurationentityoptions"></a>`options` | [`DependencyScanningCiConfigurationOptionsEntityConnection`](#dependencyscanningciconfigurationoptionsentityconnection) | Different possible values of the field. (see [Connections](#connections)) |
+| <a id="dependencyscanningciconfigurationentitysize"></a>`size` | [`DependencyScanningUiComponentSize`](#dependencyscanninguicomponentsize) | Size of the UI component. |
+| <a id="dependencyscanningciconfigurationentitytype"></a>`type` | [`String`](#string) | Type of the field value. |
+| <a id="dependencyscanningciconfigurationentityvalue"></a>`value` | [`String`](#string) | Current value of the entity. |
+
+### `DependencyScanningCiConfigurationOptionsEntity`
+
+Represents an entity for options in Dependency Scanning CI configuration.
+
+#### Fields
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| <a id="dependencyscanningciconfigurationoptionsentitylabel"></a>`label` | [`String`](#string) | Label of option entity. |
+| <a id="dependencyscanningciconfigurationoptionsentityvalue"></a>`value` | [`String`](#string) | Value of option entity. |
 
 ### `Design`
 
@@ -11253,6 +11401,7 @@ Represents vulnerability finding of a security report on the pipeline.
 | <a id="projectdastprofiles"></a>`dastProfiles` | [`DastProfileConnection`](#dastprofileconnection) | DAST Profiles associated with the project. (see [Connections](#connections)) |
 | <a id="projectdastscannerprofiles"></a>`dastScannerProfiles` | [`DastScannerProfileConnection`](#dastscannerprofileconnection) | The DAST scanner profiles associated with the project. (see [Connections](#connections)) |
 | <a id="projectdastsiteprofiles"></a>`dastSiteProfiles` | [`DastSiteProfileConnection`](#dastsiteprofileconnection) | DAST Site Profiles associated with the project. (see [Connections](#connections)) |
+| <a id="projectdependencyscanningciconfiguration"></a>`dependencyScanningCiConfiguration` | [`DependencyScanningCiConfiguration`](#dependencyscanningciconfiguration) | Dependency Scanning CI configuration for the project. |
 | <a id="projectdescription"></a>`description` | [`String`](#string) | Short description of the project. |
 | <a id="projectdescriptionhtml"></a>`descriptionHtml` | [`String`](#string) | The GitLab Flavored Markdown rendering of `description`. |
 | <a id="projectforkscount"></a>`forksCount` | [`Int!`](#int) | Number of times the project has been forked. |
@@ -14275,6 +14424,16 @@ Weight of the data visualization palette.
 | <a id="datavisualizationweightenumweight_900"></a>`WEIGHT_900` | 900 weight. |
 | <a id="datavisualizationweightenumweight_950"></a>`WEIGHT_950` | 950 weight. |
 
+### `DependencyScanningUiComponentSize`
+
+Size of UI component in Dependency Scanning configuration page.
+
+| Value | Description |
+| ----- | ----------- |
+| <a id="dependencyscanninguicomponentsizelarge"></a>`LARGE` | The size of UI component in Dependency Scanning configuration page is large. |
+| <a id="dependencyscanninguicomponentsizemedium"></a>`MEDIUM` | The size of UI component in Dependency Scanning configuration page is medium. |
+| <a id="dependencyscanninguicomponentsizesmall"></a>`SMALL` | The size of UI component in Dependency Scanning configuration page is small. |
+
 ### `DesignCollectionCopyState`
 
 Copy state of a DesignCollection.
@@ -16216,6 +16375,42 @@ Input type for DastSiteProfile authentication.
 | <a id="dastsiteprofileauthinputurl"></a>`url` | [`String`](#string) | The URL of the page containing the sign-in HTML form on the target website. |
 | <a id="dastsiteprofileauthinputusername"></a>`username` | [`String`](#string) | The username to authenticate with on the target website. |
 | <a id="dastsiteprofileauthinputusernamefield"></a>`usernameField` | [`String`](#string) | The name of username field at the sign-in HTML form. |
+
+### `DependencyScanningCiConfigurationAnalyzersEntityInput`
+
+Represents the analyzers entity in Dependency Scanning CI configuration.
+
+#### Arguments
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| <a id="dependencyscanningciconfigurationanalyzersentityinputenabled"></a>`enabled` | [`Boolean!`](#boolean) | State of the analyzer. |
+| <a id="dependencyscanningciconfigurationanalyzersentityinputname"></a>`name` | [`String!`](#string) | Name of analyzer. |
+| <a id="dependencyscanningciconfigurationanalyzersentityinputvariables"></a>`variables` | [`[DependencyScanningCiConfigurationEntityInput!]`](#dependencyscanningciconfigurationentityinput) | List of variables for the analyzer. |
+
+### `DependencyScanningCiConfigurationEntityInput`
+
+Represents an entity in Dependency Scanning CI configuration.
+
+#### Arguments
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| <a id="dependencyscanningciconfigurationentityinputdefaultvalue"></a>`defaultValue` | [`String!`](#string) | Default value that is used if value is empty. |
+| <a id="dependencyscanningciconfigurationentityinputfield"></a>`field` | [`String!`](#string) | CI keyword of entity. |
+| <a id="dependencyscanningciconfigurationentityinputvalue"></a>`value` | [`String!`](#string) | Current value of the entity. |
+
+### `DependencyScanningCiConfigurationInput`
+
+Represents a CI configuration of Dependency Scanning.
+
+#### Arguments
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| <a id="dependencyscanningciconfigurationinputanalyzers"></a>`analyzers` | [`[DependencyScanningCiConfigurationAnalyzersEntityInput!]`](#dependencyscanningciconfigurationanalyzersentityinput) | List of analyzers and related variables for the Dependency Scanning configuration. |
+| <a id="dependencyscanningciconfigurationinputglobal"></a>`global` | [`[DependencyScanningCiConfigurationEntityInput!]`](#dependencyscanningciconfigurationentityinput) | List of global entities related to Dependency Scanning configuration. |
+| <a id="dependencyscanningciconfigurationinputpipeline"></a>`pipeline` | [`[DependencyScanningCiConfigurationEntityInput!]`](#dependencyscanningciconfigurationentityinput) | List of pipeline entities related to Dependency Scanning configuration. |
 
 ### `DiffImagePositionInput`
 
