@@ -12008,7 +12008,7 @@ CREATE TABLE dast_profile_schedules (
     dast_profile_id bigint NOT NULL,
     user_id bigint NOT NULL,
     active boolean DEFAULT true,
-    next_run_at timestamp with time zone,
+    next_run_at timestamp with time zone NOT NULL,
     created_at timestamp with time zone NOT NULL,
     updated_at timestamp with time zone NOT NULL,
     cron text NOT NULL,

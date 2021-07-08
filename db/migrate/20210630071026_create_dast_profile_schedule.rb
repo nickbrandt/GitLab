@@ -13,20 +13,20 @@ class CreateDastProfileSchedule < ActiveRecord::Migration[6.1]
         description: 'Stores DAST Profile schedules'
       }
 
-      create_table :dast_profile_schedules, comment: table_comment.to_json do |t|
+      create_table_with_constraints :dast_profile_schedules, comment: table_comment.to_json do |t|
         t.bigint :dast_profile_id, null: false
         t.bigint :user_id, null: false
         t.boolean :active, default: true
-        t.datetime_with_timezone :next_run_at
+        t.datetime_with_timezone :next_run_at, null: false
         t.timestamps_with_timezone null: false
+
+        t.index :dast_profile_id
+        t.index :user_id
+
         t.text :cron, null: false
+        t.text_limit :cron, 255
       end
     end
-
-    add_text_limit :dast_profile_schedules, :cron, 255
-
-    add_index :dast_profile_schedules, :dast_profile_id
-    add_index :dast_profile_schedules, :user_id
   end
 
   def down
