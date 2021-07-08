@@ -1288,7 +1288,7 @@ To declare the aggregate of events collected with [Redis HLL Counters](#redis-hl
 you must fulfill the following requirements:
 
 1. All events listed at `events` attribute must come from
-   [`known_events/*.yml`](#known-events-are-added-automatically-in-usage-data-payload) files.
+   [`known_events/*.yml`](#known-events-are-added-automatically-in-service-data-payload) files.
 1. All events listed at `events` attribute must have the same `redis_slot` attribute.
 1. All events listed at `events` attribute must have the same `aggregation` attribute.
 1. `time_frame` does not include `all` value, which is unavailable for Redis sourced aggregated metrics.
