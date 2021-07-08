@@ -68,5 +68,18 @@ RSpec.describe Ci::Pipelines::AddJobService do
         execute
       end
     end
+
+    context 'when the FF ci_pipeline_add_job_with_lock is disabled' do
+      before do
+        stub_feature_flags(ci_pipeline_add_job_with_lock: false)
+      end
+
+      it 'behaves as it is' do
+        expect(job).to receive(:update_older_statuses_retried!)
+
+        expect(execute).to be_success
+        expect(execute.payload[:job]).to eq(job)
+      end
+    end
   end
 end
