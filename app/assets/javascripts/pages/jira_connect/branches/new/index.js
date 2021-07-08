@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import VueApollo from 'vue-apollo';
-import JiraConnectNewBranchApp from '~/jira_connect/pages/new_branch.vue';
+import JiraConnectNewBranchForm from '~/jira_connect/branches/components/new_branch_form.vue';
 import createDefaultClient from '~/lib/graphql';
 
 Vue.use(VueApollo);
@@ -27,7 +27,7 @@ export async function initJiraConnectNewBranch() {
     apolloProvider,
     provide: { formEndpoint },
     render(createElement) {
-      return createElement(JiraConnectNewBranchApp);
+      return createElement(JiraConnectNewBranchForm);
     },
   });
 }
