@@ -80,6 +80,9 @@
       - if issuable_sidebar[:supports_severity]
         #js-severity
 
+      - if issuable_sidebar[:supports_escalation_policies]
+        #js-escalation-policies
+
       - if issuable_sidebar.dig(:features_available, :health_status)
         .js-sidebar-status-entry-point
 

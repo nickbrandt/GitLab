@@ -197,6 +197,10 @@ module Issuable
       incident?
     end
 
+    def supports_escalation_policies?
+      incident?
+    end
+
     def incident?
       is_a?(Issue) && super
     end

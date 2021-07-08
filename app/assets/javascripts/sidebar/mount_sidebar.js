@@ -16,6 +16,7 @@ import CollapsedAssigneeList from '~/sidebar/components/assignees/collapsed_assi
 import SidebarAssigneesWidget from '~/sidebar/components/assignees/sidebar_assignees_widget.vue';
 import SidebarConfidentialityWidget from '~/sidebar/components/confidential/sidebar_confidentiality_widget.vue';
 import SidebarDueDateWidget from '~/sidebar/components/date/sidebar_date_widget.vue';
+import SidebarEscalationPolicies from '~/sidebar/components/escalation_policies/escalation_policies_widget.vue';
 import SidebarParticipantsWidget from '~/sidebar/components/participants/sidebar_participants_widget.vue';
 import SidebarReferenceWidget from '~/sidebar/components/reference/sidebar_reference_widget.vue';
 import { apolloProvider } from '~/sidebar/graphql';
@@ -438,6 +439,32 @@ function mountSeverityComponent() {
   });
 }
 
+function mountEscalationPoliciesComponent() {
+  const escalationPoliciesContainerEl = document.querySelector('#js-escalation-policies');
+
+  if (!escalationPoliciesContainerEl) {
+    return false;
+  }
+
+  // const { fullPath, iid, severity } = getSidebarOptions();
+
+  return new Vue({
+    el: escalationPoliciesContainerEl,
+    apolloProvider,
+    components: {
+      SidebarEscalationPolicies,
+    },
+    render: (createElement) =>
+      createElement('sidebar-escalation-policies', {
+        props: {
+      /*    projectPath: fullPath,
+          iid: String(iid),
+          initialSeverity: severity.toUpperCase(),*/
+        },
+      }),
+  });
+}
+
 function mountCopyEmailComponent() {
   const el = document.getElementById('issuable-copy-email');
 
@@ -483,6 +510,8 @@ export function mountSidebar(mediator) {
   mountTimeTrackingComponent();
 
   mountSeverityComponent();
+
+  mountEscalationPoliciesComponent();
 }
 
 export { getSidebarOptions };
