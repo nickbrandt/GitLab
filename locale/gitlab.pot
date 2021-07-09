@@ -11850,9 +11850,6 @@ msgstr ""
 msgid "Edit issues"
 msgstr ""
 
-msgid "Edit iteration"
-msgstr ""
-
 msgid "Edit public deploy key"
 msgstr ""
 
@@ -18330,9 +18327,6 @@ msgstr ""
 msgid "Iteration"
 msgstr ""
 
-msgid "Iteration cadences"
-msgstr ""
-
 msgid "Iteration changed to"
 msgstr ""
 
@@ -18375,6 +18369,9 @@ msgstr ""
 msgid "Iterations|Edit cadence"
 msgstr ""
 
+msgid "Iterations|Edit iteration"
+msgstr ""
+
 msgid "Iterations|Edit iteration cadence"
 msgstr ""
 
@@ -18384,10 +18381,16 @@ msgstr ""
 msgid "Iterations|Future iterations"
 msgstr ""
 
+msgid "Iterations|Iteration cadences"
+msgstr ""
+
 msgid "Iterations|Iteration scheduling will be handled automatically"
 msgstr ""
 
 msgid "Iterations|Move incomplete issues to the next iteration"
+msgstr ""
+
+msgid "Iterations|New iteration"
 msgstr ""
 
 msgid "Iterations|New iteration cadence"
@@ -21958,9 +21961,6 @@ msgid "New issue"
 msgstr ""
 
 msgid "New issue title"
-msgstr ""
-
-msgid "New iteration"
 msgstr ""
 
 msgid "New iteration created"
