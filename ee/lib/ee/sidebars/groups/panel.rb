@@ -12,12 +12,6 @@ module EE
 
           insert_menu_before(nil, ::Sidebars::Groups::Menus::TrialExperimentMenu.new(context))
         end
-
-        private
-
-        def jira_menu
-          @jira_menu ||= ::Sidebars::Projects::Menus::JiraMenu.new(context)
-        end
       end
     end
   end
