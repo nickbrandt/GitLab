@@ -26,9 +26,10 @@ RSpec.describe EnvironmentHelper do
   describe '#environments_detail_data' do
     subject { helper.environments_detail_data(user, project, environment) }
 
+    let_it_be(:auto_stop_at) { Time.now.utc }
     let_it_be(:user) { create(:user) }
     let_it_be(:project, reload: true) { create(:project, :repository) }
-    let_it_be(:environment) { create(:environment, project: project) }
+    let_it_be(:environment) { create(:environment, project: project, auto_stop_at: auto_stop_at) }
 
     before do
       allow(helper).to receive(:current_user).and_return(user)
@@ -37,24 +38,24 @@ RSpec.describe EnvironmentHelper do
 
     it 'returns the correct data' do
       expect(subject[:data]).to eq({
-        auto_stop_at: nil,
-        can_admin_environment: 'true',
+        name: environment.name,
+        id: environment.id,
+        external_url: environment.external_url,
+        can_update_environment: 'true',
         can_destroy_environment: 'true',
         can_read_environment: 'true',
         can_stop_environment: 'true',
-        can_update_environment: 'true',
-        environment_cancel_auto_stop_path: cancel_auto_stop_project_environment_path(project, environment),
-        environment_delete_path: environment_delete_path(environment),
-        environment_edit_path: edit_project_environment_path(project, environment),
+        can_admin_environment: 'true',
         environment_metrics_path: environment_metrics_path(environment),
-        environment_stop_path: stop_project_environment_path(project, environment),
-        environment_terminal_path: terminal_project_environment_path(project, environment),
         environments_fetch_path: project_environments_path(project, format: :json),
-        external_url: environment.external_url,
+        environment_edit_path: edit_project_environment_path(project, environment),
+        environment_stop_path: stop_project_environment_path(project, environment),
+        environment_delete_path: environment_delete_path(environment),
+        environment_cancel_auto_stop_path: cancel_auto_stop_project_environment_path(project, environment),
+        environment_terminal_path: terminal_project_environment_path(project, environment),
         has_terminals: 'false',
-        id: environment.id,
         is_environment_available: 'true',
-        name: environment.name
+        auto_stop_at: auto_stop_at
       })
     end
   end
