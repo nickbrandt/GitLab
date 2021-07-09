@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe PersonalAccessTokensHelper do
+RSpec.describe EE::PersonalAccessTokensHelper do
   let(:group) do
     build(:group, max_personal_access_token_lifetime: group_level_max_personal_access_token_lifetime)
   end
@@ -176,6 +176,14 @@ RSpec.describe PersonalAccessTokensHelper do
       let_it_be(:expiring_pat) { create(:personal_access_token, expires_at: 3.days.from_now, user: user, created_at: 1.month.ago) }
 
       it { is_expected.to eq('At least one of your Personal Access Tokens will expire soon, but expiration enforcement is disabled. %{generate_new}') }
+    end
+  end
+
+  describe '#personal_access_token_expiration_enforced' do
+    it 'calls the class method expiration_enforced?' do
+      expect(::PersonalAccessToken).to receive(:expiration_enforced?)
+
+      helper.personal_access_token_expiration_enforced?
     end
   end
 end
