@@ -28,17 +28,15 @@ module Banzai
           @references_per_parent[parent_type] ||= begin
             refs = Hash.new { |hash, key| hash[key] = Set.new }
 
-            nodes.each do |node|
-              prepare_node_for_scan(node).scan(regex) do
-                parent_path = if parent_type == :project
-                                full_project_path($~[:namespace], $~[:project])
-                              else
-                                full_group_path($~[:group])
-                              end
+            prepare_doc_for_scan(filter.doc).to_enum(:scan, regex).each do
+              parent_path = if parent_type == :project
+                              full_project_path($~[:namespace], $~[:project])
+                            else
+                              full_group_path($~[:group])
+                            end
 
-                ident = filter.identifier($~)
-                refs[parent_path] << ident if ident
-              end
+              ident = filter.identifier($~)
+              refs[parent_path] << ident if ident
             end
 
             refs
@@ -185,8 +183,8 @@ module Banzai
           Gitlab::SafeRequestStore["banzai_#{parent_type}_refs".to_sym] ||= {}
         end
 
-        def prepare_node_for_scan(node)
-          html = node.to_html
+        def prepare_doc_for_scan(doc)
+          html = doc.to_html
 
           filter.requires_unescaping? ? unescape_html_entities(html) : html
         end
