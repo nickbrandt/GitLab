@@ -10,6 +10,7 @@ class PartitionCreationWorker
   idempotent!
 
   def perform
-    # Removed in favor of Database::PartitionManagementWorker
+    # This worker has been removed in favor of Database::PartitionManagementWorker
+    Database::PartitionManagementWorker.new.perform
   end
 end
