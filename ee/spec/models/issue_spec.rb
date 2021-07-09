@@ -14,6 +14,29 @@ RSpec.describe Issue do
     it { is_expected.to have_many(:resource_iteration_events) }
     it { is_expected.to have_one(:issuable_sla) }
     it { is_expected.to have_many(:metric_images) }
+
+    it { is_expected.to have_one(:requirement) }
+    it { is_expected.to have_many(:test_reports) }
+
+    context 'for an issue with associated test report' do
+      let_it_be(:requirement_issue) do
+        ri = create(:requirement_issue)
+        create(:test_report, requirement_issue: ri, requirement: nil)
+        ri
+      end
+
+      context 'for an issue of type Requirement' do
+        specify { expect(requirement_issue.test_reports.count).to eq(1) }
+      end
+
+      context 'for an issue of a different type' do
+        before do
+          requirement_issue.update_attribute(:issue_type, :incident)
+        end
+
+        specify { expect(requirement_issue.test_reports.count).to eq(0) }
+      end
+    end
   end
 
   describe 'modules' do
@@ -411,46 +434,21 @@ RSpec.describe Issue do
     end
 
     context 'by blocking issues' do
-      it 'orders by descending blocking issues count' do
-        issue_1 = create(:issue, blocking_issues_count: 3)
-        issue_2 = create(:issue, blocking_issues_count: 2)
+      let_it_be(:issue_1) { create(:issue, blocking_issues_count: 3) }
+      let_it_be(:issue_2) { create(:issue, blocking_issues_count: 1) }
 
+      it 'orders by ascending blocking issues count', :aggregate_failures do
+        results = described_class.sort_by_attribute('blocking_issues_asc')
+
+        expect(results.first).to eq(issue_2)
+        expect(results.second).to eq(issue_1)
+      end
+
+      it 'orders by descending blocking issues count', :aggregate_failures do
         results = described_class.sort_by_attribute('blocking_issues_desc')
 
         expect(results.first).to eq(issue_1)
         expect(results.second).to eq(issue_2)
-      end
-    end
-  end
-
-  describe '#check_for_spam?' do
-    using RSpec::Parameterized::TableSyntax
-    let_it_be(:reusable_project) { create(:project) }
-    let_it_be(:author) { ::User.support_bot }
-
-    where(:visibility_level, :confidential, :new_attributes, :check_for_spam?) do
-      Gitlab::VisibilityLevel::PUBLIC   | false | { description: 'woo' } | true
-      Gitlab::VisibilityLevel::PUBLIC   | false | { title: 'woo' } | true
-      Gitlab::VisibilityLevel::PUBLIC   | true  | { confidential: false } | true
-      Gitlab::VisibilityLevel::PUBLIC   | true  | { description: 'woo' } | true
-      Gitlab::VisibilityLevel::PUBLIC   | false | { title: 'woo', confidential: true } | true
-      Gitlab::VisibilityLevel::INTERNAL | false | { description: 'woo' } | true
-      Gitlab::VisibilityLevel::PRIVATE  | true  | { description: 'woo' } | true
-      Gitlab::VisibilityLevel::PUBLIC   | false | { description: 'original description' } | false
-      Gitlab::VisibilityLevel::PRIVATE  | true  | { weight: 3 } | false
-    end
-
-    with_them do
-      context 'when author is a bot' do
-        it 'only checks for spam when description, title, or confidential status is updated' do
-          project = reusable_project
-          project.update(visibility_level: visibility_level)
-          issue = create(:issue, project: project, confidential: confidential, description: 'original description', author: author)
-
-          issue.assign_attributes(new_attributes)
-
-          expect(issue.check_for_spam?).to eq(check_for_spam?)
-        end
       end
     end
   end

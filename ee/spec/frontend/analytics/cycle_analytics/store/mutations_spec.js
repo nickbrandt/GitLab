@@ -4,16 +4,13 @@ import {
 } from 'ee/analytics/cycle_analytics/constants';
 import * as types from 'ee/analytics/cycle_analytics/store/mutation_types';
 import mutations from 'ee/analytics/cycle_analytics/store/mutations';
-
+import { createdAfter, createdBefore, selectedProjects } from 'jest/cycle_analytics/mock_data';
 import {
   issueStage,
   planStage,
   codeStage,
   stagingStage,
   reviewStage,
-  startDate,
-  endDate,
-  selectedProjects,
   customizableStagesAndEvents,
   valueStreams,
   rawCustomStageEvents,
@@ -39,7 +36,11 @@ describe('Value Stream Analytics mutations', () => {
     ${types.REQUEST_VALUE_STREAMS}               | ${'isLoadingValueStreams'}   | ${true}
     ${types.RECEIVE_VALUE_STREAMS_ERROR}         | ${'isLoadingValueStreams'}   | ${false}
     ${types.REQUEST_STAGE_DATA}                  | ${'isLoadingStage'}          | ${true}
+    ${types.REQUEST_STAGE_DATA}                  | ${'selectedStageEvents'}     | ${[]}
+    ${types.REQUEST_STAGE_DATA}                  | ${'pagination'}              | ${{}}
     ${types.RECEIVE_STAGE_DATA_ERROR}            | ${'isLoadingStage'}          | ${false}
+    ${types.RECEIVE_STAGE_DATA_ERROR}            | ${'selectedStageEvents'}     | ${[]}
+    ${types.RECEIVE_STAGE_DATA_ERROR}            | ${'pagination'}              | ${{}}
     ${types.REQUEST_VALUE_STREAM_DATA}           | ${'isLoading'}               | ${true}
     ${types.RECEIVE_GROUP_STAGES_ERROR}          | ${'stages'}                  | ${[]}
     ${types.REQUEST_GROUP_STAGES}                | ${'stages'}                  | ${[]}
@@ -85,9 +86,8 @@ describe('Value Stream Analytics mutations', () => {
 
   it.each`
     mutation                                     | payload                                                  | expectedState
-    ${types.SET_FEATURE_FLAGS}                   | ${{ hasDurationChart: true }}                            | ${{ featureFlags: { hasDurationChart: true } }}
     ${types.SET_SELECTED_PROJECTS}               | ${selectedProjects}                                      | ${{ selectedProjects }}
-    ${types.SET_DATE_RANGE}                      | ${{ startDate, endDate }}                                | ${{ startDate, endDate }}
+    ${types.SET_DATE_RANGE}                      | ${{ createdAfter, createdBefore }}                       | ${{ createdAfter, createdBefore }}
     ${types.SET_SELECTED_STAGE}                  | ${{ id: 'first-stage' }}                                 | ${{ selectedStage: { id: 'first-stage' } }}
     ${types.RECEIVE_CREATE_VALUE_STREAM_ERROR}   | ${valueStreamErrors}                                     | ${{ createValueStreamErrors: expectedValueStreamErrors, isCreatingValueStream: false }}
     ${types.RECEIVE_UPDATE_VALUE_STREAM_ERROR}   | ${valueStreamErrors}                                     | ${{ createValueStreamErrors: expectedValueStreamErrors, isEditingValueStream: false }}
@@ -231,8 +231,8 @@ describe('Value Stream Analytics mutations', () => {
       stateKey              | expectedState
       ${'isLoading'}        | ${true}
       ${'selectedProjects'} | ${initialData.selectedProjects}
-      ${'startDate'}        | ${initialData.createdAfter}
-      ${'endDate'}          | ${initialData.createdBefore}
+      ${'createdAfter'}     | ${initialData.createdAfter}
+      ${'createdBefore'}    | ${initialData.createdBefore}
     `('$stateKey will be set to $expectedState', ({ stateKey, expectedState }) => {
       state = {};
       mutations[types.INITIALIZE_VSA](state, initialData);

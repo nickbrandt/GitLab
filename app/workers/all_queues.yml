@@ -37,7 +37,7 @@
   :urgency: :low
   :resource_boundary: :unknown
   :weight: 1
-  :idempotent: true
+  :idempotent:
   :tags: []
 - :name: authorized_project_update:authorized_project_update_user_refresh_over_user_range
   :worker_name: AuthorizedProjectUpdate::UserRefreshOverUserRangeWorker
@@ -265,9 +265,18 @@
   :weight: 1
   :idempotent:
   :tags: []
+- :name: cronjob:gitlab_service_ping
+  :worker_name: GitlabServicePingWorker
+  :feature_category: :service_ping
+  :has_external_dependencies:
+  :urgency: :low
+  :resource_boundary: :unknown
+  :weight: 1
+  :idempotent:
+  :tags: []
 - :name: cronjob:gitlab_usage_ping
   :worker_name: GitlabUsagePingWorker
-  :feature_category: :usage_ping
+  :feature_category: :service_ping
   :has_external_dependencies:
   :urgency: :low
   :resource_boundary: :unknown
@@ -1078,6 +1087,15 @@
   :weight: 2
   :idempotent: true
   :tags: []
+- :name: jira_connect:jira_connect_forward_event
+  :worker_name: JiraConnect::ForwardEventWorker
+  :feature_category: :integrations
+  :has_external_dependencies: true
+  :urgency: :low
+  :resource_boundary: :unknown
+  :weight: 1
+  :idempotent:
+  :tags: []
 - :name: jira_connect:jira_connect_sync_branch
   :worker_name: JiraConnect::SyncBranchWorker
   :feature_category: :integrations
@@ -1309,6 +1327,15 @@
   :idempotent: true
   :tags:
   - :exclude_from_kubernetes
+- :name: package_repositories:packages_helm_extraction
+  :worker_name: Packages::Helm::ExtractionWorker
+  :feature_category: :package_registry
+  :has_external_dependencies:
+  :urgency: :low
+  :resource_boundary: :unknown
+  :weight: 1
+  :idempotent: true
+  :tags: []
 - :name: package_repositories:packages_maven_metadata_sync
   :worker_name: Packages::Maven::Metadata::SyncWorker
   :feature_category: :package_registry
@@ -1601,7 +1628,7 @@
   :urgency: :low
   :resource_boundary: :unknown
   :weight: 5
-  :idempotent:
+  :idempotent: true
   :tags: []
 - :name: pipeline_processing:pipeline_process
   :worker_name: PipelineProcessWorker

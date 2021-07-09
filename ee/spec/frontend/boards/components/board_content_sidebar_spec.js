@@ -31,7 +31,15 @@ describe('ee/BoardContentSidebar', () => {
     });
   };
 
+  const setPortalAnchorPoint = () => {
+    const el = document.createElement('div');
+    el.setAttribute('id', 'js-right-sidebar-portal');
+    document.body.appendChild(el);
+  };
+
   const createComponent = () => {
+    setPortalAnchorPoint();
+
     /*
       Dynamically imported components (in our case ee imports)
       aren't stubbed automatically when using shallow mount in VTU v1:
@@ -51,7 +59,12 @@ describe('ee/BoardContentSidebar', () => {
       store,
       stubs: {
         GlDrawer: stubComponent(GlDrawer, {
-          template: '<div><slot name="header"></slot><slot></slot></div>',
+          template: `
+            <div>
+              <slot name="title"></slot>
+              <slot name="header"></slot>
+              <slot></slot>
+            </div>`,
         }),
         BoardEditableItem: true,
         BoardSidebarTitle: true,
@@ -61,8 +74,9 @@ describe('ee/BoardContentSidebar', () => {
         SidebarConfidentialityWidget: true,
         SidebarDateWidget: true,
         SidebarSubscriptionsWidget: true,
-        BoardSidebarWeightInput: true,
+        SidebarWeightWidget: true,
         SidebarDropdownWidget: true,
+        MountingPortal: true,
       },
     });
   };
@@ -78,6 +92,6 @@ describe('ee/BoardContentSidebar', () => {
   });
 
   it('matches the snapshot', () => {
-    expect(wrapper.element).toMatchSnapshot();
+    expect(wrapper.find(GlDrawer).element).toMatchSnapshot();
   });
 });

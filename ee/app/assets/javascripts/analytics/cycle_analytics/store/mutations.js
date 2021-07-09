@@ -14,9 +14,9 @@ export default {
   [types.SET_SELECTED_STAGE](state, rawData) {
     state.selectedStage = convertObjectPropsToCamelCase(rawData);
   },
-  [types.SET_DATE_RANGE](state, { startDate, endDate }) {
-    state.startDate = startDate;
-    state.endDate = endDate;
+  [types.SET_DATE_RANGE](state, { createdBefore, createdAfter }) {
+    state.createdBefore = createdBefore;
+    state.createdAfter = createdAfter;
   },
   [types.SET_STAGE_EVENTS](state, data = []) {
     state.formEvents = data.map((ev) => convertObjectPropsToCamelCase(ev, { deep: true }));
@@ -35,9 +35,11 @@ export default {
   [types.REQUEST_STAGE_DATA](state) {
     state.isLoadingStage = true;
     state.selectedStageError = '';
+    state.selectedStageEvents = [];
+    state.pagination = {};
   },
   [types.RECEIVE_STAGE_DATA_SUCCESS](state, events = []) {
-    state.currentStageEvents = events.map((fields) =>
+    state.selectedStageEvents = events.map((fields) =>
       convertObjectPropsToCamelCase(fields, { deep: true }),
     );
     state.isLoadingStage = false;
@@ -46,6 +48,8 @@ export default {
   [types.RECEIVE_STAGE_DATA_ERROR](state, message) {
     state.isLoadingStage = false;
     state.selectedStageError = message;
+    state.selectedStageEvents = [];
+    state.pagination = {};
   },
   [types.REQUEST_STAGE_MEDIANS](state) {
     state.medians = {};
@@ -84,8 +88,8 @@ export default {
     state,
     {
       group = null,
-      createdAfter: startDate = null,
-      createdBefore: endDate = null,
+      createdAfter = null,
+      createdBefore = null,
       selectedProjects = [],
       selectedValueStream = {},
       defaultStageConfig = [],
@@ -96,8 +100,8 @@ export default {
     state.currentGroup = group;
     state.selectedProjects = selectedProjects;
     state.selectedValueStream = selectedValueStream;
-    state.startDate = startDate;
-    state.endDate = endDate;
+    state.createdBefore = createdBefore;
+    state.createdAfter = createdAfter;
     state.defaultStageConfig = defaultStageConfig;
 
     Vue.set(state, 'pagination', {

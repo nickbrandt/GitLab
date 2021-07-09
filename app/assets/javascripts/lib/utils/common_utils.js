@@ -254,21 +254,6 @@ export const debounceByAnimationFrame = (fn) => {
   };
 };
 
-/**
-  this will take in the `name` of the param you want to parse in the url
-  if the name does not exist this function will return `null`
-  otherwise it will return the value of the param key provided
-*/
-export const getParameterByName = (name, urlToParse) => {
-  const url = urlToParse || window.location.href;
-  const parsedName = name.replace(/[[\]]/g, '\\$&');
-  const regex = new RegExp(`[?&]${parsedName}(=([^&#]*)|&|#|$)`);
-  const results = regex.exec(url);
-  if (!results) return null;
-  if (!results[2]) return '';
-  return decodeURIComponent(results[2].replace(/\+/g, ' '));
-};
-
 const handleSelectedRange = (range, restrictToNode) => {
   // Make sure this range is within the restricting container
   if (restrictToNode && !range.intersectsNode(restrictToNode)) return null;
@@ -370,17 +355,6 @@ export const parseIntPagination = (paginationInformation) => ({
   nextPage: parseInt(paginationInformation['X-NEXT-PAGE'], 10),
   previousPage: parseInt(paginationInformation['X-PREV-PAGE'], 10),
 });
-
-/**
- * Converts object with key-value pairs
- * into query-param string
- *
- * @param {Object} params
- */
-export const objectToQueryString = (params = {}) =>
-  Object.keys(params)
-    .map((param) => `${param}=${params[param]}`)
-    .join('&');
 
 export const buildUrlWithCurrentLocation = (param) => {
   if (param) return `${window.location.pathname}${param}`;
@@ -763,3 +737,5 @@ export const isFeatureFlagEnabled = (flag) => window.gon.features?.[flag];
  * @returns {Array[String]} Converted array
  */
 export const convertArrayToCamelCase = (array) => array.map((i) => convertToCamelCase(i));
+
+export const isLoggedIn = () => Boolean(window.gon?.current_user_id);

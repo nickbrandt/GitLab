@@ -817,7 +817,7 @@ data into (`gitlabhq_production`). All existing data is either erased
 To restore a backup, you must restore `/etc/gitlab/gitlab-secrets.json`
 (for Omnibus packages) or `/home/git/gitlab/.secret` (for installations from
 source). This file contains the database encryption key,
-[CI/CD variables](../ci/variables/README.md), and
+[CI/CD variables](../ci/variables/index.md), and
 variables used for [two-factor authentication](../user/profile/account/two_factor_authentication.md).
 If you fail to restore this encryption key file along with the application data
 backup, users with two-factor authentication enabled and GitLab Runner
@@ -1188,11 +1188,11 @@ The secrets file is responsible for storing the encryption key for the columns
 that contain required, sensitive information. If the key is lost, GitLab can't
 decrypt those columns, preventing access to the following items:
 
-- [CI/CD variables](../ci/variables/README.md)
+- [CI/CD variables](../ci/variables/index.md)
 - [Kubernetes / GCP integration](../user/project/clusters/index.md)
 - [Custom Pages domains](../user/project/pages/custom_domains_ssl_tls_certification/index.md)
 - [Project error tracking](../operations/error_tracking.md)
-- [Runner authentication](../ci/runners/README.md)
+- [Runner authentication](../ci/runners/index.md)
 - [Project mirroring](../user/project/repository/repository_mirroring.md)
 - [Web hooks](../user/project/integrations/webhooks.md)
 
@@ -1290,6 +1290,9 @@ You may need to reconfigure or restart GitLab for the changes to take effect.
    UPDATE namespaces SET runners_token = null, runners_token_encrypted = null;
    -- Clear instance tokens
    UPDATE application_settings SET runners_registration_token_encrypted = null;
+   -- Clear key used for JWT authentication
+   -- This may break the $CI_JWT_TOKEN job variable:
+   -- https://gitlab.com/gitlab-org/gitlab/-/issues/325965
    UPDATE application_settings SET encrypted_ci_jwt_signing_key = null;
    -- Clear runner tokens
    UPDATE ci_runners SET token = null, token_encrypted = null;

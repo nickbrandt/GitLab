@@ -81,19 +81,21 @@ export default {
       :primary-button-link="clustersHelpPath"
       :primary-button-text="__('Learn more about deploying to a cluster')"
     >
-      <div slot="description">
-        <gl-sprintf
-          :message="
-            __(
-              'Ensure your %{linkStart}environment is part of the deploy stage%{linkEnd} of your CI pipeline to track deployments to your cluster.',
-            )
-          "
-        >
-          <template #link="{ content }">
-            <gl-link :href="environmentsHelpPath">{{ content }}</gl-link>
-          </template>
-        </gl-sprintf>
-      </div>
+      <template #description>
+        <div>
+          <gl-sprintf
+            :message="
+              __(
+                'Ensure your %{linkStart}environment is part of the deploy stage%{linkEnd} of your CI pipeline to track deployments to your cluster.',
+              )
+            "
+          >
+            <template #link="{ content }">
+              <gl-link :href="environmentsHelpPath">{{ content }}</gl-link>
+            </template>
+          </gl-sprintf>
+        </div>
+      </template>
     </gl-empty-state>
 
     <gl-table
@@ -125,6 +127,7 @@ export default {
         <!-- Loading Rollout -->
         <gl-loading-icon
           v-if="isLoadingRollout(row.item.rolloutStatus)"
+          size="sm"
           class="d-inline-flex mt-1"
         />
 

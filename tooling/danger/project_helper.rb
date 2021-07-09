@@ -49,11 +49,12 @@ module Tooling
         )\z}x => [:frontend, :product_intelligence],
         %r{\A(ee/)?app/(assets|views)/} => :frontend,
         %r{\A(ee/)?public/} => :frontend,
-        %r{\A(ee/)?spec/(javascripts|frontend)/} => :frontend,
+        %r{\A(ee/)?spec/(javascripts|frontend|frontend_integration)/} => :frontend,
         %r{\A(ee/)?vendor/assets/} => :frontend,
         %r{\A(ee/)?scripts/frontend/} => :frontend,
         %r{(\A|/)(
           \.babelrc |
+          \.browserslistrc |
           \.eslintignore |
           \.eslintrc(\.yml)? |
           \.nvmrc |

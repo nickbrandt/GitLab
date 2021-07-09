@@ -40,10 +40,6 @@ export const createTempEntry = (
       message: sprintf(__('The name "%{name}" is already taken in this directory.'), {
         name: name.split('/').pop(),
       }),
-
-      type: 'alert',
-      parent: document,
-      actionConfig: null,
       fadeTransition: false,
       addBodyClass: true,
     });
@@ -80,11 +76,11 @@ export const createTempEntry = (
   return file;
 };
 
-export const addTempImage = ({ dispatch, getters }, { name, rawPath = '' }) =>
+export const addTempImage = ({ dispatch, getters }, { name, rawPath = '', content = '' }) =>
   dispatch('createTempEntry', {
     name: getters.getAvailableFileName(name),
     type: 'blob',
-    content: rawPath.split('base64,')[1],
+    content,
     rawPath,
     openFile: false,
     makeFileActive: false,
@@ -287,9 +283,6 @@ export const getBranchData = ({ commit, state }, { projectId, branchId, force = 
           } else {
             createFlash({
               message: __('Error loading branch data. Please try again.'),
-              type: 'alert',
-              parent: document,
-              actionConfig: null,
               fadeTransition: false,
               addBodyClass: true,
             });

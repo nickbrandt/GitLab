@@ -4,8 +4,8 @@ export default () => ({
   featureFlags: {},
   defaultStageConfig: [],
 
-  startDate: null,
-  endDate: null,
+  createdAfter: null,
+  createdBefore: null,
 
   isLoading: false,
   isLoadingStage: false,
@@ -17,7 +17,7 @@ export default () => ({
   selectedStage: null,
   selectedValueStream: null,
 
-  currentStageEvents: [],
+  selectedStageEvents: [],
 
   isLoadingValueStreams: false,
   isCreatingValueStream: false,

@@ -29,7 +29,7 @@ The required minimum versions are:
 - [NuGet CLI 5.1 or later](https://www.nuget.org/downloads). If you have
   [Visual Studio](https://visualstudio.microsoft.com/vs/), the NuGet CLI is
   probably already installed.
-- Alternatively, you can use [.NET SDK 3.0 or later](https://dotnet.microsoft.com/download/dotnet-core/3.0),
+- Alternatively, you can use [.NET SDK 3.0 or later](https://dotnet.microsoft.com/download/dotnet/3.0),
   which installs the NuGet CLI.
 - NuGet protocol version 3 or later.
 
@@ -337,7 +337,7 @@ updated:
      stage: deploy
      script:
        - dotnet pack -c Release
-       - dotnet nuget add source "${CI_API_V4_URL}/${CI_PROJECT_ID}/packages/nuget/index.json" --name gitlab --username gitlab-ci-token --password $CI_JOB_TOKEN --store-password-in-clear-text
+       - dotnet nuget add source "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/nuget/index.json" --name gitlab --username gitlab-ci-token --password $CI_JOB_TOKEN --store-password-in-clear-text
        - dotnet nuget push "bin/Release/*.nupkg" --source gitlab
      only:
        - master

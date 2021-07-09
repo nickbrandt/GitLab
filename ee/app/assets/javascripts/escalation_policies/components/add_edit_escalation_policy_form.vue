@@ -76,13 +76,13 @@ export default {
     this.rules = this.form.rules.map((rule) => {
       const {
         status,
-        elapsedTimeSeconds,
+        elapsedTimeMinutes,
         oncallSchedule: { iid: oncallScheduleIid },
       } = rule;
 
       return {
         status,
-        elapsedTimeSeconds,
+        elapsedTimeMinutes,
         action: DEFAULT_ACTION,
         oncallScheduleIid,
         key: uniqueId(),
@@ -97,7 +97,7 @@ export default {
     addRule() {
       this.rules.push({ ...cloneDeep(DEFAULT_ESCALATION_RULE), key: uniqueId() });
     },
-    updateEscalationRules(index, rule) {
+    updateEscalationRules({ rule, index }) {
       this.rules[index] = { ...this.rules[index], ...rule };
       this.emitRulesUpdate();
     },

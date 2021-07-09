@@ -42,6 +42,7 @@ class WebHookService
     @uniqueness_token = uniqueness_token
     @request_options = {
       timeout: Gitlab.config.gitlab.webhook_timeout,
+      use_read_total_timeout: true,
       allow_local_requests: hook.allow_local_requests?
     }
   end
@@ -68,7 +69,7 @@ class WebHookService
     {
       status: :success,
       http_status: response.code,
-      message: response.to_s
+      message: response.body
     }
   rescue *Gitlab::HTTP::HTTP_ERRORS,
          Gitlab::Json::LimitedEncoder::LimitExceeded, URI::InvalidURIError => e
@@ -176,7 +177,6 @@ class WebHookService
   end
 
   def rate_limited?
-    return false unless Feature.enabled?(:web_hooks_rate_limit, default_enabled: :yaml)
     return false if rate_limit.nil?
 
     Gitlab::ApplicationRateLimiter.throttled?(

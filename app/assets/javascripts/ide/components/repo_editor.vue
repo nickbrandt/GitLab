@@ -252,9 +252,6 @@ export default {
         .catch((err) => {
           createFlash({
             message: __('Error setting up editor. Please try again.'),
-            type: 'alert',
-            parent: document,
-            actionConfig: null,
             fadeTransition: false,
             addBodyClass: true,
           });
@@ -418,7 +415,11 @@ export default {
           const parentPath = getPathParent(this.file.path);
           const path = `${parentPath ? `${parentPath}/` : ''}${file.name}`;
 
-          return this.addTempImage({ name: path, rawPath: content }).then(({ name: fileName }) => {
+          return this.addTempImage({
+            name: path,
+            rawPath: URL.createObjectURL(file),
+            content: atob(content.split('base64,')[1]),
+          }).then(({ name: fileName }) => {
             this.editor.replaceSelectedText(`![${fileName}](./${fileName})`);
           });
         });

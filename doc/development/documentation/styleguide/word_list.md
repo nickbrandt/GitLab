@@ -60,6 +60,10 @@ Do not use. If the user doesn't find the process to be these things, we lose the
 
 Do not use Latin abbreviations. Use **for example**, **such as**, **for instance**, or **like** instead. ([Vale](../testing.md#vale) rule: [`LatinTerms.yml`](https://gitlab.com/gitlab-org/gitlab/-/blob/master/doc/.vale/gitlab/LatinTerms.yml))
 
+## email
+
+Do not use **e-mail** with a hyphen. When plural, use **emails** or **email messages**.
+
 ## enable
 
 See [the Microsoft style guide](https://docs.microsoft.com/en-us/style-guide/a-z-word-list-term-collections/e/enable-enables) for guidance.
@@ -202,6 +206,15 @@ Do not use. Use **use** instead. It's more succinct and easier for non-native En
 ## via
 
 Do not use Latin abbreviations. Use **with**, **through**, or **by using** instead. ([Vale](../testing.md#vale) rule: [`LatinTerms.yml`](https://gitlab.com/gitlab-org/gitlab/-/blob/master/doc/.vale/gitlab/LatinTerms.yml))
+
+## we
+
+Try to avoid "we" and focus instead on how the user can accomplish something in GitLab.
+
+Instead of: We created a feature for you to add widgets.
+Use: Use widgets when you have work you want to organize.
+
+One exception: You can use "we recommend" instead of "it is recommended" or "GitLab recommends."
 
 ## whitelist
 

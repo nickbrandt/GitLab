@@ -20,6 +20,18 @@ class MergeRequestComplianceEntity < Grape::Entity
     merge_request.to_reference(merge_request.project.group)
   end
 
+  expose :reference do |merge_request|
+    merge_request.to_reference
+  end
+
+  expose :project do |merge_request|
+    {
+      avatar_url: merge_request.project.avatar_url,
+      name: merge_request.project.name,
+      web_url: merge_request.project.web_url
+    }
+  end
+
   expose :author, using: API::Entities::UserBasic
   expose :approved_by_users, using: API::Entities::UserBasic
 
@@ -30,6 +42,7 @@ class MergeRequestComplianceEntity < Grape::Entity
   expose :target_branch_uri, if: -> (merge_request) { merge_request.target_branch_exists? }
   expose :source_branch
   expose :source_branch_uri, if: -> (merge_request) { merge_request.source_branch_exists? }
+  expose :compliance_management_framework
 
   private
 
@@ -64,5 +77,9 @@ class MergeRequestComplianceEntity < Grape::Entity
 
   def source_branch_uri
     project_ref_path(merge_request.project, merge_request.source_branch)
+  end
+
+  def compliance_management_framework
+    merge_request.project&.compliance_management_framework
   end
 end

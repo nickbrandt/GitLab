@@ -33,7 +33,7 @@ export default {
   },
   computed: {
     policyKind() {
-      return getPolicyKind(this.policy);
+      return getPolicyKind(this.policy?.yaml);
     },
     policyComponent() {
       return policyComponent[this.policyKind] || null;
@@ -57,22 +57,21 @@ export default {
     v-bind="$attrs"
     v-on="$listeners"
   >
+    <template v-if="policy" #title>
+      <h3 class="gl-my-0">{{ policy.name }}</h3>
+    </template>
     <template v-if="policy" #header>
-      <div>
-        <h3 class="gl-mb-5 gl-mt-0">{{ policy.name }}</h3>
-        <div>
-          <gl-button
-            data-testid="edit-button"
-            category="primary"
-            variant="info"
-            :href="editPolicyPath"
-            >{{ s__('NetworkPolicies|Edit policy') }}</gl-button
-          >
-        </div>
-      </div>
+      <gl-button
+        class="gl-mt-5"
+        data-testid="edit-button"
+        category="primary"
+        variant="info"
+        :href="editPolicyPath"
+        >{{ s__('NetworkPolicies|Edit policy') }}</gl-button
+      >
     </template>
     <div v-if="policy">
-      <component :is="policyComponent" v-if="policyComponent" :value="policy.manifest" />
+      <component :is="policyComponent" v-if="policyComponent" :value="policy.yaml" />
       <div v-else>
         <h5>{{ s__('NetworkPolicies|Policy definition') }}</h5>
         <p>
@@ -80,7 +79,7 @@ export default {
         </p>
         <div class="gl-p-3 gl-bg-gray-50">
           <policy-yaml-editor
-            :value="policy.manifest"
+            :value="policy.yaml"
             data-testid="policy-yaml-editor"
             class="network-policy-editor"
           />

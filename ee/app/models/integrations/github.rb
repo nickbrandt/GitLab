@@ -68,7 +68,7 @@ module Integrations
       %w(pipeline)
     end
 
-    def can_test?
+    def testable?
       project&.ci_pipelines&.any?
     end
 
@@ -126,7 +126,7 @@ module Integrations
     end
 
     def disabled?
-      project.disabled_services.include?(to_param)
+      project.disabled_integrations.include?(to_param)
     end
 
     def update_status(status_message)
