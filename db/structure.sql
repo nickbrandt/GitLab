@@ -9215,7 +9215,7 @@ ALTER SEQUENCE appearances_id_seq OWNED BY appearances.id;
 CREATE TABLE application_setting_terms (
     id integer NOT NULL,
     cached_markdown_version integer,
-    terms text NOT NULL,
+    terms text,
     terms_html text
 );
 
@@ -9538,10 +9538,10 @@ CREATE TABLE application_settings (
     whats_new_variant smallint DEFAULT 0,
     encrypted_spam_check_api_key bytea,
     encrypted_spam_check_api_key_iv bytea,
-    floc_enabled boolean DEFAULT false NOT NULL,
     elasticsearch_username text,
     encrypted_elasticsearch_password bytea,
     encrypted_elasticsearch_password_iv bytea,
+    floc_enabled boolean DEFAULT false NOT NULL,
     diff_max_lines integer DEFAULT 50000 NOT NULL,
     diff_max_files integer DEFAULT 1000 NOT NULL,
     valid_runner_registrars character varying[] DEFAULT '{project,group}'::character varying[],
@@ -14995,6 +14995,22 @@ CREATE SEQUENCE merge_requests_closing_issues_id_seq
 
 ALTER SEQUENCE merge_requests_closing_issues_id_seq OWNED BY merge_requests_closing_issues.id;
 
+CREATE TABLE merge_requests_compliance_violations (
+    id bigint NOT NULL,
+    reason integer NOT NULL,
+    violating_user_id bigint NOT NULL,
+    merge_request_id bigint NOT NULL
+);
+
+CREATE SEQUENCE merge_requests_compliance_violations_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE merge_requests_compliance_violations_id_seq OWNED BY merge_requests_compliance_violations.id;
+
 CREATE SEQUENCE merge_requests_id_seq
     START WITH 1
     INCREMENT BY 1
@@ -20217,6 +20233,8 @@ ALTER TABLE ONLY merge_requests ALTER COLUMN id SET DEFAULT nextval('merge_reque
 
 ALTER TABLE ONLY merge_requests_closing_issues ALTER COLUMN id SET DEFAULT nextval('merge_requests_closing_issues_id_seq'::regclass);
 
+ALTER TABLE ONLY merge_requests_compliance_violations ALTER COLUMN id SET DEFAULT nextval('merge_requests_compliance_violations_id_seq'::regclass);
+
 ALTER TABLE ONLY merge_trains ALTER COLUMN id SET DEFAULT nextval('merge_trains_id_seq'::regclass);
 
 ALTER TABLE ONLY metrics_dashboard_annotations ALTER COLUMN id SET DEFAULT nextval('metrics_dashboard_annotations_id_seq'::regclass);
@@ -21671,6 +21689,9 @@ ALTER TABLE ONLY merge_request_user_mentions
 
 ALTER TABLE ONLY merge_requests_closing_issues
     ADD CONSTRAINT merge_requests_closing_issues_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY merge_requests_compliance_violations
+    ADD CONSTRAINT merge_requests_compliance_violations_pkey PRIMARY KEY (id);
 
 ALTER TABLE ONLY merge_requests
     ADD CONSTRAINT merge_requests_pkey PRIMARY KEY (id);
@@ -24006,6 +24027,12 @@ CREATE INDEX index_merge_requests_closing_issues_on_issue_id ON merge_requests_c
 
 CREATE INDEX index_merge_requests_closing_issues_on_merge_request_id ON merge_requests_closing_issues USING btree (merge_request_id);
 
+CREATE INDEX index_merge_requests_compliance_violations_on_merge_request_id ON merge_requests_compliance_violations USING btree (merge_request_id);
+
+CREATE INDEX index_merge_requests_compliance_violations_on_reason ON merge_requests_compliance_violations USING btree (reason);
+
+CREATE INDEX index_merge_requests_compliance_violations_on_violating_user_id ON merge_requests_compliance_violations USING btree (violating_user_id);
+
 CREATE INDEX index_merge_requests_on_assignee_id ON merge_requests USING btree (assignee_id);
 
 CREATE INDEX index_merge_requests_on_author_id ON merge_requests USING btree (author_id);
@@ -25777,6 +25804,9 @@ ALTER TABLE ONLY geo_event_log
 ALTER TABLE ONLY deployments
     ADD CONSTRAINT fk_289bba3222 FOREIGN KEY (cluster_id) REFERENCES clusters(id) ON DELETE SET NULL;
 
+ALTER TABLE ONLY merge_requests_compliance_violations
+    ADD CONSTRAINT fk_290ec1ab02 FOREIGN KEY (merge_request_id) REFERENCES merge_requests(id) ON DELETE CASCADE;
+
 ALTER TABLE ONLY ci_freeze_periods
     ADD CONSTRAINT fk_2e02bbd1a6 FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE;
 
@@ -26364,6 +26394,9 @@ ALTER TABLE ONLY pages_domains
 
 ALTER TABLE ONLY application_settings
     ADD CONSTRAINT fk_ec757bd087 FOREIGN KEY (file_template_project_id) REFERENCES projects(id) ON DELETE SET NULL;
+
+ALTER TABLE ONLY merge_requests_compliance_violations
+    ADD CONSTRAINT fk_ec881c1c6f FOREIGN KEY (violating_user_id) REFERENCES users(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY events
     ADD CONSTRAINT fk_edfd187b6f FOREIGN KEY (author_id) REFERENCES users(id) ON DELETE CASCADE;

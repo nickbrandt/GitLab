@@ -15,6 +15,7 @@ module EE
       include DeprecatedApprovalsBeforeMerge
       include UsageStatistics
       include IterationEventable
+      include ComplianceViolable
 
       has_many :approvers, as: :target, dependent: :delete_all # rubocop:disable Cop/ActiveRecordDependent
       has_many :approver_users, through: :approvers, source: :user
@@ -50,6 +51,8 @@ module EE
       has_many :blocking_merge_requests, through: :blocks_as_blockee
 
       has_many :blocked_merge_requests, through: :blocks_as_blocker
+
+      has_many :compliance_violations, class_name: 'MergeRequests::ComplianceViolation'
 
       delegate :sha, to: :head_pipeline, prefix: :head_pipeline, allow_nil: true
       delegate :sha, to: :base_pipeline, prefix: :base_pipeline, allow_nil: true
