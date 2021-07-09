@@ -12,7 +12,6 @@ module QA
           element :group_members_item
           element :group_milestones_link
           element :group_settings
-          element :group_information_link
           element :group_information_submenu
         end
 
@@ -26,10 +25,8 @@ module QA
         end
 
         def click_group_members_item
-          hover_element(:group_information_link) do
-            within_submenu(:group_information_submenu) do
-              click_element(:group_members_item)
-            end
+          hover_element(:sidebar_menu_item_link, menu_item: 'Group information') do
+            click_element(:sidebar_menu_item_link, menu_item: 'Members')
           end
         end
 
