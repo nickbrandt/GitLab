@@ -104,7 +104,7 @@ export const getIncrementalLineNumber = (acc) => {
  * @param Array accumulator
  * @returns Array parsed log lines
  */
-export const logLinesParser = (lines = [], accumulator = []) =>
+export const logLinesParserLegacy = (lines = [], accumulator = []) =>
   lines.reduce(
     (acc, line, index) => {
       const lineNumber = accumulator.length > 0 ? getIncrementalLineNumber(acc) : index;
@@ -131,7 +131,7 @@ export const logLinesParser = (lines = [], accumulator = []) =>
     [...accumulator],
   );
 
-export const logLinesParserNew = (lines = [], previousTraceState = {}, prevParsedLines = []) => {
+export const logLinesParser = (lines = [], previousTraceState = {}, prevParsedLines = []) => {
   let currentLine = previousTraceState?.prevLineCount ? previousTraceState.prevLineCount : 0;
   let currentHeader = previousTraceState?.currentHeader ? previousTraceState.currentHeader : null;
   let isPreviousLineHeader = previousTraceState?.isPreviousLineHeader
@@ -142,7 +142,7 @@ export const logLinesParserNew = (lines = [], previousTraceState = {}, prevParse
 
   for (let i = 0; i < lines.length; i += 1) {
     const line = lines[i];
-    // First runs we can use the current index, later runs we have to retrieve the last number of lines
+    // First run we can use the current index, later runs we have to retrieve the last number of lines
     currentLine = previousTraceState?.prevLineCount ? currentLine + 1 : i + 1;
 
     if (line.section_header && !isPreviousLineHeader) {
@@ -156,9 +156,13 @@ export const logLinesParserNew = (lines = [], previousTraceState = {}, prevParse
       sectionsQueue.push(currentHeader);
       currentHeader = parseHeaderLine(line, currentLine); // Let's parse the incoming header line
     } else if (line.section && !line.section_duration) {
+      // We're inside a collapsible section and want to parse a standard line
       if (currentHeader?.index) {
+        // If the current section header is only an index, add the line as part of the lines
+        // array of the current collapsible section
         parsedLines[currentHeader.index].lines.push(parseLine(line, currentLine));
       } else {
+        // Otherwise add it to the innermost collapsible section lines array
         currentHeader.lines.push(parseLine(line, currentLine));
       }
     } else if (line.section && line.section_duration) {
@@ -246,5 +250,5 @@ export const findOffsetAndRemove = (newLog = [], oldParsed = []) => {
 export const updateIncrementalTrace = (newLog = [], oldParsed = []) => {
   const parsedLog = findOffsetAndRemove(newLog, oldParsed);
 
-  return logLinesParser(newLog, parsedLog);
+  return logLinesParserLegacy(newLog, parsedLog);
 };

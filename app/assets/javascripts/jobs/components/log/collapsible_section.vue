@@ -1,4 +1,6 @@
 <script>
+import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
+import { INFINITELY_NESTED_COLLAPSIBLE_SECTIONS_FF } from '../../constants';
 import LogLine from './line.vue';
 import LogLineHeader from './line_header.vue';
 
@@ -9,6 +11,7 @@ export default {
     LogLineHeader,
     CollapsibleLogSection: () => import('./collapsible_section.vue'),
   },
+  mixins: [glFeatureFlagsMixin()],
   props: {
     section: {
       type: Object,
@@ -23,8 +26,8 @@ export default {
     badgeDuration() {
       return this.section.line && this.section.line.section_duration;
     },
-    infinitelyNestedCollapsibleSections() {
-      return gon.features.infinitelyCollapsibleSections;
+    infinitelyCollapsibleSectionsFlag() {
+      return this.glFeatures?.[INFINITELY_NESTED_COLLAPSIBLE_SECTIONS_FF];
     },
   },
   methods: {
@@ -44,7 +47,7 @@ export default {
       @toggleLine="handleOnClickCollapsibleLine(section)"
     />
     <template v-if="!section.isClosed">
-      <template v-if="infinitelyNestedCollapsibleSections">
+      <template v-if="infinitelyCollapsibleSectionsFlag">
         <template v-for="line in section.lines">
           <collapsible-log-section
             v-if="line.isHeader"

@@ -1,6 +1,7 @@
 import Vue from 'vue';
+import { INFINITELY_NESTED_COLLAPSIBLE_SECTIONS_FF } from '../constants';
 import * as types from './mutation_types';
-import { logLinesParser, logLinesParserNew, updateIncrementalTrace } from './utils';
+import { logLinesParser, logLinesParserLegacy, updateIncrementalTrace } from './utils';
 
 export default {
   [types.SET_JOB_ENDPOINT](state, endpoint) {
@@ -20,7 +21,8 @@ export default {
   },
 
   [types.RECEIVE_TRACE_SUCCESS](state, log = {}) {
-    const infinitelyCollapsibleSectionsFlag = gon.features.infinitelyCollapsibleSections;
+    const infinitelyCollapsibleSectionsFlag =
+      gon.features?.[INFINITELY_NESTED_COLLAPSIBLE_SECTIONS_FF];
     if (log.state) {
       state.traceState = log.state;
     }
@@ -28,7 +30,7 @@ export default {
     if (log.append) {
       if (infinitelyCollapsibleSectionsFlag) {
         if (log.lines) {
-          const parsedResult = logLinesParserNew(
+          const parsedResult = logLinesParser(
             log.lines,
             state.auxiliaryPartialTraceHelpers,
             state.trace,
@@ -48,11 +50,11 @@ export default {
       // will be set to `null`
 
       if (infinitelyCollapsibleSectionsFlag) {
-        const parsedResult = logLinesParserNew(log.lines);
+        const parsedResult = logLinesParser(log.lines);
         state.trace = parsedResult.parsedLines;
         state.auxiliaryPartialTraceHelpers = parsedResult.auxiliaryPartialTraceHelpers;
       } else {
-        state.trace = log.lines ? logLinesParser(log.lines) : state.trace;
+        state.trace = log.lines ? logLinesParserLegacy(log.lines) : state.trace;
       }
 
       state.traceSize = log.size || state.traceSize;

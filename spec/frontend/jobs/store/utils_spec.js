@@ -1,6 +1,6 @@
 import {
   logLinesParser,
-  logLinesParserNew,
+  logLinesParserLegacy,
   updateIncrementalTrace,
   parseHeaderLine,
   parseLine,
@@ -177,11 +177,11 @@ describe('Jobs Store Utils', () => {
       expect(isCollapsibleSection()).toEqual(false);
     });
   });
-  describe('logLinesParser', () => {
+  describe('logLinesParserLegacy', () => {
     let result;
 
     beforeEach(() => {
-      result = logLinesParser(utilsMockData);
+      result = logLinesParserLegacy(utilsMockData);
     });
 
     describe('regular line', () => {
@@ -218,11 +218,11 @@ describe('Jobs Store Utils', () => {
     });
   });
 
-  describe('logLinesParserNew', () => {
+  describe('logLinesParser', () => {
     let result;
 
     beforeEach(() => {
-      result = logLinesParserNew(utilsMockData);
+      result = logLinesParser(utilsMockData);
     });
 
     describe('regular line', () => {
@@ -262,7 +262,7 @@ describe('Jobs Store Utils', () => {
 
     describe('multiple collapsible sections', () => {
       beforeEach(() => {
-        result = logLinesParserNew(multipleCollapsibleSectionsMockData);
+        result = logLinesParser(multipleCollapsibleSectionsMockData);
       });
 
       it('should contain a section inside another section', () => {
@@ -474,7 +474,7 @@ describe('Jobs Store Utils', () => {
   describe('updateIncrementalTrace', () => {
     describe('without repeated section', () => {
       it('concats and parses both arrays', () => {
-        const oldLog = logLinesParser(originalTrace);
+        const oldLog = logLinesParserLegacy(originalTrace);
         const result = updateIncrementalTrace(regularIncremental, oldLog);
 
         expect(result).toEqual([
@@ -502,7 +502,7 @@ describe('Jobs Store Utils', () => {
 
     describe('with regular line repeated offset', () => {
       it('updates the last line and formats with the incremental part', () => {
-        const oldLog = logLinesParser(originalTrace);
+        const oldLog = logLinesParserLegacy(originalTrace);
         const result = updateIncrementalTrace(regularIncrementalRepeated, oldLog);
 
         expect(result).toEqual([
@@ -521,7 +521,7 @@ describe('Jobs Store Utils', () => {
 
     describe('with header line repeated', () => {
       it('updates the header line and formats with the incremental part', () => {
-        const oldLog = logLinesParser(headerTrace);
+        const oldLog = logLinesParserLegacy(headerTrace);
         const result = updateIncrementalTrace(headerTraceIncremental, oldLog);
 
         expect(result).toEqual([
@@ -547,7 +547,7 @@ describe('Jobs Store Utils', () => {
 
     describe('with collapsible line repeated', () => {
       it('updates the collapsible line and formats with the incremental part', () => {
-        const oldLog = logLinesParser(collapsibleTrace);
+        const oldLog = logLinesParserLegacy(collapsibleTrace);
         const result = updateIncrementalTrace(collapsibleTraceIncremental, oldLog);
 
         expect(result).toEqual([
