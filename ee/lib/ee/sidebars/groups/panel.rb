@@ -10,7 +10,7 @@ module EE
         def configure_menus
           super
 
-          insert_menu_before(nil, ::Sidebars::Groups::Menus::TrialExperimentMenu.new(context))
+          insert_menu_before(::Sidebars::Groups::Menus::GroupInformationMenu, ::Sidebars::Groups::Menus::TrialExperimentMenu.new(context))
         end
       end
     end
