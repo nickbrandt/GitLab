@@ -2529,6 +2529,9 @@ msgstr ""
 msgid "AdminUsers|Approve user"
 msgstr ""
 
+msgid "AdminUsers|Approve user %{username}?"
+msgstr ""
+
 msgid "AdminUsers|Approved users can:"
 msgstr ""
 
@@ -2694,6 +2697,9 @@ msgstr ""
 msgid "AdminUsers|Reject request"
 msgstr ""
 
+msgid "AdminUsers|Reject user %{username}?"
+msgstr ""
+
 msgid "AdminUsers|Rejected users:"
 msgstr ""
 
@@ -2755,9 +2761,6 @@ msgid "AdminUsers|Unblock user"
 msgstr ""
 
 msgid "AdminUsers|Unblock user %{username}?"
-msgstr ""
-
-msgid "AdminUsers|Unlock"
 msgstr ""
 
 msgid "AdminUsers|Unlock user %{username}?"
