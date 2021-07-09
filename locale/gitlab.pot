@@ -30665,6 +30665,15 @@ msgstr ""
 msgid "SortOptions|Manual"
 msgstr ""
 
+msgid "SortOptions|Merged date"
+msgstr ""
+
+msgid "SortOptions|Merged earlier"
+msgstr ""
+
+msgid "SortOptions|Merged recently"
+msgstr ""
+
 msgid "SortOptions|Milestone due date"
 msgstr ""
 
