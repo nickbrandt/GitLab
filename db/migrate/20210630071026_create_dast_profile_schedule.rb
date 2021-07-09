@@ -10,7 +10,7 @@ class CreateDastProfileSchedule < ActiveRecord::Migration[6.1]
   def up
     with_lock_retries do
       table_comment = {
-        description: 'Stores DAST Profile schedules'
+        owner: 'group::dynamic analysis', description: 'Scheduling for scans using DAST Profiles'
       }
 
       create_table_with_constraints :dast_profile_schedules, comment: table_comment.to_json do |t|

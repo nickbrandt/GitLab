@@ -12016,7 +12016,7 @@ CREATE TABLE dast_profile_schedules (
     CONSTRAINT check_86531ea73f CHECK ((char_length(cron) <= 255))
 );
 
-COMMENT ON TABLE dast_profile_schedules IS '{"description":"Stores DAST Profile schedules"}';
+COMMENT ON TABLE dast_profile_schedules IS '{"owner":"group::dynamic analysis","description":"Scheduling for scans using DAST Profiles"}';
 
 CREATE SEQUENCE dast_profile_schedules_id_seq
     START WITH 1
