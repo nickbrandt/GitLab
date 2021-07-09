@@ -6840,6 +6840,12 @@ msgstr ""
 msgid "Click to expand text"
 msgstr ""
 
+msgid "Click to hide"
+msgstr ""
+
+msgid "Click to reveal"
+msgstr ""
+
 msgid "Client authentication certificate"
 msgstr ""
 
