@@ -13092,6 +13092,9 @@ msgstr ""
 msgid "EscalationPolicies|The escalation policy could not be updated. Please try again"
 msgstr ""
 
+msgid "EscalationPolicies|This policy has no escalation rules."
+msgstr ""
+
 msgid "EscalationPolicies|mins"
 msgstr ""
 
@@ -22719,6 +22722,9 @@ msgid "On-call Schedules"
 msgstr ""
 
 msgid "On-call schedules"
+msgstr ""
+
+msgid "OnCallScheduless|Any escalation rules that are using this schedule will also be deleted."
 msgstr ""
 
 msgid "OnCallSchedules|1 day"
