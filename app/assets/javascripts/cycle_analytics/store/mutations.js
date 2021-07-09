@@ -9,7 +9,7 @@ import {
 import * as types from './mutation_types';
 
 export default {
-  [types.INITIALIZE_VSA](state, { projectId, endpoints, currentGroup, projectId, features }) {
+  [types.INITIALIZE_VSA](state, { projectId, endpoints, currentGroup, features }) {
     state.id = projectId;
     state.endpoints = endpoints;
     state.currentGroup = currentGroup;
