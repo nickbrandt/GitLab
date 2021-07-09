@@ -10224,6 +10224,12 @@ msgstr ""
 msgid "DastProfiles|Website"
 msgstr ""
 
+msgid "DastProfiles|You can either choose a passive scan or validate the target site in your chosen site profile. %{docsLinkStart}Learn more about site validation.%{docsLinkEnd}"
+msgstr ""
+
+msgid "DastProfiles|You cannot run an active scan against an unvalidated site."
+msgstr ""
+
 msgid "DastSiteValidation|Copy HTTP header to clipboard"
 msgstr ""
 
