@@ -9,6 +9,7 @@ import {
   GlIcon,
   GlTooltipDirective,
 } from '@gitlab/ui';
+import { flatten } from 'lodash';
 import { mapState, mapGetters } from 'vuex';
 import { PREDEFINED_NETWORK_POLICIES } from 'ee/threat_monitoring/constants';
 import createFlash from '~/flash';
@@ -17,7 +18,7 @@ import { setUrlFragment, mergeUrlParams } from '~/lib/utils/url_utility';
 import { __, s__ } from '~/locale';
 import networkPoliciesQuery from '../graphql/queries/network_policies.query.graphql';
 import scanExecutionPoliciesQuery from '../graphql/queries/scan_execution_policies.query.graphql';
-import { POLICY_TYPE_NETWORK, POLICY_TYPE_SCAN_EXECUTION, POLICY_TYPE_OPTIONS } from './constants';
+import { POLICY_TYPE_OPTIONS } from './constants';
 import EnvironmentPicker from './environment_picker.vue';
 import PolicyDrawer from './policy_drawer/policy_drawer.vue';
 import PolicyTypeFilter from './policy_type_filter.vue';
@@ -114,6 +115,12 @@ export default {
       'isLoadingEnvironments',
     ]),
     ...mapGetters('threatMonitoring', ['currentEnvironmentGid']),
+    allPolicyTypes() {
+      return {
+        [POLICY_TYPE_OPTIONS.POLICY_TYPE_NETWORK.value]: this.networkPolicies,
+        [POLICY_TYPE_OPTIONS.POLICY_TYPE_SCAN_EXECUTION.value]: this.scanExecutionPolicies,
+      };
+    },
     documentationFullPath() {
       return setUrlFragment(this.documentationPath, 'container-network-policy');
     },
@@ -123,21 +130,16 @@ export default {
         POLICY_TYPE_OPTIONS.POLICY_TYPE_NETWORK.value,
       ].includes(this.selectedPolicyType);
     },
-    shouldShowScanExecutionPolicies() {
-      return [
-        POLICY_TYPE_OPTIONS.ALL.value,
-        POLICY_TYPE_OPTIONS.POLICY_TYPE_SCAN_EXECUTION.value,
-      ].includes(this.selectedPolicyType);
-    },
     policies() {
-      return [
-        ...(this.shouldShowNetworkPolicies
-          ? getPoliciesWithType(this.networkPolicies, POLICY_TYPE_NETWORK)
-          : []),
-        ...(this.shouldShowScanExecutionPolicies
-          ? getPoliciesWithType(this.scanExecutionPolicies, POLICY_TYPE_SCAN_EXECUTION)
-          : []),
-      ];
+      const policyTypes =
+        this.selectedPolicyType === POLICY_TYPE_OPTIONS.ALL.value
+          ? Object.keys(this.allPolicyTypes)
+          : [this.selectedPolicyType];
+      const policies = policyTypes.map((type) =>
+        getPoliciesWithType(this.allPolicyTypes[type], POLICY_TYPE_OPTIONS[type].text),
+      );
+
+      return flatten(policies);
     },
     isLoadingPolicies() {
       return (

@@ -26,16 +26,14 @@ export const POLICY_KINDS = {
   scanExecution: 'scanner_profile',
 };
 
-export const POLICY_TYPE_NETWORK = s__('SecurityPolicies|Network');
-export const POLICY_TYPE_SCAN_EXECUTION = s__('SecurityPolicies|Scan execution');
 export const POLICY_TYPE_OPTIONS = {
   POLICY_TYPE_NETWORK: {
     value: 'POLICY_TYPE_NETWORK',
-    text: POLICY_TYPE_NETWORK,
+    text: s__('SecurityPolicies|Network'),
   },
   POLICY_TYPE_SCAN_EXECUTION: {
     value: 'POLICY_TYPE_SCAN_EXECUTION',
-    text: POLICY_TYPE_SCAN_EXECUTION,
+    text: s__('SecurityPolicies|Scan execution'),
   },
   ALL: {
     value: '',
