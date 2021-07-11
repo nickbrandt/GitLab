@@ -16,11 +16,11 @@ module EE
         return [] unless product_intelligence_enabled?
 
         optional_enabled = ::Gitlab::CurrentSettings.usage_ping_enabled?
-        operational_enabled = ::License.current.usage_ping?
+        customer_service_enabled = ::License.current.usage_ping?
 
         [STANDARD_CATEGORY, SUBSCRIPTION_CATEGORY].tap do |categories|
-          categories << OPTIONAL_CATEGORY if optional_enabled
-          categories << OPERATIONAL_CATEGORY if operational_enabled
+          categories << OPERATIONAL_CATEGORY << OPTIONAL_CATEGORY if optional_enabled
+          categories << OPERATIONAL_CATEGORY if customer_service_enabled
         end.to_set
       end
 

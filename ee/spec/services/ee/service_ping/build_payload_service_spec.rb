@@ -42,11 +42,7 @@ RSpec.describe ServicePing::BuildPayloadService do
           end
 
           it_behaves_like 'service ping payload with all expected metrics' do
-            let(:expected_metrics) { standard_metrics + subscription_metrics + optional_metrics }
-          end
-
-          it_behaves_like 'service ping payload without restricted metrics' do
-            let(:restricted_metrics) { operational_metrics }
+            let(:expected_metrics) { standard_metrics + subscription_metrics + optional_metrics + operational_metrics }
           end
         end
       end
