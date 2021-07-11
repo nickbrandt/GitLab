@@ -5,9 +5,13 @@ import DastProfilesSelector from 'ee/on_demand_scans/components/profile_selector
 import ConfigurationSnippetModal from 'ee/security_configuration/components/configuration_snippet_modal.vue';
 import { CONFIGURATION_SNIPPET_MODAL_ID } from 'ee/security_configuration/components/constants';
 import ConfigurationForm from 'ee/security_configuration/dast/components/configuration_form.vue';
+import { scannerProfiles, siteProfiles } from 'ee_jest/on_demand_scans/mocks/mock_data';
 import { extendedWrapper } from 'helpers/vue_test_utils_helper';
 import { CODE_SNIPPET_SOURCE_DAST } from '~/pipeline_editor/components/code_snippet_alert/constants';
 import { DAST_HELP_PATH } from '~/security_configuration/components/constants';
+
+const [scannerProfile] = scannerProfiles;
+const [siteProfile] = siteProfiles;
 
 const securityConfigurationPath = '/security/configuration';
 const gitlabCiYamlEditPath = '/ci/editor';
@@ -107,6 +111,10 @@ describe('EE - DAST Configuration Form', () => {
     it('does not show an alert', () => {
       expect(findAlert().exists()).toBe(false);
     });
+
+    it('submit button is disabled by default', () => {
+      expect(findSubmitButton().props('disabled')).toBe(true);
+    });
   });
 
   describe('error when loading profiles', () => {
@@ -127,15 +135,22 @@ describe('EE - DAST Configuration Form', () => {
   });
 
   describe.each`
-    description                                 | data                                                       | isDisabled
-    ${'by default'}                             | ${{}}                                                      | ${true}
-    ${'when conflicting profiles are selected'} | ${{ hasProfilesConflict: true }}                           | ${true}
-    ${'when form is valid'}                     | ${{ selectedSiteProfileName, selectedScannerProfileName }} | ${false}
-  `('submit button', ({ description, data, isDisabled }) => {
-    it(`is ${isDisabled ? '' : 'not '}disabled ${description}`, () => {
-      createComponent({
-        data,
-      });
+    description                                 | emittedEvent               | emittedValue                       | isDisabled
+    ${'when only scanner profile is selected'}  | ${'profiles-selected'}     | ${{ scannerProfile }}              | ${true}
+    ${'when only site profile is selected'}     | ${'profiles-selected'}     | ${{ siteProfile }}                 | ${true}
+    ${'when both profiles are selected'}        | ${'profiles-selected'}     | ${{ scannerProfile, siteProfile }} | ${false}
+    ${'when conflicting profiles are selected'} | ${'profiles-has-conflict'} | ${true}                            | ${true}
+    ${'when profiles do not have conflicts'}    | ${'profiles-has-conflict'} | ${false}                           | ${false}
+  `('submit button', ({ description, emittedEvent, emittedValue, isDisabled }) => {
+    const initialState = {
+      data: {
+        selectedScannerProfileName: 'scannerProfile.profileName',
+        selectedSiteProfileName: 'siteProfile.profileName',
+      },
+    };
+    it(`is ${isDisabled ? '' : 'not '}disabled ${description}`, async () => {
+      createComponent(initialState);
+      await findDastProfilesSelector().vm.$emit(emittedEvent, emittedValue);
       expect(findSubmitButton().props('disabled')).toBe(isDisabled);
     });
   });
