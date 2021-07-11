@@ -1,5 +1,5 @@
 import { POLICY_TYPE_OPTIONS } from 'ee/threat_monitoring/components/constants';
-import PolicyTypeFilter from 'ee/threat_monitoring/components/filters/policy_type_filter.vue';
+import PolicyTypeFilter from 'ee/threat_monitoring/components/policy_type_filter.vue';
 import { mountExtended } from 'helpers/vue_test_utils_helper';
 
 describe('PolicyTypeFilter component', () => {

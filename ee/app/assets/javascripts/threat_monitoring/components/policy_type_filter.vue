@@ -1,7 +1,7 @@
 <script>
 import { GlFormGroup, GlDropdown, GlDropdownItem } from '@gitlab/ui';
 import { __ } from '~/locale';
-import { POLICY_TYPE_OPTIONS } from '../constants';
+import { POLICY_TYPE_OPTIONS } from './constants';
 
 export default {
   name: 'PolicyTypeFilter',

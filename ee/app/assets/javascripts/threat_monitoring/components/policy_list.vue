@@ -18,9 +18,9 @@ import { __, s__ } from '~/locale';
 import networkPoliciesQuery from '../graphql/queries/network_policies.query.graphql';
 import scanExecutionPoliciesQuery from '../graphql/queries/scan_execution_policies.query.graphql';
 import { POLICY_TYPE_NETWORK, POLICY_TYPE_SCAN_EXECUTION, POLICY_TYPE_OPTIONS } from './constants';
-import EnvironmentPicker from './filters/environment_picker.vue';
-import PolicyTypeFilter from './filters/policy_type_filter.vue';
+import EnvironmentPicker from './environment_picker.vue';
 import PolicyDrawer from './policy_drawer/policy_drawer.vue';
+import PolicyTypeFilter from './policy_type_filter.vue';
 
 const createPolicyFetchError = ({ gqlError, networkError }) => {
   const error =
