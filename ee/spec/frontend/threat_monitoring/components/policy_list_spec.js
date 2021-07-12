@@ -2,6 +2,7 @@ import { GlTable, GlDrawer } from '@gitlab/ui';
 import { createLocalVue } from '@vue/test-utils';
 import { merge } from 'lodash';
 import VueApollo from 'vue-apollo';
+import { POLICY_TYPE_OPTIONS } from 'ee/threat_monitoring/components/constants';
 import PolicyDrawer from 'ee/threat_monitoring/components/policy_drawer/policy_drawer.vue';
 import PolicyList from 'ee/threat_monitoring/components/policy_list.vue';
 import networkPoliciesQuery from 'ee/threat_monitoring/graphql/queries/network_policies.query.graphql';
@@ -82,6 +83,7 @@ describe('PolicyList component', () => {
   const mountShallowWrapper = factory(shallowMountExtended);
   const mountWrapper = factory();
 
+  const findPolicyTypeFilter = () => wrapper.findByTestId('policy-type-filter');
   const findEnvironmentsPicker = () => wrapper.find({ ref: 'environmentsPicker' });
   const findPoliciesTable = () => wrapper.findComponent(GlTable);
   const findPolicyStatusCells = () => wrapper.findAllByTestId('policy-status-cell');
@@ -132,6 +134,16 @@ describe('PolicyList component', () => {
     it("sets table's loading state", () => {
       expect(findPoliciesTable().attributes('busy')).toBe('true');
     });
+  });
+
+  describe('given policies have been fetched', () => {
+    let rows;
+
+    beforeEach(async () => {
+      mountWrapper();
+      await waitForPromises();
+      rows = wrapper.findAll('tr');
+    });
 
     it('fetches network policies on environment change', async () => {
       store.dispatch.mockReset();
@@ -142,15 +154,16 @@ describe('PolicyList component', () => {
         environmentId: environments[0].global_id,
       });
     });
-  });
 
-  describe('given policies have been fetched', () => {
-    let rows;
-
-    beforeEach(async () => {
-      mountWrapper();
-      await waitForPromises();
-      rows = wrapper.findAll('tr');
+    it('if network policies are filtered out, changing the environment does not trigger a fetch', async () => {
+      store.dispatch.mockReset();
+      expect(requestHandlers.networkPolicies).toHaveBeenCalledTimes(1);
+      findPolicyTypeFilter().vm.$emit(
+        'input',
+        POLICY_TYPE_OPTIONS.POLICY_TYPE_SCAN_EXECUTION.value,
+      );
+      await store.commit('threatMonitoring/SET_CURRENT_ENVIRONMENT_ID', 2);
+      expect(requestHandlers.networkPolicies).toHaveBeenCalledTimes(1);
     });
 
     describe.each`
@@ -172,6 +185,20 @@ describe('PolicyList component', () => {
 
       it(`renders ${expectedPolicyType} in the policy type cell`, () => {
         expect(row.findAll('td').at(2).text()).toBe(expectedPolicyType);
+      });
+    });
+
+    it.each`
+      description         | filterBy                                          | hiddenTypes
+      ${'network'}        | ${POLICY_TYPE_OPTIONS.POLICY_TYPE_NETWORK}        | ${[POLICY_TYPE_OPTIONS.POLICY_TYPE_SCAN_EXECUTION]}
+      ${'scan execution'} | ${POLICY_TYPE_OPTIONS.POLICY_TYPE_SCAN_EXECUTION} | ${[POLICY_TYPE_OPTIONS.POLICY_TYPE_NETWORK]}
+    `('policies filtered by $description type', async ({ filterBy, hiddenTypes }) => {
+      findPolicyTypeFilter().vm.$emit('input', filterBy.value);
+      await wrapper.vm.$nextTick();
+
+      expect(findPoliciesTable().text()).toContain(filterBy.text);
+      hiddenTypes.forEach((hiddenType) => {
+        expect(findPoliciesTable().text()).not.toContain(hiddenType.text);
       });
     });
   });

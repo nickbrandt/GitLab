@@ -29087,6 +29087,9 @@ msgstr ""
 msgid "SecurityOrchestration|Security policy project"
 msgstr ""
 
+msgid "SecurityPolicies|All policies"
+msgstr ""
+
 msgid "SecurityPolicies|Description"
 msgstr ""
 
