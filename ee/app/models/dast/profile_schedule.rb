@@ -2,11 +2,6 @@
 
 class Dast::ProfileSchedule < ApplicationRecord
   include CronSchedulable
-  include Limitable
-  include EachBatch
-
-  self.limit_name = 'ci_pipeline_schedules'
-  self.limit_scope = :project
 
   self.table_name = 'dast_profile_schedules'
 
