@@ -6,7 +6,6 @@ export default {
   [types.INITIALIZE_VSA](state, { requestPath, fullPath, parentId, parentPath, projectId }) {
     state.requestPath = requestPath;
     state.fullPath = fullPath;
-    state.parentId = parentId;
     state.parentPath = parentPath;
     state.id = projectId;
   },
@@ -86,7 +85,7 @@ export default {
   [types.RECEIVE_STAGE_MEDIANS_SUCCESS](state, medians) {
     state.medians = formatMedianValues(medians);
   },
-  [types.RECEIVE_STAGE_MEDIANS_ERROR](state, error) {
+  [types.RECEIVE_STAGE_MEDIANS_ERROR](state) {
     state.medians = {};
   },
 };
