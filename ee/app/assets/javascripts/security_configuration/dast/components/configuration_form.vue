@@ -95,9 +95,9 @@ export default {
     </gl-alert>
 
     <dast-profiles-selector
-      @profiles="updateProfiles"
+      @profiles-selected="updateProfiles"
       @error="showErrors"
-      @hasProfilesConflict="hasProfilesConflict = $event"
+      @profiles-has-conflict="hasProfilesConflict = $event"
     />
 
     <gl-button
