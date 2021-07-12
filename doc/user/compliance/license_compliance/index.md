@@ -47,8 +47,6 @@ When GitLab detects a **Denied** license, you can view it in the [license list](
 ![License List](img/license_list_v13_0.png)
 
 You can view and modify existing policies from the [policies](#policies) tab.
-policies_maintainer_edit_v14_2.png
-policies_maintainer_edit_v14_2.png
 ![Edit Policy](img/policies_maintainer_edit_v14_2.png)
 
 ## Supported languages and package managers
