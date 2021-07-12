@@ -1,3 +1,5 @@
+import { useFakeDate } from 'helpers/fake_date';
+import { DEFAULT_DAYS_TO_DISPLAY } from '~/cycle_analytics/constants';
 import * as types from '~/cycle_analytics/store/mutation_types';
 import mutations from '~/cycle_analytics/store/mutations';
 import {
@@ -15,9 +17,12 @@ import {
 
 let state;
 const mockRequestPath = 'fake/request/path';
-const mockStartData = '2021-04-20';
+const mockCreatedAfter = '2020-06-18';
+const mockCreatedBefore = '2020-07-18';
 
 describe('Project Value Stream Analytics mutations', () => {
+  useFakeDate(2020, 6, 18);
+
   beforeEach(() => {
     state = {};
   });
@@ -57,17 +62,19 @@ describe('Project Value Stream Analytics mutations', () => {
   });
 
   it.each`
-    mutation                                      | payload                             | stateKey                 | value
-    ${types.INITIALIZE_VSA}                       | ${{ requestPath: mockRequestPath }} | ${'requestPath'}         | ${mockRequestPath}
-    ${types.SET_DATE_RANGE}                       | ${{ startDate: mockStartData }}     | ${'startDate'}           | ${mockStartData}
-    ${types.SET_LOADING}                          | ${true}                             | ${'isLoading'}           | ${true}
-    ${types.SET_LOADING}                          | ${false}                            | ${'isLoading'}           | ${false}
-    ${types.SET_SELECTED_VALUE_STREAM}            | ${selectedValueStream}              | ${'selectedValueStream'} | ${selectedValueStream}
-    ${types.RECEIVE_CYCLE_ANALYTICS_DATA_SUCCESS} | ${rawData}                          | ${'summary'}             | ${convertedData.summary}
-    ${types.RECEIVE_VALUE_STREAMS_SUCCESS}        | ${[selectedValueStream]}            | ${'valueStreams'}        | ${[selectedValueStream]}
-    ${types.RECEIVE_VALUE_STREAM_STAGES_SUCCESS}  | ${{ stages: rawValueStreamStages }} | ${'stages'}              | ${valueStreamStages}
-    ${types.RECEIVE_VALUE_STREAMS_SUCCESS}        | ${[selectedValueStream]}            | ${'valueStreams'}        | ${[selectedValueStream]}
-    ${types.RECEIVE_STAGE_MEDIANS_SUCCESS}        | ${rawStageMedians}                  | ${'medians'}             | ${formattedStageMedians}
+    mutation                                      | payload                                   | stateKey                 | value
+    ${types.INITIALIZE_VSA}                       | ${{ requestPath: mockRequestPath }}       | ${'requestPath'}         | ${mockRequestPath}
+    ${types.SET_DATE_RANGE}                       | ${{ startDate: DEFAULT_DAYS_TO_DISPLAY }} | ${'startDate'}           | ${DEFAULT_DAYS_TO_DISPLAY}
+    ${types.SET_DATE_RANGE}                       | ${{ startDate: DEFAULT_DAYS_TO_DISPLAY }} | ${'createdAfter'}        | ${mockCreatedAfter}
+    ${types.SET_DATE_RANGE}                       | ${{ startDatqe: DEFAULT_DAYS_TO_DISPLAY }} | ${'createdBefore'}       | ${mockCreatedBefore}
+    ${types.SET_LOADING}                          | ${true}                                   | ${'isLoading'}           | ${true}
+    ${types.SET_LOADING}                          | ${false}                                  | ${'isLoading'}           | ${false}
+    ${types.SET_SELECTED_VALUE_STREAM}            | ${selectedValueStream}                    | ${'selectedValueStream'} | ${selectedValueStream}
+    ${types.RECEIVE_CYCLE_ANALYTICS_DATA_SUCCESS} | ${rawData}                                | ${'summary'}             | ${convertedData.summary}
+    ${types.RECEIVE_VALUE_STREAMS_SUCCESS}        | ${[selectedValueStream]}                  | ${'valueStreams'}        | ${[selectedValueStream]}
+    ${types.RECEIVE_VALUE_STREAM_STAGES_SUCCESS}  | ${{ stages: rawValueStreamStages }}       | ${'stages'}              | ${valueStreamStages}
+    ${types.RECEIVE_VALUE_STREAMS_SUCCESS}        | ${[selectedValueStream]}                  | ${'valueStreams'}        | ${[selectedValueStream]}
+    ${types.RECEIVE_STAGE_MEDIANS_SUCCESS}        | ${rawStageMedians}                        | ${'medians'}             | ${formattedStageMedians}
   `(
     '$mutation with $payload will set $stateKey to $value',
     ({ mutation, payload, stateKey, value }) => {
