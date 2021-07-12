@@ -6,7 +6,7 @@ info: To determine the technical writer assigned to the Stage/Group associated w
 
 # Escalation Policies **(PREMIUM)**
 
-> [Introduced](https://gitlab.com/groups/gitlab-org/-/epics/4638) in [GitLab Premium](https://about.gitlab.com/pricing/) 14.0.
+> [Introduced](https://gitlab.com/groups/gitlab-org/-/epics/4638) in [GitLab Premium](https://about.gitlab.com/pricing/) 14.1.
 
 Escalation Policies protect your company from missed critical alerts. Escalation Policies contain
 time-boxed steps that automatically page the next responder in the escalation step if the responder
@@ -23,7 +23,7 @@ you can create an escalation policy:
    escalation rules to follow when a primary responder misses an alert.
 1. Select **Add escalation policy**.
 
-![Escalation Policy](img/escalation_policy_v14_0.png)
+![Escalation Policy](img/escalation_policy_v14_1.png)
 
 ### Edit an escalation policy
 
