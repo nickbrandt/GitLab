@@ -24,13 +24,25 @@ module EE
               def perform!
                 return unless limit.exceeded?
 
-                limit.log_error!(project_id: project.id, plan: project.actual_plan_name)
+                limit.log_error!(log_attrs)
+
+                return unless limit.enabled?
+
                 error(limit.message, drop_reason: :size_limit_exceeded)
               end
 
               override :break?
               def break?
-                limit.exceeded?
+                limit.enabled? && limit.exceeded?
+              end
+
+              def log_attrs
+                {
+                  pipeline_source: pipeline.source,
+                  plan: project.actual_plan_name,
+                  project_id: project.id,
+                  project_name: project.name
+                }
               end
             end
           end

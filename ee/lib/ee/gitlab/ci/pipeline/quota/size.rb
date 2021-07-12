@@ -20,13 +20,11 @@ module EE
             end
 
             def exceeded?
-              return false unless enabled?
-
               seeds_size > ci_pipeline_size_limit
             end
 
             def message
-              return unless exceeded?
+              return unless enabled? && exceeded?
 
               "Pipeline has too many jobs! Requested #{seeds_size}, but the limit is #{ci_pipeline_size_limit}."
             end
