@@ -66,7 +66,7 @@ describe('Project Value Stream Analytics mutations', () => {
     ${types.INITIALIZE_VSA}                       | ${{ requestPath: mockRequestPath }}       | ${'requestPath'}         | ${mockRequestPath}
     ${types.SET_DATE_RANGE}                       | ${{ startDate: DEFAULT_DAYS_TO_DISPLAY }} | ${'startDate'}           | ${DEFAULT_DAYS_TO_DISPLAY}
     ${types.SET_DATE_RANGE}                       | ${{ startDate: DEFAULT_DAYS_TO_DISPLAY }} | ${'createdAfter'}        | ${mockCreatedAfter}
-    ${types.SET_DATE_RANGE}                       | ${{ startDatqe: DEFAULT_DAYS_TO_DISPLAY }} | ${'createdBefore'}       | ${mockCreatedBefore}
+    ${types.SET_DATE_RANGE}                       | ${{ startDate: DEFAULT_DAYS_TO_DISPLAY }} | ${'createdBefore'}       | ${mockCreatedBefore}
     ${types.SET_LOADING}                          | ${true}                                   | ${'isLoading'}           | ${true}
     ${types.SET_LOADING}                          | ${false}                                  | ${'isLoading'}           | ${false}
     ${types.SET_SELECTED_VALUE_STREAM}            | ${selectedValueStream}                    | ${'selectedValueStream'} | ${selectedValueStream}

@@ -23,11 +23,11 @@ class Gitlab::Seeder::CycleAnalytics
   FLAG = 'SEED_VSA'
   PERF_TEST = 'VSA_PERF_TEST'
 
-  ISSUE_STAGE_MAX_DURATION_IN_HOURS = 58
-  PLAN_STAGE_MAX_DURATION_IN_HOURS = 38
-  CODE_STAGE_MAX_DURATION_IN_HOURS = 45
-  TEST_STAGE_MAX_DURATION_IN_HOURS = 2
-  REVIEW_STAGE_MAX_DURATION_IN_HOURS = 42
+  ISSUE_STAGE_MAX_DURATION_IN_HOURS = 72
+  PLAN_STAGE_MAX_DURATION_IN_HOURS = 48
+  CODE_STAGE_MAX_DURATION_IN_HOURS = 72
+  TEST_STAGE_MAX_DURATION_IN_HOURS = 5
+  REVIEW_STAGE_MAX_DURATION_IN_HOURS = 72
   DEPLOYMENT_MAX_DURATION_IN_HOURS = 48
 
   def self.seeder_based_on_env(project)
@@ -91,7 +91,7 @@ class Gitlab::Seeder::CycleAnalytics
         target_project: project,
         source_project: project,
         source_branch: "#{issue.iid}-feature-branch",
-        target_branch: 'main',
+        target_branch: 'master',
         author: developers.sample,
         created_at: within_end_time(issue.metrics.first_mentioned_in_commit_at + rand(CODE_STAGE_MAX_DURATION_IN_HOURS).hours)
       )
@@ -182,7 +182,7 @@ class Gitlab::Seeder::CycleAnalytics
   end
 
   def start_time
-    @start_time ||= 5.days.ago
+    @start_time ||= 25.days.ago
   end
 
   def end_time

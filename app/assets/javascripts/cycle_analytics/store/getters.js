@@ -25,6 +25,12 @@ const dateRangeParams = ({ createdAfter, createdBefore }) => ({
   created_before: createdBefore ? dateFormat(createdBefore, dateFormats.isoDate) : null,
 });
 
+export const legacyFilterParams = ({ startDate }) => {
+  return {
+    'cycle_analytics[start_date]': startDate,
+  };
+};
+
 export const filterParams = ({ id, ...rest }) => {
   return {
     project_ids: [id],
