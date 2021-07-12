@@ -115,7 +115,7 @@ export default {
 </script>
 <template>
   <div class="mr-widget-body media">
-    <gl-icon name="merge" size="24" class="gl-text-blue-500 gl-mr-3" />
+    <gl-icon name="merge" :size="24" class="gl-text-blue-500 gl-mr-3" />
     <div class="media-body">
       <div class="space-children">
         <mr-widget-author-time
