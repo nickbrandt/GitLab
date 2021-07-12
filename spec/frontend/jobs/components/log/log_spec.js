@@ -84,7 +84,7 @@ describe('Job Log', () => {
   });
 });
 
-describe('Job Log, feature flag enabled', () => {
+describe('Job Log, infinitelyCollapsibleSections feature flag enabled', () => {
   let wrapper;
   let actions;
   let state;

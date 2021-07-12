@@ -323,7 +323,7 @@ describe('Job Store mutations, feature flag ON', () => {
           });
         });
 
-        describe('when it is defined', () => {
+        describe('when lines are defined', () => {
           it('sets the parsed log ', () => {
             mutations[types.RECEIVE_TRACE_SUCCESS](stateCopy, {
               append: false,
@@ -344,7 +344,7 @@ describe('Job Store mutations, feature flag ON', () => {
           });
         });
 
-        describe('when it is null', () => {
+        describe('when lines are null', () => {
           it('sets the default value', () => {
             mutations[types.RECEIVE_TRACE_SUCCESS](stateCopy, {
               append: true,

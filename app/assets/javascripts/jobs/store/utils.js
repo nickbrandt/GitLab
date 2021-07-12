@@ -132,13 +132,11 @@ export const logLinesParserLegacy = (lines = [], accumulator = []) =>
   );
 
 export const logLinesParser = (lines = [], previousTraceState = {}, prevParsedLines = []) => {
-  let currentLine = previousTraceState?.prevLineCount ? previousTraceState.prevLineCount : 0;
-  let currentHeader = previousTraceState?.currentHeader ? previousTraceState.currentHeader : null;
-  let isPreviousLineHeader = previousTraceState?.isPreviousLineHeader
-    ? previousTraceState.isPreviousLineHeader
-    : false;
+  let currentLine = previousTraceState?.prevLineCount ?? 0;
+  let currentHeader = previousTraceState?.currentHeader;
+  let isPreviousLineHeader = previousTraceState?.isPreviousLineHeader ?? false;
   const parsedLines = prevParsedLines.length > 0 ? prevParsedLines : [];
-  const sectionsQueue = previousTraceState?.sectionsQueue ? previousTraceState.sectionsQueue : [];
+  const sectionsQueue = previousTraceState?.sectionsQueue ?? [];
 
   for (let i = 0; i < lines.length; i += 1) {
     const line = lines[i];
