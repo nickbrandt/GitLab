@@ -207,6 +207,11 @@ RSpec.describe TrialsController do
           end
 
           it { is_expected.to redirect_to(group_security_dashboard_url(namespace, { trial: true })) }
+          it 'records the subject' do
+            expect(Experiment).to receive(:add_subject).with('redirect_trial_user_to_feature', variant: :experimental, subject: namespace)
+
+            subject
+          end
         end
 
         context 'with redirect_trial_user_to_feature experiment control' do
@@ -215,6 +220,11 @@ RSpec.describe TrialsController do
           end
 
           it { is_expected.to redirect_to(group_url(namespace, { trial: true })) }
+          it 'records the subject' do
+            expect(Experiment).to receive(:add_subject).with('redirect_trial_user_to_feature', variant: :control, subject: namespace)
+
+            subject
+          end
         end
       end
 
