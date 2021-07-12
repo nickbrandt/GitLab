@@ -1,13 +1,22 @@
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
-import { decorateData, decorateEvents, formatMedianValues } from '../utils';
+import { DEFAULT_DAYS_TO_DISPLAY } from '../constants';
+import {
+  decorateData,
+  decorateEvents,
+  formatMedianValues,
+  calculateFormattedDayInPast,
+} from '../utils';
 import * as types from './mutation_types';
 
 export default {
-  [types.INITIALIZE_VSA](state, { requestPath, fullPath, parentId, parentPath, projectId }) {
+  [types.INITIALIZE_VSA](state, { requestPath, fullPath, parentPath, projectId }) {
     state.requestPath = requestPath;
     state.fullPath = fullPath;
     state.parentPath = parentPath;
     state.id = projectId;
+    const { now, past } = calculateFormattedDayInPast(DEFAULT_DAYS_TO_DISPLAY);
+    state.createdBefore = now;
+    state.createdAfter = past;
   },
   [types.SET_LOADING](state, loadingState) {
     state.isLoading = loadingState;
@@ -20,6 +29,9 @@ export default {
   },
   [types.SET_DATE_RANGE](state, { startDate }) {
     state.startDate = startDate;
+    const { now, past } = calculateFormattedDayInPast(startDate);
+    state.createdBefore = now;
+    state.createdAfter = past;
   },
   [types.REQUEST_VALUE_STREAMS](state) {
     state.valueStreams = [];
