@@ -23,6 +23,17 @@ RSpec.describe AppSec::Dast::ProfileScheduleWorker do
   describe '#perform' do
     subject { worker.perform }
 
+    context 'when feature flag is disabled' do
+      before do
+        stub_feature_flags(dast_on_demand_scans_scheduler: false)
+      end
+
+      it 'does not call runnable_schedules' do
+        expect(::Dast::ProfileSchedule).not_to receive(:runnable_schedules)
+        subject
+      end
+    end
+
     context 'when multiple schedules exists' do
       before do
         schedule.update_column(:next_run_at, 1.minute.from_now)

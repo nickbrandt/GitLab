@@ -11,6 +11,8 @@ module AppSec
       feature_category :dynamic_application_security_testing
 
       def perform
+        return if Feature.disabled?(:dast_on_demand_scans_scheduler)
+
         dast_runnable_schedules.find_in_batches do |schedules|
           schedules.each do |schedule|
             with_context(project: schedule.project, user: schedule.owner) do
