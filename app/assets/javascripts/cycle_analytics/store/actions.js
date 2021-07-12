@@ -79,8 +79,8 @@ export const fetchStageData = ({ state: { requestPath, selectedStage, startDate 
     .catch(() => commit(types.RECEIVE_STAGE_DATA_ERROR));
 };
 
-const getStageMedians = ({ stageId, vsaParams, queryParams = {} }) => {
-  return getValueStreamStageMedian({ ...vsaParams, stageId }, queryParams).then(({ data }) => ({
+const getStageMedians = ({ stageId, vsaParams, filterParams = {} }) => {
+  return getValueStreamStageMedian({ ...vsaParams, stageId }, filterParams).then(({ data }) => ({
     id: stageId,
     value: data?.value || null,
   }));
@@ -88,7 +88,7 @@ const getStageMedians = ({ stageId, vsaParams, queryParams = {} }) => {
 
 export const fetchStageMedians = ({
   state: { stages },
-  getters: { requestParams: vsaParams, queryParams },
+  getters: { requestParams: vsaParams, filterParams },
   commit,
 }) => {
   commit(types.REQUEST_STAGE_MEDIANS);
@@ -97,7 +97,7 @@ export const fetchStageMedians = ({
       getStageMedians({
         vsaParams,
         stageId,
-        queryParams,
+        filterParams,
       }),
     ),
   )

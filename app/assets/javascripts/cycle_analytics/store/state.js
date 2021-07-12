@@ -5,6 +5,8 @@ export default () => ({
   requestPath: '',
   fullPath: '',
   startDate: DEFAULT_DAYS_TO_DISPLAY,
+  createdAfter: null,
+  createdBefore: null,
   stages: [],
   summary: [],
   analytics: [],

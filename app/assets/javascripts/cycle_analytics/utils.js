@@ -1,6 +1,9 @@
+import dateFormat from 'dateformat';
 import { unescape } from 'lodash';
+import { dateFormats } from '~/analytics/shared/constants';
 import { sanitize } from '~/lib/dompurify';
 import { roundToNearestHalf, convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
+import { getDateInPast } from '~/lib/utils/datetime/date_calculation_utility';
 import { parseSeconds } from '~/lib/utils/datetime_utility';
 import { s__, sprintf } from '../locale';
 import DEFAULT_EVENT_OBJECTS from './default_event_objects';
@@ -112,3 +115,14 @@ export const formatMedianValues = (medians = []) =>
 
 export const filterStagesByHiddenStatus = (stages = [], isHidden = true) =>
   stages.filter(({ hidden = false }) => hidden === isHidden);
+
+const toIsoFormat = (d) => dateFormat(d, dateFormats.isoDate);
+
+// TODO: add specs
+export const calculateFormattedDayInPast = (daysInPast) => {
+  const today = new Date();
+  return {
+    now: toIsoFormat(today),
+    past: toIsoFormat(getDateInPast(today, daysInPast)),
+  };
+};

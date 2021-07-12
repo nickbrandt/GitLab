@@ -1,3 +1,5 @@
+import dateFormat from 'dateformat';
+import { dateFormats } from '~/analytics/shared/constants';
 import { transformStagesForPathNavigation, filterStagesByHiddenStatus } from '../utils';
 
 export const pathNavigationData = ({ stages, medians, stageCounts, selectedStage }) => {
@@ -18,8 +20,14 @@ export const requestParams = (state) => {
   return { valueStreamId, groupId, stageId };
 };
 
-export const queryParams = ({ id }) => {
+const dateRangeParams = ({ createdAfter, createdBefore }) => ({
+  created_after: createdAfter ? dateFormat(createdAfter, dateFormats.isoDate) : null,
+  created_before: createdBefore ? dateFormat(createdBefore, dateFormats.isoDate) : null,
+});
+
+export const filterParams = ({ id, ...rest }) => {
   return {
-    project_id: id,
+    project_ids: [id],
+    ...dateRangeParams(rest),
   };
 };
