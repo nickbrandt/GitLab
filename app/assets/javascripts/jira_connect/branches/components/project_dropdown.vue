@@ -1,10 +1,11 @@
 <script>
 import { GlDropdown, GlDropdownItem, GlSearchBoxByType, GlLoadingIcon } from '@gitlab/ui';
 import { __ } from '~/locale';
-import getProjectsQuery from '../../graphql/queries/get_projects.query.graphql';
+import { PROJECTS_PER_PAGE } from '../constants';
+import getProjectsQuery from '../graphql/queries/get_projects.query.graphql';
 
 export default {
-  PROJECTS_PER_PAGE: 20,
+  PROJECTS_PER_PAGE,
   projectQueryPageInfo: {
     endCursor: '',
   },
@@ -13,6 +14,13 @@ export default {
     GlDropdownItem,
     GlSearchBoxByType,
     GlLoadingIcon,
+  },
+  props: {
+    selectedProject: {
+      type: Object,
+      required: false,
+      default: null,
+    },
   },
   data() {
     return {
@@ -33,16 +41,18 @@ export default {
         };
       },
       update(data) {
-        return data?.projects?.nodes ?? [];
+        return data?.projects?.nodes.filter((project) => !project.repository.empty) ?? [];
       },
-      result({ data }) {
+      result() {
         this.initialProjectsLoading = false;
-        this.$options.projectQueryPageInfo.endCursor = data?.projects.pageInfo.endCursor;
+      },
+      error() {
+        this.onError({ message: __('Failed to load projects.') });
       },
     },
   },
   computed: {
-    isLoadingProjects() {
+    projectsLoading() {
       return Boolean(this.$apollo.queries.projects.loading);
     },
     projectDropdownText() {
@@ -53,8 +63,11 @@ export default {
     async onProjectSelect(project) {
       this.$emit('change', project);
     },
-    onError(err) {
-      this.$emit('error', err);
+    onError({ message } = {}) {
+      this.$emit('error', { message });
+    },
+    isProjectSelected(project) {
+      return project.id === this.selectedProject?.id;
     },
   },
 };
@@ -66,14 +79,17 @@ export default {
       <gl-search-box-by-type v-model.trim="projectSearchQuery" :debounce="250" />
     </template>
 
-    <gl-loading-icon v-show="isLoadingProjects" />
-    <gl-dropdown-item
-      v-for="project in projects"
-      v-show="!isLoadingProjects"
-      :key="project.id"
-      @click="onProjectSelect(project)"
-    >
-      {{ project.nameWithNamespace }}
-    </gl-dropdown-item>
+    <gl-loading-icon v-show="projectsLoading" />
+    <template v-if="!projectsLoading">
+      <gl-dropdown-item
+        v-for="project in projects"
+        :key="project.id"
+        is-check-item
+        :is-checked="isProjectSelected(project)"
+        @click="onProjectSelect(project)"
+      >
+        {{ project.nameWithNamespace }}
+      </gl-dropdown-item>
+    </template>
   </gl-dropdown>
 </template>

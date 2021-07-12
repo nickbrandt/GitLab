@@ -1,11 +1,11 @@
 <script>
 import { GlDropdown, GlDropdownItem, GlSearchBoxByType, GlLoadingIcon } from '@gitlab/ui';
-
 import { __ } from '~/locale';
-import getProjectQuery from '../../graphql/queries/get_project.query.graphql';
+import { BRANCHES_PER_PAGE } from '../constants';
+import getProjectQuery from '../graphql/queries/get_project.query.graphql';
 
 export default {
-  BRANCHES_PER_PAGE: 20,
+  BRANCHES_PER_PAGE,
   components: {
     GlDropdown,
     GlDropdownItem,
@@ -33,24 +33,26 @@ export default {
     };
   },
   computed: {
+    hasSelectedProject() {
+      return Boolean(this.selectedProject);
+    },
     hasSelectedSourceBranch() {
       return Boolean(this.selectedBranchName);
     },
     branchDropdownText() {
       return this.selectedBranchName || __('Select a branch');
     },
-    hasSelectedProject() {
-      return Boolean(this.selectedProject);
-    },
   },
   watch: {
-    async selectedProject(selectedProject) {
-      // this.onSourceBranchSelect(null);
-      if (!selectedProject) return;
+    selectedProject: {
+      immediate: true,
+      async handler(selectedProject) {
+        if (!selectedProject) return;
 
-      this.initialSourceBranchNamesLoading = true;
-      await this.fetchSourceBranchNames({ projectPath: selectedProject.fullPath });
-      this.initialSourceBranchNamesLoading = false;
+        this.initialSourceBranchNamesLoading = true;
+        await this.fetchSourceBranchNames({ projectPath: selectedProject.fullPath });
+        this.initialSourceBranchNamesLoading = false;
+      },
     },
   },
   methods: {
@@ -64,10 +66,10 @@ export default {
         searchPattern: this.branchSearchQuery,
       });
     },
-    onError(err) {
-      this.$emit('error', err);
+    onError({ message } = {}) {
+      this.$emit('error', { message });
     },
-    async fetchSourceBranchNames({ projectPath, searchPattern = '*' } = {}) {
+    async fetchSourceBranchNames({ projectPath, searchPattern } = {}) {
       this.sourceBranchNamesLoading = true;
       try {
         const { data } = await this.$apollo.query({
@@ -76,21 +78,20 @@ export default {
             projectPath,
             branchNamesLimit: this.$options.BRANCHES_PER_PAGE,
             branchNamesOffset: 0,
-            branchNamesSearchPattern: `*${searchPattern}*`,
+            branchNamesSearchPattern: searchPattern ? `*${searchPattern}*` : '*',
           },
         });
 
         const { branchNames, rootRef } = data?.project.repository || {};
         this.sourceBranchNames = branchNames || [];
 
-        // use root ref as the default selection
-        if (!this.hasSelectedSourceBranch) {
+        // Use root ref as the default selection
+        if (rootRef && !this.hasSelectedSourceBranch) {
           this.onSourceBranchSelect(rootRef);
         }
       } catch (err) {
         this.onError({
-          title: 'Something went wrong while fetching source branches.',
-          message: err.message,
+          message: __('Something went wrong while fetching source branches.'),
         });
       } finally {
         this.sourceBranchNamesLoading = false;
@@ -116,16 +117,18 @@ export default {
     </template>
 
     <gl-loading-icon v-show="sourceBranchNamesLoading" />
-    <gl-dropdown-item
-      v-for="branchName in sourceBranchNames"
-      v-show="!sourceBranchNamesLoading"
-      :key="branchName"
-      :is-checked="branchName === selectedBranchName"
-      is-check-item
-      class="gl-font-monospace"
-      @click="onSourceBranchSelect(branchName)"
-    >
-      {{ branchName }}
-    </gl-dropdown-item>
+    <template v-if="!sourceBranchNamesLoading">
+      <gl-dropdown-item
+        v-for="branchName in sourceBranchNames"
+        v-show="!sourceBranchNamesLoading"
+        :key="branchName"
+        :is-checked="branchName === selectedBranchName"
+        is-check-item
+        class="gl-font-monospace"
+        @click="onSourceBranchSelect(branchName)"
+      >
+        {{ branchName }}
+      </gl-dropdown-item>
+    </template>
   </gl-dropdown>
 </template>

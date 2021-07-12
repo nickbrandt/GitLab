@@ -23,6 +23,9 @@ query getProjects(
       fullPath
       avatarUrl
       path
+      repository {
+        empty
+      }
     }
     pageInfo {
       ...PageInfo
