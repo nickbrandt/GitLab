@@ -9,6 +9,8 @@ import {
   selectedValueStream,
   rawValueStreamStages,
   valueStreamStages,
+  rawStageMedians,
+  formattedStageMedians,
 } from '../mock_data';
 
 let state;
@@ -46,6 +48,8 @@ describe('Project Value Stream Analytics mutations', () => {
     ${types.RECEIVE_STAGE_DATA_ERROR}             | ${'selectedStageEvents'} | ${[]}
     ${types.RECEIVE_STAGE_DATA_ERROR}             | ${'hasError'}            | ${true}
     ${types.RECEIVE_STAGE_DATA_ERROR}             | ${'isEmptyStage'}        | ${true}
+    ${types.REQUEST_STAGE_MEDIANS}                | ${'medians'}             | ${{}}
+    ${types.RECEIVE_STAGE_MEDIANS_ERROR}          | ${'medians'}             | ${{}}
   `('$mutation will set $stateKey to $value', ({ mutation, stateKey, value }) => {
     mutations[mutation](state, {});
 
@@ -62,6 +66,8 @@ describe('Project Value Stream Analytics mutations', () => {
     ${types.RECEIVE_CYCLE_ANALYTICS_DATA_SUCCESS} | ${rawData}                          | ${'summary'}             | ${convertedData.summary}
     ${types.RECEIVE_VALUE_STREAMS_SUCCESS}        | ${[selectedValueStream]}            | ${'valueStreams'}        | ${[selectedValueStream]}
     ${types.RECEIVE_VALUE_STREAM_STAGES_SUCCESS}  | ${{ stages: rawValueStreamStages }} | ${'stages'}              | ${valueStreamStages}
+    ${types.RECEIVE_VALUE_STREAMS_SUCCESS}        | ${[selectedValueStream]}            | ${'valueStreams'}        | ${[selectedValueStream]}
+    ${types.RECEIVE_STAGE_MEDIANS_SUCCESS}        | ${rawStageMedians}                  | ${'medians'}             | ${formattedStageMedians}
   `(
     '$mutation with $payload will set $stateKey to $value',
     ({ mutation, payload, stateKey, value }) => {

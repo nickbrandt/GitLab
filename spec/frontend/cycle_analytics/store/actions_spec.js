@@ -3,7 +3,7 @@ import MockAdapter from 'axios-mock-adapter';
 import testAction from 'helpers/vuex_action_helper';
 import * as actions from '~/cycle_analytics/store/actions';
 import httpStatusCodes from '~/lib/utils/http_status';
-import { selectedStage, selectedValueStream } from '../mock_data';
+import { allowedStages, selectedStage, selectedValueStream } from '../mock_data';
 
 const mockRequestPath = 'some/cool/path';
 const mockFullPath = '/namespace/-/analytics/value_stream_analytics/value_streams';
@@ -187,7 +187,11 @@ describe('Project Value Stream Analytics actions', () => {
         state,
         payload: {},
         expectedMutations: [{ type: 'REQUEST_VALUE_STREAMS' }],
-        expectedActions: [{ type: 'receiveValueStreamsSuccess' }, { type: 'setSelectedStage' }],
+        expectedActions: [
+          { type: 'receiveValueStreamsSuccess' },
+          { type: 'setSelectedStage' },
+          { type: 'fetchStageMedians' },
+        ],
       }));
 
     describe('with a failing request', () => {
@@ -275,6 +279,61 @@ describe('Project Value Stream Analytics actions', () => {
           expectedMutations: [
             { type: 'REQUEST_VALUE_STREAM_STAGES' },
             { type: 'RECEIVE_VALUE_STREAM_STAGES_ERROR', payload: httpStatusCodes.BAD_REQUEST },
+          ],
+          expectedActions: [],
+        }));
+    });
+  });
+
+  describe('fetchStageMedians', () => {
+    const mockValueStreamPath = /median/;
+
+    const stageMediansPayload = [
+      { id: 'issue', value: null },
+      { id: 'plan', value: null },
+      { id: 'code', value: null },
+    ];
+
+    const stageMedianError = new Error(
+      `Request failed with status code ${httpStatusCodes.BAD_REQUEST}`,
+    );
+
+    beforeEach(() => {
+      state = {
+        fullPath: mockFullPath,
+        selectedValueStream,
+        stages: allowedStages,
+      };
+      mock = new MockAdapter(axios);
+      mock.onGet(mockValueStreamPath).reply(httpStatusCodes.OK);
+    });
+
+    it(`commits the 'REQUEST_STAGE_MEDIANS' and 'RECEIVE_STAGE_MEDIANS_SUCCESS' mutations`, () =>
+      testAction({
+        action: actions.fetchStageMedians,
+        state,
+        payload: {},
+        expectedMutations: [
+          { type: 'REQUEST_STAGE_MEDIANS' },
+          { type: 'RECEIVE_STAGE_MEDIANS_SUCCESS', payload: stageMediansPayload },
+        ],
+        expectedActions: [],
+      }));
+
+    describe('with a failing request', () => {
+      beforeEach(() => {
+        mock = new MockAdapter(axios);
+        mock.onGet(mockValueStreamPath).reply(httpStatusCodes.BAD_REQUEST);
+      });
+
+      it(`commits the 'RECEIVE_VALUE_STREAM_STAGES_ERROR' mutation`, () =>
+        testAction({
+          action: actions.fetchStageMedians,
+          state,
+          payload: {},
+          expectedMutations: [
+            { type: 'REQUEST_STAGE_MEDIANS' },
+            { type: 'RECEIVE_STAGE_MEDIANS_ERROR', payload: stageMedianError },
           ],
           expectedActions: [],
         }));

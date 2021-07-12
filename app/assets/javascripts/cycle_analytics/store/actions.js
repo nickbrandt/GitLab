@@ -80,10 +80,10 @@ export const fetchStageData = ({ state: { requestPath, selectedStage, startDate 
 };
 
 const getStageMedians = ({ stageId, vsaParams, queryParams = {} }) => {
-  console.log('getStageMedians', stageId, vsaParams, queryParams);
-  return getValueStreamStageMedian({ ...vsaParams, stageId }, queryParams)
-    .then(({ data }) => ({ id: stageId, value: data?.value || null }))
-    .catch((err) => ({ stageId, value: null }));
+  return getValueStreamStageMedian({ ...vsaParams, stageId }, queryParams).then(({ data }) => ({
+    id: stageId,
+    value: data?.value || null,
+  }));
 };
 
 export const fetchStageMedians = ({
@@ -92,8 +92,6 @@ export const fetchStageMedians = ({
   commit,
 }) => {
   commit(types.REQUEST_STAGE_MEDIANS);
-  console.log('fetchStageMedians::stages', stages);
-  console.log('fetchStageMedians::requestParams', vsaParams);
   return Promise.all(
     stages.map(({ id: stageId }) =>
       getStageMedians({
@@ -104,7 +102,12 @@ export const fetchStageMedians = ({
     ),
   )
     .then((data) => commit(types.RECEIVE_STAGE_MEDIANS_SUCCESS, data))
-    .catch((error) => commit(types.RECEIVE_STAGE_MEDIANS_ERROR, error));
+    .catch((error) => {
+      commit(types.RECEIVE_STAGE_MEDIANS_ERROR, error);
+      createFlash({
+        message: __('There was an error fetching median data for stages'),
+      });
+    });
 };
 
 export const setSelectedStage = ({ dispatch, commit, state: { stages } }, selectedStage = null) => {
