@@ -16,7 +16,7 @@ RSpec.describe Gitlab::Database::Partitioning::PartitionManager do
   end
 
   context 'creating partitions (mocked)' do
-    subject { described_class.new(models).sync_partitions }
+    subject(:sync_partitions) { described_class.new(models).sync_partitions }
 
     let(:models) { [model] }
     let(:model) { double(partitioning_strategy: partitioning_strategy, table_name: table) }
@@ -42,7 +42,7 @@ RSpec.describe Gitlab::Database::Partitioning::PartitionManager do
       expect(ActiveRecord::Base.connection).to receive(:execute).with(partitions.first.to_sql)
       expect(ActiveRecord::Base.connection).to receive(:execute).with(partitions.second.to_sql)
 
-      subject
+      sync_partitions
     end
 
     context 'error handling with 2 models' do
@@ -61,13 +61,13 @@ RSpec.describe Gitlab::Database::Partitioning::PartitionManager do
         expect(ActiveRecord::Base.connection).to receive(:execute).with(partitions.first.to_sql)
         expect(ActiveRecord::Base.connection).to receive(:execute).with(partitions.second.to_sql)
 
-        subject
+        sync_partitions
       end
     end
   end
 
   context 'creating partitions' do
-    subject { described_class.new([my_model]).sync_partitions }
+    subject(:sync_partitions) { described_class.new([my_model]).sync_partitions }
 
     let(:connection) { ActiveRecord::Base.connection }
     let(:my_model) do
@@ -89,14 +89,12 @@ RSpec.describe Gitlab::Database::Partitioning::PartitionManager do
     end
 
     it 'creates partitions' do
-      expect { subject }.to change { find_partitions(my_model.table_name, schema: Gitlab::Database::DYNAMIC_PARTITIONS_SCHEMA).size }.from(0)
-
-      subject
+      expect { sync_partitions }.to change { find_partitions(my_model.table_name, schema: Gitlab::Database::DYNAMIC_PARTITIONS_SCHEMA).size }.from(0)
     end
   end
 
   context 'detaching partitions (mocked)' do
-    subject { manager.sync_partitions }
+    subject(:sync_partitions) { manager.sync_partitions }
 
     let(:manager) { described_class.new(models) }
     let(:models) { [model] }
@@ -125,7 +123,7 @@ RSpec.describe Gitlab::Database::Partitioning::PartitionManager do
       it 'detaches each extra partition' do
         extra_partitions.each { |p| expect(manager).to receive(:detach_one_partition).with(p) }
 
-        subject
+        sync_partitions
       end
 
       context 'error handling' do
@@ -142,7 +140,7 @@ RSpec.describe Gitlab::Database::Partitioning::PartitionManager do
           expect(error_strategy).to receive(:extra_partitions).and_raise('injected error!')
           extra_partitions.each { |p| expect(manager).to receive(:detach_one_partition).with(p) }
 
-          subject
+          sync_partitions
         end
       end
     end
@@ -154,7 +152,7 @@ RSpec.describe Gitlab::Database::Partitioning::PartitionManager do
       it 'returns immediately' do
         expect(manager).not_to receive(:detach)
 
-        subject
+        sync_partitions
       end
     end
   end
