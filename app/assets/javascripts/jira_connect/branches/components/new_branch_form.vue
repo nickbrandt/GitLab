@@ -88,12 +88,14 @@ export default {
         <source-branch-dropdown
           :selected-project="selectedProject"
           :selected-branch-name="selectedSourceBranchName"
-          @change="onProjectSelect"
+          @change="onSourceBranchSelect"
         />
       </gl-form-group>
 
       <div class="form-actions">
-        <gl-button type="submit" variant="confirm">{{ formSubmitButtonText }}</gl-button>
+        <gl-button type="submit" variant="confirm">{{
+          $options.i18n.formSubmitButtonText
+        }}</gl-button>
       </div>
     </gl-form>
   </div>

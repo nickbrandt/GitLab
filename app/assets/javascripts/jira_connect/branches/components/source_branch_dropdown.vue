@@ -18,6 +18,11 @@ export default {
       required: false,
       default: null,
     },
+    selectedBranchName: {
+      type: String,
+      required: false,
+      default: null,
+    },
   },
   data() {
     return {
@@ -29,18 +34,22 @@ export default {
   },
   computed: {
     hasSelectedSourceBranch() {
-      return Boolean(this.selectedSourceBranchName);
+      return Boolean(this.selectedBranchName);
     },
     branchDropdownText() {
-      return this.selectedSourceBranchName || __('Select a branch');
+      return this.selectedBranchName || __('Select a branch');
+    },
+    hasSelectedProject() {
+      return Boolean(this.selectedProject);
     },
   },
   watch: {
-    async selectedProject() {
-      this.onSourceBranchSelect(null);
+    async selectedProject(selectedProject) {
+      // this.onSourceBranchSelect(null);
+      if (!selectedProject) return;
 
       this.initialSourceBranchNamesLoading = true;
-      await this.fetchSourceBranchNames({ projectPath: this.selectedProject.fullPath });
+      await this.fetchSourceBranchNames({ projectPath: selectedProject.fullPath });
       this.initialSourceBranchNamesLoading = false;
     },
   },
@@ -73,9 +82,10 @@ export default {
 
         const { branchNames, rootRef } = data?.project.repository || {};
         this.sourceBranchNames = branchNames || [];
+
         // use root ref as the default selection
         if (!this.hasSelectedSourceBranch) {
-          this.selectedSourceBranchName = rootRef;
+          this.onSourceBranchSelect(rootRef);
         }
       } catch (err) {
         this.onError({
@@ -110,7 +120,7 @@ export default {
       v-for="branchName in sourceBranchNames"
       v-show="!sourceBranchNamesLoading"
       :key="branchName"
-      :is-checked="branchName === selectedSourceBranchName"
+      :is-checked="branchName === selectedBranchName"
       is-check-item
       class="gl-font-monospace"
       @click="onSourceBranchSelect(branchName)"
