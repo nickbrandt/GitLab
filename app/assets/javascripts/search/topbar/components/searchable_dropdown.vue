@@ -17,7 +17,7 @@ import SearchableDropdownItem from './searchable_dropdown_item.vue';
 export default {
   i18n: {
     clearLabel: __('Clear'),
-    recentlyUsed: __('Recently used'),
+    frequentlySearched: __('Frequently searched'),
   },
   name: 'SearchableDropdown',
   components: {
@@ -156,7 +156,9 @@ export default {
       v-if="showFrequentItems"
       class="gl-border-b-solid gl-border-b-gray-100 gl-border-b-1 gl-pb-2 gl-mb-2"
     >
-      <gl-dropdown-section-header>{{ $options.i18n.recentlyUsed }}</gl-dropdown-section-header>
+      <gl-dropdown-section-header>{{
+        $options.i18n.frequentlySearched
+      }}</gl-dropdown-section-header>
       <searchable-dropdown-item
         v-for="item in frequentItems"
         :key="item.id"
