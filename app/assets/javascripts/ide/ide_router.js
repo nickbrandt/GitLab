@@ -1,5 +1,4 @@
 import Vue from 'vue';
-import createFlash from '~/flash';
 import IdeRouter from '~/ide/ide_router_extension';
 import { joinPaths } from '~/lib/utils/url_utility';
 import {
