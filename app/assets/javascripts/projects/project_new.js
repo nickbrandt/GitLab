@@ -74,7 +74,7 @@ const deriveProjectPathFromUrl = ($projectImportUrl) => {
 const bindEvents = () => {
   const $newProjectForm = $('#new_project');
   const $projectImportUrl = $('#project_import_url');
-  const $projectImportUrlWarning = $('#project_import_url_warning');
+  const $projectImportUrlWarning = $('.js-import-url-warning');
   const $projectPath = $('.tab-pane.active #project_path');
   const $useTemplateBtn = $('.template-button > input');
   const $projectFieldsForm = $('.project-fields-form');
