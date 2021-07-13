@@ -36,25 +36,40 @@ export default {
     };
   },
   methods: {
-    cleanFields() {
+    resetFields() {
       this.imgSrc = '';
-      this.$refs.fileUpload.value = '';
+      this.$refs.fileSelector.value = '';
     },
     insertImage() {
-      const alt = getImageAlt(this.imgSrc);
-      this.tiptapEditor.chain().focus().setImage({ src: this.imgSrc, alt }).run();
-      this.cleanFields();
+      this.tiptapEditor
+        .chain()
+        .focus()
+        .setImage({
+          src: this.imgSrc,
+          canonicalSrc: this.imgSrc,
+          alt: getImageAlt(this.imgSrc),
+        })
+        .run();
+
+      this.resetFields();
       this.emitExecute();
     },
     emitExecute(source = 'url') {
       this.$emit('execute', { contentType: 'image', value: source });
     },
     openFileUpload() {
-      this.$refs.fileUpload.click();
+      this.$refs.fileSelector.click();
     },
-    onUploadChange(e) {
-      this.tiptapEditor.chain().focus().uploadImage({ file: e.target.files[0] }).run();
-      this.cleanFields();
+    onFileSelect(e) {
+      this.tiptapEditor
+        .chain()
+        .focus()
+        .uploadImage({
+          file: e.target.files[0],
+        })
+        .run();
+
+      this.resetFields();
       this.emitExecute('upload');
     },
   },
@@ -69,7 +84,7 @@ export default {
     size="small"
     category="tertiary"
     icon="media"
-    @hidden="cleanFields()"
+    @hidden="resetFields()"
   >
     <gl-dropdown-form class="gl-px-3!">
       <gl-form-input-group v-model="imgSrc" :placeholder="__('Image URL')">
@@ -84,12 +99,12 @@ export default {
     </gl-dropdown-item>
 
     <input
-      ref="fileUpload"
+      ref="fileSelector"
       type="file"
       name="content_editor_image"
       :accept="$options.acceptedMimes"
       class="gl-display-none"
-      @change="onUploadChange"
+      @change="onFileSelect"
     />
   </gl-dropdown>
 </template>
