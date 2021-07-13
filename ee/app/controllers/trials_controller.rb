@@ -150,7 +150,7 @@ class TrialsController < ApplicationController
 
     return false unless GitlabSubscription.trial_extension_types.value?(trial_extension_type)
 
-    return false if trial_extension_type == GitlabSubscription.trial_extension_types[:extended] && !@namespace.can_extend?
+    return false if trial_extension_type == GitlabSubscription.trial_extension_types[:extended] && !@namespace.can_extend_trial?
 
     return false if trial_extension_type == GitlabSubscription.trial_extension_types[:reactivated] && !@namespace.can_reactivate?
 

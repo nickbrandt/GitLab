@@ -1229,10 +1229,10 @@ RSpec.describe Namespace do
     end
   end
 
-  describe '#can_extend?' do
-    subject { namespace.can_extend? }
+  describe '#can_extend_trial?' do
+    subject { namespace.can_extend_trial? }
 
-    where(:trial_active, :trial_extended_or_reactivated, :can_extend) do
+    where(:trial_active, :trial_extended_or_reactivated, :can_extend_trial) do
       false | false | false
       false | true  | false
       true  | false | true
@@ -1245,7 +1245,7 @@ RSpec.describe Namespace do
         allow(namespace).to receive(:trial_extended_or_reactivated?).and_return(trial_extended_or_reactivated)
       end
 
-      it { is_expected.to be can_extend }
+      it { is_expected.to be can_extend_trial }
     end
   end
 
