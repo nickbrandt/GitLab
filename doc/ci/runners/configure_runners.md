@@ -90,7 +90,7 @@ To protect or unprotect a runner:
 1. Check the **Protected** option.
 1. Click **Save changes**.
 
-![specific runners edit icon](img/protected_runners_check_box.png)
+![specific runners edit icon](img/protected_runners_check_box_v14_1.png)
 
 ### Forks
 
