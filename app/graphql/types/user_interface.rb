@@ -62,6 +62,9 @@ module Types
           type: Types::GroupMemberType.connection_type,
           null: true,
           description: 'Group memberships of the user.'
+    field :manageable_groups,
+          resolver: Resolvers::Users::ManageableGroupsResolver,
+          description: 'Groups the user can manage'
     field :group_count,
           resolver: Resolvers::Users::GroupCountResolver,
           description: 'Group count for the user.'
