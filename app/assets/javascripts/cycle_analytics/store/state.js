@@ -1,6 +1,7 @@
 import { DEFAULT_DAYS_TO_DISPLAY } from '../constants';
 
 export default () => ({
+  features: {},
   id: null,
   requestPath: '',
   fullPath: '',
