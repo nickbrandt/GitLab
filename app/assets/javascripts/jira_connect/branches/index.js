@@ -11,6 +11,8 @@ export default async function initJiraConnectBranches() {
     return null;
   }
 
+  const { initialBranchName } = el.dataset;
+
   const apolloProvider = new VueApollo({
     defaultClient: createDefaultClient(
       {},
@@ -24,7 +26,11 @@ export default async function initJiraConnectBranches() {
     el,
     apolloProvider,
     render(createElement) {
-      return createElement(JiraConnectNewBranchForm);
+      return createElement(JiraConnectNewBranchForm, {
+        props: {
+          initialBranchName,
+        },
+      });
     },
   });
 }

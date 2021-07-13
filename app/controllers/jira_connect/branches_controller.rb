@@ -28,13 +28,4 @@ class JiraConnect::BranchesController < ApplicationController
     def issue_params
       @issue_params ||= params.require(:issue).permit(:key, :summary)
     end
-  
-    def branch_params
-      @branch_params ||= params.permit(:branch_name, :source_branch, :project_id)
-    end
-  
-    def sanitize_ref(ref)
-      ref_escaped = strip_tags(sanitize(ref))
-      Addressable::URI.unescape(ref_escaped)
-    end
   end

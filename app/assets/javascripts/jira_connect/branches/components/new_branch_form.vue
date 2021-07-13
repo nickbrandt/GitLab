@@ -25,11 +25,18 @@ export default {
     ProjectDropdown,
     SourceBranchDropdown,
   },
+  props: {
+    initialBranchName: {
+      type: String,
+      required: false,
+      default: '',
+    },
+  },
   data() {
     return {
       selectedProject: null,
       selectedSourceBranchName: null,
-      branchName: '',
+      branchName: this.initialBranchName,
       createBranchLoading: false,
       alertParams: {
         ...DEFAULT_ALERT_PARAMS,
@@ -42,6 +49,9 @@ export default {
     },
     showAlert() {
       return Boolean(this.alertParams?.message);
+    },
+    disableSubmitButton() {
+      return !(this.selectedProject && this.selectedSourceBranchName && this.branchName);
     },
   },
   methods: {
@@ -160,11 +170,14 @@ export default {
         />
       </gl-form-group>
 
-      <gl-form-group :label="$options.i18n.sourceBranchDropdownLabel" label-for="branch-name-input">
+      <gl-form-group :label="$options.i18n.branchNameInputLabel" label-for="branch-name-input">
         <gl-form-input id="branch-name-input" v-model="branchName" type="text" required />
       </gl-form-group>
 
-      <gl-form-group :label="$options.i18n.branchNameInputLabel" label-for="source-branch-select">
+      <gl-form-group
+        :label="$options.i18n.sourceBranchDropdownLabel"
+        label-for="source-branch-select"
+      >
         <source-branch-dropdown
           id="source-branch-select"
           :selected-project="selectedProject"
@@ -175,7 +188,12 @@ export default {
       </gl-form-group>
 
       <div class="form-actions">
-        <gl-button :loading="createBranchLoading" type="submit" variant="confirm">
+        <gl-button
+          :loading="createBranchLoading"
+          type="submit"
+          variant="confirm"
+          :disabled="disableSubmitButton"
+        >
           {{ $options.i18n.formSubmitButtonText }}
         </gl-button>
       </div>
