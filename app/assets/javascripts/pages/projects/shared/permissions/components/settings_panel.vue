@@ -447,7 +447,7 @@ export default {
         :label="$options.i18n.issuesLabel"
         :help-text="
           s__(
-            'ProjectSettings|Flexible, powerful tool for collaboratively developing ideas and planning work in this project.',
+            'ProjectSettings|Flexible tool to collaboratively develop ideas and plan work in this project.',
           )
         "
       >
