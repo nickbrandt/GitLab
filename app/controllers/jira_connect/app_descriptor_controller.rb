@@ -54,7 +54,12 @@ class JiraConnect::AppDescriptorController < JiraConnect::ApplicationController
         },
         url: HOME_URL,
         logoUrl: logo_url,
-        capabilities: %w(branch commit pull_request)
+        capabilities: %w(branch commit pull_request),
+        actions: {
+          createBranch: {
+            templateUrl: new_jira_connect_branch_url + '?issue[key]={issue.key}&issue[summary]={issue.summary}'
+          }
+        }
       },
       postInstallPage: {
         key: 'gitlab-configuration',
