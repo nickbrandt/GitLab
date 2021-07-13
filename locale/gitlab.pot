@@ -5343,6 +5343,9 @@ msgstr ""
 msgid "Boards|An error occurred while fetching group projects. Please try again."
 msgstr ""
 
+msgid "Boards|An error occurred while fetching issues. Please reload the page."
+msgstr ""
+
 msgid "Boards|An error occurred while fetching labels. Please reload the page."
 msgstr ""
 
@@ -5432,7 +5435,13 @@ msgstr ""
 msgid "Board|Failed to delete board. Please try again."
 msgstr ""
 
+msgid "Board|Load more epics"
+msgstr ""
+
 msgid "Board|Load more issues"
+msgstr ""
+
+msgid "Board|Loading epics"
 msgstr ""
 
 msgid "Bold text"
