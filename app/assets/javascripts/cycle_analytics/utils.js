@@ -118,9 +118,15 @@ export const filterStagesByHiddenStatus = (stages = [], isHidden = true) =>
 
 const toIsoFormat = (d) => dateFormat(d, dateFormats.isoDate);
 
-// TODO: add specs
-export const calculateFormattedDayInPast = (daysInPast) => {
-  const today = new Date();
+/**
+ * Takes an integer specifying the number of days to subtract
+ * from the date specified will return the 2 dates, formatted as ISO dates
+ *
+ * @param {Number} daysInPast - Number of days in the past to subtract
+ * @param {Date} [today=new Date] - Date to subtract days from, defaults to today
+ * @returns {Object} Returns 'now' and the 'past' date formatted as ISO dates
+ */
+export const calculateFormattedDayInPast = (daysInPast, today = new Date()) => {
   return {
     now: toIsoFormat(today),
     past: toIsoFormat(getDateInPast(today, daysInPast)),
