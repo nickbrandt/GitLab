@@ -9,10 +9,10 @@ import {
 import * as types from './mutation_types';
 
 export default {
-  [types.INITIALIZE_VSA](state, { requestPath, fullPath, parentPath, projectId, features }) {
+  [types.INITIALIZE_VSA](state, { requestPath, fullPath, groupPath, projectId, features }) {
     state.requestPath = requestPath;
     state.fullPath = fullPath;
-    state.parentPath = parentPath;
+    state.groupPath = groupPath;
     state.id = projectId;
     const { now, past } = calculateFormattedDayInPast(DEFAULT_DAYS_TO_DISPLAY);
     state.createdBefore = now;
