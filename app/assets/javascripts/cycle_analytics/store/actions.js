@@ -36,12 +36,20 @@ export const receiveValueStreamsSuccess = ({ commit, dispatch }, data = []) => {
 };
 
 export const fetchValueStreams = ({ commit, dispatch, state }) => {
-  const { fullPath } = state;
+  const {
+    fullPath,
+    features: { cycleAnalyticsForGroups },
+  } = state;
   commit(types.REQUEST_VALUE_STREAMS);
+
+  const stageRequests = ['setSelectedStage'];
+  if (cycleAnalyticsForGroups) {
+    stageRequests.push('fetchStageMedians');
+  }
 
   return getProjectValueStreams(fullPath)
     .then(({ data }) => dispatch('receiveValueStreamsSuccess', data))
-    .then(() => Promise.all([dispatch('setSelectedStage'), dispatch('fetchStageMedians')]))
+    .then(() => Promise.all(stageRequests.map((r) => dispatch(r))))
     .catch(({ response: { status } }) => {
       commit(types.RECEIVE_VALUE_STREAMS_ERROR, status);
     });

@@ -25,6 +25,10 @@ const mockRequestedDataMutations = [
   },
 ];
 
+const features = {
+  cycleAnalyticsForGroups: true,
+};
+
 describe('Project Value Stream Analytics actions', () => {
   let state;
   let mock;
@@ -175,6 +179,7 @@ describe('Project Value Stream Analytics actions', () => {
 
     beforeEach(() => {
       state = {
+        features,
         fullPath: mockFullPath,
       };
       mock = new MockAdapter(axios);
@@ -193,6 +198,26 @@ describe('Project Value Stream Analytics actions', () => {
           { type: 'fetchStageMedians' },
         ],
       }));
+
+    describe('with cycleAnalyticsForGroups=false', () => {
+      beforeEach(() => {
+        state = {
+          features: { cycleAnalyticsForGroups: false },
+          fullPath: mockFullPath,
+        };
+        mock = new MockAdapter(axios);
+        mock.onGet(mockValueStreamPath).reply(httpStatusCodes.OK);
+      });
+
+      it("does not dispatch the 'fetchStageMedians' request", () =>
+        testAction({
+          action: actions.fetchValueStreams,
+          state,
+          payload: {},
+          expectedMutations: [{ type: 'REQUEST_VALUE_STREAMS' }],
+          expectedActions: [{ type: 'receiveValueStreamsSuccess' }, { type: 'setSelectedStage' }],
+        }));
+    });
 
     describe('with a failing request', () => {
       beforeEach(() => {
