@@ -120,6 +120,7 @@ RSpec.describe Gitlab::Database::Partitioning::PartitionManager do
       before do
         stub_feature_flags(partition_pruning_dry_run: true)
       end
+
       it 'detaches each extra partition' do
         extra_partitions.each { |p| expect(manager).to receive(:detach_one_partition).with(p) }
 
@@ -149,6 +150,7 @@ RSpec.describe Gitlab::Database::Partitioning::PartitionManager do
       before do
         stub_feature_flags(partition_pruning_dry_run: false)
       end
+
       it 'returns immediately' do
         expect(manager).not_to receive(:detach)
 
