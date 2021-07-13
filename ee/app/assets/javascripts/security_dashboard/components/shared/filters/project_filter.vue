@@ -15,7 +15,7 @@ import instanceProjectsQuery from '../../../graphql/queries/instance_projects.qu
 import { mapProjects, PROJECT_LOADING_ERROR_MESSAGE } from '../../../helpers';
 import FilterBody from './filter_body.vue';
 import FilterItem from './filter_item.vue';
-import StandardFilter from './standard_filter.vue';
+import SimpleFilter from './simple_filter.vue';
 
 const SEARCH_TERM_MINIMUM_LENGTH = 3;
 const SELECTED_PROJECTS_MAX_COUNT = 100;
@@ -41,7 +41,7 @@ export default {
     GlDropdownText,
   },
   directives: { SafeHtml },
-  extends: StandardFilter,
+  extends: SimpleFilter,
   inject: ['groupFullPath', 'dashboardType'],
   data: () => ({
     projectsCache: {},
@@ -57,6 +57,9 @@ export default {
       return new Set(this.selectedOptions.map((x) => x.id));
     },
     selectableProjects() {
+      // When searching, we want the "select in place" behavior when a dropdown item is clicked, so
+      // we show all the projects. If not, we want the "move the selected item to the top" behavior,
+      // so we show only unselected projects:
       return this.isSearching ? this.projects : this.projects.filter((x) => !this.isSelected(x.id));
     },
     isLoadingProjects() {
@@ -112,10 +115,7 @@ export default {
 
         const property = data[this.queryConfig.property];
         const projects = mapProjects(property.projects.nodes);
-        // Save each returned project to the cache.
-        projects.forEach((project) => {
-          this.$set(this.projectsCache, project.id, project);
-        });
+        this.saveProjectsToCache(projects);
         // Now that we have the project for each uncached ID, set the selected options.
         this.selectedOptions = this.querystringOptions;
       },
@@ -143,9 +143,7 @@ export default {
         return mapProjects(property.projects.nodes);
       },
       result() {
-        this.projects.forEach((project) => {
-          this.$set(this.projectsCache, project.id, project);
-        });
+        this.saveProjectsToCache(this.projects);
       },
       error() {
         createFlash({ message: PROJECT_LOADING_ERROR_MESSAGE });
@@ -182,6 +180,9 @@ export default {
       const terms = escapeRegExp(this.searchTerm).split(' ').join('|');
       const regex = new RegExp(`(${terms})`, 'gi');
       return name.replace(regex, '<b>$1</b>');
+    },
+    saveProjectsToCache(projects) {
+      projects.forEach((project) => this.$set(this.projectsCache, project.id, project));
     },
   },
   i18n: {
