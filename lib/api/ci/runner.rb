@@ -82,7 +82,7 @@ module API
         before { set_application_context }
 
         desc 'Request a job' do
-          success Entities::JobRequest::Response
+          success Entities::Ci::JobRequest::Response
           http_codes [[201, 'Job was scheduled'],
                       [204, 'No job for Runner'],
                       [403, 'Forbidden']]
@@ -267,7 +267,7 @@ module API
         end
 
         desc 'Upload artifacts for job' do
-          success Entities::JobRequest::Response
+          success Entities::Ci::JobRequest::Response
           http_codes [[201, 'Artifact uploaded'],
                       [400, 'Bad request'],
                       [403, 'Forbidden'],
