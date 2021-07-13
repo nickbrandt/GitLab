@@ -28,7 +28,7 @@ module EE
 
       override :pings_enabled?
       def pings_enabled?
-        ::License.current&.usage_ping? || ::Gitlab::CurrentSettings.usage_ping_enabled?
+        ::License.current&.usage_ping? || super
       end
     end
   end
