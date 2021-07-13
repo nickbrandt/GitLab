@@ -10,7 +10,8 @@ query Iterations(
   $firstPageSize: Int
   $lastPageSize: Int
 ) {
-  group(fullPath: $fullPath) {
+  workspace: group(fullPath: $fullPath) {
+    id
     iterations(
       iterationCadenceIds: [$iterationCadenceId]
       state: $state
