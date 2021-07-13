@@ -6,6 +6,14 @@ module EE
       module PopulateLatestPipelineIds
         extend ::Gitlab::Utils::Override
 
+        module LogUtils
+          MIGRATOR = 'PopulateLatestPipelineIds'
+
+          def log_info(log_attributes)
+            ::Gitlab::BackgroundMigration::Logger.info(log_attributes.merge(migrator: MIGRATOR))
+          end
+        end
+
         module Routable
           extend ActiveSupport::Concern
 
@@ -57,10 +65,11 @@ module EE
           self.table_name = 'routes'
         end
 
-        class Project < ActiveRecord::Base
+        class Project < ActiveRecord::Base # rubocop:disable Metrics/ClassLength
           include Routable
           include Visibility
           include ::Gitlab::Utils::StrongMemoize
+          include LogUtils
 
           self.table_name = 'projects'
 
@@ -132,7 +141,13 @@ module EE
           end
 
           def stats_tuple
-            return unless latest_pipeline_id
+            unless latest_pipeline_id
+              log_info(message: 'No latest_pipeline_id found', project_id: id)
+
+              return
+            end
+
+            log_info(message: 'latest_pipeline_id found', project_id: id)
 
             [id, DEFAULT_LETTER_GRADE, latest_pipeline_id, quoted_time, quoted_time].join(', ').then { |s| "(#{s})" }
           rescue StandardError => e
@@ -158,12 +173,13 @@ module EE
           end
 
           def pipeline_with_reports_sql
+            log_info(message: 'Pipeline with reports SQL requested', project_id: id, ref: default_branch)
+
             format(LATEST_PIPELINE_WITH_REPORTS_SQL, project_id: id, ref: connection.quote(default_branch), file_types: FILE_TYPES.join(', '))
           end
 
-          ### Default branch related logic
           def default_branch
-            @default_branch ||= repository.root_ref || default_branch_from_preferences
+            strong_memoize(:default_branch) { repository.root_ref || default_branch_from_preferences }
           end
 
           def repository
@@ -277,6 +293,8 @@ module EE
         end
 
         class VulnerabilityStatistic < ActiveRecord::Base
+          extend LogUtils
+
           self.table_name = 'vulnerability_statistics'
 
           UPSERT_SQL = <<~SQL
@@ -294,7 +312,9 @@ module EE
             def update_latest_pipeline_ids_for(projects)
               upsert_tuples = projects.map(&:stats_tuple).compact
 
-              run_upsert(upsert_tuples) if upsert_tuples.present?
+              return log_info(message: 'No projects to update') unless upsert_tuples.present?
+
+              run_upsert(upsert_tuples)
             end
 
             private
@@ -303,12 +323,19 @@ module EE
               upsert_sql = format(UPSERT_SQL, insert_tuples: tuples.join(', '))
 
               connection.execute(upsert_sql)
+              log_info(message: 'Update query has been executed', query: upsert_sql)
             end
           end
         end
 
+        include LogUtils
+
         def perform(start_id, end_id)
+          log_info(message: 'Migration started', start_id: start_id, end_id: end_id)
+
           projects = Project.by_range(start_id, end_id)
+
+          log_info(message: 'Projects fetched', count: projects.length)
 
           VulnerabilityStatistic.update_latest_pipeline_ids_for(projects)
         end
