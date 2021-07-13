@@ -387,7 +387,7 @@ RSpec.describe 'Admin::Users::User' do
     end
 
     with_them do
-      it "allows an admin to force confirmation of the user's email" do
+      it "allows an admin to force confirmation of the user's email", :aggregate_failures do
         visit path_helper.call(unconfirmed_user)
 
         click_button 'Confirm user'
