@@ -30603,6 +30603,9 @@ msgstr ""
 msgid "Something went wrong while fetching requirements list."
 msgstr ""
 
+msgid "Something went wrong while fetching source branches."
+msgstr ""
+
 msgid "Something went wrong while fetching the environments for this merge request. Please try again."
 msgstr ""
 
