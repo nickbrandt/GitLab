@@ -478,6 +478,7 @@ describe('SidebarDropdownWidget', () => {
                 sort: 'TITLE_ASC',
                 state: 'opened',
                 title: mockSearchTerm,
+                in: 'TITLE',
               });
             });
           });
