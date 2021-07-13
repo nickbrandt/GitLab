@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe BuildFinishedWorker do
+RSpec.describe Ci::BuildFinishedWorker do
   subject { described_class.new.perform(build.id) }
 
   describe '#perform' do
