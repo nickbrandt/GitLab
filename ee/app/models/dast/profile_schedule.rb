@@ -17,8 +17,6 @@ class Dast::ProfileSchedule < ApplicationRecord
   scope :with_owner, -> { includes(:owner) }
 
   scope :active, -> { where(active: true) }
-  # Runnable schedules should be active too.
-  scope :runnable_schedules, -> { active.where("next_run_at < ?", Time.zone.now) }
 
   private
 

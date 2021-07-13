@@ -12005,7 +12005,7 @@ ALTER SEQUENCE custom_emoji_id_seq OWNED BY custom_emoji.id;
 
 CREATE TABLE dast_profile_schedules (
     id bigint NOT NULL,
-    active boolean DEFAULT true,
+    active boolean DEFAULT true NOT NULL,
     dast_profile_id bigint NOT NULL,
     user_id bigint NOT NULL,
     project_id bigint NOT NULL,
