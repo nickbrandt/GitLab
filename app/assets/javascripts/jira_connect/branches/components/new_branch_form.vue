@@ -6,6 +6,13 @@ import ProjectDropdown from './project_dropdown.vue';
 import SourceBranchDropdown from './source_branch_dropdown.vue';
 
 const DEFAULT_ALERT_VARIANT = 'danger';
+const DEFAULT_ALERT_PARAMS = {
+  title: '',
+  message: '',
+  variant: DEFAULT_ALERT_VARIANT,
+  primaryButtonLink: '',
+  primaryButtonText: '',
+};
 
 export default {
   name: 'JiraConnectNewBranch',
@@ -24,11 +31,9 @@ export default {
       selectedSourceBranchName: null,
       branchName: '',
       createBranchLoading: false,
-      alertTitle: '',
-      alertMessage: '',
-      alertVariant: DEFAULT_ALERT_VARIANT,
-      alertPrimaryButtonLink: '',
-      alertPrimaryButtonText: '',
+      alertParams: {
+        ...DEFAULT_ALERT_PARAMS,
+      },
     };
   },
   computed: {
@@ -36,7 +41,7 @@ export default {
       return this.selectedProject?.id;
     },
     showAlert() {
-      return Boolean(this.alertMessage);
+      return Boolean(this.alertParams?.message);
     },
   },
   methods: {
@@ -47,18 +52,18 @@ export default {
       primaryButtonLink,
       primaryButtonText,
     } = {}) {
-      this.alertTitle = title;
-      this.alertMessage = message;
-      this.alertVariant = variant;
-      this.alertPrimaryButtonLink = primaryButtonLink;
-      this.alertPrimaryButtonText = primaryButtonText;
+      this.alertParams = {
+        title,
+        message,
+        variant,
+        primaryButtonLink,
+        primaryButtonText,
+      };
     },
     onAlertDismiss() {
-      this.alertTitle = '';
-      this.alertMessage = '';
-      this.alertVariant = DEFAULT_ALERT_VARIANT;
-      this.alertPrimaryButtonLink = '';
-      this.alertPrimaryButtonText = '';
+      this.alertParams = {
+        ...DEFAULT_ALERT_PARAMS,
+      };
     },
     async onProjectSelect(project) {
       this.selectedProject = project;
@@ -71,7 +76,6 @@ export default {
       this.displayAlert({
         message,
         title,
-        variant: 'danger',
       });
     },
     onSubmit() {
@@ -117,6 +121,7 @@ export default {
     },
   },
   i18n: {
+    pageTitle: __('New branch'),
     projectDropdownLabel: __('Project'),
     branchNameInputLabel: __('Branch name'),
     sourceBranchDropdownLabel: __('Source branch'),
@@ -127,35 +132,41 @@ export default {
 
 <template>
   <div>
+    <div class="gl-border-1 gl-border-b-solid gl-border-gray-100 gl-mb-5 gl-mt-7">
+      <h1 class="page-title">
+        {{ $options.i18n.pageTitle }}
+      </h1>
+    </div>
+
     <gl-alert
       v-if="showAlert"
       class="gl-mb-5"
-      :variant="alertVariant"
-      :title="alertTitle"
-      :primary-button-link="alertPrimaryButtonLink"
-      :primary-button-text="alertPrimaryButtonText"
+      :variant="alertParams.variant"
+      :title="alertParams.title"
+      :primary-button-link="alertParams.primaryButtonLink"
+      :primary-button-text="alertParams.primaryButtonText"
       @dismiss="onAlertDismiss"
     >
-      {{ alertMessage }}
+      {{ alertParams.message }}
     </gl-alert>
 
     <gl-form @submit.prevent="onSubmit">
       <gl-form-group :label="$options.i18n.projectDropdownLabel" label-for="project-select">
-        <input name="project_id" :value="selectedProjectId" type="hidden" />
         <project-dropdown
+          id="project-select"
           :selected-project="selectedProject"
           @change="onProjectSelect"
           @error="onError"
         />
       </gl-form-group>
 
-      <gl-form-group :label="$options.i18n.sourceBranchDropdownLabel">
-        <gl-form-input v-model="branchName" type="text" name="branch_name" required />
+      <gl-form-group :label="$options.i18n.sourceBranchDropdownLabel" label-for="branch-name-input">
+        <gl-form-input id="branch-name-input" v-model="branchName" type="text" required />
       </gl-form-group>
 
-      <gl-form-group :label="$options.i18n.branchNameInputLabel">
-        <input name="source_branch" :value="selectedSourceBranchName" type="hidden" />
+      <gl-form-group :label="$options.i18n.branchNameInputLabel" label-for="source-branch-select">
         <source-branch-dropdown
+          id="source-branch-select"
           :selected-project="selectedProject"
           :selected-branch-name="selectedSourceBranchName"
           @change="onSourceBranchSelect"
@@ -164,9 +175,9 @@ export default {
       </gl-form-group>
 
       <div class="form-actions">
-        <gl-button :loading="createBranchLoading" type="submit" variant="confirm">{{
-          $options.i18n.formSubmitButtonText
-        }}</gl-button>
+        <gl-button :loading="createBranchLoading" type="submit" variant="confirm">
+          {{ $options.i18n.formSubmitButtonText }}
+        </gl-button>
       </div>
     </gl-form>
   </div>

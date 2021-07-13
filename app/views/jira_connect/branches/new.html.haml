@@ -1,14 +1,4 @@
-- page_title _("New Branch")
-
-- if @error
-  .gl-alert.gl-alert-danger
-    = sprite_icon('error', size: 16, css_class: 'gl-icon gl-alert-icon gl-alert-icon-no-title')
-    %button.js-close.gl-alert-dismiss{ type: 'button', 'aria-label' => _('Dismiss') }
-      = sprite_icon('close', size: 16, css_class: 'gl-icon')
-    .gl-alert-body
-      = @error
-%h3.page-title
-  = _('New Branch')
-%hr
+- @hide_breadcrumbs = true
+- @hide_top_links = true
 
 .js-jira-connect-create-branch{ data: {  } }
