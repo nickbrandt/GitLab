@@ -3,31 +3,26 @@
 class CreateDastProfileSchedule < ActiveRecord::Migration[6.1]
   include Gitlab::Database::MigrationHelpers
 
-  DOWNTIME = false
-
-  disable_ddl_transaction!
+  INDEX_NAME = 'index_dast_profile_schedules_active_next_run_at'
 
   def up
-    with_lock_retries do
-      table_comment = {
-        owner: 'group::dynamic analysis', description: 'Scheduling for scans using DAST Profiles'
-      }
+    table_comment = {
+      owner: 'group::dynamic analysis', description: 'Scheduling for scans using DAST Profiles'
+    }
 
-      create_table_with_constraints :dast_profile_schedules, comment: table_comment.to_json do |t|
-        t.bigint :dast_profile_id, null: false
-        t.bigint :user_id, null: false
-        t.bigint :project_id, null: false
-        t.boolean :active, default: true
-        t.datetime_with_timezone :next_run_at, null: false
-        t.timestamps_with_timezone null: false
+    create_table_with_constraints :dast_profile_schedules, comment: table_comment.to_json do |t|
+      t.boolean :active, default: true
+      t.references :dast_profile, null: false, foreign_key: { on_delete: :cascade }
+      t.references :user, null: false, foreign_key: { on_delete: :cascade }
+      t.references :project, null: false, foreign_key: { on_delete: :cascade }
 
-        t.index :dast_profile_id
-        t.index :user_id
-        t.index :project_id
+      t.datetime_with_timezone :next_run_at, null: false
+      t.timestamps_with_timezone null: false
 
-        t.text :cron, null: false
-        t.text_limit :cron, 255
-      end
+      t.text :cron, null: false
+      t.text_limit :cron, 255
+
+      t.index %i[active next_run_at], name: INDEX_NAME
     end
   end
 
