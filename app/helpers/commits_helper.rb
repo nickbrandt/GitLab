@@ -91,17 +91,6 @@ module CommitsHelper
     end.join(' ').html_safe
   end
 
-  # Returns a path to the Atom feed for a given path's commits
-  def project_commits_atom_path(project, ref)
-    return unless current_controller?(:commits)
-
-    if @path.blank?
-      project_commits_path(project, ref, rss_url_options)
-    else
-      project_commits_path(project, tree_join(ref, @path), rss_url_options)
-    end
-  end
-
   def link_to_browse_code(project, commit)
     return unless current_controller?(:commits)
 
