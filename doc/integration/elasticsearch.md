@@ -26,7 +26,8 @@ and the advantage of the [special searches](../user/search/advanced_search.md).
 | GitLab Enterprise Edition 9.0 through 11.4  | Elasticsearch 5.1 through 5.5 |
 | GitLab Enterprise Edition 8.4 through 8.17  | Elasticsearch 2.4 with [Delete By Query Plugin](https://www.elastic.co/guide/en/elasticsearch/plugins/2.4/plugins-delete-by-query.html) installed |
 
-We maintain the support to the most two recent Elasticsearch major releases. We normally remove the support of the oldest major Elasticsearch version after a new major version is released. We may also remove the support of minor versions when newer minor versions of supported major versions are released. Before we remove the support of an Elasticsearch version, we announce it via [a deprecation release note](https://about.gitlab.com/handbook/marketing/blog/release-posts/#deprecations) in a release prior to the actual removal.
+The Elasticsearch Integration is designed to work with currently supported versions of Elasticsearch and follows the Elasticsearches [End of Life Policy](https://www.elastic.co/support/eol).  
+Elasticsearch version support changes will be announced in [a deprecation release note](https://about.gitlab.com/handbook/marketing/blog/release-posts/#deprecations), before the actual removal.
 
 ## System requirements
 
