@@ -306,7 +306,7 @@ module EE
       trial_active? && !trial_extended_or_reactivated?
     end
 
-    def can_reactivate?
+    def can_reactivate_trial?
       !trial_active? && !never_had_trial? && !trial_extended_or_reactivated? && free_plan?
     end
 
