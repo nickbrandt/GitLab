@@ -47,7 +47,7 @@ export default {
         this.initialProjectsLoading = false;
       },
       error() {
-        this.onError({ message: __('Failed to load projects.') });
+        this.onError({ message: __('Failed to load projects') });
       },
     },
   },
