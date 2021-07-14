@@ -19176,6 +19176,9 @@ msgstr ""
 msgid "Last item before this page loaded in your browser:"
 msgstr ""
 
+msgid "Last modified"
+msgstr ""
+
 msgid "Last month"
 msgstr ""
 
@@ -21752,13 +21755,7 @@ msgstr ""
 msgid "NetworkPolicies|Kubernetes error: %{error}"
 msgstr ""
 
-msgid "NetworkPolicies|Last modified"
-msgstr ""
-
 msgid "NetworkPolicies|Name"
-msgstr ""
-
-msgid "NetworkPolicies|Namespace"
 msgstr ""
 
 msgid "NetworkPolicies|Network"
@@ -29114,6 +29111,9 @@ msgstr ""
 msgid "SecurityOrchestration|Security policy project"
 msgstr ""
 
+msgid "SecurityPolicies|+%{count} more"
+msgstr ""
+
 msgid "SecurityPolicies|All policies"
 msgstr ""
 
@@ -29121,6 +29121,9 @@ msgid "SecurityPolicies|Description"
 msgstr ""
 
 msgid "SecurityPolicies|Enforcement status"
+msgstr ""
+
+msgid "SecurityPolicies|Environment(s)"
 msgstr ""
 
 msgid "SecurityPolicies|Latest scan"
