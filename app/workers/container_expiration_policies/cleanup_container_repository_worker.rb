@@ -61,16 +61,23 @@ module ContainerExpirationPolicies
     def container_repository
       strong_memoize(:container_repository) do
         ContainerRepository.transaction do
-          # We need a lock to prevent two workers from picking up the same row
-          container_repository = next_container_repository
+          repository = next_container_repository
 
-          container_repository&.tap(&:cleanup_ongoing!)
+          if repository
+            log_info(
+              project_id: repository.project_id,
+              container_repository_id: repository.id
+            )
+          end
+
+          repository&.tap(&:cleanup_ongoing!)
         end
       end
     end
 
     def next_container_repository
       # rubocop: disable CodeReuse/ActiveRecord
+      # We need a lock to prevent two workers from picking up the same row
       next_one_requiring = ContainerRepository.requiring_cleanup
                                               .order(:expiration_policy_cleanup_status, :expiration_policy_started_at)
                                               .limit(1)
