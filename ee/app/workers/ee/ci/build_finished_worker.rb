@@ -12,6 +12,10 @@ module EE
           RequirementsManagement::ProcessRequirementsReportsWorker.perform_async(build.id)
         end
 
+        if ::Gitlab.com? && build.has_security_reports?
+          ::Security::TrackSecureScansWorker.perform_async(build.id)
+        end
+
         super
       end
     end

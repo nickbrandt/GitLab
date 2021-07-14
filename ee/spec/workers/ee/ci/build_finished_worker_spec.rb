@@ -4,7 +4,7 @@ require 'spec_helper'
 
 RSpec.describe Ci::BuildFinishedWorker do
   let(:ci_runner) { create(:ci_runner) }
-  let(:build) { create(:ee_ci_build, :success, runner: ci_runner) }
+  let(:build) { create(:ee_ci_build, :sast, :success, runner: ci_runner) }
   let(:project) { build.project }
   let(:namespace) { project.shared_runners_limit_namespace }
 
@@ -49,6 +49,22 @@ RSpec.describe Ci::BuildFinishedWorker do
           subject
         end
       end
+
+      it 'tracks secure scans' do
+        expect(::Security::TrackSecureScansWorker).to receive(:perform_async)
+
+        subject
+      end
+
+      context 'when build does not have a security report' do
+        let(:build) { create(:ee_ci_build, :success, runner: ci_runner) }
+
+        it 'does not track secure scans' do
+          expect(::Security::TrackSecureScansWorker).not_to receive(:perform_async)
+
+          subject
+        end
+      end
     end
 
     context 'when not on .com' do
@@ -58,6 +74,12 @@ RSpec.describe Ci::BuildFinishedWorker do
 
       it 'does not notify the owners of Groups' do
         expect(::Ci::Minutes::EmailNotificationService).not_to receive(:new)
+
+        subject
+      end
+
+      it 'does not track secure scans' do
+        expect(::Security::TrackSecureScansWorker).not_to receive(:perform_async)
 
         subject
       end
