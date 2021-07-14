@@ -93,14 +93,13 @@ class Projects::JobsController < Projects::ApplicationController
   end
 
   def cancel
-    return respond_422 unless @build.cancelable?
+    service_response = Ci::BuildCancelService.new(@build).execute
 
-    @build.cancel
-
-    if continue_params[:to]
-      redirect_to continue_params[:to]
+    if service_response.success?
+      destination = continue_params[:to].presence || builds_project_pipeline_path(@project, @build.pipeline.id)
+      redirect_to destination
     else
-      redirect_to builds_project_pipeline_path(@project, @build.pipeline.id)
+      head service_response.http_status
     end
   end
 
