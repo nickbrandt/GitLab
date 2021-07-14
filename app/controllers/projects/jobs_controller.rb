@@ -104,10 +104,13 @@ class Projects::JobsController < Projects::ApplicationController
   end
 
   def unschedule
-    return respond_422 unless @build.scheduled?
+    service_response = Ci::BuildUnscheduleService.new(@build).execute
 
-    @build.unschedule!
-    redirect_to build_path(@build)
+    if service_response.success?
+      redirect_to build_path(@build)
+    else
+      head service_response.http_status
+    end
   end
 
   def status
