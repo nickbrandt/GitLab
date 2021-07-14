@@ -157,6 +157,60 @@ Example response:
 ]
 ```
 
+## List only owned namespaces
+
+Get a list of owned namespaces only.
+
+```plaintext
+GET /namespaces?owned_only=true
+```
+
+| Attribute | Type   | Required | Description |
+| --------- | ------ | -------- | ----------- |
+| `owned_only` | boolean | no | Returns a list of owned namespaces only |
+
+Example request:
+
+```shell
+curl --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/namespaces?owned_only=true"
+```
+
+Example response:
+
+```json
+[
+  {
+    "id": 1,
+    "name": "user1",
+    "path": "user1",
+    "kind": "user",
+    "full_path": "user1",
+    "parent_id": null,
+    "avatar_url": "https://secure.gravatar.com/avatar/e64c7d89f26bd1972efa854d13d7dd61?s=80&d=identicon",
+    "web_url": "https://gitlab.example.com/user1",
+    "billable_members_count": 1,
+    "plan": "default",
+    "trial_ends_on": null,
+    "trial": false
+  },
+  {
+    "id": 3,
+    "name": "bar",
+    "path": "bar",
+    "kind": "group",
+    "full_path": "foo/bar",
+    "parent_id": 9,
+    "avatar_url": null,
+    "web_url": "https://gitlab.example.com/groups/foo/bar",
+    "members_count_with_descendants": 5,
+    "billable_members_count": 5,
+    "plan": "default",
+    "trial_ends_on": null,
+    "trial": false
+  }
+]
+```
+
 ## Get namespace by ID
 
 Get a namespace by ID.
