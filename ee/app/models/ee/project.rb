@@ -114,14 +114,6 @@ module EE
       elastic_index_dependant_association :merge_requests, on_change: :visibility_level
       elastic_index_dependant_association :notes, on_change: :visibility_level
 
-      scope :with_shared_runners_limit_enabled, -> do
-        if ::Ci::Runner.has_shared_runners_with_non_zero_public_cost?
-          with_shared_runners
-        else
-          with_shared_runners.non_public_only
-        end
-      end
-
       scope :mirror, -> { where(mirror: true) }
 
       scope :mirrors_to_sync, ->(freeze_at, limit: nil) do
