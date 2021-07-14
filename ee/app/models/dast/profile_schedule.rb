@@ -7,7 +7,7 @@ class Dast::ProfileSchedule < ApplicationRecord
 
   belongs_to :project
   belongs_to :dast_profile, class_name: 'Dast::Profile', optional: false, inverse_of: :dast_profile_schedules
-  belongs_to :owner, class_name: 'User', foreign_key: :user_id
+  belongs_to :owner, class_name: 'User', optional: true, foreign_key: :user_id
 
   validates :cron, presence: true
   validates :next_run_at, presence: true

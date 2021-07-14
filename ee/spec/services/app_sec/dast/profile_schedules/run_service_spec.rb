@@ -15,6 +15,7 @@ RSpec.describe AppSec::Dast::ProfileSchedules::RunService do
       .and_return(create_service)
     allow(create_service).to receive(:execute)
       .and_return(service_result)
+    allow(Ability).to receive(:allowed?).and_return(true)
   end
 
   describe '#perform' do
@@ -56,8 +57,10 @@ RSpec.describe AppSec::Dast::ProfileSchedules::RunService do
     end
 
     context 'when schedule exists' do
+      let(:permission_error) { 'Insufficient Permissions' }
+
       before do
-        schedule.update_column(:next_run_at, 1.minute.ago)
+        schedule.update_column(:next_run_at, 10.minutes.ago)
       end
 
       it 'executes the rule schedule service' do
@@ -69,11 +72,45 @@ RSpec.describe AppSec::Dast::ProfileSchedules::RunService do
 
         subject
       end
+
+      context 'with deactivated owner' do
+        before do
+          allow(Ability).to receive(:allowed?).and_call_original
+          schedule.owner.deactivate!
+          schedule.update_column(:next_run_at, 10.minutes.ago)
+        end
+
+        it 'logs the error' do
+          expect(schedule.owner.deactivated?).to be true
+
+          expect(Gitlab::AppLogger)
+            .to receive(:info)
+            .with(message: permission_error, schedule_id: schedule.id)
+
+          subject
+        end
+      end
+
+      context 'with no owner' do
+        before do
+          allow(Ability).to receive(:allowed?).and_call_original
+          schedule.update_columns(user_id: nil, next_run_at: 10.minutes.ago)
+        end
+
+        it 'logs the error' do
+          expect(schedule.owner).to be nil
+          expect(Gitlab::AppLogger)
+            .to receive(:info)
+            .with(message: permission_error, schedule_id: schedule.id)
+
+          subject
+        end
+      end
     end
 
     context 'when create_service returns an error' do
       before do
-        schedule.update_column(:next_run_at, 1.minute.ago)
+        schedule.update_column(:next_run_at, 10.minutes.ago)
       end
 
       let(:error_message) { 'some message' }

@@ -12007,7 +12007,7 @@ CREATE TABLE dast_profile_schedules (
     id bigint NOT NULL,
     active boolean DEFAULT true NOT NULL,
     dast_profile_id bigint NOT NULL,
-    user_id bigint NOT NULL,
+    user_id bigint,
     project_id bigint NOT NULL,
     next_run_at timestamp with time zone NOT NULL,
     created_at timestamp with time zone NOT NULL,
@@ -27604,7 +27604,7 @@ ALTER TABLE ONLY bulk_import_trackers
     ADD CONSTRAINT fk_rails_aed566d3f3 FOREIGN KEY (bulk_import_entity_id) REFERENCES bulk_import_entities(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY dast_profile_schedules
-    ADD CONSTRAINT fk_rails_aef03d62e5 FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;
+    ADD CONSTRAINT fk_rails_aef03d62e5 FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL;
 
 ALTER TABLE ONLY pool_repositories
     ADD CONSTRAINT fk_rails_af3f8c5d62 FOREIGN KEY (shard_id) REFERENCES shards(id) ON DELETE RESTRICT;

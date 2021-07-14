@@ -13,7 +13,7 @@ class CreateDastProfileSchedule < ActiveRecord::Migration[6.1]
     create_table_with_constraints :dast_profile_schedules, comment: table_comment.to_json do |t|
       t.boolean :active, default: true, null: false
       t.references :dast_profile, null: false, foreign_key: { on_delete: :cascade }
-      t.references :user, null: false, foreign_key: { on_delete: :cascade }
+      t.references :user, foreign_key: { on_delete: :nullify }
       t.references :project, null: false, foreign_key: { on_delete: :cascade }
 
       t.datetime_with_timezone :next_run_at, null: false

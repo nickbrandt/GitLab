@@ -10,15 +10,17 @@ module AppSec
           dast_runnable_schedules.find_in_batches do |schedules|
             schedules.each do |schedule|
               Gitlab::ApplicationContext.with_context(project: schedule.project, user: schedule.owner) do
+                unless allowed?(schedule)
+                  log("Insufficient Permissions", schedule)
+                  next
+                end
+
                 schedule.schedule_next_run!
 
                 response = service(schedule).execute
 
                 if response.error?
-                  Gitlab::AppLogger.info(
-                    message: response.message,
-                    schedule_id: schedule.id
-                  )
+                  log(response.message, schedule)
                 end
               end
             end
@@ -39,6 +41,17 @@ module AppSec
               dast_site_profile: schedule.dast_profile.dast_site_profile,
               dast_scanner_profile: schedule.dast_profile.dast_scanner_profile
             }
+          )
+        end
+
+        def allowed?(schedule)
+          Ability.allowed?(schedule.owner, :create_on_demand_dast_scan, schedule.project)
+        end
+
+        def log(msg, schedule)
+          Gitlab::AppLogger.info(
+            message: msg,
+            schedule_id: schedule.id
           )
         end
       end
