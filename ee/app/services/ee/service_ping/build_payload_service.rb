@@ -16,7 +16,7 @@ module EE
 
       override :product_intelligence_enabled?
       def product_intelligence_enabled?
-        ::License.current&.usage_ping? || super
+        ::License.current&.customer_service_enabled? || super
       end
 
       def filtered_usage_data(payload = raw_payload, parents = [])

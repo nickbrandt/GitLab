@@ -1557,8 +1557,8 @@ RSpec.describe License do
     end
   end
 
-  describe '#usage_ping?' do
-    subject { license.usage_ping? }
+  describe '#customer_service_enabled?' do
+    subject { license.customer_service_enabled? }
 
     context 'when no license provided' do
       before do

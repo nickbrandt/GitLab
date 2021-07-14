@@ -578,7 +578,7 @@ class License < ApplicationRecord
     !!license&.cloud_licensing?
   end
 
-  def usage_ping?
+  def customer_service_enabled?
     !!license&.usage_ping_required_metrics?
   end
 
