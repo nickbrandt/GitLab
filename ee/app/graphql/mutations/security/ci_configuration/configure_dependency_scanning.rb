@@ -3,9 +3,7 @@
 module Mutations
   module Security
     module CiConfiguration
-      class ConfigureDependencyScanning < ConfigureSecurityAnalyzer
-        include FindsProject
-
+      class ConfigureDependencyScanning < BaseSecurityAnalyzer
         graphql_name 'ConfigureDependencyScanning'
         description <<~DESC
           Configure Dependency Scanning for a project by enabling Dependency Scanning in a new or modified
@@ -13,7 +11,7 @@ module Mutations
           create a Merge Request are a part of the response.
         DESC
 
-        def resolve(project_path:)
+        def resolve(project_path:, configuration: nil)
           super do |project|
             ::Security::CiConfiguration::DependencyScanningCreateService.new(project, current_user).execute
           end

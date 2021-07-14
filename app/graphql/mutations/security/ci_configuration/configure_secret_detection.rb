@@ -3,9 +3,7 @@
 module Mutations
   module Security
     module CiConfiguration
-      class ConfigureSecretDetection < ConfigureSecurityAnalyzer
-        include FindsProject
-
+      class ConfigureSecretDetection < BaseSecurityAnalyzer
         graphql_name 'ConfigureSecretDetection'
         description <<~DESC
           Configure Secret Detection for a project by enabling Secret Detection
@@ -14,7 +12,7 @@ module Mutations
           response.
         DESC
 
-        def resolve(project_path:)
+        def resolve(project_path:, configuration: nil)
           super do |project|
             ::Security::CiConfiguration::SecretDetectionCreateService.new(project, current_user).execute
           end

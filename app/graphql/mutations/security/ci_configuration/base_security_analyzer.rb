@@ -3,7 +3,9 @@
 module Mutations
   module Security
     module CiConfiguration
-      class ConfigureSecurityAnalyzer < BaseMutation
+      class BaseSecurityAnalyzer < BaseMutation
+        include FindsProject
+
         argument :project_path, GraphQL::ID_TYPE,
                  required: true,
                  description: 'Full path of the project.'
@@ -16,7 +18,7 @@ module Mutations
 
         authorize :push_code
 
-        def resolve(project_path:)
+        def resolve(project_path:, configuration: nil)
           project = authorized_find!(project_path)
 
           result = yield(project)
