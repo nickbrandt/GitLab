@@ -20,6 +20,9 @@ module Types
       argument :assignee_id, GraphQL::STRING_TYPE,
                 required: false,
                 description: 'ID of a user not assigned to the issues.'
+      argument :milestone_timebox, ::Types::NegatedMilestoneTimeboxEnum,
+                required: false,
+                description: 'Filter by negated milestone timebox values.'
     end
   end
 end

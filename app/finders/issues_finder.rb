@@ -11,7 +11,8 @@
 #     state: 'opened' or 'closed' or 'all'
 #     group_id: integer
 #     project_id: integer
-#     milestone_title: string
+#     milestone_title: string (cannot be simultaenously used with milestone_timebox)
+#     milestone_timebox: 'none', 'any', 'upcoming', 'started' (cannot be simultaenously used with milestone_title)
 #     assignee_id: integer
 #     search: string
 #     in: 'title', 'description', or a string joining them with comma

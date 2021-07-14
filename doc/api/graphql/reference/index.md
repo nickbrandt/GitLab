@@ -9500,6 +9500,7 @@ four standard [pagination arguments](#connection-pagination-arguments):
 | <a id="groupissuesiterationid"></a>`iterationId` | [`[ID]`](#id) | List of iteration Global IDs applied to the issue. |
 | <a id="groupissuesiterationwildcardid"></a>`iterationWildcardId` | [`IterationWildcardId`](#iterationwildcardid) | Filter by iteration ID wildcard. |
 | <a id="groupissueslabelname"></a>`labelName` | [`[String]`](#string) | Labels applied to this issue. |
+| <a id="groupissuesmilestonetimebox"></a>`milestoneTimebox` | [`MilestoneTimebox`](#milestonetimebox) | Filter issues by milestone timebox values. |
 | <a id="groupissuesmilestonetitle"></a>`milestoneTitle` | [`[String]`](#string) | Milestone applied to this issue. |
 | <a id="groupissuesnot"></a>`not` | [`NegatedIssueFilterInput`](#negatedissuefilterinput) | Negated arguments. |
 | <a id="groupissuessearch"></a>`search` | [`String`](#string) | Search query for issue title or description. |
@@ -11739,6 +11740,7 @@ Returns [`Issue`](#issue).
 | <a id="projectissueiterationid"></a>`iterationId` | [`[ID]`](#id) | List of iteration Global IDs applied to the issue. |
 | <a id="projectissueiterationwildcardid"></a>`iterationWildcardId` | [`IterationWildcardId`](#iterationwildcardid) | Filter by iteration ID wildcard. |
 | <a id="projectissuelabelname"></a>`labelName` | [`[String]`](#string) | Labels applied to this issue. |
+| <a id="projectissuemilestonetimebox"></a>`milestoneTimebox` | [`MilestoneTimebox`](#milestonetimebox) | Filter issues by milestone timebox values. |
 | <a id="projectissuemilestonetitle"></a>`milestoneTitle` | [`[String]`](#string) | Milestone applied to this issue. |
 | <a id="projectissuenot"></a>`not` | [`NegatedIssueFilterInput`](#negatedissuefilterinput) | Negated arguments. |
 | <a id="projectissuesearch"></a>`search` | [`String`](#string) | Search query for issue title or description. |
@@ -11770,6 +11772,7 @@ Returns [`IssueStatusCountsType`](#issuestatuscountstype).
 | <a id="projectissuestatuscountsiid"></a>`iid` | [`String`](#string) | IID of the issue. For example, "1". |
 | <a id="projectissuestatuscountsiids"></a>`iids` | [`[String!]`](#string) | List of IIDs of issues. For example, `["1", "2"]`. |
 | <a id="projectissuestatuscountslabelname"></a>`labelName` | [`[String]`](#string) | Labels applied to this issue. |
+| <a id="projectissuestatuscountsmilestonetimebox"></a>`milestoneTimebox` | [`MilestoneTimebox`](#milestonetimebox) | Filter issues by milestone timebox values. |
 | <a id="projectissuestatuscountsmilestonetitle"></a>`milestoneTitle` | [`[String]`](#string) | Milestone applied to this issue. |
 | <a id="projectissuestatuscountsnot"></a>`not` | [`NegatedIssueFilterInput`](#negatedissuefilterinput) | Negated arguments. |
 | <a id="projectissuestatuscountssearch"></a>`search` | [`String`](#string) | Search query for issue title or description. |
@@ -11805,6 +11808,7 @@ four standard [pagination arguments](#connection-pagination-arguments):
 | <a id="projectissuesiterationid"></a>`iterationId` | [`[ID]`](#id) | List of iteration Global IDs applied to the issue. |
 | <a id="projectissuesiterationwildcardid"></a>`iterationWildcardId` | [`IterationWildcardId`](#iterationwildcardid) | Filter by iteration ID wildcard. |
 | <a id="projectissueslabelname"></a>`labelName` | [`[String]`](#string) | Labels applied to this issue. |
+| <a id="projectissuesmilestonetimebox"></a>`milestoneTimebox` | [`MilestoneTimebox`](#milestonetimebox) | Filter issues by milestone timebox values. |
 | <a id="projectissuesmilestonetitle"></a>`milestoneTitle` | [`[String]`](#string) | Milestone applied to this issue. |
 | <a id="projectissuesnot"></a>`not` | [`NegatedIssueFilterInput`](#negatedissuefilterinput) | Negated arguments. |
 | <a id="projectissuessearch"></a>`search` | [`String`](#string) | Search query for issue title or description. |
@@ -14881,6 +14885,17 @@ Current state of milestone.
 | <a id="milestonestateenumactive"></a>`active` | Milestone is currently active. |
 | <a id="milestonestateenumclosed"></a>`closed` | Milestone is closed. |
 
+### `MilestoneTimebox`
+
+Milestone timebox values.
+
+| Value | Description |
+| ----- | ----------- |
+| <a id="milestonetimeboxany"></a>`ANY` | An milestone is assigned. |
+| <a id="milestonetimeboxnone"></a>`NONE` | No milestone is assigned. |
+| <a id="milestonetimeboxstarted"></a>`STARTED` | An open, started milestone (start date <= today). |
+| <a id="milestonetimeboxupcoming"></a>`UPCOMING` | An open milestone due in the future (due date >= today). |
+
 ### `MoveType`
 
 The position to which the adjacent object should be moved.
@@ -14916,6 +14931,15 @@ Negated Iteration ID wildcard values.
 | Value | Description |
 | ----- | ----------- |
 | <a id="negatediterationwildcardidcurrent"></a>`CURRENT` | Current iteration. |
+
+### `NegatedMilestoneTimebox`
+
+Negated Milestone timebox values.
+
+| Value | Description |
+| ----- | ----------- |
+| <a id="negatedmilestonetimeboxstarted"></a>`STARTED` | An open, started milestone (start date <= today). |
+| <a id="negatedmilestonetimeboxupcoming"></a>`UPCOMING` | An open milestone due in the future (due date >= today). |
 
 ### `NetworkPolicyKind`
 
@@ -16606,6 +16630,7 @@ Represents an escalation rule.
 | <a id="negatedissuefilterinputiterationid"></a>`iterationId` | [`[ID!]`](#id) | List of iteration Global IDs not applied to the issue. |
 | <a id="negatedissuefilterinputiterationwildcardid"></a>`iterationWildcardId` | [`IterationWildcardId`](#iterationwildcardid) | Filter by negated iteration ID wildcard. |
 | <a id="negatedissuefilterinputlabelname"></a>`labelName` | [`[String!]`](#string) | Labels not applied to this issue. |
+| <a id="negatedissuefilterinputmilestonetimebox"></a>`milestoneTimebox` | [`NegatedMilestoneTimebox`](#negatedmilestonetimebox) | Filter by negated milestone timebox values. |
 | <a id="negatedissuefilterinputmilestonetitle"></a>`milestoneTitle` | [`[String!]`](#string) | Milestone not applied to this issue. |
 | <a id="negatedissuefilterinputweight"></a>`weight` | [`String`](#string) | Weight not applied to the issue. |
 

@@ -15,7 +15,8 @@
 #     state: 'opened' or 'closed' or 'locked' or 'all'
 #     group_id: integer
 #     project_id: integer
-#     milestone_title: string
+#     milestone_title: string (cannot be simultaenously used with milestone_timebox)
+#     milestone_timebox: 'none', 'any', 'upcoming', 'started' (cannot be simultaenously used with milestone_title)
 #     release_tag: string
 #     author_id: integer
 #     author_username: string
