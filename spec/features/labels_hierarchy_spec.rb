@@ -357,7 +357,7 @@ RSpec.describe 'Labels Hierarchy', :js do
         wait_for_requests
       end
 
-      context 'when graphql_board_lists FF enable' do
+      context 'when graphql_board_lists FF enabled' do
         it 'creates lists from all ancestor group labels' do
           [grandparent_group_label, parent_group_label].each do |label|
             find('a', text: label.title).click
