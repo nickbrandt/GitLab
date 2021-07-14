@@ -1569,13 +1569,13 @@ RSpec.describe License do
     end
 
     context 'when the license has usage ping required metrics disabled' do
-      let(:gl_license) { build(:gitlab_license, usage_ping_required_metrics_enabled: false) }
+      let(:gl_license) { build(:gitlab_license, operational_metrics_enabled: false) }
 
       it { is_expected.to be false }
     end
 
     context 'when the license has usage ping required metrics enabled' do
-      let(:gl_license) { build(:gitlab_license, usage_ping_required_metrics_enabled: true) }
+      let(:gl_license) { build(:gitlab_license, operational_metrics_enabled: true) }
 
       it { is_expected.to be true }
     end
