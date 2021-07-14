@@ -579,7 +579,7 @@ class License < ApplicationRecord
   end
 
   def customer_service_enabled?
-    !!license&.usage_ping_required_metrics?
+    !!license&.operational_metrics?
   end
 
   def license_type
