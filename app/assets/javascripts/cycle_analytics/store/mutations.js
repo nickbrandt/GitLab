@@ -61,9 +61,15 @@ export default {
   [types.REQUEST_CYCLE_ANALYTICS_DATA](state) {
     state.isLoading = true;
     state.hasError = false;
+    if (!state.features.cycleAnalyticsForGroups) {
+      state.medians = {};
+    }
   },
   [types.RECEIVE_CYCLE_ANALYTICS_DATA_SUCCESS](state, data) {
-    const { summary } = decorateData(data);
+    const { summary, medians } = decorateData(data);
+    if (!state.features.cycleAnalyticsForGroups) {
+      state.medians = formatMedianValues(medians);
+    }
     state.permissions = data.permissions;
     state.summary = summary;
     state.hasError = false;
@@ -71,6 +77,9 @@ export default {
   [types.RECEIVE_CYCLE_ANALYTICS_DATA_ERROR](state) {
     state.isLoading = false;
     state.hasError = true;
+    if (!state.features.cycleAnalyticsForGroups) {
+      state.medians = {};
+    }
   },
   [types.REQUEST_STAGE_DATA](state) {
     state.isLoadingStage = true;

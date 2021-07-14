@@ -19,12 +19,15 @@ let state;
 const mockRequestPath = 'fake/request/path';
 const mockCreatedAfter = '2020-06-18';
 const mockCreatedBefore = '2020-07-18';
+const features = {
+  cycleAnalyticsForGroups: true,
+};
 
 describe('Project Value Stream Analytics mutations', () => {
   useFakeDate(2020, 6, 18);
 
   beforeEach(() => {
-    state = {};
+    state = { features };
   });
 
   afterEach(() => {
@@ -96,6 +99,37 @@ describe('Project Value Stream Analytics mutations', () => {
       ${types.RECEIVE_STAGE_DATA_SUCCESS} | ${{ events: [] }}        | ${'isEmptyStage'}        | ${true}
       ${types.RECEIVE_STAGE_DATA_SUCCESS} | ${{ events: rawEvents }} | ${'selectedStageEvents'} | ${convertedEvents}
       ${types.RECEIVE_STAGE_DATA_SUCCESS} | ${{ events: rawEvents }} | ${'isEmptyStage'}        | ${false}
+    `(
+      '$mutation with $payload will set $stateKey to $value',
+      ({ mutation, payload, stateKey, value }) => {
+        mutations[mutation](state, payload);
+
+        expect(state).toMatchObject({ [stateKey]: value });
+      },
+    );
+  });
+
+  describe('with cycleAnalyticsForGroups=false', () => {
+    useFakeDate(2020, 6, 18);
+
+    beforeEach(() => {
+      state = { features: { cycleAnalyticsForGroups: false } };
+    });
+
+    const formattedMedians = {
+      code: '2d',
+      issue: '-',
+      plan: '21h',
+      review: '-',
+      staging: '2d',
+      test: '4h',
+    };
+
+    it.each`
+      mutation                                      | payload    | stateKey     | value
+      ${types.RECEIVE_CYCLE_ANALYTICS_DATA_SUCCESS} | ${rawData} | ${'medians'} | ${formattedMedians}
+      ${types.REQUEST_CYCLE_ANALYTICS_DATA}         | ${{}}      | ${'medians'} | ${{}}
+      ${types.RECEIVE_CYCLE_ANALYTICS_DATA_ERROR}   | ${{}}      | ${'medians'} | ${{}}
     `(
       '$mutation with $payload will set $stateKey to $value',
       ({ mutation, payload, stateKey, value }) => {
