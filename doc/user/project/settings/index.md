@@ -409,7 +409,8 @@ To immediately delete a project marked for deletion:
 1. In the "Permanently delete project" section, select **Delete project**.
 1. Confirm the action when asked to.
 
-Your project, its repository and all related resources, including issues and merge requests are deleted.
+Your project, its repository, and all related resources, including issues and merge requests,
+are deleted.
 
 #### Restore a project **(PREMIUM)**
 
