@@ -1672,9 +1672,6 @@ msgstr ""
 msgid "About GitLab"
 msgstr ""
 
-msgid "About GitLab CE"
-msgstr ""
-
 msgid "About auto deploy"
 msgstr ""
 
@@ -9249,9 +9246,6 @@ msgstr ""
 msgid "Create and provide your GitHub %{link_start}Personal Access Token%{link_end}. You will need to select the %{code_open}repo%{code_close} scope, so we can display a list of your public and private repositories which are available to import."
 msgstr ""
 
-msgid "Create blank project"
-msgstr ""
-
 msgid "Create branch"
 msgstr ""
 
@@ -9277,9 +9271,6 @@ msgid "Create file"
 msgstr ""
 
 msgid "Create from"
-msgstr ""
-
-msgid "Create from template"
 msgstr ""
 
 msgid "Create group"
@@ -9983,9 +9974,6 @@ msgid "DashboardProjects|Personal"
 msgstr ""
 
 msgid "DashboardProjects|Trending"
-msgstr ""
-
-msgid "Dashboards"
 msgstr ""
 
 msgid "Dashboard|%{firstProject} and %{secondProject}"
@@ -16626,9 +16614,6 @@ msgstr ""
 msgid "Import from Jira"
 msgstr ""
 
-msgid "Import group"
-msgstr ""
-
 msgid "Import group from file"
 msgstr ""
 
@@ -21418,9 +21403,6 @@ msgid "Month"
 msgstr ""
 
 msgid "Months"
-msgstr ""
-
-msgid "More"
 msgstr ""
 
 msgid "More Information"
