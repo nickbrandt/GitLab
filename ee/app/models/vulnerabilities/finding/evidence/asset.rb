@@ -19,6 +19,12 @@ module Vulnerabilities
         validates :url, length: { maximum: 2048 }
 
         validate :any_field_present
+        
+        private
+
+        def one_of_required_fields
+          [:type, :name, :url]
+        end
       end
     end
   end

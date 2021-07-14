@@ -15,10 +15,11 @@ module AnyFieldValidation
   def any_field_present
     return unless one_of_required_fields.all? { |field| self[field].blank? }
 
-    errors.add(model_name.param_key.to_sym, _('At least one field must be present'))
+    errors.add(:base, _("At least one field of %{one_of_required_fields} must be present") %
+      { one_of_required_fields: one_of_required_fields })
   end
 
   def one_of_required_fields
-    self.class.column_names
+    raise NotImplementedError
   end
 end

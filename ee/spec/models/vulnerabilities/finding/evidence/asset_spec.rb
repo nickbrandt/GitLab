@@ -13,7 +13,7 @@ RSpec.describe Vulnerabilities::Finding::Evidence::Asset do
     let_it_be(:evidence) { build(:vulnerabilties_finding_evidence) }
     let_it_be(:asset) { Vulnerabilities::Finding::Evidence::Asset.new(evidence: evidence) }
 
-    it 'is invalid if there is no request or response' do
+    it 'is invalid if there are no fields present' do
       expect(asset).not_to be_valid
     end
 
