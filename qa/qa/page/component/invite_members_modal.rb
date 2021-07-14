@@ -15,12 +15,12 @@ module QA
             element :invite_members_modal_content
           end
 
-          base.view 'app/assets/javascripts/invite_members/components/members_token_select.vue' do
-            element :members_token_select_input
-          end
-
           base.view 'app/assets/javascripts/invite_members/components/group_select.vue' do
             element :group_select_dropdown_search_field
+          end
+
+          base.view 'app/assets/javascripts/invite_members/components/members_token_select.vue' do
+            element :members_token_select_input
           end
 
           base.view 'app/assets/javascripts/invite_members/components/invite_group_trigger.vue' do
